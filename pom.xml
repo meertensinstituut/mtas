@@ -23,8 +23,12 @@
 	<developers>
 		<developer>
 			<name>Matthijs Brouwer</name>
-			<url>http://matthijsbrouwer.github.io/</url>
+			<url>https://www.meertens.knaw.nl/cms/nl/medewerkers/144373-matthijsb</url>
 		</developer>
+		<developer>
+      <name>Marc Kemps-Snijders</name>
+      <url>https://www.meertens.knaw.nl/cms/nl/medewerkers/143329-marck</url>
+    </developer>
 	</developers>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
