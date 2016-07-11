@@ -1,0 +1,846 @@
+options
+{
+  STATIC = false;
+  UNICODE_INPUT = true;
+  JAVA_UNICODE_ESCAPE = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+
+  LOOKAHEAD= 1000;
+}
+
+PARSER_BEGIN(MtasCQLParser)
+package mtas.parser.cql;
+import mtas.analysis.token.MtasToken;
+import mtas.parser.cql.util.MtasCQLParserGroupCondition;
+import mtas.parser.cql.util.MtasCQLParserGroupFullCondition;
+import mtas.parser.cql.util.MtasCQLParserWordCondition;
+import mtas.parser.cql.util.MtasCQLParserWordPositionQuery;
+import mtas.parser.cql.util.MtasCQLParserWordFullCondition;
+import mtas.parser.cql.util.MtasCQLParserBasicSentenceCondition;
+import mtas.parser.cql.util.MtasCQLParserSentenceCondition;
+import mtas.parser.cql.util.MtasCQLParserSentencePartCondition;
+import mtas.parser.cql.util.MtasCQLParserGroupQuery;
+import mtas.parser.cql.util.MtasCQLParserWordQuery;
+import org.apache.lucene.search.spans.SpanContainingQuery;
+import org.apache.lucene.search.spans.SpanNotQuery;
+import org.apache.lucene.search.spans.SpanQuery;
+import org.apache.lucene.search.spans.SpanWithinQuery;
+import org.apache.lucene.index.Term;
+import mtas.search.spans.MtasSpanSequenceItem;
+import mtas.search.spans.MtasSpanSequenceQuery;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class MtasCQLParser
+{
+  public SpanQuery parse(String field) throws ParseException
+  {
+    return cql(field);
+  }
+
+  private String unquoteString(String unfiltered)
+  {
+    if (unfiltered.startsWith("\"") && unfiltered.endsWith("\""))
+    {
+      unfiltered = unfiltered.substring(1, unfiltered.length());
+      unfiltered = unfiltered.substring(0, unfiltered.length() - 1);
+      //unfiltered = unfiltered.replace("\\\"", "\"");    }
+    return unfiltered;
+  }
+}
+
+PARSER_END(MtasCQLParser)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN :
+{
+  < CONTAINING : "containing" >
+}
+
+TOKEN :
+{
+  < NOT_CONTAINING : "!containing" >
+}
+
+TOKEN :
+{
+  < WITHIN : "within" >
+}
+
+TOKEN :
+{
+  < NOT_WITHIN : "!within" >
+}
+
+TOKEN :
+{
+  < GROUP_START : "<" >
+}
+
+TOKEN :
+{
+  < GROUP_END : ">" >
+}
+
+TOKEN :
+{
+  < WORD_START : "[" >
+}
+
+TOKEN :
+{
+  < WORD_END : "]" >
+}
+
+TOKEN :
+{
+  < BRACKET_START : "(" >
+}
+
+TOKEN :
+{
+  < BRACKET_END : ")" >
+}
+
+TOKEN :
+{
+  < CURLY_BRACKET_START : "{" >
+}
+
+TOKEN :
+{
+  < CURLY_BRACKET_END : "}" >
+}
+
+TOKEN :
+{
+  < SLASH : "/" >
+}
+
+TOKEN :
+{
+  < QUESTION_MARK : "?" >
+}
+
+TOKEN :
+{
+  < NEGATION : "!" >
+}
+
+TOKEN :
+{
+  < AND : "&" >
+}
+
+TOKEN :
+{
+  < OR : "|" >
+}
+
+TOKEN :
+{
+  < KOMMA : "," >
+}
+
+TOKEN :
+{
+  < TOKEN_NOTEQUALS : "!=" >
+}
+
+TOKEN :
+{
+  < TOKEN_EQUALS : "=" >
+}
+
+TOKEN :
+{
+  < NUMBER : (< DIGIT >)+ >
+}
+
+TOKEN :
+{
+  < QUOTED_VALUE :
+    "\""
+    (
+      "\\" ~[ ] //any escaped character    | //or      ~[ "\"", "\\" ] //any character except quote or backslash    )*
+    "\"" >
+}
+
+TOKEN :
+{
+  < UNQUOTED_VALUE :
+    (
+      < ALLOWED_UNQUOTED_CHARACTER >
+    | < DIGIT >
+    )+ >
+}
+
+TOKEN :
+{
+  < OCTOTHORPE : [ "#" ] >
+}
+
+TOKEN :
+{
+  < #DIGIT : [ "0"-"9" ] >
+}
+
+TOKEN :
+{
+  < #ALLOWED_UNQUOTED_CHARACTER : 
+    [ "a"-"z", "A"-"Z", "_", ".", "-" ] 
+  >
+}
+
+private SpanQuery cql(String field) throws ParseException :
+{
+  SpanQuery q;
+  ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
+}
+{
+  q = cqlBlock(field)
+  {
+    itemList.add(new MtasSpanSequenceItem(q, false));
+  }
+  (
+    q = cqlBlock(field)
+    {
+      itemList.add(new MtasSpanSequenceItem(q, false));
+    }
+  )*
+  < EOF >
+  {
+    if (itemList.size() > 1)
+    {
+      return new MtasSpanSequenceQuery(itemList);
+    }
+    else
+    {
+      return itemList.get(0).getQuery();
+    }
+  }
+}
+
+private SpanQuery cqlBlock(String field) throws ParseException :
+{
+  MtasCQLParserSentenceCondition s1 = null, s2 = null;
+  SpanQuery q1 = null, q2 = null;
+  Token end = null;
+  String operator = null;
+  String OPERATOR_CONTAINING = "containing";
+  String OPERATOR_NOT_CONTAINING = "not_containing";
+  String OPERATOR_WITHIN = "within";
+  String OPERATOR_NOT_WITHIN = "not_within";
+}
+{
+  (
+    s1 = sentence(field)
+  | 
+    < BRACKET_START > q1 = cqlBlock(field) < BRACKET_END >
+  )
+  [
+    (
+      < CONTAINING >
+      {
+        operator = OPERATOR_CONTAINING;
+      }
+    | < NOT_CONTAINING >
+      {
+        operator = OPERATOR_NOT_CONTAINING;
+      }
+    | < WITHIN >
+      {
+        operator = OPERATOR_WITHIN;
+      }
+    | < NOT_WITHIN >
+      {
+        operator = OPERATOR_NOT_WITHIN;
+      }
+    )
+    (
+      LOOKAHEAD(100)
+      s2 = sentence(field)
+    | < BRACKET_START > q2 = cqlBlock(field) < BRACKET_END >
+    )
+  ]
+  {
+    if (s1 != null)
+    {
+      q1 = s1.getQuery();
+    }
+    if (operator != null)
+    {
+      if (s2 != null)
+      {
+        q2 = s2.getQuery();
+      }
+      if (operator.equals(OPERATOR_CONTAINING))
+      {
+        return new SpanContainingQuery(q1, q2);
+      }
+      else if (operator.equals(OPERATOR_NOT_CONTAINING))
+      {
+        return new SpanNotQuery(q1, new SpanContainingQuery(q1, q2));
+      }
+      else if (operator.equals(OPERATOR_WITHIN))
+      {
+        return new SpanWithinQuery(q2, q1);
+      }
+      else if (operator.equals(OPERATOR_NOT_WITHIN))
+      {
+        return new SpanNotQuery(q1, new SpanWithinQuery(q2, q1));
+      }
+      else
+      {
+        throw new ParseException("unexpected operator " + operator);
+      }
+    }
+    else
+    {
+      return q1;
+    }
+  }
+}
+
+private MtasCQLParserSentenceCondition sentence(String field) throws ParseException :
+{
+  MtasCQLParserSentenceCondition sentenceCondition;
+  MtasCQLParserSentencePartCondition condition;
+  Token questionMark = null;
+  Token minValue = null;
+  Token maxValue = null;
+  int minimumOccurence = 1;
+  int maximumOccurence = 1;
+}
+{
+  condition = sentencePart(field)
+  {
+    sentenceCondition = condition.createFullSentence();
+    if (questionMark != null)
+    {
+      minimumOccurence = 0;
+      maximumOccurence = 1;
+    }
+    else if (minValue != null)
+    {
+      minimumOccurence = Integer.parseInt(minValue.image);
+      if (maxValue != null)
+      {
+        maximumOccurence = Integer.parseInt(maxValue.image);
+      }
+      else
+      {
+        maximumOccurence = minimumOccurence;
+      }
+    }
+    sentenceCondition.setOccurence(minimumOccurence, maximumOccurence);
+    return sentenceCondition;
+  }
+}
+
+private MtasCQLParserSentencePartCondition sentencePart(String field) throws ParseException :
+{
+  Token operator;
+  MtasCQLParserSentencePartCondition condition, sentencePart;
+  MtasCQLParserBasicSentenceCondition basicSentence;
+  Token questionMark = null;
+  Token minValue = null;
+  Token maxValue = null;
+  int minimumOccurence = 1;
+  int maximumOccurence = 1;
+}
+{
+  (
+    basicSentence = basicSentence(field)
+    {
+      condition = new MtasCQLParserSentencePartCondition(basicSentence);
+    }
+  |
+    (
+      < BRACKET_START > sentencePart = sentencePart(field) < BRACKET_END >
+      [
+        {
+          questionMark = null;
+        }
+        (
+          LOOKAHEAD(3)
+          < CURLY_BRACKET_START > minValue = < NUMBER > < KOMMA > maxValue = < NUMBER > < CURLY_BRACKET_END >
+        | < CURLY_BRACKET_START > minValue = < NUMBER > < CURLY_BRACKET_END >
+        | questionMark = < QUESTION_MARK >
+        )
+      ]
+      {
+        condition = new MtasCQLParserSentencePartCondition(sentencePart.createFullSentence());
+        if (questionMark != null)
+        {
+          minimumOccurence = 0;
+          maximumOccurence = 1;
+        }
+        else if (minValue != null)
+        {
+          minimumOccurence = Integer.parseInt(minValue.image);
+          if (maxValue != null)
+          {
+            maximumOccurence = Integer.parseInt(maxValue.image);
+          }
+          else
+          {
+            maximumOccurence = minimumOccurence;
+          }
+        }
+        condition.setFirstOccurence(minimumOccurence, maximumOccurence);
+      }
+    )
+  )
+  (
+    {
+      operator = null;
+    }
+    [ operator = < OR > ]
+    (
+      sentencePart = sentencePart(field)
+      {
+        if (operator == null)
+        {
+          condition.setOr(false);
+        }
+        else
+        {
+          condition.setOr(true);
+        }
+        condition.setSecondPart(sentencePart);
+      }
+    )
+  )?
+  {
+    return condition;
+  }
+}
+
+private MtasCQLParserBasicSentenceCondition basicSentence(String field) throws ParseException :
+{
+  MtasCQLParserWordFullCondition subWordCondition;
+  MtasCQLParserGroupFullCondition subGroupCondition;
+  MtasCQLParserBasicSentenceCondition condition = new MtasCQLParserBasicSentenceCondition();
+}
+{
+  (
+    subWordCondition = word(field)
+    {
+      condition.addWord(subWordCondition);
+    }
+  | subGroupCondition = group(field)
+    {
+      condition.addGroup(subGroupCondition);
+    }
+  )
+  (
+    LOOKAHEAD(2)
+    (
+      subWordCondition = word(field)
+      {
+        condition.addWord(subWordCondition);
+      }
+    | subGroupCondition = group(field)
+      {
+        condition.addGroup(subGroupCondition);
+      }
+    )
+  )*
+  {
+    return condition;
+  }
+}
+
+private MtasCQLParserGroupFullCondition group(String field) throws ParseException :
+{
+  Token questionMark = null;
+  MtasCQLParserGroupFullCondition groupCondition;
+  MtasCQLParserGroupCondition condition;
+  Boolean startGroup, endGroup;
+  Token minValue = null;
+  Token maxValue = null;
+  Token slash = null;
+  int minimumOccurence = 1;
+  int maximumOccurence = 1;
+}
+{
+  < GROUP_START >
+  (
+    LOOKAHEAD(3)
+    condition = groupCondition(field) [ slash = < SLASH > ]
+    {
+      if (slash == null)
+      {
+        startGroup = true;
+      }
+      else
+      {
+        startGroup = false;
+      }
+      endGroup = false;
+    }
+  | < SLASH > condition = groupCondition(field)
+    {
+      startGroup = true;
+      endGroup = false;
+    }
+  )
+  < GROUP_END >
+  [
+    {
+      questionMark = null;
+    }
+    (
+      LOOKAHEAD(3)
+      < CURLY_BRACKET_START > minValue = < NUMBER > < KOMMA > maxValue = < NUMBER > < CURLY_BRACKET_END >
+    | < CURLY_BRACKET_START > minValue = < NUMBER > < CURLY_BRACKET_END >
+    | questionMark = < QUESTION_MARK >
+    )
+  ]
+  {
+    if (startGroup)
+    {
+      groupCondition = new MtasCQLParserGroupFullCondition(condition, MtasCQLParserGroupFullCondition.GROUP_START);
+    }
+    else if (endGroup)
+    {
+      groupCondition = new MtasCQLParserGroupFullCondition(condition, MtasCQLParserGroupFullCondition.GROUP_END);
+    }
+    else
+    {
+      groupCondition = new MtasCQLParserGroupFullCondition(condition, MtasCQLParserGroupFullCondition.GROUP_FULL);
+    }
+    if (questionMark != null)
+    {
+      minimumOccurence = 0;
+      maximumOccurence = 1;
+    }
+    else if (minValue != null)
+    {
+      minimumOccurence = Integer.parseInt(minValue.image);
+      if (maxValue != null)
+      {
+        maximumOccurence = Integer.parseInt(maxValue.image);
+      }
+      else
+      {
+        maximumOccurence = minimumOccurence;
+      }
+    }
+    groupCondition.setOccurence(minimumOccurence, maximumOccurence);
+    return groupCondition;
+  }
+}
+
+private MtasCQLParserGroupCondition groupCondition(String field) throws ParseException :
+{
+  Token prefix;
+  Token value = null;
+}
+{
+  (
+    LOOKAHEAD(3)
+    prefix = < UNQUOTED_VALUE > < TOKEN_EQUALS > value = < QUOTED_VALUE >
+  | prefix = < UNQUOTED_VALUE >
+    {
+      value = null;
+    }
+  )
+  {
+    if (value != null)
+    {
+      SpanQuery q = new MtasCQLParserGroupQuery(field, prefix.image, unquoteString(value.image));
+      MtasCQLParserGroupCondition condition = new MtasCQLParserGroupCondition(field, q);
+      return condition;
+    }
+    else
+    {
+      SpanQuery q = new MtasCQLParserGroupQuery(field, prefix.image, null);
+      MtasCQLParserGroupCondition condition = new MtasCQLParserGroupCondition(field, q);
+      return condition;
+    }
+  }
+}
+
+private MtasCQLParserWordFullCondition word(String field) throws ParseException :
+{
+  Token questionMark = null;
+  MtasCQLParserWordFullCondition wordCondition;
+  MtasCQLParserWordCondition condition, subCondition;
+  Token minValue = null;
+  Token maxValue = null;
+  int minimumOccurence = 1;
+  int maximumOccurence = 1;
+}
+{
+  (
+    LOOKAHEAD(3)
+    < WORD_START >
+    (
+      LOOKAHEAD(10)
+      subCondition = wordCondition(field)
+      (
+        < AND >
+        {
+          condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
+          condition.addCondition(subCondition);
+        }
+        subCondition = wordCondition(field)
+        {
+          condition.addCondition(subCondition);
+        }
+        (
+          < AND > subCondition = wordCondition(field)
+          {
+            condition.addCondition(subCondition);
+          }
+        )*
+      | < OR >
+        {
+          condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
+          condition.addCondition(subCondition);
+        }
+        subCondition = wordCondition(field)
+        {
+          condition.addCondition(subCondition);
+        }
+        (
+          < OR > subCondition = wordCondition(field)
+          {
+            condition.addCondition(subCondition);
+          }
+        )*
+      )
+    | condition = wordCondition(field)
+    )
+    < WORD_END >
+  |
+    {
+      condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
+    }
+    < WORD_START > < WORD_END >
+  )
+  [
+    {
+      questionMark = null;
+    }
+    (
+      LOOKAHEAD(3)
+      < CURLY_BRACKET_START > minValue = < NUMBER > < KOMMA > maxValue = < NUMBER > < CURLY_BRACKET_END >
+    | < CURLY_BRACKET_START > minValue = < NUMBER > < CURLY_BRACKET_END >
+    | questionMark = < QUESTION_MARK >
+    )
+  ]
+  {
+    condition.simplify();
+    wordCondition = new MtasCQLParserWordFullCondition(condition);
+    if (questionMark != null)
+    {
+      minimumOccurence = 0;
+      maximumOccurence = 1;
+    }
+    else if (minValue != null)
+    {
+      minimumOccurence = Integer.parseInt(minValue.image);
+      if (maxValue != null)
+      {
+        maximumOccurence = Integer.parseInt(maxValue.image);
+      }
+      else
+      {
+        maximumOccurence = minimumOccurence;
+      }
+    }
+    wordCondition.setOccurence(minimumOccurence, maximumOccurence);
+    //System.out.println(wordCondition + "\n");    return wordCondition;
+  }
+}
+
+private MtasCQLParserWordCondition wordCondition(String field) throws ParseException :
+{
+  Token negation = null;
+  MtasCQLParserWordCondition condition, subCondition;
+}
+{
+  (
+    //condition with brackets    LOOKAHEAD(2) //otherwise plain atom    [ negation = < NEGATION > ] < BRACKET_START >
+    (
+      LOOKAHEAD(5)
+      {
+        condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
+      }
+      (
+        LOOKAHEAD(2)
+        subCondition = wordAtomCondition(field)
+      | subCondition = wordCondition(field)
+      )
+      {
+        condition.addCondition(subCondition);
+      }
+      < AND >
+      (
+        LOOKAHEAD(2)
+        subCondition = wordAtomCondition(field)
+      | subCondition = wordCondition(field)
+      )
+      {
+        condition.addCondition(subCondition);
+      }
+      (
+        < AND >
+        (
+          LOOKAHEAD(2)
+          subCondition = wordAtomCondition(field)
+        | subCondition = wordCondition(field)
+        )
+        {
+          condition.addCondition(subCondition);
+        }
+      )*
+    | LOOKAHEAD(5)
+      {
+        condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
+      }
+      (
+        LOOKAHEAD(2)
+        subCondition = wordAtomCondition(field)
+      | subCondition = wordCondition(field)
+      )
+      {
+        condition.addCondition(subCondition);
+      }
+      < OR >
+      (
+        LOOKAHEAD(2)
+        subCondition = wordAtomCondition(field)
+      | subCondition = wordCondition(field)
+      )
+      {
+        condition.addCondition(subCondition);
+      }
+      (
+        < OR >
+        (
+          LOOKAHEAD(2)
+          subCondition = wordAtomCondition(field)
+        | subCondition = wordCondition(field)
+        )
+        {
+          condition.addCondition(subCondition);
+        }
+      )*
+    |
+      (
+        LOOKAHEAD(2)
+        condition = wordAtomCondition(field)
+      | condition = wordCondition(field)
+      )
+    )
+    < BRACKET_END >
+    {
+      if (negation != null)
+      {
+        condition.swapNot();
+      }
+      //System.out.println("=== wordCondition ===\n" + condition + "\n");      return condition;
+    }
+  | //plain atom is a valid condition    subCondition = wordAtomCondition(field)
+    {
+      //System.out.println("=== wordCondition ===\n" + subCondition + "\n");      return subCondition;
+    }
+  )
+  {
+    //System.out.println("=== wordCondition ===\n" + condition + "\n");    return null;
+  }
+}
+
+private MtasCQLParserWordCondition wordAtomCondition(String field) throws ParseException :
+{
+  Token negation = null;
+  Token nequals = null;
+  Token prefix;
+  Token value;
+}
+{
+  [ negation = < NEGATION > ]
+  (
+    (
+      < OCTOTHORPE >
+      (
+        value = < NUMBER >
+      | 
+        value = < UNQUOTED_VALUE >
+      )
+      {
+        Integer startPosition = null;
+        Integer endPosition = null;
+        Pattern range = Pattern.compile("([0-9]+)(\\-([0-9]+))?");
+        Matcher m = range.matcher(value.image);
+        if (m.find())
+        {
+          startPosition = m.group(1)!=null?Integer.parseInt(m.group(1)):null;
+          endPosition = m.group(3)!=null?Integer.parseInt(m.group(3)):null;
+        }
+        else
+        {
+          throw new ParseException("invalid range '" + value.image + "'");
+        }
+        MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
+        if (startPosition != null && endPosition != null)
+        {
+          SpanQuery q = new MtasCQLParserWordPositionQuery(field, startPosition, endPosition);
+          condition.addPositiveQuery(q);
+        }
+        else if (startPosition != null)
+        {
+          SpanQuery q = new MtasCQLParserWordPositionQuery(field, startPosition, startPosition);
+          condition.addPositiveQuery(q);
+        }
+        else
+        {
+          //should not happen
+          throw new ParseException("invalid range");
+        }
+        return condition;
+      }
+    )
+  |
+    (
+      (prefix = < UNQUOTED_VALUE >)
+      (
+        nequals = < TOKEN_NOTEQUALS >
+      | < TOKEN_EQUALS >
+      )
+      (value = < QUOTED_VALUE >)
+      {
+        if (nequals != null)
+        {
+          //use RegexpQuery combined with SpanMultiTermQueryWrapper          throw new ParseException("TODO: not implemented '" + prefix.image + nequals.image + value.image + "'");
+        }
+        else
+        {
+          MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
+          Term term = new Term(field, prefix.image + MtasToken.DELIMITER + unquoteString(value.image));
+          SpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, unquoteString(value.image), MtasCQLParserWordQuery.MTAS_CQL_REGEXP_QUERY);
+          if (negation != null)
+          {
+            condition.swapNot();
+          }
+          condition.addPositiveQuery(q);
+          //System.out.println("=== wordAtomCondition ===\n" + condition + "\n");          return condition;
+        }
+      }
+    )
+  )
+}

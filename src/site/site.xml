@@ -1,0 +1,10 @@
+<project name="Multi Tier Annotation Search">
+  <body>
+    <menu name="Mtas">
+      <item name="Introduction" href="index.html"/>
+      <item name="Installation" href="installation.html"/>
+      <item name="Download" href="download.html"/>      
+    </menu>
+    <menu ref="reports"/>
+  </body>
+</project>

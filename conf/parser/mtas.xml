@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+  <configurations type="mtas.analysis.util.MtasTokenizerFactory">
+    <configuration name="DBNL" file="folia/mtas.xml" />
+  </configurations>
+  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
+    <configuration name="DBNL" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+  </configurations>
+</mtas>

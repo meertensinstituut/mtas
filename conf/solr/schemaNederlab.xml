@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="nederlab" version="1.5">
+
+	<field name="_version_" type="nederlab_long" indexed="true"
+		stored="true" />
+
+	<!-- component Profile -->
+	<field name="NLProfile_name" type="nederlab_string" required="true"
+		multiValued="false" indexed="true" stored="true" />
+
+	<!-- component ResourceProxy -->
+	<field name="ResourceProxy_resourceRef" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<dynamicField name="ResourceProxy_resourceRef_mimeType_*"
+		type="nederlab_string" required="false" multiValued="true" indexed="true"
+		stored="true" />
+
+	<!-- component NLCore -->
+	<field name="NLCore_NLIdentification_nederlabID" type="nederlab_uuid"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLIdentification_editorialCode" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLIdentification_versionID" type="nederlab_string"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLIdentification_sourceRef" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLCore_NLIdentification_sourceUrl" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLCore_NLIdentification_sourceRefUrl_serialized"
+		type="nederlab_string" required="false" multiValued="true" indexed="false"
+		stored="true" />
+	<field name="NLCore_NLAdministrative_ingestTime" type="nederlab_date"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLAdministrative_expirationTime" type="nederlab_date"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLAdministrative_lastEditedBy" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLAdministrative_modificationTime" type="nederlab_date"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLAdministrative_editorialNote" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLCore_NLAdministrative_sourceCollection" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLAdministrative_isThesaurusElement" type="nederlab_boolean"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="NLCore_NLExternalReference_organizationName" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLCore_NLExternalReference_collectionName" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLCore_NLExternalReference_resourceRef" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLCore_NLExternalReference_serialized" type="nederlab_string"
+		required="false" multiValued="true" indexed="false" stored="true" />
+
+	<!-- component NLTitle -->
+	<field name="NLTitle_title" type="nederlab_text" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_subtitle" type="nederlab_text" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_genre" type="nederlab_string" required="false"
+		multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_category" type="nederlab_string" required="false"
+		multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_yearOfPublicationMin" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_yearOfPublicationMax" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_yearOfPublicationApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_yearOfPublicationLabel" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_edition" type="nederlab_string" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_inNederlabAs" type="nederlab_uuid" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_NLPublicationPlace_placeOfPublication" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_NLPublicationPlace_placeID" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_NLPublicationPlace_placeOfPublicationOriginal"
+		type="nederlab_text" required="false" multiValued="true" indexed="true"
+		stored="true" />
+	<field name="NLTitle_numberOfPages" type="nederlab_int" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_numberOfWords" type="nederlab_int" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_primaryLanguage" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_isTranslation" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_characterEncoding" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_codingStandard" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_textQuality" type="nederlab_text" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_processingMethod" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_autopsyPerformed" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_NLPersonRef_personID" type="nederlab_uuid"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_NLPersonRef_role" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<dynamicField name="NLTitle_NLPersonRef_personID_role_*"
+		type="nederlab_uuid" required="false" multiValued="true" indexed="true"
+		stored="true" />
+	<field name="NLTitle_contains" type="nederlab_uuid" required="false"
+		multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_seriesTitleID" type="nederlab_uuid"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLTitle_seriesTitleID_parent" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_seriesTitleID_root" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+
+	<!-- component NLDependentTitle -->
+	<field name="NLDependentTitle_title" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_subtitle" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_primaryLanguage" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_parentTitleID" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_inNederlabAs" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_NLPersonRef_personID" type="nederlab_uuid"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLDependentTitle_NLPersonRef_role" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<dynamicField name="NLDependentTitle_NLPersonRef_personID_role_*"
+		type="nederlab_uuid" required="false" multiValued="true" indexed="true"
+		stored="true" />
+	<field name="NLDependentTitle_startPage" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_endPage" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+
+	<!-- component NLPerson -->
+	<field name="NLPerson_NLPersonName_nameId" type="nederlab_uuid"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_lastName" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_firstName" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_infixes" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_firstNameFull" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_fullName" type="nederlab_text"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_fullName_serialized" type="nederlab_string"
+		required="false" multiValued="true" indexed="false" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredNameID" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredLastName" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredFirstName" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredFirstNameFull" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredInfixes" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredFullName" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_NLPersonName_preferredFullName_serialized"
+		type="nederlab_string" required="false" multiValued="false" indexed="false"
+		stored="true" />
+	<field name="NLPerson_dateOfBirthDayMonth" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_dateOfBirthMonth" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_dateOfBirthDay" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfBirthMin" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfBirthMax" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfBirthApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfBirthLabel" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_placeOfBirth" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_placeOfBirthID" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_dateOfDeathDayMonth" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_dateOfDeathMonth" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_dateOfDeathDay" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfDeathMin" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfDeathMax" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfDeathApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_yearOfDeathLabel" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_placeOfDeath" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_placeOfDeathID" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_gender" type="nederlab_string" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLPerson_profession" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_education" type="nederlab_string" required="false"
+		multiValued="true" indexed="true" stored="true" />
+	<field name="NLPerson_inThesaurusAs" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+
+	<!-- component NLSeriesTitle -->
+	<field name="NLSeriesTitle_title" type="nederlab_text" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLSeriesTitle_years" type="nederlab_text" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLSeriesTitle_description" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLSeriesTitle_inNederlabAs" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLSeriesTitle_seriesTitleID" type="nederlab_uuid"
+		required="false" multiValued="true" indexed="true" stored="true" />
+	<field name="NLSeriesTitle_seriesTitleID_parent" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLSeriesTitle_seriesTitleID_root" type="nederlab_uuid"
+		required="false" multiValued="false" indexed="true" stored="true" />
+
+	<!-- component NLCollectionSpecific -->
+	<dynamicField name="NLCollectionSpecific_*" type="nederlab_string"
+		required="false" multiValued="true" indexed="true" stored="true" />
+
+	<!-- component NLContent -->
+	<field name="NLContent_folia_available" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLContent_text_available" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLContent_text" type="nederlab_content" required="false"
+		multiValued="false" indexed="true" stored="true" termVectors="true"
+		termPositions="true" termOffsets="true" />
+	<field name="NLContent_text_lowercase" type="nederlab_content_lowercase"
+		required="false" multiValued="false" indexed="true" stored="true"
+		termVectors="true" termPositions="true" termOffsets="true" />
+	<copyField source="NLContent_text" dest="NLContent_text_lowercase" />
+	<field name="NLContent_ticcl_available" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLContent_ticcl_lowercase" type="nederlab_content_lowercase"
+		required="false" multiValued="false" indexed="true" stored="true"
+		termVectors="true" termPositions="true" termOffsets="true" />
+	<field name="NLContent_mtas" type="mtas_text" indexed="true"
+		stored="true" />
+	<field name="NLContent_mtas_error" type="nederlab_string"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtas_numberOfTokens" type="nederlab_int"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtas_numberOfPositions" type="nederlab_int"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtas_size" type="nederlab_int" indexed="true"
+		stored="true" />
+	<!-- Combined Field Metadata -->
+	<field name="NLMetadata" type="nederlab_text" required="false"
+		multiValued="true" indexed="true" stored="false" />
+	<copyField source="NLCore_NLIdentification_nederlabID" dest="NLMetadata" />
+	<copyField source="NLCore_NLIdentification_editorialCode"
+		dest="NLMetadata" />
+	<copyField source="NLCore_NLIdentification_sourceRef" dest="NLMetadata" />
+	<copyField source="NLCore_NLAdministrative_editorialNote"
+		dest="NLMetadata" />
+	<copyField source="NLCore_NLAdministrative_sourceCollection"
+		dest="NLMetadata" />
+	<copyField source="NLCore_NLExternalReference_organizationName"
+		dest="NLMetadata" />
+	<copyField source="NLCore_NLExternalReference_collectionName"
+		dest="NLMetadata" />
+	<copyField source="NLCore_NLExternalReference_resourceRef"
+		dest="NLMetadata" />
+	<copyField source="NLTitle_title" dest="NLMetadata" />
+	<copyField source="NLTitle_subtitle" dest="NLMetadata" />
+	<copyField source="NLTitle_genre" dest="NLMetadata" />
+	<copyField source="NLTitle_category" dest="NLMetadata" />
+	<copyField source="NLTitle_yearOfPublicationMin" dest="NLMetadata" />
+	<copyField source="NLTitle_yearOfPublicationMax" dest="NLMetadata" />
+	<copyField source="NLTitle_yearOfPublicationLabel" dest="NLMetadata" />
+	<copyField source="NLTitle_edition" dest="NLMetadata" />
+	<copyField source="NLTitle_NLPublicationPlace_placeOfPublication"
+		dest="NLMetadata" />
+	<copyField source="NLTitle_NLPublicationPlace_placeID" dest="NLMetadata" />
+	<copyField source="NLTitle_NLPublicationPlace_placeOfPublicationOriginal"
+		dest="NLMetadata" />
+	<copyField source="NLTitle_primaryLanguage" dest="NLMetadata" />
+	<copyField source="NLTitle_characterEncoding" dest="NLMetadata" />
+	<copyField source="NLTitle_codingStandard" dest="NLMetadata" />
+	<copyField source="NLTitle_textQuality" dest="NLMetadata" />
+	<copyField source="NLTitle_processingMethod" dest="NLMetadata" />
+	<copyField source="NLTitle_NLPersonRef_role" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_title" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_subtitle" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_primaryLanguage" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_NLPersonRef_role" dest="NLMetadata" />
+	<copyField source="NLPerson_NLPersonName_lastName" dest="NLMetadata" />
+	<copyField source="NLPerson_NLPersonName_firstName" dest="NLMetadata" />
+	<copyField source="NLPerson_NLPersonName_infixes" dest="NLMetadata" />
+	<copyField source="NLPerson_NLPersonName_firstNameFull" dest="NLMetadata" />
+	<copyField source="NLPerson_NLPersonName_fullName" dest="NLMetadata" />
+	<copyField source="NLPerson_dateOfBirthDayMonth" dest="NLMetadata" />
+	<copyField source="NLPerson_yearOfBirthMin" dest="NLMetadata" />
+	<copyField source="NLPerson_yearOfBirthMax" dest="NLMetadata" />
+	<copyField source="NLPerson_yearOfBirthLabel" dest="NLMetadata" />
+	<copyField source="NLPerson_placeOfBirth" dest="NLMetadata" />
+	<copyField source="NLPerson_placeOfBirthID" dest="NLMetadata" />
+	<copyField source="NLPerson_dateOfDeathDayMonth" dest="NLMetadata" />
+	<copyField source="NLPerson_yearOfDeathMin" dest="NLMetadata" />
+	<copyField source="NLPerson_yearOfDeathMax" dest="NLMetadata" />
+	<copyField source="NLPerson_yearOfDeathLabel" dest="NLMetadata" />
+	<copyField source="NLPerson_placeOfDeath" dest="NLMetadata" />
+	<copyField source="NLPerson_placeOfDeathID" dest="NLMetadata" />
+	<copyField source="NLPerson_gender" dest="NLMetadata" />
+	<copyField source="NLPerson_profession" dest="NLMetadata" />
+	<copyField source="NLPerson_education" dest="NLMetadata" />
+	<copyField source="NLSeriesTitle_title" dest="NLMetadata" />
+	<copyField source="NLSeriesTitle_years" dest="NLMetadata" />
+	<copyField source="NLSeriesTitle_description" dest="NLMetadata" />
+	<copyField source="NLCollectionSpecific_*" dest="NLMetadata" />
+
+	<uniqueKey>NLCore_NLIdentification_versionID</uniqueKey>
+
+	<fieldType name="nederlab_string" class="solr.StrField"
+		sortMissingLast="true" />
+	<fieldType name="nederlab_uuid" class="solr.StrField"
+		sortMissingLast="true" />
+	<fieldType name="nederlab_boolean" class="solr.BoolField"
+		sortMissingLast="true" />
+	<fieldType name="nederlab_int" class="solr.TrieIntField"
+		precisionStep="8" positionIncrementGap="0" />
+	<fieldType name="nederlab_long" class="solr.TrieLongField"
+		precisionStep="0" positionIncrementGap="0" />
+	<fieldType name="nederlab_date" class="solr.TrieDateField"
+		precisionStep="6" positionIncrementGap="0" />
+	<fieldtype name="nederlab_binary" class="solr.BinaryField" />
+
+	<fieldType name="nederlab_text" class="solr.TextField"
+		positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="nederlab_content" class="solr.TextField"
+		positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="nederlab_content_lowercase" class="solr.TextField"
+		positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="mtas_text_example_classical" class="solr.TextField"
+		postingsFormat="MtasCodec">
+		<analyzer type="index">
+			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+				type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+				configFile="folia/test.xml" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="mtas_text_example_config" class="solr.TextField"
+		postingsFormat="MtasCodec">
+		<analyzer type="index">
+			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+				config="mtas.xml" default="default" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+				config="mtas.xml" default="default" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="mtas_text" class="mtas.solr.schema.MtasPreAnalyzedField"
+		followIndexAnalyzer="mtas_text_example_config" defaultConfiguration="default"
+		configurationFromField="NLCore_NLAdministrative_sourceCollection" setNumberOfTokens="NLContent_mtas_numberOfTokens"
+		setNumberOfPositions="NLContent_mtas_numberOfPositions" setSize="NLContent_mtas_size"
+		setError="NLContent_mtas_error" postingsFormat="MtasCodec">
+		<analyzer type="query">
+			<tokenizer class="solr.WhitespaceTokenizerFactory" />
+			<filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory"
+				prefix="t" />
+		</analyzer>
+	</fieldType>
+
+</schema>
