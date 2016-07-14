@@ -259,6 +259,19 @@ abstract public class MtasParser {
     public void setText(String text) {
       objectText = text;
     }
+    
+    /**
+     * Adds the text.
+     *
+     * @param text the text
+     */
+    public void addText(String text) {
+      if(objectText==null) {
+        objectText = text;
+      } else {
+        objectText+=text;
+      }
+    }
 
     /**
      * Gets the text.

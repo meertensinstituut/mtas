@@ -314,7 +314,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
       try {
         int event = streamReader.getEventType();
         MtasParserType currentType, tmpCurrentType;
-        MtasParserObject currentObject;
+        MtasParserObject currentObject = null;
         while (true) {
           switch (event) {
           case XMLStreamConstants.START_DOCUMENT:
@@ -555,7 +555,6 @@ abstract class MtasXMLParser extends MtasBasicParser {
                           + currentType.getName();
                   assert unknownAncestors == 0 : "error in administration "
                       + currentObject.getType().getName();
-                  currentObject.setText(textContent);
                   currentObject.setRealOffsetEnd(lastOffset);
                   idPositions.put(currentObject.getId(),
                       currentObject.getPositions());
@@ -588,7 +587,6 @@ abstract class MtasXMLParser extends MtasBasicParser {
                           + currentType.getName();
                   assert unknownAncestors == 0 : "error in administration "
                       + currentObject.getType().getName();
-                  currentObject.setText(textContent);
                   currentObject.setOffsetEnd(lastOffset);
                   currentObject.setRealOffsetEnd(lastOffset);
                   // update ancestor groups with position and offset
@@ -624,7 +622,6 @@ abstract class MtasXMLParser extends MtasBasicParser {
                           + currentType.getName();
                   assert unknownAncestors == 0 : "error in administration "
                       + currentObject.getType().getName();
-                  currentObject.setText(textContent);
                   currentObject.setRealOffsetEnd(lastOffset);
                   idPositions.put(currentObject.getId(),
                       currentObject.getPositions());
@@ -651,7 +648,6 @@ abstract class MtasXMLParser extends MtasBasicParser {
                           + currentType.getName();
                   assert unknownAncestors == 0 : "error in administration "
                       + currentObject.getType().getName();
-                  currentObject.setText(textContent);
                   currentObject.setRealOffsetEnd(lastOffset);
                   idPositions.put(currentObject.getId(), currentObject.getPositions());
                   idOffsets.put(currentObject.getId(), currentObject.getOffset());
@@ -736,6 +732,9 @@ abstract class MtasXMLParser extends MtasBasicParser {
             // check for text
             if (streamReader.hasText()) {
               textContent = streamReader.getText();
+            }
+            if(currentObject!=null) {
+              currentObject.addText(textContent);
             }
             break;
           }
