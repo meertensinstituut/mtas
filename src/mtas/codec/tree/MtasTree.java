@@ -15,7 +15,10 @@ import mtas.analysis.token.MtasToken;
  */
 abstract public class MtasTree<N extends MtasTreeNode<N>> {
   
+  /** The Constant SINGLE_POSITION_TREE. */
   final public static byte SINGLE_POSITION_TREE = 1;
+  
+  /** The Constant STORE_ADDITIONAL_ID. */
   final public static byte STORE_ADDITIONAL_ID = 2;
 
   /** The root. */
@@ -27,9 +30,15 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /** The single point. */
   protected Boolean singlePoint; 
   
-  /** Additional id. */
+  /** The store prefix id. */
   protected Boolean storePrefixId; 
 
+  /**
+   * Instantiates a new mtas tree.
+   *
+   * @param singlePoint the single point
+   * @param storePrefixId the store prefix id
+   */
   public MtasTree(boolean singlePoint, boolean storePrefixId) {
     root = null;
     closed = false;
@@ -54,7 +63,7 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
    *
    * @param <T> the generic type
    * @param token the token
-   * @throws IOException 
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   final public <T> void addParentFromToken(MtasToken<T> token) throws IOException { 
     if(!closed && (token!=null)) {      
@@ -64,6 +73,13 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
     }
   }
   
+  /**
+   * Adds the position and object from token.
+   *
+   * @param <T> the generic type
+   * @param token the token
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   final public <T> void addPositionAndObjectFromToken(MtasToken<T> token) throws IOException {   
     addPositionFromToken(token, token.getTokenRef());
   }
@@ -73,12 +89,13 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
 //  }
   
   /**
-   * Adds the position from token.
-   *
-   * @param <T> the generic type
-   * @param token the token
-   * @throws IOException 
-   */
+ * Adds the position from token.
+ *
+ * @param <T> the generic type
+ * @param token the token
+ * @param ref the ref
+ * @throws IOException Signals that an I/O exception has occurred.
+ */
   final private <T> void addPositionFromToken(MtasToken<T> token, Long ref) throws IOException {
     int prefixId = storePrefixId?token.getPrefixId():0;        
     if(!closed && (token!=null)) {
@@ -130,36 +147,49 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   } 
 
   /**
-   * Adds the token single point.
+   * Adds the single point.
    *
    * @param position the position
+   * @param additionalId the additional id
    * @param id the id
    * @param ref the ref
    */
   abstract protected void addSinglePoint(int position, int additionalId, Integer id, Long ref);
   
   /**
-   * Adds the token range.
+   * Adds the range.
    *
    * @param left the left
    * @param right the right
+   * @param additionalId the additional id
    * @param id the id
    * @param ref the ref
    */
   abstract protected void addRange(int left, int right, int additionalId, Integer id, Long ref);
   
   /**
-   * Adds the token range empty.
+   * Adds the range empty.
    *
    * @param left the left
    * @param right the right
+   * @param additionalId the additional id
    */
   abstract protected void addRangeEmpty(int left, int right, int additionalId);
 
+  /**
+   * Checks if is single point.
+   *
+   * @return true, if is single point
+   */
   final public boolean isSinglePoint() {
     return singlePoint;
   } 
   
+  /**
+   * Checks if is store prefix id.
+   *
+   * @return true, if is store prefix id
+   */
   final public boolean isStorePrefixId() {
     return storePrefixId;    
   }

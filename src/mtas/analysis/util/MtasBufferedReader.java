@@ -10,31 +10,37 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * The Class MtasBufferedReader.
+ */
 public class MtasBufferedReader extends Reader {
 
+  /** The in. */
   private Reader in;
 
+  /** The cb. */
   private char cb[];
+  
+  /** The next char. */
   private int nChars, nextChar;
+  
+  /** The previous buffer size. */
   private int previousBufferSize;
 
-  /** If the next character is a line feed, skip it */
+  /** The skip lf. */
   private boolean skipLF = false;
 
+  /** The default char buffer size. */
   private static int defaultCharBufferSize = 8192;
+  
+  /** The default expected line length. */
   private static int defaultExpectedLineLength = 80;
 
   /**
-   * Creates a buffering character-input stream that uses an input buffer of the
-   * specified size.
+   * Instantiates a new mtas buffered reader.
    *
-   * @param in
-   *          A Reader
-   * @param sz
-   *          Input-buffer size
-   *
-   * @exception IllegalArgumentException
-   *              If {@code sz <= 0}
+   * @param in the in
+   * @param sz the sz
    */
   public MtasBufferedReader(Reader in, int sz) {
     super(in);
@@ -46,24 +52,28 @@ public class MtasBufferedReader extends Reader {
   }
 
   /**
-   * Creates a buffering character-input stream that uses a default-sized input
-   * buffer.
+   * Instantiates a new mtas buffered reader.
    *
-   * @param in
-   *          A Reader
+   * @param in the in
    */
   public MtasBufferedReader(Reader in) {
     this(in, defaultCharBufferSize);
   }
 
-  /** Checks to make sure that the stream has not been closed */
+  /**
+   * Ensure open.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void ensureOpen() throws IOException {
     if (in == null)
       throw new IOException("Stream closed");
   }
 
   /**
-   * Fills the input buffer, taking the mark into account if it is valid.
+   * Fill.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void fill() throws IOException {
     int n;
@@ -77,14 +87,8 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /**
-   * Reads a single character.
-   *
-   * @return The character read, as an integer in the range 0 to 65535
-   *         (<tt>0x00-0xffff</tt>), or -1 if the end of the stream has been
-   *         reached
-   * @exception IOException
-   *              If an I/O error occurs
+  /* (non-Javadoc)
+   * @see java.io.Reader#read()
    */
   @Override
   public int read() throws IOException {
@@ -109,8 +113,13 @@ public class MtasBufferedReader extends Reader {
   }
 
   /**
-   * Reads characters into a portion of an array, reading from the underlying
-   * stream if necessary.
+   * Read1.
+   *
+   * @param cbuf the cbuf
+   * @param off the off
+   * @param len the len
+   * @return the int
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private int read1(char[] cbuf, int off, int len) throws IOException {
     if (nextChar >= nChars) {
@@ -143,57 +152,8 @@ public class MtasBufferedReader extends Reader {
     return n;
   }
 
-  /**
-   * Reads characters into a portion of an array.
-   *
-   * <p>
-   * This method implements the general contract of the corresponding
-   * <code>{@link Reader#read(char[], int, int) read}</code> method of the
-   * <code>{@link Reader}</code> class. As an additional convenience, it
-   * attempts to read as many characters as possible by repeatedly invoking the
-   * <code>read</code> method of the underlying stream. This iterated
-   * <code>read</code> continues until one of the following conditions becomes
-   * true:
-   * <ul>
-   *
-   * <li>The specified number of characters have been read,
-   *
-   * <li>The <code>read</code> method of the underlying stream returns
-   * <code>-1</code>, indicating end-of-file, or
-   *
-   * <li>The <code>ready</code> method of the underlying stream returns
-   * <code>false</code>, indicating that further input requests would block.
-   *
-   * </ul>
-   * If the first <code>read</code> on the underlying stream returns
-   * <code>-1</code> to indicate end-of-file then this method returns
-   * <code>-1</code>. Otherwise this method returns the number of characters
-   * actually read.
-   *
-   * <p>
-   * Subclasses of this class are encouraged, but not required, to attempt to
-   * read as many characters as possible in the same fashion.
-   *
-   * <p>
-   * Ordinarily this method takes characters from this stream's character
-   * buffer, filling it from the underlying stream as necessary. If, however,
-   * the buffer is empty, the mark is not valid, and the requested length is at
-   * least as large as the buffer, then this method will read characters
-   * directly from the underlying stream into the given array. Thus redundant
-   * <code>BufferedReader</code>s will not copy data unnecessarily.
-   *
-   * @param cbuf
-   *          Destination buffer
-   * @param off
-   *          Offset at which to start storing characters
-   * @param len
-   *          Maximum number of characters to read
-   *
-   * @return The number of characters read, or -1 if the end of the stream has
-   *         been reached
-   *
-   * @exception IOException
-   *              If an I/O error occurs
+  /* (non-Javadoc)
+   * @see java.io.Reader#read(char[], int, int)
    */
   @Override
   public int read(char cbuf[], int off, int len) throws IOException {
@@ -220,21 +180,11 @@ public class MtasBufferedReader extends Reader {
   }
 
   /**
-   * Reads a line of text. A line is considered to be terminated by any one of a
-   * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
-   * immediately by a linefeed.
+   * Read line.
    *
-   * @param ignoreLF
-   *          If true, the next '\n' will be skipped
-   *
-   * @return A String containing the contents of the line, not including any
-   *         line-termination characters, or null if the end of the stream has
-   *         been reached
-   *
-   * @see java.io.LineNumberReader#readLine()
-   *
-   * @exception IOException
-   *              If an I/O error occurs
+   * @param ignoreLF the ignore lf
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   String readLine(boolean ignoreLF) throws IOException {
     StringBuffer s = null;
@@ -298,39 +248,26 @@ public class MtasBufferedReader extends Reader {
   }
 
   /**
-   * Reads a line of text. A line is considered to be terminated by any one of a
-   * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
-   * immediately by a linefeed.
+   * Read line.
    *
-   * @return A String containing the contents of the line, not including any
-   *         line-termination characters, or null if the end of the stream has
-   *         been reached
-   *
-   * @exception IOException
-   *              If an I/O error occurs
-   *
-   * @see java.nio.file.Files#readAllLines
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public String readLine() throws IOException {
     return readLine(false);
   }
 
+  /**
+   * Gets the position.
+   *
+   * @return the position
+   */
   public int getPosition() {
     return previousBufferSize + nextChar;
   }
 
-  /**
-   * Skips characters.
-   *
-   * @param n
-   *          The number of characters to skip
-   *
-   * @return The number of characters actually skipped
-   *
-   * @exception IllegalArgumentException
-   *              If <code>n</code> is negative.
-   * @exception IOException
-   *              If an I/O error occurs
+  /* (non-Javadoc)
+   * @see java.io.Reader#skip(long)
    */
   @Override
   public long skip(long n) throws IOException {
@@ -365,13 +302,8 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /**
-   * Tells whether this stream is ready to be read. A buffered character stream
-   * is ready if the buffer is not empty, or if the underlying character stream
-   * is ready.
-   *
-   * @exception IOException
-   *              If an I/O error occurs
+  /* (non-Javadoc)
+   * @see java.io.Reader#ready()
    */
   @Override
   public boolean ready() throws IOException {
@@ -400,12 +332,8 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /**
-   * Resets the stream to the most recent mark.
-   *
-   * @exception IOException
-   *              If the stream has never been marked, or if the mark has been
-   *              invalidated
+  /* (non-Javadoc)
+   * @see java.io.Reader#reset()
    */
   @Override
   public void reset() throws IOException {
@@ -416,6 +344,9 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
+  /* (non-Javadoc)
+   * @see java.io.Reader#close()
+   */
   @Override
   public void close() throws IOException {
     synchronized (lock) {
@@ -431,35 +362,9 @@ public class MtasBufferedReader extends Reader {
   }
 
   /**
-   * Returns a {@code Stream}, the elements of which are lines read from this
-   * {@code BufferedReader}. The {@link Stream} is lazily populated, i.e., read
-   * only occurs during the
-   * <a href="../util/stream/package-summary.html#StreamOps">terminal stream
-   * operation</a>.
+   * Lines.
    *
-   * <p>
-   * The reader must not be operated on during the execution of the terminal
-   * stream operation. Otherwise, the result of the terminal stream operation is
-   * undefined.
-   *
-   * <p>
-   * After execution of the terminal stream operation there are no guarantees
-   * that the reader will be at a specific position from which to read the next
-   * character or line.
-   *
-   * <p>
-   * If an {@link IOException} is thrown when accessing the underlying
-   * {@code BufferedReader}, it is wrapped in an {@link UncheckedIOException}
-   * which will be thrown from the {@code Stream} method that caused the read to
-   * take place. This method will return a Stream if invoked on a BufferedReader
-   * that is closed. Any operation on that stream that requires reading from the
-   * BufferedReader after it is closed, will cause an UncheckedIOException to be
-   * thrown.
-   *
-   * @return a {@code Stream<String>} providing the lines of text described by
-   *         this {@code BufferedReader}
-   *
-   * @since 1.8
+   * @return the stream
    */
   public Stream<String> lines() {
     Iterator<String> iter = new Iterator<String>() {

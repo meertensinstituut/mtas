@@ -151,6 +151,9 @@ public class MtasCodec extends Codec {
     return delegate.compoundFormat();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.codecs.Codec#pointsFormat()
+   */
   @Override
   public PointsFormat pointsFormat() {
     initDelegate();

@@ -7,24 +7,14 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import mtas.analysis.parser.MtasBasicParser;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
-import mtas.analysis.util.MtasConfiguration;
 import mtas.codec.payload.MtasPayloadEncoder;
 
 import org.apache.lucene.analysis.Tokenizer;
@@ -32,7 +22,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.util.AttributeFactory;
 
 /**
@@ -40,6 +29,7 @@ import org.apache.lucene.util.AttributeFactory;
  */
 public final class MtasTokenizer extends Tokenizer {
 
+  /** The configuration mtas. */
   public static String CONFIGURATION_MTAS = "mtas";
 
   /** The current position. */
@@ -51,7 +41,7 @@ public final class MtasTokenizer extends Tokenizer {
   /** The parser name. */
   private String parserName = null;
 
-  /** The parser configurations. */
+  /** The parser configuration. */
   MtasConfiguration parserConfiguration = null;
 
   /** The token collection. */
@@ -84,8 +74,7 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Instantiates a new mtas tokenizer.
    *
-   * @param configFileName
-   *          the config file name
+   * @param configFileName the config file name
    */
   public MtasTokenizer(String configFileName) {
     readConfigurationFile(configFileName);
@@ -94,24 +83,39 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Instantiates a new mtas tokenizer.
    *
-   * @param config
-   *          the config
-   * @throws IOException
+   * @param config the config
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasTokenizer(MtasConfiguration config) throws IOException {
     processConfiguration(config);
   }
 
+  /**
+   * Instantiates a new mtas tokenizer.
+   *
+   * @param reader the reader
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasTokenizer(InputStream reader) throws IOException {
     processConfiguration(MtasConfiguration.readConfiguration(reader));
   }
 
+  /**
+   * Instantiates a new mtas tokenizer.
+   *
+   * @param factory the factory
+   * @param config the config
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasTokenizer(AttributeFactory factory, MtasConfiguration config)
       throws IOException {
     super(factory);
     processConfiguration(config);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.analysis.TokenStream#incrementToken()
+   */
   @Override
   public boolean incrementToken() throws IOException {
     clearAttributes();
@@ -154,6 +158,7 @@ public final class MtasTokenizer extends Tokenizer {
           e.getClass().getSimpleName() + ": " + e.getMessage());
     } catch (MtasParserException e) {
       tokenCollectionIterator = null;
+      e.printStackTrace();
       throw new IOException(
           e.getClass().getSimpleName() + ": " + e.getMessage());
     }
@@ -163,12 +168,9 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Prints the.
    *
-   * @param r
-   *          the r
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @param r the r
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws MtasParserException the mtas parser exception
    */
   public void print(Reader r) throws IOException, MtasParserException {
     setReader(r);
@@ -178,6 +180,14 @@ public final class MtasTokenizer extends Tokenizer {
     close();
   }
 
+  /**
+   * Gets the list.
+   *
+   * @param r the r
+   * @return the list
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws MtasParserException the mtas parser exception
+   */
   public String[][] getList(Reader r) throws IOException, MtasParserException {
     setReader(r);
     reset();
@@ -190,11 +200,9 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Construct token collection.
    *
-   * @param reader
-   *          the reader
-   * @throws MtasConfigException
-   *           the mtas config exception
-   * @throws MtasParserException 
+   * @param reader the reader
+   * @throws MtasConfigException the mtas config exception
+   * @throws MtasParserException the mtas parser exception
    */
   private void constructTokenCollection(Reader reader)
       throws MtasConfigException, MtasParserException {
@@ -211,6 +219,7 @@ public final class MtasTokenizer extends Tokenizer {
           return;
         } catch (MtasParserException e) {          
           tokenCollection = new MtasTokenCollection();
+          e.printStackTrace();
           throw new MtasParserException(e.getMessage());
         }
       } else {
@@ -238,8 +247,7 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Read configuration file.
    *
-   * @param configFile
-   *          the config file
+   * @param configFile the config file
    */
   private void readConfigurationFile(String configFile) {
     InputStream is;
@@ -256,6 +264,12 @@ public final class MtasTokenizer extends Tokenizer {
 
   
 
+  /**
+   * Process configuration.
+   *
+   * @param config the config
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void processConfiguration(MtasConfiguration config)
       throws IOException {
     HashMap<String, Integer> indexEncodingMapper = new HashMap<String, Integer>();

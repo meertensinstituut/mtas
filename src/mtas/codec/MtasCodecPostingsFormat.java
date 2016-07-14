@@ -60,7 +60,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /** The Constant MTAS_STORAGE_LONG. */
   public static final int MTAS_STORAGE_LONG = 3;
 
-  /** The Constant MTAS_TMP_INDEX_FIELD. */
+  /** The Constant MTAS_TMP_FIELD_EXTENSION. */
   public static final String MTAS_TMP_FIELD_EXTENSION = "mtas.field.tmp";
 
   /** The Constant MTAS_TMP_OBJECT_EXTENSION. */
@@ -108,7 +108,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /** The Constant MTAS_INDEX_OBJECT_PARENT_EXTENSION. */
   public static final String MTAS_INDEX_OBJECT_PARENT_EXTENSION = "mtas.index.object.parent";
 
-  /** The Constant MTAS_INDEX_PREFIX_TERM_POSITION_EXTENSION. */
+  /** The Constant MTAS_INDEX_TERM_PREFIX_POSITION_EXTENSION. */
   public static final String MTAS_INDEX_TERM_PREFIX_POSITION_EXTENSION = "mtas.index.term.prefix.position";
 
   /** The payload decoder. */
@@ -130,8 +130,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Instantiates a new mtas codec postings format.
    *
-   * @param delegate
-   *          the delegate
+   * @param delegate the delegate
    */
   public MtasCodecPostingsFormat(PostingsFormat delegate) {
     super(MtasCodec.MTAS_CODEC_NAME);
@@ -154,8 +153,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Instantiates a new mtas codec postings format.
    *
-   * @param codecName
-   *          the codec name
+   * @param codecName the codec name
    */
   public MtasCodecPostingsFormat(String codecName) {
     super(codecName);
@@ -212,12 +210,9 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Gets the token.
    *
-   * @param inObject
-   *          the in object
-   * @param inTerm
-   *          the in term
-   * @param ref
-   *          the ref
+   * @param inObject the in object
+   * @param inTerm the in term
+   * @param ref the ref
    * @return the token
    */
   public static MtasToken<String> getToken(IndexInput inObject,

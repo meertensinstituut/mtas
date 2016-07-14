@@ -18,8 +18,14 @@ import org.apache.solr.schema.PreAnalyzedField.ParseResult;
 import org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser;
 import mtas.solr.update.processor.MtasUpdateRequestProcessorResult;
 
+/**
+ * The Class MtasPreAnalyzedParser.
+ */
 public class MtasPreAnalyzedParser implements PreAnalyzedParser {
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#parse(java.io.Reader, org.apache.lucene.util.AttributeSource)
+   */
   @Override
   public ParseResult parse(Reader reader, AttributeSource parent)
       throws IOException {
@@ -79,6 +85,9 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
     return res;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#toFormattedString(org.apache.lucene.document.Field)
+   */
   @Override
   public String toFormattedString(Field f) throws IOException {
     return this.getClass().getName()+" "+f.name();

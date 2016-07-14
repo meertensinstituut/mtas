@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 
 /**
- * The Class MtasTreeNode.
+ * The Class IntervalTreeNode.
  *
  * @param <N> the number type
  */
@@ -37,11 +37,12 @@ abstract public class IntervalTreeNode<N extends IntervalTreeNode<N>> {
     public N rightChild;
     
     
+    /** The lists. */
     public ArrayList<ArrayList<MtasTreeHit<?>>> lists;
 
     // node with start and end position
     /**
-     * Instantiates a new mtas tree node.
+     * Instantiates a new interval tree node.
      *
      * @param left the left
      * @param right the right
@@ -56,10 +57,9 @@ abstract public class IntervalTreeNode<N extends IntervalTreeNode<N>> {
 
     // add id to node
     /**
-     * Adds the id.
+     * Adds the list.
      *
-     * @param id the id
-     * @param ref the ref
+     * @param list the list
      */
     final public void addList(ArrayList<MtasTreeHit<?>> list) {
       if(list!=null) {

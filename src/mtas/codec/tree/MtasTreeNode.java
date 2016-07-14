@@ -54,6 +54,7 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
      *
      * @param id the id
      * @param ref the ref
+     * @param additionalId the additional id
      */
     final public void addId(Integer id, Long ref, int additionalId) {
       if(id!=null) {

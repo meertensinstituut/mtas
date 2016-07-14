@@ -33,8 +33,7 @@ public class MtasTokenCollection {
   /**
    * Adds the.
    *
-   * @param token
-   *          the token
+   * @param token the token
    * @return the integer
    */
   public Integer add(MtasToken<?> token) {
@@ -46,8 +45,7 @@ public class MtasTokenCollection {
   /**
    * Gets the.
    *
-   * @param id
-   *          the id
+   * @param id the id
    * @return the mtas token
    */
   public MtasToken<?> get(Integer id) {
@@ -58,8 +56,7 @@ public class MtasTokenCollection {
    * Iterator.
    *
    * @return the iterator
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public Iterator<MtasToken<?>> iterator() throws MtasParserException {
     checkTokenCollectionIndex();
@@ -88,8 +85,7 @@ public class MtasTokenCollection {
   /**
    * Prints the.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public void print() throws MtasParserException {
     Iterator<MtasToken<?>> it = this.iterator();
@@ -99,6 +95,12 @@ public class MtasTokenCollection {
     }
   }
 
+  /**
+   * Gets the list.
+   *
+   * @return the list
+   * @throws MtasParserException the mtas parser exception
+   */
   public String[][] getList() throws MtasParserException {
     String[][] result = new String[(tokenCollection.size() + 1)][];
     result[0] = new String[] { "id", "start real offset", "end real offset",
@@ -156,10 +158,8 @@ public class MtasTokenCollection {
   /**
    * Check.
    *
-   * @param autorepair
-   *          the autorepair
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @param autorepair the autorepair
+   * @throws MtasParserException the mtas parser exception
    */
   public void check(Boolean autorepair) throws MtasParserException {
     if (autorepair) {
@@ -256,8 +256,7 @@ public class MtasTokenCollection {
   /**
    * Check token collection index.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   private void checkTokenCollectionIndex() throws MtasParserException {
     if (tokenCollectionIndex.size() != tokenCollection.size()) {

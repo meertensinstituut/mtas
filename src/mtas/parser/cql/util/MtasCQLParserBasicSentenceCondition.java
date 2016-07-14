@@ -10,12 +10,23 @@ import mtas.search.spans.MtasSpanSequenceQuery;
 
 import org.apache.lucene.search.spans.SpanQuery;
 
+/**
+ * The Class MtasCQLParserBasicSentenceCondition.
+ */
 public class MtasCQLParserBasicSentenceCondition {
 
+  /** The part list. */
   private List<MtasCQLParserBasicSentencePartCondition> partList;
+  
+  /** The maximum occurence. */
   private int minimumOccurence, maximumOccurence;
+  
+  /** The optional parts. */
   private boolean simplified, optional, optionalParts;
 
+  /**
+   * Instantiates a new mtas cql parser basic sentence condition.
+   */
   public MtasCQLParserBasicSentenceCondition() {
     partList = new ArrayList<MtasCQLParserBasicSentencePartCondition>();
     minimumOccurence = 1;
@@ -24,6 +35,12 @@ public class MtasCQLParserBasicSentenceCondition {
     simplified = false;
   }
 
+  /**
+   * Adds the word.
+   *
+   * @param w the w
+   * @throws ParseException the parse exception
+   */
   public void addWord(MtasCQLParserWordFullCondition w) throws ParseException {
     assert w.getCondition().not() == false : "condition word should be positive in sentence definition";
     if (!simplified) {
@@ -33,6 +50,12 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
   
+  /**
+   * Adds the group.
+   *
+   * @param w the w
+   * @throws ParseException the parse exception
+   */
   public void addGroup(MtasCQLParserGroupFullCondition w) throws ParseException {
     if (!simplified) {
       partList.add(w);
@@ -41,6 +64,12 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
+  /**
+   * Adds the basic sentence.
+   *
+   * @param s the s
+   * @throws ParseException the parse exception
+   */
   public void addBasicSentence(MtasCQLParserBasicSentenceCondition s)
       throws ParseException {
     if (!simplified) {
@@ -51,14 +80,31 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
+  /**
+   * Gets the minimum occurence.
+   *
+   * @return the minimum occurence
+   */
   public int getMinimumOccurence() {
     return minimumOccurence;
   }
 
+  /**
+   * Gets the maximum occurence.
+   *
+   * @return the maximum occurence
+   */
   public int getMaximumOccurence() {
     return maximumOccurence;
   }
 
+  /**
+   * Sets the occurence.
+   *
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
+   */
   public void setOccurence(int min, int max) throws ParseException {
     if (!simplified) {
       if ((min < 0) || (min > max) || (max < 1)) {
@@ -74,10 +120,21 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
+  /**
+   * Checks if is optional.
+   *
+   * @return true, if is optional
+   */
   public boolean isOptional() {
     return optional;
   }
   
+  /**
+   * Checks for optional parts.
+   *
+   * @return true, if successful
+   * @throws ParseException the parse exception
+   */
   public boolean hasOptionalParts() throws ParseException {
     if(simplified) {
       return optionalParts;
@@ -86,10 +143,21 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
+  /**
+   * Sets the optional.
+   *
+   * @param status the new optional
+   * @throws ParseException the parse exception
+   */
   public void setOptional(boolean status) throws ParseException {
     optional = status;
   }
 
+  /**
+   * Simplify.
+   *
+   * @throws ParseException the parse exception
+   */
   public void simplify() throws ParseException {
     if (!simplified) {
       simplified = true;
@@ -171,10 +239,21 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
+  /**
+   * Gets the part list.
+   *
+   * @return the part list
+   */
   public List<MtasCQLParserBasicSentencePartCondition> getPartList() {
     return partList;
   }
 
+  /**
+   * Gets the query.
+   *
+   * @return the query
+   * @throws ParseException the parse exception
+   */
   public SpanQuery getQuery() throws ParseException {
     simplify();
     MtasSpanSequenceItem currentQuery = null;
@@ -212,6 +291,9 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     String text = "BASIC SENTENCE";

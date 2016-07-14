@@ -10,16 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.lucene.codecs.CompoundFormat;
-import org.apache.lucene.codecs.SegmentInfoFormat;
-import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.SegmentCommitInfo;
-import org.apache.lucene.index.SegmentInfo;
-import org.apache.lucene.index.SegmentInfos;
-import org.apache.lucene.store.Directory;
 import org.apache.solr.common.util.ContentStream;
-import org.apache.solr.core.DirectoryFactory;
-import org.apache.solr.core.DirectoryFactory.DirContext;
 import org.apache.solr.handler.RequestHandlerBase;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
@@ -30,19 +21,44 @@ import mtas.analysis.MtasTokenizer;
 import mtas.analysis.util.MtasFetchData;
 import mtas.analysis.util.MtasParserException;
 
+/**
+ * The Class MtasRequestHandler.
+ */
 public class MtasRequestHandler extends RequestHandlerBase {
 
+  /** The error. */
   private static String ERROR = "error";
+  
+  /** The action config files. */
   private static String ACTION_CONFIG_FILES = "files";
+  
+  /** The action config file. */
   private static String ACTION_CONFIG_FILE = "file";
+  
+  /** The action mapping. */
   private static String ACTION_MAPPING = "mapping";
+  
+  /** The action segments. */
   private static String ACTION_SEGMENTS = "segments";
+  
+  /** The param action. */
   private static String PARAM_ACTION = "action";
+  
+  /** The param config file. */
   private static String PARAM_CONFIG_FILE = "file";
+  
+  /** The param mapping configuration. */
   private static String PARAM_MAPPING_CONFIGURATION = "configuration";
+  
+  /** The param mapping document. */
   private static String PARAM_MAPPING_DOCUMENT = "document";
+  
+  /** The param mapping document url. */
   private static String PARAM_MAPPING_DOCUMENT_URL = "url";
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.RequestHandlerBase#handleRequestBody(org.apache.solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse)
+   */
   @Override
   public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp)
       throws IOException {
@@ -109,6 +125,13 @@ public class MtasRequestHandler extends RequestHandlerBase {
     }
   }
 
+  /**
+   * Gets the files.
+   *
+   * @param dir the dir
+   * @param subDir the sub dir
+   * @return the files
+   */
   private ArrayList<String> getFiles(String dir, String subDir) {
     ArrayList<String> files = new ArrayList<String>();
     String fullDir = subDir == null ? dir : dir + File.separator + subDir;
@@ -125,11 +148,21 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return files;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.RequestHandlerBase#getDescription()
+   */
   @Override
   public String getDescription() {
     return "Mtas Request Handler";
   }
 
+  /**
+   * Gets the params from json.
+   *
+   * @param params the params
+   * @param json the json
+   * @return the params from json
+   */
   private static void getParamsFromJSON(Map<String, String> params,
       String json) {
     JSONParser parser = new JSONParser(json);

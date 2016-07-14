@@ -105,6 +105,10 @@ import org.apache.lucene.util.BytesRef;
  *</ul>
  *
  */
+
+/**
+ * The Class MtasPayloadEncoder.
+ */
 public class MtasPayloadEncoder {
 
   /** The mtas token. */
@@ -139,10 +143,8 @@ public class MtasPayloadEncoder {
   /**
    * Instantiates a new mtas payload encoder.
    *
-   * @param token
-   *          the token
-   * @param flags
-   *          the flags
+   * @param token the token
+   * @param flags the flags
    */
   public MtasPayloadEncoder(MtasToken<?> token, int flags) {
     mtasToken = token;
@@ -153,8 +155,7 @@ public class MtasPayloadEncoder {
   /**
    * Instantiates a new mtas payload encoder.
    *
-   * @param token
-   *          the token
+   * @param token the token
    */
   public MtasPayloadEncoder(MtasToken<?> token) {
     this(token, ENCODE_DEFAULT);
@@ -164,8 +165,7 @@ public class MtasPayloadEncoder {
    * Gets the payload.
    *
    * @return the payload
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public BytesRef getPayload() throws IOException {
 

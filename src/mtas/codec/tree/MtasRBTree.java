@@ -12,6 +12,9 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
 
   /**
    * Instantiates a new mtas rb tree.
+   *
+   * @param singlePoint the single point
+   * @param storePrefixId the store prefix id
    */
   public MtasRBTree(boolean singlePoint, boolean storePrefixId) {
     super(singlePoint, storePrefixId);
@@ -61,6 +64,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
    * @param n the n
    * @param left the left
    * @param right the right
+   * @param additionalId the additional id
    * @param id the id
    * @param ref the ref
    * @return the mtas rb tree node

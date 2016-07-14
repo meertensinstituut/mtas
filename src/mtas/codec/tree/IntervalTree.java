@@ -11,18 +11,21 @@ import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 
 /**
- * The Class MtasTree.
+ * The Class IntervalTree.
  *
  * @param <N> the number type
  */
 abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
   
-  /** The root. */
+  /** The current. */
   protected N root, current;
   
   /** The closed. */
   private Boolean closed;
   
+  /**
+   * Instantiates a new interval tree.
+   */
   public IntervalTree() {
     root = null;
     closed = false; 
@@ -42,26 +45,24 @@ abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
   } 
   
   /**
-   * Adds the token single point.
+   * Adds the single point.
    *
    * @param position the position
-   * @param id the id
-   * @param ref the ref
+   * @param list the list
    */
   abstract protected void addSinglePoint(int position, ArrayList<MtasTreeHit<?>> list);
   
   /**
-   * Adds the token range.
+   * Adds the range.
    *
    * @param left the left
    * @param right the right
-   * @param id the id
-   * @param ref the ref
+   * @param list the list
    */
   abstract protected void addRange(int left, int right, ArrayList<MtasTreeHit<?>> list);
   
   /**
-   * Adds the token range empty.
+   * Adds the range empty.
    *
    * @param left the left
    * @param right the right
@@ -94,14 +95,29 @@ abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
     }
   }
   
+  /**
+   * Gets the root.
+   *
+   * @return the root
+   */
   final public N getRoot() {
     return root;
   }
   
+  /**
+   * Gets the current.
+   *
+   * @return the current
+   */
   final public N getCurrent() {
     return current;
   }
   
+  /**
+   * Sets the current.
+   *
+   * @param node the new current
+   */
   final public void setCurrent(N node) {
     current = node;
   }

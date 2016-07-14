@@ -6,19 +6,46 @@ import java.util.List;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
+/**
+ * The Class MtasSpanRecurrence.
+ */
 public class MtasSpanRecurrence extends Spans {
 
+  /** The spans. */
   Spans spans;
+  
+  /** The minimum recurrence. */
   int minimumRecurrence;
+  
+  /** The maximum recurrence. */
   int maximumRecurrence;
 
+  /** The queue spans. */
   List<Match> queueSpans;
+  
+  /** The queue matches. */
   List<Match> queueMatches;
+  
+  /** The current match. */
   Match currentMatch;
+  
+  /** The no more positions. */
   boolean noMorePositions;
+  
+  /** The last start position. */
   int lastStartPosition; // startPosition of last retrieved span
+  
+  /** The last span. */
   boolean lastSpan; // last span for this document added to queue
 
+  /**
+   * Instantiates a new mtas span recurrence.
+   *
+   * @param mtasSpanRecurrenceQuery the mtas span recurrence query
+   * @param spans the spans
+   * @param minimumRecurrence the minimum recurrence
+   * @param maximumRecurrence the maximum recurrence
+   */
   public MtasSpanRecurrence(MtasSpanRecurrenceQuery mtasSpanRecurrenceQuery,
       Spans spans, int minimumRecurrence, int maximumRecurrence) {
     assert minimumRecurrence <= maximumRecurrence : "minimumRecurrence > maximumRecurrence";
@@ -31,6 +58,9 @@ public class MtasSpanRecurrence extends Spans {
     resetQueue();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
   @Override
   public int nextStartPosition() throws IOException {
     if (findMatches()) {
@@ -45,39 +75,60 @@ public class MtasSpanRecurrence extends Spans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
   @Override
   public int startPosition() {
     return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
         : currentMatch.startPosition();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
   @Override
   public int endPosition() {
     return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
         : currentMatch.endPosition();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
   @Override
   public int width() {
     return 1;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans.collect(collector);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
   @Override
   public int docID() {
     return spans.docID();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
   @Override
   public int nextDoc() throws IOException {
     resetQueue();
     return (spans.nextDoc() == NO_MORE_DOCS) ? NO_MORE_DOCS : toMatchDoc();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
   @Override
   public int advance(int target) throws IOException {
     resetQueue();
@@ -85,6 +136,9 @@ public class MtasSpanRecurrence extends Spans {
         : toMatchDoc();
   }
 
+  /**
+   * Reset queue.
+   */
   void resetQueue() {
     queueSpans.clear();
     queueMatches.clear();
@@ -94,6 +148,12 @@ public class MtasSpanRecurrence extends Spans {
     noMorePositions = false;
   }
 
+  /**
+   * To match doc.
+   *
+   * @return the int
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   int toMatchDoc() throws IOException {
     while (true) {
       if (findMatches()) {
@@ -106,6 +166,12 @@ public class MtasSpanRecurrence extends Spans {
     }
   }
 
+  /**
+   * Collect span.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
     if (lastSpan) {
@@ -120,6 +186,12 @@ public class MtasSpanRecurrence extends Spans {
     }
   }
 
+  /**
+   * Find matches.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
     if (!queueMatches.isEmpty()) {
@@ -158,6 +230,13 @@ public class MtasSpanRecurrence extends Spans {
     }
   }
 
+  /**
+   * Find matches.
+   *
+   * @param match the match
+   * @param n the n
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
       int largestMatchingEndPosition = match.endPosition();
@@ -199,23 +278,49 @@ public class MtasSpanRecurrence extends Spans {
     }
   }
 
+  /**
+   * The Class Match.
+   */
   private class Match {
+    
+    /** The start position. */
     private int startPosition;
+    
+    /** The end position. */
     private int endPosition;
 
+    /**
+     * Instantiates a new match.
+     *
+     * @param startPosition the start position
+     * @param endPosition the end position
+     */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
       this.endPosition = endPosition;
     }
 
+    /**
+     * Start position.
+     *
+     * @return the int
+     */
     public int startPosition() {
       return startPosition;
     }
 
+    /**
+     * End position.
+     *
+     * @return the int
+     */
     public int endPosition() {
       return endPosition;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object object) {
       if (this.getClass().equals(object.getClass())) {
@@ -229,11 +334,17 @@ public class MtasSpanRecurrence extends Spans {
 
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
   @Override
   public long cost() {
     return (spans == null) ? 0 : spans.cost();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
   @Override
   public float positionsCost() {
     return 0;

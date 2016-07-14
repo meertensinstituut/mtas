@@ -14,12 +14,28 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.SyntaxError;
 
+/**
+ * The Class MtasCQLQParser.
+ */
 public class MtasCQLQParser extends QParser {
 
+  /** The field. */
   String field = null;
+  
+  /** The cql. */
   String cql = null;
+  
+  /** The msc. */
   MtasSolrSearchComponent msc = null;
   
+  /**
+   * Instantiates a new mtas cqlq parser.
+   *
+   * @param qstr the qstr
+   * @param localParams the local params
+   * @param params the params
+   * @param req the req
+   */
   public MtasCQLQParser(String qstr, SolrParams localParams,
       SolrParams params, SolrQueryRequest req) {
     super(qstr, localParams, params, req);
@@ -37,6 +53,9 @@ public class MtasCQLQParser extends QParser {
    
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.search.QParser#parse()
+   */
   @Override
   public Query parse() throws SyntaxError {
     if(field==null) {

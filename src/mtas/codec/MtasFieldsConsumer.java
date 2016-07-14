@@ -17,8 +17,6 @@ import mtas.analysis.token.MtasPosition;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.payload.MtasPayloadDecoder;
 import mtas.codec.tree.*;
-import mtas.codec.util.CodecInfo;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsConsumer;
@@ -36,276 +34,279 @@ import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
 
 /**
- *
- * The Class MtasFieldsConsumer constructs several temporal and permanent files
- * to provide a forward index
- *
- * <ul>
- * <li><b>Temporary files</b><br>
- * <ul>
- * <li><b>Temporary file {@link #mtasTmpFieldFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_FIELD_EXTENSION} </b><br>
- * Contains for each field a reference to the list of documents. Structure of
- * content:
- * <ul>
- * <li><b>String</b>: field</li>
- * <li><b>VLong</b>: reference to {@link #mtasDocFileName}</li>
- * <li><b>VInt</b>: number of documents</li>
- * <li><b>VLong</b>: reference to {@link #mtasTermFileName}</li>
- * <li><b>VInt</b>: number of terms</li>
- * <li><b>VLong</b>: reference to {@link #mtasPrefixFileName}</li>
- * <li><b>VInt</b>: number of prefixes</li>
- * </ul>
- * </li>
- * <li><b>Temporary file {@link #mtasTmpObjectFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_OBJECT_EXTENSION}</b><br>
- * Contains for a specific field all objects constructed by
- * {@link createObjectAndRegisterPrefix}. For all fields, the objects are later
- * on copied to {@link #mtasObjectFileName} while statistics are collected.
- * Structure of content identical to {@link #mtasObjectFileName}.</li>
- * <li><b>Temporary file {@link #mtasTmpDocsFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOCS_EXTENSION}</b> <br>
- * Contains for a specific field for each doc multiple fragments. Each occurring
- * term results in a fragment. Structure of content:
- * <ul>
- * <li><b>VInt</b>: docId</li>
- * <li><b>VInt</b>: number of objects in this fragment</li>
- * <li><b>VLong</b>: offset references to {@link #mtasTmpObjectFileName}</li>
- * <li><b>VInt</b>,<b>VLong</b>: mtasId object, reference temporary object in
- * {@link #mtasTmpObjectFileName} minus offset</li>
- * <li><b>VInt</b>,<b>VLong</b>: ...</li>
- * </ul>
- * </li>
- * <li><b>Temporary file {@link #mtasTmpDocsChainedFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOCS_CHAINED_EXTENSION}
- * </b><br>
- * Contains for a specific field for each doc multiple chained fragments.
- * Structure of content:
- * <ul>
- * <li><b>VInt</b>: docId</li>
- * <li><b>VInt</b>: number of objects in this fragment</li>
- * <li><b>VLong</b>: offset references to {@link #mtasTmpObjectFileName}</li>
- * <li><b>VInt</b>,<b>VLong</b>: mtasId object, reference temporary object in
- * {@link #mtasTmpObjectFileName} minus offset</li>
- * <li><b>VInt</b>,<b>VLong</b>: ...</li>
- * <li><b>VLong</b>: reference to next fragment in
- * {@link #mtasTmpDocsChainedFileName}, self reference indicates end of chain
- * </ul>
- * </li>
- * <li><b>Temporary file {@link #mtasTmpDocFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOC_EXTENSION}</b><br>
- * For each document
- * <ul>
- * <li><b>VInt</b>: docId</li>
- * <li><b>VLong</b>: reference to {@link #mtasIndexObjectIdFileName}</li>
- * <li><b>VLong</b>: reference first object, used as offset for tree index
- * <li><b>VInt</b>: slope used in approximation reference objects index on id
- * </li>
- * <li><b>ZLong</b>: offset used in approximation reference objects index on id
- * </li>
- * <li><b>Byte</b>: flag indicating how corrections on the approximation
- * references objects for the index on id are stored:
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_BYTE},
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_SHORT},
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_INTEGER} or
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_LONG}</li>
- * <li><b>VInt</b>: number of objects in this document</li>
- * <li><b>VInt</b>: first position</li>
- * <li><b>VInt</b>: last position</li>
- * </ul>
- * </li>
- * </ul>
- * </li>
- * <li><b>Final files</b><br>
- * <ul>
- * <li><b>File {@link #mtasIndexFieldFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_FIELD_EXTENSION}</b><br>
- * Contains for each field a reference to the list of documents and the
- * prefixes. Structure of content:
- * <ul>
- * <li><b>String</b>: field</li>
- * <li><b>VLong</b>: reference to {@link #mtasDocFileName}</li>
- * <li><b>VLong</b>: reference to {@link #mtasIndexDocIdFileName}</li>
- * <li><b>VInt</b>: number of documents</li>
- * <li><b>VLong</b>: reference to {@link #mtasTermFileName}</li>
- * <li><b>VInt</b>: number of terms</li>
- * <li><b>VLong</b>: reference to {@link #mtasPrefixFileName}</li>
- * <li><b>VInt</b>: number of prefixes</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasTermFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TERM_EXTENSION}</b><br>
- * For each field, all unique terms are stored here. Structure of content:
- * <ul>
- * <li><b>String</b>: term</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasPrefixFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_PREFIX_EXTENSION}</b><br>
- * For each field, all unique prefixes are stored here. Structure of content:
- * <ul>
- * <li><b>String</b>: prefix</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasObjectFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_OBJECT_EXTENSION}</b><br>
- * Contains all objects for all fields. Structure of content:
- * <ul>
- * <li><b>VInt</b>: mtasId</li>
- * <li><b>VInt</b>: objectFlags
- * <ul>
- * <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PARENT}</li>
- * <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}</li>
- * <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}</li>
- * <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_OFFSET}</li>
- * <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_REALOFFSET}</li>
- * <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PAYLOAD}</li>
- * </ul>
- * </li>
- * <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PARENT}<br>
- * <b>VInt</b>: parentId
- * <li>Only if
- * {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}<br>
- * <b>VInt</b>,<b>VInt</b>: startPosition and (endPosition-startPosition)
- * <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}<br>
- * <b>VInt</b>,<b>VInt</b>,<b>VInt</b>,...: number of positions, firstPosition,
- * (position-previousPosition),...
- * <li>Only if no {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}
- * or {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}<br>
- * <b>VInt</b>: position
- * <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_OFFSET}<br>
- * <b>VInt</b>,<b>VInt</b>: startOffset, (endOffset-startOffset)
- * <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_REALOFFSET}<br>
- * <b>VInt</b>,<b>VInt</b>: startRealOffset, (endRealOffset-startRealOffset)
- * <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PAYLOAD}<br>
- * <b>VInt</b>,<b>Bytes</b>: number of bytes, payload
- * <li><b>VLong</b>: reference to Term in {@link #mtasTermFileName}</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasIndexDocIdFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_DOC_ID_EXTENSION}
- * </b><br>
- * Contains for each field a tree structure {@link MtasTree} to search reference
- * to {@link #mtasDocFileName} by id. Structure of content for each node:
- * <ul>
- * <li><b>VLong</b>: offset references to {@link #mtasIndexDocIdFileName}, only
- * available in root node</li>
- * <li><b>Byte</b>: flag, should be zero for this tree, only available in root
- * node</li>
- * <li><b>VInt</b>: left</li>
- * <li><b>VInt</b>: right</li>
- * <li><b>VInt</b>: max</li>
- * <li><b>VLong</b>: left reference to {@link #mtasIndexDocIdFileName} minus the
- * offset stored in the root node</li>
- * <li><b>VLong</b>: right reference to {@link #mtasIndexDocIdFileName} minus
- * the offset stored in the root node</li>
- * <li><b>VInt</b>: number of objects on this node (always 1 for this tree)</li>
- * <li><b>VLong</b>: reference to {@link #mtasDocFileName} minus offset</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasDocFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_DOC_EXTENSION}</b><br>
- * For each document
- * <ul>
- * <li><b>VInt</b>: docId</li>
- * <li><b>VLong</b>: reference to {@link #mtasIndexObjectIdFileName}</li>
- * <li><b>VLong</b>: reference to {@link #mtasIndexObjectPositionFileName}</li>
- * <li><b>VLong</b>: reference to {@link #mtasIndexObjectParentFileName}</li>
- * <li><b>VLong</b>: reference to {@link #mtasIndexTermPrefixPositionFileName}
- * (only version {@value mtas.codec.MtasCodecPostingsFormat#VERSION_START})</li>
- * <li><b>VLong</b>: reference first object, used as offset for tree index
- * <li><b>VInt</b>: slope used in approximation reference objects index on id
- * </li>
- * <li><b>ZLong</b>: offset used in approximation reference objects index on id
- * </li>
- * <li><b>Byte</b>: flag indicating how corrections on the approximation
- * references objects for the index on id are stored:
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_BYTE},
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_SHORT},
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_INTEGER} or
- * {@link MtasCodecPostingsFormat#MTAS_STORAGE_LONG}</li>
- * <li><b>VInt</b>: number of objects</li>
- * <li><b>VInt</b>: first position</li>
- * <li><b>VInt</b>: last position</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasIndexObjectIdFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_ID_EXTENSION}
- * </b><br>
- * Provides for each mtasId the reference to {@link #mtasObjectFileName}. These
- * references are grouped by document, sorted by mtasId, and because the
- * mtasId's for each document will always start with 0 and are sequential
- * without gaps, a reference can be computed if the position of the first
- * reference for a document is known from {@link #mtasDocFileName}. The
- * reference is approximated by the reference to the first object plus the
- * mtasId times a slope. Only a correction to this approximation is stored.
- * Structure of content:
- * <ul>
- * <li><b>Byte</b>/<b>Short</b>/<b>Int</b>/<b>Long</b>: correction reference to
- * {@link #mtasObjectFileName}</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasIndexObjectPositionFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_POSITION_EXTENSION}
- * </b><br>
- * Contains for each document a tree structure {@link MtasTree} to search
- * objects by position. Structure of content for each node:
- * <ul>
- * <li><b>VLong</b>: offset references to
- * {@link #mtasIndexObjectPositionFileName}, only available in root node</li>
- * <li><b>Byte</b>: flag, should be zero for this tree, only available in root
- * node</li>
- * <li><b>VInt</b>: left</li>
- * <li><b>VInt</b>: right</li>
- * <li><b>VInt</b>: max</li>
- * <li><b>VLong</b>: left reference to {@link #mtasIndexObjectPositionFileName}
- * minus the offset stored in the root node</li>
- * <li><b>VLong</b>: right reference to {@link #mtasIndexObjectPositionFileName}
- * minus the offset stored in the root node</li>
- * <li><b>VInt</b>: number of objects on this node</li>
- * <li><b>VLong</b>,<b>VInt</b>: pair of the first reference to
- * {@link #mtasObjectFileName} minus offset and the prefixId referring to the
- * position the prefix in {@link #mtasPrefixFileName}</li>
- * <li><b>VLong</b>,<b>VInt</b>,...: for optional other pairs of reference to
- * {@link #mtasObjectFileName} and position of the prefix in
- * {@link #mtasPrefixFileName}; the difference between this reference minus the
- * previous reference is stored</li>
- * </ul>
- * </li>
- * <li><b>File {@link #mtasIndexObjectParentFileName} with extension
- * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_PARENT_EXTENSION}
- * </b><br>
- * Contains for each document a tree structure {@link MtasTree} to search
- * objects by parent. Structure of content for each node:
- * <ul>
- * <li><b>VLong</b>: offset references to {@link #mtasIndexObjectParentFileName}
- * , only available in root node</li>
- * <li><b>Byte</b>: flag, for this tree equal to
- * {@link mtas.codec.tree.MtasTree#SINGLE_POSITION_TREE} indicating a tree with
- * exactly one point at each node, only available in root node</li>
- * <li><b>VInt</b>: left</li>
- * <li><b>VInt</b>: right</li>
- * <li><b>VInt</b>: max</li>
- * <li><b>VLong</b>: left reference to {@link #mtasIndexObjectParentFileName}
- * minus the offset stored in the root node</li>
- * <li><b>VLong</b>: right reference to {@link #mtasIndexObjectParentFileName}
- * minus the offset stored in the root node</li>
- * <li><b>VInt</b>: number of objects on this node</li>
- * <li><b>VLong</b>,<b>VInt</b>: pair of the first reference to
- * {@link #mtasObjectFileName} minus offset and the prefixId referring to the
- * position the prefix in {@link #mtasPrefixFileName}</li>
- * <li><b>VLong</b>,<b>VInt</b>,...: for optional other pairs of reference to
- * {@link #mtasObjectFileName} and position of the prefix in
- * {@link #mtasPrefixFileName}; the difference between this reference minus the
- * previous reference is stored</li>
- * </ul>
- * </li>
- * </ul>
- * </li>
- * </ul>
- * 
- */
+*
+* The Class MtasFieldsConsumer constructs several temporal and permanent files
+* to provide a forward index
+*
+* <ul>
+* <li><b>Temporary files</b><br>
+* <ul>
+* <li><b>Temporary file {@link #mtasTmpFieldFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_FIELD_EXTENSION} </b><br>
+* Contains for each field a reference to the list of documents. Structure of
+* content:
+* <ul>
+* <li><b>String</b>: field</li>
+* <li><b>VLong</b>: reference to {@link #mtasDocFileName}</li>
+* <li><b>VInt</b>: number of documents</li>
+* <li><b>VLong</b>: reference to {@link #mtasTermFileName}</li>
+* <li><b>VInt</b>: number of terms</li>
+* <li><b>VLong</b>: reference to {@link #mtasPrefixFileName}</li>
+* <li><b>VInt</b>: number of prefixes</li>
+* </ul>
+* </li>
+* <li><b>Temporary file {@link #mtasTmpObjectFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_OBJECT_EXTENSION}</b><br>
+* Contains for a specific field all objects constructed by
+* {@link createObjectAndRegisterPrefix}. For all fields, the objects are later
+* on copied to {@link #mtasObjectFileName} while statistics are collected.
+* Structure of content identical to {@link #mtasObjectFileName}.</li>
+* <li><b>Temporary file {@link #mtasTmpDocsFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOCS_EXTENSION}</b> <br>
+* Contains for a specific field for each doc multiple fragments. Each occurring
+* term results in a fragment. Structure of content:
+* <ul>
+* <li><b>VInt</b>: docId</li>
+* <li><b>VInt</b>: number of objects in this fragment</li>
+* <li><b>VLong</b>: offset references to {@link #mtasTmpObjectFileName}</li>
+* <li><b>VInt</b>,<b>VLong</b>: mtasId object, reference temporary object in
+* {@link #mtasTmpObjectFileName} minus offset</li>
+* <li><b>VInt</b>,<b>VLong</b>: ...</li>
+* </ul>
+* </li>
+* <li><b>Temporary file {@link #mtasTmpDocsChainedFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOCS_CHAINED_EXTENSION}
+* </b><br>
+* Contains for a specific field for each doc multiple chained fragments.
+* Structure of content:
+* <ul>
+* <li><b>VInt</b>: docId</li>
+* <li><b>VInt</b>: number of objects in this fragment</li>
+* <li><b>VLong</b>: offset references to {@link #mtasTmpObjectFileName}</li>
+* <li><b>VInt</b>,<b>VLong</b>: mtasId object, reference temporary object in
+* {@link #mtasTmpObjectFileName} minus offset</li>
+* <li><b>VInt</b>,<b>VLong</b>: ...</li>
+* <li><b>VLong</b>: reference to next fragment in
+* {@link #mtasTmpDocsChainedFileName}, self reference indicates end of chain
+* </ul>
+* </li>
+* <li><b>Temporary file {@link #mtasTmpDocFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOC_EXTENSION}</b><br>
+* For each document
+* <ul>
+* <li><b>VInt</b>: docId</li>
+* <li><b>VLong</b>: reference to {@link #mtasIndexObjectIdFileName}</li>
+* <li><b>VLong</b>: reference first object, used as offset for tree index
+* <li><b>VInt</b>: slope used in approximation reference objects index on id
+* </li>
+* <li><b>ZLong</b>: offset used in approximation reference objects index on id
+* </li>
+* <li><b>Byte</b>: flag indicating how corrections on the approximation
+* references objects for the index on id are stored:
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_BYTE},
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_SHORT},
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_INTEGER} or
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_LONG}</li>
+* <li><b>VInt</b>: number of objects in this document</li>
+* <li><b>VInt</b>: first position</li>
+* <li><b>VInt</b>: last position</li>
+* </ul>
+* </li>
+* </ul>
+* </li>
+* <li><b>Final files</b><br>
+* <ul>
+* <li><b>File {@link #mtasIndexFieldFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_FIELD_EXTENSION}</b><br>
+* Contains for each field a reference to the list of documents and the
+* prefixes. Structure of content:
+* <ul>
+* <li><b>String</b>: field</li>
+* <li><b>VLong</b>: reference to {@link #mtasDocFileName}</li>
+* <li><b>VLong</b>: reference to {@link #mtasIndexDocIdFileName}</li>
+* <li><b>VInt</b>: number of documents</li>
+* <li><b>VLong</b>: reference to {@link #mtasTermFileName}</li>
+* <li><b>VInt</b>: number of terms</li>
+* <li><b>VLong</b>: reference to {@link #mtasPrefixFileName}</li>
+* <li><b>VInt</b>: number of prefixes</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasTermFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TERM_EXTENSION}</b><br>
+* For each field, all unique terms are stored here. Structure of content:
+* <ul>
+* <li><b>String</b>: term</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasPrefixFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_PREFIX_EXTENSION}</b><br>
+* For each field, all unique prefixes are stored here. Structure of content:
+* <ul>
+* <li><b>String</b>: prefix</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasObjectFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_OBJECT_EXTENSION}</b><br>
+* Contains all objects for all fields. Structure of content:
+* <ul>
+* <li><b>VInt</b>: mtasId</li>
+* <li><b>VInt</b>: objectFlags
+* <ul>
+* <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PARENT}</li>
+* <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}</li>
+* <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}</li>
+* <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_OFFSET}</li>
+* <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_REALOFFSET}</li>
+* <li>{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PAYLOAD}</li>
+* </ul>
+* </li>
+* <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PARENT}<br>
+* <b>VInt</b>: parentId
+* <li>Only if
+* {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}<br>
+* <b>VInt</b>,<b>VInt</b>: startPosition and (endPosition-startPosition)
+* <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}<br>
+* <b>VInt</b>,<b>VInt</b>,<b>VInt</b>,...: number of positions, firstPosition,
+* (position-previousPosition),...
+* <li>Only if no {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}
+* or {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}<br>
+* <b>VInt</b>: position
+* <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_OFFSET}<br>
+* <b>VInt</b>,<b>VInt</b>: startOffset, (endOffset-startOffset)
+* <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_REALOFFSET}<br>
+* <b>VInt</b>,<b>VInt</b>: startRealOffset, (endRealOffset-startRealOffset)
+* <li>Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PAYLOAD}<br>
+* <b>VInt</b>,<b>Bytes</b>: number of bytes, payload
+* <li><b>VLong</b>: reference to Term in {@link #mtasTermFileName}</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasIndexDocIdFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_DOC_ID_EXTENSION}
+* </b><br>
+* Contains for each field a tree structure {@link MtasTree} to search reference
+* to {@link #mtasDocFileName} by id. Structure of content for each node:
+* <ul>
+* <li><b>VLong</b>: offset references to {@link #mtasIndexDocIdFileName}, only
+* available in root node</li>
+* <li><b>Byte</b>: flag, should be zero for this tree, only available in root
+* node</li>
+* <li><b>VInt</b>: left</li>
+* <li><b>VInt</b>: right</li>
+* <li><b>VInt</b>: max</li>
+* <li><b>VLong</b>: left reference to {@link #mtasIndexDocIdFileName} minus the
+* offset stored in the root node</li>
+* <li><b>VLong</b>: right reference to {@link #mtasIndexDocIdFileName} minus
+* the offset stored in the root node</li>
+* <li><b>VInt</b>: number of objects on this node (always 1 for this tree)</li>
+* <li><b>VLong</b>: reference to {@link #mtasDocFileName} minus offset</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasDocFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_DOC_EXTENSION}</b><br>
+* For each document
+* <ul>
+* <li><b>VInt</b>: docId</li>
+* <li><b>VLong</b>: reference to {@link #mtasIndexObjectIdFileName}</li>
+* <li><b>VLong</b>: reference to {@link #mtasIndexObjectPositionFileName}</li>
+* <li><b>VLong</b>: reference to {@link #mtasIndexObjectParentFileName}</li>
+* <li><b>VLong</b>: reference to {@link #mtasIndexTermPrefixPositionFileName}
+* (only version {@value mtas.codec.MtasCodecPostingsFormat#VERSION_START})</li>
+* <li><b>VLong</b>: reference first object, used as offset for tree index
+* <li><b>VInt</b>: slope used in approximation reference objects index on id
+* </li>
+* <li><b>ZLong</b>: offset used in approximation reference objects index on id
+* </li>
+* <li><b>Byte</b>: flag indicating how corrections on the approximation
+* references objects for the index on id are stored:
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_BYTE},
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_SHORT},
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_INTEGER} or
+* {@link MtasCodecPostingsFormat#MTAS_STORAGE_LONG}</li>
+* <li><b>VInt</b>: number of objects</li>
+* <li><b>VInt</b>: first position</li>
+* <li><b>VInt</b>: last position</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasIndexObjectIdFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_ID_EXTENSION}
+* </b><br>
+* Provides for each mtasId the reference to {@link #mtasObjectFileName}. These
+* references are grouped by document, sorted by mtasId, and because the
+* mtasId's for each document will always start with 0 and are sequential
+* without gaps, a reference can be computed if the position of the first
+* reference for a document is known from {@link #mtasDocFileName}. The
+* reference is approximated by the reference to the first object plus the
+* mtasId times a slope. Only a correction to this approximation is stored.
+* Structure of content:
+* <ul>
+* <li><b>Byte</b>/<b>Short</b>/<b>Int</b>/<b>Long</b>: correction reference to
+* {@link #mtasObjectFileName}</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasIndexObjectPositionFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_POSITION_EXTENSION}
+* </b><br>
+* Contains for each document a tree structure {@link MtasTree} to search
+* objects by position. Structure of content for each node:
+* <ul>
+* <li><b>VLong</b>: offset references to
+* {@link #mtasIndexObjectPositionFileName}, only available in root node</li>
+* <li><b>Byte</b>: flag, should be zero for this tree, only available in root
+* node</li>
+* <li><b>VInt</b>: left</li>
+* <li><b>VInt</b>: right</li>
+* <li><b>VInt</b>: max</li>
+* <li><b>VLong</b>: left reference to {@link #mtasIndexObjectPositionFileName}
+* minus the offset stored in the root node</li>
+* <li><b>VLong</b>: right reference to {@link #mtasIndexObjectPositionFileName}
+* minus the offset stored in the root node</li>
+* <li><b>VInt</b>: number of objects on this node</li>
+* <li><b>VLong</b>,<b>VInt</b>: pair of the first reference to
+* {@link #mtasObjectFileName} minus offset and the prefixId referring to the
+* position the prefix in {@link #mtasPrefixFileName}</li>
+* <li><b>VLong</b>,<b>VInt</b>,...: for optional other pairs of reference to
+* {@link #mtasObjectFileName} and position of the prefix in
+* {@link #mtasPrefixFileName}; the difference between this reference minus the
+* previous reference is stored</li>
+* </ul>
+* </li>
+* <li><b>File {@link #mtasIndexObjectParentFileName} with extension
+* {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_PARENT_EXTENSION}
+* </b><br>
+* Contains for each document a tree structure {@link MtasTree} to search
+* objects by parent. Structure of content for each node:
+* <ul>
+* <li><b>VLong</b>: offset references to {@link #mtasIndexObjectParentFileName}
+* , only available in root node</li>
+* <li><b>Byte</b>: flag, for this tree equal to
+* {@link mtas.codec.tree.MtasTree#SINGLE_POSITION_TREE} indicating a tree with
+* exactly one point at each node, only available in root node</li>
+* <li><b>VInt</b>: left</li>
+* <li><b>VInt</b>: right</li>
+* <li><b>VInt</b>: max</li>
+* <li><b>VLong</b>: left reference to {@link #mtasIndexObjectParentFileName}
+* minus the offset stored in the root node</li>
+* <li><b>VLong</b>: right reference to {@link #mtasIndexObjectParentFileName}
+* minus the offset stored in the root node</li>
+* <li><b>VInt</b>: number of objects on this node</li>
+* <li><b>VLong</b>,<b>VInt</b>: pair of the first reference to
+* {@link #mtasObjectFileName} minus offset and the prefixId referring to the
+* position the prefix in {@link #mtasPrefixFileName}</li>
+* <li><b>VLong</b>,<b>VInt</b>,...: for optional other pairs of reference to
+* {@link #mtasObjectFileName} and position of the prefix in
+* {@link #mtasPrefixFileName}; the difference between this reference minus the
+* previous reference is stored</li>
+* </ul>
+* </li>
+* </ul>
+* </li>
+* </ul>
+* 
+*/
 
+/**
+ * The Class MtasFieldsConsumer.
+ */
 public class MtasFieldsConsumer extends FieldsConsumer {
 
   /** The delegate fields consumer. */
@@ -323,7 +324,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /** The prefix reference index. */
   private HashMap<String, HashMap<String, Long>> prefixReferenceIndex;
 
-  /** The prefix reference index. */
+  /** The prefix id index. */
   private HashMap<String, HashMap<String, Integer>> prefixIdIndex;
 
   /** The token stats min pos. */
@@ -335,7 +336,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /** The token stats number. */
   Integer tokenStatsNumber;
 
-  /** The mtas tmp index docs chained file name. */
+  /** The mtas tmp docs chained file name. */
   private String mtasTmpFieldFileName, mtasTmpObjectFileName,
       mtasTmpDocsFileName, mtasTmpDocFileName, mtasTmpDocsChainedFileName;
 
@@ -351,14 +352,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Instantiates a new mtas fields consumer.
    *
-   * @param fieldsConsumer
-   *          the fields consumer
-   * @param state
-   *          the state
-   * @param name
-   *          the name
-   * @param delegatePostingsFormatName
-   *          the delegate postings format name
+   * @param fieldsConsumer the fields consumer
+   * @param state the state
+   * @param name the name
+   * @param delegatePostingsFormatName the delegate postings format name
    */
   public MtasFieldsConsumer(FieldsConsumer fieldsConsumer,
       SegmentWriteState state, String name, String delegatePostingsFormatName) {
@@ -414,14 +411,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param outPrefix
-   *          the out prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param prefix the prefix
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void registerPrefix(String field, String prefix,
       IndexOutput outPrefix) throws IOException {
@@ -437,6 +430,14 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     }
   }
 
+  /**
+   * Register prefix stats single position value.
+   *
+   * @param field the field
+   * @param value the value
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public void registerPrefixStatsSinglePositionValue(String field, String value,
       IndexOutput outPrefix) throws IOException {
     initPrefixStatsField(field);
@@ -447,6 +448,14 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     }
   }
 
+  /**
+   * Register prefix stats multiple position value.
+   *
+   * @param field the field
+   * @param value the value
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public void registerPrefixStatsMultiplePositionValue(String field,
       String value, IndexOutput outPrefix) throws IOException {
     initPrefixStatsField(field);
@@ -459,8 +468,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Inits the prefix stats field.
    *
-   * @param field
-   *          the field
+   * @param field the field
    */
   private void initPrefixStatsField(String field) {
     if (!singlePositionPrefix.containsKey(field)) {
@@ -474,8 +482,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats single position prefix attribute.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefix stats single position prefix attribute
    */
   public String getPrefixStatsSinglePositionPrefixAttribute(String field) {
@@ -486,8 +493,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats multiple position prefix attribute.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefix stats multiple position prefix attribute
    */
   public String getPrefixStatsMultiplePositionPrefixAttribute(String field) {
@@ -527,13 +533,9 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Write.
    *
-   * @param fieldInfos
-   *          the field infos
-   * @param fields
-   *          the fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   * 
+   * @param fieldInfos the field infos
+   * @param fields the fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void write(FieldInfos fieldInfos, Fields fields) throws IOException {
     IndexOutput outField, outDoc, outIndexDocId, outIndexObjectId,
@@ -1086,21 +1088,15 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Creates the object and register prefix.
    *
-   * @param field
-   *          the field
-   * @param out
-   *          the out
-   * @param term
-   *          the term
-   * @param termRef
-   *          the term ref
-   * @param startPosition
-   *          the start position
-   * @param payload
-   *          the payload
+   * @param field the field
+   * @param out the out
+   * @param term the term
+   * @param termRef the term ref
+   * @param startPosition the start position
+   * @param payload the payload
+   * @param outPrefix the out prefix
    * @return the integer
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
@@ -1112,25 +1108,17 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Creates the object and register prefix.
    *
-   * @param field
-   *          the field
-   * @param out
-   *          the out
-   * @param term
-   *          the term
-   * @param termRef
-   *          the term ref
-   * @param startPosition
-   *          the start position
-   * @param payload
-   *          the payload
-   * @param startOffset
-   *          the start offset
-   * @param endOffset
-   *          the end offset
+   * @param field the field
+   * @param out the out
+   * @param term the term
+   * @param termRef the term ref
+   * @param startPosition the start position
+   * @param payload the payload
+   * @param startOffset the start offset
+   * @param endOffset the end offset
+   * @param outPrefix the out prefix
    * @return the integer
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
@@ -1239,15 +1227,11 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Store tree.
    *
-   * @param node
-   *          the node
-   * @param out
-   *          the out
-   * @param refApproxOffset
-   *          the object ref approx offset
+   * @param tree the tree
+   * @param out the out
+   * @param refApproxOffset the ref approx offset
    * @return the long
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Long storeTree(MtasTree<?> tree, IndexOutput out,
       long refApproxOffset) throws IOException {
@@ -1258,17 +1242,14 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Store tree.
    *
-   * @param node
-   *          the node
-   * @param out
-   *          the out
-   * @param nodeRefApproxOffset
-   *          the node ref approx offset
-   * @param refApproxOffset
-   *          the object ref approx offset
+   * @param node the node
+   * @param isSinglePoint the is single point
+   * @param storeAdditionalId the store additional id
+   * @param out the out
+   * @param nodeRefApproxOffset the node ref approx offset
+   * @param refApproxOffset the ref approx offset
    * @return the long
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Long storeTree(MtasTreeNode<?> node, boolean isSinglePoint,
       boolean storeAdditionalId, IndexOutput out, Long nodeRefApproxOffset,
@@ -1346,10 +1327,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Token stats add.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
+   * @param min the min
+   * @param max the max
    */
   private void tokenStatsAdd(int min, int max) {
     tokenStatsNumber++;
@@ -1368,16 +1347,11 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Copy object and update stats.
    *
-   * @param id
-   *          the id
-   * @param in
-   *          the in
-   * @param inRef
-   *          the in ref
-   * @param out
-   *          the out
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param id the id
+   * @param in the in
+   * @param inRef the in ref
+   * @param out the out
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void copyObjectAndUpdateStats(int id, IndexInput in, Long inRef,
       IndexOutput out) throws IOException {

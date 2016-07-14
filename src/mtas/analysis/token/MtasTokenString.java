@@ -1,6 +1,5 @@
 package mtas.analysis.token;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MtasTokenString.
  */

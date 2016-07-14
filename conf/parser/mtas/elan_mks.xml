@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+
+	<!-- START MTAS INDEX CONFIGURATION -->
+	<index>
+		<!-- START GENERAL SETTINGS MTAS INDEX PROCESS -->
+		<payload index="true" />
+		<offset index="true" />
+		<realoffset index="true" />
+		<parent index="true" />
+		<!-- END GENERAL SETTINGS MTAS INDEX PROCESS -->
+	</index>
+	<!-- END MTAS INDEX CONFIGURATION -->
+
+
+
+	<!-- START CONFIGURATION MTAS FOLIA PARSER -->
+	<parser name="mtas.analysis.parser.MtasElanParser">
+
+		<!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
+		<autorepair value="true" />
+		<!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
+
+		<!-- START REFERENCES -->
+		<references>
+			<reference name="segref" ref="refid" />
+			<reference name="annotationref" ref="refid" />
+		</references>
+		<!-- END REFERENCES -->
+
+		<!-- START MAPPINGS -->
+		<mappings>
+
+			<!-- START WORDS -->
+			<mapping type="word" name="segment"/>
+			<mapping type="word" name="segment">
+			  <token type="string" offset="false" realoffset="false" parent="false">
+          <pre>
+            <item type="name" />
+            <item type="string" value="_start" />
+          </pre>
+          <post>
+            <item type="attribute" name="start" />
+          </post>
+        </token>
+        <condition>
+          <item type="attribute" name="start" />
+        </condition>  
+			</mapping>
+			<mapping type="word" name="segment">
+        <token type="string" offset="false" realoffset="false" parent="false">
+          <pre>
+            <item type="name" />
+            <item type="string" value="_end" />
+          </pre>
+          <post>
+            <item type="attribute" name="end" />
+          </post>
+        </token>
+        <condition>
+          <item type="attribute" name="end" />
+        </condition>  
+      </mapping>
+			<!-- END WORDS -->
+
+			<!-- START RELATIONS -->
+			<mapping type="relation" name="annotations"/>
+			<mapping type="relation" name="annotation">
+				<token type="string" offset="false" realoffset="false" parent="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value="_" />
+						<item type="attribute" name="linguistictype" />
+					</pre>
+					<post>
+						<item type="attribute" name="value" />
+					</post>
+				</token>
+			</mapping>
+			
+			<mapping type="relation" name="tiers"/>
+      <mapping type="relation" name="tier">
+        <token type="string" offset="false" realoffset="false" parent="false">
+          <pre>
+            <item type="name" />            
+          </pre>
+          <post>
+            <item type="attribute" name="linguistictype" />
+          </post>
+        </token>
+        
+      </mapping>
+			
+			<!-- END RELATIONS -->
+
+			
+		</mappings>
+		<!-- END MAPPINGS -->
+
+	</parser>
+	<!-- END CONFIGURATION MTAS FOLIA PARSER -->
+
+</mtas>

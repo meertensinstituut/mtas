@@ -18,7 +18,6 @@
 	<parser name="mtas.analysis.parser.MtasFoliaParser">
 
 		<!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
-		<namespaceURI value="http://ilk.uvt.nl/folia" />
 		<autorepair value="true" />
 		<!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
 

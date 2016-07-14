@@ -49,6 +49,9 @@ public class MtasTermSpans extends TermSpans {
     this.assumeSinglePosition = assumeSinglePosition;    
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.TermSpans#endPosition()
+   */
   @Override
   public int endPosition() {
     if(assumeSinglePosition) {
@@ -64,6 +67,11 @@ public class MtasTermSpans extends TermSpans {
     }  
   }
   
+  /**
+   * Gets the positions.
+   *
+   * @return the positions
+   */
   public TreeSet<Integer> getPositions() {
     TreeSet<Integer> list;
     if(assumeSinglePosition) {

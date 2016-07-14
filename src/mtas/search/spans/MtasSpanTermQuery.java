@@ -44,10 +44,21 @@ public class MtasSpanTermQuery extends SpanTermQuery {
   /** The term. */
   private Term term;
 
+  /**
+   * Instantiates a new mtas span term query.
+   *
+   * @param term the term
+   */
   public MtasSpanTermQuery(Term term) {
     this(term, true);
   }
 
+  /**
+   * Instantiates a new mtas span term query.
+   *
+   * @param term the term
+   * @param singlePosition the single position
+   */
   public MtasSpanTermQuery(Term term, boolean singlePosition) {
     this(new SpanTermQuery(term), true);
   }
@@ -55,10 +66,8 @@ public class MtasSpanTermQuery extends SpanTermQuery {
   /**
    * Instantiates a new mtas span term query.
    *
-   * @param query
-   *          the query
-   * @param singlePosition
-   *          the single position
+   * @param query the query
+   * @param singlePosition the single position
    */
   public MtasSpanTermQuery(SpanTermQuery query, boolean singlePosition) {
     super(query.getTerm());
@@ -75,6 +84,9 @@ public class MtasSpanTermQuery extends SpanTermQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanTermQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -100,14 +112,10 @@ public class MtasSpanTermQuery extends SpanTermQuery {
     /**
      * Instantiates a new span term weight.
      *
-     * @param termContext
-     *          the term context
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param termContext the term context
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(TermContext termContext, IndexSearcher searcher,
         Map<Term, TermContext> terms) throws IOException {
@@ -229,6 +237,9 @@ public class MtasSpanTermQuery extends SpanTermQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanTermQuery#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -242,6 +253,9 @@ public class MtasSpanTermQuery extends SpanTermQuery {
     return buffer.toString();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanTermQuery#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)

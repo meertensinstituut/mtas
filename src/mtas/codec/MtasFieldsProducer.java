@@ -12,7 +12,6 @@ import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.index.IndexFileNames;
-import org.apache.lucene.index.IndexFormatTooNewException;
 import org.apache.lucene.index.IndexFormatTooOldException;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.Terms;
@@ -28,19 +27,21 @@ public class MtasFieldsProducer extends FieldsProducer {
   /** The delegate fields producer. */
   private FieldsProducer delegateFieldsProducer;
 
+  /** The index input list. */
   private HashMap<String, IndexInput> indexInputList;
+  
+  /** The index input offset list. */
   private HashMap<String, Long> indexInputOffsetList;
+  
+  /** The version. */
   private int version;
 
   /**
    * Instantiates a new mtas fields producer.
    *
-   * @param state
-   *          the state
-   * @param name
-   *          the name
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param state the state
+   * @param name the name
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasFieldsProducer(SegmentReadState state, String name)
       throws IOException {
@@ -99,6 +100,15 @@ public class MtasFieldsProducer extends FieldsProducer {
         .fieldsProducer(state);
   }
 
+  /**
+   * Adds the index input to list.
+   *
+   * @param name the name
+   * @param in the in
+   * @param postingsFormatName the postings format name
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private String addIndexInputToList(String name, IndexInput in,
       String postingsFormatName) throws IOException {
     if (postingsFormatName == null) {
@@ -203,6 +213,17 @@ public class MtasFieldsProducer extends FieldsProducer {
         + ")";
   }
 
+  /**
+   * Open mtas file.
+   *
+   * @param state the state
+   * @param name the name
+   * @param extension the extension
+   * @param minimum the minimum
+   * @param maximum the maximum
+   * @return the index input
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension, Integer minimum, Integer maximum) throws IOException  {
     String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,
@@ -227,6 +248,15 @@ public class MtasFieldsProducer extends FieldsProducer {
     return object;
   }
 
+  /**
+   * Open mtas file.
+   *
+   * @param state the state
+   * @param name the name
+   * @param extension the extension
+   * @return the index input
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension) throws IOException {
     return openMtasFile(state, name, extension, null, null);

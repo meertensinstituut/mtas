@@ -34,17 +34,30 @@ import mtas.analysis.util.MtasCharFilterFactory;
 import mtas.analysis.util.MtasTokenizerFactory;
 import mtas.solr.schema.MtasPreAnalyzedField;
 
+/**
+ * A factory for creating MtasUpdateRequestProcessor objects.
+ */
 public class MtasUpdateRequestProcessorFactory
     extends UpdateRequestProcessorFactory {
 
+  /** The config. */
   private MtasUpdateRequestProcessorConfig config = null;
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.update.processor.UpdateRequestProcessorFactory#init(org.apache.solr.common.util.NamedList)
+   */
   @Override
   @SuppressWarnings("rawtypes")
   public void init(NamedList args) {
     super.init(args);
   }
 
+  /**
+   * Inits the.
+   *
+   * @param req the req
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {
     if (config == null) {
@@ -222,6 +235,9 @@ public class MtasUpdateRequestProcessorFactory
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.update.processor.UpdateRequestProcessorFactory#getInstance(org.apache.solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse, org.apache.solr.update.processor.UpdateRequestProcessor)
+   */
   @Override
   public UpdateRequestProcessor getInstance(SolrQueryRequest req,
       SolrQueryResponse rsp, UpdateRequestProcessor next) {

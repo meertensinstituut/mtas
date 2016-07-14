@@ -12,8 +12,7 @@ import org.apache.lucene.util.BytesRef;
 /**
  * The Class MtasToken.
  *
- * @param <GenericType>
- *          the generic type
+ * @param <GenericType> the generic type
  */
 public abstract class MtasToken<GenericType> {
 
@@ -95,55 +94,55 @@ public abstract class MtasToken<GenericType> {
   }
 
   /**
-   * Sets the ref.
+   * Sets the token ref.
    *
-   * @param ref the new ref
+   * @param ref the new token ref
    */
   final public void setTokenRef(Long ref) {
     tokenRef = ref;
   }
 
   /**
-   * Gets the ref.
+   * Gets the token ref.
    *
-   * @return the ref
+   * @return the token ref
    */
   final public Long getTokenRef() {
     return tokenRef;
   }
   
   /**
-   * Sets the termRef.
+   * Sets the term ref.
    *
-   * @param ref the new termRef
+   * @param ref the new term ref
    */
   final public void setTermRef(Long ref) {
     termRef = ref;
   }
 
   /**
-   * Gets the termRef.
+   * Gets the term ref.
    *
-   * @return the termRef
+   * @return the term ref
    */
   final public Long getTermRef() {
     return termRef;
   }
   
   /**
-   * Sets the termRef.
+   * Sets the prefix id.
    *
-   * @param ref the new termRef
+   * @param id the new prefix id
    */
   final public void setPrefixId(int id) {
     prefixId = id;
   }
 
   /**
-   * Gets the termRef.
+   * Gets the prefix id.
    *
-   * @return the termRef
-   * @throws IOException 
+   * @return the prefix id
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   final public int getPrefixId() throws IOException {
     if(prefixId!=null) {
@@ -198,6 +197,11 @@ public abstract class MtasToken<GenericType> {
     provideParentId = provide;
   }
   
+  /**
+   * Gets the provide parent id.
+   *
+   * @return the provide parent id
+   */
   final public boolean getProvideParentId() {
     return provideParentId;
   }
@@ -411,10 +415,20 @@ public abstract class MtasToken<GenericType> {
     provideRealOffset = provide;
   }
   
+  /**
+   * Gets the provide offset.
+   *
+   * @return the provide offset
+   */
   final public boolean getProvideOffset() {
     return provideOffset;
   }
   
+  /**
+   * Gets the provide real offset.
+   *
+   * @return the provide real offset
+   */
   final public boolean getProvideRealOffset() {
     return provideRealOffset;
   }

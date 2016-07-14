@@ -14,17 +14,30 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
 
-import mtas.analysis.MtasTokenizer;
-
+/**
+ * The Class MtasConfiguration.
+ */
 public class MtasConfiguration {
 
+  /** The configurations mtas. */
   public static String CONFIGURATIONS_MTAS = "mtas";
+  
+  /** The configurations configurations. */
   public static String CONFIGURATIONS_CONFIGURATIONS = "configurations";
+  
+  /** The configurations configuration. */
   public static String CONFIGURATIONS_CONFIGURATION = "configuration";
+  
+  /** The configurations configuration name. */
   public static String CONFIGURATIONS_CONFIGURATION_NAME = "name";
 
+  /** The tokenizer configuration file. */
   public static String TOKENIZER_CONFIGURATION_FILE = "file";
+  
+  /** The charfilter configuration type. */
   public static String CHARFILTER_CONFIGURATION_TYPE = "type";
+  
+  /** The charfilter configuration prefix. */
   public static String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
 
   /** The name. */
@@ -40,7 +53,7 @@ public class MtasConfiguration {
   public MtasConfiguration parent;
 
   /**
-   * Instantiates a new mtas tokenizer config.
+   * Instantiates a new mtas configuration.
    */
   public MtasConfiguration() {
     name = null;
@@ -49,6 +62,15 @@ public class MtasConfiguration {
     parent = null;
   }
 
+  /**
+   * Read configurations.
+   *
+   * @param resourceLoader the resource loader
+   * @param configFile the config file
+   * @param className the class name
+   * @return the hash map
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static HashMap<String, HashMap<String, String>> readConfigurations(
       ResourceLoader resourceLoader, String configFile, String className)
       throws IOException {
@@ -159,6 +181,14 @@ public class MtasConfiguration {
     return configs;
   }
   
+  /**
+   * Read mtas char filter configurations.
+   *
+   * @param resourceLoader the resource loader
+   * @param configFile the config file
+   * @return the hash map
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public static HashMap<String, MtasConfiguration> readMtasCharFilterConfigurations(
       ResourceLoader resourceLoader, String configFile) throws IOException {
     HashMap<String, HashMap<String, String>> configs = readConfigurations(
@@ -183,6 +213,14 @@ public class MtasConfiguration {
     }
   }  
 
+  /**
+   * Read mtas tokenizer configurations.
+   *
+   * @param resourceLoader the resource loader
+   * @param configFile the config file
+   * @return the hash map
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public static HashMap<String, MtasConfiguration> readMtasTokenizerConfigurations(
       ResourceLoader resourceLoader, String configFile) throws IOException {
     HashMap<String, HashMap<String, String>> configs = readConfigurations(
@@ -208,11 +246,9 @@ public class MtasConfiguration {
   /**
    * Read configuration.
    *
-   * @param reader
-   *          the reader
-   * @return the mtas tokenizer config
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param reader the reader
+   * @return the mtas configuration
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasConfiguration readConfiguration(InputStream reader)
       throws IOException {

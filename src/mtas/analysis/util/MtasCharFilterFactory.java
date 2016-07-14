@@ -15,29 +15,48 @@ import java.util.Map;
  */
 public class MtasCharFilterFactory extends CharFilterFactory implements ResourceLoaderAware {
 
+  /** The argument type. */
   public static String ARGUMENT_TYPE = "type";
+  
+  /** The argument prefix. */
   public static String ARGUMENT_PREFIX = "prefix";
+  
+  /** The argument config. */
   public static String ARGUMENT_CONFIG = "config";
+  
+  /** The argument default. */
   public static String ARGUMENT_DEFAULT = "default";
 
+  /** The value type url. */
   public static String VALUE_TYPE_URL = "url";
+  
+  /** The value type file. */
   public static String VALUE_TYPE_FILE = "file";
 
-  /** The available configurations. */
+  /** The config argument. */
   String configArgument;
 
-  /** The default configuration. */
+  /** The default argument. */
   String defaultArgument;
 
-  /** The type. */
+  /** The type argument. */
   String typeArgument;
 
-  /** The prefix. */
+  /** The prefix argument. */
   String prefixArgument;
 
+  /** The configs. */
   private HashMap<String, MtasConfiguration> configs = null;
+  
+  /** The config. */
   private MtasConfiguration config = null;
   
+  /**
+   * Instantiates a new mtas char filter factory.
+   *
+   * @param args the args
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasCharFilterFactory(Map<String, String> args) throws IOException {
     this(args, null);
   }
@@ -45,9 +64,9 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
   /**
    * Instantiates a new mtas char filter factory.
    *
-   * @param args
-   *          the args
-   * @throws IOException
+   * @param args the args
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasCharFilterFactory(Map<String, String> args,
       SolrResourceLoader resourceLoader) throws IOException {
@@ -72,6 +91,12 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
     init(resourceLoader);
   }
 
+  /**
+   * Inits the.
+   *
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void init(ResourceLoader resourceLoader) throws IOException {
     if (config == null && configs == null) {
       if (typeArgument == null && configArgument == null) {
@@ -100,6 +125,9 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.analysis.util.CharFilterFactory#create(java.io.Reader)
+   */
   @Override
   public Reader create(Reader input) {
     String configuration = null;
@@ -110,6 +138,14 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
     }
   }
 
+  /**
+   * Creates the.
+   *
+   * @param input the input
+   * @param configuration the configuration
+   * @return the reader
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public Reader create(Reader input, String configuration) throws IOException {
     if (configs != null && configs.size() > 0) {
       if (configuration == null && defaultArgument == null) {
@@ -148,6 +184,13 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
 
   }
 
+  /**
+   * Creates the.
+   *
+   * @param input the input
+   * @param config the config
+   * @return the reader
+   */
   public Reader create(Reader input, MtasConfiguration config) {
     MtasFetchData fetchData = new MtasFetchData(input);
     if (config.attributes
@@ -177,6 +220,9 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.analysis.util.ResourceLoaderAware#inform(org.apache.lucene.analysis.util.ResourceLoader)
+   */
   @Override
   public void inform(ResourceLoader loader) throws IOException {
     init(loader);

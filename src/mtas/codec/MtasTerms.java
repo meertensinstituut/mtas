@@ -13,14 +13,27 @@ import org.apache.lucene.store.IndexInput;
  */
 public class MtasTerms extends Terms {
 
+  /** The index input list. */
   HashMap<String, IndexInput> indexInputList;
+  
+  /** The index input offset list. */
   HashMap<String, Long> indexInputOffsetList;
+  
+  /** The version. */
   int version;
   
   /** The delegate terms. */
   Terms delegateTerms;
 
 
+  /**
+   * Instantiates a new mtas terms.
+   *
+   * @param terms the terms
+   * @param indexInputList the index input list
+   * @param indexInputOffsetList the index input offset list
+   * @param version the version
+   */
   public MtasTerms(Terms terms, HashMap<String, IndexInput> indexInputList, HashMap<String, Long> indexInputOffsetList, int version) {
     delegateTerms = terms;
     this.indexInputList = indexInputList;
@@ -154,10 +167,20 @@ public class MtasTerms extends Terms {
     }
   }
   
+  /**
+   * Gets the version.
+   *
+   * @return the version
+   */
   public int getVersion() {
     return version;
   }
   
+  /**
+   * Gets the index input list.
+   *
+   * @return the index input list
+   */
   public HashMap<String, IndexInput> getIndexInputList() {
     HashMap<String, IndexInput> clonedIndexInputList = new HashMap<String, IndexInput>();    
     for(Entry<String, IndexInput> entry : indexInputList.entrySet()) {
@@ -166,6 +189,11 @@ public class MtasTerms extends Terms {
     return clonedIndexInputList;
   }
   
+  /**
+   * Gets the index input offset list.
+   *
+   * @return the index input offset list
+   */
   public HashMap<String, Long> getIndexInputOffsetList() {
     return indexInputOffsetList;
   }  

@@ -28,51 +28,53 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RegExp;
 
+/**
+ * The Class CodecComponent.
+ */
 public class CodecComponent {
 
   /**
-   * The Class ComponentFields contains
-   * <ul>
-   * <li>{@link ComponentField} for each field</li>
-   * <li>Collector actions to be performed for this field</li>
-   * </ul>
+   * The Class ComponentFields.
    */
   public static class ComponentFields {
 
-    /** The list of {@link ComponentField} for each field */
+    /** The list. */
     public Map<String, ComponentField> list;
 
-    /** Do kwic. */
+    /** The do kwic. */
     public boolean doKwic;
 
-    /** Do list. */
+    /** The do list. */
     public boolean doList;
 
-    /** Do group. */
+    /** The do group. */
     public boolean doGroup;
 
-    /** Do term vector. */
+    /** The do term vector. */
     public boolean doTermVector;
 
-    /** Do stats. */
+    /** The do stats. */
     public boolean doStats;
 
-    /** Do stats spans. */
+    /** The do stats spans. */
     public boolean doStatsSpans;
 
-    /** Do stats positions. */
+    /** The do stats positions. */
     public boolean doStatsPositions;
 
-    /** Do stats tokens. */
+    /** The do stats tokens. */
     public boolean doStatsTokens;
 
-    /** Do prefix. */
+    /** The do prefix. */
     public boolean doPrefix;
     
     
-    /** Do facet. */
+    /** The do facet. */
     public boolean doFacet;
 
+    /**
+     * Instantiates a new component fields.
+     */
     public ComponentFields() {
       list = new HashMap<String, ComponentField>();
       doKwic = false;
@@ -89,18 +91,7 @@ public class CodecComponent {
   }
 
   /**
-   * The Class ComponentField contains for each field
-   * <ul>
-   * <li>unique key</li>
-   * <li>list of {@link ComponentKwic}</li>
-   * <li>list of {@link ComponentList}</li>
-   * <li>list of {@link ComponentFacet}</li>
-   * <li>list of {@link ComponentTermVector}</li>
-   * <li>list of {@link ComponentPosition}</li>
-   * <li>list of {@link ComponentSpan}</li>
-   * <li>list of {@link SpanQuery}</li>
-   * <li>{@link ComponentPrefix}</li>
-   * </ul>
+   * The Class ComponentField.
    */
   public static class ComponentField {
 
@@ -128,7 +119,7 @@ public class CodecComponent {
     /** The stats position list. */
     public List<ComponentPosition> statsPositionList;
 
-    /** The stats position list. */
+    /** The stats token list. */
     public List<ComponentToken> statsTokenList;
 
     /** The stats span list. */
@@ -140,6 +131,12 @@ public class CodecComponent {
     /** The prefix. */
     public ComponentPrefix prefix;
     
+    /**
+     * Instantiates a new component field.
+     *
+     * @param field the field
+     * @param uniqueKeyField the unique key field
+     */
     public ComponentField(String field, String uniqueKeyField) {
       this.field = field;
       this.uniqueKeyField = uniqueKeyField;
@@ -158,11 +155,7 @@ public class CodecComponent {
   
 
   /**
-   * The Class ComponentPrefix contains
-   * <ul>
-   * <li>List of singlePosition prefixes</li>
-   * <li>List of multiplePosition prefixes</li>
-   * </ul>
+   * The Class ComponentPrefix.
    */
   public static class ComponentPrefix {
 
@@ -178,8 +171,7 @@ public class CodecComponent {
     /**
      * Instantiates a new component prefix.
      *
-     * @param key
-     *          the key
+     * @param key the key
      */
     public ComponentPrefix(String key) {
       this.key = key;
@@ -190,8 +182,7 @@ public class CodecComponent {
     /**
      * Adds the single position.
      *
-     * @param prefix
-     *          the prefix
+     * @param prefix the prefix
      */
     public void addSinglePosition(String prefix) {
       if (!singlePositionList.contains(prefix)
@@ -203,8 +194,7 @@ public class CodecComponent {
     /**
      * Adds the multiple position.
      *
-     * @param prefix
-     *          the prefix
+     * @param prefix the prefix
      */
     public void addMultiplePosition(String prefix) {
       if (!singlePositionList.contains(prefix)) {
@@ -219,12 +209,7 @@ public class CodecComponent {
   }
 
   /**
-   * The Class ComponentKwic contains
-   * <ul>
-   * <li>The SpanQuery to match</li>
-   * <li>A list of {@link KwicToken} if output is {@link KWIC_OUTPUT_TOKEN}</li>
-   * <li>A list of {@link KwicHit} if output is {@link KWIC_OUTPUT_HIT}</li>
-   * </ul>
+   * The Class ComponentKwic.
    */
   public static class ComponentKwic {
 
@@ -255,7 +240,7 @@ public class CodecComponent {
     /** The prefixes. */
     public ArrayList<String> prefixes;
 
-    /** The left, right and start. */
+    /** The start. */
     public int left, right, start;
 
     /** The number. */
@@ -264,12 +249,25 @@ public class CodecComponent {
     /** The output. */
     public String output;
 
-    /** Provide full token information */
+    /** The Constant KWIC_OUTPUT_TOKEN. */
     public static final String KWIC_OUTPUT_TOKEN = "token";
 
-    /** Provide basic information for the hit */
+    /** The Constant KWIC_OUTPUT_HIT. */
     public static final String KWIC_OUTPUT_HIT = "hit";
 
+    /**
+     * Instantiates a new component kwic.
+     *
+     * @param query the query
+     * @param key the key
+     * @param prefixes the prefixes
+     * @param number the number
+     * @param start the start
+     * @param left the left
+     * @param right the right
+     * @param output the output
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public ComponentKwic(SpanQuery query, String key, String prefixes,
         Integer number, int start, int left, int right, String output)
         throws IOException {
@@ -309,19 +307,14 @@ public class CodecComponent {
   }
 
   /**
-   * The Class ComponentList contains
-   * <ul>
-   * <li>The SpanQuery to match</li>
-   * <li>A list of {@link KwicToken} if output is {@link LIST_OUTPUT_TOKEN}</li>
-   * <li>A list of {@link KwicHit} if output is {@link LIST_OUTPUT_HIT}</li>
-   * </ul>
+   * The Class ComponentList.
    */
   public static class ComponentList {
 
     /** The span query. */
     public SpanQuery spanQuery;
 
-    /** The field. */
+    /** The key. */
     public String field, queryValue, queryType, key;
 
     /** The tokens. */
@@ -345,21 +338,37 @@ public class CodecComponent {
     /** The prefixes. */
     public ArrayList<String> prefixes;
 
-    /** The left, right, total, position and start. */
+    /** The start. */
     public int left, right, total, position, start;
 
     /** The number. */
     public int number;
 
-    /** The prefix and output. */
+    /** The output. */
     public String prefix, output;
 
-    /** Provide full token information */
+    /** The Constant LIST_OUTPUT_TOKEN. */
     public static final String LIST_OUTPUT_TOKEN = "token";
 
-    /** Provide basic information for the hit */
+    /** The Constant LIST_OUTPUT_HIT. */
     public static final String LIST_OUTPUT_HIT = "hit";
 
+    /**
+     * Instantiates a new component list.
+     *
+     * @param spanQuery the span query
+     * @param field the field
+     * @param queryValue the query value
+     * @param queryType the query type
+     * @param key the key
+     * @param prefix the prefix
+     * @param start the start
+     * @param number the number
+     * @param left the left
+     * @param right the right
+     * @param output the output
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public ComponentList(SpanQuery spanQuery, String field, String queryValue,
         String queryType, String key, String prefix, int start, int number,
         int left, int right, String output) throws IOException {
@@ -405,21 +414,62 @@ public class CodecComponent {
     }
   }
 
+  /**
+   * The Class ComponentGroup.
+   */
   public static class ComponentGroup {
 
     /** The span query. */
     public SpanQuery spanQuery;
 
+    /** The sort direction. */
     public String dataType, statsType, sortType, sortDirection;
+    
+    /** The stats items. */
     public TreeSet<String> statsItems;
+    
+    /** The number. */
     public Integer start, number;
+    
+    /** The key. */
     public String field, queryValue, queryType, key;
+    
+    /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;    
+    
+    /** The prefixes. */
     ArrayList<String> prefixes;
+    
+    /** The hit inside. */
     HashSet<String> hitInside;
+    
+    /** The right. */
     HashSet<String>[] hitInsideLeft, hitInsideRight, hitLeft, hitRight, left,
         right;
 
+    /**
+     * Instantiates a new component group.
+     *
+     * @param spanQuery the span query
+     * @param field the field
+     * @param queryValue the query value
+     * @param queryType the query type
+     * @param key the key
+     * @param groupingHitInsidePrefixes the grouping hit inside prefixes
+     * @param groupingHitInsideLeftPosition the grouping hit inside left position
+     * @param groupingHitInsideLeftPrefixes the grouping hit inside left prefixes
+     * @param groupingHitInsideRightPosition the grouping hit inside right position
+     * @param groupingHitInsideRightPrefixes the grouping hit inside right prefixes
+     * @param groupingHitLeftPosition the grouping hit left position
+     * @param groupingHitLeftPrefixes the grouping hit left prefixes
+     * @param groupingHitRightPosition the grouping hit right position
+     * @param groupingHitRightPrefixes the grouping hit right prefixes
+     * @param groupingLeftPosition the grouping left position
+     * @param groupingLeftPrefixes the grouping left prefixes
+     * @param groupingRightPosition the grouping right position
+     * @param groupingRightPrefixes the grouping right prefixes
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public ComponentGroup(SpanQuery spanQuery, String field, String queryValue,
         String queryType, String key, String groupingHitInsidePrefixes,
         String[] groupingHitInsideLeftPosition,
@@ -480,6 +530,15 @@ public class CodecComponent {
 
   }
 
+  /**
+   * Creates the positioned prefixes.
+   *
+   * @param prefixList the prefix list
+   * @param position the position
+   * @param prefixes the prefixes
+   * @return the hash set[]
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static HashSet<String>[] createPositionedPrefixes(
       HashSet<String> prefixList, String[] position, String[] prefixes)
       throws IOException {
@@ -551,25 +610,70 @@ public class CodecComponent {
    */
   public static class ComponentFacet {
 
+    /** The span queries. */
     public SpanQuery[] spanQueries;
+    
+    /** The base sort directions. */
     public String[] baseFields, baseFieldTypes, baseTypes, baseSortTypes,
         baseSortDirections;
+    
+    /** The base stats types. */
     public String[] baseCollectorTypes, baseDataTypes, baseStatsTypes;
+    
+    /** The base stats items. */
     public TreeSet<String>[] baseStatsItems;
 
+    /** The field. */
     public String key, field;
+    
+    /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
+    
+    /** The base numbers. */
     public Integer[] baseNumbers;
+    
+    /** The base maximum longs. */
     public Long[] baseMinimumLongs, baseMaximumLongs;
+    
+    /** The base maximum doubles. */
     public Double[] baseMinimumDoubles, baseMaximumDoubles;
+    
+    /** The base function parsers. */
     public MtasFunctionParserFunction[] baseFunctionParsers;
 
+    /** The Constant TYPE_INTEGER. */
     public static final String TYPE_INTEGER = "integer";
+    
+    /** The Constant TYPE_DOUBLE. */
     public static final String TYPE_DOUBLE = "double";
+    
+    /** The Constant TYPE_LONG. */
     public static final String TYPE_LONG = "long";
+    
+    /** The Constant TYPE_FLOAT. */
     public static final String TYPE_FLOAT = "float";
+    
+    /** The Constant TYPE_STRING. */
     public static final String TYPE_STRING = "string";
 
+    /**
+     * Instantiates a new component facet.
+     *
+     * @param spanQueries the span queries
+     * @param field the field
+     * @param key the key
+     * @param baseFields the base fields
+     * @param baseFieldTypes the base field types
+     * @param baseTypes the base types
+     * @param baseSortTypes the base sort types
+     * @param baseSortDirections the base sort directions
+     * @param baseNumbers the base numbers
+     * @param baseMinimumDoubles the base minimum doubles
+     * @param baseMaximumDoubles the base maximum doubles
+     * @param baseFunctions the base functions
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
+     */
     public ComponentFacet(SpanQuery[] spanQueries, String field, String key,
         String[] baseFields, String[] baseFieldTypes, String[] baseTypes,
         String[] baseSortTypes, String[] baseSortDirections,
@@ -677,16 +781,48 @@ public class CodecComponent {
    */
   public static class ComponentTermVector {
 
+    /** The sort direction. */
     public String key, dataType, statsType, prefix, regexp, sortType,
         sortDirection;
+    
+    /** The stats items. */
     public TreeSet<String> statsItems;
+    
+    /** The number. */
     public Integer start, number;
+    
+    /** The compiled automaton. */
     public CompiledAutomaton compiledAutomaton;
+    
+    /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
+    
+    /** The maximum double. */
     public Double minimumDouble, maximumDouble;
+    
+    /** The maximum long. */
     public Long minimumLong, maximumLong;
+    
+    /** The function parser. */
     public MtasFunctionParserFunction functionParser;
 
+    /**
+     * Instantiates a new component term vector.
+     *
+     * @param key the key
+     * @param prefix the prefix
+     * @param regexp the regexp
+     * @param statsType the stats type
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param function the function
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
+     */
     public ComponentTermVector(String key, String prefix, String regexp,
         String statsType, String sortType, String sortDirection, Integer start,
         Integer number, Double minimumDouble, Double maximumDouble,
@@ -753,16 +889,45 @@ public class CodecComponent {
    * The Class ComponentSpan.
    */
   public static class ComponentSpan {
+    
+    /** The queries. */
     public SpanQuery[] queries;
+    
+    /** The key. */
     public String key;
+    
+    /** The data type. */
     public String dataType;
+    
+    /** The stats type. */
     public String statsType;
+    
+    /** The stats items. */
     public TreeSet<String> statsItems;
+    
+    /** The maximum double. */
     public Double minimumDouble, maximumDouble;
+    
+    /** The maximum long. */
     public Long minimumLong, maximumLong;
+    
+    /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
+    
+    /** The function parser. */
     public MtasFunctionParserFunction functionParser;
 
+    /**
+     * Instantiates a new component span.
+     *
+     * @param queries the queries
+     * @param key the key
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param type the type
+     * @param function the function
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public ComponentSpan(SpanQuery[] queries, String key, Double minimumDouble,
         Double maximumDouble, String type, String function) throws IOException {
       this.queries = queries;
@@ -806,15 +971,42 @@ public class CodecComponent {
    * The Class ComponentPosition.
    */
   public static class ComponentPosition {
+    
+    /** The field. */
     public String field;
+    
+    /** The key. */
     public String key;
+    
+    /** The stats type. */
     public String dataType, statsType;
+    
+    /** The stats items. */
     public TreeSet<String> statsItems;
+    
+    /** The maximum double. */
     public Double minimumDouble, maximumDouble;
+    
+    /** The maximum long. */
     public Long minimumLong, maximumLong;
+    
+    /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
+    
+    /** The function parser. */
     public MtasFunctionParserFunction functionParser;
 
+    /**
+     * Instantiates a new component position.
+     *
+     * @param field the field
+     * @param key the key
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param statsType the stats type
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
+     */
     public ComponentPosition(String field, String key, Double minimumDouble,
         Double maximumDouble, String statsType)
         throws IOException, ParseException {
@@ -845,16 +1037,46 @@ public class CodecComponent {
     }
   }
   
+  /**
+   * The Class ComponentToken.
+   */
   public static class ComponentToken {
+    
+    /** The field. */
     public String field;
+    
+    /** The key. */
     public String key;
+    
+    /** The stats type. */
     public String dataType, statsType;
+    
+    /** The stats items. */
     public TreeSet<String> statsItems;
+    
+    /** The maximum double. */
     public Double minimumDouble, maximumDouble;
+    
+    /** The maximum long. */
     public Long minimumLong, maximumLong;
+    
+    /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
+    
+    /** The function parser. */
     public MtasFunctionParserFunction functionParser;
 
+    /**
+     * Instantiates a new component token.
+     *
+     * @param field the field
+     * @param key the key
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param statsType the stats type
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
+     */
     public ComponentToken(String field, String key, Double minimumDouble,
         Double maximumDouble, String statsType)
         throws IOException, ParseException {
@@ -889,10 +1111,22 @@ public class CodecComponent {
    * The Class KwicToken.
    */
   public static class KwicToken {
+    
+    /** The start position. */
     public int startPosition;
+    
+    /** The end position. */
     public int endPosition;
+    
+    /** The tokens. */
     public ArrayList<MtasToken<String>> tokens;
 
+    /**
+     * Instantiates a new kwic token.
+     *
+     * @param match the match
+     * @param tokens the tokens
+     */
     public KwicToken(Match match, ArrayList<MtasToken<String>> tokens) {
       startPosition = match.startPosition;
       endPosition = match.endPosition - 1;
@@ -904,10 +1138,22 @@ public class CodecComponent {
    * The Class KwicHit.
    */
   public static class KwicHit {
+    
+    /** The start position. */
     public int startPosition;
+    
+    /** The end position. */
     public int endPosition;
+    
+    /** The hits. */
     public HashMap<Integer, ArrayList<String>> hits;
 
+    /**
+     * Instantiates a new kwic hit.
+     *
+     * @param match the match
+     * @param hits the hits
+     */
     public KwicHit(Match match, HashMap<Integer, ArrayList<String>> hits) {
       startPosition = match.startPosition;
       endPosition = match.endPosition - 1;
@@ -919,9 +1165,19 @@ public class CodecComponent {
    * The Class GroupHit.
    */
   public static class GroupHit {
+    
+    /** The key. */
     public String key;
+    
+    /** The data right. */
     public ArrayList<String>[] dataHit, dataLeft, dataRight;
     
+    /**
+     * Sort.
+     *
+     * @param data the data
+     * @return the array list
+     */
     private ArrayList<MtasTreeHit<String>> sort(ArrayList<MtasTreeHit<String>> data) {
       Collections.sort(data, new Comparator<MtasTreeHit<String>>() {
         @Override
@@ -932,6 +1188,12 @@ public class CodecComponent {
       return data;
     }
 
+    /**
+     * Creates the hash.
+     *
+     * @param data the data
+     * @return the string
+     */
     private String createHash(ArrayList<MtasTreeHit<String>> data) {
       String hash = "";
       for (MtasTreeHit<String> item : data) {
@@ -941,6 +1203,16 @@ public class CodecComponent {
       return hash;
     }
 
+    /**
+     * Instantiates a new group hit.
+     *
+     * @param list the list
+     * @param start the start
+     * @param end the end
+     * @param hitStart the hit start
+     * @param hitEnd the hit end
+     * @param group the group
+     */
     public GroupHit(ArrayList<MtasTreeHit<String>> list, int start, int end,
         int hitStart, int hitEnd, ComponentGroup group) {
       int leftRangeStart = start;
@@ -1060,6 +1332,12 @@ public class CodecComponent {
       }      
     }
 
+    /**
+     * Data to string.
+     *
+     * @param data the data
+     * @return the string
+     */
     private String dataToString(ArrayList<String>[] data) {
       String text = "";
       if(data!=null) {
@@ -1070,10 +1348,18 @@ public class CodecComponent {
       return text.trim();
     }
     
+    /**
+     * Gets the key.
+     *
+     * @return the key
+     */
     public String getKey() {
       return key;
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
       return (key!=null)?key.replaceAll("\u0001", ":"):key;
@@ -1085,10 +1371,24 @@ public class CodecComponent {
    * The Class ListToken.
    */
   public static class ListToken {
+    
+    /** The doc position. */
     public Integer docId, docPosition;
+    
+    /** The end position. */
     public int startPosition, endPosition;
+    
+    /** The tokens. */
     public ArrayList<MtasToken<String>> tokens;
 
+    /**
+     * Instantiates a new list token.
+     *
+     * @param docId the doc id
+     * @param docPosition the doc position
+     * @param match the match
+     * @param tokens the tokens
+     */
     public ListToken(Integer docId, Integer docPosition, Match match,
         ArrayList<MtasToken<String>> tokens) {
       this.docId = docId;
@@ -1103,10 +1403,24 @@ public class CodecComponent {
    * The Class ListHit.
    */
   public static class ListHit {
+    
+    /** The doc position. */
     public Integer docId, docPosition;
+    
+    /** The end position. */
     public int startPosition, endPosition;
+    
+    /** The hits. */
     public HashMap<Integer, ArrayList<String>> hits;
 
+    /**
+     * Instantiates a new list hit.
+     *
+     * @param docId the doc id
+     * @param docPosition the doc position
+     * @param match the match
+     * @param hits the hits
+     */
     public ListHit(Integer docId, Integer docPosition, Match match,
         HashMap<Integer, ArrayList<String>> hits) {
       this.docId = docId;
@@ -1121,14 +1435,27 @@ public class CodecComponent {
    * The Class Match.
    */
   public static class Match {
+    
+    /** The start position. */
     public int startPosition;
+    
+    /** The end position. */
     public int endPosition;
 
+    /**
+     * Instantiates a new match.
+     *
+     * @param startPosition the start position
+     * @param endPosition the end position
+     */
     public Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
       this.endPosition = endPosition;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object object) {
       if (this.getClass().equals(object.getClass())) {

@@ -12,13 +12,29 @@ import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
+/**
+ * The Class MtasSpanSequence.
+ */
 public class MtasSpanSequence extends Spans {
 
+  /** The queue spans. */
   private List<QueueItem> queueSpans;
+  
+  /** The queue matches. */
   private List<Match> queueMatches;
+  
+  /** The current position. */
   private int docId, currentPosition;
+  
+  /** The current match. */
   Match currentMatch;
 
+  /**
+   * Instantiates a new mtas span sequence.
+   *
+   * @param mtasSpanSequenceQuery the mtas span sequence query
+   * @param setSequenceSpans the set sequence spans
+   */
   public MtasSpanSequence(MtasSpanSequenceQuery mtasSpanSequenceQuery,
       List<MtasSpanSequenceSpans> setSequenceSpans) {
     super();
@@ -31,6 +47,9 @@ public class MtasSpanSequence extends Spans {
     resetQueue();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
   @Override
   public int nextStartPosition() throws IOException {
     if (findMatches()) {
@@ -45,6 +64,9 @@ public class MtasSpanSequence extends Spans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
   @Override
   public int startPosition() {
     if (currentMatch == null) {
@@ -54,6 +76,9 @@ public class MtasSpanSequence extends Spans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
   @Override
   public int endPosition() {
     if (currentMatch == null) {
@@ -63,20 +88,32 @@ public class MtasSpanSequence extends Spans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
   @Override
   public int width() {
     return 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
   @Override
   public int docID() {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
   @Override
   public int nextDoc() throws IOException {
     resetQueue();
@@ -85,6 +122,12 @@ public class MtasSpanSequence extends Spans {
     return docId;
   }
 
+  /**
+   * Go to next doc.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
       return true;
@@ -177,6 +220,13 @@ public class MtasSpanSequence extends Spans {
     return docId;
   }
 
+  /**
+   * Advance to doc.
+   *
+   * @param target the target
+   * @return the integer
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private Integer advanceToDoc(int target) throws IOException {
     if (docId == NO_MORE_DOCS) {
       return null;
@@ -227,10 +277,10 @@ public class MtasSpanSequence extends Spans {
   }
 
   /**
-   * Check for matches in queueMatches; if empty, try to create
+   * Find matches.
    *
    * @return true, if successful
-   * @throws IOException
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     Boolean status = _findMatches();
@@ -241,10 +291,10 @@ public class MtasSpanSequence extends Spans {
   }
 
   /**
-   * Create matches
+   * _find matches.
    *
    * @return true, if successful
-   * @throws IOException
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean _findMatches() throws IOException {
     // queue not empty
@@ -402,6 +452,14 @@ public class MtasSpanSequence extends Spans {
     }
   }
 
+  /**
+   * _glue.
+   *
+   * @param subMatchesQueue the sub matches queue
+   * @param subMatchesOptional the sub matches optional
+   * @param item the item
+   * @return the list
+   */
   private List<Match> _glue(List<Match> subMatchesQueue,
       Boolean subMatchesOptional, QueueItem item) {
     List<Match> newSubMatchesQueue = new ArrayList<Match>();    
@@ -527,15 +585,11 @@ public class MtasSpanSequence extends Spans {
   /**
    * Fill queue.
    *
-   * @param item
-   *          the item
-   * @param minStartPosition
-   *          the min start position, everything below can be removed
-   * @param maxStartPosition
-   *          the max start position, collect until this is reached completely
-   * @param minEndPosition
-   *          the min end position, ignore otherwise
-   * @throws IOException
+   * @param item the item
+   * @param minStartPosition the min start position
+   * @param maxStartPosition the max start position
+   * @param minEndPosition the min end position
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void fillQueue(QueueItem item, Integer minStartPosition,
       Integer maxStartPosition, Integer minEndPosition) throws IOException {
@@ -589,6 +643,9 @@ public class MtasSpanSequence extends Spans {
     }
   }
 
+  /**
+   * Reset queue.
+   */
   void resetQueue() {
     currentPosition = -1;
     queueMatches.clear();
@@ -598,17 +655,36 @@ public class MtasSpanSequence extends Spans {
     currentMatch = null;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
     return null;
   }
 
+  /**
+   * The Class QueueItem.
+   */
   private class QueueItem {
+    
+    /** The filled position. */
     private boolean noMoreDocs, noMorePositions, filledPosition;
+    
+    /** The last retrieved position. */
     private Integer lowestPosition, lastFilledPosition, lastRetrievedPosition;
+    
+    /** The queue. */
     private HashMap<Integer, List<Integer>> queue;
+    
+    /** The sequence spans. */
     public MtasSpanSequenceSpans sequenceSpans;
 
+    /**
+     * Instantiates a new queue item.
+     *
+     * @param sequenceSpans the sequence spans
+     */
     QueueItem(MtasSpanSequenceSpans sequenceSpans) {
       noMoreDocs = false;
       this.sequenceSpans = sequenceSpans;
@@ -616,6 +692,9 @@ public class MtasSpanSequence extends Spans {
       reset();
     }
 
+    /**
+     * Reset.
+     */
     public void reset() {
       noMorePositions = false;
       lowestPosition = null;
@@ -625,6 +704,12 @@ public class MtasSpanSequence extends Spans {
       queue.clear();
     }
 
+    /**
+     * Adds the.
+     *
+     * @param startPosition the start position
+     * @param endPosition the end position
+     */
     public void add(int startPosition, int endPosition) {
       if (!queue.keySet().contains(startPosition)) {
         if (!queue.isEmpty()) {
@@ -640,6 +725,11 @@ public class MtasSpanSequence extends Spans {
       lastRetrievedPosition = startPosition;
     }
 
+    /**
+     * Del.
+     *
+     * @param position the position
+     */
     public void del(int position) {
       ArrayList<Integer> removePositions = new ArrayList<Integer>();
       for (int p : queue.keySet()) {
@@ -669,23 +759,49 @@ public class MtasSpanSequence extends Spans {
     }
   }
 
+  /**
+   * The Class Match.
+   */
   private class Match {
+    
+    /** The start position. */
     private int startPosition;
+    
+    /** The end position. */
     private int endPosition;
 
+    /**
+     * Instantiates a new match.
+     *
+     * @param startPosition the start position
+     * @param endPosition the end position
+     */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
       this.endPosition = endPosition;
     }
 
+    /**
+     * Start position.
+     *
+     * @return the int
+     */
     public int startPosition() {
       return startPosition;
     }
 
+    /**
+     * End position.
+     *
+     * @return the int
+     */
     public int endPosition() {
       return endPosition;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object object) {
       if (this.getClass().equals(object.getClass())) {
@@ -699,11 +815,17 @@ public class MtasSpanSequence extends Spans {
 
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
   @Override
   public long cost() {
     return 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
   @Override
   public float positionsCost() {
     return 0;

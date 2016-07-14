@@ -16,7 +16,7 @@ import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 /**
- * The Class MtasSpanTermQuery.
+ * The Class MtasSpanPrefixQuery.
  */
 public class MtasSpanPrefixQuery extends SpanQuery {
 
@@ -29,30 +29,30 @@ public class MtasSpanPrefixQuery extends SpanQuery {
   /** The single position. */
   private boolean singlePosition;
   
+  /** The query name. */
   private static String QUERY_NAME = "mtasSpanPrefixQuery";
   
 
+  /** The term. */
   private Term term;
 
+  /** The query. */
   private SpanMultiTermQueryWrapper<PrefixQuery> query;
 
   /**
-   * Instantiates a new mtas span regexp query.
+   * Instantiates a new mtas span prefix query.
    *
-   * @param term
-   *          the term
+   * @param term the term
    */
   public MtasSpanPrefixQuery(Term term) {
     this(term, true);
   }
 
   /**
-   * Instantiates a new mtas span regexp query.
+   * Instantiates a new mtas span prefix query.
    *
-   * @param term
-   *          the term
-   * @param singlePosition
-   *          the single position
+   * @param term the term
+   * @param singlePosition the single position
    */
   public MtasSpanPrefixQuery(Term term, boolean singlePosition) {
     super();
@@ -71,6 +71,9 @@ public class MtasSpanPrefixQuery extends SpanQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public Query rewrite(IndexReader reader) throws IOException {
     Query q = query.rewrite(reader);
@@ -110,11 +113,17 @@ public class MtasSpanPrefixQuery extends SpanQuery {
     return buffer.toString();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() {
     return term.field();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -122,6 +131,9 @@ public class MtasSpanPrefixQuery extends SpanQuery {
         needsScores);
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -134,6 +146,9 @@ public class MtasSpanPrefixQuery extends SpanQuery {
     return other.term.equals(term) && (other.singlePosition!=singlePosition);    
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = QUERY_NAME.hashCode();

@@ -19,27 +19,47 @@ import java.util.Map;
 public class MtasTokenizerFactory extends TokenizerFactory
     implements ResourceLoaderAware {
 
+  /** The argument configfile. */
   public static String ARGUMENT_CONFIGFILE = "configFile";
+  
+  /** The argument config. */
   public static String ARGUMENT_CONFIG = "config";
+  
+  /** The argument default. */
   public static String ARGUMENT_DEFAULT = "default";
 
-  /** The available configurations. */
+  /** The config argument. */
   private String configArgument;
 
-  /** The default configuration. */
+  /** The default argument. */
   private String defaultArgument;
 
-  /** The field containing configuration. */
+  /** The config file argument. */
   private String configFileArgument;
 
   /** The configs. */
   private HashMap<String, MtasConfiguration> configs = null;
+  
+  /** The config. */
   private MtasConfiguration config = null;
 
+  /**
+   * Instantiates a new mtas tokenizer factory.
+   *
+   * @param args the args
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasTokenizerFactory(Map<String, String> args) throws IOException {
     this(args, null);
   }
 
+  /**
+   * Instantiates a new mtas tokenizer factory.
+   *
+   * @param args the args
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasTokenizerFactory(Map<String, String> args,
       SolrResourceLoader resourceLoader) throws IOException {
     super(args);
@@ -77,10 +97,25 @@ public class MtasTokenizerFactory extends TokenizerFactory
     return tokenizer;
   }
 
+  /**
+   * Creates the.
+   *
+   * @param configuration the configuration
+   * @return the mtas tokenizer
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasTokenizer create(String configuration) throws IOException {
     return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
   }
 
+  /**
+   * Creates the.
+   *
+   * @param factory the factory
+   * @param configuration the configuration
+   * @return the mtas tokenizer
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasTokenizer create(AttributeFactory factory, String configuration)
       throws IOException {
     if (configs != null && configs.size() > 0) {
@@ -119,6 +154,12 @@ public class MtasTokenizerFactory extends TokenizerFactory
     }
   }
 
+  /**
+   * Inits the.
+   *
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void init(ResourceLoader resourceLoader) throws IOException {
     if (config == null && configs == null) {
       if (resourceLoader == null) {
@@ -148,6 +189,9 @@ public class MtasTokenizerFactory extends TokenizerFactory
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.analysis.util.ResourceLoaderAware#inform(org.apache.lucene.analysis.util.ResourceLoader)
+   */
   @Override
   public void inform(ResourceLoader loader) throws IOException {
     init(loader);

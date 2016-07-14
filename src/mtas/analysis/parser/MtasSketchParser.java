@@ -18,6 +18,9 @@ import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
 
+/**
+ * The Class MtasSketchParser.
+ */
 final public class MtasSketchParser extends MtasBasicParser {
 
   /** The Constant MAPPING_TYPE_WORD_ANNOTATION. */
@@ -26,7 +29,7 @@ final public class MtasSketchParser extends MtasBasicParser {
   /** The autorepair. */
   private Boolean autorepair = true;
 
-  /** The word types. */
+  /** The word type. */
   private MtasParserType wordType = null;
 
   /** The word annotation types. */
@@ -35,6 +38,11 @@ final public class MtasSketchParser extends MtasBasicParser {
   /** The group types. */
   private HashMap<String, MtasParserType> groupTypes = new HashMap<String, MtasParserType>();
 
+  /**
+   * Instantiates a new mtas sketch parser.
+   *
+   * @param config the config
+   */
   public MtasSketchParser(MtasConfiguration config) {
     super(config);
     try {
@@ -45,11 +53,8 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
-  /**
-   * Inits the parser.
-   *
-   * @throws MtasConfigException
-   *           the mtas config exception
+  /* (non-Javadoc)
+   * @see mtas.analysis.parser.MtasParser#initParser()
    */
   @Override
   protected void initParser() throws MtasConfigException {
@@ -108,6 +113,9 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.analysis.parser.MtasParser#createTokenCollection(java.io.Reader)
+   */
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException {
@@ -324,7 +332,7 @@ final public class MtasSketchParser extends MtasBasicParser {
     for (Entry<Integer, HashSet<String>> updateItem : updateList
         .get(UPDATE_TYPE_POSITION).entrySet()) {
       for (String refId : updateItem.getValue()) {
-        MtasToken token = tokenCollection.get(updateItem.getKey());
+        MtasToken<?> token = tokenCollection.get(updateItem.getKey());
         token.addPositions(idPositions.get(refId));
       }
     }
@@ -333,6 +341,9 @@ final public class MtasSketchParser extends MtasBasicParser {
     return tokenCollection;
   }
 
+  /* (non-Javadoc)
+   * @see mtas.analysis.parser.MtasParser#printConfig()
+   */
   @Override
   public String printConfig() {
     String text = "";
@@ -343,6 +354,12 @@ final public class MtasSketchParser extends MtasBasicParser {
     return text;
   }
 
+  /**
+   * Prints the config types.
+   *
+   * @param types the types
+   * @return the string
+   */
   private String printConfigTypes(HashMap<?, MtasParserType> types) {
     String text = "";
     for (Entry<?, MtasParserType> entry : types.entrySet()) {
@@ -383,11 +400,14 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
+  /**
+   * The Class MtasSketchParserMappingGroup.
+   */
   private class MtasSketchParserMappingGroup
       extends MtasParserMapping<MtasSketchParserMappingGroup> {
 
     /**
-     * Instantiates a new mtas folia parser mapping group.
+     * Instantiates a new mtas sketch parser mapping group.
      */
     public MtasSketchParserMappingGroup() {
       super();

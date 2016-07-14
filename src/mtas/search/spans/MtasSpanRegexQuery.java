@@ -16,10 +16,11 @@ import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 /**
- * The Class MtasSpanTermQuery.
+ * The Class MtasSpanRegexQuery.
  */
 public class MtasSpanRegexQuery extends SpanQuery {
 
+  /** The Constant MTAS_REGEX_EXPAND_BOUNDARY. */
   private static final int MTAS_REGEX_EXPAND_BOUNDARY = 1000;
 
   /** The prefix. */
@@ -31,14 +32,20 @@ public class MtasSpanRegexQuery extends SpanQuery {
   /** The single position. */
   private boolean singlePosition;
 
+  /** The term. */
   private Term term;
 
+  /** The query. */
   private SpanMultiTermQueryWrapper<RegexpQuery> query;
 
+  /** The query name. */
   private static String QUERY_NAME = "mtasSpanRegexQuery";
   
   
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public Query rewrite(IndexReader reader) throws IOException {
     Query q = query.rewrite(reader);
@@ -85,11 +92,17 @@ public class MtasSpanRegexQuery extends SpanQuery {
     return buffer.toString();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() {
     return term.field();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -97,6 +110,9 @@ public class MtasSpanRegexQuery extends SpanQuery {
         needsScores);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -109,6 +125,9 @@ public class MtasSpanRegexQuery extends SpanQuery {
     return term.equals(that.term) && singlePosition==that.singlePosition;    
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = QUERY_NAME.hashCode();

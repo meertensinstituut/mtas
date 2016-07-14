@@ -18,13 +18,38 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
- * Collect data
+ * The Class DataCollector.
  */
 public class DataCollector {
 
+  /** The collector type list. */
   public static String COLLECTOR_TYPE_LIST = "list";
+  
+  /** The collector type data. */
   public static String COLLECTOR_TYPE_DATA = "data";
 
+ /**
+  * Gets the collector.
+  *
+  * @param collectorType the collector type
+  * @param dataType the data type
+  * @param statsType the stats type
+  * @param statsItems the stats items
+  * @param sortType the sort type
+  * @param sortDirection the sort direction
+  * @param start the start
+  * @param number the number
+  * @param subCollectorTypes the sub collector types
+  * @param subDataTypes the sub data types
+  * @param subStatsTypes the sub stats types
+  * @param subStatsItems the sub stats items
+  * @param subSortTypes the sub sort types
+  * @param subSortDirections the sub sort directions
+  * @param subStart the sub start
+  * @param subNumber the sub number
+  * @return the collector
+  * @throws IOException Signals that an I/O exception has occurred.
+  */
  public static MtasDataCollector<?, ?> getCollector(String collectorType,
       String dataType, String statsType, TreeSet<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
@@ -76,69 +101,156 @@ public class DataCollector {
     }
   }
 
+  /**
+   * The Class MtasDataCollector.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   */
   public abstract static class MtasDataCollector<T1 extends Number, T2 extends MtasDataItem<T1>>
       implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The size. */
     // size and position current level
     private int size;
 
+    /** The position. */
     protected int position;
 
+    /** The collector type. */
     // properties collector
     protected String collectorType;
+    
+    /** The stats type. */
     protected String statsType;
+    
+    /** The data type. */
     protected String dataType;
+    
+    /** The stats items. */
     protected TreeSet<String> statsItems;
+    
+    /** The sort type. */
     protected String sortType;
+    
+    /** The sort direction. */
     protected String sortDirection;
+    
+    /** The start. */
     protected Integer start;
+    
+    /** The number. */
     protected Integer number;
 
+    /** The error number. */
     // error
     protected int[] errorNumber;
+    
+    /** The error list. */
     protected HashMap<String, Integer>[] errorList;
 
+    /** The key list. */
     // administration keys
     protected String[] keyList;
 
+    /** The has sub. */
     // subcollectors properties
     private boolean hasSub;
+    
+    /** The sub collector types. */
     private String[] subCollectorTypes;
+    
+    /** The sub data types. */
     private String[] subDataTypes;
+    
+    /** The sub stats types. */
     private String[] subStatsTypes;
+    
+    /** The sub stats items. */
     private TreeSet<String>[] subStatsItems;
+    
+    /** The sub sort types. */
     private String[] subSortTypes;
+    
+    /** The sub sort directions. */
     private String[] subSortDirections;
+    
+    /** The sub start. */
     private Integer[] subStart;
+    
+    /** The sub number. */
     private Integer[] subNumber;
 
+    /** The sub collector list next level. */
     // subcollectors next level
     protected MtasDataCollector<?, ?>[] subCollectorListNextLevel = null;
+    
+    /** The sub collector next level. */
     protected MtasDataCollector<?, ?> subCollectorNextLevel = null;
 
+    /** The new current position. */
     // administration for adding
     protected int newSize, newPosition, newCurrentPosition;
+    
+    /** The new current existing. */
     protected boolean newCurrentExisting;
+    
+    /** The new key list. */
     protected String[] newKeyList = null;
+    
+    /** The new error number. */
     protected int[] newErrorNumber;
+    
+    /** The new error list. */
     protected HashMap<String, Integer>[] newErrorList;
 
+    /** The new sub collector types. */
     // subcollectors properties for adding
     private String[] newSubCollectorTypes;
+    
+    /** The new sub data types. */
     private String[] newSubDataTypes;
+    
+    /** The new sub stats types. */
     private String[] newSubStatsTypes;
+    
+    /** The new sub stats items. */
     private TreeSet<String>[] newSubStatsItems;
+    
+    /** The new sub sort types. */
     private String[] newSubSortTypes;
+    
+    /** The new sub sort directions. */
     private String[] newSubSortDirections;
+    
+    /** The new sub start. */
     private Integer[] newSubStart;
+    
+    /** The new sub number. */
     private Integer[] newSubNumber;
 
+    /** The new sub collector list next level. */
     // subcollectors next level for adding
     protected MtasDataCollector<?, ?>[] newSubCollectorListNextLevel = null;
+    
+    /** The new sub collector next level. */
     protected MtasDataCollector<?, ?> newSubCollectorNextLevel = null;
 
+    /**
+     * Instantiates a new mtas data collector.
+     *
+     * @param collectorType the collector type
+     * @param dataType the data type
+     * @param statsType the stats type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     */
     protected MtasDataCollector(String collectorType, String dataType,
         String statsType, TreeSet<String> statsItems, String sortType,
         String sortDirection, Integer start, Integer number) {
@@ -171,6 +283,26 @@ public class DataCollector {
       subCollectorNextLevel = null;
     }
 
+    /**
+     * Instantiates a new mtas data collector.
+     *
+     * @param collectorType the collector type
+     * @param dataType the data type
+     * @param statsType the stats type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     */
     protected MtasDataCollector(String collectorType, String dataType,
         String statsType, TreeSet<String> statsItems, String sortType,
         String sortDirection, Integer start, Integer number,
@@ -212,9 +344,20 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Merge.
+     *
+     * @param newDataCollector the new data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     abstract public void merge(MtasDataCollector<?, ?> newDataCollector)
         throws IOException;
 
+    /**
+     * Inits the new list.
+     *
+     * @param maxNumberOfTerms the max number of terms
+     */
     protected void initNewList(int maxNumberOfTerms) {
       position = 0;
       newPosition = 0;
@@ -228,6 +371,9 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Increase new list size.
+     */
     protected void increaseNewListSize() {
       String[] tmpNewKeyList = newKeyList;
       int[] tmpNewErrorNumber = newErrorNumber;
@@ -248,6 +394,12 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Adds the.
+     *
+     * @return the mtas data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected final MtasDataCollector<?, ?> add() throws IOException {
       if (!collectorType.equals(COLLECTOR_TYPE_DATA)) {
         throw new IOException("collector should be " + COLLECTOR_TYPE_DATA);
@@ -290,6 +442,13 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Adds the.
+     *
+     * @param key the key
+     * @return the mtas data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected final MtasDataCollector<?, ?> add(String key) throws IOException {
       if (collectorType.equals(COLLECTOR_TYPE_DATA)) {
         throw new IOException("collector should be " + COLLECTOR_TYPE_LIST);
@@ -372,10 +531,27 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Copy to new.
+     *
+     * @param position the position
+     * @param newPosition the new position
+     */
     protected abstract void copyToNew(int position, int newPosition);
 
+    /**
+     * Copy from new.
+     */
     protected abstract void copyFromNew();
 
+    /**
+     * Sets the error.
+     *
+     * @param newPosition the new position
+     * @param errorNumberItem the error number item
+     * @param errorListItem the error list item
+     * @param currentExisting the current existing
+     */
     protected final void setError(int newPosition, int errorNumberItem,
         HashMap<String, Integer> errorListItem, boolean currentExisting) {
       if (currentExisting) {
@@ -395,6 +571,13 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sorted and unique.
+     *
+     * @param keyList the key list
+     * @param size the size
+     * @return true, if successful
+     */
     private boolean sortedAndUnique(String[] keyList, int size) {
       for (int i = 1; i < size; i++) {
         if (keyList[(i - 1)].compareTo(keyList[i]) >= 0) {
@@ -404,6 +587,13 @@ public class DataCollector {
       return true;
     }
 
+    /**
+     * Compute sort and unique mapping.
+     *
+     * @param keyList the key list
+     * @param size the size
+     * @return the int[][]
+     */
     private int[][] computeSortAndUniqueMapping(String[] keyList, int size) {
       if (size > 0) {
         SortedMap<String, int[]> sortedMap = new TreeMap<String, int[]>();
@@ -426,6 +616,12 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Remap data.
+     *
+     * @param mapping the mapping
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     protected void remapData(int[][] mapping) throws IOException {
       // remap and merge keys
       String[] newKeyList = new String[mapping.length];
@@ -472,6 +668,11 @@ public class DataCollector {
       position = 0;
     }
 
+    /**
+     * Close new list.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void closeNewList() throws IOException {
       if (newSize > 0) {
         // add remaining old
@@ -507,46 +708,147 @@ public class DataCollector {
       newCurrentPosition = 0;
     }
 
+    /**
+     * Gets the item.
+     *
+     * @param i the i
+     * @return the item
+     */
     abstract protected T2 getItem(int i);
 
+    /**
+     * Checks for sub.
+     *
+     * @return true, if successful
+     */
     protected boolean hasSub() {
       return hasSub;
     }
 
+    /**
+     * Error.
+     *
+     * @param error the error
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract void error(String error) throws IOException;
 
+    /**
+     * Error.
+     *
+     * @param keys the keys
+     * @param error the error
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract void error(String keys[], String error) throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @return the mtas data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param values the values
+     * @param number the number
+     * @return the mtas data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @return the mtas data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param values the values
+     * @param number the number
+     * @return the mtas data collector
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param keys the keys
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @return the mtas data collector[]
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param keys the keys
+     * @param values the values
+     * @param number the number
+     * @return the mtas data collector[]
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param keys the keys
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @return the mtas data collector[]
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?>[] add(String[] keys,
         double valueSum, long valueN) throws IOException;
 
+    /**
+     * Adds the.
+     *
+     * @param keys the keys
+     * @param values the values
+     * @param number the number
+     * @return the mtas data collector[]
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract MtasDataCollector<?, ?>[] add(String[] keys,
         double[] values, int number) throws IOException;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
       return this.getClass().getCanonicalName() + ": " + collectorType + " - "
           + statsType + " " + statsItems + " " + hasSub;
     }
 
+    /**
+     * Gets the list.
+     *
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public final SortedMap<String, T2> getList() throws IOException {
       final TreeMap<String, T2> basicList = getBasicList();
       SortedMap<String, T2> list = null;
@@ -600,6 +902,12 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Gets the basic list.
+     *
+     * @return the basic list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private TreeMap<String, T2> getBasicList() throws IOException {
       closeNewList();
       TreeMap<String, T2> list = new TreeMap<String, T2>();
@@ -617,6 +925,12 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Gets the data.
+     *
+     * @return the data
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public final T2 getData() throws IOException {
       closeNewList();
       if (collectorType.equals(COLLECTOR_TYPE_DATA)) {
@@ -630,139 +944,320 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Gets the collector type.
+     *
+     * @return the collector type
+     */
     public String getCollectorType() {
       return collectorType;
     }
 
+    /**
+     * Gets the stats type.
+     *
+     * @return the stats type
+     */
     public String getStatsType() {
       return statsType;
     }
 
+    /**
+     * Gets the data type.
+     *
+     * @return the data type
+     */
     public String getDataType() {
       return dataType;
     }
 
+    /**
+     * Gets the size.
+     *
+     * @return the size
+     */
     public int getSize() {
       return size;
     }
 
   }
 
+  /**
+   * The Interface MtasDataOperations.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   */
   private interface MtasDataOperations<T1 extends Number, T2 extends Number> {
+    
+    /**
+     * Product11.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t1
+     */
     public T1 product11(T1 arg1, T1 arg2);
 
+    /**
+     * Add11.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t1
+     */
     public T1 add11(T1 arg1, T1 arg2);
 
+    /**
+     * Add22.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t2
+     */
     public T2 add22(T2 arg1, T2 arg2);
 
+    /**
+     * Subtract12.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t2
+     */
     public T2 subtract12(T1 arg1, T2 arg2);
 
+    /**
+     * Divide1.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t2
+     */
     public T2 divide1(T1 arg1, long arg2);
 
+    /**
+     * Divide2.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t2
+     */
     public T2 divide2(T2 arg1, long arg2);
 
+    /**
+     * Exp2.
+     *
+     * @param arg1 the arg1
+     * @return the t2
+     */
     public T2 exp2(T2 arg1);
 
+    /**
+     * Sqrt2.
+     *
+     * @param arg1 the arg1
+     * @return the t2
+     */
     public T2 sqrt2(T2 arg1);
 
+    /**
+     * Log1.
+     *
+     * @param arg1 the arg1
+     * @return the t2
+     */
     public T2 log1(T1 arg1);
 
+    /**
+     * Min11.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t1
+     */
     public T1 min11(T1 arg1, T1 arg2);
 
+    /**
+     * Max11.
+     *
+     * @param arg1 the arg1
+     * @param arg2 the arg2
+     * @return the t1
+     */
     public T1 max11(T1 arg1, T1 arg2);
 
+    /**
+     * Creates the vector1.
+     *
+     * @param length the length
+     * @return the t1[]
+     */
     public T1[] createVector1(int length);
 
+    /**
+     * Creates the vector2.
+     *
+     * @param length the length
+     * @return the t2[]
+     */
     public T2[] createVector2(int length);
 
+    /**
+     * Creates the matrix1.
+     *
+     * @param length the length
+     * @return the t1[][]
+     */
     public T1[][] createMatrix1(int length);
 
+    /**
+     * Gets the zero1.
+     *
+     * @return the zero1
+     */
     public T1 getZero1();
 
+    /**
+     * Gets the zero2.
+     *
+     * @return the zero2
+     */
     public T2 getZero2();
 
   }
 
+  /**
+   * The Class MtasDataLongOperations.
+   */
   private static class MtasDataLongOperations
       implements MtasDataOperations<Long, Double>, Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#product11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Long product11(Long arg1, Long arg2) {
       return arg1 * arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#add11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Long add11(Long arg1, Long arg2) {
       return arg1 + arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#add22(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double add22(Double arg1, Double arg2) {
       return arg1 + arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#subtract12(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double subtract12(Long arg1, Double arg2) {
       return arg1.doubleValue() - arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#divide1(java.lang.Number, long)
+     */
     @Override
     public Double divide1(Long arg1, long arg2) {
       return arg1 / (double) arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#divide2(java.lang.Number, long)
+     */
     @Override
     public Double divide2(Double arg1, long arg2) {
       return arg1 / arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#min11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Long min11(Long arg1, Long arg2) {
       return Math.min(arg1, arg2);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#max11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Long max11(Long arg1, Long arg2) {
       return Math.max(arg1, arg2);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#exp2(java.lang.Number)
+     */
     @Override
     public Double exp2(Double arg1) {
       return Math.exp(arg1);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#sqrt2(java.lang.Number)
+     */
     @Override
     public Double sqrt2(Double arg1) {
       return Math.sqrt(arg1);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#log1(java.lang.Number)
+     */
     @Override
     public Double log1(Long arg1) {
       return Math.log(arg1);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#createVector1(int)
+     */
     @Override
     public Long[] createVector1(int length) {
       return new Long[length];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#createVector2(int)
+     */
     @Override
     public Double[] createVector2(int length) {
       return new Double[length];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#createMatrix1(int)
+     */
     @Override
     public Long[][] createMatrix1(int length) {
       return new Long[length][];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#getZero1()
+     */
     @Override
     public Long getZero1() {
       return Long.valueOf(0);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#getZero2()
+     */
     @Override
     public Double getZero2() {
       return Double.valueOf(0);
@@ -770,86 +1265,138 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataDoubleOperations.
+   */
   private static class MtasDataDoubleOperations
       implements MtasDataOperations<Double, Double>, Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#product11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double product11(Double arg1, Double arg2) {
       return arg1 * arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#add11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double add11(Double arg1, Double arg2) {
       return arg1 + arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#add22(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double add22(Double arg1, Double arg2) {
       return arg1 + arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#subtract12(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double subtract12(Double arg1, Double arg2) {
       return arg1 - arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#divide1(java.lang.Number, long)
+     */
     @Override
     public Double divide1(Double arg1, long arg2) {
       return arg1 / arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#divide2(java.lang.Number, long)
+     */
     @Override
     public Double divide2(Double arg1, long arg2) {
       return arg1 / arg2;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#min11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double min11(Double arg1, Double arg2) {
       return Math.min(arg1, arg2);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#max11(java.lang.Number, java.lang.Number)
+     */
     @Override
     public Double max11(Double arg1, Double arg2) {
       return Math.max(arg1, arg2);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#exp2(java.lang.Number)
+     */
     @Override
     public Double exp2(Double arg1) {
       return Math.exp(arg1);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#sqrt2(java.lang.Number)
+     */
     @Override
     public Double sqrt2(Double arg1) {
       return Math.sqrt(arg1);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#log1(java.lang.Number)
+     */
     @Override
     public Double log1(Double arg1) {
       return Math.log(arg1);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#createVector1(int)
+     */
     @Override
     public Double[] createVector1(int length) {
       return new Double[length];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#createVector2(int)
+     */
     @Override
     public Double[] createVector2(int length) {
       return new Double[length];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#createMatrix1(int)
+     */
     @Override
     public Double[][] createMatrix1(int length) {
       return new Double[length][];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#getZero1()
+     */
     @Override
     public Double getZero1() {
       return Double.valueOf(0);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataOperations#getZero2()
+     */
     @Override
     public Double getZero2() {
       return Double.valueOf(0);
@@ -857,15 +1404,42 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataItem.
+   *
+   * @param <T> the generic type
+   */
   public abstract static class MtasDataItem<T extends Number>
       implements Serializable, Comparable<MtasDataItem<T>> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The sub. */
     protected MtasDataCollector<?, ?> sub;
+    
+    /** The stats items. */
     protected TreeSet<String> statsItems;
+    
+    /** The sort direction. */
     protected String sortType, sortDirection;
+    
+    /** The error number. */
     protected int errorNumber;
+    
+    /** The error list. */
     protected HashMap<String, Integer> errorList;
 
+    /**
+     * Instantiates a new mtas data item.
+     *
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItem(MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
         String sortType, String sortDirection, int errorNumber,
         HashMap<String, Integer> errorList) {
@@ -877,24 +1451,67 @@ public class DataCollector {
       this.errorList = errorList;
     }
 
+    /**
+     * Adds the.
+     *
+     * @param newItem the new item
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract void add(MtasDataItem<T> newItem) throws IOException;
 
+    /**
+     * Rewrite.
+     *
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public abstract Map<String, Object> rewrite() throws IOException;
 
+    /**
+     * Gets the sub.
+     *
+     * @return the sub
+     */
     public MtasDataCollector<?, ?> getSub() {
       return sub;
     }
 
   }
 
+  /**
+   * The Class MtasDataItemBasic.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   */
   private abstract static class MtasDataItemBasic<T1 extends Number, T2 extends Number>
       extends MtasDataItem<T1> implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The value sum. */
     protected T1 valueSum;
+    
+    /** The value n. */
     protected Long valueN;
+    
+    /** The operations. */
     protected MtasDataOperations<T1, T2> operations;
 
+    /**
+     * Instantiates a new mtas data item basic.
+     *
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     * @param operations the operations
+     */
     public MtasDataItemBasic(T1 valueSum, long valueN,
         MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
         String sortType, String sortDirection, int errorNumber,
@@ -906,6 +1523,9 @@ public class DataCollector {
       this.operations = operations;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.DataCollector.MtasDataItem)
+     */
     @Override
     public void add(MtasDataItem<T1> newItem) throws IOException {
       if (newItem instanceof MtasDataItemBasic) {
@@ -917,6 +1537,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
+     */
     @Override
     public Map<String, Object> rewrite() throws IOException {
       Map<String, Object> response = new HashMap<String, Object>();
@@ -943,6 +1566,12 @@ public class DataCollector {
       return response;
     }
 
+    /**
+     * Gets the value.
+     *
+     * @param statsType the stats type
+     * @return the value
+     */
     protected T2 getValue(String statsType) {
       if (statsType.equals(CodecUtil.STATS_TYPE_MEAN)) {
         return operations.divide1(valueSum, valueN);
@@ -953,17 +1582,56 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataItemAdvanced.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   */
   private abstract static class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
       extends MtasDataItem<T1> implements Serializable {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The value sum. */
     protected T1 valueSum;
+    
+    /** The value sum of logs. */
     protected T2 valueSumOfLogs;
+    
+    /** The value sum of squares. */
     protected T1 valueSumOfSquares;
+    
+    /** The value min. */
     protected T1 valueMin;
+    
+    /** The value max. */
     protected T1 valueMax;
+    
+    /** The value n. */
     protected Long valueN;
+    
+    /** The operations. */
     protected MtasDataOperations<T1, T2> operations;
 
+    /**
+     * Instantiates a new mtas data item advanced.
+     *
+     * @param valueSum the value sum
+     * @param valueSumOfLogs the value sum of logs
+     * @param valueSumOfSquares the value sum of squares
+     * @param valueMin the value min
+     * @param valueMax the value max
+     * @param valueN the value n
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     * @param operations the operations
+     */
     public MtasDataItemAdvanced(T1 valueSum, T2 valueSumOfLogs,
         T1 valueSumOfSquares, T1 valueMin, T1 valueMax, long valueN,
         MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
@@ -980,6 +1648,9 @@ public class DataCollector {
       this.operations = operations;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.DataCollector.MtasDataItem)
+     */
     @Override
     public void add(MtasDataItem<T1> newItem) throws IOException {
       if (newItem instanceof MtasDataItemAdvanced) {
@@ -997,6 +1668,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
+     */
     @Override
     public Map<String, Object> rewrite() throws IOException {
       Map<String, Object> response = new HashMap<String, Object>();
@@ -1041,6 +1715,12 @@ public class DataCollector {
       return response;
     }
 
+    /**
+     * Gets the value.
+     *
+     * @param statsType the stats type
+     * @return the value
+     */
     protected T2 getValue(String statsType) {
       if (statsType.equals(CodecUtil.STATS_TYPE_MEAN)) {
         return operations.divide1(valueSum, valueN);
@@ -1079,16 +1759,43 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataItemFull.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   */
   private abstract static class MtasDataItemFull<T1 extends Number, T2 extends Number>
       extends MtasDataItem<T1> implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The full values. */
     public T1[] fullValues;
+    
+    /** The operations. */
     protected MtasDataOperations<T1, T2> operations;
+    
+    /** The stats. */
     protected DescriptiveStatistics stats = null;
+    
+    /** The fp stats function items. */
     private Pattern fpStatsFunctionItems = Pattern
         .compile("(([^\\(,]+)(\\(([^\\)]*)\\))?)");
 
+    /**
+     * Instantiates a new mtas data item full.
+     *
+     * @param value the value
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     * @param operations the operations
+     */
     public MtasDataItemFull(T1[] value, MtasDataCollector<?, ?> sub,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         int errorNumber, HashMap<String, Integer> errorList,
@@ -1098,6 +1805,9 @@ public class DataCollector {
       this.operations = operations;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.DataCollector.MtasDataItem)
+     */
     @Override
     public void add(MtasDataItem<T1> newItem) throws IOException {
       if (newItem instanceof MtasDataItemFull) {
@@ -1113,6 +1823,9 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Creates the stats.
+     */
     protected void createStats() {
       if (stats == null) {
         stats = new DescriptiveStatistics();
@@ -1122,9 +1835,18 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Gets the distribution.
+     *
+     * @param arguments the arguments
+     * @return the distribution
+     */
     abstract protected HashMap<String, Object> getDistribution(
         String arguments);
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
+     */
     @Override
     public Map<String, Object> rewrite() throws IOException {
       createStats();
@@ -1187,6 +1909,9 @@ public class DataCollector {
       return response;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(MtasDataItem<T1> o) {
       int compare = 0;
@@ -1244,10 +1969,27 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataItemLongBasic.
+   */
   private static class MtasDataItemLongBasic
       extends MtasDataItemBasic<Long, Double> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data item long basic.
+     *
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItemLongBasic(long valueSum, long valueN,
         MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
         String sortType, String sortDirection, int errorNumber,
@@ -1256,6 +1998,9 @@ public class DataCollector {
           errorNumber, errorList, new MtasDataLongOperations());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(MtasDataItem<Long> o) {
       int compare = 0;
@@ -1274,10 +2019,27 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataItemDoubleBasic.
+   */
   private static class MtasDataItemDoubleBasic
       extends MtasDataItemBasic<Double, Double> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data item double basic.
+     *
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItemDoubleBasic(double valueSum, long valueN,
         MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
         String sortType, String sortDirection, int errorNumber,
@@ -1286,6 +2048,9 @@ public class DataCollector {
           errorNumber, errorList, new MtasDataDoubleOperations());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(MtasDataItem<Double> o) {
       int compare = 0;
@@ -1303,10 +2068,31 @@ public class DataCollector {
     }
   }
 
+  /**
+   * The Class MtasDataItemLongAdvanced.
+   */
   private static class MtasDataItemLongAdvanced
       extends MtasDataItemAdvanced<Long, Double> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data item long advanced.
+     *
+     * @param valueSum the value sum
+     * @param valueSumOfLogs the value sum of logs
+     * @param valueSumOfSquares the value sum of squares
+     * @param valueMin the value min
+     * @param valueMax the value max
+     * @param valueN the value n
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItemLongAdvanced(long valueSum, double valueSumOfLogs,
         long valueSumOfSquares, long valueMin, long valueMax, long valueN,
         MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
@@ -1317,6 +2103,9 @@ public class DataCollector {
           errorList, new MtasDataLongOperations());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(MtasDataItem<Long> o) {
       int compare = 0;
@@ -1352,10 +2141,31 @@ public class DataCollector {
     }
   }
 
+  /**
+   * The Class MtasDataItemDoubleAdvanced.
+   */
   private static class MtasDataItemDoubleAdvanced
       extends MtasDataItemAdvanced<Double, Double> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data item double advanced.
+     *
+     * @param valueSum the value sum
+     * @param valueSumOfLogs the value sum of logs
+     * @param valueSumOfSquares the value sum of squares
+     * @param valueMin the value min
+     * @param valueMax the value max
+     * @param valueN the value n
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItemDoubleAdvanced(double valueSum, double valueSumOfLogs,
         double valueSumOfSquares, double valueMin, double valueMax, long valueN,
         MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
@@ -1366,6 +2176,9 @@ public class DataCollector {
           errorList, new MtasDataDoubleOperations());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
     public int compareTo(MtasDataItem<Double> o) {
       int compare = 0;
@@ -1401,11 +2214,29 @@ public class DataCollector {
     }
   }
 
+  /**
+   * The Class MtasDataItemLongFull.
+   */
   private static class MtasDataItemLongFull
       extends MtasDataItemFull<Long, Double> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The fp argument. */
     private static Pattern fpArgument = Pattern.compile("([^=,]+)=([^,]*)");
 
+    /**
+     * Instantiates a new mtas data item long full.
+     *
+     * @param value the value
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItemLongFull(long[] value, MtasDataCollector<?, ?> sub,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         int errorNumber, HashMap<String, Integer> errorList) {
@@ -1413,6 +2244,9 @@ public class DataCollector {
           sortDirection, errorNumber, errorList, new MtasDataLongOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItemFull#getDistribution(java.lang.String)
+     */
     @Override
     protected HashMap<String, Object> getDistribution(String argument) {
       HashMap<String, Object> result = new LinkedHashMap<String, Object>();
@@ -1508,11 +2342,29 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataItemDoubleFull.
+   */
   private static class MtasDataItemDoubleFull
       extends MtasDataItemFull<Double, Double> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The fp argument. */
     private static Pattern fpArgument = Pattern.compile("([^=,]+)=([^,]*)");
 
+    /**
+     * Instantiates a new mtas data item double full.
+     *
+     * @param value the value
+     * @param sub the sub
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param errorNumber the error number
+     * @param errorList the error list
+     */
     public MtasDataItemDoubleFull(double[] value, MtasDataCollector<?, ?> sub,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         int errorNumber, HashMap<String, Integer> errorList) {
@@ -1521,6 +2373,12 @@ public class DataCollector {
           new MtasDataDoubleOperations());
     }
 
+    /**
+     * Gets the number of decimals.
+     *
+     * @param ds the ds
+     * @return the number of decimals
+     */
     private int getNumberOfDecimals(String ds) {
       if (!ds.contains(".")) {
         return 0;
@@ -1529,6 +2387,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataItemFull#getDistribution(java.lang.String)
+     */
     @Override
     protected HashMap<String, Object> getDistribution(String argument) {
       HashMap<String, Object> result = new LinkedHashMap<String, Object>();
@@ -1639,14 +2500,49 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataBasic.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   * @param <T3> the generic type
+   */
   private abstract static class MtasDataBasic<T1 extends Number, T2 extends Number, T3 extends MtasDataItem<T1>>
       extends MtasDataCollector<T1, T3> implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The new basic value sum list. */
     protected T1[] basicValueSumList = null, newBasicValueSumList = null;
+    
+    /** The new basic value n list. */
     protected long[] basicValueNList = null, newBasicValueNList = null;
+    
+    /** The operations. */
     protected MtasDataOperations<T1, T2> operations;
 
+    /**
+     * Instantiates a new mtas data basic.
+     *
+     * @param collectorType the collector type
+     * @param dataType the data type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @param operations the operations
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataBasic(String collectorType, String dataType,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         Integer start, Integer number, String[] subCollectorTypes,
@@ -1661,12 +2557,18 @@ public class DataCollector {
       this.operations = operations;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String)
+     */
     @Override
     public final void error(String error) throws IOException {
       add();
       setError(newCurrentPosition, error, newCurrentExisting);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String[], java.lang.String)
+     */
     @Override
     public final void error(String[] keys, String error) throws IOException {
       if (keys != null && keys.length > 0) {
@@ -1677,6 +2579,13 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sets the error.
+     *
+     * @param newPosition the new position
+     * @param error the error
+     * @param currentExisting the current existing
+     */
     protected void setError(int newPosition, String error,
         boolean currentExisting) {
       if (!currentExisting) {
@@ -1692,6 +2601,14 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sets the value.
+     *
+     * @param newPosition the new position
+     * @param valueSum the value sum
+     * @param valueN the value n
+     * @param currentExisting the current existing
+     */
     protected void setValue(int newPosition, T1 valueSum, long valueN,
         boolean currentExisting) {
       if (valueN > 0) {
@@ -1706,6 +2623,14 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sets the value.
+     *
+     * @param newPosition the new position
+     * @param values the values
+     * @param number the number
+     * @param currentExisting the current existing
+     */
     protected void setValue(int newPosition, T1[] values, int number,
         boolean currentExisting) {
       if (number > 0) {
@@ -1725,6 +2650,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
+     */
     @Override
     protected final void increaseNewListSize() {
       // register old situation
@@ -1744,18 +2672,27 @@ public class DataCollector {
           tmpOldSize);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#copyToNew(int, int)
+     */
     @Override
     protected void copyToNew(int position, int newPosition) {
       newBasicValueSumList[newPosition] = basicValueSumList[position];
       newBasicValueNList[newPosition] = basicValueNList[position];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#copyFromNew()
+     */
     @Override
     protected void copyFromNew() {
       basicValueSumList = newBasicValueSumList;
       basicValueNList = newBasicValueNList;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#remapData(int[][])
+     */
     @Override
     protected void remapData(int[][] mapping) throws IOException {
       super.remapData(mapping);
@@ -1778,6 +2715,9 @@ public class DataCollector {
       basicValueNList = newBasicValueNList;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.DataCollector.MtasDataCollector)
+     */
     @Override
     public void merge(MtasDataCollector<?, ?> newDataCollector)
         throws IOException {
@@ -1825,6 +2765,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int)
+     */
     @Override
     public final void initNewList(int maxNumberOfTerms) {
       super.initNewList(maxNumberOfTerms);
@@ -1834,20 +2777,63 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataAdvanced.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   * @param <T3> the generic type
+   */
   private abstract static class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends MtasDataItem<T1>>
       extends MtasDataCollector<T1, T3> implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The new advanced value sum list. */
     protected T1[] advancedValueSumList = null, newAdvancedValueSumList = null;
+    
+    /** The new advanced value max list. */
     protected T1[] advancedValueMaxList = null, newAdvancedValueMaxList = null;
+    
+    /** The new advanced value min list. */
     protected T1[] advancedValueMinList = null, newAdvancedValueMinList = null;
+    
+    /** The new advanced value sum of squares list. */
     protected T1[] advancedValueSumOfSquaresList = null,
         newAdvancedValueSumOfSquaresList = null;
+    
+    /** The new advanced value sum of logs list. */
     protected T2[] advancedValueSumOfLogsList = null,
         newAdvancedValueSumOfLogsList = null;
+    
+    /** The new advanced value n list. */
     protected long[] advancedValueNList = null, newAdvancedValueNList = null;
+    
+    /** The operations. */
     protected MtasDataOperations<T1, T2> operations;
 
+    /**
+     * Instantiates a new mtas data advanced.
+     *
+     * @param collectorType the collector type
+     * @param dataType the data type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @param operations the operations
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataAdvanced(String collectorType, String dataType,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         Integer start, Integer number, String[] subCollectorTypes,
@@ -1862,12 +2848,18 @@ public class DataCollector {
       this.operations = operations;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String)
+     */
     @Override
     public final void error(String error) throws IOException {
       add();
       setError(newCurrentPosition, error, newCurrentExisting);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String[], java.lang.String)
+     */
     @Override
     public final void error(String[] keys, String error) throws IOException {
       if (keys != null && keys.length > 0) {
@@ -1878,6 +2870,13 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sets the error.
+     *
+     * @param newPosition the new position
+     * @param error the error
+     * @param currentExisting the current existing
+     */
     protected void setError(int newPosition, String error,
         boolean currentExisting) {
       if (!currentExisting) {
@@ -1897,6 +2896,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
+     */
     @Override
     protected final void increaseNewListSize() {
       // register old situation
@@ -1932,6 +2934,9 @@ public class DataCollector {
           tmpOldSize);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#copyToNew(int, int)
+     */
     @Override
     protected void copyToNew(int position, int newPosition) {
       newAdvancedValueSumList[newPosition] = advancedValueSumList[position];
@@ -1942,6 +2947,9 @@ public class DataCollector {
       newAdvancedValueNList[newPosition] = advancedValueNList[position];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#copyFromNew()
+     */
     @Override
     protected void copyFromNew() {
       advancedValueSumList = newAdvancedValueSumList;
@@ -1952,6 +2960,14 @@ public class DataCollector {
       advancedValueNList = newAdvancedValueNList;
     }
 
+    /**
+     * Sets the value.
+     *
+     * @param newPosition the new position
+     * @param values the values
+     * @param number the number
+     * @param currentExisting the current existing
+     */
     protected void setValue(int newPosition, T1[] values, int number,
         boolean currentExisting) {
       if (number > 0) {
@@ -1979,6 +2995,18 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sets the value.
+     *
+     * @param newPosition the new position
+     * @param valueSum the value sum
+     * @param valueSumOfLogs the value sum of logs
+     * @param valueSumOfSquares the value sum of squares
+     * @param valueMin the value min
+     * @param valueMax the value max
+     * @param valueN the value n
+     * @param currentExisting the current existing
+     */
     private void setValue(int newPosition, T1 valueSum, T2 valueSumOfLogs,
         T1 valueSumOfSquares, T1 valueMin, T1 valueMax, long valueN,
         boolean currentExisting) {
@@ -2006,6 +3034,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#remapData(int[][])
+     */
     @Override
     protected void remapData(int[][] mapping) throws IOException {
       super.remapData(mapping);
@@ -2050,6 +3081,9 @@ public class DataCollector {
       advancedValueNList = newAdvancedValueNList;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.DataCollector.MtasDataCollector)
+     */
     @Override
     public void merge(MtasDataCollector<?, ?> newDataCollector)
         throws IOException {
@@ -2105,6 +3139,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int)
+     */
     @Override
     public final void initNewList(int maxNumberOfTerms) {
       super.initNewList(maxNumberOfTerms);
@@ -2118,13 +3155,46 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataFull.
+   *
+   * @param <T1> the generic type
+   * @param <T2> the generic type
+   * @param <T3> the generic type
+   */
   private abstract static class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends MtasDataItem<T1>>
       extends MtasDataCollector<T1, T3> implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The new full value list. */
     protected T1[][] fullValueList = null, newFullValueList = null;
+    
+    /** The operations. */
     protected MtasDataOperations<T1, T2> operations;
 
+    /**
+     * Instantiates a new mtas data full.
+     *
+     * @param collectorType the collector type
+     * @param dataType the data type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @param operations the operations
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataFull(String collectorType, String dataType,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         Integer start, Integer number, String[] subCollectorTypes,
@@ -2139,12 +3209,18 @@ public class DataCollector {
       this.operations = operations;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String)
+     */
     @Override
     public final void error(String error) throws IOException {
       add();
       setError(newCurrentPosition, error, newCurrentExisting);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String[], java.lang.String)
+     */
     @Override
     public final void error(String[] keys, String error) throws IOException {
       if (keys != null && keys.length > 0) {
@@ -2155,6 +3231,13 @@ public class DataCollector {
       }
     }
 
+    /**
+     * Sets the error.
+     *
+     * @param newPosition the new position
+     * @param error the error
+     * @param currentExisting the current existing
+     */
     protected void setError(int newPosition, String error,
         boolean currentExisting) {
       if (!currentExisting) {
@@ -2169,6 +3252,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
+     */
     @Override
     protected final void increaseNewListSize() {
       // register old situation
@@ -2183,16 +3269,30 @@ public class DataCollector {
       System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#copyToNew(int, int)
+     */
     @Override
     protected void copyToNew(int position, int newPosition) {
       newFullValueList[newPosition] = fullValueList[position];
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#copyFromNew()
+     */
     @Override
     protected void copyFromNew() {
       fullValueList = newFullValueList;
     }
 
+    /**
+     * Sets the value.
+     *
+     * @param newPosition the new position
+     * @param values the values
+     * @param number the number
+     * @param currentExisting the current existing
+     */
     protected void setValue(int newPosition, T1[] values, int number,
         boolean currentExisting) {
       if (number > 0) {
@@ -2216,6 +3316,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#remapData(int[][])
+     */
     @Override
     protected void remapData(int[][] mapping) throws IOException {
       super.remapData(mapping);
@@ -2235,6 +3338,9 @@ public class DataCollector {
       fullValueList = newFullValueList;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.DataCollector.MtasDataCollector)
+     */
     @Override
     public void merge(MtasDataCollector<?, ?> newDataCollector)
         throws IOException {
@@ -2283,6 +3389,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int)
+     */
     @Override
     public final void initNewList(int maxNumberOfTerms) {
       super.initNewList(maxNumberOfTerms);
@@ -2291,10 +3400,34 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataLongBasic.
+   */
   private static class MtasDataLongBasic
       extends MtasDataBasic<Long, Double, MtasDataItemLongBasic> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data long basic.
+     *
+     * @param collectorType the collector type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataLongBasic(String collectorType, TreeSet<String> statsItems,
         String sortType, String sortDirection, Integer start, Integer number,
         String[] subCollectorTypes, String[] subDataTypes,
@@ -2307,6 +3440,9 @@ public class DataCollector {
           subStart, subNumber, new MtasDataLongOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
+     */
     @Override
     protected MtasDataItemLongBasic getItem(int i) {
       return new MtasDataItemLongBasic(basicValueSumList[i], basicValueNList[i],
@@ -2314,6 +3450,9 @@ public class DataCollector {
           sortDirection, errorNumber[i], errorList[i]);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException {
@@ -2322,6 +3461,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException {
@@ -2331,6 +3473,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException {
@@ -2340,6 +3485,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException {
@@ -2351,6 +3499,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException {
@@ -2366,6 +3517,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException {
@@ -2382,6 +3536,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
         long valueN) throws IOException {
@@ -2398,6 +3555,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
         int number) throws IOException {
@@ -2418,10 +3578,34 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataDoubleBasic.
+   */
   private static class MtasDataDoubleBasic
       extends MtasDataBasic<Double, Double, MtasDataItemDoubleBasic> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data double basic.
+     *
+     * @param collectorType the collector type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataDoubleBasic(String collectorType, TreeSet<String> statsItems,
         String sortType, String sortDirection, Integer start, Integer number,
         String[] subCollectorTypes, String[] subDataTypes,
@@ -2434,6 +3618,9 @@ public class DataCollector {
           subStart, subNumber, new MtasDataDoubleOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
+     */
     @Override
     protected MtasDataItemDoubleBasic getItem(int i) {
       return new MtasDataItemDoubleBasic(basicValueSumList[i],
@@ -2441,6 +3628,9 @@ public class DataCollector {
           statsItems, sortType, sortDirection, errorNumber[i], errorList[i]);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException {
@@ -2450,6 +3640,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException {
@@ -2461,6 +3654,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException {
@@ -2469,6 +3665,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException {
@@ -2478,6 +3677,9 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException {
@@ -2494,6 +3696,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException {
@@ -2512,6 +3717,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
         long valueN) throws IOException {
@@ -2527,6 +3735,9 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
         int number) throws IOException {
@@ -2545,10 +3756,34 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataLongAdvanced.
+   */
   private static class MtasDataLongAdvanced
       extends MtasDataAdvanced<Long, Double, MtasDataItemLongAdvanced> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data long advanced.
+     *
+     * @param collectorType the collector type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataLongAdvanced(String collectorType,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         Integer start, Integer number, String[] subCollectorTypes,
@@ -2562,6 +3797,9 @@ public class DataCollector {
           subStart, subNumber, new MtasDataLongOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
+     */
     @Override
     protected final MtasDataItemLongAdvanced getItem(int i) {
       return new MtasDataItemLongAdvanced(advancedValueSumList[i],
@@ -2571,12 +3809,18 @@ public class DataCollector {
           statsItems, sortType, sortDirection, errorNumber[i], errorList[i]);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException {
@@ -2586,12 +3830,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException {
@@ -2603,12 +3853,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException {
@@ -2625,12 +3881,18 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
         int number) throws IOException {
@@ -2651,10 +3913,34 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataDoubleAdvanced.
+   */
   private static class MtasDataDoubleAdvanced
       extends MtasDataAdvanced<Double, Double, MtasDataItemDoubleAdvanced> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data double advanced.
+     *
+     * @param collectorType the collector type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataDoubleAdvanced(String collectorType,
         TreeSet<String> statsItems, String sortType, String sortDirection,
         Integer start, Integer number, String[] subCollectorTypes,
@@ -2668,6 +3954,9 @@ public class DataCollector {
           subStart, subNumber, new MtasDataDoubleOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
+     */
     @Override
     protected final MtasDataItemDoubleAdvanced getItem(int i) {
       return new MtasDataItemDoubleAdvanced(advancedValueSumList[i],
@@ -2677,12 +3966,18 @@ public class DataCollector {
           statsItems, sortType, sortDirection, errorNumber[i], errorList[i]);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException {
@@ -2694,12 +3989,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException {
@@ -2709,12 +4010,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException {
@@ -2733,12 +4040,18 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
         int number) throws IOException {
@@ -2757,10 +4070,34 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataLongFull.
+   */
   private static class MtasDataLongFull
       extends MtasDataFull<Long, Double, MtasDataItemLongFull> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data long full.
+     *
+     * @param collectorType the collector type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataLongFull(String collectorType, TreeSet<String> statsItems,
         String sortType, String sortDirection, Integer start, Integer number,
         String[] subCollectorTypes, String[] subDataTypes,
@@ -2773,6 +4110,9 @@ public class DataCollector {
           subStart, subNumber, new MtasDataLongOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
+     */
     @Override
     protected MtasDataItemLongFull getItem(int i) {
       return new MtasDataItemLongFull(ArrayUtils.toPrimitive(fullValueList[i]),
@@ -2780,12 +4120,18 @@ public class DataCollector {
           sortDirection, errorNumber[i], errorList[i]);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException {
@@ -2795,12 +4141,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException {
@@ -2812,12 +4164,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException {
@@ -2834,12 +4192,18 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
         int number) throws IOException {
@@ -2860,10 +4224,34 @@ public class DataCollector {
 
   }
 
+  /**
+   * The Class MtasDataDoubleFull.
+   */
   private static class MtasDataDoubleFull
       extends MtasDataFull<Double, Double, MtasDataItemDoubleFull> {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Instantiates a new mtas data double full.
+     *
+     * @param collectorType the collector type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
+     * @param subCollectorTypes the sub collector types
+     * @param subDataTypes the sub data types
+     * @param subStatsTypes the sub stats types
+     * @param subStatsItems the sub stats items
+     * @param subSortTypes the sub sort types
+     * @param subSortDirections the sub sort directions
+     * @param subStart the sub start
+     * @param subNumber the sub number
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasDataDoubleFull(String collectorType, TreeSet<String> statsItems,
         String sortType, String sortDirection, Integer start, Integer number,
         String[] subCollectorTypes, String[] subDataTypes,
@@ -2876,6 +4264,9 @@ public class DataCollector {
           subStart, subNumber, new MtasDataDoubleOperations());
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
+     */
     @Override
     protected MtasDataItemDoubleFull getItem(int i) {
       return new MtasDataItemDoubleFull(
@@ -2884,12 +4275,18 @@ public class DataCollector {
           sortDirection, errorNumber[i], errorList[i]);
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(long[] values, int number)
         throws IOException {
@@ -2901,12 +4298,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double valueSum, long valueN)
         throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?> add(double[] values, int number)
         throws IOException {
@@ -2916,12 +4319,18 @@ public class DataCollector {
       return dataCollector;
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], long[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
         int number) throws IOException {
@@ -2940,12 +4349,18 @@ public class DataCollector {
       }
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double, long)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
         long valueN) throws IOException {
       throw new IOException("not supported");
     }
 
+    /* (non-Javadoc)
+     * @see mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[], double[], int)
+     */
     @Override
     public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
         int number) throws IOException {

@@ -35,7 +35,7 @@ public class MtasFetchData {
    * Gets the string.
    *
    * @return the string
-   * @throws MtasParserException the Mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   private String getString() throws MtasParserException {
     String text = null;

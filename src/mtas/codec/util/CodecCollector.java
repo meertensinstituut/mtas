@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import mtas.analysis.token.MtasToken;
@@ -55,8 +54,27 @@ import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.LegacyNumericUtils;
 
+/**
+ * The Class CodecCollector.
+ */
 public class CodecCollector {
   
+  /**
+   * Collect.
+   *
+   * @param field the field
+   * @param searcher the searcher
+   * @param reader the reader
+   * @param rawReader the raw reader
+   * @param fullDocList the full doc list
+   * @param fullDocSet the full doc set
+   * @param fieldInfo the field info
+   * @param spansQueryWeight the spans query weight
+   * @throws IllegalAccessException the illegal access exception
+   * @throws IllegalArgumentException the illegal argument exception
+   * @throws InvocationTargetException the invocation target exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public static void collect(String field, IndexSearcher searcher,
       IndexReader reader, IndexReader rawReader, ArrayList<Integer> fullDocList,
       ArrayList<Integer> fullDocSet, ComponentField fieldInfo,
@@ -111,6 +129,21 @@ public class CodecCollector {
     
   }
 
+  /**
+   * Collect spans positions and tokens.
+   *
+   * @param spansQueryWeight the spans query weight
+   * @param searcher the searcher
+   * @param mtasCodecInfo the mtas codec info
+   * @param r the r
+   * @param lrc the lrc
+   * @param field the field
+   * @param t the t
+   * @param docSet the doc set
+   * @param docList the doc list
+   * @param fieldInfo the field info
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void collectSpansPositionsAndTokens(
       HashMap<SpanQuery, SpanWeight> spansQueryWeight, IndexSearcher searcher,
       CodecInfo mtasCodecInfo, LeafReader r, LeafReaderContext lrc,
@@ -484,6 +517,14 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Collect prefixes.
+   *
+   * @param fieldInfos the field infos
+   * @param field the field
+   * @param fieldInfo the field info
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void collectPrefixes(FieldInfos fieldInfos, String field,
       ComponentField fieldInfo) throws IOException {
     if (fieldInfo.prefix != null) {
@@ -512,6 +553,14 @@ public class CodecCollector {
   }
   
 
+  /**
+   * Compute arguments.
+   *
+   * @param spansNumberData the spans number data
+   * @param queries the queries
+   * @param docSet the doc set
+   * @return the hash map
+   */
   private static HashMap<Integer, long[]> computeArguments(
       HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
       SpanQuery[] queries, Integer[] docSet) {
@@ -537,6 +586,13 @@ public class CodecCollector {
     return args;
   }
 
+  /**
+   * Intersected doc list.
+   *
+   * @param facetDocList the facet doc list
+   * @param docSet the doc set
+   * @return the integer[]
+   */
   private static Integer[] intersectedDocList(int[] facetDocList,
       Integer[] docSet) {
     if (facetDocList != null) {
@@ -562,6 +618,14 @@ public class CodecCollector {
     return null;
   }
 
+  /**
+   * Creates the positions.
+   *
+   * @param statsPositionList the stats position list
+   * @param positionsData the positions data
+   * @param docSet the doc set
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createPositions(List<ComponentPosition> statsPositionList,
       HashMap<Integer, Integer> positionsData, List<Integer> docSet)
       throws IOException {
@@ -590,6 +654,14 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the tokens.
+   *
+   * @param statsTokenList the stats token list
+   * @param tokensData the tokens data
+   * @param docSet the doc set
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createTokens(List<ComponentToken> statsTokenList,
       HashMap<Integer, Integer> tokensData, List<Integer> docSet)
       throws IOException {
@@ -620,6 +692,15 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the stats.
+   *
+   * @param statsSpanList the stats span list
+   * @param positionsData the positions data
+   * @param spansNumberData the spans number data
+   * @param docSet the doc set
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createStats(List<ComponentSpan> statsSpanList,
       HashMap<Integer, Integer> positionsData,
       HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
@@ -745,6 +826,20 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the list.
+   *
+   * @param listList the list list
+   * @param spansNumberData the spans number data
+   * @param spansMatchData the spans match data
+   * @param docSet the doc set
+   * @param field the field
+   * @param docBase the doc base
+   * @param uniqueKeyField the unique key field
+   * @param mtasCodecInfo the mtas codec info
+   * @param searcher the searcher
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createList(List<ComponentList> listList,
       HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
       HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
@@ -904,6 +999,17 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the group.
+   *
+   * @param groupList the group list
+   * @param spansMatchData the spans match data
+   * @param docSet the doc set
+   * @param field the field
+   * @param docBase the doc base
+   * @param mtasCodecInfo the mtas codec info
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createGroup(List<ComponentGroup> groupList,
       HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
       List<Integer> docSet, String field, int docBase, CodecInfo mtasCodecInfo)
@@ -917,8 +1023,6 @@ public class CodecCollector {
       for (ComponentGroup group : groupList) {
         if (group.prefixes.size() > 0) {
           // compute prefixIds
-          HashMap<String, Integer> prefixIds = mtasCodecInfo
-              .getPrefixesIds(field, group.prefixes);
           matchData = spansMatchData.get(group.spanQuery);
           group.dataCollector.initNewList(1);
           for (int docId : docSet) {
@@ -1010,13 +1114,7 @@ public class CodecCollector {
                       1);
                 }
               } else {
-                
-//                System.out.print("\nFIND MATCHES FOR "+(docId - docBase)+": ");
-//                for(IntervalTreeNodeData<String> item : positionsHits) {
-//                  System.out.print(item.start+"-"+item.end+" ");
-//                }
-//                System.out.println();
-                
+                                
                 mtasCodecInfo.collectTermsByPrefixesForListOfHitPositions(field,
                     (docId - docBase), group.prefixes, positionsHits);
                 
@@ -1045,6 +1143,19 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the kwic.
+   *
+   * @param kwicList the kwic list
+   * @param spansMatchData the spans match data
+   * @param docList the doc list
+   * @param field the field
+   * @param docBase the doc base
+   * @param uniqueKeyField the unique key field
+   * @param mtasCodecInfo the mtas codec info
+   * @param searcher the searcher
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createKwic(List<ComponentKwic> kwicList,
       HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
       List<Integer> docList, String field, int docBase, String uniqueKeyField,
@@ -1158,6 +1269,18 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the facet base.
+   *
+   * @param cf the cf
+   * @param level the level
+   * @param dataCollector the data collector
+   * @param positionsData the positions data
+   * @param spansNumberData the spans number data
+   * @param facetData the facet data
+   * @param docSet the doc set
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createFacetBase(ComponentFacet cf, int level,
       MtasDataCollector<?, ?> dataCollector,
       HashMap<Integer, Integer> positionsData,
@@ -1384,6 +1507,21 @@ public class CodecCollector {
     }
   }
 
+  /**
+   * Creates the facet.
+   *
+   * @param facetList the facet list
+   * @param positionsData the positions data
+   * @param spansNumberData the spans number data
+   * @param facetData the facet data
+   * @param docSet the doc set
+   * @param field the field
+   * @param docBase the doc base
+   * @param uniqueKeyField the unique key field
+   * @param mtasCodecInfo the mtas codec info
+   * @param searcher the searcher
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createFacet(List<ComponentFacet> facetList,
       HashMap<Integer, Integer> positionsData,
       HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
@@ -1405,6 +1543,18 @@ public class CodecCollector {
   // private static void createTermVector(LeafReader r, LeafReaderContext lrc,
   // Terms t, List<Integer> docSet, ComponentField fieldInfo)
 
+  /**
+   * Creates the termvector.
+   *
+   * @param termVectorList the term vector list
+   * @param positionsData the positions data
+   * @param docSet the doc set
+   * @param field the field
+   * @param t the t
+   * @param r the r
+   * @param lrc the lrc
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createTermvector(List<ComponentTermVector> termVectorList,
       HashMap<Integer, Integer> positionsData, List<Integer> docSet,
       String field, Terms t, LeafReader r, LeafReaderContext lrc)

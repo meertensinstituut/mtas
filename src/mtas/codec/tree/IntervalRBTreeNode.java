@@ -1,7 +1,7 @@
 package mtas.codec.tree;
 
 /**
- * The Class MtasRBTreeNode.
+ * The Class IntervalRBTreeNode.
  */
 public class IntervalRBTreeNode extends IntervalTreeNode<IntervalRBTreeNode> {
 
@@ -19,7 +19,7 @@ public class IntervalRBTreeNode extends IntervalTreeNode<IntervalRBTreeNode> {
     
     // node with start and end position
     /**
-     * Instantiates a new mtas rb tree node.
+     * Instantiates a new interval rb tree node.
      *
      * @param left the left
      * @param right the right

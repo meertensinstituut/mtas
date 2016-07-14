@@ -8,12 +8,26 @@ import mtas.codec.util.CodecInfo.IndexDoc;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
+/**
+ * The Class MtasSpanMatchAll.
+ */
 public class MtasSpanMatchAll extends Spans {
 
+  /** The field. */
   private String field;
+  
+  /** The doc id. */
   private int minPosition, maxPosition, currentStartPosition, currentEndPosition, docId;
+  
+  /** The mtas codec info. */
   private CodecInfo mtasCodecInfo;
   
+  /**
+   * Instantiates a new mtas span match all.
+   *
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
+   */
   public MtasSpanMatchAll(CodecInfo mtasCodecInfo, String field) {
     super(); 
     this.mtasCodecInfo = mtasCodecInfo;
@@ -25,6 +39,9 @@ public class MtasSpanMatchAll extends Spans {
     docId = -1;    
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
   @Override
   public int nextStartPosition() throws IOException {
     if(currentStartPosition < minPosition) {
@@ -41,31 +58,49 @@ public class MtasSpanMatchAll extends Spans {
     return currentStartPosition;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
   @Override
   public int startPosition() {
     return currentStartPosition;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
   @Override
   public int endPosition() {
     return currentEndPosition;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
   @Override
   public int width() {
     return 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
   @Override
   public int docID() {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
   @Override
   public int nextDoc() throws IOException {
     IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, docId);
@@ -85,6 +120,9 @@ public class MtasSpanMatchAll extends Spans {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
   @Override
   public int advance(int target) throws IOException {      
     IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, (target-1));
@@ -104,11 +142,17 @@ public class MtasSpanMatchAll extends Spans {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
   @Override
   public long cost() {
     return 0;
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
   @Override
   public float positionsCost() {
     return 0;

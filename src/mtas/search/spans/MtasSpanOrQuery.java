@@ -7,11 +7,22 @@ import java.util.List;
 import org.apache.lucene.search.spans.SpanOrQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 
+/**
+ * The Class MtasSpanOrQuery.
+ */
 public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
   
+  /** The clauses. */
   private List<SpanQuery> clauses;
+  
+  /** The query name. */
   private static String QUERY_NAME = "mtasSpanOrQuery";
   
+  /**
+   * Instantiates a new mtas span or query.
+   *
+   * @param clauses the clauses
+   */
   public MtasSpanOrQuery(SpanQuery... clauses) {
     super(new SpanOrQuery(clauses));  
     this.clauses = new ArrayList<>(clauses.length);
@@ -20,6 +31,9 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
     }
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.MtasSpanUniquePositionQuery#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -36,6 +50,9 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
     return buffer.toString();
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.MtasSpanUniquePositionQuery#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -48,6 +65,9 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
     return clauses.equals(that.clauses);   
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.MtasSpanUniquePositionQuery#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = QUERY_NAME.hashCode();

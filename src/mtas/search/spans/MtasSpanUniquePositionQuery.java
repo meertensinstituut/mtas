@@ -16,25 +16,48 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
+/**
+ * The Class MtasSpanUniquePositionQuery.
+ */
 abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
   
+  /** The clause. */
   private SpanQuery clause;
+  
+  /** The field. */
   private String field;
   
+  /** The query name. */
   private static String QUERY_NAME = "mtasSpanUniquePositionQuery";
   
+  /**
+   * Instantiates a new mtas span unique position query.
+   *
+   * @param clause the clause
+   */
   public MtasSpanUniquePositionQuery(SpanQuery clause) {
     field = clause.getField();
     this.clause = clause;
   }
 
+  /**
+   * Gets the clause.
+   *
+   * @return the clause
+   */
   public SpanQuery getClause() {
     return clause;
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() { return field; }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -47,6 +70,9 @@ abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
     return clause.equals(that.clause);    
   }  
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = QUERY_NAME.hashCode();
@@ -54,6 +80,9 @@ abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
     return h;
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -63,6 +92,9 @@ abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
     return buffer.toString();
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -71,20 +103,38 @@ abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
   }
 
   
+  /**
+   * The Class SpanUniquePositionWeight.
+   */
   public class SpanUniquePositionWeight extends SpanWeight {
 
+    /** The sub weight. */
     final SpanWeight subWeight;
 
+    /**
+     * Instantiates a new span unique position weight.
+     *
+     * @param subWeight the sub weight
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public SpanUniquePositionWeight(SpanWeight subWeight, IndexSearcher searcher, Map<Term, TermContext> terms) throws IOException {
       super(MtasSpanUniquePositionQuery.this, searcher, terms);
       this.subWeight = subWeight;
     }
     
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.Map)
+     */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       subWeight.extractTermContexts(contexts);
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
@@ -105,6 +155,9 @@ abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
       }
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
     @Override
     public void extractTerms(Set<Term> terms) {
       subWeight.extractTerms(terms);

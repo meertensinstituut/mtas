@@ -8,10 +8,19 @@ import mtas.search.spans.MtasSpanOrQuery;
 import org.apache.lucene.search.spans.SpanNotQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 
+/**
+ * The Class MtasCQLParserWordFullCondition.
+ */
 public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePartCondition {
 
+  /** The word condition. */
   private MtasCQLParserWordCondition wordCondition;  
 
+  /**
+   * Instantiates a new mtas cql parser word full condition.
+   *
+   * @param condition the condition
+   */
   public MtasCQLParserWordFullCondition(MtasCQLParserWordCondition condition) {
     minimumOccurence = 1;
     maximumOccurence = 1;    
@@ -26,16 +35,29 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
     wordCondition = condition;
   }
 
+  /**
+   * Gets the condition.
+   *
+   * @return the condition
+   */
   public MtasCQLParserWordCondition getCondition() {
     return wordCondition;
   }
 
   
 
+  /**
+   * Checks if is empty.
+   *
+   * @return true, if is empty
+   */
   public boolean isEmpty() {
     return wordCondition.isEmpty();
   }
   
+  /* (non-Javadoc)
+   * @see mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#getQuery()
+   */
   @Override
   public SpanQuery getQuery() throws ParseException {
     SpanQuery q = null;
@@ -105,6 +127,9 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
     return q;
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object object) {
     if(object==null) 
