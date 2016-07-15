@@ -1,3 +1,3 @@
 # Multi Tier Annotation Search
 
-See [matthijsbrouwer.github.io/mtas/](https://matthijsbrouwer.github.io/mtas/)
+See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/)
