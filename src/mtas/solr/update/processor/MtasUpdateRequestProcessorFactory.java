@@ -331,8 +331,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                   .getAttribute(FlagsAttribute.class);
 
               int numberOfPositions = 0;
-              int numberOfTokens = 0;
-
+              int numberOfTokens = 0;                            
+              
               while (tokenizer.incrementToken()) {
                 String term = null;
                 Integer offsetStart = null, offsetEnd = null, posIncr = null,

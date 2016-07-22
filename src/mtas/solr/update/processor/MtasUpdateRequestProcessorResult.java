@@ -8,10 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.lucene.util.BytesRef;
 
 /**
@@ -19,33 +16,19 @@ import org.apache.lucene.util.BytesRef;
  */
 public class MtasUpdateRequestProcessorResult implements Serializable {
   
+  private static final long serialVersionUID = 1L;
+
   /** The stored string value. */
   private String storedStringValue;
   
   /** The tokens. */
-  private List<Map<String,Object>> tokens;
+  private List<String> tokenTerms;
+  private List<Integer> tokenOffsetStarts;
+  private List<Integer> tokenOffsetEnds;
+  private List<Integer> tokenPosIncrs;
+  private List<byte[]> tokenPayloads;
+  private List<Integer> tokenFlags;
   
-  /** The Constant TERM_KEY. */
-  public static final String TERM_KEY = "t";
-  
-  /** The Constant OFFSET_START_KEY. */
-  public static final String OFFSET_START_KEY = "s";
-  
-  /** The Constant OFFSET_END_KEY. */
-  public static final String OFFSET_END_KEY = "e";
-  
-  /** The Constant POSINCR_KEY. */
-  public static final String POSINCR_KEY = "i";
-  
-  /** The Constant PAYLOAD_KEY. */
-  public static final String PAYLOAD_KEY = "p";
-  
-  /** The Constant TYPE_KEY. */
-  public static final String TYPE_KEY = "y";
-  
-  /** The Constant FLAGS_KEY. */
-  public static final String FLAGS_KEY = "f"; 
- 
   /**
    * Instantiates a new mtas update request processor result.
    *
@@ -53,7 +36,12 @@ public class MtasUpdateRequestProcessorResult implements Serializable {
    */
   public MtasUpdateRequestProcessorResult(String value) {
     storedStringValue = value;
-    tokens = new ArrayList<Map<String,Object>>();
+    tokenTerms = new ArrayList<String>();
+    tokenOffsetStarts = new ArrayList<Integer>();
+    tokenOffsetEnds = new ArrayList<Integer>();
+    tokenPosIncrs = new ArrayList<Integer>();
+    tokenPayloads = new ArrayList<byte[]>();
+    tokenFlags = new ArrayList<Integer>();
   }
   
   /**
@@ -67,24 +55,29 @@ public class MtasUpdateRequestProcessorResult implements Serializable {
    * @param flags the flags
    */
   public void addItem(String term, Integer offsetStart, Integer offsetEnd, Integer posIncr, BytesRef payload, Integer flags) {
-    Map<String,Object> item = new HashMap<String,Object>();
-    if(term!=null) {
-      item.put(TERM_KEY, term);
-    }
+    tokenTerms.add(term);    
     if(offsetStart!=null && offsetEnd!=null) {
-      item.put(OFFSET_START_KEY, offsetStart.intValue());
-      item.put(OFFSET_END_KEY, offsetEnd.intValue());
+      tokenOffsetStarts.add(offsetStart.intValue());
+      tokenOffsetEnds.add(offsetEnd.intValue());
+    } else {
+      tokenOffsetStarts.add(null);
+      tokenOffsetEnds.add(null);
     }
     if(posIncr!=null && posIncr!=1) {
-      item.put(POSINCR_KEY, posIncr.intValue());
+      tokenPosIncrs.add(posIncr.intValue());     
+    } else {
+      tokenPosIncrs.add(null); 
     }
     if(payload!=null) {
-      item.put(PAYLOAD_KEY, payload.bytes);
+      tokenPayloads.add(payload.bytes);
+    } else {
+      tokenPayloads.add(null);
     }
     if(flags!=null) {
-      item.put(FLAGS_KEY, flags);
+      tokenFlags.add(flags);
+    } else {
+      tokenFlags.add(null);
     }
-    tokens.add(item);
   }
   
   /**
@@ -110,8 +103,32 @@ public class MtasUpdateRequestProcessorResult implements Serializable {
    *
    * @return the tokens
    */
-  public List<Map<String,Object>> getTokens() {
-    return tokens;
+  public Integer getTokenNumber() {
+    return tokenTerms.size();
+  }
+  
+  public String getTokenTerm(int id) {
+    return tokenTerms.get(id);
+  }
+  
+  public Integer getTokenOffsetStart(int id) {
+    return tokenOffsetStarts.get(id);
+  }
+  
+  public Integer getTokenOffsetEnd(int id) {
+    return tokenOffsetEnds.get(id);
+  }
+  
+  public Integer getTokenPosIncr(int id) {
+    return tokenPosIncrs.get(id);
+  }
+  
+  public byte[] getTokenPayload(int id) {
+    return tokenPayloads.get(id);
+  }
+  
+  public Integer getTokenFlag(int id) {
+    return tokenFlags.get(id);
   }
   
   /**
@@ -148,10 +165,11 @@ public class MtasUpdateRequestProcessorResult implements Serializable {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static String toString(MtasUpdateRequestProcessorResult o) throws IOException {
+    System.out.println("Maak string "+o.tokenTerms.size());
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     oos.writeObject(o);
-    oos.close();
+    oos.close();     
     return Base64.getEncoder().encodeToString(baos.toByteArray());
   }
 

@@ -625,6 +625,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     // list of objectIds and references to objects
     TreeMap<Integer, Long> memoryIndexDocList = new TreeMap<Integer, Long>();
 
+    
     //get lock
     Lock mtasFieldsConsumerLock = null;
     int mtasFieldsConsumerLockCounter = 0;
@@ -643,6 +644,9 @@ public class MtasFieldsConsumer extends FieldsConsumer {
         }
       }
     }  
+    
+    //try to release lock in case of IOException
+    try {
     
     // create file tmpDoc
     outTmpDoc = state.directory.createOutput(mtasTmpDocFileName, state.context);
@@ -1188,6 +1192,12 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     
     //release lock
     mtasFieldsConsumerLock.close();
+    } catch(IOException e) {
+      //release lock in case of IOException 
+      mtasFieldsConsumerLock.close();
+      //System.out.println(e.getStackTrace().toString());
+      throw (IOException) new IOException().initCause(e);
+    }
   }
 
   /**

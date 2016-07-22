@@ -2,9 +2,6 @@ package mtas.solr.schema;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -52,28 +49,34 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
       return null;
     }    
                 
-    List<Map<String,Object>>tokens = result.getTokens();
+    Integer numberOfTokens =  result.getTokenNumber();
     parent.clearAttributes();
-    for(Map<String,Object> item : tokens) {
-      if(item.containsKey(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.TERM_KEY)) {
+    for(int i=0; i<numberOfTokens; i++) {
+      String tokenTerm = result.getTokenTerm(i);
+      Integer tokenFlags = result.getTokenFlag(i);
+      Integer tokenPosIncr = result.getTokenPosIncr(i);
+      Integer tokenOffsetStart = result.getTokenOffsetStart(i);
+      Integer tokenOffsetEnd = result.getTokenOffsetEnd(i);
+      byte[] tokenPayload = result.getTokenPayload(i);
+      if(tokenTerm!=null) {
         CharTermAttribute catt = parent.addAttribute(CharTermAttribute.class);
-        catt.append((String) item.get(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.TERM_KEY));
+        catt.append(tokenTerm);
       }  
-      if(item.containsKey(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.FLAGS_KEY)) {
+      if(tokenFlags!=null) {
         FlagsAttribute flags = parent.addAttribute(FlagsAttribute.class);
-        flags.setFlags((int) item.get(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.FLAGS_KEY));
+        flags.setFlags(tokenFlags);
       }
-      if(item.containsKey(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.POSINCR_KEY)) {
+      if(tokenPosIncr!=null) {
         PositionIncrementAttribute patt = parent.addAttribute(PositionIncrementAttribute.class);
-        patt.setPositionIncrement((int) item.get(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.POSINCR_KEY));
+        patt.setPositionIncrement(tokenPosIncr);
       }  
-      if(item.containsKey(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.PAYLOAD_KEY)) {
+      if(tokenPayload!=null) {
         PayloadAttribute p = parent.addAttribute(PayloadAttribute.class);
-        p.setPayload(new BytesRef((byte[]) item.get(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.PAYLOAD_KEY)));
+        p.setPayload(new BytesRef(tokenPayload));
       }
-      if(item.containsKey(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.OFFSET_START_KEY) && item.containsKey(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.OFFSET_END_KEY)) {
+      if(tokenOffsetStart!=null && tokenOffsetEnd!=null) {
         OffsetAttribute offset = parent.addAttribute(OffsetAttribute.class);
-        offset.setOffset((int) item.get(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.OFFSET_START_KEY), (int) item.get(mtas.solr.update.processor.MtasUpdateRequestProcessorResult.OFFSET_END_KEY));
+        offset.setOffset(tokenOffsetStart, tokenOffsetEnd);
       }
       // capture state and add to result
       State state = parent.captureState();
