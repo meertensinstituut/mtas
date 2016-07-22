@@ -19,6 +19,7 @@ public class MtasFunctionParserFunctionDefault extends MtasFunctionParserFunctio
     this.dataType = CodecUtil.DATA_TYPE_LONG;
     this.needPositions = false;
     this.sumRule = true;
+    this.degree = numberOfArguments>0?1:0;
     for(int i=0; i<numberOfArguments; i++) {
       this.needArgument.add(i);
     }

@@ -1,6 +1,8 @@
 package mtas.codec.tree;
 
 import java.util.HashMap;
+import mtas.codec.tree.MtasTree;
+import mtas.codec.tree.MtasAVLTreeNode;
 
 /**
  * The Class MtasAVLTree.
@@ -27,13 +29,13 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
    * @see mtas.codec.tree.MtasTree#addTokenRangeEmpty(int, int)
    */
   @Override
-  final protected void addRangeEmpty(int left, int right, int additionalId) {
+  final protected void addRangeEmpty(int left, int right, int additionalId, long additionalRef) {
     String key = ((Integer) left).toString() + "_"
         + ((Integer) right).toString();
     if (index.containsKey(key)) {
       // do nothing (empty...)
     } else {
-      addRange(left, right, additionalId, null, null);
+      addRange(left, right, additionalId, additionalRef, null, null);
     }
   }
 
@@ -44,8 +46,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
    * java.lang.Long)
    */
   @Override
-  final protected void addSinglePoint(int position, int additionalId, Integer id, Long ref) {
-    addRange(position, position, additionalId, id, ref);
+  final protected void addSinglePoint(int position, int additionalId, long additionalRef, Integer id, Long ref) {
+    addRange(position, position, additionalId, additionalRef, id, ref);
   }
 
   /*
@@ -55,16 +57,16 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
    * java.lang.Long)
    */
   @Override
-  final protected void addRange(int left, int right, int additionalId, Integer id, Long ref) {
+  final protected void addRange(int left, int right, int additionalId, long additionalRef, Integer id, Long ref) {
     String key = ((Integer) left).toString() + "_"
         + ((Integer) right).toString();
     if (index.containsKey(key)) {
-      index.get(key).addId(id, ref, additionalId);
+      index.get(key).addIdAndRef(id, ref, additionalId, additionalRef);
       return;
     }
     if (root == null) {
       root = new MtasAVLTreeNode(left, right, null);
-      root.addId(id, ref, additionalId);
+      root.addIdAndRef(id, ref, additionalId, additionalRef);
       index.put(key, root);
     } else {
       MtasAVLTreeNode n = root;
@@ -77,12 +79,12 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
           if (goLeft) {
             parent.leftChild = new MtasAVLTreeNode(left, right, parent);
             updateMax(parent, parent.leftChild.max);
-            parent.leftChild.addId(id, ref, additionalId);
+            parent.leftChild.addIdAndRef(id, ref, additionalId, additionalRef);
             index.put(key, parent.leftChild);
           } else {
             parent.rightChild = new MtasAVLTreeNode(left, right, parent);
             updateMax(parent, parent.rightChild.max);
-            parent.rightChild.addId(id, ref, additionalId);
+            parent.rightChild.addIdAndRef(id, ref, additionalId, additionalRef);
             index.put(key, parent.rightChild);
           }
           rebalance(parent);

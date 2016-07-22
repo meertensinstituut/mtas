@@ -294,7 +294,7 @@ public class CodecInfo {
         startPosition, endPosition, inIndexObjectPosition,
         doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
     ArrayList<MtasTreeHit<String>> hits = new ArrayList<MtasTreeHit<String>>();
-    if (version == MtasCodecPostingsFormat.VERSION_OLD) {
+    if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
       // old way
       ArrayList<MtasToken<String>> objects = getObjects(hitItems);
       for (MtasToken<String> token : objects) {
@@ -347,7 +347,7 @@ public class CodecInfo {
     IndexInput inTerm = indexInputList.get("term");    
     // create tree interval hits
     IntervalRBTree positionTree = new IntervalRBTree(positionsHits);
-    if (version == MtasCodecPostingsFormat.VERSION_OLD) {
+    if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
       CodecSearchTree.searchMtasTreeWithIntervalTree(null, positionTree,
           inIndexObjectPosition, doc.fpIndexObjectPosition,
           doc.smallestObjectFilepointer);
@@ -674,7 +674,7 @@ public class CodecInfo {
       fpIndexObjectId = inIndexDoc.readVLong(); // ref indexObjectId
       fpIndexObjectPosition = inIndexDoc.readVLong(); // ref indexObjectPosition
       fpIndexObjectParent = inIndexDoc.readVLong(); // ref indexObjectParent
-      if (version == MtasCodecPostingsFormat.VERSION_OLD) {
+      if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
         inIndexDoc.readVLong(); // fpIndexTermPrefixPosition ref
       }
       smallestObjectFilepointer = inIndexDoc.readVLong(); // offset

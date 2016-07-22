@@ -77,7 +77,8 @@ public class MtasFunctionParserFunctionBasic
     sumRule=true;
     String type = item.getType();
     MtasFunctionParserFunction parser;
-    firstType = type;
+    firstType = type;  
+    degree = item.getDegree();
     switch (type) {
     case MtasFunctionParserItem.TYPE_N:
       firstId = 0;
@@ -253,28 +254,95 @@ public class MtasFunctionParserFunctionBasic
       if (operator.equals(BASIC_OPERATOR_DIVIDE)) {
         dataType = CodecUtil.DATA_TYPE_DOUBLE;
       }
-      sumRule = sumRule?operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT):false;
       switch (type) {
       case MtasFunctionParserItem.TYPE_N:
         tmpTypeList.add(type);
         tmpIdList.add(0);
         needPositions = true;
+        if(sumRule && degree!=null) {
+          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if(degree<0) {
+              sumRule=false;
+              degree=null;
+            } else if(degree>0) {
+              sumRule=false;
+            }
+          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
+            if(degree!=0) {
+              sumRule=false;
+              degree=null;
+            }
+          }
+        }
         break;
       case MtasFunctionParserItem.TYPE_ARGUMENT:
         tmpTypeList.add(type);
         tmpIdList.add(item.getId());
         needArgument.add(item.getId());
+        if(sumRule && degree!=null) {
+          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if(degree!=1) {
+              sumRule=false;
+            }
+            if(degree>=0) {
+              degree=Math.max(degree, 1);
+            } else {
+              degree=null;
+            }
+          } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+            if(degree!=0) {
+              sumRule=false;
+            }
+            degree+=1;
+          } else if(operator.equals(BASIC_OPERATOR_DIVIDE)) {
+            sumRule=false;
+            degree-=1;
+          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
+            sumRule=false;
+            degree=null;
+          } 
+        }
         break;
       case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
         tmpTypeList.add(type);
         tmpIdList.add(tmpConstantLongs.size());
         tmpConstantLongs.add(item.getValueLong());
+        if(sumRule && degree!=null) {
+          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if(degree<0) {
+              sumRule=false;
+              degree=null;
+            } else if(degree>0) {
+              sumRule=false;
+            }
+          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
+            if(degree!=0) {
+              sumRule = false;
+              degree=null;
+            }
+          }
+        }
         break;
       case MtasFunctionParserItem.TYPE_CONSTANT_DOUBLE:
         tmpTypeList.add(type);
         tmpIdList.add(tmpConstantDoubles.size());
         dataType = CodecUtil.DATA_TYPE_DOUBLE;
         tmpConstantDoubles.add(item.getValueDouble());
+        if(sumRule && degree!=null) {
+          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if(degree<0) {
+              sumRule=false;
+              degree=null;
+            } else if(degree>0) {
+              sumRule=false;
+            }
+          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
+            if(degree!=0) {
+              sumRule = false;
+              degree=null;
+            }
+          }
+        }
         break;
       case MtasFunctionParserItem.TYPE_PARSER_LONG:
         tmpTypeList.add(type);
@@ -285,6 +353,28 @@ public class MtasFunctionParserFunctionBasic
         sumRule = sumRule?parser.sumRule():false;
         needPositions = needPositions?needPositions:parser.needPositions();
         needArgument.addAll(parser.needArgument);
+        if(sumRule && degree!=null) {
+          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {            
+            if(parser.degree!=degree) {
+              sumRule=false;
+              if(degree<0) {
+                degree=null;               
+              } else {
+                degree = Math.max(degree, parser.degree);
+              }
+            }
+          } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+            if(degree!=0 || parser.degree!=0) {
+              sumRule = false;              
+            }
+            degree+=parser.degree;                        
+          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
+            if(degree!=0) {
+              sumRule = false;
+              degree = null;              
+            }
+          }
+        }
         break;
       case MtasFunctionParserItem.TYPE_PARSER_DOUBLE:
         tmpTypeList.add(type);
@@ -296,6 +386,28 @@ public class MtasFunctionParserFunctionBasic
         sumRule = sumRule?parser.sumRule():false;
         needPositions = needPositions?needPositions:parser.needPositions();
         needArgument.addAll(parser.needArgument);
+        if(sumRule && degree!=null) {
+          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {            
+            if(parser.degree!=degree) {
+              sumRule=false;
+              if(degree<0) {
+                degree=null;               
+              } else {
+                degree = Math.max(degree, parser.degree);
+              }
+            }
+          } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+            if(degree!=0 || parser.degree!=0) {
+              sumRule = false;              
+            }
+            degree+=parser.degree;                        
+          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
+            if(degree!=0) {
+              sumRule = false;
+              degree = null;              
+            }
+          }
+        }
         break;
       default:
         throw new ParseException("incorrect type");

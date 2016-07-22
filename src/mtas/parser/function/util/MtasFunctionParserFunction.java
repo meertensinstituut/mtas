@@ -32,6 +32,9 @@ public abstract class MtasFunctionParserFunction {
   /** The need positions. */
   protected boolean needPositions = false;
   
+  /** The degree. */
+  protected Integer degree = null;
+  
   /** The need argument. */
   protected HashSet<Integer> needArgument = new HashSet<Integer>();
 
@@ -84,6 +87,15 @@ public abstract class MtasFunctionParserFunction {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract long getValueLong(long[] args, long n) throws IOException;
+
+  /**
+   * Close.
+   *
+   * @throws ParseException the parse exception
+   */
+  public void close() throws ParseException {
+    defined = true;
+  }
 
   /**
    * Gets the type.
@@ -144,15 +156,6 @@ public abstract class MtasFunctionParserFunction {
     return needArgument.toArray(new Integer[needArgument.size()]);
   }
   
-  /**
-   * Close.
-   *
-   * @throws ParseException the parse exception
-   */
-  public void close() throws ParseException {
-    defined = true;
-  }
-
   /**
    * Defined.
    *

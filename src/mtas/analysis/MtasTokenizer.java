@@ -15,6 +15,7 @@ import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
+import mtas.codec.payload.MtasPayloadDecoder;
 import mtas.codec.payload.MtasPayloadEncoder;
 
 import org.apache.lucene.analysis.Tokenizer;
@@ -23,6 +24,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
+import org.apache.lucene.util.BytesRef;
 
 /**
  * The Class MtasTokenizer.
@@ -129,7 +131,7 @@ public final class MtasTokenizer extends Tokenizer {
       // compute info
       positionIncrement = token.getPositionStart() - currentPosition;
       currentPosition = token.getPositionStart();
-      payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);
+      payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);      
       // set info
       termAtt.append(token.getValue().toString());
       positionIncrementAtt.setPositionIncrement(positionIncrement);

@@ -316,5 +316,27 @@ public class MtasConfiguration {
     }
     return null;
   }
+  
+//  public String toString() {
+//    return toString(0);
+//  }
+//  
+//  private String toString(int indent) {
+//    String text = "";
+//    if(name!=null) {
+//      text+=(indent>0?String.format("%"+indent+"s", ""):"")+"name: "+name+"\n";
+//    }
+//    if(attributes!=null) {
+//      for(String key : attributes.keySet()) {
+//        text+=(indent>0?String.format("%"+indent+"s", ""):"")+key+": "+attributes.get(key)+"\n";
+//      }
+//    }
+//    if(children!=null) {
+//      for(MtasConfiguration child : children) {
+//        text+=(indent>0?String.format("%"+indent+"s", ""):"")+child.toString(indent+2);
+//      }
+//    }
+//    return text;    
+//  }
 
 }

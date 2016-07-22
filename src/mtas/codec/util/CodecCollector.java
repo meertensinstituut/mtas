@@ -58,22 +58,34 @@ import org.apache.lucene.util.LegacyNumericUtils;
  * The Class CodecCollector.
  */
 public class CodecCollector {
-  
+
   /**
    * Collect.
    *
-   * @param field the field
-   * @param searcher the searcher
-   * @param reader the reader
-   * @param rawReader the raw reader
-   * @param fullDocList the full doc list
-   * @param fullDocSet the full doc set
-   * @param fieldInfo the field info
-   * @param spansQueryWeight the spans query weight
-   * @throws IllegalAccessException the illegal access exception
-   * @throws IllegalArgumentException the illegal argument exception
-   * @throws InvocationTargetException the invocation target exception
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param searcher
+   *          the searcher
+   * @param reader
+   *          the reader
+   * @param rawReader
+   *          the raw reader
+   * @param fullDocList
+   *          the full doc list
+   * @param fullDocSet
+   *          the full doc set
+   * @param fieldInfo
+   *          the field info
+   * @param spansQueryWeight
+   *          the spans query weight
+   * @throws IllegalAccessException
+   *           the illegal access exception
+   * @throws IllegalArgumentException
+   *           the illegal argument exception
+   * @throws InvocationTargetException
+   *           the invocation target exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static void collect(String field, IndexSearcher searcher,
       IndexReader reader, IndexReader rawReader, ArrayList<Integer> fullDocList,
@@ -81,6 +93,8 @@ public class CodecCollector {
       HashMap<SpanQuery, SpanWeight> spansQueryWeight)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
+
+    HashMap<Integer, List<Integer>> docSets = new HashMap<Integer, List<Integer>>();
 
     ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
     while (iterator.hasNext()) {
@@ -92,6 +106,7 @@ public class CodecCollector {
       List<Integer> docList = null;
       if (fullDocSet != null) {
         docSet = new ArrayList<Integer>();
+        docSets.put(lrc.ord, docSet);
         Iterator<Integer> docSetIterator = fullDocSet.iterator();
         Integer docSetId = null;
         while (docSetIterator.hasNext()) {
@@ -121,28 +136,72 @@ public class CodecCollector {
       CodecInfo mtasCodecInfo = t == null ? null
           : CodecInfo.getCodecInfoFromTerms(t);
 
-      collectSpansPositionsAndTokens(spansQueryWeight, searcher, mtasCodecInfo, r,
-          lrc, field, t, docSet, docList, fieldInfo);
+      collectSpansPositionsAndTokens(spansQueryWeight, searcher, mtasCodecInfo,
+          r, lrc, field, t, docSet, docList, fieldInfo);
       collectPrefixes(rawReader.leaves().get(lrc.ord).reader().getFieldInfos(),
-          field, fieldInfo);      
+          field, fieldInfo);
     }
-    
+
+    // check termvectors
+    if (fieldInfo.termVectorList.size() > 0) {
+      if (needSecondRoundTermvector(fieldInfo.termVectorList)) {
+        // check positions
+        boolean needPositions = false;
+        if (fieldInfo.termVectorList.size() > 0) {
+          for (ComponentTermVector ctv : fieldInfo.termVectorList) {
+            needPositions = !needPositions
+                ? (ctv.functionParser != null
+                    ? ctv.functionParser.needPositions() : needPositions)
+                : needPositions;
+          }
+        }
+        HashMap<Integer, Integer> positionsData = null;
+
+        // loop
+        iterator = reader.leaves().listIterator();
+        while (iterator.hasNext()) {
+          LeafReaderContext lrc = iterator.next();
+          LeafReader r = lrc.reader();
+          List<Integer> docSet = docSets.get(lrc.ord);
+          Terms t = rawReader.leaves().get(lrc.ord).reader().terms(field);
+          if (needPositions) {
+            CodecInfo mtasCodecInfo = t == null ? null
+                : CodecInfo.getCodecInfoFromTerms(t);
+            positionsData = computePositions(mtasCodecInfo, r, lrc, field, t,
+                docSet);
+          }
+          createTermvectorSecondRound(fieldInfo.termVectorList, positionsData,
+              docSets.get(lrc.ord), field, t, r, lrc);
+        }
+      }
+    }
   }
 
   /**
    * Collect spans positions and tokens.
    *
-   * @param spansQueryWeight the spans query weight
-   * @param searcher the searcher
-   * @param mtasCodecInfo the mtas codec info
-   * @param r the r
-   * @param lrc the lrc
-   * @param field the field
-   * @param t the t
-   * @param docSet the doc set
-   * @param docList the doc list
-   * @param fieldInfo the field info
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param spansQueryWeight
+   *          the spans query weight
+   * @param searcher
+   *          the searcher
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @param field
+   *          the field
+   * @param t
+   *          the t
+   * @param docSet
+   *          the doc set
+   * @param docList
+   *          the doc list
+   * @param fieldInfo
+   *          the field info
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void collectSpansPositionsAndTokens(
       HashMap<SpanQuery, SpanWeight> spansQueryWeight, IndexSearcher searcher,
@@ -153,7 +212,7 @@ public class CodecCollector {
     boolean needSpans = false;
     boolean needPositions = false;
     boolean needTokens = false;
-    
+
     // results
     HashMap<Integer, Integer> positionsData = null;
     HashMap<Integer, Integer> tokensData = null;
@@ -172,7 +231,9 @@ public class CodecCollector {
     }
     if (fieldInfo.termVectorList.size() > 0) {
       for (ComponentTermVector ctv : fieldInfo.termVectorList) {
-        needPositions = !needPositions ? ctv.functionParser.needPositions()
+        needPositions = !needPositions
+            ? (ctv.functionParser == null ? ctv.defaultParser.needPositions()
+                : ctv.functionParser.needPositions())
             : needPositions;
       }
     }
@@ -423,8 +484,8 @@ public class CodecCollector {
         if (docSet.size() < Math.log(r.maxDoc())) {
           positionsData = new HashMap<Integer, Integer>();
           for (int docId : docSet) {
-            positionsData.put(docId,
-                mtasCodecInfo.getNumberOfPositions(field, (docId - lrc.docBase)));            
+            positionsData.put(docId, mtasCodecInfo.getNumberOfPositions(field,
+                (docId - lrc.docBase)));
           }
           // compute everything, only use what is needed
         } else {
@@ -443,7 +504,7 @@ public class CodecCollector {
         }
       }
     }
-    
+
     // collect token stats
     if (needTokens) {
       if (mtasCodecInfo != null) {
@@ -452,12 +513,11 @@ public class CodecCollector {
           tokensData = new HashMap<Integer, Integer>();
           for (int docId : docSet) {
             tokensData.put(docId,
-                mtasCodecInfo.getNumberOfTokens(field, (docId - lrc.docBase)));            
+                mtasCodecInfo.getNumberOfTokens(field, (docId - lrc.docBase)));
           }
           // compute everything, only use what is needed
         } else {
-          tokensData = mtasCodecInfo.getAllNumberOfTokens(field,
-              lrc.docBase);
+          tokensData = mtasCodecInfo.getAllNumberOfTokens(field, lrc.docBase);
           for (int docId : docSet) {
             if (!tokensData.containsKey(docId)) {
               tokensData.put(docId, 0);
@@ -471,12 +531,12 @@ public class CodecCollector {
         }
       }
     }
-    
+
     if (fieldInfo.statsPositionList.size() > 0) {
       // create positions
       createPositions(fieldInfo.statsPositionList, positionsData, docSet);
     }
-    
+
     if (fieldInfo.statsTokenList.size() > 0) {
       // create positions
       createTokens(fieldInfo.statsTokenList, tokensData, docSet);
@@ -520,10 +580,14 @@ public class CodecCollector {
   /**
    * Collect prefixes.
    *
-   * @param fieldInfos the field infos
-   * @param field the field
-   * @param fieldInfo the field info
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param fieldInfos
+   *          the field infos
+   * @param field
+   *          the field
+   * @param fieldInfo
+   *          the field info
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void collectPrefixes(FieldInfos fieldInfos, String field,
       ComponentField fieldInfo) throws IOException {
@@ -551,14 +615,47 @@ public class CodecCollector {
       }
     }
   }
-  
+
+  private static HashMap<Integer, Integer> computePositions(
+      CodecInfo mtasCodecInfo, LeafReader r, LeafReaderContext lrc,
+      String field, Terms t, List<Integer> docSet) throws IOException {
+    HashMap<Integer, Integer> positionsData;
+    if (mtasCodecInfo != null) {
+      // for relatively small numbers, compute only what is needed
+      if (docSet.size() < Math.log(r.maxDoc())) {
+        positionsData = new HashMap<Integer, Integer>();
+        for (int docId : docSet) {
+          positionsData.put(docId,
+              mtasCodecInfo.getNumberOfPositions(field, (docId - lrc.docBase)));
+        }
+        // compute everything, only use what is needed
+      } else {
+        positionsData = mtasCodecInfo.getAllNumberOfPositions(field,
+            lrc.docBase);
+        for (int docId : docSet) {
+          if (!positionsData.containsKey(docId)) {
+            positionsData.put(docId, 0);
+          }
+        }
+      }
+    } else {
+      positionsData = new HashMap<Integer, Integer>();
+      for (int docId : docSet) {
+        positionsData.put(docId, 0);
+      }
+    }
+    return positionsData;
+  }
 
   /**
    * Compute arguments.
    *
-   * @param spansNumberData the spans number data
-   * @param queries the queries
-   * @param docSet the doc set
+   * @param spansNumberData
+   *          the spans number data
+   * @param queries
+   *          the queries
+   * @param docSet
+   *          the doc set
    * @return the hash map
    */
   private static HashMap<Integer, long[]> computeArguments(
@@ -589,8 +686,10 @@ public class CodecCollector {
   /**
    * Intersected doc list.
    *
-   * @param facetDocList the facet doc list
-   * @param docSet the doc set
+   * @param facetDocList
+   *          the facet doc list
+   * @param docSet
+   *          the doc set
    * @return the integer[]
    */
   private static Integer[] intersectedDocList(int[] facetDocList,
@@ -621,10 +720,14 @@ public class CodecCollector {
   /**
    * Creates the positions.
    *
-   * @param statsPositionList the stats position list
-   * @param positionsData the positions data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param statsPositionList
+   *          the stats position list
+   * @param positionsData
+   *          the positions data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createPositions(List<ComponentPosition> statsPositionList,
       HashMap<Integer, Integer> positionsData, List<Integer> docSet)
@@ -657,10 +760,14 @@ public class CodecCollector {
   /**
    * Creates the tokens.
    *
-   * @param statsTokenList the stats token list
-   * @param tokensData the tokens data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param statsTokenList
+   *          the stats token list
+   * @param tokensData
+   *          the tokens data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createTokens(List<ComponentToken> statsTokenList,
       HashMap<Integer, Integer> tokensData, List<Integer> docSet)
@@ -671,19 +778,18 @@ public class CodecCollector {
         Integer tmpValue;
         long[] values = new long[docSet.size()];
         int value, number = 0;
-        if(tokensData!=null) {
+        if (tokensData != null) {
           for (int docId : docSet) {
             tmpValue = tokensData.get(docId);
             value = tmpValue == null ? 0 : tmpValue.intValue();
-            if (((token.minimumLong == null)
-                || (value >= token.minimumLong))
+            if (((token.minimumLong == null) || (value >= token.minimumLong))
                 && ((token.maximumLong == null)
                     || (value <= token.maximumLong))) {
               values[number] = value;
               number++;
             }
           }
-        }  
+        }
         if (number > 0) {
           token.dataCollector.add(values, number);
         }
@@ -695,11 +801,16 @@ public class CodecCollector {
   /**
    * Creates the stats.
    *
-   * @param statsSpanList the stats span list
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param statsSpanList
+   *          the stats span list
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createStats(List<ComponentSpan> statsSpanList,
       HashMap<Integer, Integer> positionsData,
@@ -829,16 +940,26 @@ public class CodecCollector {
   /**
    * Creates the list.
    *
-   * @param listList the list list
-   * @param spansNumberData the spans number data
-   * @param spansMatchData the spans match data
-   * @param docSet the doc set
-   * @param field the field
-   * @param docBase the doc base
-   * @param uniqueKeyField the unique key field
-   * @param mtasCodecInfo the mtas codec info
-   * @param searcher the searcher
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param listList
+   *          the list list
+   * @param spansNumberData
+   *          the spans number data
+   * @param spansMatchData
+   *          the spans match data
+   * @param docSet
+   *          the doc set
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param uniqueKeyField
+   *          the unique key field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param searcher
+   *          the searcher
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createList(List<ComponentList> listList,
       HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
@@ -1002,13 +1123,20 @@ public class CodecCollector {
   /**
    * Creates the group.
    *
-   * @param groupList the group list
-   * @param spansMatchData the spans match data
-   * @param docSet the doc set
-   * @param field the field
-   * @param docBase the doc base
-   * @param mtasCodecInfo the mtas codec info
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param groupList
+   *          the group list
+   * @param spansMatchData
+   *          the spans match data
+   * @param docSet
+   *          the doc set
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createGroup(List<ComponentGroup> groupList,
       HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
@@ -1091,50 +1219,56 @@ public class CodecCollector {
                   end = end == null ? m.endPosition + group.right.length
                       : Math.max(m.endPosition + group.right.length, end);
                 }
-                positionsHits.add(new IntervalTreeNodeData<String>(start,end,m.startPosition,m.endPosition-1));                                
+                positionsHits.add(new IntervalTreeNodeData<String>(start, end,
+                    m.startPosition, m.endPosition - 1));
               }
-              if(1>2) {
-                for(IntervalTreeNodeData positionHit : positionsHits) {
-                  ArrayList<MtasTreeHit<String>> list = mtasCodecInfo
-                      .getPositionedTermsByPrefixesAndPositionRange(field,
-                          (docId - docBase), group.prefixes, positionHit.start, positionHit.end);
-                  GroupHit hit = new GroupHit(list, positionHit.start, positionHit.end, positionHit.hitStart, positionHit.hitEnd, group);
-                  String key = hit.toString();
-                  if (key != null) {
-                    if (occurences.containsKey(key)) {
-                      occurences.put(key, occurences.get(key) + 1);
-                    } else {
-                      occurences.put(key, Long.valueOf(1));
-                    }
+              // if(1>2) {
+              // for(IntervalTreeNodeData positionHit : positionsHits) {
+              // ArrayList<MtasTreeHit<String>> list = mtasCodecInfo
+              // .getPositionedTermsByPrefixesAndPositionRange(field,
+              // (docId - docBase), group.prefixes, positionHit.start,
+              // positionHit.end);
+              // GroupHit hit = new GroupHit(list, positionHit.start,
+              // positionHit.end, positionHit.hitStart, positionHit.hitEnd,
+              // group);
+              // String key = hit.toString();
+              // if (key != null) {
+              // if (occurences.containsKey(key)) {
+              // occurences.put(key, occurences.get(key) + 1);
+              // } else {
+              // occurences.put(key, Long.valueOf(1));
+              // }
+              // }
+              // }
+              // for (String key : occurences.keySet()) {
+              // group.dataCollector.add(new String[] { key },
+              // ArrayUtils.toPrimitive(new Long[] { occurences.get(key) }),
+              // 1);
+              // }
+              // } else {
+
+              mtasCodecInfo.collectTermsByPrefixesForListOfHitPositions(field,
+                  (docId - docBase), group.prefixes, positionsHits);
+
+              for (IntervalTreeNodeData<String> positionHit : positionsHits) {
+                GroupHit hit = new GroupHit(positionHit.list, positionHit.start,
+                    positionHit.end, positionHit.hitStart, positionHit.hitEnd,
+                    group);
+                String key = hit.toString();
+                if (key != null) {
+                  if (occurences.containsKey(key)) {
+                    occurences.put(key, occurences.get(key) + 1);
+                  } else {
+                    occurences.put(key, Long.valueOf(1));
                   }
-                }                              
-                for (String key : occurences.keySet()) {
-                  group.dataCollector.add(new String[] { key },
-                      ArrayUtils.toPrimitive(new Long[] { occurences.get(key) }),
-                      1);
-                }
-              } else {
-                                
-                mtasCodecInfo.collectTermsByPrefixesForListOfHitPositions(field,
-                    (docId - docBase), group.prefixes, positionsHits);
-                
-                for(IntervalTreeNodeData<String> positionHit : positionsHits) {
-                  GroupHit hit = new GroupHit(positionHit.list, positionHit.start, positionHit.end, positionHit.hitStart, positionHit.hitEnd, group);
-                  String key = hit.toString();
-                  if (key != null) {
-                    if (occurences.containsKey(key)) {
-                      occurences.put(key, occurences.get(key) + 1);
-                    } else {
-                      occurences.put(key, Long.valueOf(1));
-                    }
-                  } 
-                }                              
-                for (String key : occurences.keySet()) {
-                  group.dataCollector.add(new String[] { key },
-                      ArrayUtils.toPrimitive(new Long[] { occurences.get(key) }),
-                      1);
                 }
               }
+              for (String key : occurences.keySet()) {
+                group.dataCollector.add(new String[] { key },
+                    ArrayUtils.toPrimitive(new Long[] { occurences.get(key) }),
+                    1);
+              }
+              // }
             }
           }
           group.dataCollector.closeNewList();
@@ -1146,15 +1280,24 @@ public class CodecCollector {
   /**
    * Creates the kwic.
    *
-   * @param kwicList the kwic list
-   * @param spansMatchData the spans match data
-   * @param docList the doc list
-   * @param field the field
-   * @param docBase the doc base
-   * @param uniqueKeyField the unique key field
-   * @param mtasCodecInfo the mtas codec info
-   * @param searcher the searcher
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param kwicList
+   *          the kwic list
+   * @param spansMatchData
+   *          the spans match data
+   * @param docList
+   *          the doc list
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param uniqueKeyField
+   *          the unique key field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param searcher
+   *          the searcher
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createKwic(List<ComponentKwic> kwicList,
       HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
@@ -1272,14 +1415,22 @@ public class CodecCollector {
   /**
    * Creates the facet base.
    *
-   * @param cf the cf
-   * @param level the level
-   * @param dataCollector the data collector
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param facetData the facet data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param cf
+   *          the cf
+   * @param level
+   *          the level
+   * @param dataCollector
+   *          the data collector
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param facetData
+   *          the facet data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createFacetBase(ComponentFacet cf, int level,
       MtasDataCollector<?, ?> dataCollector,
@@ -1510,17 +1661,28 @@ public class CodecCollector {
   /**
    * Creates the facet.
    *
-   * @param facetList the facet list
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param facetData the facet data
-   * @param docSet the doc set
-   * @param field the field
-   * @param docBase the doc base
-   * @param uniqueKeyField the unique key field
-   * @param mtasCodecInfo the mtas codec info
-   * @param searcher the searcher
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param facetList
+   *          the facet list
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param facetData
+   *          the facet data
+   * @param docSet
+   *          the doc set
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param uniqueKeyField
+   *          the unique key field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param searcher
+   *          the searcher
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createFacet(List<ComponentFacet> facetList,
       HashMap<Integer, Integer> positionsData,
@@ -1540,22 +1702,503 @@ public class CodecCollector {
     }
   }
 
-  // private static void createTermVector(LeafReader r, LeafReaderContext lrc,
-  // Terms t, List<Integer> docSet, ComponentField fieldInfo)
+  private static void createTermvector(List<ComponentTermVector> termVectorList,
+      HashMap<Integer, Integer> positionsData, List<Integer> docSet,
+      String field, Terms t, LeafReader r, LeafReaderContext lrc)
+      throws IOException {
+    createTermvectorFirstRound(termVectorList, positionsData, docSet, field, t,
+        r, lrc);
+  }
+
+  private static void createTermvectorFirstRound(
+      List<ComponentTermVector> termVectorList,
+      HashMap<Integer, Integer> positionsData, List<Integer> docSet,
+      String field, Terms t, LeafReader r, LeafReaderContext lrc)
+      throws IOException {
+    if (t != null) {
+      BytesRef term;
+      TermsEnum termsEnum;
+      PostingsEnum postingsEnum = null;
+      String segmentName = "segment" + lrc.ord;
+      int segmentNumber = lrc.parent.leaves().size();
+      // loop over termvectors
+      for (ComponentTermVector termVector : termVectorList) {
+        termsEnum = t.intersect(termVector.compiledAutomaton, null);
+        termVector.dataDefaultCollector.initNewList((int) t.size(), segmentName,
+            segmentNumber);
+        if (termVector.dataFunctionCollector != null) {
+          termVector.dataFunctionCollector.initNewList((int) t.size(),
+              segmentName, segmentNumber);
+        }
+        // only if documents
+        if (docSet.size() > 0) {
+          int termDocId;
+          String key;
+          String[] keys;
+          int termNumberMaximum = (termVector.start + termVector.number);
+          // basic, don't need full values
+          if (termVector.defaultStatsType.equals(CodecUtil.STATS_BASIC)
+              && (termVector.functionParser == null
+                  || (termVector.functionParser.sumRule()
+                      && !termVector.functionParser.needPositions()))) {
+            if ((termVector.sortType.equals(CodecUtil.SORT_TERM)
+                && termVector.sortDirection.equals(CodecUtil.SORT_ASC))
+                || (termVector.sortDirection.equals(CodecUtil.SORT_DESC)
+                    && (termVector.sortType.equals(CodecUtil.STATS_TYPE_SUM)
+                        || termVector.sortType
+                            .equals(CodecUtil.STATS_TYPE_N)))) {
+              int termCounter = 0;
+              // loop over terms
+              while ((term = termsEnum.next()) != null) {
+                termDocId = -1;
+                key = MtasToken.getPostfixFromValue(term.utf8ToString());
+                keys = new String[] { key };
+                // compute numbers;
+                TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                    docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                // register
+                if (numberBasic.docNumber > 0) {
+                  termCounter++;
+                  registerBasicValue(keys, termVector, numberBasic,
+                      termNumberMaximum, segmentNumber);
+                }
+                // stop after termCounterMaximum
+                if (termVector.sortType.equals(CodecUtil.SORT_TERM)
+                    && termCounter >= termNumberMaximum) {
+                  break;
+                }
+              }
+            } else {
+              throw new IOException("sort '" + termVector.sortType + " "
+                  + termVector.sortDirection + "' not supported");
+            }
+            // finish if segments are used
+            termVector.dataDefaultCollector.closeSegmentKeyValueRegistration();
+            if (termVector.dataFunctionCollector != null) {
+              termVector.dataFunctionCollector
+                  .closeSegmentKeyValueRegistration();
+            }
+          } else {
+            if ((termVector.sortType.equals(CodecUtil.SORT_TERM)
+                && termVector.sortDirection.equals(CodecUtil.SORT_ASC))
+                || (termVector.sortDirection.equals(CodecUtil.SORT_DESC)
+                    && (termVector.sortType.equals(CodecUtil.STATS_TYPE_SUM)
+                        || termVector.sortType
+                            .equals(CodecUtil.STATS_TYPE_N)))) {
+              int termCounter = 0;
+              while ((term = termsEnum.next()) != null) {
+                termDocId = -1;
+                termCounter++;
+                key = MtasToken.getPostfixFromValue(term.utf8ToString());
+                keys = new String[] { key };
+                // compute numbers;
+                TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                    docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                    positionsData);
+                // register
+                if (numberFull.docNumber > 0) {
+                  termCounter++;
+                  registerFullValues(keys, termVector, numberFull,
+                      termNumberMaximum, segmentNumber);
+                }
+                // stop after termCounterMaximum
+                if (termVector.sortType.equals(CodecUtil.SORT_TERM)
+                    && termCounter >= termNumberMaximum) {
+                  break;
+                }
+              }
+            } else {
+              throw new IOException("sort '" + termVector.sortType + " "
+                  + termVector.sortDirection + "' not supported");
+            }
+            // finish if segments are used
+            termVector.dataDefaultCollector.closeSegmentKeyValueRegistration();
+            if (termVector.dataFunctionCollector != null) {
+              termVector.dataFunctionCollector
+                  .closeSegmentKeyValueRegistration();
+            }
+          }
+        }
+        termVector.dataDefaultCollector.closeNewList();
+        if (termVector.dataFunctionCollector != null) {
+          termVector.dataFunctionCollector.closeNewList();
+        }
+      }
+    }
+
+  }
+
+  private static void createTermvectorSecondRound(
+      List<ComponentTermVector> termVectorList,
+      HashMap<Integer, Integer> positionsData, List<Integer> docSet,
+      String field, Terms t, LeafReader r, LeafReaderContext lrc)
+      throws IOException {
+    if (t != null) {
+      BytesRef term;
+      TermsEnum termsEnum;
+      PostingsEnum postingsEnum = null;
+      String segmentName = "segment" + lrc.ord;
+      int segmentNumber = lrc.parent.leaves().size();
+      for (ComponentTermVector termVector : termVectorList) {
+        if (termVector.dataDefaultCollector.segmentRecomputeKeyList
+            .containsKey(segmentName)) {
+          termsEnum = t.intersect(termVector.compiledAutomaton, null);
+          termVector.dataDefaultCollector.initNewList(
+              termVector.dataDefaultCollector.segmentKeys.size(), segmentName,
+              segmentNumber);
+          if (termVector.dataFunctionCollector != null) {
+            termVector.dataFunctionCollector.initNewList((int) t.size(),
+                segmentName, segmentNumber);
+          }
+          if (docSet.size() > 0) {
+            int termDocId;
+            String key;
+            String[] keys;
+            HashSet<String> recomputeKeyList = termVector.dataDefaultCollector.segmentRecomputeKeyList
+                .get(segmentName);
+            if (termVector.defaultStatsType.equals(CodecUtil.STATS_BASIC)
+                && (termVector.functionParser == null
+                    || (termVector.functionParser.sumRule()
+                        && !termVector.functionParser.needPositions()))) {
+              while ((term = termsEnum.next()) != null) {
+                termDocId = -1;
+                key = MtasToken.getPostfixFromValue(term.utf8ToString());
+                if (recomputeKeyList.contains(key)) {
+                  keys = new String[] { key };
+                  // compute numbers;
+                  TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                      docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                  if (numberBasic.docNumber > 0) {
+                    registerBasicValue(keys, termVector, numberBasic, 0,
+                        segmentNumber);
+                  }
+                }
+              }
+            } else {
+              while ((term = termsEnum.next()) != null) {
+                termDocId = -1;
+                key = MtasToken.getPostfixFromValue(term.utf8ToString());
+                if (recomputeKeyList.contains(key)) {
+                  keys = new String[] { key };
+                  // compute numbers;
+                  TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                      docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                      positionsData);
+                  // register
+                  if (numberFull.docNumber > 0) {
+                    registerFullValues(keys, termVector, numberFull, 0,
+                        segmentNumber);
+                  }
+                }
+              }
+            }
+          }
+          termVector.dataDefaultCollector.closeNewList();
+          if (termVector.dataFunctionCollector != null) {
+            termVector.dataFunctionCollector.closeNewList();
+          }
+        }
+      }
+
+    }
+  }
+
+  private static boolean needSecondRoundTermvector(
+      List<ComponentTermVector> termVectorList) {
+    boolean needSecondRound = false;
+    for (ComponentTermVector termVector : termVectorList) {
+      if (termVector.dataDefaultCollector.segmentRegistration
+          && termVector.number > 0) {
+        termVector.dataDefaultCollector.recomputeSegmentKeys();
+        if (!termVector.dataDefaultCollector.checkExistenceNecessaryKeys()) {
+          needSecondRound = true;
+        }
+      }
+    }
+    return needSecondRound;
+  }
+
+  private static class TermvectorNumberBasic {
+    public long[] valueSum;
+    public int docNumber;
+
+    TermvectorNumberBasic() {
+      valueSum = new long[] { 0 };
+      docNumber = 0;
+    }
+  }
+
+  private static class TermvectorNumberFull {
+    public long[] args;
+    public int[] positions;
+    public int docNumber;
+
+    TermvectorNumberFull(int maxSize) {
+      args = new long[maxSize];
+      positions = new int[maxSize];
+      docNumber = 0;
+    }
+  }
+
+  private static void registerBasicValue(String[] keys,
+      ComponentTermVector termVector, TermvectorNumberBasic numbers,
+      Integer termNumberMaximum, Integer segmentNumber) throws IOException {
+    if (termVector.dataFunctionCollector == null
+        || termVector.dataFunctionCollector.getDataType()
+            .equals(CodecUtil.DATA_TYPE_LONG)) {
+      long valueFunction = 0;
+      long valueDefault = termVector.defaultParser
+          .getValueLong(numbers.valueSum, 0);
+      boolean addItem;
+      MtasDataCollector<Long, ?> dataFunctionCollector = null;
+      MtasDataCollector<Long, ?> dataDefaultCollector = (MtasDataCollector<Long, ?>) termVector.dataDefaultCollector;
+      for (String key : keys) {
+        if (termVector.sortType.equals(CodecUtil.SORT_TERM)) {
+          addItem = true;
+        } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_SUM)) {
+          addItem = dataDefaultCollector.validateSegmentValue(key, valueDefault,
+              termNumberMaximum, segmentNumber);
+        } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_N)) {
+          addItem = dataDefaultCollector.validateSegmentValue(key,
+              Long.valueOf(numbers.docNumber), termNumberMaximum,
+              segmentNumber);
+        } else {
+          addItem = false;
+        }
+        if (addItem) {
+          dataDefaultCollector.add(new String[] { key }, valueDefault,
+              numbers.docNumber);
+          if (termVector.functionParser != null) {
+            valueFunction = termVector.functionParser
+                .getValueLong(numbers.valueSum, 0);
+            dataFunctionCollector = (MtasDataCollector<Long, ?>) termVector.dataFunctionCollector;
+            dataFunctionCollector.add(new String[] { key }, valueFunction,
+                numbers.docNumber);
+          }
+        }
+      }
+    } else if (termVector.dataFunctionCollector.getDataType()
+        .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+      long valueDefault = termVector.defaultParser
+          .getValueLong(numbers.valueSum, 0);
+      double valueFunction = termVector.functionParser
+          .getValueDouble(numbers.valueSum, 0);
+      MtasDataCollector<Long, ?> dataDefaultCollector = (MtasDataCollector<Long, ?>) termVector.dataFunctionCollector;
+      MtasDataCollector<Double, ?> dataFunctionCollector = (MtasDataCollector<Double, ?>) termVector.dataFunctionCollector;
+      for (String key : keys) {
+        if (dataDefaultCollector.validateSegmentValue(key, valueDefault,
+            termNumberMaximum, segmentNumber)) {
+          dataDefaultCollector.add(new String[] { key }, valueDefault,
+              numbers.docNumber);
+          dataFunctionCollector.add(new String[] { key }, valueFunction,
+              numbers.docNumber);
+        }
+      }
+    } else {
+      throw new IOException(
+          "unknown dataType " + termVector.dataFunctionCollector.getDataType());
+    }
+  }
+
+  private static void registerFullValues(String[] keys,
+      ComponentTermVector termVector, TermvectorNumberFull numbers,
+      Integer termNumberMaximum, Integer segmentNumber) throws IOException {
+    if (numbers.docNumber > 0) {
+      long valueDefault, valueSum = 0;
+      boolean[] addItems = new boolean[keys.length];
+      boolean addItem = false;
+      MtasDataCollector<Long, ?> dataDefaultCollector = (MtasDataCollector<Long, ?>) termVector.dataDefaultCollector;      
+      //check for each key
+      for (int i = 0; i < numbers.docNumber; i++) {
+        valueSum += numbers.args[i];
+      }
+      valueDefault = termVector.defaultParser
+          .getValueLong(new long[] { valueSum }, 0);      
+      for (int i=0; i<keys.length;i++) {
+        if (termVector.sortType.equals(CodecUtil.SORT_TERM)) {
+          addItems[i] = true;
+          addItem = true;
+        } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_SUM)) {
+          addItems[i] = dataDefaultCollector.validateSegmentValue(keys[i], valueDefault,
+              termNumberMaximum, segmentNumber);
+          addItem = addItem?addItem:addItems[i];
+        } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_N)) {
+          addItems[i] = dataDefaultCollector.validateSegmentValue(keys[i],
+              Long.valueOf(numbers.docNumber), termNumberMaximum,
+              segmentNumber);
+          addItem = addItem?addItem:addItems[i];
+        } else {
+          addItems[i] = false;        
+          addItem = addItem?addItem:addItems[i];
+        }
+      }
+      if(addItem) {
+        if (termVector.dataFunctionCollector==null) {
+          long[] values = new long[numbers.docNumber];
+          for (int k=0;k<keys.length;k++) {            
+            if (addItems[k]) {
+              for (int i = 0; i < numbers.docNumber; i++) {
+                try {
+                  values[i] = termVector.defaultParser.getValueLong(
+                      new long[] { numbers.args[i] }, numbers.positions[i]);
+                } catch (IOException e) {
+                  dataDefaultCollector.error(keys, e.getMessage());
+                }
+              }
+              dataDefaultCollector.add(new String[] { keys[k] }, values,
+                  values.length);
+            }
+          }
+        } else if (termVector.dataFunctionCollector.getDataType()
+            .equals(CodecUtil.DATA_TYPE_LONG) && termVector.defaultStatsType.equals(CodecUtil.STATS_BASIC)) {
+          long[] values = new long[numbers.docNumber];
+          MtasDataCollector<Long, ?> dataFunctionCollector = (MtasDataCollector<Long, ?>) termVector.dataFunctionCollector;        
+          for (String key : keys) {
+            if (termVector.sortType.equals(CodecUtil.SORT_TERM)) {
+              addItem = true;
+            } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_SUM)) {
+              addItem = dataDefaultCollector.validateSegmentValue(key, valueDefault,
+                  termNumberMaximum, segmentNumber);
+            } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_N)) {
+              addItem = dataDefaultCollector.validateSegmentValue(key,
+                  Long.valueOf(numbers.docNumber), termNumberMaximum,
+                  segmentNumber);
+            } else {
+              addItem = false;
+            }
+            if (addItem) {
+              for (int i = 0; i < numbers.docNumber; i++) {
+                try {
+                  values[i] = termVector.functionParser.getValueLong(
+                      new long[] { numbers.args[i] }, numbers.positions[i]);
+                } catch (IOException e) {
+                  dataFunctionCollector.error(keys, e.getMessage());
+                }
+              }
+              dataDefaultCollector.add(new String[] { key }, valueDefault,
+                  numbers.docNumber);
+              dataFunctionCollector.add(new String[] { key }, values,
+                  values.length);
+            }
+          }
+        } else if (termVector.dataFunctionCollector.getDataType()
+            .equals(CodecUtil.DATA_TYPE_DOUBLE) && termVector.defaultStatsType.equals(CodecUtil.STATS_BASIC)) {
+          double[] values = new double[numbers.docNumber];
+          MtasDataCollector<Double, ?> dataFunctionCollector = (MtasDataCollector<Double, ?>) termVector.dataFunctionCollector;        
+          for (String key : keys) {
+            if (termVector.sortType.equals(CodecUtil.SORT_TERM)) {
+              addItem = true;
+            } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_SUM)) {
+              addItem = dataDefaultCollector.validateSegmentValue(key, valueDefault,
+                  termNumberMaximum, segmentNumber);
+            } else if (termVector.sortType.equals(CodecUtil.STATS_TYPE_N)) {
+              addItem = dataDefaultCollector.validateSegmentValue(key,
+                  Long.valueOf(numbers.docNumber), termNumberMaximum,
+                  segmentNumber);
+            } else {
+              addItem = false;
+            }
+            if (addItem) {
+              for (int i = 0; i < numbers.docNumber; i++) {
+                try {
+                  values[i] = termVector.functionParser.getValueDouble(
+                      new long[] { numbers.args[i] }, numbers.positions[i]);
+                } catch (IOException e) {
+                  dataFunctionCollector.error(keys, e.getMessage());
+                }
+              }
+              dataDefaultCollector.add(new String[] { key }, valueDefault,
+                  numbers.docNumber);
+              dataFunctionCollector.add(new String[] { key }, values,
+                  values.length);
+            }
+          }
+        } else {
+          throw new IOException("unknown dataType "
+              + termVector.dataFunctionCollector.getDataType() + " or problem with default statsType");
+        }
+      }
+    }
+  }
+
+  private static TermvectorNumberBasic computeTermvectorNumberBasic(
+      List<Integer> docSet, int termDocId, TermsEnum termsEnum, LeafReader r,
+      LeafReaderContext lrc, PostingsEnum postingsEnum) throws IOException {
+    TermvectorNumberBasic result = new TermvectorNumberBasic();
+    boolean subtractValue = false;
+    if (docSet.size() == r.numDocs()) {
+      result.valueSum[0] = termsEnum.totalTermFreq();
+      result.docNumber = termsEnum.docFreq();
+    } else {
+      if (docSet.size() > Math.round(r.numDocs() / 2)) {
+        result.valueSum[0] = termsEnum.totalTermFreq();
+        subtractValue = true;
+      }
+      Iterator<Integer> docIterator = docSet.iterator();
+      postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);
+      while (docIterator.hasNext()) {
+        int docId = docIterator.next() - lrc.docBase;
+        if (docId >= termDocId) {
+          if ((docId == termDocId)
+              || ((termDocId = postingsEnum.advance(docId)) == docId)) {
+            result.docNumber++;
+            if (subtractValue) {
+              result.valueSum[0] -= postingsEnum.freq();
+            } else {
+              result.valueSum[0] += postingsEnum.freq();
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  private static TermvectorNumberFull computeTermvectorNumberFull(
+      List<Integer> docSet, int termDocId, TermsEnum termsEnum, LeafReader r,
+      LeafReaderContext lrc, PostingsEnum postingsEnum,
+      HashMap<Integer, Integer> positionsData) throws IOException {
+    TermvectorNumberFull result = new TermvectorNumberFull(docSet.size());
+    Iterator<Integer> docIterator = docSet.iterator();
+    postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);
+    while (docIterator.hasNext()) {
+      int docId = docIterator.next() - lrc.docBase;
+      if (docId >= termDocId) {
+        if ((docId == termDocId)
+            || ((termDocId = postingsEnum.advance(docId)) == docId)) {
+          result.args[result.docNumber] = postingsEnum.freq();
+          result.positions[result.docNumber] = (positionsData == null) ? 0
+              : positionsData.get(docId + lrc.docBase);
+          result.docNumber++;
+        }
+      }
+    }
+
+    return result;
+  }
 
   /**
    * Creates the termvector.
    *
-   * @param termVectorList the term vector list
-   * @param positionsData the positions data
-   * @param docSet the doc set
-   * @param field the field
-   * @param t the t
-   * @param r the r
-   * @param lrc the lrc
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param termVectorList
+   *          the term vector list
+   * @param positionsData
+   *          the positions data
+   * @param docSet
+   *          the doc set
+   * @param field
+   *          the field
+   * @param t
+   *          the t
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private static void createTermvector(List<ComponentTermVector> termVectorList,
+  private static void createTermvectorClassic(
+      List<ComponentTermVector> termVectorList,
       HashMap<Integer, Integer> positionsData, List<Integer> docSet,
       String field, Terms t, LeafReader r, LeafReaderContext lrc)
       throws IOException {
@@ -1565,16 +2208,15 @@ public class CodecCollector {
       PostingsEnum postingsEnum = null;
       for (ComponentTermVector termVector : termVectorList) {
         termsEnum = t.intersect(termVector.compiledAutomaton, null);
-        termVector.dataCollector.initNewList((int) t.size());
+        termVector.dataFunctionCollector.initNewList((int) t.size(),
+            "segment" + lrc.ord, 0);
         if (docSet.size() > 0) {
           while ((term = termsEnum.next()) != null) {
             int termDocId = -1;
             String key = MtasToken.getPostfixFromValue(term.utf8ToString());
             String[] keys = new String[] { key };
-            if (termVector.statsType.equals(CodecUtil.STATS_BASIC)
+            if (termVector.defaultStatsType.equals(CodecUtil.STATS_BASIC)
                 && termVector.functionParser.sumRule()
-                && (termVector.minimumLong == null)
-                && (termVector.maximumLong == null)
                 && !termVector.functionParser.needPositions()) {
               long[] valueSum = new long[] { 0 };
               int docNumber = 0;
@@ -1606,26 +2248,26 @@ public class CodecCollector {
                 }
               }
               if (docNumber > 0) {
-                if (termVector.dataCollector.getDataType()
+                if (termVector.dataFunctionCollector.getDataType()
                     .equals(CodecUtil.DATA_TYPE_LONG)) {
                   long value = termVector.functionParser.getValueLong(valueSum,
                       0);
-                  termVector.dataCollector.add(keys, value, docNumber);
-                } else if (termVector.dataCollector.getDataType()
+                  termVector.dataFunctionCollector.add(keys, value, docNumber);
+                } else if (termVector.dataFunctionCollector.getDataType()
                     .equals(CodecUtil.DATA_TYPE_LONG)) {
                   double value = termVector.functionParser
                       .getValueDouble(valueSum, 0);
-                  termVector.dataCollector.add(keys, value, docNumber);
+                  termVector.dataFunctionCollector.add(keys, value, docNumber);
                 } else {
                   throw new IOException("unknown dataType "
-                      + termVector.dataCollector.getDataType());
+                      + termVector.dataFunctionCollector.getDataType());
                 }
               }
             } else {
               Iterator<Integer> docIterator = docSet.iterator();
               postingsEnum = termsEnum.postings(postingsEnum,
                   PostingsEnum.FREQS);
-              if (termVector.dataCollector.getDataType()
+              if (termVector.dataFunctionCollector.getDataType()
                   .equals(CodecUtil.DATA_TYPE_LONG)) {
                 long[] args = new long[1];
                 long value;
@@ -1644,16 +2286,17 @@ public class CodecCollector {
                             positions);
                         values[number] = value;
                       } catch (IOException e) {
-                        termVector.dataCollector.error(keys, e.getMessage());
+                        termVector.dataFunctionCollector.error(keys,
+                            e.getMessage());
                       }
                       number++;
                     }
                   }
                 }
                 if (number > 0) {
-                  termVector.dataCollector.add(keys, values, number);
+                  termVector.dataFunctionCollector.add(keys, values, number);
                 }
-              } else if (termVector.dataCollector.getDataType()
+              } else if (termVector.dataFunctionCollector.getDataType()
                   .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
                 long[] args = new long[1];
                 double value;
@@ -1672,20 +2315,21 @@ public class CodecCollector {
                             positions);
                         values[number] = value;
                       } catch (IOException e) {
-                        termVector.dataCollector.error(keys, e.getMessage());
+                        termVector.dataFunctionCollector.error(keys,
+                            e.getMessage());
                       }
                       number++;
                     }
                   }
                 }
                 if (number > 0) {
-                  termVector.dataCollector.add(keys, values, number);
+                  termVector.dataFunctionCollector.add(keys, values, number);
                 }
               }
             }
           }
         }
-        termVector.dataCollector.closeNewList();
+        termVector.dataFunctionCollector.closeNewList();
       }
     }
   }

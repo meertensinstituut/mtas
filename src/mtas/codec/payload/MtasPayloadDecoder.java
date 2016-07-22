@@ -148,7 +148,7 @@ public class MtasPayloadDecoder {
     }
     if(mtasParent) {
       mtasParentId = byteStream.readEliasGammaCodingInteger() + mtasId;
-    }
+    }    
     if(mtasPayload) {
       mtasPayloadValue = byteStream.readRemainingBytes();
     }

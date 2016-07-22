@@ -605,7 +605,7 @@ abstract public class MtasBasicParser extends MtasParser {
           if (mappingPayload.get("text") != null) {
             BytesRef subpayload = computeMaximumFilteredPayload(
                 mappingPayload.get("text"), payload, null);
-            payload = (subpayload != null) ? subpayload : payload;
+            payload = (subpayload != null) ? subpayload : payload;            
           }
         }
         // from objects

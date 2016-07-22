@@ -19,6 +19,9 @@ public class MtasFunctionParserItem {
   /** The value double. */
   private Double valueDouble = null;
   
+  /** The degree. */
+  private Integer degree = null;
+  
   /** The parser. */
   private MtasFunctionParserFunction parser = null;
   
@@ -49,6 +52,7 @@ public class MtasFunctionParserItem {
   public MtasFunctionParserItem(String t) throws ParseException {
     if(t.equals(TYPE_N)) {
       type = t;
+      degree = 0;
     } else {
       throw new ParseException("unknown type "+t);
     }
@@ -65,6 +69,7 @@ public class MtasFunctionParserItem {
     if(t.equals(TYPE_ARGUMENT)) {
       type = t;
       id = i;
+      degree = 1;
     } else {
       throw new ParseException("unknown type "+t);
     }
@@ -81,6 +86,7 @@ public class MtasFunctionParserItem {
     if(t.equals(TYPE_CONSTANT_LONG)) {
       type = t;
       valueLong = l;
+      degree = 0;
     } else {
       throw new ParseException("unknown type "+t);
     }
@@ -97,6 +103,7 @@ public class MtasFunctionParserItem {
     if(t.equals(TYPE_CONSTANT_DOUBLE)) {
       type = t;
       valueDouble = d;
+      degree = 0;
     } else {
       throw new ParseException("unknown type "+t);
     }      
@@ -113,9 +120,11 @@ public class MtasFunctionParserItem {
     if(t.equals(TYPE_PARSER_LONG)) {
       type = t;
       parser = p;
+      degree = parser.degree;
     } else if(t.equals(TYPE_PARSER_DOUBLE)) {
       type = t;
       parser = p;
+      degree = parser.degree;
     } else {
       throw new ParseException("unknown type "+t);
     }
@@ -137,6 +146,15 @@ public class MtasFunctionParserItem {
    */
   public int getId() {
     return id.intValue();
+  }
+  
+  /**
+   * Gets the degree.
+   *
+   * @return the degree
+   */
+  public Integer getDegree() {
+    return degree;
   }
   
   /**

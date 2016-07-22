@@ -81,19 +81,37 @@ public class MtasFieldsProducer extends FieldsProducer {
           openMtasFile(state, name,
               MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
           postingsFormatName);
-    } catch (IndexFormatTooOldException e) {
-      version = MtasCodecPostingsFormat.VERSION_OLD;
-      addIndexInputToList("doc",
-          openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
-          postingsFormatName);
-      addIndexInputToList("indexObjectPosition",
-          openMtasFile(state, name,
-              MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION, version, version),
-          postingsFormatName);
-      addIndexInputToList("indexObjectParent",
-          openMtasFile(state, name,
-              MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
-          postingsFormatName);
+    } catch (IndexFormatTooOldException e1) {      
+      version = MtasCodecPostingsFormat.VERSION_OLD_2;
+      try {
+        addIndexInputToList("doc",
+            openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
+            postingsFormatName);
+        addIndexInputToList("indexObjectPosition",
+            openMtasFile(state, name,
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION, version, version),
+            postingsFormatName);
+        addIndexInputToList("indexObjectParent",
+            openMtasFile(state, name,
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
+            postingsFormatName);
+      } catch (IndexFormatTooOldException e2) {
+        version = MtasCodecPostingsFormat.VERSION_OLD_1;
+        addIndexInputToList("doc",
+            openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
+            postingsFormatName);
+        addIndexInputToList("indexObjectPosition",
+            openMtasFile(state, name,
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION, version, version),
+            postingsFormatName);
+        addIndexInputToList("indexObjectParent",
+            openMtasFile(state, name,
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
+            postingsFormatName);
+      }
+    }
+    if(version == MtasCodecPostingsFormat.VERSION_OLD_2) {
+      throw new IOException("This MTAS doesn't support index version "+version+", please upgrade");
     }
     // Load the delegate postingsFormatName from this file
     this.delegateFieldsProducer = PostingsFormat.forName(postingsFormatName)
@@ -111,6 +129,9 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   private String addIndexInputToList(String name, IndexInput in,
       String postingsFormatName) throws IOException {
+    if(indexInputList.get(name)!=null) {
+      indexInputList.get(name).close();
+    }
     if (postingsFormatName == null) {
       postingsFormatName = in.readString();
     } else if (!in.readString().equals(postingsFormatName)) {

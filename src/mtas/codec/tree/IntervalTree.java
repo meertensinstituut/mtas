@@ -1,13 +1,6 @@
 package mtas.codec.tree;
 
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map.Entry;
-
-import mtas.analysis.token.MtasPosition;
-import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 
 /**

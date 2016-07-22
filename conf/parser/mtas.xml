@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <mtas>
   <configurations type="mtas.analysis.util.MtasTokenizerFactory">
-    <configuration name="DBNL" file="mtas/folia_mtas.xml" />
+    <configuration name="DBNL" file="mtas/folia_dbnl.xml" />
+    <configuration name="EDBO" file="mtas/folia_edbo.xml" />
+    <configuration name="SONAR" file="mtas/folia_sonar.xml" />
   </configurations>
   <configurations type="mtas.analysis.util.MtasCharFilterFactory">
     <configuration name="DBNL" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="EDBO" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="SONAR" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
   </configurations>
 </mtas>

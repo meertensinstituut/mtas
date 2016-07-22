@@ -281,8 +281,8 @@ public class MtasPayloadEncoder {
         && mtasToken.getPayload() != null) {
       BytesRef payload = mtasToken.getPayload();
       byteStream.write(Arrays.copyOfRange(payload.bytes, payload.offset,
-          (payload.offset + payload.length)));
-    }
+          (payload.offset + payload.length)));     
+    }    
     // construct new payload
     return new BytesRef(byteStream.toByteArray());
   }

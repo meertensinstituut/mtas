@@ -24,11 +24,14 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /** The Constant VERSION_START. */
   public static final int VERSION_START = 1;
   
-  /** The Constant VERSION_OLD. */
-  public static final int VERSION_OLD = 1;
+  /** The Constant VERSION_OLD_1. */
+  public static final int VERSION_OLD_1 = 1;
+  
+  /** The Constant VERSION_OLD_2. */
+  public static final int VERSION_OLD_2 = 2;
 
   /** The Constant VERSION_CURRENT. */
-  public static final int VERSION_CURRENT = 2;
+  public static final int VERSION_CURRENT = 3;
 
   /** The Constant MTAS_OBJECT_HAS_PARENT. */
   static final int MTAS_OBJECT_HAS_PARENT = 1;
@@ -80,6 +83,9 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION. */
   public static final String MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION = "mtas.prefix.multiple.position";
+
+  /** The Constant MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION. */
+  public static final String MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION = "mtas.prefix.set.position";
 
   /** The Constant MTAS_OBJECT_EXTENSION. */
   public static final String MTAS_OBJECT_EXTENSION = "mtas.object";
@@ -145,6 +151,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       Class.forName("mtas.codec.tree.MtasRBTree");
       Class.forName("mtas.codec.MtasTerms");
       Class.forName("mtas.codec.util.CodecInfo");
+      Class.forName("mtas.codec.tree.MtasTreeNodeId");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
@@ -168,6 +175,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       Class.forName("mtas.codec.tree.MtasRBTree");
       Class.forName("mtas.codec.MtasTerms");
       Class.forName("mtas.codec.util.CodecInfo");
+      Class.forName("mtas.codec.tree.MtasTreeNodeId");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
@@ -260,13 +268,14 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
         int length = inObject.readVInt();
         byte[] mtasPayload = new byte[length];
         inObject.readBytes(mtasPayload, 0, length);
-        token.setPayload(new BytesRef(mtasPayload));
+        token.setPayload(new BytesRef(mtasPayload));               
       }
       Long termRef = inObject.readVLong();
       inTerm.seek(termRef);
       token.setTermRef(termRef);
       token.setValue(inTerm.readString());
     } catch (IOException e) {
+      e.printStackTrace();
       return null;
     }
     return token;

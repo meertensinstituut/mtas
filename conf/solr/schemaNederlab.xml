@@ -233,9 +233,8 @@
 	<dynamicField name="NLCollectionSpecific_*" type="nederlab_string"
 		required="false" multiValued="true" indexed="true" stored="true" />
 
-	<!-- component NLContent -->
-	<field name="NLContent_folia_available" type="nederlab_boolean"
-		required="false" multiValued="false" indexed="true" stored="true" />
+	<!-- component NLContent old -->
+	
 	<field name="NLContent_text_available" type="nederlab_boolean"
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLContent_text" type="nederlab_content" required="false"
@@ -250,7 +249,12 @@
 	<field name="NLContent_ticcl_lowercase" type="nederlab_content_lowercase"
 		required="false" multiValued="false" indexed="true" stored="true"
 		termVectors="true" termPositions="true" termOffsets="true" />
-	<field name="NLContent_mtas" type="mtas_text" indexed="true"
+		
+	<!-- component NLContent -->
+  
+  <field name="NLContent_folia_available" type="nederlab_boolean"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLContent_mtas" type="mtas_text" indexed="true"
 		stored="true" />
 	<field name="NLContent_mtas_error" type="nederlab_string"
 		indexed="true" stored="true" />
@@ -375,23 +379,33 @@
 		</analyzer>
 	</fieldType>
 
-	<fieldType name="mtas_text_example_classical" class="solr.TextField"
+	<fieldType name="mtas_text_example_test" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
 			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
 				type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				configFile="folia/test.xml" />
+				configFile="mtas/folia_test.xml" />
 		</analyzer>
 	</fieldType>
+	
+	<fieldType name="mtas_text_example_local" class="solr.TextField"
+    postingsFormat="MtasCodec">
+    <analyzer type="index">
+      <charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+        type="file" prefix="/local/data/" />
+      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+        configFile="mtas/folia_test.xml" />
+    </analyzer>
+  </fieldType>
 
 	<fieldType name="mtas_text_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
 			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				config="mtas.xml" default="default" />
+				config="mtas.xml" default="DBNL" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				config="mtas.xml" default="default" />
+				config="mtas.xml" default="DBNL" />
 		</analyzer>
 	</fieldType>
 

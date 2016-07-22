@@ -1,6 +1,8 @@
 package mtas.codec.tree;
 
 import java.util.HashMap;
+import mtas.codec.tree.MtasTree;
+import mtas.codec.tree.MtasRBTreeNode;
 
 /**
  * The Class MtasRBTree.
@@ -25,12 +27,12 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
    * @see mtas.codec.tree.MtasTree#addRangeEmpty(int, int)
    */
   @Override
-  final protected void addRangeEmpty(int left, int right, int additionalId) {
+  final protected void addRangeEmpty(int left, int right, int additionalId, long additionalRef) {
     String key = ((Integer) left).toString() + "_" + ((Integer) right).toString();
     if (index.containsKey(key)) {
       //do nothing (empty...)
     } else {
-      root = addRange(root, left, right, additionalId, null, null);
+      root = addRange(root, left, right, additionalId, additionalRef, null, null);
       root.color = MtasRBTreeNode.BLACK;
     }
   }
@@ -39,21 +41,21 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
    * @see mtas.codec.tree.MtasTree#addSinglePoint(int, java.lang.Integer, java.lang.Long)
    */
   @Override
-  final protected void addSinglePoint(int position, int additionalId, Integer id, Long ref) {
-    addRange(position, position, additionalId, id, ref);
+  final protected void addSinglePoint(int position, int additionalId, long additionalRef, Integer id, Long ref) {
+    addRange(position, position, additionalId, additionalRef, id, ref);
   }
 
   /* (non-Javadoc)
    * @see mtas.codec.tree.MtasTree#addRange(int, int, java.lang.Integer, java.lang.Long)
    */
   @Override
-  final protected void addRange(int left, int right, int additionalId, Integer id,
+  final protected void addRange(int left, int right, int additionalId, long additionalRef, Integer id,
       Long ref) {
     String key = ((Integer) left).toString() + "_" + ((Integer) right).toString();
     if (index.containsKey(key)) {
-      index.get(key).addId(id, ref, additionalId);        
+      index.get(key).addIdAndRef(id, ref, additionalId, additionalRef);        
     } else {
-      root = addRange(root, left, right, additionalId, id, ref);
+      root = addRange(root, left, right, additionalId, additionalRef, id, ref);
       root.color = MtasRBTreeNode.BLACK;
     }  
   }
@@ -70,18 +72,18 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
    * @return the mtas rb tree node
    */
   private MtasRBTreeNode addRange(MtasRBTreeNode n, Integer left,
-      Integer right, int additionalId, Integer id, Long ref) {
+      Integer right, int additionalId, long additionalRef, Integer id, Long ref) {
     if (n == null) {
       String key = left.toString() + "_" + right.toString();
       n = new MtasRBTreeNode(left, right, MtasRBTreeNode.RED, 1);
-      n.addId(id, ref, additionalId);
+      n.addIdAndRef(id, ref, additionalId, additionalRef);
       index.put(key, n);
     } else {
       if (left <= n.left) {
-        n.leftChild = addRange(n.leftChild, left, right, additionalId, id, ref);
+        n.leftChild = addRange(n.leftChild, left, right, additionalId, additionalRef, id, ref);
         updateMax(n, n.leftChild);
       } else {
-        n.rightChild = addRange(n.rightChild, left, right, additionalId, id, ref);
+        n.rightChild = addRange(n.rightChild, left, right, additionalId, additionalRef, id, ref);
         updateMax(n, n.rightChild);
       }
       if (isRed(n.rightChild) && !isRed(n.leftChild)) {

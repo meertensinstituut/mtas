@@ -1,5 +1,7 @@
 package mtas.codec.tree;
 
+import mtas.codec.tree.MtasTreeNode;
+
 /**
  * The Class MtasAVLTreeNode.
  */

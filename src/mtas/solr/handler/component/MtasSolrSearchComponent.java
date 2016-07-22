@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -79,202 +81,202 @@ public class MtasSolrSearchComponent extends SearchComponent {
 
   /** The Constant PARAM_MTAS_FACET. */
   public static final String PARAM_MTAS_FACET = PARAM_MTAS + ".facet";
-  
+
   /** The Constant NAME_MTAS_FACET_KEY. */
   public static final String NAME_MTAS_FACET_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_FACET_FIELD. */
   public static final String NAME_MTAS_FACET_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_FACET_QUERY. */
   private static final String NAME_MTAS_FACET_QUERY = "query";
-  
+
   /** The Constant NAME_MTAS_FACET_BASE. */
   private static final String NAME_MTAS_FACET_BASE = "base";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_QUERY_TYPE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_TYPE = "type";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_VALUE = "value";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_FIELD. */
   public static final String SUBNAME_MTAS_FACET_BASE_FIELD = "field";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_TYPE = "type";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_SORT_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_SORT_TYPE = "sort.type";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION. */
   public static final String SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION = "sort.direction";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_NUMBER. */
   public static final String SUBNAME_MTAS_FACET_BASE_NUMBER = "number";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_MINIMUM. */
   public static final String SUBNAME_MTAS_FACET_BASE_MINIMUM = "minimum";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_MAXIMUM. */
   public static final String SUBNAME_MTAS_FACET_BASE_MAXIMUM = "maximum";
-  
+
   /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION = "function";
 
   /** The Constant PARAM_MTAS_KWIC. */
   public static final String PARAM_MTAS_KWIC = PARAM_MTAS + ".kwic";
-  
+
   /** The Constant NAME_MTAS_KWIC_FIELD. */
   public static final String NAME_MTAS_KWIC_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_KWIC_QUERY_TYPE. */
   public static final String NAME_MTAS_KWIC_QUERY_TYPE = "query.type";
-  
+
   /** The Constant NAME_MTAS_KWIC_QUERY_VALUE. */
   public static final String NAME_MTAS_KWIC_QUERY_VALUE = "query.value";
-  
+
   /** The Constant NAME_MTAS_KWIC_KEY. */
   public static final String NAME_MTAS_KWIC_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_KWIC_PREFIX. */
   public static final String NAME_MTAS_KWIC_PREFIX = "prefix";
-  
+
   /** The Constant NAME_MTAS_KWIC_NUMBER. */
   public static final String NAME_MTAS_KWIC_NUMBER = "number";
-  
+
   /** The Constant NAME_MTAS_KWIC_START. */
   public static final String NAME_MTAS_KWIC_START = "start";
-  
+
   /** The Constant NAME_MTAS_KWIC_LEFT. */
   public static final String NAME_MTAS_KWIC_LEFT = "left";
-  
+
   /** The Constant NAME_MTAS_KWIC_RIGHT. */
   public static final String NAME_MTAS_KWIC_RIGHT = "right";
-  
+
   /** The Constant NAME_MTAS_KWIC_OUTPUT. */
   public static final String NAME_MTAS_KWIC_OUTPUT = "output";
 
   /** The Constant PARAM_MTAS_LIST. */
   public static final String PARAM_MTAS_LIST = PARAM_MTAS + ".list";
-  
+
   /** The Constant NAME_MTAS_LIST_FIELD. */
   public static final String NAME_MTAS_LIST_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_LIST_QUERY_TYPE. */
   public static final String NAME_MTAS_LIST_QUERY_TYPE = "query.type";
-  
+
   /** The Constant NAME_MTAS_LIST_QUERY_VALUE. */
   public static final String NAME_MTAS_LIST_QUERY_VALUE = "query.value";
-  
+
   /** The Constant NAME_MTAS_LIST_KEY. */
   public static final String NAME_MTAS_LIST_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_LIST_PREFIX. */
   public static final String NAME_MTAS_LIST_PREFIX = "prefix";
-  
+
   /** The Constant NAME_MTAS_LIST_START. */
   public static final String NAME_MTAS_LIST_START = "start";
-  
+
   /** The Constant NAME_MTAS_LIST_NUMBER. */
   public static final String NAME_MTAS_LIST_NUMBER = "number";
-  
+
   /** The Constant NAME_MTAS_LIST_LEFT. */
   public static final String NAME_MTAS_LIST_LEFT = "left";
-  
+
   /** The Constant NAME_MTAS_LIST_RIGHT. */
   public static final String NAME_MTAS_LIST_RIGHT = "right";
-  
+
   /** The Constant NAME_MTAS_LIST_OUTPUT. */
   public static final String NAME_MTAS_LIST_OUTPUT = "output";
 
   /** The Constant PARAM_MTAS_GROUP. */
   public static final String PARAM_MTAS_GROUP = PARAM_MTAS + ".group";
-  
+
   /** The Constant NAME_MTAS_GROUP_FIELD. */
   public static final String NAME_MTAS_GROUP_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_GROUP_QUERY_TYPE. */
   public static final String NAME_MTAS_GROUP_QUERY_TYPE = "query.type";
-  
+
   /** The Constant NAME_MTAS_GROUP_QUERY_VALUE. */
   public static final String NAME_MTAS_GROUP_QUERY_VALUE = "query.value";
-  
+
   /** The Constant NAME_MTAS_GROUP_KEY. */
   public static final String NAME_MTAS_GROUP_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_LEFT = "grouping.left";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_RIGHT. */
   public static final String NAME_MTAS_GROUP_GROUPING_RIGHT = "grouping.right";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE = "grouping.hit.inside";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_LEFT = "grouping.hit.left";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_RIGHT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_RIGHT = "grouping.hit.right";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT = "grouping.hit.insideLeft";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT = "grouping.hit.insideRight";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_POSITION. */
   public static final String NAME_MTAS_GROUP_GROUPING_POSITION = "position";
-  
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_PREFIXES. */
   public static final String NAME_MTAS_GROUP_GROUPING_PREFIXES = "prefixes";
 
   /** The Constant PARAM_MTAS_TERMVECTOR. */
   public static final String PARAM_MTAS_TERMVECTOR = PARAM_MTAS + ".termvector";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_FIELD. */
   public static final String NAME_MTAS_TERMVECTOR_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_KEY. */
   public static final String NAME_MTAS_TERMVECTOR_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_PREFIX. */
   public static final String NAME_MTAS_TERMVECTOR_PREFIX = "prefix";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_REGEXP = "regexp";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_TYPE. */
   public static final String NAME_MTAS_TERMVECTOR_TYPE = "type";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_SORT_TYPE. */
   public static final String NAME_MTAS_TERMVECTOR_SORT_TYPE = "sort.type";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_SORT_DIRECTION. */
   public static final String NAME_MTAS_TERMVECTOR_SORT_DIRECTION = "sort.direction";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_START. */
   public static final String NAME_MTAS_TERMVECTOR_START = "start";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_NUMBER. */
   public static final String NAME_MTAS_TERMVECTOR_NUMBER = "number";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_MINIMUM. */
   public static final String NAME_MTAS_TERMVECTOR_MINIMUM = "minimum";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_MAXIMUM. */
   public static final String NAME_MTAS_TERMVECTOR_MAXIMUM = "maximum";
-  
+
   /** The Constant NAME_MTAS_TERMVECTOR_FUNCTION. */
   public static final String NAME_MTAS_TERMVECTOR_FUNCTION = "function";
 
   /** The Constant PARAM_MTAS_PREFIX. */
   public static final String PARAM_MTAS_PREFIX = PARAM_MTAS + ".prefix";
-  
+
   /** The Constant NAME_MTAS_PREFIX_FIELD. */
   public static final String NAME_MTAS_PREFIX_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_PREFIX_KEY. */
   public static final String NAME_MTAS_PREFIX_KEY = "key";
 
@@ -284,73 +286,75 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The Constant PARAM_MTAS_STATS_POSITIONS. */
   public static final String PARAM_MTAS_STATS_POSITIONS = PARAM_MTAS_STATS
       + ".positions";
-  
+
   /** The Constant NAME_MTAS_STATS_POSITIONS_FIELD. */
   public static final String NAME_MTAS_STATS_POSITIONS_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_STATS_POSITIONS_KEY. */
   public static final String NAME_MTAS_STATS_POSITIONS_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_STATS_POSITIONS_TYPE. */
   public static final String NAME_MTAS_STATS_POSITIONS_TYPE = "type";
-  
+
   /** The Constant NAME_MTAS_STATS_POSITIONS_MINIMUM. */
   public static final String NAME_MTAS_STATS_POSITIONS_MINIMUM = "minimum";
-  
+
   /** The Constant NAME_MTAS_STATS_POSITIONS_MAXIMUM. */
   public static final String NAME_MTAS_STATS_POSITIONS_MAXIMUM = "maximum";
 
   /** The Constant PARAM_MTAS_STATS_TOKENS. */
   public static final String PARAM_MTAS_STATS_TOKENS = PARAM_MTAS_STATS
       + ".tokens";
-  
+
   /** The Constant NAME_MTAS_STATS_TOKENS_FIELD. */
   public static final String NAME_MTAS_STATS_TOKENS_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_STATS_TOKENS_KEY. */
   public static final String NAME_MTAS_STATS_TOKENS_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_STATS_TOKENS_TYPE. */
   public static final String NAME_MTAS_STATS_TOKENS_TYPE = "type";
-  
+
   /** The Constant NAME_MTAS_STATS_TOKENS_MINIMUM. */
   public static final String NAME_MTAS_STATS_TOKENS_MINIMUM = "minimum";
-  
+
   /** The Constant NAME_MTAS_STATS_TOKENS_MAXIMUM. */
   public static final String NAME_MTAS_STATS_TOKENS_MAXIMUM = "maximum";
 
   /** The Constant PARAM_MTAS_STATS_SPANS. */
   public static final String PARAM_MTAS_STATS_SPANS = PARAM_MTAS_STATS
       + ".spans";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_FIELD. */
   public static final String NAME_MTAS_STATS_SPANS_FIELD = "field";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_QUERY. */
   public static final String NAME_MTAS_STATS_SPANS_QUERY = "query";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_KEY. */
   public static final String NAME_MTAS_STATS_SPANS_KEY = "key";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_TYPE. */
   public static final String NAME_MTAS_STATS_SPANS_TYPE = "type";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_MINIMUM. */
   public static final String NAME_MTAS_STATS_SPANS_MINIMUM = "minimum";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_MAXIMUM. */
   public static final String NAME_MTAS_STATS_SPANS_MAXIMUM = "maximum";
-  
+
   /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION. */
   public static final String NAME_MTAS_STATS_SPANS_FUNCTION = "function";
-  
+
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE = "type";
-  
+
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE = "value";
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.solr.handler.component.SearchComponent#getVersion()
    */
   @Override
@@ -358,7 +362,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
     return String.valueOf(MtasCodecPostingsFormat.VERSION_CURRENT);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.solr.handler.component.SearchComponent#getDescription()
    */
   @Override
@@ -366,8 +372,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     return "Mtas";
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.component.SearchComponent#prepare(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.component.SearchComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder)
    */
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
@@ -412,8 +422,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the field type.
    *
-   * @param schema the schema
-   * @param field the field
+   * @param schema
+   *          the schema
+   * @param field
+   *          the field
    * @return the field type
    */
   private String getFieldType(IndexSchema schema, String field) {
@@ -439,9 +451,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare kwic.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareKwic(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -542,9 +557,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare facet.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareFacet(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -707,9 +725,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare list.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareList(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -812,9 +833,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare group.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareGroup(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -859,8 +883,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
         // collect grouping inside
         tmpName = PARAM_MTAS_GROUP + "." + id + "."
             + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE;
-        groupingHitInsidePrefixes[tmpCounter] = rb.req
-            .getParams().get(tmpName+"."+NAME_MTAS_GROUP_GROUPING_PREFIXES);
+        groupingHitInsidePrefixes[tmpCounter] = rb.req.getParams()
+            .get(tmpName + "." + NAME_MTAS_GROUP_GROUPING_PREFIXES);
         // collect grouping left
         tmpName = PARAM_MTAS_GROUP + "." + id + "."
             + NAME_MTAS_GROUP_GROUPING_LEFT;
@@ -945,15 +969,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
         String key = (keys[i] == null) || (keys[i].isEmpty())
             ? String.valueOf(i) + ":" + fields[i] + ":" + queryValues[i]
             : keys[i].trim();
-        mtasFields.list.get(fields[i]).groupList
-            .add(new ComponentGroup(q, fields[i], queryValues[i], queryTypes[i],
-                key, groupingHitInsidePrefixes[i], groupingHitInsideLeftPosition[i],
-                groupingHitInsideLeftPrefixes[i], groupingHitInsideRightPosition[i],
-                groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],
-                groupingHitLeftPrefixes[i], groupingHitRightPosition[i],
-                groupingHitRightPrefixes[i], groupingLeftPosition[i],
-                groupingLeftPrefixes[i], groupingRightPosition[i],
-                groupingRightPrefixes[i]));
+        mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
+            fields[i], queryValues[i], queryTypes[i], key,
+            groupingHitInsidePrefixes[i], groupingHitInsideLeftPosition[i],
+            groupingHitInsideLeftPrefixes[i], groupingHitInsideRightPosition[i],
+            groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],
+            groupingHitLeftPrefixes[i], groupingHitRightPosition[i],
+            groupingHitRightPrefixes[i], groupingLeftPosition[i],
+            groupingLeftPrefixes[i], groupingRightPosition[i],
+            groupingRightPrefixes[i]));
       }
     }
   }
@@ -961,11 +985,16 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare group.
    *
-   * @param solrParams the solr params
-   * @param gids the gids
-   * @param name the name
-   * @param positions the positions
-   * @param prefixes the prefixes
+   * @param solrParams
+   *          the solr params
+   * @param gids
+   *          the gids
+   * @param name
+   *          the name
+   * @param positions
+   *          the positions
+   * @param prefixes
+   *          the prefixes
    */
   private void prepareGroup(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) {
@@ -985,9 +1014,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare term vector.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareTermVector(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1002,10 +1034,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
       String[] sortTypes = new String[ids.size()];
       String[] sortDirections = new String[ids.size()];
       String[] types = new String[ids.size()];
-      String[] starts = new String[ids.size()];
+      String[] startValues = new String[ids.size()];
       String[] numbers = new String[ids.size()];
-      String[] minima = new String[ids.size()];
-      String[] maxima = new String[ids.size()];
       String[] functions = new String[ids.size()];
       for (String id : ids) {
         fields[tmpCounter] = rb.req.getParams().get(
@@ -1023,15 +1053,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
         sortDirections[tmpCounter] = rb.req.getParams()
             .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
                 + NAME_MTAS_TERMVECTOR_SORT_DIRECTION, null);
-        starts[tmpCounter] = rb.req.getParams().get(
+        startValues[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_START,
             null);
         numbers[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + "."
             + id + "." + NAME_MTAS_TERMVECTOR_NUMBER, null);
-        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + "."
-            + id + "." + NAME_MTAS_TERMVECTOR_MINIMUM, null);
-        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + "."
-            + id + "." + NAME_MTAS_TERMVECTOR_MAXIMUM, null);
         types[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_TYPE,
             null);
@@ -1063,13 +1089,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
       compareAndCheck(sortDirections, fields,
           NAME_MTAS_TERMVECTOR_SORT_DIRECTION, NAME_MTAS_TERMVECTOR_FIELD,
           false);
-      compareAndCheck(starts, fields, NAME_MTAS_TERMVECTOR_START,
+      compareAndCheck(startValues, fields, NAME_MTAS_TERMVECTOR_START,
           NAME_MTAS_TERMVECTOR_FIELD, false);
       compareAndCheck(numbers, fields, NAME_MTAS_TERMVECTOR_NUMBER,
-          NAME_MTAS_TERMVECTOR_FIELD, false);
-      compareAndCheck(minima, fields, NAME_MTAS_TERMVECTOR_MINIMUM,
-          NAME_MTAS_TERMVECTOR_FIELD, false);
-      compareAndCheck(maxima, fields, NAME_MTAS_TERMVECTOR_MAXIMUM,
           NAME_MTAS_TERMVECTOR_FIELD, false);
       compareAndCheck(functions, fields, NAME_MTAS_TERMVECTOR_FUNCTION,
           NAME_MTAS_TERMVECTOR_FIELD, false);
@@ -1081,14 +1103,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
             ? String.valueOf(i) + ":" + field + ":" + prefix : keys[i].trim();
         String regexp = (regexps[i] == null) || (regexps[i].isEmpty()) ? null
             : regexps[i].trim();
-        Integer start = (starts[i] == null) || (starts[i].isEmpty()) ? null
-            : Integer.parseInt(starts[i]);
-        Integer number = (numbers[i] == null) || (numbers[i].isEmpty()) ? null
+        String startValue = (startValues[i] == null)
+            || (startValues[i].isEmpty()) ? null : startValues[i].trim();
+        int number = (numbers[i] == null) || (numbers[i].isEmpty()) ? 0
             : Integer.parseInt(numbers[i]);
-        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null
-            : Double.parseDouble(minima[i]);
-        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null
-            : Double.parseDouble(maxima[i]);
         String type = (types[i] == null) || (types[i].isEmpty()) ? null
             : types[i].trim();
         String sortType = (sortTypes[i] == null) || (sortTypes[i].isEmpty())
@@ -1100,9 +1118,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
           throw new IOException("no (valid) prefix in mtas termvector");
         } else {
           try {
-            mtasFields.list.get(field).termVectorList.add(
-                new ComponentTermVector(key, prefix, regexp, type, sortType,
-                    sortDirection, start, number, minimum, maximum, function));
+            mtasFields.list.get(field).termVectorList
+                .add(new ComponentTermVector(key, prefix, regexp, type,
+                    sortType, sortDirection, startValue, number, function));
           } catch (ParseException e) {
             throw new IOException(e.getMessage());
           }
@@ -1115,9 +1133,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare prefix.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void preparePrefix(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1158,13 +1179,16 @@ public class MtasSolrSearchComponent extends SearchComponent {
       }
     }
   }
-    
+
   /**
    * Prepare stats.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareStats(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1182,9 +1206,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats positions.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareStatsPositions(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
@@ -1253,9 +1280,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats tokens.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareStatsTokens(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
@@ -1279,8 +1309,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
             + "." + id + "." + NAME_MTAS_STATS_TOKENS_MINIMUM, null);
         maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS
             + "." + id + "." + NAME_MTAS_STATS_TOKENS_MAXIMUM, null);
-        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS
-            + "." + id + "." + NAME_MTAS_STATS_TOKENS_TYPE, null);
+        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS + "."
+            + id + "." + NAME_MTAS_STATS_TOKENS_TYPE, null);
         tmpCounter++;
       }
       String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();
@@ -1324,9 +1354,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats spans.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepareStatsSpans(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1439,12 +1472,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the ids from parameters.
    *
-   * @param params the params
-   * @param prefix the prefix
+   * @param params
+   *          the params
+   * @param prefix
+   *          the prefix
    * @return the ids from parameters
    */
   private SortedSet<String> getIdsFromParameters(SolrParams params,
-      String prefix) {    
+      String prefix) {
     SortedSet<String> ids = new TreeSet<String>();
     Iterator<String> it = params.getParameterNamesIterator();
     Pattern pattern = Pattern
@@ -1462,11 +1497,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Construct query.
    *
-   * @param queryValue the query value
-   * @param queryType the query type
-   * @param field the field
+   * @param queryValue
+   *          the query value
+   * @param queryType
+   *          the query type
+   * @param field
+   *          the field
    * @return the span query
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private SpanQuery constructQuery(String queryValue, String queryType,
       String field) throws IOException {
@@ -1493,7 +1532,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the positive integer.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -1507,7 +1547,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the double.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the double
    */
   private Double getDouble(String number) {
@@ -1521,12 +1562,18 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Compare and check.
    *
-   * @param list the list
-   * @param original the original
-   * @param nameNew the name new
-   * @param nameOriginal the name original
-   * @param unique the unique
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param list
+   *          the list
+   * @param original
+   *          the original
+   * @param nameNew
+   *          the name new
+   * @param nameOriginal
+   *          the name original
+   * @param unique
+   *          the unique
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void compareAndCheck(String[] list, String[] original, String nameNew,
       String nameOriginal, Boolean unique) throws IOException {
@@ -1547,8 +1594,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.component.SearchComponent#process(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.component.SearchComponent#process(org.apache.solr.
+   * handler.component.ResponseBuilder)
    */
   @Override
   public void process(ResponseBuilder rb) throws IOException {
@@ -1673,15 +1724,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
         }
         if (mtasFields.doStats) {
           NamedList<Object> mtasStatsResponse = new SimpleOrderedMap<>();
-          if (mtasFields.doStatsPositions || mtasFields.doStatsTokens || mtasFields.doStatsSpans) {
+          if (mtasFields.doStatsPositions || mtasFields.doStatsTokens
+              || mtasFields.doStatsSpans) {
             if (mtasFields.doStatsTokens) {
               ArrayList<Object> mtasStatsTokensResponses = new ArrayList<Object>();
               for (String field : mtasFields.list.keySet()) {
                 for (ComponentToken token : mtasFields.list
                     .get(field).statsTokenList) {
                   if (rb.req.getParams().getBool("isShard", false)) {
-                    mtasStatsTokensResponses
-                        .add(createStatsToken(token, true));
+                    mtasStatsTokensResponses.add(createStatsToken(token, true));
                   } else {
                     mtasStatsTokensResponses
                         .add(createStatsToken(token, false));
@@ -1730,8 +1781,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.component.SearchComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.component.SearchComponent#modifyRequest(org.apache.
+   * solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   @Override
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
@@ -1823,13 +1880,31 @@ public class MtasSolrSearchComponent extends SearchComponent {
             sreq.params.remove(
                 PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_OUTPUT);
           }
+        }        
+      }  
+      if (sreq.params.getBool(PARAM_MTAS_TERMVECTOR, false)) {
+        // compute keys
+        Set<String> keys = getIdsFromParameters(rb.req.getParams(),
+            PARAM_MTAS_TERMVECTOR);
+        if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
+          for (String key : keys) {
+            System.out.println("Normal request termvector "+key);
+          }
+        } else {
+          for (String key : keys) {
+            System.out.println("Special request termvector "+key);
+          }
         }
       }
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.component.SearchComponent#handleResponses(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.solr.handler.component.SearchComponent#handleResponses(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   @Override
   public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
@@ -1842,8 +1917,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Merge responses tree set.
    *
-   * @param originalList the original list
-   * @param shardList the shard list
+   * @param originalList
+   *          the original list
+   * @param shardList
+   *          the shard list
    */
   private void mergeResponsesTreeSet(TreeSet<Object> originalList,
       TreeSet<Object> shardList) {
@@ -1855,9 +1932,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Merge responses array list.
    *
-   * @param originalList the original list
-   * @param shardList the shard list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param originalList
+   *          the original list
+   * @param shardList
+   *          the shard list
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void mergeResponsesArrayList(ArrayList<Object> originalList,
       ArrayList<Object> shardList) throws IOException {
@@ -1903,9 +1983,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Merge responses named list.
    *
-   * @param mainResponse the main response
-   * @param shardResponse the shard response
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param mainResponse
+   *          the main response
+   * @param shardResponse
+   *          the shard response
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void mergeResponsesNamedList(NamedList<Object> mainResponse,
       NamedList<Object> shardResponse) throws IOException {
@@ -1958,7 +2041,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Adjustable parts cloned.
    *
-   * @param original the original
+   * @param original
+   *          the original
    * @return the object
    */
   private Object adjustablePartsCloned(Object original) {
@@ -1984,8 +2068,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     return original;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.component.SearchComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.component.SearchComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @Override
   public void finishStage(ResponseBuilder rb) {
@@ -2062,10 +2150,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Finish stage array list.
    *
-   * @param rb the rb
-   * @param mtasResponse the mtas response
-   * @param key the key
-   * @param preferredPurpose the preferred purpose
+   * @param rb
+   *          the rb
+   * @param mtasResponse
+   *          the mtas response
+   * @param key
+   *          the key
+   * @param preferredPurpose
+   *          the preferred purpose
    */
   private void finishStageArrayList(ResponseBuilder rb,
       NamedList<Object> mtasResponse, String key, Integer preferredPurpose) {
@@ -2111,10 +2203,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Finish stage named list.
    *
-   * @param rb the rb
-   * @param mtasResponse the mtas response
-   * @param key the key
-   * @param preferredPurpose the preferred purpose
+   * @param rb
+   *          the rb
+   * @param mtasResponse
+   *          the mtas response
+   * @param key
+   *          the key
+   * @param preferredPurpose
+   *          the preferred purpose
    */
   private void finishStageNamedList(ResponseBuilder rb,
       NamedList<Object> mtasResponse, String key, Integer preferredPurpose) {
@@ -2156,28 +2252,54 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.component.SearchComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.component.SearchComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder)
    */
   @Override
   public int distributedProcess(ResponseBuilder rb) throws IOException {
-    // System.out.println(Thread.currentThread().getId() + " - "
-    // + rb.req.getParams().getBool("isShard", false) + " DISTIRBUTEDPROCESS "
-    // + rb.stage + " " + rb.req.getParamString());
+//    System.out.println(Thread.currentThread().getId() + " - "
+//        + rb.req.getParams().getBool("isShard", false) + " DISTIRBUTEDPROCESS "
+//        + rb.stage + " " + rb.req.getParamString());
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
       ComponentFields mtasFields = getMtasFields(rb);
       if (rb.req.getParams().getBool(PARAM_MTAS_LIST, false)) {
         distributedProcessList(rb, mtasFields);
       }
+      if (rb.req.getParams().getBool(PARAM_MTAS_TERMVECTOR, false)) {
+        distributedProcessTermvector(rb, mtasFields);
+      }
     }
     return ResponseBuilder.STAGE_DONE;
+  }
+
+  private void distributedProcessTermvector(ResponseBuilder rb,
+      ComponentFields mtasFields) throws IOException {
+    System.out.println(Thread.currentThread().getId() + "\t" + rb.stage);
+    if (rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {
+      HashMap<String, HashMap<String, Integer>> listShardTotals = new HashMap<String, HashMap<String, Integer>>();
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_TERMVECTOR, false)) {
+          HashMap<String, HashMap<String, HashSet<String>>> missingKeys = computeMissingItemsPerShard(
+              sreq.responses, "mtas", "termvector");
+          System.out
+              .println(Thread.currentThread().getId() + "\t" + missingKeys);
+        }
+      }
+    }
   }
 
   /**
    * Distributed process list.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
    */
   private void distributedProcessList(ResponseBuilder rb,
       ComponentFields mtasFields) {
@@ -2292,10 +2414,90 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
+  private HashMap<String, HashMap<String, HashSet<String>>> computeMissingItemsPerShard(
+      List<ShardResponse> shardResponses, String... args) throws IOException {
+    HashMap<String, HashMap<String, HashSet<String>>> result = new HashMap<String, HashMap<String, HashSet<String>>>();
+    HashMap<String, HashMap<String, HashSet<String>>> itemsPerShardSets = new HashMap<String, HashMap<String, HashSet<String>>>();
+    HashMap<String, HashSet<String>> itemSets = new HashMap<String, HashSet<String>>();
+    // loop over responses different shards
+    for (ShardResponse shardResponse : shardResponses) {
+      NamedList<Object> response = shardResponse.getSolrResponse()
+          .getResponse();
+      try {
+        ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
+            .findRecursive(args);
+        if (data != null) {
+          // loop over different keys
+          for (NamedList<Object> dataItem : data) {
+            Object oKey = dataItem.get("key");
+            Object oList = dataItem.get("list");
+            if (oKey != null && oList != null && oKey instanceof String
+                && oList instanceof ComponentSortSelect) {
+              ComponentSortSelect list = (ComponentSortSelect) oList;
+              if (list.sortType.equals(CodecUtil.SORT_TERM)) {
+                break;
+              } else {
+                String key = (String) oKey;
+                HashMap<String, HashSet<String>> itemsPerShardSet;
+                HashSet<String> itemSet, tmpItemSet = new HashSet<String>();
+                if (itemsPerShardSets.containsKey(key)) {
+                  itemsPerShardSet = itemsPerShardSets.get(key);
+                  itemSet = itemSets.get(key);
+                } else {
+                  itemsPerShardSet = new HashMap<String, HashSet<String>>();
+                  itemSet = new HashSet<String>();
+                  itemsPerShardSets.put(key, itemsPerShardSet);
+                  itemSets.put(key, itemSet);
+                }
+                itemsPerShardSet.put(shardResponse.getShardAddress(),
+                    tmpItemSet);
+                Iterator<Entry<String, Object>> it = list.getNamedList()
+                    .iterator();
+                String item;
+                while (it.hasNext()) {
+                  item = it.next().getKey();
+                  tmpItemSet.add(item);
+                  itemSet.add(item);
+                }
+              }
+            }
+          }
+        }
+      } catch (ClassCastException e) {
+      }
+    }
+    // construct result
+    for (String key : itemSets.keySet()) {
+      if (itemsPerShardSets.containsKey(key)) {
+        HashMap<String, HashSet<String>> itemsPerShardSet = itemsPerShardSets
+            .get(key);
+        for (String shardAddress : itemsPerShardSet.keySet()) {
+          HashMap<String, HashSet<String>> tmpShardKeySet;
+          if (result.containsKey(shardAddress)) {
+            tmpShardKeySet = result.get(shardAddress);
+          } else {
+            tmpShardKeySet = new HashMap<String, HashSet<String>>();
+            result.put(shardAddress, tmpShardKeySet);
+          }
+          HashSet<String> tmpResult = new HashSet<String>();
+          tmpShardKeySet.put(key, tmpResult);
+          HashSet<String> itemsSet = itemsPerShardSet.get(shardAddress);
+          for (String item : itemSets.get(key)) {
+            if (!itemsSet.contains(item)) {
+              tmpResult.add(item);
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }
+
   /**
    * Gets the mtas fields.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    * @return the mtas fields
    */
   private ComponentFields getMtasFields(ResponseBuilder rb) {
@@ -2305,7 +2507,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Encode.
    *
-   * @param o the o
+   * @param o
+   *          the o
    * @return the string
    */
   private String encode(Object o) {
@@ -2325,7 +2528,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Decode.
    *
-   * @param s the s
+   * @param s
+   *          the s
    * @return the object
    */
   private Object decode(String s) {
@@ -2344,7 +2548,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Decode.
    *
-   * @param l the l
+   * @param l
+   *          the l
    * @return the array list
    */
   private ArrayList decode(ArrayList l) {
@@ -2361,7 +2566,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Decode.
    *
-   * @param nl the nl
+   * @param nl
+   *          the nl
    * @return the named list
    */
   private NamedList<Object> decode(NamedList<Object> nl) {
@@ -2401,8 +2607,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Rewrite.
    *
-   * @param al the al
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param al
+   *          the al
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void rewrite(ArrayList<Object> al) throws IOException {
     for (int i = 0; i < al.size(); i++) {
@@ -2417,12 +2625,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Rewrite.
    *
-   * @param nl the nl
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param nl
+   *          the nl
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void rewrite(NamedList<Object> nl) throws IOException {
     HashMap<String, NamedList<Object>> collapseNamedList = null;
-    Integer newTotal = null;
+    HashMap<String, String> mergeMappingList = new HashMap<String, String>();
+    Pattern mergePattern = Pattern.compile("_merge_([^_]+)_([^_]+)+");
     int length = nl.size();
     for (int i = 0; i < length; i++) {
       if (nl.getVal(i) instanceof NamedList) {
@@ -2440,11 +2651,13 @@ public class MtasSolrSearchComponent extends SearchComponent {
         ComponentSortSelect o = (ComponentSortSelect) nl.getVal(i);
         if (o.dataCollector.getCollectorType()
             .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-          newTotal = o.getTotal();
-          nl.setName(i, DataCollector.COLLECTOR_TYPE_LIST);
           NamedList<Object> nnl = o.getNamedList();
           rewrite(nnl);
           nl.setVal(i, nnl);
+          Matcher mergeMatcher = mergePattern.matcher(nl.getName(i));
+          if (mergeMatcher.find()) {
+            mergeMappingList.put(mergeMatcher.group(1), mergeMatcher.group(2));
+          }
         } else if (o.dataCollector.getCollectorType()
             .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
           NamedList<Object> nnl = o.getData();
@@ -2459,9 +2672,30 @@ public class MtasSolrSearchComponent extends SearchComponent {
         }
       }
     }
-    // overwrite
-    if (newTotal != null) {
-      nl.add("total", newTotal);
+    // merge
+    if (mergeMappingList.size() > 0) {
+      for (String key : mergeMappingList.keySet()) {
+        Object so = nl
+            .get("_merge_" + key + "_" + mergeMappingList.get(key) + "_");
+        Object to = nl.get(mergeMappingList.get(key));
+        if (to != null && so != null && to instanceof NamedList
+            && so instanceof NamedList) {
+          NamedList<Object> snl = (NamedList<Object>) so;
+          NamedList<Object> tnl = (NamedList<Object>) to;
+          for (int i = 0; i < tnl.size(); i++) {
+            Object item = snl.get(tnl.getName(i));
+            if (item != null && tnl.getVal(i) instanceof NamedList) {
+              ((NamedList<Object>) tnl.getVal(i)).add(key, item);
+            }
+          }
+        } else {
+          throw new IOException(
+              "can't merge " + key + " with " + mergeMappingList.get(key));
+        }
+      }
+      for (String key : mergeMappingList.keySet()) {
+        nl.remove("_merge_" + key + "_" + mergeMappingList.get(key) + "_");
+      }
     }
     // collapse
     if (collapseNamedList != null) {
@@ -2477,16 +2711,19 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the stats position.
    *
-   * @param position the position
-   * @param encode the encode
+   * @param position
+   *          the position
+   * @param encode
+   *          the encode
    * @return the named list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private NamedList<Object> createStatsPosition(ComponentPosition position,
-      Boolean encode) throws IOException {
+  private SimpleOrderedMap<Object> createStatsPosition(
+      ComponentPosition position, Boolean encode) throws IOException {
     // System.out.println("Create stats position " + position.dataType + " "
     // + position.statsType + " " + position.statsItems + " --- " + encode);
-    NamedList<Object> mtasPositionResponse = new SimpleOrderedMap<>();
+    SimpleOrderedMap<Object> mtasPositionResponse = new SimpleOrderedMap<>();
     mtasPositionResponse.add("key", position.key);
     ComponentSortSelect data = new ComponentSortSelect(position.dataCollector,
         position.dataType, position.statsType, position.statsItems);
@@ -2502,16 +2739,19 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the stats token.
    *
-   * @param token the token
-   * @param encode the encode
+   * @param token
+   *          the token
+   * @param encode
+   *          the encode
    * @return the named list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private NamedList<Object> createStatsToken(ComponentToken token,
+  private SimpleOrderedMap<Object> createStatsToken(ComponentToken token,
       Boolean encode) throws IOException {
     // System.out.println("Create stats position " + position.dataType + " "
     // + position.statsType + " " + position.statsItems + " --- " + encode);
-    NamedList<Object> mtasTokenResponse = new SimpleOrderedMap<>();
+    SimpleOrderedMap<Object> mtasTokenResponse = new SimpleOrderedMap<>();
     mtasTokenResponse.add("key", token.key);
     ComponentSortSelect data = new ComponentSortSelect(token.dataCollector,
         token.dataType, token.statsType, token.statsItems);
@@ -2527,16 +2767,19 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the stats span.
    *
-   * @param span the span
-   * @param encode the encode
+   * @param span
+   *          the span
+   * @param encode
+   *          the encode
    * @return the named list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private NamedList<Object> createStatsSpan(ComponentSpan span, Boolean encode)
-      throws IOException {
+  private SimpleOrderedMap<Object> createStatsSpan(ComponentSpan span,
+      Boolean encode) throws IOException {
     // System.out.println("Create stats span " + span.dataType + " "
     // + span.statsType + " " + span.statsItems + " --- " + encode);
-    NamedList<Object> mtasSpanResponse = new SimpleOrderedMap<>();
+    SimpleOrderedMap<Object> mtasSpanResponse = new SimpleOrderedMap<>();
     mtasSpanResponse.add("key", span.key);
     ComponentSortSelect data = new ComponentSortSelect(span.dataCollector,
         span.dataType, span.statsType, span.statsItems);
@@ -2552,44 +2795,67 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the term vector.
    *
-   * @param termVector the term vector
-   * @param encode the encode
+   * @param termVector
+   *          the term vector
+   * @param encode
+   *          the encode
    * @return the named list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private NamedList<Object> createTermVector(ComponentTermVector termVector,
-      Boolean encode) throws IOException {
-    NamedList<Object> mtasTermVectorResponse = new SimpleOrderedMap<>();
+  private SimpleOrderedMap<Object> createTermVector(
+      ComponentTermVector termVector, Boolean encode) throws IOException {
+    SimpleOrderedMap<Object> mtasTermVectorResponse = new SimpleOrderedMap<>();
     mtasTermVectorResponse.add("key", termVector.key);
-    ComponentSortSelect data = new ComponentSortSelect(termVector.dataCollector,
-        new String[] { termVector.dataType },
-        new String[] { termVector.statsType },
-        new TreeSet[] { termVector.statsItems },
+    ComponentSortSelect defaultData = new ComponentSortSelect(
+        termVector.dataDefaultCollector,
+        new String[] { termVector.defaultDataType },
+        new String[] { termVector.defaultStatsType },
+        new TreeSet[] { termVector.defaultStatsItems },
         new String[] { termVector.sortType },
         new String[] { termVector.sortDirection },
         new Integer[] { termVector.start },
         new Integer[] { termVector.number });
+    ComponentSortSelect functionData = null;
+    if (termVector.dataFunctionCollector != null) {
+      functionData = new ComponentSortSelect(termVector.dataFunctionCollector,
+          new String[] { termVector.functionDataType },
+          new String[] { termVector.functionStatsType },
+          new TreeSet[] { termVector.functionStatsItems },
+          new String[] { termVector.sortType },
+          new String[] { termVector.sortDirection },
+          new Integer[] { termVector.start },
+          new Integer[] { termVector.number });
+    }
     if (encode) {
-      mtasTermVectorResponse.add("total", null);
-      mtasTermVectorResponse.add("_encoded_", encode(data));
+      mtasTermVectorResponse.add("_encoded_list", encode(defaultData));
+      if (functionData != null) {
+        mtasTermVectorResponse.add("_encoded__merge_function_list_",
+            encode(functionData));
+      }
     } else {
-      mtasTermVectorResponse.add("total", termVector.dataCollector.getSize());
-      mtasTermVectorResponse.add("list", data);
+      mtasTermVectorResponse.add("list", defaultData);
+      if (functionData != null) {
+        mtasTermVectorResponse.add("_merge_function_list_", functionData);
+      }
       rewrite(mtasTermVectorResponse);
     }
+
     return mtasTermVectorResponse;
   }
 
   /**
    * Creates the prefix.
    *
-   * @param prefix the prefix
-   * @param encode the encode
+   * @param prefix
+   *          the prefix
+   * @param encode
+   *          the encode
    * @return the named list
    */
-  private NamedList<Object> createPrefix(ComponentPrefix prefix,
+  private SimpleOrderedMap<Object> createPrefix(ComponentPrefix prefix,
       Boolean encode) {
-    NamedList<Object> mtasPrefixResponse = new SimpleOrderedMap<Object>();
+    SimpleOrderedMap<Object> mtasPrefixResponse = new SimpleOrderedMap<Object>();
     mtasPrefixResponse.add("key", prefix.key);
     if (encode) {
       mtasPrefixResponse.add("_encoded_singlePosition",
@@ -2606,11 +2872,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the list.
    *
-   * @param list the list
+   * @param list
+   *          the list
    * @return the named list
    */
-  private NamedList<Object> createList(ComponentList list) {
-    NamedList<Object> mtasListResponse = new SimpleOrderedMap<>();
+  private SimpleOrderedMap<Object> createList(ComponentList list) {
+    SimpleOrderedMap<Object> mtasListResponse = new SimpleOrderedMap<>();
     mtasListResponse.add("key", list.key);
     mtasListResponse.add("total", list.total);
     if (list.output != null) {
@@ -2736,21 +3003,21 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the group.
    *
-   * @param group the group
-   * @param encode the encode
+   * @param group
+   *          the group
+   * @param encode
+   *          the encode
    * @return the named list
    */
-  private NamedList<Object> createGroup(ComponentGroup group, Boolean encode) {
-    NamedList<Object> mtasGroupResponse = new SimpleOrderedMap<>();
+  private SimpleOrderedMap<Object> createGroup(ComponentGroup group,
+      Boolean encode) {
+    SimpleOrderedMap<Object> mtasGroupResponse = new SimpleOrderedMap<>();
     mtasGroupResponse.add("key", group.key);
     ComponentSortSelect data = new ComponentSortSelect(group.dataCollector,
-        new String[] { group.dataType },
-        new String[] { group.statsType },
-        new TreeSet[] { group.statsItems },
-        new String[] { group.sortType },
-        new String[] { group.sortDirection },
-        new Integer[] { group.start },
-        new Integer[] { group.number });    
+        new String[] { group.dataType }, new String[] { group.statsType },
+        new TreeSet[] { group.statsItems }, new String[] { group.sortType },
+        new String[] { group.sortDirection }, new Integer[] { group.start },
+        new Integer[] { group.number });
     if (encode) {
       mtasGroupResponse.add("_encoded_list", encode(data));
     } else {
@@ -2768,16 +3035,19 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the facet.
    *
-   * @param facet the facet
-   * @param encode the encode
+   * @param facet
+   *          the facet
+   * @param encode
+   *          the encode
    * @return the named list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private NamedList<Object> createFacet(ComponentFacet facet, Boolean encode)
-      throws IOException {
-    NamedList<Object> mtasFacetResponse = new SimpleOrderedMap<>();
+  private SimpleOrderedMap<Object> createFacet(ComponentFacet facet,
+      Boolean encode) throws IOException {
+    SimpleOrderedMap<Object> mtasFacetResponse = new SimpleOrderedMap<>();
     mtasFacetResponse.add("key", facet.key);
-    NamedList<Object> mtasFacetItemResponses = new SimpleOrderedMap();
+    SimpleOrderedMap<Object> mtasFacetItemResponses = new SimpleOrderedMap();
     ComponentSortSelect data = new ComponentSortSelect(facet.dataCollector,
         facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,
         facet.baseSortTypes, facet.baseSortDirections, null, facet.baseNumbers);
@@ -2798,11 +3068,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the kwic.
    *
-   * @param kwic the kwic
+   * @param kwic
+   *          the kwic
    * @return the named list
    */
-  private NamedList<Object> createKwic(ComponentKwic kwic) {
-    NamedList<Object> mtasKwicResponse = new SimpleOrderedMap<>();
+  private SimpleOrderedMap<Object> createKwic(ComponentKwic kwic) {
+    SimpleOrderedMap<Object> mtasKwicResponse = new SimpleOrderedMap<>();
     mtasKwicResponse.add("key", kwic.key);
     ArrayList<NamedList<Object>> mtasKwicItemResponses = new ArrayList<NamedList<Object>>();
     if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_HIT)) {
@@ -2935,42 +3206,50 @@ public class MtasSolrSearchComponent extends SearchComponent {
 
     /** The stats type. */
     public String dataType, statsType;
-    
+
     /** The stats items. */
     public TreeSet<String> statsItems;
-    
+
     /** The sort direction. */
     public String sortType, sortDirection;
-    
+
     /** The number. */
     public Integer start, number;
-    
+
     /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector = null;
 
     /** The sub stats type. */
     private String[] subDataType, subStatsType;
-    
+
     /** The sub stats items. */
     private TreeSet<String>[] subStatsItems;
-    
+
     /** The sub sort direction. */
     private String[] subSortType, subSortDirection;
-    
+
     /** The sub number. */
     private Integer[] subStart, subNumber;
 
     /**
      * Instantiates a new component sort select.
      *
-     * @param dataCollector the data collector
-     * @param dataType the data type
-     * @param statsType the stats type
-     * @param statsItems the stats items
-     * @param sortType the sort type
-     * @param sortDirection the sort direction
-     * @param start the start
-     * @param number the number
+     * @param dataCollector
+     *          the data collector
+     * @param dataType
+     *          the data type
+     * @param statsType
+     *          the stats type
+     * @param statsItems
+     *          the stats items
+     * @param sortType
+     *          the sort type
+     * @param sortDirection
+     *          the sort direction
+     * @param start
+     *          the start
+     * @param number
+     *          the number
      */
     public ComponentSortSelect(MtasDataCollector<?, ?> dataCollector,
         String[] dataType, String[] statsType, TreeSet<String>[] statsItems,
@@ -3008,10 +3287,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Instantiates a new component sort select.
      *
-     * @param dataCollector the data collector
-     * @param dataType the data type
-     * @param statsType the stats type
-     * @param statsItems the stats items
+     * @param dataCollector
+     *          the data collector
+     * @param dataType
+     *          the data type
+     * @param statsType
+     *          the stats type
+     * @param statsItems
+     *          the stats items
      */
     public ComponentSortSelect(MtasDataCollector dataCollector, String dataType,
         String statsType, TreeSet<String> statsItems) {
@@ -3023,8 +3306,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Merge.
      *
-     * @param newItem the new item
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param newItem
+     *          the new item
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void merge(ComponentSortSelect newItem) throws IOException {
       dataCollector.merge(newItem.dataCollector);
@@ -3034,7 +3319,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
      * Gets the total.
      *
      * @return the total
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public int getTotal() throws IOException {
       if (dataCollector.getCollectorType()
@@ -3050,7 +3336,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
      * Gets the data.
      *
      * @return the data
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public NamedList<Object> getData() throws IOException {
       if (dataCollector.getCollectorType()
@@ -3085,16 +3372,17 @@ public class MtasSolrSearchComponent extends SearchComponent {
      * Gets the named list.
      *
      * @return the named list
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public NamedList<Object> getNamedList() throws IOException {
       if (dataCollector.getCollectorType()
           .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-        NamedList<Object> mtasResponseList = new SimpleOrderedMap<>();
+        SimpleOrderedMap<Object> mtasResponseList = new SimpleOrderedMap<>();
         Map<String, MtasDataItem<?>> dataList = (Map<String, MtasDataItem<?>>) dataCollector
             .getList();
         for (String key : dataList.keySet()) {
-          NamedList<Object> mtasResponseListItem = new SimpleOrderedMap<>();
+          SimpleOrderedMap<Object> mtasResponseListItem = new SimpleOrderedMap<>();
           MtasDataItem<?> dataItem = dataList.get(key);
           mtasResponseListItem.addAll(dataItem.rewrite());
           if ((subDataType != null) && (dataItem.getSub() != null)) {

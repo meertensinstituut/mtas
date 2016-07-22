@@ -219,7 +219,7 @@ public class CodecSearchTree {
    *
    * @param ref the ref
    * @param isSinglePoint the is single point
-   * @param isStoreAdditionalId the is store additional id
+   * @param isStoreAdditionalIdAndRef the is store additional id and ref
    * @param nodeRefApproxOffset the node ref approx offset
    * @param in the in
    * @param objectRefApproxOffset the object ref approx offset
@@ -227,7 +227,7 @@ public class CodecSearchTree {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private static MtasTreeItem getMtasTreeItem(Long ref,
-      AtomicBoolean isSinglePoint, AtomicBoolean isStoreAdditionalId,
+      AtomicBoolean isSinglePoint, AtomicBoolean isStoreAdditionalIdAndRef,
       AtomicLong nodeRefApproxOffset, IndexInput in, long objectRefApproxOffset)
       throws IOException {
     Boolean isRoot = false;
@@ -244,7 +244,7 @@ public class CodecSearchTree {
       }
       if ((flag
           & MtasTree.STORE_ADDITIONAL_ID) == MtasTree.STORE_ADDITIONAL_ID) {
-        isStoreAdditionalId.set(true);
+        isStoreAdditionalIdAndRef.set(true);
       }
     }
     int left = in.readVInt();
@@ -258,25 +258,29 @@ public class CodecSearchTree {
     }
     // initialize
     long[] objectRefs = new long[size];
-    int[] objectIds = null;
+    int[] objectAdditionalIds = null;
+    long[] objectAdditionalRefs = null;
     // get first
     long objectRef = in.readVLong();
     long objectRefPrevious = objectRef + objectRefApproxOffset;
     objectRefs[0] = objectRefPrevious;
-    if (isStoreAdditionalId.get()) {
-      objectIds = new int[size];
-      objectIds[0] = in.readVInt();
+    if (isStoreAdditionalIdAndRef.get()) {
+      objectAdditionalIds = new int[size];
+      objectAdditionalRefs = new long[size];
+      objectAdditionalIds[0] = in.readVInt();
+      objectAdditionalRefs[0] = in.readVLong();
     }
     // get others
     for (int t = 1; t < size; t++) {
       objectRef = objectRefPrevious + in.readVLong();
       objectRefs[t] = objectRef;
       objectRefPrevious = objectRef;
-      if (isStoreAdditionalId.get()) {
-        objectIds[t] = in.readVInt();
+      if (isStoreAdditionalIdAndRef.get()) {
+        objectAdditionalIds[t] = in.readVInt();
+        objectAdditionalRefs[t] = in.readVLong();
       }
     }
-    return new MtasTreeItem(left, right, max, objectRefs, objectIds, ref,
+    return new MtasTreeItem(left, right, max, objectRefs, objectAdditionalIds, ref,
         leftChild, rightChild);
   }
 
@@ -521,13 +525,11 @@ public class CodecSearchTree {
           }
         } else {
           for (int i = 0; i < refs.length; i++) {
-            //if(requiredAdditionalIds.contains(additionalIds[i])) {
-              MtasTreeHit<?> hit = new MtasTreeHit<String>(startPosition,
-                  endPosition, refs[i], additionalIds[i], null);
-              for (ArrayList<MtasTreeHit<?>> list : intervalTreeItem.lists) {
-                list.add(hit);
-              }
-            //}  
+            MtasTreeHit<?> hit = new MtasTreeHit<String>(startPosition,
+                endPosition, refs[i], additionalIds[i], null);
+            for (ArrayList<MtasTreeHit<?>> list : intervalTreeItem.lists) {
+              list.add(hit);
+            }            
           }
         }  
       }
