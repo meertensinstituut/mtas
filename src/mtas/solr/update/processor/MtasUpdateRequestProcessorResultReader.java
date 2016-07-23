@@ -32,7 +32,6 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * Instantiates a new mtas update request processor result reader.
    *
    * @param fileName the file name
-   * @throws FileNotFoundException the file not found exception
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasUpdateRequestProcessorResultReader(String fileName)
@@ -123,6 +122,9 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
     file.delete();
   }
   
+  /**
+   * Force close.
+   */
   private void forceClose() {
     try {
       ois.close();
