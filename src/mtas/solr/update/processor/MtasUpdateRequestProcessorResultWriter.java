@@ -20,7 +20,7 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.util.Base64;
 
 /**
- * The Class MtasUpdateRequestProcessorResult.
+ * The Class MtasUpdateRequestProcessorResultWriter.
  */
 /**
  * @author matthijs
@@ -31,12 +31,14 @@ public class MtasUpdateRequestProcessorResultWriter {
   /** The stored string value. */
   private String storedStringValue;
   
+  /** The items. */
   private List<MtasUpdateRequestProcessorResultItem> items;  
   
+  /** The closed. */
   private boolean closed;
   
   /**
-   * Instantiates a new mtas update request processor result.
+   * Instantiates a new mtas update request processor result writer.
    *
    * @param value the value
    */
@@ -63,15 +65,23 @@ public class MtasUpdateRequestProcessorResultWriter {
   }
   
   
+  /**
+   * Gets the token number.
+   *
+   * @return the token number
+   */
   public int getTokenNumber() {
     return items.size();
   }
   
   
   /**
-   * Gets the token number.
+   * From file old.
    *
-   * @return the token number
+   * @param fileName the file name
+   * @return the mtas update request processor result writer
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws ClassNotFoundException the class not found exception
    */
    
   
@@ -104,7 +114,7 @@ public class MtasUpdateRequestProcessorResultWriter {
   }
 
   /**
-   * To file.
+   * To file old.
    *
    * @param o the o
    * @return the string
@@ -122,6 +132,12 @@ public class MtasUpdateRequestProcessorResultWriter {
   
   
   
+  /**
+   * Creates the file.
+   *
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public String createFile() throws IOException {
     File temporaryFile = File.createTempFile("MtasUpdateRequestProcessorResult", ".data");
     FileOutputStream fos = new FileOutputStream(temporaryFile);

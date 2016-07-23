@@ -8,19 +8,33 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Iterator;
 
+/**
+ * The Class MtasUpdateRequestProcessorResultReader.
+ */
 public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
   /** The stored string value. */
   private String storedStringValue;
 
+  /** The token number. */
   private int tokenNumber;
 
+  /** The ois. */
   private ObjectInputStream ois;
 
+  /** The file name. */
   private String fileName;
   
+  /** The iterator. */
   private Iterator<MtasUpdateRequestProcessorResultItem> iterator;
 
+  /**
+   * Instantiates a new mtas update request processor result reader.
+   *
+   * @param fileName the file name
+   * @throws FileNotFoundException the file not found exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public MtasUpdateRequestProcessorResultReader(String fileName)
       throws FileNotFoundException, IOException {
     this.fileName = fileName;
@@ -58,6 +72,11 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
   }
 
+  /**
+   * Gets the token number.
+   *
+   * @return the token number
+   */
   public int getTokenNumber() {
     return tokenNumber;
   }
@@ -80,10 +99,18 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
     return null;
   }
   
+  /**
+   * Gets the iterator.
+   *
+   * @return the iterator
+   */
   public Iterator<MtasUpdateRequestProcessorResultItem> getIterator() {
     return iterator;
   }
 
+  /* (non-Javadoc)
+   * @see java.io.Closeable#close()
+   */
   @Override
   public void close() throws IOException {
     ois.close();
