@@ -359,10 +359,6 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /** The delegate postings format name. */
   private String name, delegatePostingsFormatName;
 
-  private static int mtasFieldsConsumerWriteLockCounterMax = 10;
-  private static int mtasFieldsConsumerWriteLockSleepTime = 30000;
-  
-  
   /**
    * Instantiates a new mtas fields consumer.
    *
@@ -596,10 +592,9 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    * Fields )
    */
   @Override
-  public void write(Fields fields) throws IOException {         
-    write(state.fieldInfos, fields);       
+  public void write(Fields fields) throws IOException {
+    write(state.fieldInfos, fields);
     delegateFieldsConsumer.write(fields);
-    
   }
 
   /**
@@ -617,7 +612,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
         outIndexObjectPosition, outIndexObjectParent, outTerm, outObject,
         outPrefix;
     IndexOutput outTmpDoc, outTmpField;
-        
+
     // temporary temporary index in memory for doc
     TreeMap<Integer, Long> memoryIndexTemporaryObject = new TreeMap<Integer, Long>();
     // create (backwards) chained new temporary index docs
@@ -625,29 +620,6 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     // list of objectIds and references to objects
     TreeMap<Integer, Long> memoryIndexDocList = new TreeMap<Integer, Long>();
 
-    
-    //get lock
-    Lock mtasFieldsConsumerLock = null;
-    int mtasFieldsConsumerLockCounter = 0;
-    while(mtasFieldsConsumerLock==null) {
-      mtasFieldsConsumerLockCounter++;
-      try {
-        mtasFieldsConsumerLock = state.directory.obtainLock("MtasFieldsConsumer");
-      } catch (LockObtainFailedException e) {
-        if(mtasFieldsConsumerLockCounter>=mtasFieldsConsumerWriteLockCounterMax) {
-          throw new IOException("couldn't obtain lock for MtasFieldsConsumer to write, tried "+mtasFieldsConsumerLockCounter+" times");
-        }
-        try {
-          Thread.sleep(mtasFieldsConsumerWriteLockSleepTime);
-        } catch (InterruptedException e1) {
-          //shouldn't happen?
-        }
-      }
-    }  
-    
-    //try to release lock in case of IOException
-    try {
-    
     // create file tmpDoc
     outTmpDoc = state.directory.createOutput(mtasTmpDocFileName, state.context);
     // create file tmpField
@@ -1116,7 +1088,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
                   .getToken(inObject, inTerm, ref);
               String prefix = token.getPrefix();
               Integer prefixId = prefixIdIndexField.get(prefix);
-              token.setPrefixId(prefixId);              
+              token.setPrefixId(prefixId);
               assert token.getId().equals(mtasId) : "unexpected mtasId "
                   + mtasId;
               mtasPositionTree.addPositionAndObjectFromToken(token);
@@ -1189,15 +1161,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     outIndexDocId.close();
     CodecUtil.writeFooter(outField);
     outField.close();
-    
-    //release lock
-    mtasFieldsConsumerLock.close();
-    } catch(IOException e) {
-      //release lock in case of IOException 
-      mtasFieldsConsumerLock.close();
-      //System.out.println(e.getStackTrace().toString());
-      throw (IOException) new IOException().initCause(e);
-    }
+
   }
 
   /**

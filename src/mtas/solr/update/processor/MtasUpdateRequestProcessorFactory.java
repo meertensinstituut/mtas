@@ -313,7 +313,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
               
               // tokenizerFactory
-              MtasUpdateRequestProcessorResult result = new MtasUpdateRequestProcessorResult(
+              MtasUpdateRequestProcessorResultWriter result = new MtasUpdateRequestProcessorResultWriter(
                   storedValue);
               MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
               tokenizer.setReader(sizeReader);
@@ -363,8 +363,9 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
               // update field
               doc.remove(field);
-              doc.addField(field,
-                  MtasUpdateRequestProcessorResult.toString(result));
+              if(result.getTokenNumber()>0) {
+                doc.addField(field, result.createFile());
+              }  
               // update size
               setFields(doc, config.fieldTypeSizeField.get(fieldType), sizeReader.getTotalReadSize());
               // update numberOfPositions

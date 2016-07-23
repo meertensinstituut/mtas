@@ -2,6 +2,8 @@ package mtas.solr.schema;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Iterator;
+
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -13,7 +15,10 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.AttributeSource.State;
 import org.apache.solr.schema.PreAnalyzedField.ParseResult;
 import org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser;
-import mtas.solr.update.processor.MtasUpdateRequestProcessorResult;
+
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultItem;
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultWriter;
 
 /**
  * The Class MtasPreAnalyzedParser.
@@ -34,49 +39,42 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
     while ((cnt = reader.read(buf)) > 0) {
       sb.append(buf, 0, cnt);
     }
-    MtasUpdateRequestProcessorResult result;
-    try {
-      result = MtasUpdateRequestProcessorResult.fromString(sb.toString());
-      if(result!=null) {
-        res.str = result.getStoredStringValue();
-        res.bin = result.getStoredBinValue();
-      } else {
-        res.str = sb.toString();
-        res.bin = null;
-        return res;
-      }
-    } catch (ClassNotFoundException e) {
-      return null;
-    }    
-                
-    Integer numberOfTokens =  result.getTokenNumber();
+    MtasUpdateRequestProcessorResultReader result;
+    result = new MtasUpdateRequestProcessorResultReader(sb.toString());
+    if(result.getTokenNumber()>0) {
+      res.str = result.getStoredStringValue();
+      res.bin = result.getStoredBinValue();
+    } else {
+      res.str = sb.toString();
+      res.bin = null;
+      result.close();
+      return res;
+    }
+                       
     parent.clearAttributes();
-    for(int i=0; i<numberOfTokens; i++) {
-      String tokenTerm = result.getTokenTerm(i);
-      Integer tokenFlags = result.getTokenFlag(i);
-      Integer tokenPosIncr = result.getTokenPosIncr(i);
-      Integer tokenOffsetStart = result.getTokenOffsetStart(i);
-      Integer tokenOffsetEnd = result.getTokenOffsetEnd(i);
-      byte[] tokenPayload = result.getTokenPayload(i);
-      if(tokenTerm!=null) {
+    Iterator<MtasUpdateRequestProcessorResultItem> iterator = result.getIterator();
+    
+    while(iterator.hasNext()) {
+      MtasUpdateRequestProcessorResultItem item = iterator.next();
+      if(item.tokenTerm!=null) {
         CharTermAttribute catt = parent.addAttribute(CharTermAttribute.class);
-        catt.append(tokenTerm);
+        catt.append(item.tokenTerm);
       }  
-      if(tokenFlags!=null) {
+      if(item.tokenFlags!=null) {
         FlagsAttribute flags = parent.addAttribute(FlagsAttribute.class);
-        flags.setFlags(tokenFlags);
+        flags.setFlags(item.tokenFlags);
       }
-      if(tokenPosIncr!=null) {
+      if(item.tokenPosIncr!=null) {
         PositionIncrementAttribute patt = parent.addAttribute(PositionIncrementAttribute.class);
-        patt.setPositionIncrement(tokenPosIncr);
+        patt.setPositionIncrement(item.tokenPosIncr);
       }  
-      if(tokenPayload!=null) {
+      if(item.tokenPayload!=null) {
         PayloadAttribute p = parent.addAttribute(PayloadAttribute.class);
-        p.setPayload(new BytesRef(tokenPayload));
+        p.setPayload(new BytesRef(item.tokenPayload));
       }
-      if(tokenOffsetStart!=null && tokenOffsetEnd!=null) {
+      if(item.tokenOffsetStart!=null && item.tokenOffsetEnd!=null) {
         OffsetAttribute offset = parent.addAttribute(OffsetAttribute.class);
-        offset.setOffset(tokenOffsetStart, tokenOffsetEnd);
+        offset.setOffset(item.tokenOffsetStart, item.tokenOffsetEnd);
       }
       // capture state and add to result
       State state = parent.captureState();
@@ -84,7 +82,7 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
       // reset for reuse
       parent.clearAttributes();      
     }
-
+    result.close();
     return res;
   }
 
