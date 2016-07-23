@@ -36,9 +36,9 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasUpdateRequestProcessorResultReader(String fileName)
-      throws FileNotFoundException, IOException {
+      throws IOException {
     this.fileName = fileName;
-    ObjectInputStream ois = new ObjectInputStream(
+    ois = new ObjectInputStream(
         new FileInputStream(fileName));
     try {
       storedStringValue = (String) ois.readObject();
@@ -55,12 +55,17 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
             position++;
             try {
               return (MtasUpdateRequestProcessorResultItem) ois.readObject();
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e1) {
+              position = tokenNumber;
+              forceClose();
               return null;
-            } catch (IOException e) {
+            } catch (IOException e3) {
+              position = tokenNumber;
+              forceClose();
               return null;
             }
           } else {
+            forceClose();
             return null;
           }
         }
@@ -114,6 +119,16 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
   @Override
   public void close() throws IOException {
     ois.close();
+    File file = new File(fileName);
+    file.delete();
+  }
+  
+  private void forceClose() {
+    try {
+      ois.close();
+    } catch (IOException e) {
+      //do nothing
+    }
     File file = new File(fileName);
     file.delete();
   }
