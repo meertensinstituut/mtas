@@ -9,6 +9,9 @@ import org.apache.lucene.util.BytesRef;
  */
 public class MtasUpdateRequestProcessorResultItem implements Serializable {
   
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
   /** The token term. */
   public String tokenTerm;
   

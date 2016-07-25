@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.tree.IntervalRBTree;
 import mtas.codec.tree.IntervalTreeNodeData;
-import mtas.codec.util.CodecComponent.ComponentGroup;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
-
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.store.IndexInput;
 
@@ -339,14 +336,14 @@ public class CodecInfo {
    */
   public void collectTermsByPrefixesForListOfHitPositions(String field,
       int docId, ArrayList<String> prefixes,
-      ArrayList<IntervalTreeNodeData> positionsHits) throws IOException {
+      ArrayList<IntervalTreeNodeData<String>> positionsHits) throws IOException {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectPosition = indexInputList
         .get("indexObjectPosition");
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");    
     // create tree interval hits
-    IntervalRBTree positionTree = new IntervalRBTree(positionsHits);
+    IntervalRBTree<String> positionTree = new IntervalRBTree<String>(positionsHits);
     if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
       CodecSearchTree.searchMtasTreeWithIntervalTree(null, positionTree,
           inIndexObjectPosition, doc.fpIndexObjectPosition,
@@ -360,7 +357,7 @@ public class CodecInfo {
           doc.smallestObjectFilepointer);                
     }
     for(IntervalTreeNodeData<String> positionHit : positionsHits) {
-      for(MtasTreeHit hit : positionHit.list) {
+      for(MtasTreeHit<String> hit : positionHit.list) {
         if(hit.data==null) {
           MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
               inTerm, hit.ref);

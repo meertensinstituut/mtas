@@ -97,7 +97,7 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("mtasSpanSequence([");
+    buffer.append(QUERY_NAME+"([");
     Iterator<MtasSpanSequenceItem> i = items.iterator();
     while (i.hasNext()) {
       MtasSpanSequenceItem item = i.next();

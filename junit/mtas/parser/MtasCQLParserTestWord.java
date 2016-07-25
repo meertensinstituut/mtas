@@ -66,6 +66,7 @@ public class MtasCQLParserTestWord {
     basicTest9();
     basicTest10(); 
     basicTest11(); 
+    basicTest12(); 
   }
   
   private void basicNotTest1() {
@@ -232,6 +233,15 @@ public class MtasCQLParserTestWord {
     SpanQuery q3b = new MtasCQLParserWordPositionQuery(field, 110);
     SpanQuery q3 = new MtasSpanOrQuery(q3a, q3b);
     testCQLParse(field, cql3, q3);
-  }    
-
+  }  
+  
+  private void basicTest12() {
+    String field = "testveld";
+    String cql = "[(t_lc=\"de\"|t_lc=\"het\"|t_lc=\"paard\")]";
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de");
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"t_lc","het");
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","paard");
+    SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q2,q3});
+    testCQLParse(field, cql, q);   
+  }  
 }

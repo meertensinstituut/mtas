@@ -5,11 +5,8 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
 import mtas.analysis.token.MtasToken;
-import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecUtil;
-
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReader;
@@ -154,7 +151,6 @@ public class MtasSpanTermQuery extends SpanTermQuery {
      * index.LeafReaderContext,
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Spans getSpans(final LeafReaderContext context,
         Postings requiredPostings) throws IOException {
@@ -203,10 +199,8 @@ public class MtasSpanTermQuery extends SpanTermQuery {
           }
         }
 
-        Terms t = r.terms(field);
         FieldInfo fieldInfo = r.getFieldInfos().fieldInfo(field);
-        CodecInfo codecInfo = CodecInfo.getCodecInfoFromTerms(t);
-
+        
         if (CodecUtil.isSinglePositionPrefix(fieldInfo, prefix)) {
           postings = termsEnum.postings(null,
               requiredPostings.getRequiredPostings());

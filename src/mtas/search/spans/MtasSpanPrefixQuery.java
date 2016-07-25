@@ -109,7 +109,7 @@ public class MtasSpanPrefixQuery extends SpanQuery {
     } else {
       buffer.append(this.query.getField() + ":" + prefix + "=" + value);
     }
-    buffer.append("])");
+    buffer.append(","+singlePosition+"])");
     return buffer.toString();
   }
 
@@ -135,7 +135,7 @@ public class MtasSpanPrefixQuery extends SpanQuery {
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(Object obj) {    
     if (this == obj)
       return true;
     if (obj == null)
@@ -143,7 +143,7 @@ public class MtasSpanPrefixQuery extends SpanQuery {
     if (getClass() != obj.getClass())
       return false;
     MtasSpanPrefixQuery other = (MtasSpanPrefixQuery) obj;
-    return other.term.equals(term) && (other.singlePosition!=singlePosition);    
+    return other.term.equals(term) && (other.singlePosition==singlePosition);    
   }
 
   /* (non-Javadoc)

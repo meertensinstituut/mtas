@@ -2,7 +2,6 @@ package mtas.codec.util;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,19 +9,15 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import mtas.analysis.token.MtasToken;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.codec.util.CodecComponent.ComponentField;
-
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
-import org.apache.lucene.store.IndexInput;
 
 /**
  * The Class CodecUtil.

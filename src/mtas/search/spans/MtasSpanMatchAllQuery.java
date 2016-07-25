@@ -2,13 +2,10 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
-
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -20,7 +17,6 @@ import org.apache.lucene.search.similarities.Similarity.SimScorer;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
-import org.apache.lucene.store.IndexInput;
 
 /**
  * The Class MtasSpanMatchAllQuery.
@@ -86,7 +82,6 @@ public class MtasSpanMatchAllQuery extends SpanQuery {
     /* (non-Javadoc)
      * @see org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.search.spans.SpanWeight.Postings)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {

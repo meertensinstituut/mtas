@@ -21,9 +21,7 @@ import mtas.parser.function.MtasFunctionParser;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.parser.function.util.MtasFunctionParserFunctionDefault;
-
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RegExp;
@@ -141,10 +139,8 @@ public class CodecComponent {
     /**
      * Instantiates a new component field.
      *
-     * @param field
-     *          the field
-     * @param uniqueKeyField
-     *          the unique key field
+     * @param field the field
+     * @param uniqueKeyField the unique key field
      */
     public ComponentField(String field, String uniqueKeyField) {
       this.field = field;
@@ -179,8 +175,7 @@ public class CodecComponent {
     /**
      * Instantiates a new component prefix.
      *
-     * @param key
-     *          the key
+     * @param key the key
      */
     public ComponentPrefix(String key) {
       this.key = key;
@@ -191,8 +186,7 @@ public class CodecComponent {
     /**
      * Adds the single position.
      *
-     * @param prefix
-     *          the prefix
+     * @param prefix the prefix
      */
     public void addSinglePosition(String prefix) {
       if (!singlePositionList.contains(prefix)
@@ -204,8 +198,7 @@ public class CodecComponent {
     /**
      * Adds the multiple position.
      *
-     * @param prefix
-     *          the prefix
+     * @param prefix the prefix
      */
     public void addMultiplePosition(String prefix) {
       if (!singlePositionList.contains(prefix)) {
@@ -269,24 +262,15 @@ public class CodecComponent {
     /**
      * Instantiates a new component kwic.
      *
-     * @param query
-     *          the query
-     * @param key
-     *          the key
-     * @param prefixes
-     *          the prefixes
-     * @param number
-     *          the number
-     * @param start
-     *          the start
-     * @param left
-     *          the left
-     * @param right
-     *          the right
-     * @param output
-     *          the output
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param query the query
+     * @param key the key
+     * @param prefixes the prefixes
+     * @param number the number
+     * @param start the start
+     * @param left the left
+     * @param right the right
+     * @param output the output
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public ComponentKwic(SpanQuery query, String key, String prefixes,
         Integer number, int start, int left, int right, String output)
@@ -376,30 +360,18 @@ public class CodecComponent {
     /**
      * Instantiates a new component list.
      *
-     * @param spanQuery
-     *          the span query
-     * @param field
-     *          the field
-     * @param queryValue
-     *          the query value
-     * @param queryType
-     *          the query type
-     * @param key
-     *          the key
-     * @param prefix
-     *          the prefix
-     * @param start
-     *          the start
-     * @param number
-     *          the number
-     * @param left
-     *          the left
-     * @param right
-     *          the right
-     * @param output
-     *          the output
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param spanQuery the span query
+     * @param field the field
+     * @param queryValue the query value
+     * @param queryType the query type
+     * @param key the key
+     * @param prefix the prefix
+     * @param start the start
+     * @param number the number
+     * @param left the left
+     * @param right the right
+     * @param output the output
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public ComponentList(SpanQuery spanQuery, String field, String queryValue,
         String queryType, String key, String prefix, int start, int number,
@@ -482,44 +454,25 @@ public class CodecComponent {
     /**
      * Instantiates a new component group.
      *
-     * @param spanQuery
-     *          the span query
-     * @param field
-     *          the field
-     * @param queryValue
-     *          the query value
-     * @param queryType
-     *          the query type
-     * @param key
-     *          the key
-     * @param groupingHitInsidePrefixes
-     *          the grouping hit inside prefixes
-     * @param groupingHitInsideLeftPosition
-     *          the grouping hit inside left position
-     * @param groupingHitInsideLeftPrefixes
-     *          the grouping hit inside left prefixes
-     * @param groupingHitInsideRightPosition
-     *          the grouping hit inside right position
-     * @param groupingHitInsideRightPrefixes
-     *          the grouping hit inside right prefixes
-     * @param groupingHitLeftPosition
-     *          the grouping hit left position
-     * @param groupingHitLeftPrefixes
-     *          the grouping hit left prefixes
-     * @param groupingHitRightPosition
-     *          the grouping hit right position
-     * @param groupingHitRightPrefixes
-     *          the grouping hit right prefixes
-     * @param groupingLeftPosition
-     *          the grouping left position
-     * @param groupingLeftPrefixes
-     *          the grouping left prefixes
-     * @param groupingRightPosition
-     *          the grouping right position
-     * @param groupingRightPrefixes
-     *          the grouping right prefixes
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param spanQuery the span query
+     * @param field the field
+     * @param queryValue the query value
+     * @param queryType the query type
+     * @param key the key
+     * @param groupingHitInsidePrefixes the grouping hit inside prefixes
+     * @param groupingHitInsideLeftPosition the grouping hit inside left position
+     * @param groupingHitInsideLeftPrefixes the grouping hit inside left prefixes
+     * @param groupingHitInsideRightPosition the grouping hit inside right position
+     * @param groupingHitInsideRightPrefixes the grouping hit inside right prefixes
+     * @param groupingHitLeftPosition the grouping hit left position
+     * @param groupingHitLeftPrefixes the grouping hit left prefixes
+     * @param groupingHitRightPosition the grouping hit right position
+     * @param groupingHitRightPrefixes the grouping hit right prefixes
+     * @param groupingLeftPosition the grouping left position
+     * @param groupingLeftPrefixes the grouping left prefixes
+     * @param groupingRightPosition the grouping right position
+     * @param groupingRightPrefixes the grouping right prefixes
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public ComponentGroup(SpanQuery spanQuery, String field, String queryValue,
         String queryType, String key, String groupingHitInsidePrefixes,
@@ -584,15 +537,11 @@ public class CodecComponent {
   /**
    * Creates the positioned prefixes.
    *
-   * @param prefixList
-   *          the prefix list
-   * @param position
-   *          the position
-   * @param prefixes
-   *          the prefixes
+   * @param prefixList the prefix list
+   * @param position the position
+   * @param prefixes the prefixes
    * @return the hash set[]
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private static HashSet<String>[] createPositionedPrefixes(
       HashSet<String> prefixList, String[] position, String[] prefixes)
@@ -714,34 +663,20 @@ public class CodecComponent {
     /**
      * Instantiates a new component facet.
      *
-     * @param spanQueries
-     *          the span queries
-     * @param field
-     *          the field
-     * @param key
-     *          the key
-     * @param baseFields
-     *          the base fields
-     * @param baseFieldTypes
-     *          the base field types
-     * @param baseTypes
-     *          the base types
-     * @param baseSortTypes
-     *          the base sort types
-     * @param baseSortDirections
-     *          the base sort directions
-     * @param baseNumbers
-     *          the base numbers
-     * @param baseMinimumDoubles
-     *          the base minimum doubles
-     * @param baseMaximumDoubles
-     *          the base maximum doubles
-     * @param baseFunctions
-     *          the base functions
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
-     * @throws ParseException
-     *           the parse exception
+     * @param spanQueries the span queries
+     * @param field the field
+     * @param key the key
+     * @param baseFields the base fields
+     * @param baseFieldTypes the base field types
+     * @param baseTypes the base types
+     * @param baseSortTypes the base sort types
+     * @param baseSortDirections the base sort directions
+     * @param baseNumbers the base numbers
+     * @param baseMinimumDoubles the base minimum doubles
+     * @param baseMaximumDoubles the base maximum doubles
+     * @param baseFunctions the base functions
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
      */
     public ComponentFacet(SpanQuery[] spanQueries, String field, String key,
         String[] baseFields, String[] baseFieldTypes, String[] baseTypes,
@@ -854,7 +789,7 @@ public class CodecComponent {
     public String key, defaultDataType, functionDataType, defaultStatsType,
         functionStatsType, prefix, regexp, sortType, sortDirection;
 
-    /** The stats default items. */
+    /** The default stats items. */
     public TreeSet<String> functionStatsItems, defaultStatsItems;
 
     /** The number. */
@@ -881,28 +816,17 @@ public class CodecComponent {
     /**
      * Instantiates a new component term vector.
      *
-     * @param key
-     *          the key
-     * @param prefix
-     *          the prefix
-     * @param regexp
-     *          the regexp
-     * @param statsType
-     *          the stats type
-     * @param sortType
-     *          the sort type
-     * @param sortDirection
-     *          the sort direction
-     * @param startValue
-     *          the start value
-     * @param number
-     *          the number
-     * @param function
-     *          the function
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
-     * @throws ParseException
-     *           the parse exception
+     * @param key the key
+     * @param prefix the prefix
+     * @param regexp the regexp
+     * @param statsType the stats type
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param startValue the start value
+     * @param number the number
+     * @param function the function
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
      */
     public ComponentTermVector(String key, String prefix, String regexp,
         String statsType, String sortType, String sortDirection,
@@ -1023,20 +947,13 @@ public class CodecComponent {
     /**
      * Instantiates a new component span.
      *
-     * @param queries
-     *          the queries
-     * @param key
-     *          the key
-     * @param minimumDouble
-     *          the minimum double
-     * @param maximumDouble
-     *          the maximum double
-     * @param type
-     *          the type
-     * @param function
-     *          the function
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param queries the queries
+     * @param key the key
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param type the type
+     * @param function the function
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public ComponentSpan(SpanQuery[] queries, String key, Double minimumDouble,
         Double maximumDouble, String type, String function) throws IOException {
@@ -1109,20 +1026,13 @@ public class CodecComponent {
     /**
      * Instantiates a new component position.
      *
-     * @param field
-     *          the field
-     * @param key
-     *          the key
-     * @param minimumDouble
-     *          the minimum double
-     * @param maximumDouble
-     *          the maximum double
-     * @param statsType
-     *          the stats type
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
-     * @throws ParseException
-     *           the parse exception
+     * @param field the field
+     * @param key the key
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param statsType the stats type
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
      */
     public ComponentPosition(String field, String key, Double minimumDouble,
         Double maximumDouble, String statsType)
@@ -1186,20 +1096,13 @@ public class CodecComponent {
     /**
      * Instantiates a new component token.
      *
-     * @param field
-     *          the field
-     * @param key
-     *          the key
-     * @param minimumDouble
-     *          the minimum double
-     * @param maximumDouble
-     *          the maximum double
-     * @param statsType
-     *          the stats type
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
-     * @throws ParseException
-     *           the parse exception
+     * @param field the field
+     * @param key the key
+     * @param minimumDouble the minimum double
+     * @param maximumDouble the maximum double
+     * @param statsType the stats type
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
      */
     public ComponentToken(String field, String key, Double minimumDouble,
         Double maximumDouble, String statsType)
@@ -1248,10 +1151,8 @@ public class CodecComponent {
     /**
      * Instantiates a new kwic token.
      *
-     * @param match
-     *          the match
-     * @param tokens
-     *          the tokens
+     * @param match the match
+     * @param tokens the tokens
      */
     public KwicToken(Match match, ArrayList<MtasToken<String>> tokens) {
       startPosition = match.startPosition;
@@ -1277,10 +1178,8 @@ public class CodecComponent {
     /**
      * Instantiates a new kwic hit.
      *
-     * @param match
-     *          the match
-     * @param hits
-     *          the hits
+     * @param match the match
+     * @param hits the hits
      */
     public KwicHit(Match match, HashMap<Integer, ArrayList<String>> hits) {
       startPosition = match.startPosition;
@@ -1303,8 +1202,7 @@ public class CodecComponent {
     /**
      * Sort.
      *
-     * @param data
-     *          the data
+     * @param data the data
      * @return the array list
      */
     private ArrayList<MtasTreeHit<String>> sort(
@@ -1321,8 +1219,7 @@ public class CodecComponent {
     /**
      * Creates the hash.
      *
-     * @param data
-     *          the data
+     * @param data the data
      * @return the string
      */
     private String createHash(ArrayList<MtasTreeHit<String>> data) {
@@ -1337,18 +1234,12 @@ public class CodecComponent {
     /**
      * Instantiates a new group hit.
      *
-     * @param list
-     *          the list
-     * @param start
-     *          the start
-     * @param end
-     *          the end
-     * @param hitStart
-     *          the hit start
-     * @param hitEnd
-     *          the hit end
-     * @param group
-     *          the group
+     * @param list the list
+     * @param start the start
+     * @param end the end
+     * @param hitStart the hit start
+     * @param hitEnd the hit end
+     * @param group the group
      */
     public GroupHit(ArrayList<MtasTreeHit<String>> list, int start, int end,
         int hitStart, int hitEnd, ComponentGroup group) {
@@ -1501,8 +1392,7 @@ public class CodecComponent {
     /**
      * Data to string.
      *
-     * @param data
-     *          the data
+     * @param data the data
      * @return the string
      */
     private String dataToString(ArrayList<String>[] data) {
@@ -1553,14 +1443,10 @@ public class CodecComponent {
     /**
      * Instantiates a new list token.
      *
-     * @param docId
-     *          the doc id
-     * @param docPosition
-     *          the doc position
-     * @param match
-     *          the match
-     * @param tokens
-     *          the tokens
+     * @param docId the doc id
+     * @param docPosition the doc position
+     * @param match the match
+     * @param tokens the tokens
      */
     public ListToken(Integer docId, Integer docPosition, Match match,
         ArrayList<MtasToken<String>> tokens) {
@@ -1589,14 +1475,10 @@ public class CodecComponent {
     /**
      * Instantiates a new list hit.
      *
-     * @param docId
-     *          the doc id
-     * @param docPosition
-     *          the doc position
-     * @param match
-     *          the match
-     * @param hits
-     *          the hits
+     * @param docId the doc id
+     * @param docPosition the doc position
+     * @param match the match
+     * @param hits the hits
      */
     public ListHit(Integer docId, Integer docPosition, Match match,
         HashMap<Integer, ArrayList<String>> hits) {
@@ -1622,10 +1504,8 @@ public class CodecComponent {
     /**
      * Instantiates a new match.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     public Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;

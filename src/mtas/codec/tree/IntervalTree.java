@@ -8,20 +8,17 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
  *
  * @param <N> the number type
  */
-abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
+abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
   
   /** The current. */
   protected N root, current;
   
-  /** The closed. */
-  private Boolean closed;
   
   /**
    * Instantiates a new interval tree.
    */
   public IntervalTree() {
     root = null;
-    closed = false; 
   }
   
   /**
@@ -33,7 +30,6 @@ abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
     if(root==null) {
       addRangeEmpty(0,0);
     }
-    closed = true;
     return root;
   } 
   
@@ -43,7 +39,7 @@ abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
    * @param position the position
    * @param list the list
    */
-  abstract protected void addSinglePoint(int position, ArrayList<MtasTreeHit<?>> list);
+  abstract protected void addSinglePoint(int position, ArrayList<MtasTreeHit<T>> list);
   
   /**
    * Adds the range.
@@ -52,7 +48,7 @@ abstract public class IntervalTree<N extends IntervalTreeNode<N>> {
    * @param right the right
    * @param list the list
    */
-  abstract protected void addRange(int left, int right, ArrayList<MtasTreeHit<?>> list);
+  abstract protected void addRange(int left, int right, ArrayList<MtasTreeHit<T>> list);
   
   /**
    * Adds the range empty.

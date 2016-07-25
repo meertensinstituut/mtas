@@ -3,15 +3,11 @@ package mtas.codec.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-
 import mtas.codec.tree.IntervalTree;
 import mtas.codec.tree.IntervalTreeNode;
 import mtas.codec.tree.MtasTree;
-import mtas.codec.util.CodecSearchTree.MtasTreeHit;
-
 import org.apache.lucene.store.IndexInput;
 
 /**
@@ -392,6 +388,8 @@ public class CodecSearchTree {
   /**
    * Search mtas tree with interval tree.
    *
+   * @param <T> the generic type
+   * @param <N> the number type
    * @param additionalIds the additional ids
    * @param intervalTree the interval tree
    * @param in the in
@@ -399,20 +397,19 @@ public class CodecSearchTree {
    * @param objectRefApproxOffset the object ref approx offset
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static void searchMtasTreeWithIntervalTree(
-      Collection<Integer> additionalIds, IntervalTree<?> intervalTree, IndexInput in, long ref,
+  public static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeWithIntervalTree(
+      Collection<Integer> additionalIds, IntervalTree<T,N> intervalTree, IndexInput in, long ref,
       long objectRefApproxOffset) throws IOException {
-    ArrayList<IntervalItem> checkList = new ArrayList<IntervalItem>();
+    ArrayList<IntervalItem<T,N>> checkList = new ArrayList<IntervalItem<T,N>>();
     AtomicBoolean isSinglePoint = new AtomicBoolean(false);
     AtomicBoolean isStoreAdditionalId = new AtomicBoolean(false);
     AtomicLong nodeRefApproxOffset = new AtomicLong(-1);
-    checkList.add(new IntervalItem(
+    checkList.add(new IntervalItem<T,N>(
         getMtasTreeItem(ref, isSinglePoint, isStoreAdditionalId,
             nodeRefApproxOffset, in, objectRefApproxOffset),
         intervalTree.getRoot()));
-    IntervalTreeNode<?> intervalTreeNode = intervalTree.getRoot();
     do {
-      IntervalItem checkItem = checkList.remove(checkList.size() - 1);
+      IntervalItem<T,N> checkItem = checkList.remove(checkList.size() - 1);
       searchMtasTreeWithIntervalTree(additionalIds, checkItem, in, isSinglePoint,
           isStoreAdditionalId, objectRefApproxOffset, nodeRefApproxOffset,
           checkList);
@@ -422,6 +419,8 @@ public class CodecSearchTree {
   /**
    * Search mtas tree with interval tree.
    *
+   * @param <T> the generic type
+   * @param <N> the number type
    * @param additionalIds the additional ids
    * @param checkItem the check item
    * @param in the in
@@ -432,13 +431,13 @@ public class CodecSearchTree {
    * @param checkList the check list
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  private static void searchMtasTreeWithIntervalTree(Collection<Integer> additionalIds, IntervalItem checkItem,
+  private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeWithIntervalTree(Collection<Integer> additionalIds, IntervalItem<T,N> checkItem,
       IndexInput in, AtomicBoolean isSinglePoint,
       AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
-      AtomicLong nodeRefApproxOffset, ArrayList<IntervalItem> checkList)
+      AtomicLong nodeRefApproxOffset, ArrayList<IntervalItem<T,N>> checkList)
       throws IOException {
     MtasTreeItem treeItem = checkItem.mtasTreeItem;
-    IntervalTreeNode<?> intervalTreeNode = checkItem.intervalTreeNode;
+    IntervalTreeNode<T,N> intervalTreeNode = checkItem.intervalTreeNode;
     if (intervalTreeNode.min <= treeItem.max) {
       // advance intervalTree
       while (intervalTreeNode.left > treeItem.max) {
@@ -465,14 +464,14 @@ public class CodecSearchTree {
         MtasTreeItem treeItemLeft = getMtasTreeItem(treeItem.leftChild,
             isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
             objectRefApproxOffset);
-        checkList.add(new IntervalItem(treeItemLeft, intervalTreeNode));
+        checkList.add(new IntervalItem<T,N>(treeItemLeft, intervalTreeNode));
       }
       // check rightChild
       if (!treeItem.rightChild.equals(treeItem.ref)) {
         MtasTreeItem treeItemRight = getMtasTreeItem(treeItem.rightChild,
             isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
             objectRefApproxOffset);
-        checkList.add(new IntervalItem(treeItemRight, intervalTreeNode));
+        checkList.add(new IntervalItem<T,N>(treeItemRight, intervalTreeNode));
       }
     }
   }
@@ -480,16 +479,18 @@ public class CodecSearchTree {
   /**
    * Search mtas tree item with interval tree.
    *
+   * @param <T> the generic type
+   * @param <N> the number type
    * @param additionalIds the additional ids
    * @param treeItem the tree item
    * @param intervalTreeNode the interval tree node
    */
-  private static void searchMtasTreeItemWithIntervalTree(Collection<Integer> additionalIds, MtasTreeItem treeItem,
-      IntervalTreeNode<?> intervalTreeNode) {
-    ArrayList<IntervalTreeNode<?>> checkList = new ArrayList<IntervalTreeNode<?>>();
+  private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeItemWithIntervalTree(Collection<Integer> additionalIds, MtasTreeItem treeItem,
+      IntervalTreeNode<T,N> intervalTreeNode) {
+    ArrayList<IntervalTreeNode<T,N>> checkList = new ArrayList<IntervalTreeNode<T,N>>();
     checkList.add(intervalTreeNode);
     do {
-      IntervalTreeNode<?> checkItem = checkList.remove(checkList.size() - 1);
+      IntervalTreeNode<T,N> checkItem = checkList.remove(checkList.size() - 1);
       searchMtasTreeItemWithIntervalTree(additionalIds, checkItem, treeItem.left,
           treeItem.right, treeItem.objectRefs, treeItem.objectIds, checkList);
     } while (checkList.size() > 0);
@@ -498,6 +499,8 @@ public class CodecSearchTree {
   /**
    * Search mtas tree item with interval tree.
    *
+   * @param <T> the generic type
+   * @param <N> the number type
    * @param requiredAdditionalIds the required additional ids
    * @param intervalTreeItem the interval tree item
    * @param startPosition the start position
@@ -506,10 +509,10 @@ public class CodecSearchTree {
    * @param additionalIds the additional ids
    * @param checkList the check list
    */
-  private static void searchMtasTreeItemWithIntervalTree(Collection<Integer> requiredAdditionalIds,
-      IntervalTreeNode<?> intervalTreeItem, int startPosition, int endPosition,
+  private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeItemWithIntervalTree(Collection<Integer> requiredAdditionalIds,
+      IntervalTreeNode<T,N> intervalTreeItem, int startPosition, int endPosition,
       long[] refs, int[] additionalIds,
-      ArrayList<IntervalTreeNode<?>> checkList) {
+      ArrayList<IntervalTreeNode<T,N>> checkList) {
     if (startPosition <= intervalTreeItem.max) {
       // match current node
       if ((endPosition >= intervalTreeItem.left)
@@ -517,17 +520,17 @@ public class CodecSearchTree {
         //System.out.print("[" + startPosition + "-" + endPosition + "] ");
         if(requiredAdditionalIds==null || additionalIds==null) {
           for (int i = 0; i < refs.length; i++) {
-            MtasTreeHit<?> hit = new MtasTreeHit<String>(startPosition,
+            MtasTreeHit<T> hit = new MtasTreeHit<T>(startPosition,
                 endPosition, refs[i], 0, null);
-            for (ArrayList<MtasTreeHit<?>> list : intervalTreeItem.lists) {
+            for (ArrayList<MtasTreeHit<T>> list : intervalTreeItem.lists) {
               list.add(hit);
             }
           }
         } else {
           for (int i = 0; i < refs.length; i++) {
-            MtasTreeHit<?> hit = new MtasTreeHit<String>(startPosition,
+            MtasTreeHit<T> hit = new MtasTreeHit<T>(startPosition,
                 endPosition, refs[i], additionalIds[i], null);
-            for (ArrayList<MtasTreeHit<?>> list : intervalTreeItem.lists) {
+            for (ArrayList<MtasTreeHit<T>> list : intervalTreeItem.lists) {
               list.add(hit);
             }            
           }
@@ -535,7 +538,7 @@ public class CodecSearchTree {
       }
       // check leftChild
       if (intervalTreeItem.leftChild != null) {
-        IntervalTreeNode treeItemLeft = intervalTreeItem.leftChild;
+        IntervalTreeNode<T,N> treeItemLeft = intervalTreeItem.leftChild;
         if (treeItemLeft.max >= startPosition) {
           checkList.add(treeItemLeft);
         }
@@ -543,7 +546,7 @@ public class CodecSearchTree {
       // check rightChild
       if (intervalTreeItem.left < endPosition) {
         if (intervalTreeItem.rightChild != null) {
-          IntervalTreeNode treeItemRight = intervalTreeItem.rightChild;
+          IntervalTreeNode<T,N> treeItemRight = intervalTreeItem.rightChild;
           if ((treeItemRight.left >= endPosition)
               || (treeItemRight.max >= startPosition)) {
             checkList.add(treeItemRight);
@@ -556,14 +559,17 @@ public class CodecSearchTree {
 
   /**
    * The Class IntervalItem.
+   *
+   * @param <T> the generic type
+   * @param <N> the number type
    */
-  private static class IntervalItem {
+  private static class IntervalItem<T, N extends IntervalTreeNode<T, N>> {
     
     /** The mtas tree item. */
     public MtasTreeItem mtasTreeItem;
     
     /** The interval tree node. */
-    public IntervalTreeNode<?> intervalTreeNode;
+    public IntervalTreeNode<T,N> intervalTreeNode;
 
     /**
      * Instantiates a new interval item.
@@ -572,7 +578,7 @@ public class CodecSearchTree {
      * @param intervalTreeNode the interval tree node
      */
     public IntervalItem(MtasTreeItem mtasTreeItem,
-        IntervalTreeNode<?> intervalTreeNode) {
+        IntervalTreeNode<T,N> intervalTreeNode) {
       this.mtasTreeItem = mtasTreeItem;
       this.intervalTreeNode = intervalTreeNode;
     }

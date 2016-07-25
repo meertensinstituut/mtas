@@ -268,7 +268,6 @@ private SpanQuery cqlBlock(String field) throws ParseException :
       }
     )
     (
-      LOOKAHEAD(100)
       s2 = sentence(field)
     | < BRACKET_START > q2 = cqlBlock(field) < BRACKET_END >
     )
@@ -373,7 +372,6 @@ private MtasCQLParserSentencePartCondition sentencePart(String field) throws Par
           questionMark = null;
         }
         (
-          LOOKAHEAD(3)
           < CURLY_BRACKET_START > minValue = < NUMBER > < KOMMA > maxValue = < NUMBER > < CURLY_BRACKET_END >
         | < CURLY_BRACKET_START > minValue = < NUMBER > < CURLY_BRACKET_END >
         | questionMark = < QUESTION_MARK >
@@ -391,11 +389,11 @@ private MtasCQLParserSentencePartCondition sentencePart(String field) throws Par
           minimumOccurence = Integer.parseInt(minValue.image);
           if (maxValue != null)
           {
-            maximumOccurence = Integer.parseInt(maxValue.image);
+            maximumOccurence = Integer.parseInt(maxValue.image);            
           }
           else
           {
-            maximumOccurence = minimumOccurence;
+            maximumOccurence = minimumOccurence;            
           }
         }
         condition.setFirstOccurence(minimumOccurence, maximumOccurence);
@@ -445,7 +443,6 @@ private MtasCQLParserBasicSentenceCondition basicSentence(String field) throws P
     }
   )
   (
-    LOOKAHEAD(2)
     (
       subWordCondition = word(field)
       {
@@ -477,7 +474,6 @@ private MtasCQLParserGroupFullCondition group(String field) throws ParseExceptio
 {
   < GROUP_START >
   (
-    LOOKAHEAD(3)
     condition = groupCondition(field) [ slash = < SLASH > ]
     {
       if (slash == null)
@@ -502,7 +498,6 @@ private MtasCQLParserGroupFullCondition group(String field) throws ParseExceptio
       questionMark = null;
     }
     (
-      LOOKAHEAD(3)
       < CURLY_BRACKET_START > minValue = < NUMBER > < KOMMA > maxValue = < NUMBER > < CURLY_BRACKET_END >
     | < CURLY_BRACKET_START > minValue = < NUMBER > < CURLY_BRACKET_END >
     | questionMark = < QUESTION_MARK >
@@ -550,7 +545,6 @@ private MtasCQLParserGroupCondition groupCondition(String field) throws ParseExc
 }
 {
   (
-    LOOKAHEAD(3)
     prefix = < UNQUOTED_VALUE > < TOKEN_EQUALS > value = < QUOTED_VALUE >
   | prefix = < UNQUOTED_VALUE >
     {
@@ -585,10 +579,8 @@ private MtasCQLParserWordFullCondition word(String field) throws ParseException 
 }
 {
   (
-    LOOKAHEAD(3)
     < WORD_START >
     (
-      LOOKAHEAD(10)
       subCondition = wordCondition(field)
       (
         < AND >
@@ -636,7 +628,6 @@ private MtasCQLParserWordFullCondition word(String field) throws ParseException 
       questionMark = null;
     }
     (
-      LOOKAHEAD(3)
       < CURLY_BRACKET_START > minValue = < NUMBER > < KOMMA > maxValue = < NUMBER > < CURLY_BRACKET_END >
     | < CURLY_BRACKET_START > minValue = < NUMBER > < CURLY_BRACKET_END >
     | questionMark = < QUESTION_MARK >
@@ -674,14 +665,12 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
 }
 {
   (
-    //condition with brackets    LOOKAHEAD(2) //otherwise plain atom    [ negation = < NEGATION > ] < BRACKET_START >
+    //condition with brackets    [ negation = < NEGATION > ] < BRACKET_START >
     (
-      LOOKAHEAD(5)
       {
         condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
       }
       (
-        LOOKAHEAD(2)
         subCondition = wordAtomCondition(field)
       | subCondition = wordCondition(field)
       )
@@ -690,7 +679,6 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
       }
       < AND >
       (
-        LOOKAHEAD(2)
         subCondition = wordAtomCondition(field)
       | subCondition = wordCondition(field)
       )
@@ -700,7 +688,6 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
       (
         < AND >
         (
-          LOOKAHEAD(2)
           subCondition = wordAtomCondition(field)
         | subCondition = wordCondition(field)
         )
@@ -708,12 +695,11 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
           condition.addCondition(subCondition);
         }
       )*
-    | LOOKAHEAD(5)
+    |
       {
         condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
       }
       (
-        LOOKAHEAD(2)
         subCondition = wordAtomCondition(field)
       | subCondition = wordCondition(field)
       )
@@ -722,7 +708,6 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
       }
       < OR >
       (
-        LOOKAHEAD(2)
         subCondition = wordAtomCondition(field)
       | subCondition = wordCondition(field)
       )
@@ -732,22 +717,20 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
       (
         < OR >
         (
-          LOOKAHEAD(2)
           subCondition = wordAtomCondition(field)
         | subCondition = wordCondition(field)
         )
         {
           condition.addCondition(subCondition);
         }
-      )*
+      )*      
     |
       (
-        LOOKAHEAD(2)
-        condition = wordAtomCondition(field)
-      | condition = wordCondition(field)
+        condition = wordAtomCondition(field)        
+      | condition = wordCondition(field)        
       )
     )
-    < BRACKET_END >
+    < BRACKET_END >         
     {
       if (negation != null)
       {
@@ -789,8 +772,8 @@ private MtasCQLParserWordCondition wordAtomCondition(String field) throws ParseE
         Matcher m = range.matcher(value.image);
         if (m.find())
         {
-          startPosition = m.group(1)!=null?Integer.parseInt(m.group(1)):null;
-          endPosition = m.group(3)!=null?Integer.parseInt(m.group(3)):null;
+          startPosition = m.group(1) != null ? Integer.parseInt(m.group(1)) : null;
+          endPosition = m.group(3) != null ? Integer.parseInt(m.group(3)) : null;
         }
         else
         {

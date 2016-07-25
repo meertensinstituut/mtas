@@ -330,7 +330,6 @@ public class MtasFunctionParserTest {
       pf = p.parse();
       args = getArgs(10 + generator.nextInt(20), 0, 2);
       double answer = (double)(k1+k2) / (args[0]+1+k3-2);
-      System.out.println(pf);
       testFunction(pf, args, n,
           new MtasFunctionParserFunctionResponseDouble(answer, true));
     } catch (ParseException e) {

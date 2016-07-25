@@ -262,7 +262,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
   }
 
   @Override
-  public void processAdd(AddUpdateCommand cmd) throws IOException {
+  public void processAdd(AddUpdateCommand cmd) throws IOException  {
     if (config != null && config.fieldMapping.size() > 0) {
       // get document
       SolrInputDocument doc = cmd.getSolrInputDocument();
@@ -278,6 +278,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
         if (originalValue != null) {
           // only string
           if (originalValue.getValue() instanceof String) {
+            MtasUpdateRequestProcessorResultWriter result = null;
             try {
               String storedValue = (String) originalValue.getValue();
               // create reader
@@ -313,7 +314,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
               
               // tokenizerFactory
-              MtasUpdateRequestProcessorResultWriter result = new MtasUpdateRequestProcessorResultWriter(
+              result = new MtasUpdateRequestProcessorResultWriter(
                   storedValue);
               MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
               tokenizer.setReader(sizeReader);
@@ -359,13 +360,14 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 result.addItem(term, offsetStart, offsetEnd, posIncr, payload,
                     flags);
                 // System.out.println(term);
-              }
+              }              
 
               // update field
               doc.remove(field);
               if(result.getTokenNumber()>0) {
-                doc.addField(field, result.createFile());
-              }  
+                doc.addField(field, result.getFileName());
+              }
+              result.close();
               // update size
               setFields(doc, config.fieldTypeSizeField.get(fieldType), sizeReader.getTotalReadSize());
               // update numberOfPositions
@@ -388,13 +390,17 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               // update numberOfTokens
               setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
                   0);
+              if(result!=null) {
+                result.forceCloseAndDelete();
+                doc.remove(field);                
+              }
             }
           }
         }
       }
 
     }
-    // pass it up the chain
+    // pass it up the chain 
     super.processAdd(cmd);
   }
 

@@ -8,10 +8,10 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 /**
  * The Class IntervalRBTree.
  */
-public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
+public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
 
   /** The index. */
-  private final HashMap<String, IntervalRBTreeNode> index;
+  private final HashMap<String, IntervalRBTreeNode<T>> index;
 
   /**
    * Instantiates a new interval rb tree.
@@ -26,9 +26,9 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    *
    * @param positionsHits the positions hits
    */
-  public IntervalRBTree(ArrayList<IntervalTreeNodeData> positionsHits) {
+  public IntervalRBTree(ArrayList<IntervalTreeNodeData<T>> positionsHits) {
     this();    
-    for (IntervalTreeNodeData positionsHit : positionsHits) {
+    for (IntervalTreeNodeData<T> positionsHit : positionsHits) {
       addRange(positionsHit.start, positionsHit.end, positionsHit.list);
     }
     close();
@@ -54,7 +54,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    */
   @Override
   final protected void addSinglePoint(int position,
-      ArrayList<MtasTreeHit<?>> list) {
+      ArrayList<MtasTreeHit<T>> list) {
     addRange(position, position, list);
   }
 
@@ -63,7 +63,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    */
   @Override
   final protected void addRange(int left, int right,
-      ArrayList<MtasTreeHit<?>> list) {
+      ArrayList<MtasTreeHit<T>> list) {
     String key = ((Integer) left).toString() + "_"
         + ((Integer) right).toString();
     if (index.containsKey(key)) {
@@ -73,6 +73,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
       root.color = IntervalRBTreeNode.BLACK;
     }
   }
+  
 
   /**
    * Adds the range.
@@ -83,11 +84,11 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    * @param list the list
    * @return the interval rb tree node
    */
-  private IntervalRBTreeNode addRange(IntervalRBTreeNode n, Integer left,
-      Integer right, ArrayList<MtasTreeHit<?>> list) {
+  private IntervalRBTreeNode<T> addRange(IntervalRBTreeNode<T> n, Integer left,
+      Integer right, ArrayList<MtasTreeHit<T>> list) {
     if (n == null) {
       String key = left.toString() + "_" + right.toString();
-      n = new IntervalRBTreeNode(left, right, IntervalRBTreeNode.RED, 1);
+      n = new IntervalRBTreeNode<T>(left, right, IntervalRBTreeNode.RED, 1);
       n.addList(list);
       index.put(key, n);
     } else {
@@ -118,7 +119,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    * @param n the n
    * @param c the c
    */
-  private void updateMaxMin(IntervalRBTreeNode n, IntervalRBTreeNode c) {
+  private void updateMaxMin(IntervalRBTreeNode<T> n, IntervalRBTreeNode<T> c) {
     if (c != null) {
       if (n.max < c.max) {
         n.max = c.max;
@@ -136,9 +137,9 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    * @param n the n
    * @return the interval rb tree node
    */
-  private IntervalRBTreeNode rotateRight(IntervalRBTreeNode n) {
+  private IntervalRBTreeNode<T> rotateRight(IntervalRBTreeNode<T> n) {
     assert (n != null) && isRed(n.leftChild);
-    IntervalRBTreeNode x = n.leftChild;
+    IntervalRBTreeNode<T> x = n.leftChild;
     n.leftChild = x.rightChild;
     x.rightChild = n;
     x.color = x.rightChild.color;
@@ -157,9 +158,9 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    * @param n the n
    * @return the interval rb tree node
    */
-  private IntervalRBTreeNode rotateLeft(IntervalRBTreeNode n) {
+  private IntervalRBTreeNode<T> rotateLeft(IntervalRBTreeNode<T> n) {
     assert (n != null) && isRed(n.rightChild);
-    IntervalRBTreeNode x = n.rightChild;
+    IntervalRBTreeNode<T> x = n.rightChild;
     n.rightChild = x.leftChild;
     x.leftChild = n;
     x.color = x.leftChild.color;
@@ -177,7 +178,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    *
    * @param n the n
    */
-  private void flipColors(IntervalRBTreeNode n) {
+  private void flipColors(IntervalRBTreeNode<T> n) {
     // n must have opposite color of its two children
     assert (n != null) && (n.leftChild != null) && (n.rightChild != null);
     assert (!isRed(n) && isRed(n.leftChild) && isRed(n.rightChild))
@@ -193,7 +194,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    * @param n the n
    * @return true, if is red
    */
-  private boolean isRed(IntervalRBTreeNode n) {
+  private boolean isRed(IntervalRBTreeNode<T> n) {
     if (n == null) {
       return false;
     }
@@ -206,7 +207,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    * @param n the n
    * @return the int
    */
-  private int size(IntervalRBTreeNode n) {
+  private int size(IntervalRBTreeNode<T> n) {
     if (n == null)
       return 0;
     return n.n;
@@ -217,7 +218,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
    *
    * @param n the new max min
    */
-  private void setMaxMin(IntervalRBTreeNode n) {
+  private void setMaxMin(IntervalRBTreeNode<T> n) {
     n.min = n.left;
     n.max = n.right;
     if (n.leftChild != null) {
@@ -229,5 +230,7 @@ public class IntervalRBTree extends IntervalTree<IntervalRBTreeNode> {
       n.max = Math.max(n.max, n.rightChild.max);
     }
   }
+
+  
 
 }

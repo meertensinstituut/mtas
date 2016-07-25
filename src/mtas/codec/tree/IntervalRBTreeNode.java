@@ -3,7 +3,7 @@ package mtas.codec.tree;
 /**
  * The Class IntervalRBTreeNode.
  */
-public class IntervalRBTreeNode extends IntervalTreeNode<IntervalRBTreeNode> {
+public class IntervalRBTreeNode<T> extends IntervalTreeNode<T, IntervalRBTreeNode<T>> {
 
     /** The Constant BLACK. */
     static final int BLACK = 1;
@@ -36,7 +36,7 @@ public class IntervalRBTreeNode extends IntervalTreeNode<IntervalRBTreeNode> {
      * @see mtas.codec.tree.MtasTreeNode#self()
      */
     @Override
-    protected IntervalRBTreeNode self() {
+    protected IntervalRBTreeNode<T> self() {
       return self();
     }    
 

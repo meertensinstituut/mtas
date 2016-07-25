@@ -1,0 +1,120 @@
+package mtas.codec.util.collector;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.Map.Entry;
+import mtas.codec.util.CodecUtil;
+import mtas.codec.util.DataCollector.MtasDataCollector;
+
+/**
+ * The Class MtasDataItemBasic.
+ *
+ * @param <T1> the generic type
+ * @param <T2> the generic type
+ */
+abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
+    extends MtasDataItem<T1> implements Serializable {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The value sum. */
+  protected T1 valueSum;
+
+  /** The value n. */
+  protected Long valueN;
+
+  /** The operations. */
+  protected MtasDataOperations<T1, T2> operations;
+
+  /**
+   * Instantiates a new mtas data item basic.
+   *
+   * @param valueSum the value sum
+   * @param valueN the value n
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param operations the operations
+   */
+  public MtasDataItemBasic(T1 valueSum, long valueN,
+      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
+      String sortType, String sortDirection, int errorNumber,
+      HashMap<String, Integer> errorList,
+      MtasDataOperations<T1, T2> operations) {
+    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList);
+    this.valueSum = valueSum;
+    this.valueN = valueN;
+    this.operations = operations;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.
+   * DataCollector.MtasDataItem)
+   */
+  @Override
+  public void add(MtasDataItem<T1> newItem) throws IOException {
+    if (newItem instanceof MtasDataItemBasic) {
+      MtasDataItemBasic<T1, T2> newTypedItem = (MtasDataItemBasic<T1, T2>) newItem;
+      this.valueSum = operations.add11(this.valueSum, newTypedItem.valueSum);
+      this.valueN += newTypedItem.valueN;
+    } else {
+      throw new IOException("can only add MtasDataItemBasic");
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
+   */
+  @Override
+  public Map<String, Object> rewrite() throws IOException {
+    Map<String, Object> response = new HashMap<String, Object>();
+    for (String statsItem : statsItems) {
+      if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
+        response.put(statsItem, valueSum);
+      } else if (statsItem.equals(CodecUtil.STATS_TYPE_N)) {
+        response.put(statsItem, valueN);
+      } else if (statsItem.equals(CodecUtil.STATS_TYPE_MEAN)) {
+        response.put(statsItem, getValue(statsItem));
+      } else {
+        response.put(statsItem, null);
+      }
+    }
+    if (errorNumber > 0) {
+      Map<String, Object> errorResponse = new HashMap<String, Object>();
+      for (Entry<String, Integer> entry : errorList.entrySet()) {
+        errorResponse.put(entry.getKey(), entry.getValue());
+      }
+      response.put("errorNumber", errorNumber);
+      response.put("errorList", errorResponse);
+    }
+    // response.put("stats", "basic");
+    return response;
+  }
+
+  /**
+   * Gets the value.
+   *
+   * @param statsType the stats type
+   * @return the value
+   */
+  protected T2 getValue(String statsType) {
+    if (statsType.equals(CodecUtil.STATS_TYPE_MEAN)) {
+      return operations.divide1(valueSum, valueN);
+    } else {
+      return null;
+    }
+  }
+
+}
+

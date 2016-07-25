@@ -9,7 +9,7 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
  *
  * @param <N> the number type
  */
-abstract public class IntervalTreeNode<N extends IntervalTreeNode<N>> {
+abstract public class IntervalTreeNode<T, N extends IntervalTreeNode<T, N>> {
 
   /**
    * Self.
@@ -38,7 +38,7 @@ abstract public class IntervalTreeNode<N extends IntervalTreeNode<N>> {
     
     
     /** The lists. */
-    public ArrayList<ArrayList<MtasTreeHit<?>>> lists;
+    public ArrayList<ArrayList<MtasTreeHit<T>>> lists;
 
     // node with start and end position
     /**
@@ -52,7 +52,7 @@ abstract public class IntervalTreeNode<N extends IntervalTreeNode<N>> {
       this.right = right;
       min = left;
       max = right;
-      lists = new ArrayList<ArrayList<MtasTreeHit<?>>>();
+      lists = new ArrayList<ArrayList<MtasTreeHit<T>>>();
     }
 
     // add id to node
@@ -61,7 +61,7 @@ abstract public class IntervalTreeNode<N extends IntervalTreeNode<N>> {
      *
      * @param list the list
      */
-    final public void addList(ArrayList<MtasTreeHit<?>> list) {
+    final public void addList(ArrayList<MtasTreeHit<T>> list) {
       if(list!=null) {
         lists.add(list);
       }

@@ -151,7 +151,7 @@ public class MtasCQLParserSentencePartCondition {
    * @return the mtas cql parser sentence condition
    * @throws ParseException the parse exception
    */
-  public MtasCQLParserSentenceCondition createFullSentence() throws ParseException {    
+  public MtasCQLParserSentenceCondition createFullSentence() throws ParseException {        
     if(fullCondition==null) {
       if(secondSentencePart == null) {
         if(firstBasicSentence!=null) {

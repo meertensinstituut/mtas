@@ -562,16 +562,24 @@ public class MtasCQLParserSentenceCondition {
   public SpanQuery getQuery() throws ParseException {
     simplify();
     if (isBasic()) {
+      SpanQuery query;
       if (basicSentence == null) {
         throw new ParseException("no condition");
       } else if (basicSentence.isOptional()) {
         List<MtasSpanSequenceItem> clauses = new ArrayList<MtasSpanSequenceItem>();
         clauses.add(new MtasSpanSequenceItem(basicSentence.getQuery(),
             basicSentence.isOptional()));
-        return new MtasSpanSequenceQuery(clauses);
+        query = new MtasSpanSequenceQuery(clauses);
+        if(basicSentence.getMaximumOccurence()>1) {
+          query = new MtasSpanRecurrenceQuery(query, basicSentence.getMinimumOccurence(), basicSentence.getMaximumOccurence()); 
+        } 
       } else {
-        return basicSentence.getQuery();
+        query = basicSentence.getQuery();
+        if(basicSentence.getMaximumOccurence()>1) {
+          query = new MtasSpanRecurrenceQuery(query, basicSentence.getMinimumOccurence(), basicSentence.getMaximumOccurence()); 
+        }
       }
+      return query;
     } else if (sequenceList.isEmpty()) {
       throw new ParseException("no condition");
     } else if (isSingle()) {

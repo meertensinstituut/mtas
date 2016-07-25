@@ -16,6 +16,7 @@ import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
 import mtas.parser.cql.util.MtasCQLParserGroupQuery;
 import mtas.parser.cql.util.MtasCQLParserWordQuery;
+import mtas.search.spans.MtasSpanMatchAllQuery;
 import mtas.search.spans.MtasSpanOrQuery;
 import mtas.search.spans.MtasSpanRecurrenceQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
@@ -70,6 +71,8 @@ public class MtasCQLParserTestSentence {
     basicTest14();
     basicTest15();
     basicTest16();
+    basicTest17();
+    basicTest18();
   }
   
   private void basicTest1() {
@@ -255,6 +258,33 @@ public class MtasCQLParserTestSentence {
     SpanQuery q4 = new SpanContainingQuery(q2, q3);
     SpanQuery q5 = new SpanWithinQuery(q4, q1);
     SpanQuery q = new SpanNotQuery(q5,new SpanContainingQuery(q5, q3));
+    testCQLParse(field, cql, q);    
+  }
+  
+  private void basicTest17() {
+    String field = "testveld";
+    String cql = "[]<entity=\"loc\"/>{1,2}[]"; 
+    SpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
+    SpanQuery q2 = new MtasSpanRecurrenceQuery(q1,1,2);
+    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
+    items.add(new MtasSpanSequenceItem(q2, false));
+    items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
+    SpanQuery q = new MtasSpanSequenceQuery(items);
+    testCQLParse(field, cql, q);    
+  }
+  
+  private void basicTest18() {
+    String field = "testveld";
+    String cql = "([]<entity=\"loc\"/>{1,2}[]){3,4}"; 
+    SpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
+    SpanQuery q2 = new MtasSpanRecurrenceQuery(q1,1,2);
+    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
+    items.add(new MtasSpanSequenceItem(q2, false));
+    items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
+    SpanQuery q3 = new MtasSpanSequenceQuery(items);
+    SpanQuery q = new MtasSpanRecurrenceQuery(q3,3,4); 
     testCQLParse(field, cql, q);    
   }
   
