@@ -6,6 +6,7 @@ mtas.codec
 mtas.codec.payload
 mtas.codec.tree
 mtas.codec.util
+mtas.codec.util.collector
 mtas.parser.cql
 mtas.parser.cql.util
 mtas.parser.function
