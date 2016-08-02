@@ -34,10 +34,10 @@ public class MtasDataItemDoubleFull
    */
   public MtasDataItemDoubleFull(double[] value, MtasDataCollector<?, ?> sub,
       TreeSet<String> statsItems, String sortType, String sortDirection,
-      int errorNumber, HashMap<String, Integer> errorList) {
+      int errorNumber, HashMap<String, Integer> errorList, int sourceNumber) {
     super(ArrayUtils.toObject(value), sub, statsItems, sortType,
         sortDirection, errorNumber, errorList,
-        new MtasDataDoubleOperations());
+        new MtasDataDoubleOperations(), sourceNumber);
   }
 
   /**

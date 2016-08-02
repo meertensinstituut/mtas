@@ -10,9 +10,12 @@ import mtas.codec.util.DataCollector.MtasDataCollector;
 /**
  * The Class MtasDataFull.
  *
- * @param <T1> the generic type
- * @param <T2> the generic type
- * @param <T3> the generic type
+ * @param <T1>
+ *          the generic type
+ * @param <T2>
+ *          the generic type
+ * @param <T3>
+ *          the generic type
  */
 abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends MtasDataItem<T1>>
     extends MtasDataCollector<T1, T3> implements Serializable {
@@ -29,24 +32,42 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   /**
    * Instantiates a new mtas data full.
    *
-   * @param collectorType the collector type
-   * @param dataType the data type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param subCollectorTypes the sub collector types
-   * @param subDataTypes the sub data types
-   * @param subStatsTypes the sub stats types
-   * @param subStatsItems the sub stats items
-   * @param subSortTypes the sub sort types
-   * @param subSortDirections the sub sort directions
-   * @param subStart the sub start
-   * @param subNumber the sub number
-   * @param operations the operations
-   * @param segmentRegistration the segment registration
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param collectorType
+   *          the collector type
+   * @param dataType
+   *          the data type
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param start
+   *          the start
+   * @param number
+   *          the number
+   * @param subCollectorTypes
+   *          the sub collector types
+   * @param subDataTypes
+   *          the sub data types
+   * @param subStatsTypes
+   *          the sub stats types
+   * @param subStatsItems
+   *          the sub stats items
+   * @param subSortTypes
+   *          the sub sort types
+   * @param subSortDirections
+   *          the sub sort directions
+   * @param subStart
+   *          the sub start
+   * @param subNumber
+   *          the sub number
+   * @param operations
+   *          the operations
+   * @param segmentRegistration
+   *          the segment registration
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasDataFull(String collectorType, String dataType,
       TreeSet<String> statsItems, String sortType, String sortDirection,
@@ -58,8 +79,8 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
       throws IOException {
     super(collectorType, dataType, CodecUtil.STATS_FULL, statsItems, sortType,
         sortDirection, start, number, subCollectorTypes, subDataTypes,
-        subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
-        subStart, subNumber, segmentRegistration);
+        subStatsTypes, subStatsItems, subSortTypes, subSortDirections, subStart,
+        subNumber, segmentRegistration);
     this.operations = operations;
   }
 
@@ -71,7 +92,7 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
    */
   @Override
   public final void error(String error) throws IOException {
-    add();
+    add(false);
     setError(newCurrentPosition, error, newCurrentExisting);
   }
 
@@ -86,7 +107,7 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   public final void error(String[] keys, String error) throws IOException {
     if (keys != null && keys.length > 0) {
       for (int i = 0; i < keys.length; i++) {
-        add(keys[i]);
+        add(keys[i], false);
         setError(newCurrentPosition, error, newCurrentExisting);
       }
     }
@@ -95,9 +116,12 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   /**
    * Sets the error.
    *
-   * @param newPosition the new position
-   * @param error the error
-   * @param currentExisting the current existing
+   * @param newPosition
+   *          the new position
+   * @param error
+   *          the error
+   * @param currentExisting
+   *          the current existing
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
@@ -116,8 +140,7 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
    */
   @Override
   protected final void increaseNewListSize() {
@@ -131,6 +154,22 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
     newFullValueList = operations.createMatrix1(newSize);
     newPosition = tmpNewPosition;
     System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);
+  }
+
+  public void reduceToSegmentKeys() {
+    if(segmentRegistration) {
+      int sizeCopy = size;
+      String[] keyListCopy = keyList.clone();
+      T1[][] fullValueListCopy = fullValueList.clone(); 
+      size = 0;
+      for(int i=0; i< sizeCopy; i++) {
+        if(segmentKeys.contains(keyListCopy[i])) {
+          keyList[size] = keyListCopy[i];
+          fullValueList[size] = fullValueListCopy[i];
+          size++;
+        }
+      } 
+    }  
   }
 
   /*
@@ -156,10 +195,14 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   /**
    * Sets the value.
    *
-   * @param newPosition the new position
-   * @param values the values
-   * @param number the number
-   * @param currentExisting the current existing
+   * @param newPosition
+   *          the new position
+   * @param values
+   *          the values
+   * @param number
+   *          the number
+   * @param currentExisting
+   *          the current existing
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
@@ -211,12 +254,11 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.
    * DataCollector.MtasDataCollector)
    */
   @Override
-  public void merge(MtasDataCollector<?, ?> newDataCollector)
+  public void merge(MtasDataCollector<?, ?> newDataCollector, boolean increaseSourceNumber)
       throws IOException {
     closeNewList();
     if (!collectorType.equals(newDataCollector.getCollectorType())
@@ -233,7 +275,7 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
         for (int i = 0; i < newMtasDataFull.getSize(); i++) {
           if (newMtasDataFull.fullValueList[i].length > 0) {
             MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[1];
-            subCollectors[0] = add(newMtasDataFull.keyList[i]);
+            subCollectors[0] = add(newMtasDataFull.keyList[i], increaseSourceNumber);
             setError(newCurrentPosition, newMtasDataFull.errorNumber[i],
                 newMtasDataFull.errorList[i], newCurrentExisting);
             setValue(newCurrentPosition, newMtasDataFull.fullValueList[i],
@@ -241,19 +283,19 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
             if (hasSub() && newMtasDataFull.hasSub()) {
               // single key implies exactly one subCollector if hasSub
               subCollectors[0]
-                  .merge(newMtasDataFull.subCollectorListNextLevel[i]);
+                  .merge(newMtasDataFull.subCollectorListNextLevel[i], increaseSourceNumber);
             }
           }
         }
       } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
         if (newMtasDataFull.getSize() > 0) {
-          MtasDataCollector<?, ?> subCollector = add();
+          MtasDataCollector<?, ?> subCollector = add(increaseSourceNumber);
           setError(newCurrentPosition, newMtasDataFull.errorNumber[0],
               newMtasDataFull.errorList[0], newCurrentExisting);
           setValue(newCurrentPosition, newMtasDataFull.fullValueList[0],
               newMtasDataFull.fullValueList[0].length, newCurrentExisting);
           if (hasSub() && newMtasDataFull.hasSub()) {
-            subCollector.merge(newMtasDataFull.subCollectorNextLevel);
+            subCollector.merge(newMtasDataFull.subCollectorNextLevel, increaseSourceNumber);
           }
         }
       } else {
@@ -290,12 +332,11 @@ abstract class MtasDataFull<T1 extends Number, T2 extends Number, T3 extends Mta
   /**
    * Inits the new list basic.
    *
-   * @param maxNumberOfTerms the max number of terms
+   * @param maxNumberOfTerms
+   *          the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
     newFullValueList = operations.createMatrix1(newSize);
   }
 
 }
-
-

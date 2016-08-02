@@ -34,10 +34,10 @@ class MtasDataItemLongAdvanced
       long valueSumOfSquares, long valueMin, long valueMax, long valueN,
       MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList) {
+      HashMap<String, Integer> errorList, int sourceNumber) {
     super(valueSum, valueSumOfLogs, valueSumOfSquares, valueMin, valueMax,
         valueN, sub, statsItems, sortType, sortDirection, errorNumber,
-        errorList, new MtasDataLongOperations());
+        errorList, new MtasDataLongOperations(), sourceNumber);
   }
 
   /*

@@ -1,5 +1,6 @@
 package mtas.analysis.token;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,7 +92,7 @@ public class MtasTokenCollection {
     Iterator<MtasToken<?>> it = this.iterator();
     while (it.hasNext()) {
       MtasToken<?> token = it.next();
-      System.out.println(token);
+      System.out.println(token);      
     }
   }
 
@@ -194,8 +195,10 @@ public class MtasTokenCollection {
         trash.add(i);
       } else if ((token.getPositionStart() == null)
           || (token.getPositionEnd() == null)) {
-        trash.add(i);
+        trash.add(i);        
       } else if (token.getValue() == null || (token.getValue().equals(""))) {
+        trash.add(i);
+      } else if (token.getPrefix() == null || (token.getPrefix().equals(""))) {
         trash.add(i);
       }
     }
@@ -277,6 +280,9 @@ public class MtasTokenCollection {
         } else if (token.getValue() == null || (token.getValue().equals(""))) {
           throw new MtasParserException(
               "no value for token with id " + token.getId());
+        } else if (token.getPrefix() == null || (token.getPrefix().equals(""))) {
+          throw new MtasParserException(
+              "no prefix for token with id " + token.getId());
         } else if ((token.getParentId() != null)
             && !tokenCollection.containsKey(token.getParentId())) {
           throw new MtasParserException(

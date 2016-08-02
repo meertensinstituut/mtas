@@ -33,9 +33,9 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
    */
   public MtasDataItemLongFull(long[] value, MtasDataCollector<?, ?> sub,
       TreeSet<String> statsItems, String sortType, String sortDirection,
-      int errorNumber, HashMap<String, Integer> errorList) {
+      int errorNumber, HashMap<String, Integer> errorList, int sourceNumber) {
     super(ArrayUtils.toObject(value), sub, statsItems, sortType, sortDirection,
-        errorNumber, errorList, new MtasDataLongOperations());
+        errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);
   }
 
   /*

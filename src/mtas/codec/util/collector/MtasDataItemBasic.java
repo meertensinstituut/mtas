@@ -47,8 +47,8 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
       MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
       HashMap<String, Integer> errorList,
-      MtasDataOperations<T1, T2> operations) {
-    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList);
+      MtasDataOperations<T1, T2> operations, int sourceNumber) {
+    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList, sourceNumber);
     this.valueSum = valueSum;
     this.valueN = valueN;
     this.operations = operations;
@@ -77,7 +77,7 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
    * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
    */
   @Override
-  public Map<String, Object> rewrite() throws IOException {
+  public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     Map<String, Object> response = new HashMap<String, Object>();
     for (String statsItem : statsItems) {
       if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
@@ -97,8 +97,11 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
       }
       response.put("errorNumber", errorNumber);
       response.put("errorList", errorResponse);
-    }
-    // response.put("stats", "basic");
+    }   
+    if(showDebugInfo) {
+      response.put("sourceNumber", sourceNumber);    
+      response.put("stats", "basic");
+    } 
     return response;
   }
 

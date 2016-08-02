@@ -359,9 +359,9 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 numberOfPositions += posIncr;
                 result.addItem(term, offsetStart, offsetEnd, posIncr, payload,
                     flags);
-                // System.out.println(term);
+                //System.out.print(term+" ");
               }              
-
+              
               // update field
               doc.remove(field);
               if(result.getTokenNumber()>0) {
@@ -401,7 +401,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
     }
     // pass it up the chain 
-    super.processAdd(cmd);
+    super.processAdd(cmd);    
   }
 
   private void setFields(SolrInputDocument doc, String fieldNames,

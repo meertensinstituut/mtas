@@ -86,7 +86,7 @@ public final class MtasTokenizer extends Tokenizer {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasTokenizer(MtasConfiguration config) throws IOException {
-    processConfiguration(config);
+    processConfiguration(config);    
   }
 
   /**
@@ -174,7 +174,9 @@ public final class MtasTokenizer extends Tokenizer {
   public void print(Reader r) throws IOException, MtasParserException {
     setReader(r);
     reset();
-    tokenCollection.print();
+    if(tokenCollection!=null) {
+      tokenCollection.print();
+    } 
     end();
     close();
   }

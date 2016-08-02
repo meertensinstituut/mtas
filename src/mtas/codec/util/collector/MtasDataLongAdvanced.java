@@ -61,7 +61,7 @@ public class MtasDataLongAdvanced
         advancedValueSumOfLogsList[i], advancedValueSumOfSquaresList[i],
         advancedValueMinList[i], advancedValueMaxList[i],
         advancedValueNList[i], hasSub() ? subCollectorListNextLevel[i] : null,
-        statsItems, sortType, sortDirection, errorNumber[i], errorList[i]);
+        statsItems, sortType, sortDirection, errorNumber[i], errorList[i], sourceNumberList[i]);
   }
 
   /*
@@ -83,7 +83,7 @@ public class MtasDataLongAdvanced
   @Override
   public MtasDataCollector<?, ?> add(long[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
         newCurrentExisting);
     return dataCollector;
@@ -108,7 +108,7 @@ public class MtasDataLongAdvanced
   @Override
   public MtasDataCollector<?, ?> add(double[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     Long[] newValues = new Long[number];
     for (int i = 0; i < values.length; i++)
       newValues[i] = Double.valueOf(values[i]).longValue();
@@ -142,7 +142,7 @@ public class MtasDataLongAdvanced
     if (keys != null && keys.length > 0) {
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
             newCurrentExisting);
       }
@@ -181,7 +181,7 @@ public class MtasDataLongAdvanced
         newValues[i] = Double.valueOf(values[i]).longValue();
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, newValues, number, newCurrentExisting);
       }
       return subCollectors;

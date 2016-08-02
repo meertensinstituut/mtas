@@ -52,8 +52,8 @@ abstract class MtasDataItemFull<T1 extends Number, T2 extends Number>
   public MtasDataItemFull(T1[] value, MtasDataCollector<?, ?> sub,
       TreeSet<String> statsItems, String sortType, String sortDirection,
       int errorNumber, HashMap<String, Integer> errorList,
-      MtasDataOperations<T1, T2> operations) {
-    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList);
+      MtasDataOperations<T1, T2> operations, int sourceNumber) {
+    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList, sourceNumber);
     this.fullValues = value;
     this.operations = operations;
   }
@@ -106,7 +106,7 @@ abstract class MtasDataItemFull<T1 extends Number, T2 extends Number>
    * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
    */
   @Override
-  public Map<String, Object> rewrite() throws IOException {
+  public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     createStats();
     Map<String, Object> response = new HashMap<String, Object>();
     for (String statsItem : statsItems) {
@@ -163,7 +163,10 @@ abstract class MtasDataItemFull<T1 extends Number, T2 extends Number>
       response.put("errorNumber", errorNumber);
       response.put("errorList", errorResponse);
     }
-    // response.put("stats", "full");
+    if(showDebugInfo) {
+      response.put("sourceNumber", sourceNumber);    
+      response.put("stats", "full");
+    }  
     return response;
   }
 

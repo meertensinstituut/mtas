@@ -26,9 +26,9 @@
 			<url>https://www.meertens.knaw.nl/cms/nl/medewerkers/144373-matthijsb</url>
 		</developer>
 		<developer>
-      <name>Marc Kemps-Snijders</name>
-      <url>https://www.meertens.knaw.nl/cms/nl/medewerkers/143329-marck</url>
-    </developer>
+			<name>Marc Kemps-Snijders</name>
+			<url>https://www.meertens.knaw.nl/cms/nl/medewerkers/143329-marck</url>
+		</developer>
 	</developers>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -46,7 +46,7 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-			</plugin>			
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
@@ -64,7 +64,7 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
-			</plugin>
+			</plugin>			
 		</plugins>
 	</build>
 	<reporting>

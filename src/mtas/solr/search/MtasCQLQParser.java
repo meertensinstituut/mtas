@@ -69,7 +69,7 @@ public class MtasCQLQParser extends QParser {
       SpanQuery q = null;
       
       try {
-        q = p.parse(field);                   
+        q = p.parse(field, null);                   
       } catch (mtas.parser.cql.ParseException e) {
         throw new SyntaxError(e.getMessage());
       }  

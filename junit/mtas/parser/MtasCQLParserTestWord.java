@@ -23,10 +23,10 @@ public class MtasCQLParserTestWord {
     basicNotTests();
   }
   
-  private void testCQLParse(String field, String cql, SpanQuery q) {    
+  private void testCQLParse(String field, String defaultPrefix, String cql, SpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));
     try {
-      assertEquals(p.parse(field) ,q);
+      assertEquals(p.parse(field, defaultPrefix) ,q);
       System.out.println("Tested CQL parsing:\t"+cql);
     } catch (ParseException e) {
       System.out.println("Error CQL parsing:\t"+cql);
@@ -34,11 +34,11 @@ public class MtasCQLParserTestWord {
     }
   }
   
-  private void testCQLEquivalent(String field, String cql1, String cql2) {    
+  private void testCQLEquivalent(String field, String defaultPrefix, String cql1, String cql2) {    
     MtasCQLParser p1 = new MtasCQLParser(new BufferedReader(new StringReader(cql1)));   
     MtasCQLParser p2 = new MtasCQLParser(new BufferedReader(new StringReader(cql2)));   
     try {
-      assertEquals(p1.parse(field) ,p2.parse(field));
+      assertEquals(p1.parse(field, defaultPrefix) ,p2.parse(field, defaultPrefix));
       System.out.println("Tested CQL equivalent:\t"+cql1+" and "+cql2);
     } catch (ParseException e) {
       System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
@@ -67,6 +67,7 @@ public class MtasCQLParserTestWord {
     basicTest10(); 
     basicTest11(); 
     basicTest12(); 
+    basicTest13(); 
   }
   
   private void basicNotTest1() {
@@ -75,14 +76,14 @@ public class MtasCQLParserTestWord {
     SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
     SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de");
     SpanQuery q = new SpanNotQuery(q1,q2);
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicNotTest2() {
     String field = "testveld";
     String cql1 = "[pos=\"LID\" & (!lemma=\"de\")]";
     String cql2 = "[pos=\"LID\" & !(lemma=\"de\")]";
-    testCQLEquivalent(field, cql1, cql2);    
+    testCQLEquivalent(field, null, cql1, cql2);    
   }
   
   private void basicNotTest3() {
@@ -93,28 +94,28 @@ public class MtasCQLParserTestWord {
     SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","een");
     SpanQuery q4 = new MtasSpanOrQuery(new SpanQuery[]{q2,q3});
     SpanQuery q = new SpanNotQuery(q1,q4);
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicNotTest4() {
     String field = "testveld";
     String cql1 = "[pos=\"LID\" & !(lemma=\"de\" | lemma=\"een\")]";
     String cql2 = "[pos=\"LID\" & (!lemma=\"de\" & !lemma=\"een\")]";
-    testCQLEquivalent(field, cql1, cql2);    
+    testCQLEquivalent(field, null, cql1, cql2);    
   }
   
   private void basicNotTest5() {
     String field = "testveld";
     String cql1 = "[pos=\"LID\" & !(lemma=\"de\" | lemma=\"een\")]";
     String cql2 = "[pos=\"LID\" & !lemma=\"de\" & !lemma=\"een\"]";
-    testCQLEquivalent(field, cql1, cql2);      
+    testCQLEquivalent(field, null, cql1, cql2);      
   }
   
   private void basicTest1() {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]";
     SpanQuery q = new MtasCQLParserWordQuery(field, "lemma", "koe");
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest2() {
@@ -123,7 +124,7 @@ public class MtasCQLParserTestWord {
     SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
     SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N");
     SpanQuery q = new MtasSpanAndQuery(new SpanQuery[]{q1,q2});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest3() {
@@ -132,14 +133,14 @@ public class MtasCQLParserTestWord {
     SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
     SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","paard");
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q2});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest4() {
     String field = "testveld";
     String cql1 = "[lemma=\"koe\" | lemma=\"paard\"]";
     String cql2 = "[(lemma=\"koe\" | lemma=\"paard\")]";
-    testCQLEquivalent(field, cql1, cql2);    
+    testCQLEquivalent(field, null, cql1, cql2);    
   }
   
   private void basicTest5() {
@@ -150,7 +151,7 @@ public class MtasCQLParserTestWord {
     SpanQuery q3 = new MtasSpanOrQuery(new SpanQuery[]{q1,q2});
     SpanQuery q4 = new MtasCQLParserWordQuery(field,"pos","N");
     SpanQuery q = new MtasSpanAndQuery(new SpanQuery[]{q3,q4});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest6() {
@@ -161,7 +162,7 @@ public class MtasCQLParserTestWord {
     SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","paard");
     SpanQuery q4 = new MtasSpanOrQuery(new SpanQuery[]{q2,q3});
     SpanQuery q = new MtasSpanAndQuery(new SpanQuery[]{q1,q4});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest7() {
@@ -172,7 +173,7 @@ public class MtasCQLParserTestWord {
     SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","N");
     SpanQuery q4 = new MtasSpanAndQuery(new SpanQuery[]{q2,q3});
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q4});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest8() {
@@ -185,7 +186,7 @@ public class MtasCQLParserTestWord {
     SpanQuery q5 = new MtasSpanAndQuery(new SpanQuery[]{q1,q2});
     SpanQuery q6 = new MtasSpanAndQuery(new SpanQuery[]{q3,q4});
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q5,q6});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest9() {
@@ -200,7 +201,7 @@ public class MtasCQLParserTestWord {
     SpanQuery q7 = new MtasSpanAndQuery(new SpanQuery[]{q6,q3});
     SpanQuery q8 = new MtasSpanAndQuery(new SpanQuery[]{q4,q5});
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q7,q8});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest10() {
@@ -217,22 +218,22 @@ public class MtasCQLParserTestWord {
     SpanQuery q9 = new MtasSpanOrQuery(new SpanQuery[]{q4,q5});    
     SpanQuery q10 = new MtasSpanAndQuery(new SpanQuery[]{q9,q6});
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q8,q10});
-    testCQLParse(field, cql, q);    
+    testCQLParse(field, null, cql, q);    
   }
   
   private void basicTest11() {
     String field = "testveld";
     String cql1 = "[#300]";
     SpanQuery q1 = new MtasCQLParserWordPositionQuery(field, 300);
-    testCQLParse(field, cql1, q1); 
+    testCQLParse(field, null, cql1, q1); 
     String cql2 = "[#100-110]";
     SpanQuery q2 = new MtasCQLParserWordPositionQuery(field, 100, 110);
-    testCQLParse(field, cql2, q2);
+    testCQLParse(field, null, cql2, q2);
     String cql3 = "[#100-105 | #110]";
     SpanQuery q3a = new MtasCQLParserWordPositionQuery(field, 100, 105);
     SpanQuery q3b = new MtasCQLParserWordPositionQuery(field, 110);
     SpanQuery q3 = new MtasSpanOrQuery(q3a, q3b);
-    testCQLParse(field, cql3, q3);
+    testCQLParse(field, null, cql3, q3);
   }  
   
   private void basicTest12() {
@@ -242,6 +243,13 @@ public class MtasCQLParserTestWord {
     SpanQuery q2 = new MtasCQLParserWordQuery(field,"t_lc","het");
     SpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","paard");
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q2,q3});
-    testCQLParse(field, cql, q);   
-  }  
+    testCQLParse(field, null, cql, q);   
+  }
+  
+  private void basicTest13() {
+    String field = "testveld";
+    String cql = "\"de\"";
+    SpanQuery q = new MtasCQLParserWordQuery(field,"t_lc","de");
+    testCQLParse(field, "t_lc", cql, q);   
+  }
 }

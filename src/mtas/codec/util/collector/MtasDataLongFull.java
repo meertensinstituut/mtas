@@ -58,7 +58,7 @@ public class MtasDataLongFull
   protected MtasDataItemLongFull getItem(int i) {
     return new MtasDataItemLongFull(ArrayUtils.toPrimitive(fullValueList[i]),
         hasSub() ? subCollectorListNextLevel[i] : null, statsItems, sortType,
-        sortDirection, errorNumber[i], errorList[i]);
+        sortDirection, errorNumber[i], errorList[i], sourceNumberList[i]);
   }
 
   /*
@@ -80,7 +80,7 @@ public class MtasDataLongFull
   @Override
   public MtasDataCollector<?, ?> add(long[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
         newCurrentExisting);
     return dataCollector;
@@ -105,7 +105,7 @@ public class MtasDataLongFull
   @Override
   public MtasDataCollector<?, ?> add(double[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     Long[] newValues = new Long[number];
     for (int i = 0; i < values.length; i++)
       newValues[i] = Double.valueOf(values[i]).longValue();
@@ -139,7 +139,7 @@ public class MtasDataLongFull
     if (keys != null && keys.length > 0) {
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
             newCurrentExisting);
       }
@@ -178,7 +178,7 @@ public class MtasDataLongFull
         newValues[i] = Double.valueOf(values[i]).longValue();
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, newValues, number, newCurrentExisting);
       }
       return subCollectors;

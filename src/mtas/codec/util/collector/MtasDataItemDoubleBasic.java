@@ -29,9 +29,9 @@ public class MtasDataItemDoubleBasic
   public MtasDataItemDoubleBasic(double valueSum, long valueN,
       MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList) {
+      HashMap<String, Integer> errorList, int sourceNumber) {
     super(valueSum, valueN, sub, statsItems, sortType, sortDirection,
-        errorNumber, errorList, new MtasDataDoubleOperations());
+        errorNumber, errorList, new MtasDataDoubleOperations(), sourceNumber);
   }
 
   /*

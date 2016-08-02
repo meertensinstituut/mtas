@@ -122,7 +122,7 @@ public class DataCollector {
 
     /** The size. */
     // size and position current level
-    private int size;
+    protected int size;
 
     /** The position. */
     protected int position;
@@ -160,8 +160,9 @@ public class DataCollector {
     protected HashMap<String, Integer>[] errorList;
 
     /** The key list. */
-    // administration keys
     protected String[] keyList;
+    
+    protected int[] sourceNumberList;
 
     /** The segment registration. */
     protected boolean segmentRegistration;
@@ -234,6 +235,8 @@ public class DataCollector {
 
     /** The new key list. */
     protected String[] newKeyList = null;
+    
+    protected int[] newSourceNumberList = null;
 
     /** The new error number. */
     protected int[] newErrorNumber;
@@ -308,6 +311,7 @@ public class DataCollector {
       }
       // initialize administration
       keyList = new String[0];
+      sourceNumberList = new int[0];
       errorNumber = new int[0];
       errorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[0];
       size = 0;
@@ -394,7 +398,7 @@ public class DataCollector {
      * @param newDataCollector the new data collector
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    abstract public void merge(MtasDataCollector<?, ?> newDataCollector)
+    abstract public void merge(MtasDataCollector<?, ?> newDataCollector, boolean increaseSourceNumber)
         throws IOException;
 
     /**
@@ -445,6 +449,7 @@ public class DataCollector {
       newCurrentPosition = 0;
       newSize = maxNumberOfTerms + size;
       newKeyList = new String[newSize];
+      newSourceNumberList = new int[newSize];
       newErrorNumber = new int[newSize];
       newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
       if (hasSub) {
@@ -457,14 +462,17 @@ public class DataCollector {
      */
     protected void increaseNewListSize() {
       String[] tmpNewKeyList = newKeyList;
+      int[] tmpNewSourceNumberList = newSourceNumberList;
       int[] tmpNewErrorNumber = newErrorNumber;
       HashMap<String, Integer>[] tmpNewErrorList = newErrorList;
       int tmpNewSize = newSize;
       newSize = 2 * newSize;
       newKeyList = new String[newSize];
+      newSourceNumberList = new int[newSize];
       newErrorNumber = new int[newSize];
       newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
       System.arraycopy(tmpNewKeyList, 0, newKeyList, 0, tmpNewSize);
+      System.arraycopy(tmpNewSourceNumberList, 0, newSourceNumberList, 0, tmpNewSize);
       System.arraycopy(tmpNewErrorNumber, 0, newErrorNumber, 0, tmpNewSize);
       System.arraycopy(tmpNewErrorList, 0, newErrorList, 0, tmpNewSize);
       if (hasSub) {
@@ -481,7 +489,7 @@ public class DataCollector {
      * @return the mtas data collector
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected final MtasDataCollector<?, ?> add() throws IOException {
+    protected final MtasDataCollector<?, ?> add(boolean increaseSourceNumber) throws IOException {
       if (!collectorType.equals(COLLECTOR_TYPE_DATA)) {
         throw new IOException("collector should be " + COLLECTOR_TYPE_DATA);
       } else {
@@ -490,6 +498,10 @@ public class DataCollector {
         } else if (position < getSize()) {
           // copy
           newKeyList[0] = keyList[0];
+          newSourceNumberList[0] = sourceNumberList[0];
+          if(increaseSourceNumber) {
+            newSourceNumberList[0]++;
+          }
           newErrorNumber[0] = errorNumber[0];
           newErrorList[0] = errorList[0];
           if (hasSub) {
@@ -502,6 +514,7 @@ public class DataCollector {
         } else {
           // add key
           newKeyList[0] = COLLECTOR_TYPE_DATA;
+          newSourceNumberList[0] = 1;
           newErrorNumber[0] = 0;
           newErrorList[0] = new HashMap<String, Integer>();
           newPosition = 1;
@@ -531,7 +544,7 @@ public class DataCollector {
      * @return the mtas data collector
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected final MtasDataCollector<?, ?> add(String key) throws IOException {
+    protected final MtasDataCollector<?, ?> add(String key, boolean increaseSourceNumber) throws IOException {
       if (collectorType.equals(COLLECTOR_TYPE_DATA)) {
         throw new IOException("collector should be " + COLLECTOR_TYPE_LIST);
       } else if (key == null) {
@@ -563,6 +576,7 @@ public class DataCollector {
             }
             // copy
             newKeyList[newPosition] = keyList[position];
+            newSourceNumberList[newPosition] = sourceNumberList[position];
             newErrorNumber[newPosition] = errorNumber[position];
             newErrorList[newPosition] = errorList[position];
             if (hasSub) {
@@ -573,6 +587,9 @@ public class DataCollector {
             position++;
             // check if added key from list is right key
             if (newKeyList[(newPosition - 1)].equals(key)) {
+              if(increaseSourceNumber) {
+                newSourceNumberList[(newPosition-1)]++;
+              }
               newCurrentPosition = newPosition - 1;
               newCurrentExisting = true;
               // ready
@@ -593,6 +610,7 @@ public class DataCollector {
         }
         // add key
         newKeyList[newPosition] = key;
+        newSourceNumberList[newPosition] = 1;
         newErrorNumber[newPosition] = 0;
         newErrorList[newPosition] = new HashMap<String, Integer>();
         newPosition++;
@@ -731,6 +749,8 @@ public class DataCollector {
       this.segmentName = null;
     }
 
+    public abstract void reduceToSegmentKeys();
+    
     /**
      * Check existence necessary keys.
      *
@@ -870,10 +890,12 @@ public class DataCollector {
     protected void remapData(int[][] mapping) throws IOException {
       // remap and merge keys
       String[] newKeyList = new String[mapping.length];
+      int[] newSourceNumberList = new int[mapping.length];
       int[] newErrorNumber = new int[mapping.length];
       HashMap<String, Integer>[] newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[mapping.length];
       for (int i = 0; i < mapping.length; i++) {
         newKeyList[i] = keyList[mapping[i][0]];
+        newSourceNumberList[i] = sourceNumberList[mapping[i][0]];
         for (int j = 0; j < mapping[i].length; j++) {
           if (j == 0) {
             newErrorNumber[i] = errorNumber[mapping[i][j]];
@@ -900,13 +922,14 @@ public class DataCollector {
               newSubCollectorListNextLevel[i] = subCollectorListNextLevel[mapping[i][j]];
             } else {
               newSubCollectorListNextLevel[i]
-                  .merge(subCollectorListNextLevel[mapping[i][j]]);
+                  .merge(subCollectorListNextLevel[mapping[i][j]], false);
             }
           }
         }
         subCollectorListNextLevel = newSubCollectorListNextLevel;
       }
       keyList = newKeyList;
+      sourceNumberList = newSourceNumberList;
       errorNumber = newErrorNumber;
       errorList = newErrorList;
       size = keyList.length;
@@ -929,6 +952,7 @@ public class DataCollector {
             increaseNewListSize();
           }
           newKeyList[newPosition] = keyList[position];
+          newSourceNumberList[newPosition] = sourceNumberList[position];
           newErrorNumber[newPosition] = errorNumber[position];
           newErrorList[newPosition] = errorList[position];
           if (hasSub) {
@@ -940,6 +964,7 @@ public class DataCollector {
         }
         // copy
         keyList = newKeyList;
+        sourceNumberList = newSourceNumberList;
         errorNumber = newErrorNumber;
         errorList = newErrorList;
         subCollectorListNextLevel = newSubCollectorListNextLevel;
@@ -1093,13 +1118,17 @@ public class DataCollector {
           + statsType + " " + statsItems + " " + hasSub;
     }
 
+    public final SortedMap<String, T2> getList() throws IOException {
+      return getList(false);
+    }
+    
     /**
      * Gets the list.
      *
      * @return the list
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public final SortedMap<String, T2> getList() throws IOException {
+    public final SortedMap<String, T2> getList(boolean showFull) throws IOException {
       final TreeMap<String, T2> basicList = getBasicList();
       SortedMap<String, T2> list = null;
       if (sortType.equals(CodecUtil.SORT_TERM)) {
@@ -1127,7 +1156,7 @@ public class DataCollector {
         throw new IOException("unknown sort type " + sortType);
       }
       int start = this.start == null ? 0 : this.start;
-      if (number == null || (start == 0 && number >= list.size())) {
+      if (showFull || number == null || (start == 0 && number >= list.size())) {
         // ful list
         return list;
       } else if (start < list.size() && number > 0) {

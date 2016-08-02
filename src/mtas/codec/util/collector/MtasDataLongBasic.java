@@ -58,7 +58,7 @@ public class MtasDataLongBasic
   protected MtasDataItemLongBasic getItem(int i) {
     return new MtasDataItemLongBasic(basicValueSumList[i], basicValueNList[i],
         hasSub() ? subCollectorListNextLevel[i] : null, statsItems, sortType,
-        sortDirection, errorNumber[i], errorList[i]);
+        sortDirection, errorNumber[i], errorList[i], sourceNumberList[i]);
   }
 
   /*
@@ -69,7 +69,7 @@ public class MtasDataLongBasic
   @Override
   public MtasDataCollector<?, ?> add(long valueSum, long valueN)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);
     return dataCollector;
   }
@@ -82,7 +82,7 @@ public class MtasDataLongBasic
   @Override
   public MtasDataCollector<?, ?> add(long[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
         newCurrentExisting);
     return dataCollector;
@@ -96,7 +96,7 @@ public class MtasDataLongBasic
   @Override
   public MtasDataCollector<?, ?> add(double valueSum, long valueN)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(), valueN,
         newCurrentExisting);
     return dataCollector;
@@ -110,7 +110,7 @@ public class MtasDataLongBasic
   @Override
   public MtasDataCollector<?, ?> add(double[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     Long[] newValues = new Long[number];
     for (int i = 0; i < values.length; i++)
       newValues[i] = Double.valueOf(values[i]).longValue();
@@ -131,7 +131,7 @@ public class MtasDataLongBasic
     if (keys != null && keys.length > 0) {
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);
       }
       return subCollectors;
@@ -153,7 +153,7 @@ public class MtasDataLongBasic
     if (keys != null && keys.length > 0) {
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
             newCurrentExisting);
       }
@@ -176,7 +176,7 @@ public class MtasDataLongBasic
     if (keys != null && keys.length > 0) {
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(),
             valueN, newCurrentExisting);
       }
@@ -202,7 +202,7 @@ public class MtasDataLongBasic
         newValues[i] = Double.valueOf(values[i]).longValue();
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, newValues, number, newCurrentExisting);
       }
       return subCollectors;

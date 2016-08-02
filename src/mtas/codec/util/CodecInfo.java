@@ -231,15 +231,16 @@ public class CodecInfo {
    * @param hits the hits
    * @param prefixes the prefixes
    * @return the prefix filtered objects
+   * @throws IOException 
    */
   private ArrayList<MtasToken<String>> getPrefixFilteredObjects(
-      List<MtasTreeHit<?>> hits, ArrayList<String> prefixes) {
+      List<MtasTreeHit<?>> hits, ArrayList<String> prefixes) throws IOException {
     ArrayList<MtasToken<String>> tokens = new ArrayList<MtasToken<String>>();
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
       MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
-          inTerm, hit.ref);
+          inTerm, hit.ref); 
       if (token != null) {
         if (prefixes.size() > 0) {
           if (prefixes.contains(token.getPrefix())) {
@@ -373,8 +374,9 @@ public class CodecInfo {
    *
    * @param hits the hits
    * @return the objects
+   * @throws IOException 
    */
-  public ArrayList<MtasToken<String>> getObjects(List<MtasTreeHit<?>> hits) {
+  public ArrayList<MtasToken<String>> getObjects(List<MtasTreeHit<?>> hits) throws IOException {
     ArrayList<MtasToken<String>> tokens = new ArrayList<MtasToken<String>>();
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");

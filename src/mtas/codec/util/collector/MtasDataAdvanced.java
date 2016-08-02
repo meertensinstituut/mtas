@@ -88,7 +88,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
    */
   @Override
   public final void error(String error) throws IOException {
-    add();
+    add(false);
     setError(newCurrentPosition, error, newCurrentExisting);
   }
 
@@ -103,7 +103,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   public final void error(String[] keys, String error) throws IOException {
     if (keys != null && keys.length > 0) {
       for (int i = 0; i < keys.length; i++) {
-        add(keys[i]);
+        add(keys[i], false);
         setError(newCurrentPosition, error, newCurrentExisting);
       }
     }
@@ -175,6 +175,32 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
         tmpOldSize);
   }
 
+  public void reduceToSegmentKeys() {
+    if(segmentRegistration) {
+      int sizeCopy = size;
+      String[] keyListCopy = keyList.clone();
+      T1[] advancedValueSumListCopy = advancedValueSumList.clone(); 
+      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone(); 
+      T1[] advancedValueMinListCopy = advancedValueMinList.clone(); 
+      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList.clone(); 
+      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone(); 
+      long[] advancedValueNListCopy = advancedValueNList.clone(); 
+      size = 0;
+      for(int i=0; i< sizeCopy; i++) {
+        if(segmentKeys.contains(keyListCopy[i])) {
+          keyList[size] = keyListCopy[i];
+          advancedValueSumList[size] = advancedValueSumListCopy[i];
+          advancedValueMaxList[size] = advancedValueMaxListCopy[i];
+          advancedValueMinList[size] = advancedValueMinListCopy[i];
+          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];
+          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];
+          advancedValueNList[size] = advancedValueNListCopy[i];
+          size++;
+        }
+      } 
+    }  
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -332,7 +358,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
    * DataCollector.MtasDataCollector)
    */
   @Override
-  public void merge(MtasDataCollector<?, ?> newDataCollector)
+  public void merge(MtasDataCollector<?, ?> newDataCollector, boolean increaseSourceNumber)
       throws IOException {
     closeNewList();
     if (!collectorType.equals(newDataCollector.getCollectorType())
@@ -347,7 +373,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
       if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
         for (int i = 0; i < newMtasDataAdvanced.getSize(); i++) {
           MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector[1];
-          subCollectors[0] = add(newMtasDataAdvanced.keyList[i]);
+          subCollectors[0] = add(newMtasDataAdvanced.keyList[i], increaseSourceNumber);
           setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[i],
               newMtasDataAdvanced.errorList[i], newCurrentExisting);
           setValue(newCurrentPosition,
@@ -359,13 +385,13 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
               newMtasDataAdvanced.advancedValueNList[i], newCurrentExisting);
           if (hasSub() && newMtasDataAdvanced.hasSub()) {
             subCollectors[0]
-                .merge(newMtasDataAdvanced.subCollectorListNextLevel[i]);
+                .merge(newMtasDataAdvanced.subCollectorListNextLevel[i], increaseSourceNumber);
           }
         }
         closeNewList();
       } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
         if (newMtasDataAdvanced.getSize() > 0) {
-          MtasDataCollector subCollector = add();
+          MtasDataCollector subCollector = add(increaseSourceNumber);
           setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[0],
               newMtasDataAdvanced.errorList[0], newCurrentExisting);
           setValue(newCurrentPosition,
@@ -376,7 +402,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
               newMtasDataAdvanced.advancedValueMaxList[0],
               newMtasDataAdvanced.advancedValueNList[0], newCurrentExisting);
           if (hasSub() && newMtasDataAdvanced.hasSub()) {
-            subCollector.merge(newMtasDataAdvanced.subCollectorNextLevel);
+            subCollector.merge(newMtasDataAdvanced.subCollectorNextLevel, increaseSourceNumber);
           }
         }
         closeNewList();

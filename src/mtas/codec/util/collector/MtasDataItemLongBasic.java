@@ -29,9 +29,9 @@ class MtasDataItemLongBasic
   public MtasDataItemLongBasic(long valueSum, long valueN,
       MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList) {
+      HashMap<String, Integer> errorList, int sourceNumber) {
     super(valueSum, valueN, sub, statsItems, sortType, sortDirection,
-        errorNumber, errorList, new MtasDataLongOperations());
+        errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);
   }
 
   /*

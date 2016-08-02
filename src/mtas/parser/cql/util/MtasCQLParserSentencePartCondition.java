@@ -88,7 +88,7 @@ public class MtasCQLParserSentencePartCondition {
         firstOptional = true;
       }
       firstMinimumOccurence = Math.max(1,min);
-      firstMaximumOccurence = max;    
+      firstMaximumOccurence = max;          
     } else {
       throw new ParseException("fullCondition already generated");
     }
@@ -143,7 +143,7 @@ public class MtasCQLParserSentencePartCondition {
     } else {
       throw new ParseException("fullCondition already generated");
     }  
-  }
+  }  
   
   /**
    * Creates the full sentence.

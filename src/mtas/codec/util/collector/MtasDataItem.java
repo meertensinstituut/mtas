@@ -33,6 +33,8 @@ public abstract class MtasDataItem<T extends Number>
 
   /** The error list. */
   protected HashMap<String, Integer> errorList;
+  
+  protected int sourceNumber;
 
   /**
    * Instantiates a new mtas data item.
@@ -46,13 +48,14 @@ public abstract class MtasDataItem<T extends Number>
    */
   public MtasDataItem(MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList) {
+      HashMap<String, Integer> errorList, int sourceNumber) {
     this.sub = sub;
     this.statsItems = statsItems;
     this.sortType = sortType;
     this.sortDirection = sortDirection;
     this.errorNumber = errorNumber;
     this.errorList = errorList;
+    this.sourceNumber = sourceNumber;
   }
 
   /**
@@ -69,7 +72,7 @@ public abstract class MtasDataItem<T extends Number>
    * @return the map
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract Map<String, Object> rewrite() throws IOException;
+  public abstract Map<String, Object> rewrite(boolean showDebugInfo) throws IOException;
 
   /**
    * Gets the sub.

@@ -569,6 +569,8 @@ public class CodecCollector {
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
         String multiplePositionPrefixes = fi.getAttribute(
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION);
+        String setPositionPrefixes = fi.getAttribute(
+            MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION);
         if (singlePositionPrefixes != null) {
           String[] prefixes = singlePositionPrefixes
               .split(Pattern.quote(MtasToken.DELIMITER));
@@ -581,6 +583,13 @@ public class CodecCollector {
               .split(Pattern.quote(MtasToken.DELIMITER));
           for (int i = 0; i < prefixes.length; i++) {
             fieldInfo.prefix.addMultiplePosition(prefixes[i]);
+          }
+        }
+        if (setPositionPrefixes != null) {
+          String[] prefixes = setPositionPrefixes
+              .split(Pattern.quote(MtasToken.DELIMITER));
+          for (int i = 0; i < prefixes.length; i++) {
+            fieldInfo.prefix.addSetPosition(prefixes[i]);
           }
         }
       }
@@ -1875,8 +1884,9 @@ public class CodecCollector {
         if (!termVector.dataDefaultCollector.checkExistenceNecessaryKeys()) {
           needSecondRound = true;
         }
-      }
-    }
+        termVector.dataDefaultCollector.reduceToSegmentKeys();
+      }      
+    }    
     return needSecondRound;
   }
 

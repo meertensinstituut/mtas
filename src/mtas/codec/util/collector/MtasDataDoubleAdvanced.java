@@ -61,7 +61,7 @@ public class MtasDataDoubleAdvanced
         advancedValueSumOfLogsList[i], advancedValueSumOfSquaresList[i],
         advancedValueMinList[i], advancedValueMaxList[i],
         advancedValueNList[i], hasSub() ? subCollectorListNextLevel[i] : null,
-        statsItems, sortType, sortDirection, errorNumber[i], errorList[i]);
+        statsItems, sortType, sortDirection, errorNumber[i], errorList[i], sourceNumberList[i]);
   }
 
   /*
@@ -83,7 +83,7 @@ public class MtasDataDoubleAdvanced
   @Override
   public MtasDataCollector<?, ?> add(long[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     Double[] newValues = new Double[number];
     for (int i = 0; i < values.length; i++)
       newValues[i] = Long.valueOf(values[i]).doubleValue();
@@ -110,7 +110,7 @@ public class MtasDataDoubleAdvanced
   @Override
   public MtasDataCollector<?, ?> add(double[] values, int number)
       throws IOException {
-    MtasDataCollector<?, ?> dataCollector = add();
+    MtasDataCollector<?, ?> dataCollector = add(false);
     setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
         newCurrentExisting);
     return dataCollector;
@@ -145,7 +145,7 @@ public class MtasDataDoubleAdvanced
         newValues[i] = Long.valueOf(values[i]).doubleValue();
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, newValues, number, newCurrentExisting);
       }
       return subCollectors;
@@ -180,7 +180,7 @@ public class MtasDataDoubleAdvanced
     if (keys != null && keys.length > 0) {
       MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
       for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i]);
+        subCollectors[i] = add(keys[i], false);
         setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
             newCurrentExisting);
       }
