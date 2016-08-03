@@ -18,6 +18,9 @@ import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
 
+/**
+ * The Class MtasCRMParser.
+ */
 public class MtasCRMParser extends MtasBasicParser {
 
   /** The word type. */
@@ -26,8 +29,14 @@ public class MtasCRMParser extends MtasBasicParser {
   /** The word annotation types. */
   private HashMap<String, MtasParserType> wordAnnotationTypes = new HashMap<String, MtasParserType>();
 
+  /** The functions. */
   private HashMap<String, MtasCRMParserFunction> functions = new HashMap<String, MtasCRMParserFunction>();
 
+  /**
+   * Instantiates a new mtas crm parser.
+   *
+   * @param config the config
+   */
   public MtasCRMParser(MtasConfiguration config) {
     super(config);
     try {
@@ -38,6 +47,9 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.analysis.parser.MtasParser#initParser()
+   */
   @Override
   protected void initParser() throws MtasConfigException {
     super.initParser();
@@ -128,6 +140,9 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.analysis.parser.MtasParser#createTokenCollection(java.io.Reader)
+   */
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException {
@@ -252,6 +267,22 @@ public class MtasCRMParser extends MtasBasicParser {
 
   }
 
+  /**
+   * Process word annotation.
+   *
+   * @param name the name
+   * @param text the text
+   * @param previousOffset the previous offset
+   * @param currentOffset the current offset
+   * @param functionOutputList the function output list
+   * @param unknownAncestors the unknown ancestors
+   * @param currentList the current list
+   * @param updateList the update list
+   * @param idPositions the id positions
+   * @param idOffsets the id offsets
+   * @throws MtasParserException the mtas parser exception
+   * @throws MtasConfigException the mtas config exception
+   */
   private void processWordAnnotation(String name, String text,
       Integer previousOffset, Integer currentOffset,
       ArrayList<MtasCRMParserFunctionOutput> functionOutputList,
@@ -318,6 +349,9 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.analysis.parser.MtasParser#printConfig()
+   */
   @Override
   public String printConfig() {
     String text = "";
@@ -328,6 +362,12 @@ public class MtasCRMParser extends MtasBasicParser {
     return text;
   }
 
+  /**
+   * Prints the config types.
+   *
+   * @param types the types
+   * @return the string
+   */
   private String printConfigTypes(HashMap<?, MtasParserType> types) {
     String text = "";
     for (Entry<?, MtasParserType> entry : types.entrySet()) {
@@ -340,12 +380,25 @@ public class MtasCRMParser extends MtasBasicParser {
     return text;
   }
 
+  /**
+   * The Class MtasCRMParserFunction.
+   */
   private class MtasCRMParserFunction {
 
+    /** The type. */
     public String type;
+    
+    /** The split. */
     public String split;
+    
+    /** The output. */
     public HashMap<String, ArrayList<MtasCRMParserFunctionOutput>> output;
 
+    /**
+     * Instantiates a new mtas crm parser function.
+     *
+     * @param split the split
+     */
     public MtasCRMParserFunction(String split) {
       this.split = split;
       output = new HashMap<String, ArrayList<MtasCRMParserFunctionOutput>>();
@@ -353,21 +406,37 @@ public class MtasCRMParser extends MtasBasicParser {
 
   }
 
+  /**
+   * The Class MtasCRMParserFunctionOutput.
+   */
   private class MtasCRMParserFunctionOutput {
+    
+    /** The name. */
     public String name;
+    
+    /** The value. */
     public String value;
 
+    /**
+     * Instantiates a new mtas crm parser function output.
+     *
+     * @param name the name
+     * @param value the value
+     */
     public MtasCRMParserFunctionOutput(String name, String value) {
       this.name = name;
       this.value = value;
     }
   }
 
+  /**
+   * The Class MtasCRMParserMappingWordAnnotation.
+   */
   private class MtasCRMParserMappingWordAnnotation
       extends MtasParserMapping<MtasCRMParserMappingWordAnnotation> {
 
     /**
-     * Instantiates a new mtas sketch parser mapping word annotation.
+     * Instantiates a new mtas crm parser mapping word annotation.
      */
     public MtasCRMParserMappingWordAnnotation() {
       super();

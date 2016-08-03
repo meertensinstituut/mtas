@@ -15,25 +15,26 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
   /** The stored string value. */
   private String storedStringValue;
 
+  /** The file input stream. */
   private FileInputStream fileInputStream;
 
   /** The object input stream. */
   private ObjectInputStream objectInputStream;
 
+  /** The file. */
   private File file;
 
   /** The iterator. */
   private Iterator<MtasUpdateRequestProcessorResultItem> iterator;
 
+  /** The closed. */
   private boolean closed;
 
   /**
    * Instantiates a new mtas update request processor result reader.
    *
-   * @param fileName
-   *          the file name
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param fileName the file name
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasUpdateRequestProcessorResultReader(String fileName)
       throws IOException {

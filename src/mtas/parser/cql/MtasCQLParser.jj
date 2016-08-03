@@ -8,8 +8,8 @@ options
   DEBUG_TOKEN_MANAGER = false;
 
   LOOKAHEAD= 1000;
-}
-
+} 
+ 
 PARSER_BEGIN(MtasCQLParser)
 package mtas.parser.cql;
 import mtas.analysis.token.MtasToken;

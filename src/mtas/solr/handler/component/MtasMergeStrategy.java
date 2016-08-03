@@ -21,8 +21,14 @@ import org.apache.solr.search.SolrIndexSearcher;
 
 import mtas.solr.handler.component.MtasSolrSearchComponent.ComponentSortSelect;
 
+/**
+ * The Class MtasMergeStrategy.
+ */
 public class MtasMergeStrategy implements MergeStrategy {
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.component.MergeStrategy#merge(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.ShardRequest)
+   */
   @Override
   public void merge(ResponseBuilder rb, ShardRequest sreq) {
 
@@ -84,26 +90,46 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.component.MergeStrategy#mergesIds()
+   */
   @Override
   public boolean mergesIds() {
     return false;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.component.MergeStrategy#handlesMergeFields()
+   */
   @Override
   public boolean handlesMergeFields() {
     return false;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.component.MergeStrategy#handleMergeFields(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.search.SolrIndexSearcher)
+   */
   @Override
   public void handleMergeFields(ResponseBuilder rb,
       SolrIndexSearcher searcher) {
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.component.MergeStrategy#getCost()
+   */
   @Override
   public int getCost() {
     return 0;
   }
 
+  /**
+   * Merge named list.
+   *
+   * @param sreq the sreq
+   * @param mtasResponse the mtas response
+   * @param key the key
+   * @param preferredPurpose the preferred purpose
+   */
   private void mergeNamedList(ShardRequest sreq,
       NamedList<Object> mtasResponse, String key, Integer preferredPurpose) {
     // create new response for key
@@ -147,6 +173,15 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Merge array list.
+   *
+   * @param sreq the sreq
+   * @param mtasResponse the mtas response
+   * @param key the key
+   * @param preferredPurpose the preferred purpose
+   * @param mergeAllShardResponses the merge all shard responses
+   */
   private void mergeArrayList(ShardRequest sreq,
       NamedList<Object> mtasResponse, String key, Integer preferredPurpose,
       boolean mergeAllShardResponses) {
@@ -203,6 +238,12 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Encode.
+   *
+   * @param o the o
+   * @return the string
+   */
   String encode(Object o) {
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     ObjectOutputStream objectOutputStream;
@@ -217,6 +258,12 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Decode.
+   *
+   * @param s the s
+   * @return the object
+   */
   private Object decode(String s) {
     byte[] bytes = Base64.base64ToByteArray(s);
     ObjectInputStream objectInputStream;
@@ -230,6 +277,12 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Decode.
+   *
+   * @param l the l
+   * @return the array list
+   */
   ArrayList decode(ArrayList l) {
     for (int i = 0; i < l.size(); i++) {
       if (l.get(i) instanceof NamedList) {
@@ -241,6 +294,12 @@ public class MtasMergeStrategy implements MergeStrategy {
     return l;
   }
 
+  /**
+   * Decode.
+   *
+   * @param nl the nl
+   * @return the named list
+   */
   private NamedList<Object> decode(NamedList<Object> nl) {
     for (int i = 0; i < nl.size(); i++) {
       String key = nl.getName(i);
@@ -276,6 +335,12 @@ public class MtasMergeStrategy implements MergeStrategy {
   }
 
 
+  /**
+   * Merge responses tree set.
+   *
+   * @param originalList the original list
+   * @param shardList the shard list
+   */
   private void mergeResponsesTreeSet(TreeSet<Object> originalList,
       TreeSet<Object> shardList) {
     for (Object item : shardList) {
@@ -283,6 +348,13 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Merge responses array list.
+   *
+   * @param originalList the original list
+   * @param shardList the shard list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void mergeResponsesArrayList(ArrayList<Object> originalList,
       ArrayList<Object> shardList) throws IOException {
     // get keys from original
@@ -324,6 +396,13 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Merge responses named list.
+   *
+   * @param mainResponse the main response
+   * @param shardResponse the shard response
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void mergeResponsesNamedList(NamedList<Object> mainResponse,
       NamedList<Object> shardResponse) throws IOException {
     Iterator<Entry<String, Object>> it = shardResponse.iterator();
@@ -372,6 +451,12 @@ public class MtasMergeStrategy implements MergeStrategy {
     }
   }
 
+  /**
+   * Adjustable parts cloned.
+   *
+   * @param original the original
+   * @return the object
+   */
   private Object adjustablePartsCloned(Object original) {
     if (original instanceof NamedList) {
       NamedList<Object> newObject = new SimpleOrderedMap();

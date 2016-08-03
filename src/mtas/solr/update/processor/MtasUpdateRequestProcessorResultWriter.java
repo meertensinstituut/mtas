@@ -12,22 +12,25 @@ import org.apache.lucene.util.BytesRef;
  */
 public class MtasUpdateRequestProcessorResultWriter implements Closeable {
 
+  /** The object output stream. */
   private ObjectOutputStream objectOutputStream;
 
+  /** The file output stream. */
   private FileOutputStream fileOutputStream;
 
+  /** The closed. */
   private boolean closed;
 
+  /** The token number. */
   private int tokenNumber;
 
+  /** The file. */
   private File file;
 
   /**
    * Instantiates a new mtas update request processor result writer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
+   * @param value the value
    */
   public MtasUpdateRequestProcessorResultWriter(String value) {
     closed = false;
@@ -48,19 +51,12 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
   /**
    * Adds the item.
    *
-   * @param term
-   *          the term
-   * @param offsetStart
-   *          the offset start
-   * @param offsetEnd
-   *          the offset end
-   * @param posIncr
-   *          the pos incr
-   * @param payload
-   *          the payload
-   * @param flags
-   *          the flags
-   * @throws IOException
+   * @param term the term
+   * @param offsetStart the offset start
+   * @param offsetEnd the offset end
+   * @param posIncr the pos incr
+   * @param payload the payload
+   * @param flags the flags
    */
   public void addItem(String term, Integer offsetStart, Integer offsetEnd,
       Integer posIncr, BytesRef payload, Integer flags) {
@@ -78,16 +74,20 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
+  /**
+   * Gets the token number.
+   *
+   * @return the token number
+   */
   public int getTokenNumber() {
     return tokenNumber;
   }
 
   /**
-   * Creates the file.
+   * Gets the file name.
    *
-   * @return the string
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @return the file name
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public String getFileName() throws IOException {
     if (file != null) {
@@ -97,6 +97,9 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
+  /* (non-Javadoc)
+   * @see java.io.Closeable#close()
+   */
   @Override
   public void close() throws IOException {
     if (!closed) {
@@ -106,6 +109,9 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
+  /**
+   * Force close and delete.
+   */
   public void forceCloseAndDelete() {
     try {
       if (objectOutputStream != null) {

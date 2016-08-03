@@ -1,8 +1,24 @@
 <project name="Multi Tier Annotation Search">
+  <bannerRight>
+    <name>Meertens Instituut</name>
+    <src>images/meertens.png</src>
+    <href>http://www.meertens.knaw.nl/</href>
+    <width>147</width>
+    <height>100</height>
+    <title>Meertens Instituut</title>
+  </bannerRight>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.5</version>
+  </skin>
   <body>
     <menu name="Mtas">
       <item name="Introduction" href="index.html"/>
-      <item name="Installation" href="installation.html"/>
+      <item name="Getting started" href="installation.html">
+        <item name="Lucene" href="installation_lucene.html"/>
+        <item name="Solr" href="installation_solr.html"/>
+      </item>
       <item name="Download" href="download.html"/>      
     </menu>
     <menu ref="reports"/>

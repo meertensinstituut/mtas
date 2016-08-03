@@ -339,14 +339,21 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE = "value";
 
+  /** The Constant STAGE_TERMVECTOR_MISSING_TOP. */
   public static final int STAGE_TERMVECTOR_MISSING_TOP = ResponseBuilder.STAGE_EXECUTE_QUERY
       + 10;
+  
+  /** The Constant STAGE_TERMVECTOR_MISSING_KEY. */
   public static final int STAGE_TERMVECTOR_MISSING_KEY = ResponseBuilder.STAGE_EXECUTE_QUERY
       + 15;
+  
+  /** The Constant STAGE_LIST. */
   public static final int STAGE_LIST = ResponseBuilder.STAGE_EXECUTE_QUERY + 20;
 
+  /** The show debug info. */
   private static boolean showDebugInfo = true;
 
+  /** The merge strategy. */
   private MtasMergeStrategy mergeStrategy;
 
   /*
@@ -422,10 +429,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the field type.
    *
-   * @param schema
-   *          the schema
-   * @param field
-   *          the field
+   * @param schema the schema
+   * @param field the field
    * @return the field type
    */
   private String getFieldType(IndexSchema schema, String field) {
@@ -451,12 +456,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare kwic.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareKwic(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -557,12 +559,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare facet.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareFacet(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -725,12 +724,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare list.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareList(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -833,12 +829,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare group.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareGroup(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -985,16 +978,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare group.
    *
-   * @param solrParams
-   *          the solr params
-   * @param gids
-   *          the gids
-   * @param name
-   *          the name
-   * @param positions
-   *          the positions
-   * @param prefixes
-   *          the prefixes
+   * @param solrParams the solr params
+   * @param gids the gids
+   * @param name the name
+   * @param positions the positions
+   * @param prefixes the prefixes
    */
   private void prepareGroup(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) {
@@ -1013,12 +1001,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare term vector.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareTermVector(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1131,12 +1116,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare prefix.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void preparePrefix(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1181,12 +1163,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareStats(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1204,12 +1183,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats positions.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareStatsPositions(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
@@ -1278,12 +1254,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats tokens.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareStatsTokens(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
@@ -1352,12 +1325,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Prepare stats spans.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareStatsSpans(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -1470,10 +1440,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the ids from parameters.
    *
-   * @param params
-   *          the params
-   * @param prefix
-   *          the prefix
+   * @param params the params
+   * @param prefix the prefix
    * @return the ids from parameters
    */
   private SortedSet<String> getIdsFromParameters(SolrParams params,
@@ -1495,15 +1463,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Construct query.
    *
-   * @param queryValue
-   *          the query value
-   * @param queryType
-   *          the query type
-   * @param field
-   *          the field
+   * @param queryValue the query value
+   * @param queryType the query type
+   * @param field the field
    * @return the span query
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private SpanQuery constructQuery(String queryValue, String queryType,
       String field) throws IOException {
@@ -1533,8 +1497,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the positive integer.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -1548,8 +1511,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the double.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the double
    */
   private Double getDouble(String number) {
@@ -1563,18 +1525,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Compare and check.
    *
-   * @param list
-   *          the list
-   * @param original
-   *          the original
-   * @param nameNew
-   *          the name new
-   * @param nameOriginal
-   *          the name original
-   * @param unique
-   *          the unique
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param list the list
+   * @param original the original
+   * @param nameNew the name new
+   * @param nameOriginal the name original
+   * @param unique the unique
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void compareAndCheck(String[] list, String[] original, String nameNew,
       String nameOriginal, Boolean unique) throws IOException {
@@ -1928,6 +1884,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
     //        + " HANDLERESPONSES " + rb.stage + " " + rb.req.getParamString());
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.solr.handler.component.SearchComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+   */
   @Override
   public void finishStage(ResponseBuilder rb) {
     // System.out
@@ -1996,6 +1955,13 @@ public class MtasSolrSearchComponent extends SearchComponent {
     return ResponseBuilder.STAGE_DONE;
   }
 
+  /**
+   * Distributed process termvector missing top.
+   *
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void distributedProcessTermvectorMissingTop(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
     int numberOfShards = rb.shards.length;
@@ -2031,15 +1997,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
   }
 
   /**
-   * Distributed process termvector.
+   * Distributed process termvector missing key.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @return
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void distributedProcessTermvectorMissingKey(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
@@ -2123,10 +2085,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Distributed process list.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
+   * @param rb the rb
+   * @param mtasFields the mtas fields
    */
   private void distributedProcessList(ResponseBuilder rb,
       ComponentFields mtasFields) {
@@ -2240,15 +2200,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
   }
 
   /**
-   * Compute missing items per shard.
+   * Compute missing termvector items per shard.
    *
-   * @param shardResponses
-   *          the shard responses
-   * @param args
-   *          the args
+   * @param shardResponses the shard responses
+   * @param args the args
    * @return the hash map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private HashMap<String, HashMap<String, HashSet<String>>> computeMissingTermvectorItemsPerShard(
       List<ShardResponse> shardResponses, String... args) throws IOException {
@@ -2330,6 +2287,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
     return result;
   }
 
+  /**
+   * Repair prefix items.
+   *
+   * @param mtasResponse the mtas response
+   */
   private void repairPrefixItems(NamedList<Object> mtasResponse) {
     // repair prefix lists
     try {
@@ -2360,8 +2322,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the mtas fields.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    * @return the mtas fields
    */
   private ComponentFields getMtasFields(ResponseBuilder rb) {
@@ -2371,13 +2332,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the stats position.
    *
-   * @param position
-   *          the position
-   * @param encode
-   *          the encode
+   * @param position the position
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private SimpleOrderedMap<Object> createStatsPosition(
       ComponentPosition position, Boolean encode) throws IOException {
@@ -2399,13 +2357,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the stats token.
    *
-   * @param token
-   *          the token
-   * @param encode
-   *          the encode
+   * @param token the token
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private SimpleOrderedMap<Object> createStatsToken(ComponentToken token,
       Boolean encode) throws IOException {
@@ -2427,13 +2382,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the stats span.
    *
-   * @param span
-   *          the span
-   * @param encode
-   *          the encode
+   * @param span the span
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private SimpleOrderedMap<Object> createStatsSpan(ComponentSpan span,
       Boolean encode) throws IOException {
@@ -2455,13 +2407,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the term vector.
    *
-   * @param termVector
-   *          the term vector
-   * @param encode
-   *          the encode
+   * @param termVector the term vector
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private SimpleOrderedMap<Object> createTermVector(
       ComponentTermVector termVector, Boolean encode) throws IOException {
@@ -2507,10 +2456,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the prefix.
    *
-   * @param prefix
-   *          the prefix
-   * @param encode
-   *          the encode
+   * @param prefix the prefix
+   * @param encode the encode
    * @return the simple ordered map
    */
   private SimpleOrderedMap<Object> createPrefix(ComponentPrefix prefix,
@@ -2535,8 +2482,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the list.
    *
-   * @param list
-   *          the list
+   * @param list the list
    * @return the simple ordered map
    */
   private SimpleOrderedMap<Object> createList(ComponentList list) {
@@ -2666,10 +2612,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the group.
    *
-   * @param group
-   *          the group
-   * @param encode
-   *          the encode
+   * @param group the group
+   * @param encode the encode
    * @return the simple ordered map
    */
   private SimpleOrderedMap<Object> createGroup(ComponentGroup group,
@@ -2698,13 +2642,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the facet.
    *
-   * @param facet
-   *          the facet
-   * @param encode
-   *          the encode
+   * @param facet the facet
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private SimpleOrderedMap<Object> createFacet(ComponentFacet facet,
       Boolean encode) throws IOException {
@@ -2731,8 +2672,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Creates the kwic.
    *
-   * @param kwic
-   *          the kwic
+   * @param kwic the kwic
    * @return the simple ordered map
    */
   private SimpleOrderedMap<Object> createKwic(ComponentKwic kwic) {
@@ -2859,6 +2799,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     return mtasKwicResponse;
   }
 
+  /**
+   * Rewrite.
+   *
+   * @param al the al
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void rewrite(ArrayList<Object> al) throws IOException {
     for (int i = 0; i < al.size(); i++) {
       if (al.get(i) instanceof NamedList) {
@@ -2872,10 +2818,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Rewrite.
    *
-   * @param nl
-   *          the nl
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param nl the nl
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void rewrite(NamedList<Object> nl) throws IOException {
     HashMap<String, NamedList<Object>> collapseNamedList = null;
@@ -2993,22 +2937,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Instantiates a new component sort select.
      *
-     * @param dataCollector
-     *          the data collector
-     * @param dataType
-     *          the data type
-     * @param statsType
-     *          the stats type
-     * @param statsItems
-     *          the stats items
-     * @param sortType
-     *          the sort type
-     * @param sortDirection
-     *          the sort direction
-     * @param start
-     *          the start
-     * @param number
-     *          the number
+     * @param dataCollector the data collector
+     * @param dataType the data type
+     * @param statsType the stats type
+     * @param statsItems the stats items
+     * @param sortType the sort type
+     * @param sortDirection the sort direction
+     * @param start the start
+     * @param number the number
      */
     public ComponentSortSelect(MtasDataCollector<?, ?> dataCollector,
         String[] dataType, String[] statsType, TreeSet<String>[] statsItems,
@@ -3046,14 +2982,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Instantiates a new component sort select.
      *
-     * @param dataCollector
-     *          the data collector
-     * @param dataType
-     *          the data type
-     * @param statsType
-     *          the stats type
-     * @param statsItems
-     *          the stats items
+     * @param dataCollector the data collector
+     * @param dataType the data type
+     * @param statsType the stats type
+     * @param statsItems the stats items
      */
     public ComponentSortSelect(MtasDataCollector dataCollector, String dataType,
         String statsType, TreeSet<String> statsItems) {
@@ -3065,10 +2997,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Merge.
      *
-     * @param newItem
-     *          the new item
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param newItem the new item
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     void merge(ComponentSortSelect newItem) throws IOException {
       dataCollector.merge(newItem.dataCollector, true);
@@ -3078,8 +3008,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
      * Gets the total.
      *
      * @return the total
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private int getTotal() throws IOException {
       if (dataCollector.getCollectorType()
@@ -3094,9 +3023,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Gets the data.
      *
+     * @param showDebugInfo the show debug info
      * @return the data
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     NamedList<Object> getData(boolean showDebugInfo) throws IOException {
       if (dataCollector.getCollectorType()
@@ -3127,6 +3056,13 @@ public class MtasSolrSearchComponent extends SearchComponent {
       }
     }
 
+    /**
+     * Gets the key list.
+     *
+     * @param showFull the show full
+     * @return the key list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Set<String> getKeyList(boolean showFull) throws IOException {
       if (dataCollector.getCollectorType()
           .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
@@ -3139,6 +3075,13 @@ public class MtasSolrSearchComponent extends SearchComponent {
       }
     }
 
+    /**
+     * Gets the named list.
+     *
+     * @param showDebugInfo the show debug info
+     * @return the named list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     NamedList<Object> getNamedList(boolean showDebugInfo) throws IOException {
       return getNamedList(false, showDebugInfo);
     }
@@ -3146,9 +3089,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
     /**
      * Gets the named list.
      *
+     * @param showFull the show full
+     * @param showDebugInfo the show debug info
      * @return the named list
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private NamedList<Object> getNamedList(boolean showFull,
         boolean showDebugInfo) throws IOException {
