@@ -53,7 +53,9 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.analysis.parser.MtasParser#initParser()
    */
   @Override
@@ -62,7 +64,7 @@ final public class MtasSketchParser extends MtasBasicParser {
     if (config != null) {
 
       // always word, no mappings
-      wordType = new MtasParserType(MAPPING_TYPE_WORD, null);
+      wordType = new MtasParserType(MAPPING_TYPE_WORD, null, false);
 
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
@@ -74,7 +76,7 @@ final public class MtasSketchParser extends MtasBasicParser {
               String nameMapping = mapping.attributes.get("name");
               if ((typeMapping != null)) {
                 if (typeMapping.equals(MAPPING_TYPE_WORD)) {
-                  MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
+                  MtasSketchParserMappingWord m = new MtasSketchParserMappingWord();
                   m.processConfig(mapping);
                   wordType.addMapping(m);
                 } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)
@@ -85,7 +87,7 @@ final public class MtasSketchParser extends MtasBasicParser {
                     wordAnnotationTypes.get(nameMapping).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
                   }
@@ -97,7 +99,7 @@ final public class MtasSketchParser extends MtasBasicParser {
                     groupTypes.get(nameMapping).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     groupTypes.put(nameMapping, t);
                   }
@@ -113,7 +115,9 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.analysis.parser.MtasParser#createTokenCollection(java.io.Reader)
    */
   @Override
@@ -337,11 +341,13 @@ final public class MtasSketchParser extends MtasBasicParser {
       }
     }
     // final check
-    tokenCollection.check(autorepair);
+    tokenCollection.check(autorepair, makeunique);
     return tokenCollection;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.analysis.parser.MtasParser#printConfig()
    */
   @Override
@@ -370,6 +376,34 @@ final public class MtasSketchParser extends MtasBasicParser {
       }
     }
     return text;
+  }
+
+  /**
+   * The Class MtasSketchParserMappingWord.
+   */
+  private class MtasSketchParserMappingWord
+      extends MtasParserMapping<MtasSketchParserMappingWord> {
+
+    /**
+     * Instantiates a new mtas sketch parser mapping word.
+     */
+    public MtasSketchParserMappingWord() {
+      super();
+      this.position = SOURCE_OWN;
+      this.realOffset = SOURCE_OWN;
+      this.offset = SOURCE_OWN;
+      this.type = MAPPING_TYPE_WORD;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
+     */
+    @Override
+    protected MtasSketchParserMappingWord self() {
+      return this;
+    }
   }
 
   /**

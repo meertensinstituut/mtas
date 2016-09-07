@@ -15,50 +15,57 @@ public class MtasSpanMatchAll extends Spans {
 
   /** The field. */
   private String field;
-  
+
   /** The doc id. */
-  private int minPosition, maxPosition, currentStartPosition, currentEndPosition, docId;
-  
+  private int minPosition, maxPosition, currentStartPosition,
+      currentEndPosition, docId;
+
   /** The mtas codec info. */
   private CodecInfo mtasCodecInfo;
-  
+
   /**
    * Instantiates a new mtas span match all.
    *
-   * @param mtasCodecInfo the mtas codec info
-   * @param field the field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param field
+   *          the field
    */
   public MtasSpanMatchAll(CodecInfo mtasCodecInfo, String field) {
-    super(); 
+    super();
     this.mtasCodecInfo = mtasCodecInfo;
     this.field = field;
     minPosition = NO_MORE_POSITIONS;
     maxPosition = NO_MORE_POSITIONS;
     currentStartPosition = NO_MORE_POSITIONS;
     currentEndPosition = NO_MORE_POSITIONS;
-    docId = -1;    
+    docId = -1;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
   public int nextStartPosition() throws IOException {
-    if(currentStartPosition < minPosition) {
+    if (currentStartPosition < minPosition) {
       currentStartPosition = minPosition;
       currentEndPosition = currentStartPosition + 1;
     } else {
       currentStartPosition++;
       currentEndPosition = currentStartPosition + 1;
-      if(currentStartPosition > maxPosition) {
+      if (currentStartPosition > maxPosition) {
         currentStartPosition = NO_MORE_POSITIONS;
         currentEndPosition = NO_MORE_POSITIONS;
-      }  
+      }
     }
     return currentStartPosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
@@ -66,7 +73,9 @@ public class MtasSpanMatchAll extends Spans {
     return currentStartPosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
@@ -74,7 +83,9 @@ public class MtasSpanMatchAll extends Spans {
     return currentEndPosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
@@ -82,15 +93,21 @@ public class MtasSpanMatchAll extends Spans {
     return 0;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-    
+
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -98,13 +115,15 @@ public class MtasSpanMatchAll extends Spans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
   public int nextDoc() throws IOException {
     IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, docId);
-    if(indexDoc!=null) {
+    if (indexDoc != null) {
       docId = indexDoc.docId;
       minPosition = indexDoc.minPosition;
       maxPosition = indexDoc.maxPosition;
@@ -120,13 +139,15 @@ public class MtasSpanMatchAll extends Spans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
-  public int advance(int target) throws IOException {      
-    IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, (target-1));
-    if(indexDoc!=null) {
+  public int advance(int target) throws IOException {
+    IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, (target - 1));
+    if (indexDoc != null) {
       docId = indexDoc.docId;
       minPosition = indexDoc.minPosition;
       maxPosition = indexDoc.maxPosition;
@@ -137,25 +158,29 @@ public class MtasSpanMatchAll extends Spans {
       minPosition = NO_MORE_POSITIONS;
       maxPosition = NO_MORE_POSITIONS;
       currentStartPosition = NO_MORE_POSITIONS;
-      currentEndPosition = NO_MORE_POSITIONS;      
+      currentEndPosition = NO_MORE_POSITIONS;
     }
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
   public long cost() {
     return 0;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
   public float positionsCost() {
     return 0;
-  }  
+  }
 
 }

@@ -17,6 +17,7 @@
 
     <!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
     <autorepair value="true" />
+    <makeunique value="true" />
     <!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
 
     <!-- START REFERENCES -->
@@ -72,30 +73,6 @@
           <item type="unknownAncestor" number="0" />
         </condition>
       </mapping>
-      <mapping type="wordAnnotation" name="aref">
-        <token type="string" offset="false">
-          <pre>
-            <item type="string" value="translated.t" />
-          </pre>
-          <post>
-            <item type="attribute" name="t" />
-          </post>
-        </token>
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="string" value="translated.t" />
-            <item type="string" value="_lc" />
-          </pre>
-          <post>
-            <item type="attribute" name="t" filter="ascii,lowercase" />
-          </post>
-        </token>
-        <condition>
-          <item type="ancestor" number="0" />
-          <item type="ancestorWord" number="1" />
-          <item type="unknownAncestor" number="1" />
-        </condition>
-      </mapping>
       <mapping type="wordAnnotation" name="lemma">
         <token type="string" offset="false" realoffset="false" parent="false">
           <pre>
@@ -109,24 +86,6 @@
           <item type="attribute" name="class" />
           <item type="ancestor" number="0" />
           <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="set" condition="original.http://ilk.uvt.nl/folia/sets/frog-mblem-nl" />                    
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="lemma">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="string" value="translated." />
-            <item type="name" />
-          </pre>
-          <post>
-            <item type="attribute" name="class" />
-          </post>
-        </token>
-        <condition>
-          <item type="attribute" name="class" />
-          <item type="ancestor" number="0" />
-          <item type="unknownAncestor" number="1" />
-          <item type="attribute" name="set" condition="translated.http://ilk.uvt.nl/folia/sets/frog-mblem-nl" />          
         </condition>
       </mapping>
       <mapping type="wordAnnotation" name="morphology">
@@ -166,27 +125,6 @@
           <item type="ancestor" number="0" />
           <item type="unknownAncestor" number="0" />
           <item type="attribute" name="class" />
-          <item type="attribute" name="set" condition="original.http://ilk.uvt.nl/folia/sets/frog-mbpos-cgn" />          
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="pos">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="string" value="translated." />
-            <item type="name" />
-          </pre>
-          <post>
-            <item type="attribute" name="head" />
-          </post>
-          <payload>
-            <item type="attribute" name="confidence" />
-          </payload>
-        </token>
-        <condition>
-          <item type="ancestor" number="0" />
-          <item type="unknownAncestor" number="1" />
-          <item type="attribute" name="class" />
-          <item type="attribute" name="set" condition="translated.http://ilk.uvt.nl/folia/sets/frog-mbpos-cgn" />          
         </condition>
       </mapping>
       <mapping type="wordAnnotation" name="feat">
@@ -207,29 +145,6 @@
           <item type="unknownAncestor" number="0" />
           <item type="attribute" name="class" />
           <item type="attribute" name="subset" />
-          <item type="ancestorAttribute" name="set" condition="original.http://ilk.uvt.nl/folia/sets/frog-mbpos-cgn" />          
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="feat">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="string" value="translated." />
-            <item type="name" />
-            <item type="attribute" name="subset" prefix="." />
-          </pre>
-          <post>
-            <item type="attribute" name="class" />
-          </post>
-          <payload>
-            <item type="ancestorAttribute" distance="0" name="confidence" />
-          </payload>
-        </token>
-        <condition>
-          <item type="ancestor" number="1" />
-          <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="class" />
-          <item type="attribute" name="subset" />
-          <item type="ancestorAttribute" name="set" condition="translated.http://ilk.uvt.nl/folia/sets/frog-mbpos-cgn" />          
         </condition>
       </mapping>
       <!-- END WORD ANNOTATIONS -->

@@ -8,8 +8,8 @@ options
   DEBUG_TOKEN_MANAGER = false;
 
   LOOKAHEAD= 1000;
-}
-
+} 
+ 
 PARSER_BEGIN(MtasCQLParser)
 package mtas.parser.cql;
 import mtas.analysis.token.MtasToken;
@@ -23,6 +23,7 @@ import mtas.parser.cql.util.MtasCQLParserSentenceCondition;
 import mtas.parser.cql.util.MtasCQLParserSentencePartCondition;
 import mtas.parser.cql.util.MtasCQLParserGroupQuery;
 import mtas.parser.cql.util.MtasCQLParserWordQuery;
+import mtas.parser.cql.util.MtasCQLParserDefaultPrefixCondition;
 import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanNotQuery;
 import org.apache.lucene.search.spans.SpanQuery;
@@ -36,9 +37,9 @@ import java.util.regex.Pattern;
 
 public class MtasCQLParser
 {
-  public SpanQuery parse(String field) throws ParseException
+  public SpanQuery parse(String field, String defaultPrefix) throws ParseException
   {
-    return cql(field);
+    return cql(field, defaultPrefix);
   }
 
   private String unquoteString(String unfiltered)
@@ -47,7 +48,7 @@ public class MtasCQLParser
     {
       unfiltered = unfiltered.substring(1, unfiltered.length());
       unfiltered = unfiltered.substring(0, unfiltered.length() - 1);
-      //unfiltered = unfiltered.replace("\\\"", "\"");    }
+    }
     return unfiltered;
   }
 }
@@ -202,18 +203,18 @@ TOKEN :
   >
 }
 
-private SpanQuery cql(String field) throws ParseException :
+private SpanQuery cql(String field, String defaultPrefix) throws ParseException :
 {
   SpanQuery q;
   ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
 }
 {
-  q = cqlBlock(field)
+  q = cqlBlock(field, defaultPrefix)
   {
     itemList.add(new MtasSpanSequenceItem(q, false));
   }
   (
-    q = cqlBlock(field)
+    q = cqlBlock(field, defaultPrefix)
     {
       itemList.add(new MtasSpanSequenceItem(q, false));
     }
@@ -231,7 +232,7 @@ private SpanQuery cql(String field) throws ParseException :
   }
 }
 
-private SpanQuery cqlBlock(String field) throws ParseException :
+private SpanQuery cqlBlock(String field, String defaultPrefix) throws ParseException :
 {
   MtasCQLParserSentenceCondition s1 = null, s2 = null;
   SpanQuery q1 = null, q2 = null;
@@ -244,9 +245,9 @@ private SpanQuery cqlBlock(String field) throws ParseException :
 }
 {
   (
-    s1 = sentence(field)
+    s1 = sentence(field, defaultPrefix)
   | 
-    < BRACKET_START > q1 = cqlBlock(field) < BRACKET_END >
+    < BRACKET_START > q1 = cqlBlock(field, defaultPrefix) < BRACKET_END >
   )
   [
     (
@@ -268,8 +269,8 @@ private SpanQuery cqlBlock(String field) throws ParseException :
       }
     )
     (
-      s2 = sentence(field)
-    | < BRACKET_START > q2 = cqlBlock(field) < BRACKET_END >
+      s2 = sentence(field, defaultPrefix)
+    | < BRACKET_START > q2 = cqlBlock(field, defaultPrefix) < BRACKET_END >
     )
   ]
   {
@@ -311,7 +312,7 @@ private SpanQuery cqlBlock(String field) throws ParseException :
   }
 }
 
-private MtasCQLParserSentenceCondition sentence(String field) throws ParseException :
+private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix) throws ParseException :
 {
   MtasCQLParserSentenceCondition sentenceCondition;
   MtasCQLParserSentencePartCondition condition;
@@ -322,32 +323,14 @@ private MtasCQLParserSentenceCondition sentence(String field) throws ParseExcept
   int maximumOccurence = 1;
 }
 {
-  condition = sentencePart(field)
+  condition = sentencePart(field, defaultPrefix)
   {
     sentenceCondition = condition.createFullSentence();
-    if (questionMark != null)
-    {
-      minimumOccurence = 0;
-      maximumOccurence = 1;
-    }
-    else if (minValue != null)
-    {
-      minimumOccurence = Integer.parseInt(minValue.image);
-      if (maxValue != null)
-      {
-        maximumOccurence = Integer.parseInt(maxValue.image);
-      }
-      else
-      {
-        maximumOccurence = minimumOccurence;
-      }
-    }
-    sentenceCondition.setOccurence(minimumOccurence, maximumOccurence);
     return sentenceCondition;
   }
 }
 
-private MtasCQLParserSentencePartCondition sentencePart(String field) throws ParseException :
+private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix) throws ParseException :
 {
   Token operator;
   MtasCQLParserSentencePartCondition condition, sentencePart;
@@ -360,13 +343,13 @@ private MtasCQLParserSentencePartCondition sentencePart(String field) throws Par
 }
 {
   (
-    basicSentence = basicSentence(field)
+    basicSentence = basicSentence(field, defaultPrefix)
     {
       condition = new MtasCQLParserSentencePartCondition(basicSentence);
     }
   |
     (
-      < BRACKET_START > sentencePart = sentencePart(field) < BRACKET_END >
+      < BRACKET_START > sentencePart = sentencePart(field, defaultPrefix) < BRACKET_END >
       [
         {
           questionMark = null;
@@ -389,11 +372,11 @@ private MtasCQLParserSentencePartCondition sentencePart(String field) throws Par
           minimumOccurence = Integer.parseInt(minValue.image);
           if (maxValue != null)
           {
-            maximumOccurence = Integer.parseInt(maxValue.image);            
+            maximumOccurence = Integer.parseInt(maxValue.image);
           }
           else
           {
-            maximumOccurence = minimumOccurence;            
+            maximumOccurence = minimumOccurence;
           }
         }
         condition.setFirstOccurence(minimumOccurence, maximumOccurence);
@@ -406,7 +389,7 @@ private MtasCQLParserSentencePartCondition sentencePart(String field) throws Par
     }
     [ operator = < OR > ]
     (
-      sentencePart = sentencePart(field)
+      sentencePart = sentencePart(field, defaultPrefix)
       {
         if (operator == null)
         {
@@ -425,7 +408,7 @@ private MtasCQLParserSentencePartCondition sentencePart(String field) throws Par
   }
 }
 
-private MtasCQLParserBasicSentenceCondition basicSentence(String field) throws ParseException :
+private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix) throws ParseException :
 {
   MtasCQLParserWordFullCondition subWordCondition;
   MtasCQLParserGroupFullCondition subGroupCondition;
@@ -433,7 +416,7 @@ private MtasCQLParserBasicSentenceCondition basicSentence(String field) throws P
 }
 {
   (
-    subWordCondition = word(field)
+    subWordCondition = word(field, defaultPrefix)
     {
       condition.addWord(subWordCondition);
     }
@@ -444,7 +427,7 @@ private MtasCQLParserBasicSentenceCondition basicSentence(String field) throws P
   )
   (
     (
-      subWordCondition = word(field)
+      subWordCondition = word(field, defaultPrefix)
       {
         condition.addWord(subWordCondition);
       }
@@ -567,9 +550,10 @@ private MtasCQLParserGroupCondition groupCondition(String field) throws ParseExc
   }
 }
 
-private MtasCQLParserWordFullCondition word(String field) throws ParseException :
+private MtasCQLParserWordFullCondition word(String field, String defaultPrefix) throws ParseException :
 {
   Token questionMark = null;
+  Token value;
   MtasCQLParserWordFullCondition wordCondition;
   MtasCQLParserWordCondition condition, subCondition;
   Token minValue = null;
@@ -579,6 +563,11 @@ private MtasCQLParserWordFullCondition word(String field) throws ParseException 
 }
 {
   (
+    value = < QUOTED_VALUE >
+    {
+      condition = new MtasCQLParserDefaultPrefixCondition(field, defaultPrefix, unquoteString(value.image));
+    }
+  | 
     < WORD_START >
     (
       subCondition = wordCondition(field)
@@ -723,14 +712,14 @@ private MtasCQLParserWordCondition wordCondition(String field) throws ParseExcep
         {
           condition.addCondition(subCondition);
         }
-      )*      
+      )*
     |
       (
-        condition = wordAtomCondition(field)        
-      | condition = wordCondition(field)        
+        condition = wordAtomCondition(field)
+      | condition = wordCondition(field)
       )
     )
-    < BRACKET_END >         
+    < BRACKET_END >
     {
       if (negation != null)
       {

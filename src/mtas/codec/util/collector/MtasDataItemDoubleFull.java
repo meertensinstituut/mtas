@@ -7,13 +7,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.ArrayUtils;
 import mtas.codec.util.CodecUtil;
-import mtas.codec.util.DataCollector.MtasDataCollector;
 
 /**
  * The Class MtasDataItemDoubleFull.
  */
-public class MtasDataItemDoubleFull
-    extends MtasDataItemFull<Double, Double> {
+public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
@@ -24,26 +22,35 @@ public class MtasDataItemDoubleFull
   /**
    * Instantiates a new mtas data item double full.
    *
-   * @param value the value
-   * @param sub the sub
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param errorNumber the error number
-   * @param errorList the error list
+   * @param value
+   *          the value
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param sourceNumber
+   *          the source number
    */
   public MtasDataItemDoubleFull(double[] value, MtasDataCollector<?, ?> sub,
       TreeSet<String> statsItems, String sortType, String sortDirection,
-      int errorNumber, HashMap<String, Integer> errorList) {
-    super(ArrayUtils.toObject(value), sub, statsItems, sortType,
-        sortDirection, errorNumber, errorList,
-        new MtasDataDoubleOperations());
+      int errorNumber, HashMap<String, Integer> errorList, int sourceNumber) {
+    super(ArrayUtils.toObject(value), sub, statsItems, sortType, sortDirection,
+        errorNumber, errorList, new MtasDataDoubleOperations(), sourceNumber);
   }
 
   /**
    * Gets the number of decimals.
    *
-   * @param ds the ds
+   * @param ds
+   *          the ds
    * @return the number of decimals
    */
   private int getNumberOfDecimals(String ds) {
@@ -114,8 +121,7 @@ public class MtasDataItemDoubleFull
       if (step == null) {
         step = (tmpEnd - tmpStart) / number;
       }
-      number = Double.valueOf(Math.ceil((tmpEnd - tmpStart) / step))
-          .intValue();
+      number = Double.valueOf(Math.ceil((tmpEnd - tmpStart) / step)).intValue();
       start = tmpStart;
       end = start + (number * step);
     } else if (start == null) {
@@ -137,8 +143,7 @@ public class MtasDataItemDoubleFull
       number = Double.valueOf(Math.ceil((end - start) / step)).intValue();
     }
     // round step to agreeable format and recompute number
-    int tmpD = Double
-        .valueOf(Math.max(0, 1 + Math.ceil(-1 * Math.log10(step))))
+    int tmpD = Double.valueOf(Math.max(0, 1 + Math.ceil(-1 * Math.log10(step))))
         .intValue();
     d = (d == null) ? tmpD : Math.max(d, tmpD);
     double tmp = Math.pow(10.0, d);
@@ -169,59 +174,87 @@ public class MtasDataItemDoubleFull
     return result;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  public int compareTo(MtasDataItem<Double> o) {
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public int compareTo(MtasDataItem<Double, Double> o) {
     int compare = 0;
     if (o instanceof MtasDataItemDoubleFull) {
       MtasDataItemDoubleFull to = (MtasDataItemDoubleFull) o;
-      createStats();
-      to.createStats();
-      if (sortType.equals(CodecUtil.STATS_TYPE_N)) {
-        compare = Long.valueOf(stats.getN()).compareTo(to.stats.getN());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_SUM)) {
-        compare = Double.valueOf(stats.getSum()).compareTo(to.stats.getSum());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_MAX)) {
-        compare = Double.valueOf(stats.getMax()).compareTo(to.stats.getMax());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_MIN)) {
-        compare = Double.valueOf(stats.getMin()).compareTo(to.stats.getMin());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_SUMSQ)) {
-        compare = Double.valueOf(stats.getSumsq())
-            .compareTo(to.stats.getSumsq());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_SUMOFLOGS)) {
-        compare = Double
-            .valueOf(stats.getN() * Math.log(stats.getGeometricMean()))
-            .compareTo(to.stats.getN() * Math.log(to.stats.getGeometricMean()));
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_MEAN)) {
-        compare = Double.valueOf(stats.getMean()).compareTo(to.stats.getMean());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_GEOMETRICMEAN)) {
-        compare = Double.valueOf(stats.getGeometricMean())
-            .compareTo(to.stats.getGeometricMean());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_STANDARDDEVIATION)) {
-        compare = Double.valueOf(stats.getStandardDeviation())
-            .compareTo(to.stats.getStandardDeviation());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_VARIANCE)) {
-        compare = Double.valueOf(stats.getVariance())
-            .compareTo(to.stats.getVariance());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_POPULATIONVARIANCE)) {
-        compare = Double.valueOf(stats.getPopulationVariance())
-            .compareTo(to.stats.getPopulationVariance());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_QUADRATICMEAN)) {
-        compare = Double.valueOf(stats.getQuadraticMean())
-            .compareTo(to.stats.getQuadraticMean());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_KURTOSIS)) {
-        compare = Double.valueOf(stats.getKurtosis())
-            .compareTo(to.stats.getKurtosis());
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_MEDIAN)) {
-        compare = Double.valueOf(stats.getPercentile(50))
-            .compareTo(to.stats.getPercentile(50));
-      } else if (sortType.equals(CodecUtil.STATS_TYPE_SKEWNESS)) {
-        compare = Double.valueOf(stats.getSkewness())
-            .compareTo(to.stats.getSkewness());
-      }
+      NumberComparator c1 = getComparableValue();
+      NumberComparator c2 = to.getComparableValue();
+      compare = (c1 != null && c2 != null) ? c1.compareTo(c2.getValue()) : 0;
     }
     return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue1()
+   */
+  @Override
+  public NumberComparator<Double> getCompareValue1() {
+    createStats();
+    switch (sortType) {
+    case CodecUtil.STATS_TYPE_SUM:
+      return new NumberComparator<Double>(stats.getSum());
+    case CodecUtil.STATS_TYPE_MAX:
+      return new NumberComparator<Double>(stats.getMax());
+    case CodecUtil.STATS_TYPE_MIN:
+      return new NumberComparator<Double>(stats.getMin());
+    case CodecUtil.STATS_TYPE_SUMSQ:
+      return new NumberComparator<Double>(stats.getSumsq());
+    default:
+      return null;
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
+   */
+  @Override
+  public NumberComparator<Double> getCompareValue2() {
+    createStats();
+    switch (sortType) {
+    case CodecUtil.STATS_TYPE_SUMOFLOGS:
+      return new NumberComparator<Double>(
+          stats.getN() * Math.log(stats.getGeometricMean()));
+    case CodecUtil.STATS_TYPE_MEAN:
+      return new NumberComparator<Double>(stats.getMean());
+    case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
+      return new NumberComparator<Double>(stats.getGeometricMean());
+    case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
+      return new NumberComparator<Double>(stats.getStandardDeviation());
+    case CodecUtil.STATS_TYPE_VARIANCE:
+      return new NumberComparator<Double>(stats.getVariance());
+    case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
+      return new NumberComparator<Double>(stats.getPopulationVariance());
+    case CodecUtil.STATS_TYPE_QUADRATICMEAN:
+      return new NumberComparator<Double>(stats.getQuadraticMean());
+    case CodecUtil.STATS_TYPE_KURTOSIS:
+      return new NumberComparator<Double>(stats.getKurtosis());
+    case CodecUtil.STATS_TYPE_MEDIAN:
+      return new NumberComparator<Double>(stats.getPercentile(50));
+    case CodecUtil.STATS_TYPE_SKEWNESS:
+      return new NumberComparator<Double>(stats.getSkewness());
+    default:
+      return null;
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return this.getClass().getSimpleName() + "[" + fullValues.length + "]";
+  }
+
 }

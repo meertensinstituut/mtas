@@ -1,8 +1,6 @@
 package mtas.codec;
 
 import java.io.IOException;
-import java.util.TreeSet;
-
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenString;
 import mtas.codec.payload.MtasPayloadDecoder;
@@ -23,10 +21,10 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant VERSION_START. */
   public static final int VERSION_START = 1;
-  
+
   /** The Constant VERSION_OLD_1. */
   public static final int VERSION_OLD_1 = 1;
-  
+
   /** The Constant VERSION_OLD_2. */
   public static final int VERSION_OLD_2 = 2;
 
@@ -50,7 +48,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant MTAS_OBJECT_HAS_PAYLOAD. */
   static final int MTAS_OBJECT_HAS_PAYLOAD = 32;
-  
+
   /** The Constant MTAS_STORAGE_BYTE. */
   public static final int MTAS_STORAGE_BYTE = 0;
 
@@ -136,7 +134,8 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Instantiates a new mtas codec postings format.
    *
-   * @param delegate the delegate
+   * @param delegate
+   *          the delegate
    */
   public MtasCodecPostingsFormat(PostingsFormat delegate) {
     super(MtasCodec.MTAS_CODEC_NAME);
@@ -160,7 +159,8 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Instantiates a new mtas codec postings format.
    *
-   * @param codecName the codec name
+   * @param codecName
+   *          the codec name
    */
   public MtasCodecPostingsFormat(String codecName) {
     super(codecName);
@@ -210,21 +210,25 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
           delegatePostingsFormat.getName());
     } else {
       PostingsFormat pf = Codec.forName(delegateCodecName).postingsFormat();
-      return new MtasFieldsConsumer(pf.fieldsConsumer(state), state, getName(),
-          pf.getName());
+      return pf.fieldsConsumer(state);
     }
   }
 
   /**
    * Gets the token.
    *
-   * @param inObject the in object
-   * @param inTerm the in term
-   * @param ref the ref
+   * @param inObject
+   *          the in object
+   * @param inTerm
+   *          the in term
+   * @param ref
+   *          the ref
    * @return the token
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static MtasToken<String> getToken(IndexInput inObject,
-      IndexInput inTerm, Long ref) {
+      IndexInput inTerm, Long ref) throws IOException {
     MtasToken<String> token = null;
     try {
       inObject.seek(ref);
@@ -232,22 +236,25 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       token.setId(inObject.readVInt());
       token.setTokenRef(ref);
       int objectFlags = inObject.readVInt();
-      TreeSet<Integer> positions = new TreeSet<Integer>();
+      int[] positions = null;
       if ((objectFlags & MTAS_OBJECT_HAS_PARENT) == MTAS_OBJECT_HAS_PARENT) {
         int parentId = inObject.readVInt();
         token.setParentId(parentId);
       }
-      if ((objectFlags & MTAS_OBJECT_HAS_POSITION_RANGE) == MTAS_OBJECT_HAS_POSITION_RANGE) {
+      if ((objectFlags
+          & MTAS_OBJECT_HAS_POSITION_RANGE) == MTAS_OBJECT_HAS_POSITION_RANGE) {
         int positionStart = inObject.readVInt();
         int positionEnd = positionStart + inObject.readVInt();
         token.addPositionRange(positionStart, positionEnd);
-      } else if ((objectFlags & MTAS_OBJECT_HAS_POSITION_SET) == MTAS_OBJECT_HAS_POSITION_SET) {
+      } else if ((objectFlags
+          & MTAS_OBJECT_HAS_POSITION_SET) == MTAS_OBJECT_HAS_POSITION_SET) {
         int size = inObject.readVInt();
         int tmpPrevious = 0;
+        positions = new int[size];
         for (int t = 0; t < size; t++) {
           int position = tmpPrevious + inObject.readVInt();
           tmpPrevious = position;
-          positions.add(position);
+          positions[t] = position;
         }
         token.addPositions(positions);
       } else {
@@ -259,7 +266,8 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
         int offsetEnd = offsetStart + inObject.readVInt();
         token.setOffset(offsetStart, offsetEnd);
       }
-      if ((objectFlags & MTAS_OBJECT_HAS_REALOFFSET) == MTAS_OBJECT_HAS_REALOFFSET) {
+      if ((objectFlags
+          & MTAS_OBJECT_HAS_REALOFFSET) == MTAS_OBJECT_HAS_REALOFFSET) {
         int realOffsetStart = inObject.readVInt();
         int realOffsetEnd = realOffsetStart + inObject.readVInt();
         token.setRealOffset(realOffsetStart, realOffsetEnd);
@@ -268,15 +276,14 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
         int length = inObject.readVInt();
         byte[] mtasPayload = new byte[length];
         inObject.readBytes(mtasPayload, 0, length);
-        token.setPayload(new BytesRef(mtasPayload));               
+        token.setPayload(new BytesRef(mtasPayload));
       }
       Long termRef = inObject.readVLong();
       inTerm.seek(termRef);
       token.setTermRef(termRef);
       token.setValue(inTerm.readString());
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+    } catch (Exception e) {
+      throw new IOException(e.getMessage());
     }
     return token;
   }

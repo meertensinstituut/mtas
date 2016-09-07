@@ -1,5 +1,8 @@
 package mtas.codec.tree;
 
+/**
+ * The Class MtasTreeNodeId.
+ */
 public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
 
   /** The ref. */
@@ -18,6 +21,8 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
    *          the ref
    * @param additionalId
    *          the additional id
+   * @param additionalRef
+   *          the additional ref
    */
   public MtasTreeNodeId(long ref, int additionalId, long additionalRef) {
     this.ref = ref;

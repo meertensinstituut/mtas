@@ -7,16 +7,17 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 import mtas.codec.util.CodecUtil;
-import mtas.codec.util.DataCollector.MtasDataCollector;
 
 /**
  * The Class MtasDataItemBasic.
  *
- * @param <T1> the generic type
- * @param <T2> the generic type
+ * @param <T1>
+ *          the generic type
+ * @param <T2>
+ *          the generic type
  */
-abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
-    extends MtasDataItem<T1> implements Serializable {
+abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
+    extends MtasDataItem<T1, T2> implements Serializable {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
@@ -33,22 +34,33 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
   /**
    * Instantiates a new mtas data item basic.
    *
-   * @param valueSum the value sum
-   * @param valueN the value n
-   * @param sub the sub
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param errorNumber the error number
-   * @param errorList the error list
-   * @param operations the operations
+   * @param valueSum
+   *          the value sum
+   * @param valueN
+   *          the value n
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param operations
+   *          the operations
+   * @param sourceNumber
+   *          the source number
    */
   public MtasDataItemBasic(T1 valueSum, long valueN,
-      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
-      String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList,
-      MtasDataOperations<T1, T2> operations) {
-    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList);
+      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems, String sortType,
+      String sortDirection, int errorNumber, HashMap<String, Integer> errorList,
+      MtasDataOperations<T1, T2> operations, int sourceNumber) {
+    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList,
+        sourceNumber);
     this.valueSum = valueSum;
     this.valueN = valueN;
     this.operations = operations;
@@ -61,11 +73,12 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
    * DataCollector.MtasDataItem)
    */
   @Override
-  public void add(MtasDataItem<T1> newItem) throws IOException {
+  public void add(MtasDataItem<T1, T2> newItem) throws IOException {
     if (newItem instanceof MtasDataItemBasic) {
       MtasDataItemBasic<T1, T2> newTypedItem = (MtasDataItemBasic<T1, T2>) newItem;
       this.valueSum = operations.add11(this.valueSum, newTypedItem.valueSum);
       this.valueN += newTypedItem.valueN;
+      recomputeComparableSortValue = true;
     } else {
       throw new IOException("can only add MtasDataItemBasic");
     }
@@ -77,7 +90,7 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
    * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
    */
   @Override
-  public Map<String, Object> rewrite() throws IOException {
+  public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     Map<String, Object> response = new HashMap<String, Object>();
     for (String statsItem : statsItems) {
       if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
@@ -98,14 +111,18 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
       response.put("errorNumber", errorNumber);
       response.put("errorList", errorResponse);
     }
-    // response.put("stats", "basic");
+    if (showDebugInfo) {
+      response.put("sourceNumber", sourceNumber);
+      response.put("stats", "basic");
+    }
     return response;
   }
 
   /**
    * Gets the value.
    *
-   * @param statsType the stats type
+   * @param statsType
+   *          the stats type
    * @return the value
    */
   protected T2 getValue(String statsType) {
@@ -116,5 +133,36 @@ abstract class MtasDataItemBasic<T1 extends Number, T2 extends Number>
     }
   }
 
-}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValueType()
+   */
+  public final int getCompareValueType() throws IOException {
+    switch (sortType) {
+    case CodecUtil.STATS_TYPE_N:
+      return 0;
+    case CodecUtil.STATS_TYPE_SUM:
+      return 1;
+    case CodecUtil.STATS_TYPE_MEAN:
+      return 2;
+    default:
+      throw new IOException("sortType " + sortType + " not supported");
+    }
+  }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
+   */
+  public final NumberComparator<Long> getCompareValue0() {
+    switch (sortType) {
+    case CodecUtil.STATS_TYPE_N:
+      return new NumberComparator<Long>(valueN);
+    default:
+      return null;
+    }
+  }
+
+}

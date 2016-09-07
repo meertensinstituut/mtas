@@ -9,127 +9,142 @@ public class MtasFunctionParserItem {
 
   /** The type. */
   private String type = null;
-  
+
   /** The id. */
   private Integer id = null;
-  
+
   /** The value long. */
   private Long valueLong = null;
-  
+
   /** The value double. */
   private Double valueDouble = null;
-  
+
   /** The degree. */
   private Integer degree = null;
-  
+
   /** The parser. */
   private MtasFunctionParserFunction parser = null;
-  
+
   /** The Constant TYPE_CONSTANT_LONG. */
   public final static String TYPE_CONSTANT_LONG = "constantLong";
-  
+
   /** The Constant TYPE_CONSTANT_DOUBLE. */
   public final static String TYPE_CONSTANT_DOUBLE = "constantDouble";
-  
+
   /** The Constant TYPE_PARSER_LONG. */
   public final static String TYPE_PARSER_LONG = "parserLong";
-  
+
   /** The Constant TYPE_PARSER_DOUBLE. */
   public final static String TYPE_PARSER_DOUBLE = "parserDouble";
-  
+
   /** The Constant TYPE_ARGUMENT. */
   public final static String TYPE_ARGUMENT = "argument";
-  
+
   /** The Constant TYPE_N. */
   public final static String TYPE_N = "n";
-  
+
   /**
    * Instantiates a new mtas function parser item.
    *
-   * @param t the t
-   * @throws ParseException the parse exception
+   * @param t
+   *          the t
+   * @throws ParseException
+   *           the parse exception
    */
   public MtasFunctionParserItem(String t) throws ParseException {
-    if(t.equals(TYPE_N)) {
+    if (t.equals(TYPE_N)) {
       type = t;
       degree = 0;
     } else {
-      throw new ParseException("unknown type "+t);
+      throw new ParseException("unknown type " + t);
     }
   }
-  
+
   /**
    * Instantiates a new mtas function parser item.
    *
-   * @param t the t
-   * @param i the i
-   * @throws ParseException the parse exception
+   * @param t
+   *          the t
+   * @param i
+   *          the i
+   * @throws ParseException
+   *           the parse exception
    */
   public MtasFunctionParserItem(String t, int i) throws ParseException {
-    if(t.equals(TYPE_ARGUMENT)) {
+    if (t.equals(TYPE_ARGUMENT)) {
       type = t;
       id = i;
       degree = 1;
     } else {
-      throw new ParseException("unknown type "+t);
+      throw new ParseException("unknown type " + t);
     }
   }
-  
+
   /**
    * Instantiates a new mtas function parser item.
    *
-   * @param t the t
-   * @param l the l
-   * @throws ParseException the parse exception
+   * @param t
+   *          the t
+   * @param l
+   *          the l
+   * @throws ParseException
+   *           the parse exception
    */
   public MtasFunctionParserItem(String t, long l) throws ParseException {
-    if(t.equals(TYPE_CONSTANT_LONG)) {
+    if (t.equals(TYPE_CONSTANT_LONG)) {
       type = t;
       valueLong = l;
       degree = 0;
     } else {
-      throw new ParseException("unknown type "+t);
+      throw new ParseException("unknown type " + t);
     }
   }
-  
+
   /**
    * Instantiates a new mtas function parser item.
    *
-   * @param t the t
-   * @param d the d
-   * @throws ParseException the parse exception
+   * @param t
+   *          the t
+   * @param d
+   *          the d
+   * @throws ParseException
+   *           the parse exception
    */
   public MtasFunctionParserItem(String t, double d) throws ParseException {
-    if(t.equals(TYPE_CONSTANT_DOUBLE)) {
+    if (t.equals(TYPE_CONSTANT_DOUBLE)) {
       type = t;
       valueDouble = d;
       degree = 0;
     } else {
-      throw new ParseException("unknown type "+t);
-    }      
+      throw new ParseException("unknown type " + t);
+    }
   }
-  
+
   /**
    * Instantiates a new mtas function parser item.
    *
-   * @param t the t
-   * @param p the p
-   * @throws ParseException the parse exception
+   * @param t
+   *          the t
+   * @param p
+   *          the p
+   * @throws ParseException
+   *           the parse exception
    */
-  public MtasFunctionParserItem(String t, MtasFunctionParserFunction p) throws ParseException {
-    if(t.equals(TYPE_PARSER_LONG)) {
+  public MtasFunctionParserItem(String t, MtasFunctionParserFunction p)
+      throws ParseException {
+    if (t.equals(TYPE_PARSER_LONG)) {
       type = t;
       parser = p;
       degree = parser.degree;
-    } else if(t.equals(TYPE_PARSER_DOUBLE)) {
+    } else if (t.equals(TYPE_PARSER_DOUBLE)) {
       type = t;
       parser = p;
       degree = parser.degree;
     } else {
-      throw new ParseException("unknown type "+t);
+      throw new ParseException("unknown type " + t);
     }
   }
-  
+
   /**
    * Gets the type.
    *
@@ -138,7 +153,7 @@ public class MtasFunctionParserItem {
   public String getType() {
     return type;
   }
-  
+
   /**
    * Gets the id.
    *
@@ -147,7 +162,7 @@ public class MtasFunctionParserItem {
   public int getId() {
     return id.intValue();
   }
-  
+
   /**
    * Gets the degree.
    *
@@ -156,7 +171,7 @@ public class MtasFunctionParserItem {
   public Integer getDegree() {
     return degree;
   }
-  
+
   /**
    * Gets the value long.
    *
@@ -165,7 +180,7 @@ public class MtasFunctionParserItem {
   public long getValueLong() {
     return valueLong.longValue();
   }
-  
+
   /**
    * Gets the value double.
    *
@@ -174,7 +189,7 @@ public class MtasFunctionParserItem {
   public double getValueDouble() {
     return valueDouble.doubleValue();
   }
-  
+
   /**
    * Gets the parser.
    *
@@ -183,5 +198,5 @@ public class MtasFunctionParserItem {
   public MtasFunctionParserFunction getParser() {
     return parser;
   }
-  
+
 }

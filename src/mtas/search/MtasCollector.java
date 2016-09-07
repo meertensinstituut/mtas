@@ -5,13 +5,14 @@ import java.io.IOException;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.SimpleCollector;
 
-
 /**
  * The Class MtasCollector.
  */
 public class MtasCollector extends SimpleCollector {
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Collector#needsScores()
    */
   @Override
@@ -19,23 +20,26 @@ public class MtasCollector extends SimpleCollector {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.SimpleCollector#doSetNextReader(org.apache.lucene.index.LeafReaderContext)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.SimpleCollector#doSetNextReader(org.apache.lucene.
+   * index.LeafReaderContext)
    */
   @Override
   protected void doSetNextReader(LeafReaderContext context) throws IOException {
-       
+
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.SimpleCollector#collect(int)
    */
   @Override
   public void collect(int doc) throws IOException {
-    System.out.println("Mtas collector voor doc "+doc);
-    
+    // System.out.println("Mtas collector voor doc "+doc);
   }
 
-  
-  
 }

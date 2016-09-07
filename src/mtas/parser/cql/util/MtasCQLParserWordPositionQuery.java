@@ -17,37 +17,44 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
 
   /** The query. */
   SpanQuery query;
-  
+
   /** The term. */
   Term term;
-  
+
   /** The query name. */
   private static String QUERY_NAME = "mtasCQLParserWordPositionQuery";
-  
+
   /**
    * Instantiates a new mtas cql parser word position query.
    *
-   * @param field the field
-   * @param position the position
+   * @param field
+   *          the field
+   * @param position
+   *          the position
    */
   public MtasCQLParserWordPositionQuery(String field, int position) {
     term = new Term(field);
-    query = new MtasSpanPositionQuery(field, position);    
+    query = new MtasSpanPositionQuery(field, position);
   }
-  
+
   /**
    * Instantiates a new mtas cql parser word position query.
    *
-   * @param field the field
-   * @param start the start
-   * @param end the end
+   * @param field
+   *          the field
+   * @param start
+   *          the start
+   * @param end
+   *          the end
    */
   public MtasCQLParserWordPositionQuery(String field, int start, int end) {
     term = new Term(field);
     query = new MtasSpanPositionQuery(field, start, end);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -55,16 +62,23 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
     return term.field();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
   public Query rewrite(IndexReader reader) throws IOException {
     return query.rewrite(reader);
   }
-  
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
@@ -72,30 +86,36 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
     return query.createWeight(searcher, needsScores);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#toString(java.lang.String)
    */
   @Override
   public String toString(String field) {
     return query.toString(term.field());
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (obj== null)
+    if (obj == null)
       return false;
     if (getClass() != obj.getClass())
       return false;
     final MtasCQLParserWordPositionQuery that = (MtasCQLParserWordPositionQuery) obj;
-    return query.equals(that.query);    
+    return query.equals(that.query);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
@@ -104,5 +124,5 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
     h = (h * 7) ^ query.hashCode();
     return h;
   }
-  
+
 }

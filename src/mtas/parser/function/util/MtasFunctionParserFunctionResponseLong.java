@@ -5,19 +5,22 @@ import java.io.IOException;
 /**
  * The Class MtasFunctionParserFunctionResponseLong.
  */
-public class MtasFunctionParserFunctionResponseLong extends MtasFunctionParserFunctionResponse {
+public class MtasFunctionParserFunctionResponseLong
+    extends MtasFunctionParserFunctionResponse {
 
   /** The value. */
   private long value;
-  
+
   /**
    * Instantiates a new mtas function parser function response long.
    *
-   * @param l the l
-   * @param s the s
+   * @param l
+   *          the l
+   * @param s
+   *          the s
    */
   public MtasFunctionParserFunctionResponseLong(long l, boolean s) {
-    super(s);    
+    super(s);
     value = l;
   }
 
@@ -25,18 +28,23 @@ public class MtasFunctionParserFunctionResponseLong extends MtasFunctionParserFu
    * Gets the value.
    *
    * @return the value
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public long getValue() throws IOException {
-    if(defined) {
+    if (defined) {
       return value;
     } else {
       throw new IOException("undefined");
     }
   }
-  
-  /* (non-Javadoc)
-   * @see mtas.parser.function.util.MtasFunctionParserFunctionResponse#equals(java.lang.Object)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.function.util.MtasFunctionParserFunctionResponse#equals(java.
+   * lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
@@ -48,8 +56,8 @@ public class MtasFunctionParserFunctionResponseLong extends MtasFunctionParserFu
       return false;
     MtasFunctionParserFunctionResponseLong other = (MtasFunctionParserFunctionResponseLong) obj;
     try {
-      if(value == other.getValue()) {
-        if(defined) 
+      if (value == other.getValue()) {
+        if (defined)
           return true;
         else
           return false;
@@ -57,19 +65,21 @@ public class MtasFunctionParserFunctionResponseLong extends MtasFunctionParserFu
         return false;
       }
     } catch (IOException e) {
-      if(!defined)
+      if (!defined)
         return true;
       else
         return false;
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-    return defined?"long:"+String.valueOf(value):"long:undefined";
+    return defined ? "long:" + String.valueOf(value) : "long:undefined";
   }
-  
+
 }

@@ -26,46 +26,46 @@ public class CodecUtil {
 
   /** The Constant STATS_TYPE_GEOMETRICMEAN. */
   public static final String STATS_TYPE_GEOMETRICMEAN = "geometricmean";
-  
+
   /** The Constant STATS_TYPE_KURTOSIS. */
   public static final String STATS_TYPE_KURTOSIS = "kurtosis";
-  
+
   /** The Constant STATS_TYPE_MAX. */
   public static final String STATS_TYPE_MAX = "max";
-  
+
   /** The Constant STATS_TYPE_MEAN. */
   public static final String STATS_TYPE_MEAN = "mean";
-  
+
   /** The Constant STATS_TYPE_MIN. */
   public static final String STATS_TYPE_MIN = "min";
-  
+
   /** The Constant STATS_TYPE_N. */
   public static final String STATS_TYPE_N = "n";
-  
+
   /** The Constant STATS_TYPE_MEDIAN. */
   public static final String STATS_TYPE_MEDIAN = "median";
-  
+
   /** The Constant STATS_TYPE_POPULATIONVARIANCE. */
   public static final String STATS_TYPE_POPULATIONVARIANCE = "populationvariance";
-  
+
   /** The Constant STATS_TYPE_QUADRATICMEAN. */
   public static final String STATS_TYPE_QUADRATICMEAN = "quadraticmean";
-  
+
   /** The Constant STATS_TYPE_SKEWNESS. */
   public static final String STATS_TYPE_SKEWNESS = "skewness";
-  
+
   /** The Constant STATS_TYPE_STANDARDDEVIATION. */
   public static final String STATS_TYPE_STANDARDDEVIATION = "standarddeviation";
-  
+
   /** The Constant STATS_TYPE_SUM. */
   public static final String STATS_TYPE_SUM = "sum";
-  
+
   /** The Constant STATS_TYPE_SUMSQ. */
   public static final String STATS_TYPE_SUMSQ = "sumsq";
-  
+
   /** The Constant STATS_TYPE_SUMOFLOGS. */
   public static final String STATS_TYPE_SUMOFLOGS = "sumoflogs";
-  
+
   /** The Constant STATS_TYPE_VARIANCE. */
   public static final String STATS_TYPE_VARIANCE = "variance";
 
@@ -77,10 +77,10 @@ public class CodecUtil {
 
   /** The Constant SORT_TERM. */
   public static final String SORT_TERM = "term";
-  
+
   /** The Constant SORT_ASC. */
   public static final String SORT_ASC = "asc";
-  
+
   /** The Constant SORT_DESC. */
   public static final String SORT_DESC = "desc";
 
@@ -113,32 +113,37 @@ public class CodecUtil {
 
   /** The Constant STATS_BASIC. */
   public static final String STATS_BASIC = "basic";
-  
+
   /** The Constant STATS_ADVANCED. */
   public static final String STATS_ADVANCED = "advanced";
-  
+
   /** The Constant STATS_FULL. */
   public static final String STATS_FULL = "full";
 
   /** The Constant DATA_TYPE_LONG. */
   public static final String DATA_TYPE_LONG = "long";
-  
+
   /** The Constant DATA_TYPE_DOUBLE. */
   public static final String DATA_TYPE_DOUBLE = "double";
-  
+
   /** The fp stats items. */
-  private static Pattern fpStatsItems = Pattern.compile("(([^\\(,]+)(\\([^\\)]*\\))?)");
-  
+  private static Pattern fpStatsItems = Pattern
+      .compile("(([^\\(,]+)(\\([^\\)]*\\))?)");
+
   /** The fp stats function items. */
-  private static Pattern fpStatsFunctionItems = Pattern.compile("(([^\\(,]+)(\\(([^\\)]*)\\)))");
+  private static Pattern fpStatsFunctionItems = Pattern
+      .compile("(([^\\(,]+)(\\(([^\\)]*)\\)))");
 
   /**
    * Checks if is single position prefix.
    *
-   * @param fieldInfo the field info
-   * @param prefix the prefix
+   * @param fieldInfo
+   *          the field info
+   * @param prefix
+   *          the prefix
    * @return true, if is single position prefix
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static boolean isSinglePositionPrefix(FieldInfo fieldInfo,
       String prefix) throws IOException {
@@ -160,7 +165,8 @@ public class CodecUtil {
   /**
    * Term value.
    *
-   * @param term the term
+   * @param term
+   *          the term
    * @return the string
    */
   public static String termValue(String term) {
@@ -176,7 +182,8 @@ public class CodecUtil {
   /**
    * Term prefix.
    *
-   * @param term the term
+   * @param term
+   *          the term
    * @return the string
    */
   public static String termPrefix(String term) {
@@ -186,31 +193,42 @@ public class CodecUtil {
       prefix = term.substring(0, i);
     }
     return (prefix == null) ? null : prefix.replace("\u0000", "");
-  } 
-  
+  }
+
   /**
    * Term prefix value.
    *
-   * @param term the term
+   * @param term
+   *          the term
    * @return the string
    */
   public static String termPrefixValue(String term) {
-    return (term==null)?null:term.replace("\u0000", "");
+    return (term == null) ? null : term.replace("\u0000", "");
   }
 
   /**
    * Collect.
    *
-   * @param field the field
-   * @param searcher the searcher
-   * @param rawReader the raw reader
-   * @param fullDocList the full doc list
-   * @param fullDocSet the full doc set
-   * @param fieldStats the field stats
-   * @throws IllegalAccessException the illegal access exception
-   * @throws IllegalArgumentException the illegal argument exception
-   * @throws InvocationTargetException the invocation target exception
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param searcher
+   *          the searcher
+   * @param rawReader
+   *          the raw reader
+   * @param fullDocList
+   *          the full doc list
+   * @param fullDocSet
+   *          the full doc set
+   * @param fieldStats
+   *          the field stats
+   * @throws IllegalAccessException
+   *           the illegal access exception
+   * @throws IllegalArgumentException
+   *           the illegal argument exception
+   * @throws InvocationTargetException
+   *           the invocation target exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static void collect(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList<Integer> fullDocList,
@@ -236,14 +254,16 @@ public class CodecUtil {
   /**
    * Creates the stats items.
    *
-   * @param statsType the stats type
+   * @param statsType
+   *          the stats type
    * @return the tree set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   static TreeSet<String> createStatsItems(String statsType) throws IOException {
     TreeSet<String> statsItems = new TreeSet<String>();
     TreeSet<String> functionItems = new TreeSet<String>();
-    if (statsType != null) {      
+    if (statsType != null) {
       Matcher m = fpStatsItems.matcher(statsType.trim());
       while (m.find()) {
         String tmpStatsItem = m.group(2).trim();
@@ -254,19 +274,18 @@ public class CodecUtil {
             statsItems.add(type);
           }
         } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {
-          if(m.group(3)==null) {
-            throw new IOException(
-                "'" + tmpStatsItem + "' should be called as '" + tmpStatsItem + "()' with an optional argument");
+          if (m.group(3) == null) {
+            throw new IOException("'" + tmpStatsItem + "' should be called as '"
+                + tmpStatsItem + "()' with an optional argument");
           } else {
             functionItems.add(m.group(1).trim());
-          }  
+          }
         } else {
-          throw new IOException(
-              "unknown statsType '" + tmpStatsItem + "'");
+          throw new IOException("unknown statsType '" + tmpStatsItem + "'");
         }
       }
     }
-    if (statsItems.size() == 0) {
+    if (statsItems.size() == 0 && functionItems.size() == 0) {
       statsItems.add(STATS_TYPE_SUM);
       statsItems.add(STATS_TYPE_N);
       statsItems.add(STATS_TYPE_MEAN);
@@ -280,9 +299,12 @@ public class CodecUtil {
   /**
    * Creates the stats type.
    *
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param functionParser the function parser
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param functionParser
+   *          the function parser
    * @return the string
    */
   static String createStatsType(TreeSet<String> statsItems, String sortType,
@@ -299,11 +321,11 @@ public class CodecUtil {
         statsType = STATS_BASIC;
       } else {
         Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());
-        if(m.find()) {
-          if(STATS_FUNCTIONS.contains(m.group(2).trim())) {
+        if (m.find()) {
+          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {
             statsType = STATS_FULL;
             break;
-          } 
+          }
         }
       }
     }

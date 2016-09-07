@@ -25,8 +25,11 @@ import org.apache.lucene.util.AttributeFactory;
 
 /**
  * The Class MtasTokenizer.
+ *
+ * @param <T>
+ *          the generic type
  */
-public final class MtasTokenizer extends Tokenizer {
+public final class MtasTokenizer<T> extends Tokenizer {
 
   /** The configuration mtas. */
   public static String CONFIGURATION_MTAS = "mtas";
@@ -73,7 +76,8 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Instantiates a new mtas tokenizer.
    *
-   * @param configFileName the config file name
+   * @param configFileName
+   *          the config file name
    */
   public MtasTokenizer(String configFileName) {
     readConfigurationFile(configFileName);
@@ -82,8 +86,10 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Instantiates a new mtas tokenizer.
    *
-   * @param config the config
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param config
+   *          the config
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasTokenizer(MtasConfiguration config) throws IOException {
     processConfiguration(config);
@@ -92,8 +98,10 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Instantiates a new mtas tokenizer.
    *
-   * @param reader the reader
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param reader
+   *          the reader
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasTokenizer(InputStream reader) throws IOException {
     processConfiguration(MtasConfiguration.readConfiguration(reader));
@@ -102,9 +110,12 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Instantiates a new mtas tokenizer.
    *
-   * @param factory the factory
-   * @param config the config
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param factory
+   *          the factory
+   * @param config
+   *          the config
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasTokenizer(AttributeFactory factory, MtasConfiguration config)
       throws IOException {
@@ -112,7 +123,9 @@ public final class MtasTokenizer extends Tokenizer {
     processConfiguration(config);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.analysis.TokenStream#incrementToken()
    */
   @Override
@@ -128,7 +141,7 @@ public final class MtasTokenizer extends Tokenizer {
       // compute info
       positionIncrement = token.getPositionStart() - currentPosition;
       currentPosition = token.getPositionStart();
-      payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);      
+      payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);
       // set info
       termAtt.append(token.getValue().toString());
       positionIncrementAtt.setPositionIncrement(positionIncrement);
@@ -157,7 +170,6 @@ public final class MtasTokenizer extends Tokenizer {
           e.getClass().getSimpleName() + ": " + e.getMessage());
     } catch (MtasParserException e) {
       tokenCollectionIterator = null;
-      e.printStackTrace();
       throw new IOException(
           e.getClass().getSimpleName() + ": " + e.getMessage());
     }
@@ -167,14 +179,19 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Prints the.
    *
-   * @param r the r
-   * @throws IOException Signals that an I/O exception has occurred.
-   * @throws MtasParserException the mtas parser exception
+   * @param r
+   *          the r
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public void print(Reader r) throws IOException, MtasParserException {
     setReader(r);
     reset();
-    tokenCollection.print();
+    if (tokenCollection != null) {
+      tokenCollection.print();
+    }
     end();
     close();
   }
@@ -182,10 +199,13 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Gets the list.
    *
-   * @param r the r
+   * @param r
+   *          the r
    * @return the list
-   * @throws IOException Signals that an I/O exception has occurred.
-   * @throws MtasParserException the mtas parser exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public String[][] getList(Reader r) throws IOException, MtasParserException {
     setReader(r);
@@ -199,9 +219,12 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Construct token collection.
    *
-   * @param reader the reader
-   * @throws MtasConfigException the mtas config exception
-   * @throws MtasParserException the mtas parser exception
+   * @param reader
+   *          the reader
+   * @throws MtasConfigException
+   *           the mtas config exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private void constructTokenCollection(Reader reader)
       throws MtasConfigException, MtasParserException {
@@ -216,29 +239,28 @@ public final class MtasTokenizer extends Tokenizer {
         try {
           tokenCollection = parser.createTokenCollection(reader);
           return;
-        } catch (MtasParserException e) {          
+        } catch (MtasParserException e) {
           tokenCollection = new MtasTokenCollection();
-          e.printStackTrace();
           throw new MtasParserException(e.getMessage());
         }
       } else {
         throw new MtasConfigException("no instance of MtasParser");
       }
     } catch (NoSuchMethodException e) {
-      throw new MtasConfigException(e.getClass().getName()
-          + " : '" + e.getMessage() + "'");
+      throw new MtasConfigException(
+          e.getClass().getName() + " : '" + e.getMessage() + "'");
     } catch (InvocationTargetException e) {
-      throw new MtasConfigException(e.getClass().getName()
-          + " : '" + e.getMessage() + "'");
+      throw new MtasConfigException(
+          e.getClass().getName() + " : '" + e.getMessage() + "'");
     } catch (IllegalAccessException e) {
-      throw new MtasConfigException(e.getClass().getName()
-          + " : '" + e.getMessage() + "'");
+      throw new MtasConfigException(
+          e.getClass().getName() + " : '" + e.getMessage() + "'");
     } catch (ClassNotFoundException e) {
-      throw new MtasConfigException(e.getClass().getName()
-          + " : '" + e.getMessage() + "'");
+      throw new MtasConfigException(
+          e.getClass().getName() + " : '" + e.getMessage() + "'");
     } catch (InstantiationException e) {
-      throw new MtasConfigException(e.getClass().getName()
-          + " : '" + e.getMessage() + "'");
+      throw new MtasConfigException(
+          e.getClass().getName() + " : '" + e.getMessage() + "'");
     }
 
   }
@@ -246,7 +268,8 @@ public final class MtasTokenizer extends Tokenizer {
   /**
    * Read configuration file.
    *
-   * @param configFile the config file
+   * @param configFile
+   *          the config file
    */
   private void readConfigurationFile(String configFile) {
     InputStream is;
@@ -261,13 +284,13 @@ public final class MtasTokenizer extends Tokenizer {
     }
   }
 
-  
-
   /**
    * Process configuration.
    *
-   * @param config the config
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param config
+   *          the config
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void processConfiguration(MtasConfiguration config)
       throws IOException {

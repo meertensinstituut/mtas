@@ -2,7 +2,6 @@ package mtas.codec.util.collector;
 
 import java.io.Serializable;
 
-
 /**
  * The Class MtasDataLongOperations.
  */
@@ -15,13 +14,16 @@ class MtasDataLongOperations
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataOperations#product11(java.lang.
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#product11(java.lang.
    * Number, java.lang.Number)
    */
   @Override
   public Long product11(Long arg1, Long arg2) {
-    return arg1 * arg2;
+    if (arg1 == null || arg2 == null) {
+      return null;
+    } else {
+      return arg1 * arg2;
+    }
   }
 
   /*
@@ -33,7 +35,11 @@ class MtasDataLongOperations
    */
   @Override
   public Long add11(Long arg1, Long arg2) {
-    return arg1 + arg2;
+    if (arg1 == null || arg2 == null) {
+      return null;
+    } else {
+      return arg1 + arg2;
+    }
   }
 
   /*
@@ -45,19 +51,26 @@ class MtasDataLongOperations
    */
   @Override
   public Double add22(Double arg1, Double arg2) {
-    return arg1 + arg2;
+    if (arg1 == null || arg2 == null) {
+      return Double.NaN;
+    } else {
+      return arg1 + arg2;
+    }
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataOperations#subtract12(java.lang.
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#subtract12(java.lang.
    * Number, java.lang.Number)
    */
   @Override
   public Double subtract12(Long arg1, Double arg2) {
-    return arg1.doubleValue() - arg2;
+    if (arg1 == null || arg2 == null) {
+      return Double.NaN;
+    } else {
+      return arg1.doubleValue() - arg2;
+    }
   }
 
   /*
@@ -68,7 +81,11 @@ class MtasDataLongOperations
    */
   @Override
   public Double divide1(Long arg1, long arg2) {
-    return arg1 / (double) arg2;
+    if (arg1 == null) {
+      return Double.NaN;
+    } else {
+      return arg1 / (double) arg2;
+    }
   }
 
   /*
@@ -79,7 +96,11 @@ class MtasDataLongOperations
    */
   @Override
   public Double divide2(Double arg1, long arg2) {
-    return arg1 / arg2;
+    if (arg1 == null) {
+      return Double.NaN;
+    } else {
+      return arg1 / arg2;
+    }
   }
 
   /*
@@ -91,7 +112,11 @@ class MtasDataLongOperations
    */
   @Override
   public Long min11(Long arg1, Long arg2) {
-    return Math.min(arg1, arg2);
+    if (arg1 == null || arg2 == null) {
+      return null;
+    } else {
+      return Math.min(arg1, arg2);
+    }
   }
 
   /*
@@ -103,7 +128,11 @@ class MtasDataLongOperations
    */
   @Override
   public Long max11(Long arg1, Long arg2) {
-    return Math.max(arg1, arg2);
+    if (arg1 == null || arg2 == null) {
+      return null;
+    } else {
+      return Math.max(arg1, arg2);
+    }
   }
 
   /*
@@ -114,7 +143,11 @@ class MtasDataLongOperations
    */
   @Override
   public Double exp2(Double arg1) {
-    return Math.exp(arg1);
+    if (arg1 == null) {
+      return Double.NaN;
+    } else {
+      return Math.exp(arg1);
+    }
   }
 
   /*
@@ -125,7 +158,11 @@ class MtasDataLongOperations
    */
   @Override
   public Double sqrt2(Double arg1) {
-    return Math.sqrt(arg1);
+    if (arg1 == null) {
+      return Double.NaN;
+    } else {
+      return Math.sqrt(arg1);
+    }
   }
 
   /*
@@ -136,7 +173,11 @@ class MtasDataLongOperations
    */
   @Override
   public Double log1(Long arg1) {
-    return Math.log(arg1);
+    if (arg1 == null) {
+      return Double.NaN;
+    } else {
+      return Math.log(arg1);
+    }
   }
 
   /*

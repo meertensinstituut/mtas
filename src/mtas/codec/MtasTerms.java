@@ -15,26 +15,30 @@ public class MtasTerms extends Terms {
 
   /** The index input list. */
   HashMap<String, IndexInput> indexInputList;
-  
+
   /** The index input offset list. */
   HashMap<String, Long> indexInputOffsetList;
-  
+
   /** The version. */
   int version;
-  
+
   /** The delegate terms. */
   Terms delegateTerms;
-
 
   /**
    * Instantiates a new mtas terms.
    *
-   * @param terms the terms
-   * @param indexInputList the index input list
-   * @param indexInputOffsetList the index input offset list
-   * @param version the version
+   * @param terms
+   *          the terms
+   * @param indexInputList
+   *          the index input list
+   * @param indexInputOffsetList
+   *          the index input offset list
+   * @param version
+   *          the version
    */
-  public MtasTerms(Terms terms, HashMap<String, IndexInput> indexInputList, HashMap<String, Long> indexInputOffsetList, int version) {
+  public MtasTerms(Terms terms, HashMap<String, IndexInput> indexInputList,
+      HashMap<String, Long> indexInputOffsetList, int version) {
     delegateTerms = terms;
     this.indexInputList = indexInputList;
     this.indexInputOffsetList = indexInputOffsetList;
@@ -166,7 +170,7 @@ public class MtasTerms extends Terms {
       return false;
     }
   }
-  
+
   /**
    * Gets the version.
    *
@@ -175,20 +179,20 @@ public class MtasTerms extends Terms {
   public int getVersion() {
     return version;
   }
-  
+
   /**
    * Gets the index input list.
    *
    * @return the index input list
    */
   public HashMap<String, IndexInput> getIndexInputList() {
-    HashMap<String, IndexInput> clonedIndexInputList = new HashMap<String, IndexInput>();    
-    for(Entry<String, IndexInput> entry : indexInputList.entrySet()) {
+    HashMap<String, IndexInput> clonedIndexInputList = new HashMap<String, IndexInput>();
+    for (Entry<String, IndexInput> entry : indexInputList.entrySet()) {
       clonedIndexInputList.put(entry.getKey(), entry.getValue().clone());
     }
     return clonedIndexInputList;
   }
-  
+
   /**
    * Gets the index input offset list.
    *
@@ -196,6 +200,6 @@ public class MtasTerms extends Terms {
    */
   public HashMap<String, Long> getIndexInputOffsetList() {
     return indexInputOffsetList;
-  }  
+  }
 
 }

@@ -2,8 +2,6 @@ package mtas.codec.payload;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.TreeSet;
 
 import mtas.analysis.token.MtasPosition;
 import mtas.analysis.token.MtasToken;
@@ -12,98 +10,7 @@ import mtas.analysis.token.MtasTokenString;
 import org.apache.lucene.util.BytesRef;
 
 /**
- * The Class MtasPayloadEncoder encodes position, (real)offset, parent and
- * original payload into a new payload. <br>
- * <b>Initial bits</b><br>
- * <ul>
- * <li>bit 0,1 describe position type:
- * <ul>
- * <li>00 is single</li>
- * <li>10 is range</li>
- * <li>01 is set</li>
- * <li>11 is reserved (sub-position?)</li>
- * </ul>
- * </li>
- * <li>bit 2 describes offset:
- * <ul>
- * <li>0 is no offset</li>
- * <li>1 is offset
- * </ul>
- * </li>
- * <li>bit 3 describes real offset:
- * <ul>
- * <li>0 is follow offset</li>
- * <li>1 is separate real offset</li>
- * </ul>
- * </li>
- * <li>bit 4 describes parent:
- * <ul>
- * <li>0 is no parent</li>
- * <li>1 is parent</li>
- * </ul>
- * </li>
- * <li>bit 5 describes payload:
- * <ul>
- * <li>0 is no payload</li>
- * <li>1 is payload</li>
- * </ul>
- * </li>
- * </ul>
- * 
- * <b>Following bits</b><br>
- * 
- * <ul>
- * <li>id: add 1 and use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingNonNegativeInteger(int)}</li>
- * <li>if range-position:
- * <ul>
- * <li>range-length: use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingPositiveInteger(int)}</li>
- * </ul>
- * </li>
- * <li>if set-position:
- * <ul>
- * <li>number of positions: use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingPositiveInteger(int)}</li>
- * <li>increments: use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingPositiveInteger(int)}</li>
- * </ul>
- * </li>
- * <li>if offset:
- * <ul>
- * <li>startOffset: add 1, use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingNonNegativeInteger(int)}</li>
- * <li>length: use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingPositiveInteger(int)}</li> 
- * </ul>
- * </li>
- * 
- * <li>if realoffset:
- * <ul>
- * <li>if offset available:
- * <ul>
- * <li>difference of startRealOffset with startOffset: generalize for negative values, use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingInteger(int)}</li>
- * <li>length: use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingPositiveInteger(int)}</li>
- * </ul>
- * </li>
- * <li>if no offset available:
- * <ul>
- * <li>startOffset: add 1, use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingNonNegativeInteger(int)}</li>
- * <li>length: use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingPositiveInteger(int)}</li>
- * </ul>
- * </li>
- * </ul>
- * </li>
- * 
- * <li>if parent: 
- * <ul>
- * <li>increment relative from id to parent_id:
- * generalize for negative values, use Elias Gamma Coding, see {@link mtas.codec.payload.MtasBitOutputStream#writeEliasGammaCodingInteger(int)}</li>
- * </ul>
- * </li>
- * </ul>
- *
- *<b>Finally</b><br>
- *<ul>
- * <li>add minimal number of bits
- * to get multiple of 8 bits</li> 
- * <li>if payload: add payload bytes</li>
- *</ul>
- *
+ * The Class MtasPayloadEncoder.
  */
 
 /**
@@ -143,8 +50,10 @@ public class MtasPayloadEncoder {
   /**
    * Instantiates a new mtas payload encoder.
    *
-   * @param token the token
-   * @param flags the flags
+   * @param token
+   *          the token
+   * @param flags
+   *          the flags
    */
   public MtasPayloadEncoder(MtasToken<?> token, int flags) {
     mtasToken = token;
@@ -155,7 +64,8 @@ public class MtasPayloadEncoder {
   /**
    * Instantiates a new mtas payload encoder.
    *
-   * @param token the token
+   * @param token
+   *          the token
    */
   public MtasPayloadEncoder(MtasToken<?> token) {
     this(token, ENCODE_DEFAULT);
@@ -165,7 +75,8 @@ public class MtasPayloadEncoder {
    * Gets the payload.
    *
    * @return the payload
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public BytesRef getPayload() throws IOException {
 
@@ -224,22 +135,17 @@ public class MtasPayloadEncoder {
       // do nothing
     } else if (mtasToken.checkPositionType(MtasPosition.POSITION_RANGE)) {
       // write length
-      byteStream.writeEliasGammaCodingPositiveInteger(1
-          + mtasToken.getPositionEnd() - mtasToken.getPositionStart());
+      byteStream.writeEliasGammaCodingPositiveInteger(
+          1 + mtasToken.getPositionEnd() - mtasToken.getPositionStart());
     } else if (mtasToken.checkPositionType(MtasPosition.POSITION_SET)) {
       // write number of positions
-      TreeSet<Integer> positionList = mtasToken.getPositions();
-      byteStream.writeEliasGammaCodingPositiveInteger(positionList.size());
-      int previousPosition = positionList.first();
-      Iterator<Integer> it = positionList.iterator();
-      if (it.hasNext()) {
-        it.next(); // skip start position
-        while (it.hasNext()) {
-          int currentPosition = it.next();
-          byteStream.writeEliasGammaCodingPositiveInteger(currentPosition
-              - previousPosition);
-          previousPosition = currentPosition;
-        }
+      int[] positionList = mtasToken.getPositions();
+      byteStream.writeEliasGammaCodingPositiveInteger(positionList.length);
+      int previousPosition = positionList[0];
+      for (int i = 1; i < positionList.length; i++) {
+        byteStream.writeEliasGammaCodingPositiveInteger(
+            positionList[i] - previousPosition);
+        previousPosition = positionList[i];
       }
     } else {
       // do nothing
@@ -247,32 +153,32 @@ public class MtasPayloadEncoder {
     // add offset info (EliasGammaCoding)
     if ((encodingFlags & ENCODE_OFFSET) == ENCODE_OFFSET
         && mtasToken.checkOffset()) {
-      byteStream.writeEliasGammaCodingNonNegativeInteger(mtasToken
-          .getOffsetStart());
-      byteStream.writeEliasGammaCodingPositiveInteger(1
-          + mtasToken.getOffsetEnd() - mtasToken.getOffsetStart());
+      byteStream
+          .writeEliasGammaCodingNonNegativeInteger(mtasToken.getOffsetStart());
+      byteStream.writeEliasGammaCodingPositiveInteger(
+          1 + mtasToken.getOffsetEnd() - mtasToken.getOffsetStart());
     }
     // add realOffset info (EliasGammaCoding)
     if ((encodingFlags & ENCODE_REALOFFSET) == ENCODE_REALOFFSET
         && mtasToken.checkRealOffset()) {
       if ((encodingFlags & ENCODE_OFFSET) == ENCODE_OFFSET
           && mtasToken.checkOffset()) {
-        byteStream.writeEliasGammaCodingInteger(mtasToken.getRealOffsetStart()
-            - mtasToken.getOffsetStart());
-        byteStream.writeEliasGammaCodingPositiveInteger(1
-            + mtasToken.getRealOffsetEnd() - mtasToken.getRealOffsetStart());
+        byteStream.writeEliasGammaCodingInteger(
+            mtasToken.getRealOffsetStart() - mtasToken.getOffsetStart());
+        byteStream.writeEliasGammaCodingPositiveInteger(
+            1 + mtasToken.getRealOffsetEnd() - mtasToken.getRealOffsetStart());
       } else {
-        byteStream.writeEliasGammaCodingNonNegativeInteger(mtasToken
-            .getRealOffsetStart());
-        byteStream.writeEliasGammaCodingPositiveInteger(1
-            + mtasToken.getRealOffsetEnd() - mtasToken.getRealOffsetStart());
+        byteStream.writeEliasGammaCodingNonNegativeInteger(
+            mtasToken.getRealOffsetStart());
+        byteStream.writeEliasGammaCodingPositiveInteger(
+            1 + mtasToken.getRealOffsetEnd() - mtasToken.getRealOffsetStart());
       }
     }
     // add parent info (EliasGammaCoding)
     if ((encodingFlags & ENCODE_PARENT) == ENCODE_PARENT
         && mtasToken.checkParentId()) {
-      byteStream.writeEliasGammaCodingInteger(mtasToken.getParentId()
-          - mtasToken.getId());
+      byteStream.writeEliasGammaCodingInteger(
+          mtasToken.getParentId() - mtasToken.getId());
     }
     // add minimal number of zero-bits to get round number of bytes
     byteStream.createByte();
@@ -281,8 +187,8 @@ public class MtasPayloadEncoder {
         && mtasToken.getPayload() != null) {
       BytesRef payload = mtasToken.getPayload();
       byteStream.write(Arrays.copyOfRange(payload.bytes, payload.offset,
-          (payload.offset + payload.length)));     
-    }    
+          (payload.offset + payload.length)));
+    }
     // construct new payload
     return new BytesRef(byteStream.toByteArray());
   }

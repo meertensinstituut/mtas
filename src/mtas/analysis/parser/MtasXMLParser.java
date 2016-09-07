@@ -173,7 +173,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
               String ref = reference.attributes.get("ref");
               if ((name != null) && (ref != null)) {
                 MtasParserType t = new MtasParserType(MAPPING_TYPE_REF, name,
-                    ref);
+                    false, ref);
                 refTypes.put(getQName(t.getName()), t);
               }
             }
@@ -193,7 +193,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                     relationTypes.get(qn).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     relationTypes.put(qn, t);
                   }
@@ -206,7 +206,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                     relationAnnotationTypes.get(qn).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     relationAnnotationTypes.put(qn, t);
                   }
@@ -218,7 +218,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                     wordTypes.get(qn).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     wordTypes.put(qn, t);
                   }
@@ -230,7 +230,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                     wordAnnotationTypes.get(qn).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     wordAnnotationTypes.put(qn, t);
                   }
@@ -242,7 +242,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                     groupTypes.get(qn).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     groupTypes.put(qn, t);
                   }
@@ -254,7 +254,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                     groupAnnotationTypes.get(qn).addMapping(m);
                   } else {
                     MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping);
+                        nameMapping, false);
                     t.addMapping(m);
                     groupAnnotationTypes.put(qn, t);
                   }
@@ -321,8 +321,9 @@ abstract class MtasXMLParser extends MtasBasicParser {
             String encodingScheme = streamReader.getCharacterEncodingScheme();
             if (encodingScheme == null) {
               throw new MtasParserException("No encodingScheme found");
-            } else if (!encodingScheme.equals("UTF-8")) {
-              throw new MtasParserException("XML not UTF-8 encoded");
+            } else if (!encodingScheme.toLowerCase().equals("utf-8")) {
+              throw new MtasParserException(
+                  "XML not UTF-8 encoded but '" + encodingScheme + "'");
             }
             break;
           case XMLStreamConstants.END_DOCUMENT:
@@ -488,7 +489,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                         relationKeyMap.put(currentRelation.getId(), keyMapList);
                       }
                       keyMapList.add(currentObject
-                          .getAttribute(currentType.getRefAttributeName()));                      
+                          .getAttribute(currentType.getRefAttributeName()));
                     }
                   }
                 }
@@ -649,8 +650,10 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   assert unknownAncestors == 0 : "error in administration "
                       + currentObject.getType().getName();
                   currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(), currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(), currentObject.getOffset());
+                  idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                  idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
                   computeMappingsFromObject(currentObject, currentList,
@@ -671,8 +674,10 @@ abstract class MtasXMLParser extends MtasBasicParser {
                       + currentObject.getType().getName();
                   // ignore text: should not occur
                   currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(), currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(), currentObject.getOffset());
+                  idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                  idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
                   computeMappingsFromObject(currentObject, currentList,
@@ -733,7 +738,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
             if (streamReader.hasText()) {
               textContent = streamReader.getText();
             }
-            if(currentObject!=null) {
+            if (currentObject != null) {
               currentObject.addText(textContent);
             }
             break;
@@ -751,19 +756,16 @@ abstract class MtasXMLParser extends MtasBasicParser {
       assert hasRoot : "no " + rootTag;
     } catch (XMLStreamException e) {
       throw new MtasParserException("No valid XML: " + e.getMessage());
-    } catch (MtasParserException e) {
-      e.printStackTrace();
-      throw new MtasParserException("No valid XML");
     }
     // update tokens with offset
     for (Entry<Integer, HashSet<String>> updateItem : updateList
         .get(UPDATE_TYPE_OFFSET).entrySet()) {
       HashSet<String> refIdList = new HashSet<String>();
-      for(String refId : updateItem.getValue()) {
-        if(idPositions.containsKey(refId)) {
+      for (String refId : updateItem.getValue()) {
+        if (idPositions.containsKey(refId)) {
           refIdList.add(refId);
-        } 
-        if(relationKeyMap.containsKey(refId)) {
+        }
+        if (relationKeyMap.containsKey(refId)) {
           refIdList.addAll(recursiveCollect(refId, relationKeyMap, 10));
         }
       }
@@ -784,11 +786,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
     for (Entry<Integer, HashSet<String>> updateItem : updateList
         .get(UPDATE_TYPE_POSITION).entrySet()) {
       HashSet<String> refIdList = new HashSet<String>();
-      for(String refId : updateItem.getValue()) {
-        if(idPositions.containsKey(refId)) {
+      for (String refId : updateItem.getValue()) {
+        if (idPositions.containsKey(refId)) {
           refIdList.add(refId);
-        } 
-        if(relationKeyMap.containsKey(refId)) {
+        }
+        if (relationKeyMap.containsKey(refId)) {
           refIdList.addAll(recursiveCollect(refId, relationKeyMap, 10));
         }
       }
@@ -799,12 +801,12 @@ abstract class MtasXMLParser extends MtasBasicParser {
           if (refPositions != null) {
             MtasToken<?> token = tokenCollection.get(tokenId);
             token.addPositions(refPositions);
-          } 
+          }
         }
       }
     }
     // final check
-    tokenCollection.check(autorepair);
+    tokenCollection.check(autorepair, makeunique);
     return tokenCollection;
   }
 
@@ -819,14 +821,15 @@ abstract class MtasXMLParser extends MtasBasicParser {
   private Collection<? extends String> recursiveCollect(String refId,
       HashMap<String, TreeSet<String>> relationKeyMap, int maxRecursion) {
     HashSet<String> list = new HashSet<String>();
-    if(maxRecursion>0 && relationKeyMap.containsKey(refId)) {
-      TreeSet<String> subList = relationKeyMap.get(refId);      
-      for(String subRefId : subList) {
+    if (maxRecursion > 0 && relationKeyMap.containsKey(refId)) {
+      TreeSet<String> subList = relationKeyMap.get(refId);
+      for (String subRefId : subList) {
         list.add(subRefId);
-        list.addAll(recursiveCollect(subRefId, relationKeyMap, maxRecursion-1));
-      }           
-    } 
-    return list;    
+        list.addAll(
+            recursiveCollect(subRefId, relationKeyMap, maxRecursion - 1));
+      }
+    }
+    return list;
   }
 
   /**

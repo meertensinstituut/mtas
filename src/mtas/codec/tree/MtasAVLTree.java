@@ -15,8 +15,10 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Instantiates a new mtas avl tree.
    *
-   * @param singlePoint the single point
-   * @param storePrefixId the store prefix id
+   * @param singlePoint
+   *          the single point
+   * @param storePrefixId
+   *          the store prefix id
    */
   public MtasAVLTree(boolean singlePoint, boolean storePrefixId) {
     super(singlePoint, storePrefixId);
@@ -29,7 +31,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
    * @see mtas.codec.tree.MtasTree#addTokenRangeEmpty(int, int)
    */
   @Override
-  final protected void addRangeEmpty(int left, int right, int additionalId, long additionalRef) {
+  final protected void addRangeEmpty(int left, int right, int additionalId,
+      long additionalRef) {
     String key = ((Integer) left).toString() + "_"
         + ((Integer) right).toString();
     if (index.containsKey(key)) {
@@ -46,7 +49,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
    * java.lang.Long)
    */
   @Override
-  final protected void addSinglePoint(int position, int additionalId, long additionalRef, Integer id, Long ref) {
+  final protected void addSinglePoint(int position, int additionalId,
+      long additionalRef, Integer id, Long ref) {
     addRange(position, position, additionalId, additionalRef, id, ref);
   }
 
@@ -57,7 +61,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
    * java.lang.Long)
    */
   @Override
-  final protected void addRange(int left, int right, int additionalId, long additionalRef, Integer id, Long ref) {
+  final protected void addRange(int left, int right, int additionalId,
+      long additionalRef, Integer id, Long ref) {
     String key = ((Integer) left).toString() + "_"
         + ((Integer) right).toString();
     if (index.containsKey(key)) {
@@ -98,8 +103,10 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Update max.
    *
-   * @param n the n
-   * @param max the max
+   * @param n
+   *          the n
+   * @param max
+   *          the max
    */
   private void updateMax(MtasAVLTreeNode n, int max) {
     if (n != null) {
@@ -113,7 +120,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rebalance.
    *
-   * @param n the n
+   * @param n
+   *          the n
    */
   private void rebalance(MtasAVLTreeNode n) {
     setBalance(n);
@@ -140,7 +148,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate left.
    *
-   * @param a the a
+   * @param a
+   *          the a
    * @return the mtas avl tree node
    */
   private MtasAVLTreeNode rotateLeft(MtasAVLTreeNode a) {
@@ -168,7 +177,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate right.
    *
-   * @param a the a
+   * @param a
+   *          the a
    * @return the mtas avl tree node
    */
   private MtasAVLTreeNode rotateRight(MtasAVLTreeNode a) {
@@ -196,7 +206,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate left then right.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return the mtas avl tree node
    */
   private MtasAVLTreeNode rotateLeftThenRight(MtasAVLTreeNode n) {
@@ -207,7 +218,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate right then left.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return the mtas avl tree node
    */
   private MtasAVLTreeNode rotateRightThenLeft(MtasAVLTreeNode n) {
@@ -218,7 +230,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Height.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return the int
    */
   private int height(MtasAVLTreeNode n) {
@@ -232,7 +245,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Sets the balance.
    *
-   * @param nodes the new balance
+   * @param nodes
+   *          the new balance
    */
   private void setBalance(MtasAVLTreeNode... nodes) {
     for (MtasAVLTreeNode n : nodes) {
@@ -243,7 +257,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Sets the max.
    *
-   * @param n the new max
+   * @param n
+   *          the new max
    */
   private void setMax(MtasAVLTreeNode n) {
     n.max = n.right;

@@ -20,66 +20,73 @@ public class MtasCodec extends Codec {
 
   /** The Constant MTAS_CODEC_NAME. */
   public static final String MTAS_CODEC_NAME = "MtasCodec";
-  
+
   /** The delegate. */
   Codec delegate;
-  
+
   /**
    * Instantiates a new mtas codec.
    */
-  public MtasCodec() {    
+  public MtasCodec() {
     super(MTAS_CODEC_NAME);
     delegate = null;
   }
-  
+
   /**
    * Instantiates a new mtas codec.
    *
-   * @param name the name
-   * @param delegate the delegate
+   * @param name
+   *          the name
+   * @param delegate
+   *          the delegate
    */
   protected MtasCodec(String name, Codec delegate) {
     super(name);
     this.delegate = delegate;
   }
-  
+
   /**
    * Inits the delegate.
    */
   private void initDelegate() {
-    if(delegate == null) {
+    if (delegate == null) {
       delegate = Codec.getDefault();
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#postingsFormat()
    */
   @Override
   public PostingsFormat postingsFormat() {
     initDelegate();
-    if(delegate.postingsFormat() instanceof PerFieldPostingsFormat) {      
+    if (delegate.postingsFormat() instanceof PerFieldPostingsFormat) {
       Codec defaultCodec = Codec.getDefault();
       PostingsFormat defaultPostingsFormat = defaultCodec.postingsFormat();
-      if(defaultPostingsFormat instanceof PerFieldPostingsFormat) {
-        defaultPostingsFormat = ((PerFieldPostingsFormat) defaultPostingsFormat).getPostingsFormatForField(null);
-        if((defaultPostingsFormat==null) || (defaultPostingsFormat instanceof PerFieldPostingsFormat)) {
-          //fallback option
-          return new MtasCodecPostingsFormat(PostingsFormat.forName("Lucene50")); 
+      if (defaultPostingsFormat instanceof PerFieldPostingsFormat) {
+        defaultPostingsFormat = ((PerFieldPostingsFormat) defaultPostingsFormat)
+            .getPostingsFormatForField(null);
+        if ((defaultPostingsFormat == null)
+            || (defaultPostingsFormat instanceof PerFieldPostingsFormat)) {
+          // fallback option
+          return new MtasCodecPostingsFormat(
+              PostingsFormat.forName("Lucene60"));
         } else {
-          return new MtasCodecPostingsFormat(defaultPostingsFormat); 
+          return new MtasCodecPostingsFormat(defaultPostingsFormat);
         }
       } else {
-        return new MtasCodecPostingsFormat(defaultPostingsFormat);     
+        return new MtasCodecPostingsFormat(defaultPostingsFormat);
       }
-    } else {   
+    } else {
       return new MtasCodecPostingsFormat(delegate.postingsFormat());
-    }  
+    }
   }
-  
-  
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#docValuesFormat()
    */
   @Override
@@ -88,7 +95,9 @@ public class MtasCodec extends Codec {
     return delegate.docValuesFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#storedFieldsFormat()
    */
   @Override
@@ -97,7 +106,9 @@ public class MtasCodec extends Codec {
     return delegate.storedFieldsFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#termVectorsFormat()
    */
   @Override
@@ -106,7 +117,9 @@ public class MtasCodec extends Codec {
     return delegate.termVectorsFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#fieldInfosFormat()
    */
   @Override
@@ -115,7 +128,9 @@ public class MtasCodec extends Codec {
     return delegate.fieldInfosFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#segmentInfoFormat()
    */
   @Override
@@ -124,7 +139,9 @@ public class MtasCodec extends Codec {
     return delegate.segmentInfoFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#normsFormat()
    */
   @Override
@@ -133,7 +150,9 @@ public class MtasCodec extends Codec {
     return delegate.normsFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#liveDocsFormat()
    */
   @Override
@@ -142,7 +161,9 @@ public class MtasCodec extends Codec {
     return delegate.liveDocsFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#compoundFormat()
    */
   @Override
@@ -151,7 +172,9 @@ public class MtasCodec extends Codec {
     return delegate.compoundFormat();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.codecs.Codec#pointsFormat()
    */
   @Override
@@ -159,5 +182,5 @@ public class MtasCodec extends Codec {
     initDelegate();
     return delegate.pointsFormat();
   }
-  
+
 }

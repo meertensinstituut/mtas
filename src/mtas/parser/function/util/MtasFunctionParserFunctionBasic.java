@@ -14,70 +14,72 @@ public class MtasFunctionParserFunctionBasic
 
   /** The first type. */
   private String firstType;
-  
+
   /** The first id. */
   private int firstId;
 
   /** The tmp parser longs. */
   private ArrayList<MtasFunctionParserFunction> tmpParserLongs = new ArrayList<MtasFunctionParserFunction>();
-  
+
   /** The tmp parser doubles. */
   private ArrayList<MtasFunctionParserFunction> tmpParserDoubles = new ArrayList<MtasFunctionParserFunction>();
-  
+
   /** The tmp constant longs. */
   private ArrayList<Long> tmpConstantLongs = new ArrayList<Long>();
-  
+
   /** The tmp constant doubles. */
   private ArrayList<Double> tmpConstantDoubles = new ArrayList<Double>();
 
   /** The number. */
   private int number;
-  
+
   /** The operator list. */
   private String[] operatorList;
-  
+
   /** The type list. */
   private String[] typeList;
-  
+
   /** The id list. */
   private int[] idList;
 
   /** The tmp operator list. */
   private ArrayList<String> tmpOperatorList = new ArrayList<String>();
-  
+
   /** The tmp type list. */
   private ArrayList<String> tmpTypeList = new ArrayList<String>();
-  
+
   /** The tmp id list. */
   private ArrayList<Integer> tmpIdList = new ArrayList<Integer>();
 
   /** The Constant BASIC_OPERATOR_ADD. */
   public final static String BASIC_OPERATOR_ADD = "add";
-  
+
   /** The Constant BASIC_OPERATOR_SUBTRACT. */
   public final static String BASIC_OPERATOR_SUBTRACT = "subtract";
-  
+
   /** The Constant BASIC_OPERATOR_MULTIPLY. */
   public final static String BASIC_OPERATOR_MULTIPLY = "multiply";
-  
+
   /** The Constant BASIC_OPERATOR_DIVIDE. */
   public final static String BASIC_OPERATOR_DIVIDE = "divide";
-  
+
   /** The Constant BASIC_OPERATOR_POWER. */
   public final static String BASIC_OPERATOR_POWER = "power";
 
   /**
    * Instantiates a new mtas function parser function basic.
    *
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   public MtasFunctionParserFunctionBasic(MtasFunctionParserItem item)
       throws ParseException {
-    sumRule=true;
+    sumRule = true;
     String type = item.getType();
     MtasFunctionParserFunction parser;
-    firstType = type;  
+    firstType = type;
     degree = item.getDegree();
     switch (type) {
     case MtasFunctionParserItem.TYPE_N:
@@ -109,7 +111,7 @@ public class MtasFunctionParserFunctionBasic
         tmpParserLongs.add(parser);
         sumRule = parser.sumRule();
         dataType = CodecUtil.DATA_TYPE_LONG;
-        needPositions = needPositions?needPositions:parser.needPositions();
+        needPositions = needPositions ? needPositions : parser.needPositions();
         needArgument.addAll(parser.needArgument);
       } else {
         throw new ParseException("incorrect dataType");
@@ -123,7 +125,7 @@ public class MtasFunctionParserFunctionBasic
         tmpParserDoubles.add(parser);
         sumRule = parser.sumRule();
         dataType = CodecUtil.DATA_TYPE_DOUBLE;
-        needPositions = needPositions?needPositions:parser.needPositions();
+        needPositions = needPositions ? needPositions : parser.needPositions();
         needArgument.addAll(parser.needArgument);
       } else {
         throw new ParseException("incorrect dataType");
@@ -131,10 +133,12 @@ public class MtasFunctionParserFunctionBasic
       break;
     default:
       throw new ParseException("unknown type");
-    }    
+    }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.parser.function.util.MtasFunctionParserFunction#close()
    */
   @Override
@@ -142,8 +146,7 @@ public class MtasFunctionParserFunctionBasic
     if (!defined()) {
       super.close();
       if (tmpParserLongs.size() > 0) {
-        parserLongs = new MtasFunctionParserFunction[tmpParserLongs
-            .size()];
+        parserLongs = new MtasFunctionParserFunction[tmpParserLongs.size()];
         parserLongs = tmpParserLongs.toArray(parserLongs);
       }
       if (tmpParserDoubles.size() > 0) {
@@ -177,7 +180,7 @@ public class MtasFunctionParserFunctionBasic
           idList = new int[number];
           for (int i = 0; i < number; i++) {
             idList[i] = tmpIdList.get(i).intValue();
-          }          
+          }
         }
       } else {
         number = 0;
@@ -191,8 +194,10 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Adds the.
    *
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   public void add(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_ADD, item);
@@ -201,8 +206,10 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Subtract.
    *
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   public void subtract(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_SUBTRACT, item);
@@ -211,8 +218,10 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Multiply.
    *
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   public void multiply(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_MULTIPLY, item);
@@ -221,8 +230,10 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Divide.
    *
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   public void divide(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_DIVIDE, item);
@@ -231,8 +242,10 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Power.
    *
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   public void power(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_POWER, item);
@@ -241,9 +254,12 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Basic.
    *
-   * @param operator the operator
-   * @param item the item
-   * @throws ParseException the parse exception
+   * @param operator
+   *          the operator
+   * @param item
+   *          the item
+   * @throws ParseException
+   *           the parse exception
    */
   private void basic(String operator, MtasFunctionParserItem item)
       throws ParseException {
@@ -259,18 +275,19 @@ public class MtasFunctionParserFunctionBasic
         tmpTypeList.add(type);
         tmpIdList.add(0);
         needPositions = true;
-        if(sumRule && degree!=null) {
-          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-            if(degree<0) {
-              sumRule=false;
-              degree=null;
-            } else if(degree>0) {
-              sumRule=false;
+        if (sumRule && degree != null) {
+          if (operator.equals(BASIC_OPERATOR_ADD)
+              || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if (degree < 0) {
+              sumRule = false;
+              degree = null;
+            } else if (degree > 0) {
+              sumRule = false;
             }
-          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-            if(degree!=0) {
-              sumRule=false;
-              degree=null;
+          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+            if (degree != 0) {
+              sumRule = false;
+              degree = null;
             }
           }
         }
@@ -279,46 +296,48 @@ public class MtasFunctionParserFunctionBasic
         tmpTypeList.add(type);
         tmpIdList.add(item.getId());
         needArgument.add(item.getId());
-        if(sumRule && degree!=null) {
-          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-            if(degree!=1) {
-              sumRule=false;
+        if (sumRule && degree != null) {
+          if (operator.equals(BASIC_OPERATOR_ADD)
+              || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if (degree != 1) {
+              sumRule = false;
             }
-            if(degree>=0) {
-              degree=Math.max(degree, 1);
+            if (degree >= 0) {
+              degree = Math.max(degree, 1);
             } else {
-              degree=null;
+              degree = null;
             }
-          } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
-            if(degree!=0) {
-              sumRule=false;
+          } else if (operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+            if (degree != 0) {
+              sumRule = false;
             }
-            degree+=1;
-          } else if(operator.equals(BASIC_OPERATOR_DIVIDE)) {
-            sumRule=false;
-            degree-=1;
-          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-            sumRule=false;
-            degree=null;
-          } 
+            degree += 1;
+          } else if (operator.equals(BASIC_OPERATOR_DIVIDE)) {
+            sumRule = false;
+            degree -= 1;
+          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+            sumRule = false;
+            degree = null;
+          }
         }
         break;
       case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
         tmpTypeList.add(type);
         tmpIdList.add(tmpConstantLongs.size());
         tmpConstantLongs.add(item.getValueLong());
-        if(sumRule && degree!=null) {
-          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-            if(degree<0) {
-              sumRule=false;
-              degree=null;
-            } else if(degree>0) {
-              sumRule=false;
-            }
-          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-            if(degree!=0) {
+        if (sumRule && degree != null) {
+          if (operator.equals(BASIC_OPERATOR_ADD)
+              || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if (degree < 0) {
               sumRule = false;
-              degree=null;
+              degree = null;
+            } else if (degree > 0) {
+              sumRule = false;
+            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+            if (degree != 0) {
+              sumRule = false;
+              degree = null;
             }
           }
         }
@@ -328,18 +347,19 @@ public class MtasFunctionParserFunctionBasic
         tmpIdList.add(tmpConstantDoubles.size());
         dataType = CodecUtil.DATA_TYPE_DOUBLE;
         tmpConstantDoubles.add(item.getValueDouble());
-        if(sumRule && degree!=null) {
-          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-            if(degree<0) {
-              sumRule=false;
-              degree=null;
-            } else if(degree>0) {
-              sumRule=false;
-            }
-          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-            if(degree!=0) {
+        if (sumRule && degree != null) {
+          if (operator.equals(BASIC_OPERATOR_ADD)
+              || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if (degree < 0) {
               sumRule = false;
-              degree=null;
+              degree = null;
+            } else if (degree > 0) {
+              sumRule = false;
+            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+            if (degree != 0) {
+              sumRule = false;
+              degree = null;
             }
           }
         }
@@ -350,28 +370,29 @@ public class MtasFunctionParserFunctionBasic
         parser = item.getParser();
         parser.close();
         tmpParserLongs.add(parser);
-        sumRule = sumRule?parser.sumRule():false;
-        needPositions = needPositions?needPositions:parser.needPositions();
+        sumRule = sumRule ? parser.sumRule() : false;
+        needPositions = needPositions ? needPositions : parser.needPositions();
         needArgument.addAll(parser.needArgument);
-        if(sumRule && degree!=null) {
-          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {            
-            if(parser.degree!=degree) {
-              sumRule=false;
-              if(degree<0) {
-                degree=null;               
+        if (sumRule && degree != null) {
+          if (operator.equals(BASIC_OPERATOR_ADD)
+              || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if (parser.degree != degree) {
+              sumRule = false;
+              if (degree < 0) {
+                degree = null;
               } else {
                 degree = Math.max(degree, parser.degree);
               }
             }
-          } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
-            if(degree!=0 || parser.degree!=0) {
-              sumRule = false;              
-            }
-            degree+=parser.degree;                        
-          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-            if(degree!=0) {
+          } else if (operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+            if (degree != 0 || parser.degree != 0) {
               sumRule = false;
-              degree = null;              
+            }
+            degree += parser.degree;
+          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+            if (degree != 0) {
+              sumRule = false;
+              degree = null;
             }
           }
         }
@@ -383,28 +404,29 @@ public class MtasFunctionParserFunctionBasic
         parser = item.getParser();
         parser.close();
         tmpParserDoubles.add(parser);
-        sumRule = sumRule?parser.sumRule():false;
-        needPositions = needPositions?needPositions:parser.needPositions();
+        sumRule = sumRule ? parser.sumRule() : false;
+        needPositions = needPositions ? needPositions : parser.needPositions();
         needArgument.addAll(parser.needArgument);
-        if(sumRule && degree!=null) {
-          if(operator.equals(BASIC_OPERATOR_ADD)||operator.equals(BASIC_OPERATOR_SUBTRACT)) {            
-            if(parser.degree!=degree) {
-              sumRule=false;
-              if(degree<0) {
-                degree=null;               
+        if (sumRule && degree != null) {
+          if (operator.equals(BASIC_OPERATOR_ADD)
+              || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+            if (parser.degree != degree) {
+              sumRule = false;
+              if (degree < 0) {
+                degree = null;
               } else {
                 degree = Math.max(degree, parser.degree);
               }
             }
-          } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
-            if(degree!=0 || parser.degree!=0) {
-              sumRule = false;              
-            }
-            degree+=parser.degree;                        
-          } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-            if(degree!=0) {
+          } else if (operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+            if (degree != 0 || parser.degree != 0) {
               sumRule = false;
-              degree = null;              
+            }
+            degree += parser.degree;
+          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+            if (degree != 0) {
+              sumRule = false;
+              degree = null;
             }
           }
         }
@@ -417,8 +439,12 @@ public class MtasFunctionParserFunctionBasic
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.parser.function.util.MtasFunctionParserFunction#getValueDouble(long[], long)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.function.util.MtasFunctionParserFunction#getValueDouble(long[],
+   * long)
    */
   @Override
   public double getValueDouble(long[] args, long n) throws IOException {
@@ -485,7 +511,7 @@ public class MtasFunctionParserFunctionBasic
         case MtasFunctionParserItem.TYPE_CONSTANT_DOUBLE:
           sum -= constantDoubles[idList[i]];
           break;
-        case MtasFunctionParserItem.TYPE_CONSTANT_LONG:          
+        case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
           sum -= constantLongs[idList[i]];
           break;
         case MtasFunctionParserItem.TYPE_N:
@@ -552,22 +578,22 @@ public class MtasFunctionParserFunctionBasic
       case BASIC_OPERATOR_POWER:
         switch (typeList[i]) {
         case MtasFunctionParserItem.TYPE_ARGUMENT:
-          sum = Math.pow(sum,args[idList[i]]);
+          sum = Math.pow(sum, args[idList[i]]);
           break;
         case MtasFunctionParserItem.TYPE_PARSER_DOUBLE:
-          sum = Math.pow(sum,parserDoubles[idList[i]].getValueDouble(args, n));
+          sum = Math.pow(sum, parserDoubles[idList[i]].getValueDouble(args, n));
           break;
         case MtasFunctionParserItem.TYPE_PARSER_LONG:
-          sum = Math.pow(sum,parserLongs[idList[i]].getValueLong(args, n));
+          sum = Math.pow(sum, parserLongs[idList[i]].getValueLong(args, n));
           break;
         case MtasFunctionParserItem.TYPE_CONSTANT_DOUBLE:
-          sum = Math.pow(sum,constantDoubles[idList[i]]);
+          sum = Math.pow(sum, constantDoubles[idList[i]]);
           break;
         case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
-          sum = Math.pow(sum,constantLongs[idList[i]]);
+          sum = Math.pow(sum, constantLongs[idList[i]]);
           break;
         case MtasFunctionParserItem.TYPE_N:
-          sum = Math.pow(sum,n);
+          sum = Math.pow(sum, n);
           break;
         default:
           throw new IOException("unknown type");
@@ -580,8 +606,12 @@ public class MtasFunctionParserFunctionBasic
     return sum;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.parser.function.util.MtasFunctionParserFunction#getValueLong(long[], long)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.function.util.MtasFunctionParserFunction#getValueLong(long[],
+   * long)
    */
   @Override
   public long getValueLong(long[] args, long n) throws IOException {
@@ -707,7 +737,7 @@ public class MtasFunctionParserFunctionBasic
           default:
             throw new IOException("unknown type");
           }
-          if(v!=0) {
+          if (v != 0) {
             sum /= v;
           } else {
             throw new IOException("division by zero");
@@ -716,22 +746,22 @@ public class MtasFunctionParserFunctionBasic
         case BASIC_OPERATOR_POWER:
           switch (typeList[i]) {
           case MtasFunctionParserItem.TYPE_ARGUMENT:
-            sum = sum^args[idList[i]];
+            sum = sum ^ args[idList[i]];
             break;
           case MtasFunctionParserItem.TYPE_PARSER_DOUBLE:
-            sum = sum^(long) parserDoubles[idList[i]].getValueDouble(args, n);
+            sum = sum ^ (long) parserDoubles[idList[i]].getValueDouble(args, n);
             break;
           case MtasFunctionParserItem.TYPE_PARSER_LONG:
-            sum = sum^parserLongs[idList[i]].getValueLong(args, n);
+            sum = sum ^ parserLongs[idList[i]].getValueLong(args, n);
             break;
           case MtasFunctionParserItem.TYPE_CONSTANT_DOUBLE:
-            sum = sum^constantDoubles[idList[i]].longValue();
+            sum = sum ^ constantDoubles[idList[i]].longValue();
             break;
           case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
-            sum = sum^constantLongs[idList[i]];
+            sum = sum ^ constantLongs[idList[i]];
             break;
           case MtasFunctionParserItem.TYPE_N:
-            sum = sum^n;
+            sum = sum ^ n;
             break;
           default:
             throw new IOException("unknown type");
@@ -746,57 +776,61 @@ public class MtasFunctionParserFunctionBasic
       throw new IOException(e.getMessage());
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     String text = "?";
-    if(firstType!=null) {
+    if (firstType != null) {
       text = toString(firstType, firstId);
-      for(int i=0; i<tmpOperatorList.size(); i++) {
+      for (int i = 0; i < tmpOperatorList.size(); i++) {
         String operator = tmpOperatorList.get(i);
-        if(operator.equals(BASIC_OPERATOR_ADD)) {
-          text+=" + ";
-        } else if(operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-          text+=" - ";
-        } else if(operator.equals(BASIC_OPERATOR_MULTIPLY)) {
-          text+=" * ";
-        } else if(operator.equals(BASIC_OPERATOR_DIVIDE)) {
-          text+=" / ";
-        } else if(operator.equals(BASIC_OPERATOR_POWER)) {
-          text+=" ^ ";
+        if (operator.equals(BASIC_OPERATOR_ADD)) {
+          text += " + ";
+        } else if (operator.equals(BASIC_OPERATOR_SUBTRACT)) {
+          text += " - ";
+        } else if (operator.equals(BASIC_OPERATOR_MULTIPLY)) {
+          text += " * ";
+        } else if (operator.equals(BASIC_OPERATOR_DIVIDE)) {
+          text += " / ";
+        } else if (operator.equals(BASIC_OPERATOR_POWER)) {
+          text += " ^ ";
         } else {
-          text+=" ? ";
+          text += " ? ";
         }
-        text+=toString(tmpTypeList.get(i), tmpIdList.get(i));
+        text += toString(tmpTypeList.get(i), tmpIdList.get(i));
       }
     }
     return text;
   }
-  
+
   /**
    * To string.
    *
-   * @param type the type
-   * @param id the id
+   * @param type
+   *          the type
+   * @param id
+   *          the id
    * @return the string
    */
   private String toString(String type, int id) {
-    if(type.equals(MtasFunctionParserItem.TYPE_CONSTANT_LONG)) {
+    if (type.equals(MtasFunctionParserItem.TYPE_CONSTANT_LONG)) {
       return tmpConstantLongs.get(id).toString();
-    } else if(type.equals(MtasFunctionParserItem.TYPE_CONSTANT_DOUBLE)) {
+    } else if (type.equals(MtasFunctionParserItem.TYPE_CONSTANT_DOUBLE)) {
       return tmpConstantDoubles.get(id).toString();
-    } else if(type.equals(MtasFunctionParserItem.TYPE_PARSER_LONG)) {
-      return "("+tmpParserLongs.get(id).toString()+")";
-    } else if(type.equals(MtasFunctionParserItem.TYPE_PARSER_DOUBLE)) {
-      return "("+tmpParserDoubles.get(id).toString()+")";
-    } else if(type.equals(MtasFunctionParserItem.TYPE_ARGUMENT)) {
-      return "$q"+id;
-    } else if(type.equals(MtasFunctionParserItem.TYPE_N)) {
+    } else if (type.equals(MtasFunctionParserItem.TYPE_PARSER_LONG)) {
+      return "(" + tmpParserLongs.get(id).toString() + ")";
+    } else if (type.equals(MtasFunctionParserItem.TYPE_PARSER_DOUBLE)) {
+      return "(" + tmpParserDoubles.get(id).toString() + ")";
+    } else if (type.equals(MtasFunctionParserItem.TYPE_ARGUMENT)) {
+      return "$q" + id;
+    } else if (type.equals(MtasFunctionParserItem.TYPE_N)) {
       return "$n";
-    } else{
+    } else {
       return "..";
     }
   }

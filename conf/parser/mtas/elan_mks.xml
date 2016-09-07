@@ -17,9 +17,10 @@
 	<!-- START CONFIGURATION MTAS FOLIA PARSER -->
 	<parser name="mtas.analysis.parser.MtasElanParser">
 
-		<!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
+		<!-- START GENERAL SETTINGS MTAS PARSER -->
 		<autorepair value="true" />
-		<!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
+		<makeunique value="true" />
+    <!-- END GENERAL SETTINGS MTAS PARSER -->
 
 		<!-- START REFERENCES -->
 		<references>

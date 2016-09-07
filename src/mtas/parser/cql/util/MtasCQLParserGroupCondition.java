@@ -9,15 +9,17 @@ public class MtasCQLParserGroupCondition {
 
   /** The condition. */
   private SpanQuery condition;
-  
+
   /** The field. */
   private String field;
 
   /**
    * Instantiates a new mtas cql parser group condition.
    *
-   * @param field the field
-   * @param condition the condition
+   * @param field
+   *          the field
+   * @param condition
+   *          the condition
    */
   public MtasCQLParserGroupCondition(String field, SpanQuery condition) {
     this.field = field;
@@ -39,10 +41,12 @@ public class MtasCQLParserGroupCondition {
    * @return the query
    */
   public SpanQuery getQuery() {
-    return condition;    
+    return condition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -57,7 +61,7 @@ public class MtasCQLParserGroupCondition {
       } else {
         if (!this.condition.equals(condition)) {
           return false;
-        } 
+        }
         return true;
       }
     } else {

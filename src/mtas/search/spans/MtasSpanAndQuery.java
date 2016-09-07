@@ -14,25 +14,29 @@ public class MtasSpanAndQuery extends SpanNearQuery {
 
   /** The clauses. */
   private List<SpanQuery> clauses;
-  
+
   /** The query name. */
   private static String QUERY_NAME = "mtasSpanAndQuery";
 
   /**
    * Instantiates a new mtas span and query.
    *
-   * @param clauses the clauses
+   * @param clauses
+   *          the clauses
    */
   public MtasSpanAndQuery(SpanQuery... clauses) {
     super(clauses, -1 * (clauses.length - 1), false);
     this.clauses = new ArrayList<>(clauses.length);
     for (SpanQuery clause : clauses) {
       this.clauses.add(clause);
-    }    
+    }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanNearQuery#toString(java.lang.String)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanNearQuery#toString(java.lang.String)
    */
   @Override
   public String toString(String field) {
@@ -50,22 +54,26 @@ public class MtasSpanAndQuery extends SpanNearQuery {
     return buffer.toString();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanNearQuery#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (obj== null)
+    if (obj == null)
       return false;
     if (getClass() != obj.getClass())
       return false;
     final MtasSpanAndQuery that = (MtasSpanAndQuery) obj;
-    return clauses.equals(that.clauses);    
+    return clauses.equals(that.clauses);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanNearQuery#hashCode()
    */
   @Override
@@ -74,7 +82,5 @@ public class MtasSpanAndQuery extends SpanNearQuery {
     h = (h * 7) ^ super.hashCode();
     return h;
   }
-
-
 
 }

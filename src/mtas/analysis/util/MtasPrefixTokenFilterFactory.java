@@ -19,22 +19,26 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
   /**
    * Instantiates a new mtas prefix token filter factory.
    *
-   * @param args the args
+   * @param args
+   *          the args
    */
   public MtasPrefixTokenFilterFactory(Map<String, String> args) {
     super(args);
     prefix = get(args, "prefix");
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.analysis.util.TokenFilterFactory#create(org.apache.lucene.analysis.TokenStream)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.analysis.util.TokenFilterFactory#create(org.apache.lucene
+   * .analysis.TokenStream)
    */
   @Override
   public TokenStream create(TokenStream input) {
     return new MtasPrefixTokenFilter(input, prefix);
   }
 
-  
   /**
    * The Class MtasPrefixTokenFilter.
    */
@@ -42,37 +46,42 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
 
     /** The prefix. */
     private String prefix;
-    
+
     /** The term att. */
-    private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+    private final CharTermAttribute termAtt = addAttribute(
+        CharTermAttribute.class);
 
     /**
      * Instantiates a new mtas prefix token filter.
      *
-     * @param input the input
-     * @param prefix the prefix
+     * @param input
+     *          the input
+     * @param prefix
+     *          the prefix
      */
     protected MtasPrefixTokenFilter(TokenStream input, String prefix) {
       super(input);
-      this.prefix = prefix+MtasToken.DELIMITER;
+      this.prefix = prefix + MtasToken.DELIMITER;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.analysis.TokenStream#incrementToken()
      */
     @Override
     public final boolean incrementToken() throws IOException {
       if (input.incrementToken()) {
-        int oldLen = termAtt.length();  
-        char [] buffer = termAtt.resizeBuffer(oldLen + prefix.length());
-        
-        for (int i = 0; i < oldLen; i++) {  
-          buffer[(oldLen + prefix.length() - 1 - i)] = buffer[(oldLen - 1 - i)];  
-        }  
-        for(int i=0;i< prefix.length();i++) {
-          buffer[i]=prefix.charAt(i);
+        int oldLen = termAtt.length();
+        char[] buffer = termAtt.resizeBuffer(oldLen + prefix.length());
+
+        for (int i = 0; i < oldLen; i++) {
+          buffer[(oldLen + prefix.length() - 1 - i)] = buffer[(oldLen - 1 - i)];
         }
-        termAtt.copyBuffer(buffer, 0, oldLen + prefix.length());  
+        for (int i = 0; i < prefix.length(); i++) {
+          buffer[i] = prefix.charAt(i);
+        }
+        termAtt.copyBuffer(buffer, 0, oldLen + prefix.length());
         return true;
       } else {
         return false;
@@ -80,6 +89,5 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
     }
 
   }
-
 
 }

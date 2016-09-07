@@ -1,66 +1,84 @@
 package mtas.analysis.token;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.lucene.analysis.payloads.PayloadHelper;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.automaton.Automaton;
+import org.apache.lucene.util.automaton.CompiledAutomaton;
+import org.apache.lucene.util.automaton.Operations;
+import org.apache.lucene.util.automaton.RegExp;
 
 /**
  * The Class MtasToken.
  *
- * @param <GenericType> the generic type
+ * @param <GenericType>
+ *          the generic type
  */
 public abstract class MtasToken<GenericType> {
 
   /** The Constant DELIMITER. */
   public static final String DELIMITER = "\u0001";
 
+  /** The Constant regexpPrePostFix. */
+  public static final String regexpPrePostFix = "(.*)" + DELIMITER
+      + "(.[^\u0000]*)";
+
+  /** The Constant patternPrePostFix. */
+  public static final Pattern patternPrePostFix = Pattern
+      .compile(regexpPrePostFix);
+
   /** The Constant MTAS_TOKEN_ID. */
-  static final AtomicInteger MTAS_TOKEN_ID = new AtomicInteger(0);  
-  
+  static final AtomicInteger MTAS_TOKEN_ID = new AtomicInteger(0);
+
   /** The token id. */
   private Integer tokenId = MTAS_TOKEN_ID.getAndIncrement();
-  
+
   /** The token ref. */
   private Long tokenRef = null;
-  
+
   /** The term ref. */
   private Long termRef = null;
-  
+
   /** The prefix id. */
   private Integer prefixId = null;
-  
+
   /** The token type. */
   protected String tokenType = null;
-  
+
   /** The token parent id. */
   private Integer tokenParentId = null;
-  
+
   /** The token value. */
   private String tokenValue = null;
-  
+
   /** The token position. */
   private MtasPosition tokenPosition = null;
-  
+
   /** The token offset. */
   private MtasOffset tokenOffset = null;
-  
+
   /** The token real offset. */
   private MtasOffset tokenRealOffset = null;
-  
+
   /** The token payload. */
   private BytesRef tokenPayload = null;
-  
+
   /** The provide offset. */
   private Boolean provideOffset = true;
-  
+
   /** The provide real offset. */
   private Boolean provideRealOffset = true;
-  
+
   /** The provide parent id. */
   private Boolean provideParentId = true;
 
@@ -70,22 +88,25 @@ public abstract class MtasToken<GenericType> {
   public static void resetId() {
     MTAS_TOKEN_ID.set(0);
   }
-  
+
   /**
    * Instantiates a new mtas token.
    *
-   * @param value the value
+   * @param value
+   *          the value
    */
   protected MtasToken(String value) {
     setType();
     setValue(value);
   }
-  
+
   /**
    * Instantiates a new mtas token.
    *
-   * @param value the value
-   * @param position the position
+   * @param value
+   *          the value
+   * @param position
+   *          the position
    */
   protected MtasToken(String value, Integer position) {
     setType();
@@ -96,7 +117,8 @@ public abstract class MtasToken<GenericType> {
   /**
    * Sets the token ref.
    *
-   * @param ref the new token ref
+   * @param ref
+   *          the new token ref
    */
   final public void setTokenRef(Long ref) {
     tokenRef = ref;
@@ -110,11 +132,12 @@ public abstract class MtasToken<GenericType> {
   final public Long getTokenRef() {
     return tokenRef;
   }
-  
+
   /**
    * Sets the term ref.
    *
-   * @param ref the new term ref
+   * @param ref
+   *          the new term ref
    */
   final public void setTermRef(Long ref) {
     termRef = ref;
@@ -128,11 +151,12 @@ public abstract class MtasToken<GenericType> {
   final public Long getTermRef() {
     return termRef;
   }
-  
+
   /**
    * Sets the prefix id.
    *
-   * @param id the new prefix id
+   * @param id
+   *          the new prefix id
    */
   final public void setPrefixId(int id) {
     prefixId = id;
@@ -142,10 +166,11 @@ public abstract class MtasToken<GenericType> {
    * Gets the prefix id.
    *
    * @return the prefix id
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   final public int getPrefixId() throws IOException {
-    if(prefixId!=null) {
+    if (prefixId != null) {
       return prefixId;
     } else {
       throw new IOException("no prefixId");
@@ -155,7 +180,8 @@ public abstract class MtasToken<GenericType> {
   /**
    * Sets the id.
    *
-   * @param id the new id
+   * @param id
+   *          the new id
    */
   final public void setId(Integer id) {
     tokenId = id;
@@ -173,7 +199,8 @@ public abstract class MtasToken<GenericType> {
   /**
    * Sets the parent id.
    *
-   * @param id the new parent id
+   * @param id
+   *          the new parent id
    */
   final public void setParentId(Integer id) {
     tokenParentId = id;
@@ -187,16 +214,17 @@ public abstract class MtasToken<GenericType> {
   final public Integer getParentId() {
     return tokenParentId;
   }
-  
+
   /**
    * Sets the provide parent id.
    *
-   * @param provide the new provide parent id
+   * @param provide
+   *          the new provide parent id
    */
   final public void setProvideParentId(Boolean provide) {
     provideParentId = provide;
   }
-  
+
   /**
    * Gets the provide parent id.
    *
@@ -225,7 +253,8 @@ public abstract class MtasToken<GenericType> {
   /**
    * Adds the position.
    *
-   * @param position the position
+   * @param position
+   *          the position
    */
   final public void addPosition(int position) {
     if (tokenPosition == null) {
@@ -238,16 +267,18 @@ public abstract class MtasToken<GenericType> {
   /**
    * Adds the position range.
    *
-   * @param start the start
-   * @param end the end
+   * @param start
+   *          the start
+   * @param end
+   *          the end
    */
   final public void addPositionRange(int start, int end) {
     if (tokenPosition == null) {
       tokenPosition = new MtasPosition(start, end);
     } else {
-      TreeSet<Integer> positions = new TreeSet<Integer>();
+      int[] positions = new int[end - start + 1];
       for (int i = start; i <= end; i++) {
-        positions.add(i);
+        positions[i - start] = i;
       }
       tokenPosition.add(positions);
     }
@@ -256,10 +287,11 @@ public abstract class MtasToken<GenericType> {
   /**
    * Adds the positions.
    *
-   * @param positions the positions
+   * @param positions
+   *          the positions
    */
-  final public void addPositions(TreeSet<Integer> positions) {
-    if (positions != null && positions.size() > 0) {
+  final public void addPositions(int[] positions) {
+    if (positions != null && positions.length > 0) {
       if (tokenPosition == null) {
         tokenPosition = new MtasPosition(positions);
       } else {
@@ -269,9 +301,22 @@ public abstract class MtasToken<GenericType> {
   }
 
   /**
+   * Adds the positions.
+   *
+   * @param list
+   *          the list
+   */
+  final public void addPositions(TreeSet<Integer> list) {
+    int[] positions = ArrayUtils
+        .toPrimitive(list.toArray(new Integer[list.size()]));
+    addPositions(positions);
+  }
+
+  /**
    * Check position type.
    *
-   * @param type the type
+   * @param type
+   *          the type
    * @return the boolean
    */
   final public Boolean checkPositionType(String type) {
@@ -310,7 +355,7 @@ public abstract class MtasToken<GenericType> {
    *
    * @return the positions
    */
-  final public TreeSet<Integer> getPositions() {
+  final public int[] getPositions() {
     return tokenPosition == null ? null : tokenPosition.getPositions();
   }
 
@@ -320,7 +365,7 @@ public abstract class MtasToken<GenericType> {
    * @return the boolean
    */
   final public Boolean checkOffset() {
-    if ((tokenOffset == null)||!provideOffset) {
+    if ((tokenOffset == null) || !provideOffset) {
       return false;
     } else {
       return true;
@@ -333,7 +378,7 @@ public abstract class MtasToken<GenericType> {
    * @return the boolean
    */
   final public Boolean checkRealOffset() {
-    if ((tokenRealOffset == null)||!provideRealOffset) {
+    if ((tokenRealOffset == null) || !provideRealOffset) {
       return false;
     } else if (tokenOffset == null) {
       return true;
@@ -348,8 +393,10 @@ public abstract class MtasToken<GenericType> {
   /**
    * Sets the offset.
    *
-   * @param start the start
-   * @param end the end
+   * @param start
+   *          the start
+   * @param end
+   *          the end
    */
   final public void setOffset(Integer start, Integer end) {
     if ((start == null) || (end == null)) {
@@ -364,8 +411,10 @@ public abstract class MtasToken<GenericType> {
   /**
    * Adds the offset.
    *
-   * @param start the start
-   * @param end the end
+   * @param start
+   *          the start
+   * @param end
+   *          the end
    */
   final public void addOffset(Integer start, Integer end) {
     if (tokenOffset == null) {
@@ -378,11 +427,12 @@ public abstract class MtasToken<GenericType> {
       tokenOffset.add(start, end);
     }
   }
-  
+
   /**
    * Sets the provide offset.
    *
-   * @param provide the new provide offset
+   * @param provide
+   *          the new provide offset
    */
   final public void setProvideOffset(Boolean provide) {
     provideOffset = provide;
@@ -391,8 +441,10 @@ public abstract class MtasToken<GenericType> {
   /**
    * Sets the real offset.
    *
-   * @param start the start
-   * @param end the end
+   * @param start
+   *          the start
+   * @param end
+   *          the end
    */
   final public void setRealOffset(Integer start, Integer end) {
     if ((start == null) || (end == null)) {
@@ -404,17 +456,17 @@ public abstract class MtasToken<GenericType> {
       tokenRealOffset = new MtasOffset(start, end);
     }
   }
-  
- 
+
   /**
    * Sets the provide real offset.
    *
-   * @param provide the new provide real offset
+   * @param provide
+   *          the new provide real offset
    */
   final public void setProvideRealOffset(Boolean provide) {
     provideRealOffset = provide;
   }
-  
+
   /**
    * Gets the provide offset.
    *
@@ -423,7 +475,7 @@ public abstract class MtasToken<GenericType> {
   final public boolean getProvideOffset() {
     return provideOffset;
   }
-  
+
   /**
    * Gets the provide real offset.
    *
@@ -472,41 +524,127 @@ public abstract class MtasToken<GenericType> {
   /**
    * Sets the value.
    *
-   * @param value the new value
+   * @param value
+   *          the new value
    */
   public void setValue(String value) {
-    tokenValue = value;   
+    tokenValue = value;
   }
-  
+
   /**
    * Gets the prefix from value.
    *
-   * @param value the value
+   * @param value
+   *          the value
    * @return the prefix from value
    */
   public static String getPrefixFromValue(String value) {
     String prefix = null;
-    if(value.contains(DELIMITER)) {
+    if (value.contains(DELIMITER)) {
       prefix = value.split(DELIMITER)[0];
     } else {
       prefix = value;
     }
     return prefix.replaceAll("\u0000", "");
   }
-  
+
   /**
    * Gets the postfix from value.
    *
-   * @param value the value
+   * @param value
+   *          the value
    * @return the postfix from value
    */
   public static String getPostfixFromValue(String value) {
     String postfix = "";
-    if(value.contains(DELIMITER)) {
-      String[] list = value.split(DELIMITER);
-      postfix = StringUtils.join(Arrays.copyOfRange(list,1,list.length),DELIMITER);
-    } 
-    return postfix.replaceAll("\u0000", "");
+    Matcher m = patternPrePostFix.matcher(value);
+    if (m.find()) {
+      postfix = m.group(2);
+
+    }
+    return postfix;
+  }
+
+  /**
+   * Gets the postfix from value.
+   *
+   * @param term
+   *          the term
+   * @return the postfix from value
+   */
+  public static String getPostfixFromValue(BytesRef term) {
+    int i = term.offset, length = term.offset + term.length;
+    byte[] postfix = new byte[length];
+    while (i < length) {
+      if ((term.bytes[i] & 0b10000000) == 0b00000000) {
+        if (term.bytes[i] == 0b00000001) {
+          i++;
+          break;
+        } else {
+          i++;
+        }
+      } else if ((term.bytes[i] & 0b11100000) == 0b11000000) {
+        i += 2;
+      } else if ((term.bytes[i] & 0b11110000) == 0b11100000) {
+        i += 3;
+      } else if ((term.bytes[i] & 0b11111000) == 0b11110000) {
+        i += 4;
+      } else if ((term.bytes[i] & 0b11111100) == 0b11111000) {
+        i += 5;
+      } else if ((term.bytes[i] & 0b11111110) == 0b11111100) {
+        i += 6;
+      } else {
+        return "";
+      }
+    }
+    int start = i;
+    while (i < length) {
+      if ((term.bytes[i] & 0b10000000) == 0b00000000) {
+        if (term.bytes[i] == 0b00000000) {
+          break;
+        }
+        postfix[i] = term.bytes[i];
+        i++;
+      } else if ((term.bytes[i] & 0b11100000) == 0b11000000) {
+        postfix[i] = term.bytes[i];
+        postfix[i + 1] = term.bytes[i + 1];
+        i += 2;
+      } else if ((term.bytes[i] & 0b11110000) == 0b11100000) {
+        postfix[i] = term.bytes[i];
+        postfix[i + 1] = term.bytes[i + 1];
+        postfix[i + 2] = term.bytes[i + 2];
+        i += 3;
+      } else if ((term.bytes[i] & 0b11111000) == 0b11110000) {
+        postfix[i] = term.bytes[i];
+        postfix[i + 1] = term.bytes[i + 1];
+        postfix[i + 2] = term.bytes[i + 2];
+        postfix[i + 3] = term.bytes[i + 3];
+        i += 4;
+      } else if ((term.bytes[i] & 0b11111100) == 0b11111000) {
+        postfix[i] = term.bytes[i];
+        postfix[i + 1] = term.bytes[i + 1];
+        postfix[i + 2] = term.bytes[i + 2];
+        postfix[i + 3] = term.bytes[i + 3];
+        postfix[i + 4] = term.bytes[i + 4];
+        i += 5;
+      } else if ((term.bytes[i] & 0b11111110) == 0b11111100) {
+        postfix[i] = term.bytes[i];
+        postfix[i + 1] = term.bytes[i + 1];
+        postfix[i + 2] = term.bytes[i + 2];
+        postfix[i + 3] = term.bytes[i + 3];
+        postfix[i + 4] = term.bytes[i + 4];
+        postfix[i + 5] = term.bytes[i + 5];
+        i += 6;
+      } else {
+        return "";
+      }
+    }
+    try {
+      return new String(Arrays.copyOfRange(postfix, start, i), "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      return "";
+    }
+
   }
 
   /**
@@ -517,7 +655,7 @@ public abstract class MtasToken<GenericType> {
   public String getValue() {
     return tokenValue;
   }
-  
+
   /**
    * Gets the prefix.
    *
@@ -526,7 +664,7 @@ public abstract class MtasToken<GenericType> {
   public String getPrefix() {
     return getPrefixFromValue(tokenValue);
   }
-  
+
   /**
    * Gets the postfix.
    *
@@ -542,30 +680,31 @@ public abstract class MtasToken<GenericType> {
    * @return the boolean
    */
   final public Boolean checkParentId() {
-    if ((tokenParentId==null)||!provideParentId) {
+    if ((tokenParentId == null) || !provideParentId) {
       return false;
     } else {
       return true;
     }
   }
-  
+
   /**
    * Check payload.
    *
    * @return the boolean
    */
   final public Boolean checkPayload() {
-    if (tokenPayload  == null) {
+    if (tokenPayload == null) {
       return false;
     } else {
       return true;
     }
   }
-  
+
   /**
    * Sets the payload.
    *
-   * @param payload the new payload
+   * @param payload
+   *          the new payload
    */
   public void setPayload(BytesRef payload) {
     tokenPayload = payload;
@@ -580,42 +719,78 @@ public abstract class MtasToken<GenericType> {
     return tokenPayload;
   }
 
-  /* (non-Javadoc)
+  /**
+   * Creates the automata.
+   *
+   * @param prefix
+   *          the prefix
+   * @param valueList
+   *          the value list
+   * @return the list
+   */
+  public static List<CompiledAutomaton> createAutomata(String prefix,
+      List<String> valueList) {
+    List<CompiledAutomaton> list = new ArrayList<CompiledAutomaton>();
+    int step = 100;
+    for (int i = 0; i < valueList.size(); i += step) {
+      int next = Math.min(valueList.size(), i + step);
+      List<Automaton> listAutomaton = new ArrayList<Automaton>();
+      for (int j = i; j < next; j++) {
+        String value = valueList.get(j);
+        value = value.replaceAll("([\\\"\\)\\(\\<\\>\\.\\@\\#\\]\\[\\{\\}])",
+            "\\\\\\1");
+        listAutomaton
+            .add((new RegExp(prefix + MtasToken.DELIMITER + value + "\u0000*"))
+                .toAutomaton());
+      }
+      Automaton automaton = Operations.union(listAutomaton);
+      CompiledAutomaton compiledAutomaton = new CompiledAutomaton(automaton);
+      list.add(compiledAutomaton);
+    }
+    return list;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     String text = "";
-    text+="[" + String.format("%05d", getId()) + "] ";
-    text+=((getRealOffsetStart() == null) ? "[-------,-------]"
-            : "[" + String.format("%07d", getRealOffsetStart()) + "-"
-                + String.format("%07d", getRealOffsetEnd()) + "]");
-    text+=(provideRealOffset?"  ":"* ");
-    text+=((getOffsetStart() == null) ? "[-------,-------]"
+    text += "[" + String.format("%05d", getId()) + "] ";
+    text += ((getRealOffsetStart() == null) ? "[-------,-------]"
+        : "[" + String.format("%07d", getRealOffsetStart()) + "-"
+            + String.format("%07d", getRealOffsetEnd()) + "]");
+    text += (provideRealOffset ? "  " : "* ");
+    text += ((getOffsetStart() == null) ? "[-------,-------]"
         : "[" + String.format("%07d", getOffsetStart()) + "-"
             + String.format("%07d", getOffsetEnd()) + "]");
-    text+=(provideOffset?"  ":"* ");
+    text += (provideOffset ? "  " : "* ");
     if (getPositionLength() == null) {
-      text+=String.format("%11s", "");
+      text += String.format("%11s", "");
     } else if (getPositionStart().equals(getPositionEnd())) {
-      text+=String.format("%11s", "[" + getPositionStart()
-          + "]");
-    } else if ((getPositions() == null)
-        || (getPositions().size() == (1 + getPositionEnd() -getPositionStart()))) {
-      text+=String.format("%11s", "[" + getPositionStart()
-          + "-" + getPositionEnd() + "]");
+      text += String.format("%11s", "[" + getPositionStart() + "]");
+    } else if ((getPositions() == null) || (getPositions().length == (1
+        + getPositionEnd() - getPositionStart()))) {
+      text += String.format("%11s",
+          "[" + getPositionStart() + "-" + getPositionEnd() + "]");
     } else {
-      text+=String.format("%11s", getPositions());
+      text += String.format("%11s", Arrays.toString(getPositions()));
     }
-    text+=((getParentId() == null) ? "[-----]" : "["
-        + String.format("%05d", getParentId()) + "]");
-    text+=(provideParentId?"  ":"* ");    
+    text += ((getParentId() == null) ? "[-----]"
+        : "[" + String.format("%05d", getParentId()) + "]");
+    text += (provideParentId ? "  " : "* ");
     BytesRef payload = getPayload();
-    text+=(payload == null) ? "[------] " : "["
-        + String.format("%.4f",
-            PayloadHelper.decodeFloat(Arrays.copyOfRange(payload.bytes, payload.offset, (payload.offset+payload.length)))) + "] ";
-    text+=String.format("%25s", "[" + getPrefix() + "]") + " ";
-    text+=((getPostfix()==null)?"---":"[" + getPostfix() + "]") + " ";
+    text += (payload == null) ? "[------] "
+        : "["
+            + String
+                .format("%.4f",
+                    PayloadHelper.decodeFloat(Arrays.copyOfRange(payload.bytes,
+                        payload.offset, (payload.offset + payload.length))))
+            + "] ";
+    text += String.format("%25s", "[" + getPrefix() + "]") + " ";
+    text += ((getPostfix() == null) ? "---" : "[" + getPostfix() + "]") + " ";
     return text;
   }
 

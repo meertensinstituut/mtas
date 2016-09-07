@@ -17,10 +17,10 @@ public class MtasCQLParserBasicSentenceCondition {
 
   /** The part list. */
   private List<MtasCQLParserBasicSentencePartCondition> partList;
-  
+
   /** The maximum occurence. */
   private int minimumOccurence, maximumOccurence;
-  
+
   /** The optional parts. */
   private boolean simplified, optional, optionalParts;
 
@@ -38,25 +38,31 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Adds the word.
    *
-   * @param w the w
-   * @throws ParseException the parse exception
+   * @param w
+   *          the w
+   * @throws ParseException
+   *           the parse exception
    */
   public void addWord(MtasCQLParserWordFullCondition w) throws ParseException {
-    assert w.getCondition().not() == false : "condition word should be positive in sentence definition";
+    assert w.getCondition()
+        .not() == false : "condition word should be positive in sentence definition";
     if (!simplified) {
       partList.add(w);
     } else {
       throw new ParseException("already simplified");
     }
   }
-  
+
   /**
    * Adds the group.
    *
-   * @param w the w
-   * @throws ParseException the parse exception
+   * @param w
+   *          the w
+   * @throws ParseException
+   *           the parse exception
    */
-  public void addGroup(MtasCQLParserGroupFullCondition w) throws ParseException {
+  public void addGroup(MtasCQLParserGroupFullCondition w)
+      throws ParseException {
     if (!simplified) {
       partList.add(w);
     } else {
@@ -67,13 +73,16 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Adds the basic sentence.
    *
-   * @param s the s
-   * @throws ParseException the parse exception
+   * @param s
+   *          the s
+   * @throws ParseException
+   *           the parse exception
    */
   public void addBasicSentence(MtasCQLParserBasicSentenceCondition s)
       throws ParseException {
     if (!simplified) {
-      List<MtasCQLParserBasicSentencePartCondition> newWordList = s.getPartList();
+      List<MtasCQLParserBasicSentencePartCondition> newWordList = s
+          .getPartList();
       partList.addAll(newWordList);
     } else {
       throw new ParseException("already simplified");
@@ -101,9 +110,12 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Sets the occurence.
    *
-   * @param min the min
-   * @param max the max
-   * @throws ParseException the parse exception
+   * @param min
+   *          the min
+   * @param max
+   *          the max
+   * @throws ParseException
+   *           the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
     if (!simplified) {
@@ -128,15 +140,16 @@ public class MtasCQLParserBasicSentenceCondition {
   public boolean isOptional() {
     return optional;
   }
-  
+
   /**
    * Checks for optional parts.
    *
    * @return true, if successful
-   * @throws ParseException the parse exception
+   * @throws ParseException
+   *           the parse exception
    */
   public boolean hasOptionalParts() throws ParseException {
-    if(simplified) {
+    if (simplified) {
       return optionalParts;
     } else {
       throw new ParseException("can't be called when not simplified");
@@ -146,8 +159,10 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Sets the optional.
    *
-   * @param status the new optional
-   * @throws ParseException the parse exception
+   * @param status
+   *          the new optional
+   * @throws ParseException
+   *           the parse exception
    */
   public void setOptional(boolean status) throws ParseException {
     optional = status;
@@ -156,7 +171,8 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Simplify.
    *
-   * @throws ParseException the parse exception
+   * @throws ParseException
+   *           the parse exception
    */
   public void simplify() throws ParseException {
     if (!simplified) {
@@ -166,11 +182,11 @@ public class MtasCQLParserBasicSentenceCondition {
       MtasCQLParserBasicSentencePartCondition lastPart = null;
       newPartList = new ArrayList<MtasCQLParserBasicSentencePartCondition>();
       // try and merge equal word conditions
-      for (MtasCQLParserBasicSentencePartCondition part: partList) {
+      for (MtasCQLParserBasicSentencePartCondition part : partList) {
         if ((lastPart == null) || !lastPart.equals(part)) {
           lastPart = part;
           newPartList.add(part);
-          if(!part.isOptional()) {
+          if (!part.isOptional()) {
             optionalParts = false;
           }
         } else {
@@ -193,7 +209,7 @@ public class MtasCQLParserBasicSentenceCondition {
             } else {
               lastPart = part;
               newPartList.add(part);
-              if(!part.isOptional()) {
+              if (!part.isOptional()) {
                 optionalParts = false;
               }
             }
@@ -209,7 +225,7 @@ public class MtasCQLParserBasicSentenceCondition {
             } else {
               lastPart = part;
               newPartList.add(part);
-              if(!part.isOptional()) {
+              if (!part.isOptional()) {
                 optionalParts = false;
               }
             }
@@ -225,7 +241,7 @@ public class MtasCQLParserBasicSentenceCondition {
             } else {
               lastPart = part;
               newPartList.add(part);
-              if(!part.isOptional()) {
+              if (!part.isOptional()) {
                 optionalParts = false;
               }
             }
@@ -233,7 +249,7 @@ public class MtasCQLParserBasicSentenceCondition {
         }
       }
       partList = newPartList;
-      if(optionalParts) {
+      if (optionalParts) {
         optional = true;
       }
     }
@@ -252,7 +268,8 @@ public class MtasCQLParserBasicSentenceCondition {
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException the parse exception
+   * @throws ParseException
+   *           the parse exception
    */
   public SpanQuery getQuery() throws ParseException {
     simplify();
@@ -291,7 +308,9 @@ public class MtasCQLParserBasicSentenceCondition {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

@@ -1,7 +1,6 @@
 package mtas.codec.tree;
 
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -11,170 +10,214 @@ import mtas.analysis.token.MtasToken;
 /**
  * The Class MtasTree.
  *
- * @param <N> the number type
+ * @param <N>
+ *          the number type
  */
 abstract public class MtasTree<N extends MtasTreeNode<N>> {
-  
+
   /** The Constant SINGLE_POSITION_TREE. */
   final public static byte SINGLE_POSITION_TREE = 1;
-  
+
   /** The Constant STORE_ADDITIONAL_ID. */
   final public static byte STORE_ADDITIONAL_ID = 2;
 
   /** The root. */
   protected N root;
-  
+
   /** The closed. */
   private Boolean closed;
-  
+
   /** The single point. */
-  protected Boolean singlePoint; 
-  
-  /** The store prefix id. */
-  protected Boolean storePrefixAndTermRef; 
+  protected Boolean singlePoint;
+
+  /** The store prefix and term ref. */
+  protected Boolean storePrefixAndTermRef;
 
   /**
    * Instantiates a new mtas tree.
    *
-   * @param singlePoint the single point
-   * @param storePrefixId the store prefix id
+   * @param singlePoint
+   *          the single point
+   * @param storePrefixAndTermRef
+   *          the store prefix and term ref
    */
   public MtasTree(boolean singlePoint, boolean storePrefixAndTermRef) {
     root = null;
     closed = false;
-    this.singlePoint = singlePoint;    
-    this.storePrefixAndTermRef = storePrefixAndTermRef;    
+    this.singlePoint = singlePoint;
+    this.storePrefixAndTermRef = storePrefixAndTermRef;
   }
-  
+
   /**
    * Adds the id from doc.
    *
-   * @param docId the doc id
-   * @param reference the reference
+   * @param docId
+   *          the doc id
+   * @param reference
+   *          the reference
    */
-  final public void addIdFromDoc(Integer docId, Long reference) { 
-    if(!closed && (docId!=null)) {      
+  final public void addIdFromDoc(Integer docId, Long reference) {
+    if (!closed && (docId != null)) {
       addSinglePoint(docId, 0, 0, docId, reference);
     }
   }
-    
+
   /**
    * Adds the parent from token.
    *
-   * @param <T> the generic type
-   * @param token the token
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param <T>
+   *          the generic type
+   * @param token
+   *          the token
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  final public <T> void addParentFromToken(MtasToken<T> token) throws IOException { 
-    if(!closed && (token!=null)) {      
-      if(token.checkParentId()) {
-        addSinglePoint(token.getParentId(), token.getPrefixId(), token.getTermRef(), token.getId(), token.getTokenRef());
+  final public <T> void addParentFromToken(MtasToken<T> token)
+      throws IOException {
+    if (!closed && (token != null)) {
+      if (token.checkParentId()) {
+        addSinglePoint(token.getParentId(), token.getPrefixId(),
+            token.getTermRef(), token.getId(), token.getTokenRef());
       }
     }
   }
-  
+
   /**
    * Adds the position and object from token.
    *
-   * @param <T> the generic type
-   * @param token the token
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param <T>
+   *          the generic type
+   * @param token
+   *          the token
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  final public <T> void addPositionAndObjectFromToken(MtasToken<T> token) throws IOException {   
+  final public <T> void addPositionAndObjectFromToken(MtasToken<T> token)
+      throws IOException {
     addPositionFromToken(token, token.getTokenRef());
   }
-  
-//  final public <T> void addPositionAndTermFromToken(MtasToken<T> token) {   
-//    addPositionFromToken(token, token.getTermRef());
-//  }
-  
+
+  // final public <T> void addPositionAndTermFromToken(MtasToken<T> token) {
+  // addPositionFromToken(token, token.getTermRef());
+  // }
+
   /**
- * Adds the position from token.
- *
- * @param <T> the generic type
- * @param token the token
- * @param ref the ref
- * @throws IOException Signals that an I/O exception has occurred.
- */
-  final private <T> void addPositionFromToken(MtasToken<T> token, Long ref) throws IOException {
-    int prefixId = storePrefixAndTermRef?token.getPrefixId():0;        
-    if(!closed && (token!=null)) {
-      if(token.checkPositionType(MtasPosition.POSITION_SINGLE)) {
-        addSinglePoint(token.getPositionStart(), prefixId, token.getTermRef(), token.getId(), ref);
-      } else if(token.checkPositionType(MtasPosition.POSITION_RANGE)) {
-        addRange(token.getPositionStart(), token.getPositionEnd(), prefixId, token.getTermRef(), token.getId(), ref);  
-      } else if(token.checkPositionType(MtasPosition.POSITION_SET)) {
-        //split set into minimum number of single points and ranges
-        TreeMap<Integer,Integer> list = new TreeMap<Integer,Integer>();
-        TreeSet<Integer> positions = token.getPositions();
+   * Adds the position from token.
+   *
+   * @param <T>
+   *          the generic type
+   * @param token
+   *          the token
+   * @param ref
+   *          the ref
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  final private <T> void addPositionFromToken(MtasToken<T> token, Long ref)
+      throws IOException {
+    int prefixId = storePrefixAndTermRef ? token.getPrefixId() : 0;
+    if (!closed && (token != null)) {
+      if (token.checkPositionType(MtasPosition.POSITION_SINGLE)) {
+        addSinglePoint(token.getPositionStart(), prefixId, token.getTermRef(),
+            token.getId(), ref);
+      } else if (token.checkPositionType(MtasPosition.POSITION_RANGE)) {
+        addRange(token.getPositionStart(), token.getPositionEnd(), prefixId,
+            token.getTermRef(), token.getId(), ref);
+      } else if (token.checkPositionType(MtasPosition.POSITION_SET)) {
+        // split set into minimum number of single points and ranges
+        TreeMap<Integer, Integer> list = new TreeMap<Integer, Integer>();
+        int[] positions = token.getPositions();
         Integer lastPoint = null;
-        Integer startPoint = null;      
+        Integer startPoint = null;
         for (int position : positions) {
-          if(lastPoint==null) {
+          if (lastPoint == null) {
             startPoint = position;
             lastPoint = position;
-          } else if((position-lastPoint)!=1) {
+          } else if ((position - lastPoint) != 1) {
             list.put(startPoint, lastPoint);
-            startPoint = position;          
+            startPoint = position;
           }
           lastPoint = position;
         }
-        if(lastPoint!=null) {
+        if (lastPoint != null) {
           list.put(startPoint, lastPoint);
         }
         for (Entry<Integer, Integer> entry : list.entrySet()) {
-          if(entry.getKey().equals(entry.getValue())) {
-            addSinglePoint(entry.getKey(), prefixId, token.getTermRef(), token.getId(), ref);
+          if (entry.getKey().equals(entry.getValue())) {
+            addSinglePoint(entry.getKey(), prefixId, token.getTermRef(),
+                token.getId(), ref);
           } else {
-            addRange(entry.getKey(), entry.getValue(), prefixId, token.getTermRef(), token.getId(), ref);
+            addRange(entry.getKey(), entry.getValue(), prefixId,
+                token.getTermRef(), token.getId(), ref);
           }
         }
       }
     }
   }
-  
+
   /**
    * Close.
    *
    * @return the n
    */
   final public N close() {
-    if(root==null) {
-      addRangeEmpty(0,0,0,0);
+    if (root == null) {
+      addRangeEmpty(0, 0, 0, 0);
     }
     closed = true;
     return root;
-  } 
+  }
 
   /**
    * Adds the single point.
    *
-   * @param position the position
-   * @param additionalId the additional id
-   * @param id the id
-   * @param ref the ref
+   * @param position
+   *          the position
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
+   * @param id
+   *          the id
+   * @param ref
+   *          the ref
    */
-  abstract protected void addSinglePoint(int position, int additionalId, long additionalRef, Integer id, Long ref);
-  
+  abstract protected void addSinglePoint(int position, int additionalId,
+      long additionalRef, Integer id, Long ref);
+
   /**
    * Adds the range.
    *
-   * @param left the left
-   * @param right the right
-   * @param additionalId the additional id
-   * @param id the id
-   * @param ref the ref
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
+   * @param id
+   *          the id
+   * @param ref
+   *          the ref
    */
-  abstract protected void addRange(int left, int right, int additionalId, long additionalRef, Integer id, Long ref);
-  
+  abstract protected void addRange(int left, int right, int additionalId,
+      long additionalRef, Integer id, Long ref);
+
   /**
    * Adds the range empty.
    *
-   * @param left the left
-   * @param right the right
-   * @param additionalId the additional id
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
    */
-  abstract protected void addRangeEmpty(int left, int right, int additionalId, long additionalRef);
+  abstract protected void addRangeEmpty(int left, int right, int additionalId,
+      long additionalRef);
 
   /**
    * Checks if is single point.
@@ -183,17 +226,17 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
    */
   final public boolean isSinglePoint() {
     return singlePoint;
-  } 
-  
+  }
+
   /**
-   * Checks if is store prefix id.
+   * Checks if is store prefix and term ref.
    *
-   * @return true, if is store prefix id
+   * @return true, if is store prefix and term ref
    */
   final public boolean isStorePrefixAndTermRef() {
-    return storePrefixAndTermRef;    
+    return storePrefixAndTermRef;
   }
-  
+
   /**
    * Prints the balance.
    */
@@ -204,19 +247,23 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Prints the balance.
    *
-   * @param p the p
-   * @param n the n
+   * @param p
+   *          the p
+   * @param n
+   *          the n
    */
-  final private void printBalance(Integer p, N n) {    
-    if(n!=null) {
-      printBalance((p+1), n.leftChild);
-      System.out.print(String.format("%"+(3*p)+"s", ""));
-      if(n.left==n.right) {
-        System.out.println("["+n.left+"] ("+n.max+") : "+n.ids.size()+" tokens");
+  final private void printBalance(Integer p, N n) {
+    if (n != null) {
+      printBalance((p + 1), n.leftChild);
+      System.out.print(String.format("%" + (3 * p) + "s", ""));
+      if (n.left == n.right) {
+        System.out.println(
+            "[" + n.left + "] (" + n.max + ") : " + n.ids.size() + " tokens");
       } else {
-        System.out.println("["+n.left+"-"+n.right+"] ("+n.max+") : "+n.ids.size()+" tokens");        
+        System.out.println("[" + n.left + "-" + n.right + "] (" + n.max + ") : "
+            + n.ids.size() + " tokens");
       }
-      printBalance((p+1), n.rightChild);
+      printBalance((p + 1), n.rightChild);
     }
   }
 

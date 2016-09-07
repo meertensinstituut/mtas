@@ -15,16 +15,19 @@ import mtas.analysis.util.MtasParserException;
  * The Class MtasParser.
  */
 abstract public class MtasParser {
-  
+
   /** The token collection. */
   protected MtasTokenCollection tokenCollection;
-  
+
   /** The config. */
   protected MtasConfiguration config;
 
   /** The autorepair. */
   protected Boolean autorepair = false;
-  
+
+  /** The makeunique. */
+  protected Boolean makeunique = false;
+
   /**
    * Inits the parser.
    *
@@ -38,10 +41,13 @@ abstract public class MtasParser {
         if (current.name.equals("autorepair")) {
           autorepair = current.attributes.get("value").equals("true");
         }
+        if (current.name.equals("makeunique")) {
+          makeunique = current.attributes.get("value").equals("true");
+        }
       }
     }
   }
-  
+
   /**
    * Creates the token collection.
    *
@@ -59,7 +65,7 @@ abstract public class MtasParser {
    * @return the string
    */
   public abstract String printConfig();
-  
+
   /**
    * The Class MtasParserObject.
    */
@@ -259,17 +265,17 @@ abstract public class MtasParser {
     public void setText(String text) {
       objectText = text;
     }
-    
+
     /**
      * Adds the text.
      *
      * @param text the text
      */
     public void addText(String text) {
-      if(objectText==null) {
+      if (objectText == null) {
         objectText = text;
       } else {
-        objectText+=text;
+        objectText += text;
       }
     }
 

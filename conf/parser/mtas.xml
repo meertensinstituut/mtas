@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <mtas>
   <configurations type="mtas.analysis.util.MtasTokenizerFactory">
+    <configuration name="test" file="mtas/folia_test.xml" />
+    <configuration name="CRM" file="mtas/crm_test.xml" />
     <configuration name="DBNL" file="mtas/folia_dbnl.xml" />
+    <configuration name="DDD" file="mtas/folia_ddd.xml" />
     <configuration name="EDBO" file="mtas/folia_edbo.xml" />
     <configuration name="SONAR" file="mtas/folia_sonar.xml" />
   </configurations>
   <configurations type="mtas.analysis.util.MtasCharFilterFactory">
+    <configuration name="test" type="file" />
+    <configuration name="CRM" type="file" prefix="/Users/matthijs/Software/Mtas/data/CRM/data/files/" postfix=".txt" />
     <configuration name="DBNL" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="DDD" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="EDBO" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="SONAR" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
   </configurations>

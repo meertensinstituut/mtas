@@ -18,7 +18,8 @@
 	<parser name="mtas.analysis.parser.MtasSketchParser">
 		<!-- START GENERAL SETTINGS MTAS SKETCH PARSER -->
 		<autorepair value="true" />
-		<!-- END GENERAL SETTINGS MTAS SKETCH PARSER -->
+		<makeunique value="true" />
+    <!-- END GENERAL SETTINGS MTAS SKETCH PARSER -->
 
 		<mappings>
 		

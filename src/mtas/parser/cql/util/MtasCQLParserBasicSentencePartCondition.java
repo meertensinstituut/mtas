@@ -8,18 +8,19 @@ import mtas.parser.cql.ParseException;
  * The Class MtasCQLParserBasicSentencePartCondition.
  */
 public abstract class MtasCQLParserBasicSentencePartCondition {
-  
+
   /** The maximum occurence. */
   protected int minimumOccurence, maximumOccurence;
-  
+
   /** The not. */
   protected boolean optional, not;
-  
+
   /**
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException the parse exception
+   * @throws ParseException
+   *           the parse exception
    */
   public abstract SpanQuery getQuery() throws ParseException;
 
@@ -44,21 +45,24 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
   /**
    * Sets the occurence.
    *
-   * @param min the min
-   * @param max the max
-   * @throws ParseException the parse exception
+   * @param min
+   *          the min
+   * @param max
+   *          the max
+   * @throws ParseException
+   *           the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
     if ((min < 0) || (min > max) || (max < 1)) {
       throw new ParseException("Illegal number {" + min + "," + max + "}");
     }
-    if(min==0) {
+    if (min == 0) {
       optional = true;
     }
-    minimumOccurence = Math.max(1,min);
-    maximumOccurence = max;    
+    minimumOccurence = Math.max(1, min);
+    maximumOccurence = max;
   }
-  
+
   /**
    * Checks if is optional.
    *
@@ -67,17 +71,20 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
   public boolean isOptional() {
     return optional;
   }
-  
+
   /**
    * Sets the optional.
    *
-   * @param status the new optional
+   * @param status
+   *          the new optional
    */
   public void setOptional(boolean status) {
     optional = status;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
@@ -88,14 +95,16 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
   /**
    * To string.
    *
-   * @param firstIndent the first indent
-   * @param indent the indent
+   * @param firstIndent
+   *          the first indent
+   * @param indent
+   *          the indent
    * @return the string
    */
   public String toString(String firstIndent, String indent) {
     String text = "";
     text += firstIndent + "PART";
-    if(optional) {
+    if (optional) {
       text += " OPTIONAL";
     }
     if ((minimumOccurence > 1) || (minimumOccurence != maximumOccurence)) {
@@ -106,12 +115,13 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
       }
     }
     try {
-      text += "\n" + indent + "- Query: " + getQuery().toString(getQuery().getField());
+      text += "\n" + indent + "- Query: "
+          + getQuery().toString(getQuery().getField());
     } catch (ParseException e) {
       text += "\n" + indent + "- Query: " + e.getMessage();
     }
     text += "\n";
     return text;
   }
-  
+
 }

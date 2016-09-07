@@ -255,8 +255,8 @@
   <field name="NLContent_folia_available" type="nederlab_boolean"
     required="false" multiValued="false" indexed="true" stored="true" />
   <field name="NLContent_mtas" type="mtas_text" indexed="true"
-		stored="true" />
-	<field name="NLContent_mtas_error" type="nederlab_string"
+    stored="true" />
+  <field name="NLContent_mtas_error" type="nederlab_string"
 		indexed="true" stored="true" />
 	<field name="NLContent_mtas_numberOfTokens" type="nederlab_int"
 		indexed="true" stored="true" />
@@ -264,7 +264,17 @@
 		indexed="true" stored="true" />
 	<field name="NLContent_mtas_size" type="nederlab_int" indexed="true"
 		stored="true" />
-	<!-- Combined Field Metadata -->
+	<field name="NLContent_mtasSource" type="mtasSource_text" indexed="true"
+    stored="true" />
+  <field name="NLContent_mtasSource_error" type="nederlab_string"
+    indexed="true" stored="true" />
+  <field name="NLContent_mtasSource_numberOfTokens" type="nederlab_int"
+    indexed="true" stored="true" />
+  <field name="NLContent_mtasSource_numberOfPositions" type="nederlab_int"
+    indexed="true" stored="true" />
+  <field name="NLContent_mtasSource_size" type="nederlab_int" indexed="true"
+    stored="true" />  
+  <!-- Combined Field Metadata -->
 	<field name="NLMetadata" type="nederlab_text" required="false"
 		multiValued="true" indexed="true" stored="false" />
 	<copyField source="NLCore_NLIdentification_nederlabID" dest="NLMetadata" />
@@ -420,5 +430,27 @@
 				prefix="t" />
 		</analyzer>
 	</fieldType>
+	
+	<fieldType name="mtasSource_text_example_config" class="solr.TextField"
+    postingsFormat="MtasCodec">
+    <analyzer type="index">
+      <charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+        config="mtasSource.xml" />
+      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+        config="mtasSource.xml" />
+    </analyzer>
+  </fieldType>
+	
+	<fieldType name="mtasSource_text" class="mtas.solr.schema.MtasPreAnalyzedField"
+    followIndexAnalyzer="mtasSource_text_example_config"
+    configurationFromField="NLCore_NLAdministrative_sourceCollection" setNumberOfTokens="NLContent_mtasSource_numberOfTokens"
+    setNumberOfPositions="NLContent_mtasSource_numberOfPositions" setSize="NLContent_mtasSource_size"
+    setError="NLContent_mtasSource_error" postingsFormat="MtasCodec">
+    <analyzer type="query">
+      <tokenizer class="solr.WhitespaceTokenizerFactory" />
+      <filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory"
+        prefix="t" />
+    </analyzer>
+  </fieldType>
 
 </schema>

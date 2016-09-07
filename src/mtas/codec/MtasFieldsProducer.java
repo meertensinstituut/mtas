@@ -29,19 +29,22 @@ public class MtasFieldsProducer extends FieldsProducer {
 
   /** The index input list. */
   private HashMap<String, IndexInput> indexInputList;
-  
+
   /** The index input offset list. */
   private HashMap<String, Long> indexInputOffsetList;
-  
+
   /** The version. */
   private int version;
 
   /**
    * Instantiates a new mtas fields producer.
    *
-   * @param state the state
-   * @param name the name
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param state
+   *          the state
+   * @param name
+   *          the name
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasFieldsProducer(SegmentReadState state, String name)
       throws IOException {
@@ -49,15 +52,13 @@ public class MtasFieldsProducer extends FieldsProducer {
     indexInputList = new HashMap<String, IndexInput>();
     indexInputOffsetList = new HashMap<String, Long>();
     version = MtasCodecPostingsFormat.VERSION_CURRENT;
-    postingsFormatName = addIndexInputToList("object",
-        openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_OBJECT_EXTENSION),
-        postingsFormatName);
+    postingsFormatName = addIndexInputToList("object", openMtasFile(state, name,
+        MtasCodecPostingsFormat.MTAS_OBJECT_EXTENSION), postingsFormatName);
     addIndexInputToList("term",
         openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_TERM_EXTENSION),
         postingsFormatName);
-    addIndexInputToList("prefix",
-        openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_PREFIX_EXTENSION),
-        postingsFormatName);
+    addIndexInputToList("prefix", openMtasFile(state, name,
+        MtasCodecPostingsFormat.MTAS_PREFIX_EXTENSION), postingsFormatName);
     addIndexInputToList("field",
         openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_FIELD_EXTENSION),
         postingsFormatName);
@@ -68,50 +69,60 @@ public class MtasFieldsProducer extends FieldsProducer {
     addIndexInputToList("indexObjectId",
         openMtasFile(state, name,
             MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_ID_EXTENSION),
-        postingsFormatName);    
+        postingsFormatName);
     try {
-      addIndexInputToList("doc",
-          openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
+      addIndexInputToList(
+          "doc", openMtasFile(state, name,
+              MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
           postingsFormatName);
       addIndexInputToList("indexObjectPosition",
           openMtasFile(state, name,
-              MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION, version, version),
+              MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION,
+              version, version),
           postingsFormatName);
       addIndexInputToList("indexObjectParent",
           openMtasFile(state, name,
-              MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
+              MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
+              version, version),
           postingsFormatName);
-    } catch (IndexFormatTooOldException e1) {      
+    } catch (IndexFormatTooOldException e1) {
       version = MtasCodecPostingsFormat.VERSION_OLD_2;
       try {
         addIndexInputToList("doc",
-            openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
+            openMtasFile(state, name,
+                MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
             postingsFormatName);
         addIndexInputToList("indexObjectPosition",
             openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION, version, version),
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION,
+                version, version),
             postingsFormatName);
         addIndexInputToList("indexObjectParent",
             openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
+                version, version),
             postingsFormatName);
       } catch (IndexFormatTooOldException e2) {
         version = MtasCodecPostingsFormat.VERSION_OLD_1;
         addIndexInputToList("doc",
-            openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
+            openMtasFile(state, name,
+                MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
             postingsFormatName);
         addIndexInputToList("indexObjectPosition",
             openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION, version, version),
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION,
+                version, version),
             postingsFormatName);
         addIndexInputToList("indexObjectParent",
             openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION, version, version),
+                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
+                version, version),
             postingsFormatName);
       }
     }
-    if(version == MtasCodecPostingsFormat.VERSION_OLD_2) {
-      throw new IOException("This MTAS doesn't support index version "+version+", please upgrade");
+    if (version == MtasCodecPostingsFormat.VERSION_OLD_2) {
+      throw new IOException("This MTAS doesn't support index version " + version
+          + ", please upgrade");
     }
     // Load the delegate postingsFormatName from this file
     this.delegateFieldsProducer = PostingsFormat.forName(postingsFormatName)
@@ -121,15 +132,19 @@ public class MtasFieldsProducer extends FieldsProducer {
   /**
    * Adds the index input to list.
    *
-   * @param name the name
-   * @param in the in
-   * @param postingsFormatName the postings format name
+   * @param name
+   *          the name
+   * @param in
+   *          the in
+   * @param postingsFormatName
+   *          the postings format name
    * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private String addIndexInputToList(String name, IndexInput in,
       String postingsFormatName) throws IOException {
-    if(indexInputList.get(name)!=null) {
+    if (indexInputList.get(name) != null) {
       indexInputList.get(name).close();
     }
     if (postingsFormatName == null) {
@@ -237,16 +252,22 @@ public class MtasFieldsProducer extends FieldsProducer {
   /**
    * Open mtas file.
    *
-   * @param state the state
-   * @param name the name
-   * @param extension the extension
-   * @param minimum the minimum
-   * @param maximum the maximum
+   * @param state
+   *          the state
+   * @param name
+   *          the name
+   * @param extension
+   *          the extension
+   * @param minimum
+   *          the minimum
+   * @param maximum
+   *          the maximum
    * @return the index input
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private IndexInput openMtasFile(SegmentReadState state, String name,
-      String extension, Integer minimum, Integer maximum) throws IOException  {
+      String extension, Integer minimum, Integer maximum) throws IOException {
     String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,
         state.segmentSuffix, extension);
     IndexInput object;
@@ -263,20 +284,25 @@ public class MtasFieldsProducer extends FieldsProducer {
       CodecUtil.checkIndexHeader(object, name, minVersion, maxVersion,
           state.segmentInfo.getId(), state.segmentSuffix);
     } catch (IndexFormatTooOldException e) {
-      object.close();      
-      throw new IndexFormatTooOldException(e.getMessage(),e.getVersion(), e.getMinVersion(), e.getMaxVersion());
-    }    
+      object.close();
+      throw new IndexFormatTooOldException(e.getMessage(), e.getVersion(),
+          e.getMinVersion(), e.getMaxVersion());
+    }
     return object;
   }
 
   /**
    * Open mtas file.
    *
-   * @param state the state
-   * @param name the name
-   * @param extension the extension
+   * @param state
+   *          the state
+   * @param name
+   *          the name
+   * @param extension
+   *          the extension
    * @return the index input
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension) throws IOException {

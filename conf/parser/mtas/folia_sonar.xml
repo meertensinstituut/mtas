@@ -18,6 +18,7 @@
 
       <!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
       <autorepair value="true" />
+      <makeunique value="true" />
       <!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
 
       <!-- START REFERENCES -->

@@ -115,11 +115,7 @@
   
   WARNING: The _text_ catch-all field will significantly increase your index size.
            If you don't need it, consider removing it and the corresponding copyField directive.
-      -->
-    <!
-    <fieldType name="string_simpletext" class="solr.StrField" postingsFormat="SimpleText" />
-    <field name="simple_string" type="string_simpletext" indexed="true" stored="true" required="false" multiValued="false" />
-    -->
+      -->    
     
     <fieldType name="mtas_text" class="solr.TextField" postingsFormat="MtasCodec">
       <analyzer type="index">

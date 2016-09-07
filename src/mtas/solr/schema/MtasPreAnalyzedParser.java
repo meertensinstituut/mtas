@@ -23,28 +23,32 @@ import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
  */
 public class MtasPreAnalyzedParser implements PreAnalyzedParser {
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#parse(java.io.Reader, org.apache.lucene.util.AttributeSource)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#parse(java.io.
+   * Reader, org.apache.lucene.util.AttributeSource)
    */
   @Override
-  public ParseResult parse(Reader reader, AttributeSource parent) throws IOException
-      {
+  public ParseResult parse(Reader reader, AttributeSource parent)
+      throws IOException {
     ParseResult res = new ParseResult();
-    //get MtasUpdateRequestProcessorResult    
+    // get MtasUpdateRequestProcessorResult
     StringBuilder sb = new StringBuilder();
     char[] buf = new char[128];
     int cnt;
     while ((cnt = reader.read(buf)) > 0) {
       sb.append(buf, 0, cnt);
     }
-    
+
     MtasUpdateRequestProcessorResultReader result;
     Iterator<MtasUpdateRequestProcessorResultItem> iterator;
-    
+
     try {
       result = new MtasUpdateRequestProcessorResultReader(sb.toString());
       iterator = result.getIterator();
-      if(iterator!=null && iterator.hasNext()) {
+      if (iterator != null && iterator.hasNext()) {
         res.str = result.getStoredStringValue();
         res.bin = result.getStoredBinValue();
       } else {
@@ -53,27 +57,28 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
         result.close();
         return res;
       }
-                         
-      parent.clearAttributes();    
-      while(iterator.hasNext()) {
+
+      parent.clearAttributes();
+      while (iterator.hasNext()) {
         MtasUpdateRequestProcessorResultItem item = iterator.next();
-        if(item.tokenTerm!=null) {
+        if (item.tokenTerm != null) {
           CharTermAttribute catt = parent.addAttribute(CharTermAttribute.class);
           catt.append(item.tokenTerm);
-        }  
-        if(item.tokenFlags!=null) {
+        }
+        if (item.tokenFlags != null) {
           FlagsAttribute flags = parent.addAttribute(FlagsAttribute.class);
           flags.setFlags(item.tokenFlags);
         }
-        if(item.tokenPosIncr!=null) {
-          PositionIncrementAttribute patt = parent.addAttribute(PositionIncrementAttribute.class);
+        if (item.tokenPosIncr != null) {
+          PositionIncrementAttribute patt = parent
+              .addAttribute(PositionIncrementAttribute.class);
           patt.setPositionIncrement(item.tokenPosIncr);
-        }  
-        if(item.tokenPayload!=null) {
+        }
+        if (item.tokenPayload != null) {
           PayloadAttribute p = parent.addAttribute(PayloadAttribute.class);
           p.setPayload(new BytesRef(item.tokenPayload));
         }
-        if(item.tokenOffsetStart!=null && item.tokenOffsetEnd!=null) {
+        if (item.tokenOffsetStart != null && item.tokenOffsetEnd != null) {
           OffsetAttribute offset = parent.addAttribute(OffsetAttribute.class);
           offset.setOffset(item.tokenOffsetStart, item.tokenOffsetEnd);
         }
@@ -81,22 +86,26 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
         State state = parent.captureState();
         res.states.add(state.clone());
         // reset for reuse
-        parent.clearAttributes();      
+        parent.clearAttributes();
       }
       result.close();
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    }            
+    }
     return res;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#toFormattedString(org.apache.lucene.document.Field)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#toFormattedString
+   * (org.apache.lucene.document.Field)
    */
   @Override
   public String toFormattedString(Field f) throws IOException {
-    return this.getClass().getName()+" "+f.name();
+    return this.getClass().getName() + " " + f.name();
   }
 
 }

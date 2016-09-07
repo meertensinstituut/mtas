@@ -13,38 +13,42 @@ public class MtasSpanRecurrence extends Spans {
 
   /** The spans. */
   Spans spans;
-  
+
   /** The minimum recurrence. */
   int minimumRecurrence;
-  
+
   /** The maximum recurrence. */
   int maximumRecurrence;
 
   /** The queue spans. */
   List<Match> queueSpans;
-  
+
   /** The queue matches. */
   List<Match> queueMatches;
-  
+
   /** The current match. */
   Match currentMatch;
-  
+
   /** The no more positions. */
   boolean noMorePositions;
-  
+
   /** The last start position. */
   int lastStartPosition; // startPosition of last retrieved span
-  
+
   /** The last span. */
   boolean lastSpan; // last span for this document added to queue
 
   /**
    * Instantiates a new mtas span recurrence.
    *
-   * @param mtasSpanRecurrenceQuery the mtas span recurrence query
-   * @param spans the spans
-   * @param minimumRecurrence the minimum recurrence
-   * @param maximumRecurrence the maximum recurrence
+   * @param mtasSpanRecurrenceQuery
+   *          the mtas span recurrence query
+   * @param spans
+   *          the spans
+   * @param minimumRecurrence
+   *          the minimum recurrence
+   * @param maximumRecurrence
+   *          the maximum recurrence
    */
   public MtasSpanRecurrence(MtasSpanRecurrenceQuery mtasSpanRecurrenceQuery,
       Spans spans, int minimumRecurrence, int maximumRecurrence) {
@@ -58,7 +62,9 @@ public class MtasSpanRecurrence extends Spans {
     resetQueue();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
@@ -75,7 +81,9 @@ public class MtasSpanRecurrence extends Spans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
@@ -84,7 +92,9 @@ public class MtasSpanRecurrence extends Spans {
         : currentMatch.startPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
@@ -93,7 +103,9 @@ public class MtasSpanRecurrence extends Spans {
         : currentMatch.endPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
@@ -101,15 +113,21 @@ public class MtasSpanRecurrence extends Spans {
     return 1;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans.collect(collector);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -117,7 +135,9 @@ public class MtasSpanRecurrence extends Spans {
     return spans.docID();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
@@ -126,7 +146,9 @@ public class MtasSpanRecurrence extends Spans {
     return (spans.nextDoc() == NO_MORE_DOCS) ? NO_MORE_DOCS : toMatchDoc();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
@@ -152,14 +174,15 @@ public class MtasSpanRecurrence extends Spans {
    * To match doc.
    *
    * @return the int
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   int toMatchDoc() throws IOException {
     while (true) {
       if (findMatches()) {
         return docID();
-      } 
-      resetQueue();        
+      }
+      resetQueue();
       if (spans.nextDoc() == NO_MORE_DOCS) {
         return NO_MORE_DOCS;
       }
@@ -170,7 +193,8 @@ public class MtasSpanRecurrence extends Spans {
    * Collect span.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
@@ -190,7 +214,8 @@ public class MtasSpanRecurrence extends Spans {
    * Find matches.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
@@ -212,13 +237,14 @@ public class MtasSpanRecurrence extends Spans {
         while (!lastSpan && (lastStartPosition == firstMatch.startPosition())) {
           collectSpan();
         }
-        while (!queueSpans.isEmpty()
-            && (queueSpans.get(0).startPosition() == firstMatch.startPosition())) {
+        while (!queueSpans.isEmpty() && (queueSpans.get(0)
+            .startPosition() == firstMatch.startPosition())) {
           matches.add(queueSpans.remove(0));
         }
         // construct all matches for this startPosition
         for (Match match : matches) {
-          for (int n = (minimumRecurrence - 1); n <= (maximumRecurrence - 1); n++) {
+          for (int n = (minimumRecurrence - 1); n <= (maximumRecurrence
+              - 1); n++) {
             findMatches(match, n);
           }
         }
@@ -233,9 +259,12 @@ public class MtasSpanRecurrence extends Spans {
   /**
    * Find matches.
    *
-   * @param match the match
-   * @param n the n
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param match
+   *          the match
+   * @param n
+   *          the n
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
@@ -282,18 +311,20 @@ public class MtasSpanRecurrence extends Spans {
    * The Class Match.
    */
   private class Match {
-    
+
     /** The start position. */
     private int startPosition;
-    
+
     /** The end position. */
     private int endPosition;
 
     /**
      * Instantiates a new match.
      *
-     * @param startPosition the start position
-     * @param endPosition the end position
+     * @param startPosition
+     *          the start position
+     * @param endPosition
+     *          the end position
      */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
@@ -318,7 +349,9 @@ public class MtasSpanRecurrence extends Spans {
       return endPosition;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -334,7 +367,9 @@ public class MtasSpanRecurrence extends Spans {
 
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
@@ -342,7 +377,9 @@ public class MtasSpanRecurrence extends Spans {
     return (spans == null) ? 0 : spans.cost();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override

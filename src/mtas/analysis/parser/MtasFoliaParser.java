@@ -17,10 +17,12 @@ final public class MtasFoliaParser extends MtasXMLParser {
    * @param config the config
    */
   public MtasFoliaParser(MtasConfiguration config) {
-    super(config);    
+    super(config);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.analysis.parser.MtasXMLParser#initParser()
    */
   @Override

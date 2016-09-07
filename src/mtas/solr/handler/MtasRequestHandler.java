@@ -28,36 +28,37 @@ public class MtasRequestHandler extends RequestHandlerBase {
 
   /** The error. */
   private static String ERROR = "error";
-  
+
   /** The action config files. */
   private static String ACTION_CONFIG_FILES = "files";
-  
+
   /** The action config file. */
   private static String ACTION_CONFIG_FILE = "file";
-  
+
   /** The action mapping. */
   private static String ACTION_MAPPING = "mapping";
-  
-  /** The action segments. */
-  private static String ACTION_SEGMENTS = "segments";
-  
+
   /** The param action. */
   private static String PARAM_ACTION = "action";
-  
+
   /** The param config file. */
   private static String PARAM_CONFIG_FILE = "file";
-  
+
   /** The param mapping configuration. */
   private static String PARAM_MAPPING_CONFIGURATION = "configuration";
-  
+
   /** The param mapping document. */
   private static String PARAM_MAPPING_DOCUMENT = "document";
-  
+
   /** The param mapping document url. */
   private static String PARAM_MAPPING_DOCUMENT_URL = "url";
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.handler.RequestHandlerBase#handleRequestBody(org.apache.solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.RequestHandlerBase#handleRequestBody(org.apache.
+   * solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse)
    */
   @Override
   public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp)
@@ -76,7 +77,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
         InputStream is;
         try {
           is = req.getCore().getResourceLoader().openResource(file);
-          rsp.add(ACTION_CONFIG_FILE, IOUtils.toString(is));
+          rsp.add(ACTION_CONFIG_FILE, IOUtils.toString(is, "UTF-8"));
         } catch (IOException e) {
           rsp.add(ERROR, e.getMessage());
         }
@@ -85,7 +86,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     } else if (req.getParams().get(PARAM_ACTION, "false")
         .equals(ACTION_MAPPING)) {
       String configuration = null, document = null, documentUrl = null;
-      if(req.getContentStreams()!=null) {
+      if (req.getContentStreams() != null) {
         Iterator<ContentStream> it = req.getContentStreams().iterator();
         if (it.hasNext()) {
           ContentStream cs = it.next();
@@ -94,32 +95,32 @@ public class MtasRequestHandler extends RequestHandlerBase {
           configuration = params.get(PARAM_MAPPING_CONFIGURATION);
           document = params.get(PARAM_MAPPING_DOCUMENT);
           documentUrl = params.get(PARAM_MAPPING_DOCUMENT_URL);
-        }        
+        }
       } else {
         configuration = req.getParams().get(PARAM_MAPPING_CONFIGURATION);
         document = req.getParams().get(PARAM_MAPPING_DOCUMENT);
         documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);
-      }      
-      if (configuration != null && documentUrl != null) {        
+      }
+      if (configuration != null && documentUrl != null) {
         try {
-          MtasTokenizer tokenizer = new MtasTokenizer(
-              IOUtils.toInputStream(configuration));
+          MtasTokenizer<String> tokenizer = new MtasTokenizer<String>(
+              IOUtils.toInputStream(configuration, "UTF-8"));
           MtasFetchData fetchData = new MtasFetchData(
               new StringReader(documentUrl));
-          rsp.add(ACTION_MAPPING, tokenizer.getList(fetchData.getUrl(null)));
+          rsp.add(ACTION_MAPPING, tokenizer.getList(fetchData.getUrl(null, null)));
           tokenizer.close();
         } catch (IOException | MtasParserException e) {
           rsp.add(ERROR, e.getMessage());
         }
       } else if (configuration != null && document != null) {
         try {
-          MtasTokenizer tokenizer = new MtasTokenizer(
-              IOUtils.toInputStream(configuration));
+          MtasTokenizer<String> tokenizer = new MtasTokenizer<String>(
+              IOUtils.toInputStream(configuration, "UTF-8"));
           rsp.add(ACTION_MAPPING,
               tokenizer.getList(new StringReader(document)));
           tokenizer.close();
         } catch (IOException | MtasParserException e) {
-          rsp.add(ERROR, e.getMessage());          
+          rsp.add(ERROR, e.getMessage());
         }
       }
     }
@@ -128,8 +129,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Gets the files.
    *
-   * @param dir the dir
-   * @param subDir the sub dir
+   * @param dir
+   *          the dir
+   * @param subDir
+   *          the sub dir
    * @return the files
    */
   private ArrayList<String> getFiles(String dir, String subDir) {
@@ -148,7 +151,9 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return files;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.solr.handler.RequestHandlerBase#getDescription()
    */
   @Override
@@ -159,10 +164,13 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Gets the params from json.
    *
-   * @param params the params
-   * @param json the json
+   * @param params
+   *          the params
+   * @param json
+   *          the json
    * @return the params from json
    */
+  @SuppressWarnings("unchecked")
   private static void getParamsFromJSON(Map<String, String> params,
       String json) {
     JSONParser parser = new JSONParser(json);
@@ -195,6 +203,5 @@ public class MtasRequestHandler extends RequestHandlerBase {
       return;
     }
   }
-  
 
 }

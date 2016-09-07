@@ -17,10 +17,12 @@ final public class MtasElanParser extends MtasXMLParser {
    * @param config the config
    */
   public MtasElanParser(MtasConfiguration config) {
-    super(config);    
+    super(config);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.analysis.parser.MtasXMLParser#initParser()
    */
   @Override

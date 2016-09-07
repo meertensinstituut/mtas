@@ -7,26 +7,29 @@ abstract public class MtasFunctionParserFunctionResponse {
 
   /** The defined. */
   boolean defined;
-  
+
   /** The value double. */
   double valueDouble;
-  
+
   /** The value int. */
   int valueInt;
-  
+
   /**
    * Instantiates a new mtas function parser function response.
    *
-   * @param s the s
+   * @param s
+   *          the s
    */
   protected MtasFunctionParserFunctionResponse(boolean s) {
     defined = s;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   abstract public boolean equals(Object obj);
-  
+
 }

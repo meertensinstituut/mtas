@@ -8,45 +8,54 @@ import org.apache.lucene.search.spans.Spans;
  * The Class MtasEndSpans.
  */
 public class MtasEndSpans extends Spans {
-  
-/** The spans. */
-Spans spans;
-  
+
+  /** The spans. */
+  Spans spans;
+
   /**
    * Instantiates a new mtas end spans.
    *
-   * @param spans the spans
+   * @param spans
+   *          the spans
    */
   public MtasEndSpans(Spans spans) {
     super();
     this.spans = spans;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
   public int nextStartPosition() throws IOException {
-    return (spans==null)?NO_MORE_POSITIONS:spans.nextStartPosition();
+    return (spans == null) ? NO_MORE_POSITIONS : spans.nextStartPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
   public int startPosition() {
-    return (spans==null)?-1:spans.endPosition();
+    return (spans == null) ? -1 : spans.endPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
   public int endPosition() {
-    return (spans==null)?-1:spans.endPosition();
+    return (spans == null) ? -1 : spans.endPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
@@ -54,54 +63,68 @@ Spans spans;
     return 0;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-    if(spans!=null) {
-      spans.collect(collector);    
+    if (spans != null) {
+      spans.collect(collector);
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
   public int docID() {
-    return (spans==null)?NO_MORE_DOCS:spans.docID();
+    return (spans == null) ? NO_MORE_DOCS : spans.docID();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
   public int nextDoc() throws IOException {
-    return (spans==null)?NO_MORE_DOCS:spans.nextDoc();
+    return (spans == null) ? NO_MORE_DOCS : spans.nextDoc();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
   public int advance(int target) throws IOException {
-    return (spans==null)?NO_MORE_DOCS:spans.advance(target);
+    return (spans == null) ? NO_MORE_DOCS : spans.advance(target);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
   public long cost() {
-    return (spans==null)?0:spans.cost();
+    return (spans == null) ? 0 : spans.cost();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
   public float positionsCost() {
-    return (spans==null)?0:spans.positionsCost();
-  }  
+    return (spans == null) ? 0 : spans.positionsCost();
+  }
 
 }

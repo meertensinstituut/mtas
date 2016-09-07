@@ -7,16 +7,17 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 import mtas.codec.util.CodecUtil;
-import mtas.codec.util.DataCollector.MtasDataCollector;
 
 /**
  * The Class MtasDataItemAdvanced.
  *
- * @param <T1> the generic type
- * @param <T2> the generic type
+ * @param <T1>
+ *          the generic type
+ * @param <T2>
+ *          the generic type
  */
-abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
-    extends MtasDataItem<T1> implements Serializable {
+abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
+    extends MtasDataItem<T1, T2> implements Serializable {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
@@ -45,27 +46,42 @@ abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
   /**
    * Instantiates a new mtas data item advanced.
    *
-   * @param valueSum the value sum
-   * @param valueSumOfLogs the value sum of logs
-   * @param valueSumOfSquares the value sum of squares
-   * @param valueMin the value min
-   * @param valueMax the value max
-   * @param valueN the value n
-   * @param sub the sub
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param errorNumber the error number
-   * @param errorList the error list
-   * @param operations the operations
+   * @param valueSum
+   *          the value sum
+   * @param valueSumOfLogs
+   *          the value sum of logs
+   * @param valueSumOfSquares
+   *          the value sum of squares
+   * @param valueMin
+   *          the value min
+   * @param valueMax
+   *          the value max
+   * @param valueN
+   *          the value n
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param operations
+   *          the operations
+   * @param sourceNumber
+   *          the source number
    */
   public MtasDataItemAdvanced(T1 valueSum, T2 valueSumOfLogs,
-      T1 valueSumOfSquares, T1 valueMin, T1 valueMax, long valueN,
-      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
-      String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList,
-      MtasDataOperations<T1, T2> operations) {
-    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList);
+      T1 valueSumOfSquares, T1 valueMin, T1 valueMax, Long valueN,
+      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems, String sortType,
+      String sortDirection, int errorNumber, HashMap<String, Integer> errorList,
+      MtasDataOperations<T1, T2> operations, int sourceNumber) {
+    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList,
+        sourceNumber);
     this.valueSum = valueSum;
     this.valueSumOfLogs = valueSumOfLogs;
     this.valueSumOfSquares = valueSumOfSquares;
@@ -82,7 +98,7 @@ abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
    * DataCollector.MtasDataItem)
    */
   @Override
-  public void add(MtasDataItem<T1> newItem) throws IOException {
+  public void add(MtasDataItem<T1, T2> newItem) throws IOException {
     if (newItem instanceof MtasDataItemAdvanced) {
       MtasDataItemAdvanced<T1, T2> newTypedItem = (MtasDataItemAdvanced<T1, T2>) newItem;
       valueSum = operations.add11(valueSum, newTypedItem.valueSum);
@@ -93,6 +109,7 @@ abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
       valueMin = operations.min11(valueMin, newTypedItem.valueMin);
       valueMax = operations.max11(valueMax, newTypedItem.valueMax);
       valueN += newTypedItem.valueN;
+      recomputeComparableSortValue = true;
     } else {
       throw new IOException("can only add MtasDataItemAdvanced");
     }
@@ -104,7 +121,7 @@ abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
    * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
    */
   @Override
-  public Map<String, Object> rewrite() throws IOException {
+  public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     Map<String, Object> response = new HashMap<String, Object>();
     for (String statsItem : statsItems) {
       if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
@@ -143,14 +160,18 @@ abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
       response.put("errorNumber", errorNumber);
       response.put("errorList", errorResponse);
     }
-    // response.put("stats", "advanced");
+    if (showDebugInfo) {
+      response.put("sourceNumber", sourceNumber);
+      response.put("stats", "advanced");
+    }
     return response;
   }
 
   /**
    * Gets the value.
    *
-   * @param statsType the stats type
+   * @param statsType
+   *          the stats type
    * @return the value
    */
   protected T2 getValue(String statsType) {
@@ -189,6 +210,56 @@ abstract class MtasDataItemAdvanced<T1 extends Number, T2 extends Number>
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValueType()
+   */
+  @Override
+  public int getCompareValueType() throws IOException {
+    switch (sortType) {
+    case CodecUtil.STATS_TYPE_N:
+      return 0;
+    case CodecUtil.STATS_TYPE_SUM:
+      return 1;
+    case CodecUtil.STATS_TYPE_MAX:
+      return 1;
+    case CodecUtil.STATS_TYPE_MIN:
+      return 1;
+    case CodecUtil.STATS_TYPE_SUMSQ:
+      return 1;
+    case CodecUtil.STATS_TYPE_SUMOFLOGS:
+      return 2;
+    case CodecUtil.STATS_TYPE_MEAN:
+      return 2;
+    case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
+      return 2;
+    case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
+      return 2;
+    case CodecUtil.STATS_TYPE_VARIANCE:
+      return 2;
+    case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
+      return 2;
+    case CodecUtil.STATS_TYPE_QUADRATICMEAN:
+      return 2;
+    default:
+      throw new IOException("sortType " + sortType + " not supported");
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
+   */
+  @Override
+  public final NumberComparator<Long> getCompareValue0() {
+    switch (sortType) {
+    case CodecUtil.STATS_TYPE_N:
+      return new NumberComparator<Long>(valueN);
+    default:
+      return null;
+    }
+  }
+
 }
-
-

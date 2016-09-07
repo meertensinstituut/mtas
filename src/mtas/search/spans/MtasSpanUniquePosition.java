@@ -14,33 +14,35 @@ public class MtasSpanUniquePosition extends Spans {
 
   /** The spans. */
   Spans spans;
-  
+
   /** The queue spans. */
   List<Match> queueSpans;
-  
+
   /** The queue matches. */
   List<Match> queueMatches;
-  
+
   /** The current match. */
   Match currentMatch;
-  
+
   /** The last start position. */
   int lastStartPosition; // startPosition of last retrieved span
-  
+
   /** The last span. */
   boolean lastSpan; // last span for this document added to queue
-  
+
   /** The no more positions. */
   boolean noMorePositions;
-  
+
   /**
    * Instantiates a new mtas span unique position.
    *
-   * @param mtasSpanUniquePositionQuery the mtas span unique position query
-   * @param spans the spans
+   * @param mtasSpanUniquePositionQuery
+   *          the mtas span unique position query
+   * @param spans
+   *          the spans
    */
-  public MtasSpanUniquePosition(MtasSpanUniquePositionQuery mtasSpanUniquePositionQuery,
-      Spans spans) {
+  public MtasSpanUniquePosition(
+      MtasSpanUniquePositionQuery mtasSpanUniquePositionQuery, Spans spans) {
     super();
     this.spans = spans;
     queueSpans = new ArrayList<Match>();
@@ -48,7 +50,9 @@ public class MtasSpanUniquePosition extends Spans {
     resetQueue();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
@@ -65,40 +69,54 @@ public class MtasSpanUniquePosition extends Spans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
   public int startPosition() {
-    return (currentMatch==null)?(noMorePositions?NO_MORE_POSITIONS:-1):currentMatch.startPosition();
+    return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
+        : currentMatch.startPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
   public int endPosition() {
-    return (currentMatch==null)?(noMorePositions?NO_MORE_POSITIONS:-1):currentMatch.endPosition();    
+    return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
+        : currentMatch.endPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
   public int width() {
-    //return (currentMatch.endPosition() - currentMatch.startPosition());
+    // return (currentMatch.endPosition() - currentMatch.startPosition());
     return 1;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans.collect(collector);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -106,7 +124,9 @@ public class MtasSpanUniquePosition extends Spans {
     return spans.docID();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
@@ -116,7 +136,9 @@ public class MtasSpanUniquePosition extends Spans {
     return (spans.nextDoc() == NO_MORE_DOCS) ? NO_MORE_DOCS : toMatchDoc();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
@@ -142,7 +164,8 @@ public class MtasSpanUniquePosition extends Spans {
    * To match doc.
    *
    * @return the int
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   int toMatchDoc() throws IOException {
     while (true) {
@@ -159,7 +182,8 @@ public class MtasSpanUniquePosition extends Spans {
    * Collect span.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
@@ -179,7 +203,8 @@ public class MtasSpanUniquePosition extends Spans {
    * Find matches.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
@@ -202,15 +227,15 @@ public class MtasSpanUniquePosition extends Spans {
         while (!lastSpan && (lastStartPosition == firstMatch.startPosition())) {
           collectSpan();
         }
-        while (!queueSpans.isEmpty()
-            && (queueSpans.get(0).startPosition() == firstMatch.startPosition())) {
+        while (!queueSpans.isEmpty() && (queueSpans.get(0)
+            .startPosition() == firstMatch.startPosition())) {
           matches.add(queueSpans.get(0));
           queueSpans.remove(0);
         }
         // construct all matches for this startposition
         for (Match match : matches) {
-          //only unique spans
-          if(!queueMatches.contains(match)) {
+          // only unique spans
+          if (!queueMatches.contains(match)) {
             queueMatches.add(match);
           }
         }
@@ -222,23 +247,24 @@ public class MtasSpanUniquePosition extends Spans {
     }
   }
 
-
   /**
    * The Class Match.
    */
   private class Match {
-    
+
     /** The start position. */
     private int startPosition;
-    
+
     /** The end position. */
     private int endPosition;
 
     /**
      * Instantiates a new match.
      *
-     * @param startPosition the start position
-     * @param endPosition the end position
+     * @param startPosition
+     *          the start position
+     * @param endPosition
+     *          the end position
      */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
@@ -263,7 +289,9 @@ public class MtasSpanUniquePosition extends Spans {
       return endPosition;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -279,21 +307,24 @@ public class MtasSpanUniquePosition extends Spans {
 
   }
 
-
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
   public long cost() {
-    return (spans==null)?0:spans.cost();
+    return (spans == null) ? 0 : spans.cost();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
   public float positionsCost() {
-    return (spans==null)?0:spans.positionsCost();
-  }  
+    return (spans == null) ? 0 : spans.positionsCost();
+  }
 
 }

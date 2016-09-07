@@ -41,11 +41,12 @@ public class MtasSpanRegexpQuery extends SpanQuery {
 
   /** The query name. */
   private static String QUERY_NAME = "mtasSpanRegexpQuery";
-  
+
   /**
    * Instantiates a new mtas span regexp query.
    *
-   * @param term the term
+   * @param term
+   *          the term
    */
   public MtasSpanRegexpQuery(Term term) {
     this(term, true);
@@ -54,8 +55,10 @@ public class MtasSpanRegexpQuery extends SpanQuery {
   /**
    * Instantiates a new mtas span regexp query.
    *
-   * @param term the term
-   * @param singlePosition the single position
+   * @param term
+   *          the term
+   * @param singlePosition
+   *          the single position
    */
   public MtasSpanRegexpQuery(Term term, boolean singlePosition) {
     super();
@@ -74,8 +77,11 @@ public class MtasSpanRegexpQuery extends SpanQuery {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
   public Query rewrite(IndexReader reader) throws IOException {
@@ -113,7 +119,7 @@ public class MtasSpanRegexpQuery extends SpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME+"([");
+    buffer.append(QUERY_NAME + "([");
     if (value == null) {
       buffer.append(this.query.getField() + ":" + prefix);
     } else {
@@ -123,7 +129,9 @@ public class MtasSpanRegexpQuery extends SpanQuery {
     return buffer.toString();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -131,8 +139,12 @@ public class MtasSpanRegexpQuery extends SpanQuery {
     return term.field();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
@@ -140,8 +152,10 @@ public class MtasSpanRegexpQuery extends SpanQuery {
     return ((SpanQuery) searcher.rewrite(query)).createWeight(searcher,
         needsScores);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
@@ -153,19 +167,20 @@ public class MtasSpanRegexpQuery extends SpanQuery {
     if (getClass() != obj.getClass())
       return false;
     MtasSpanRegexpQuery that = (MtasSpanRegexpQuery) obj;
-    return term.equals(that.term) && singlePosition==that.singlePosition;    
+    return term.equals(that.term) && singlePosition == that.singlePosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
   public int hashCode() {
     int h = QUERY_NAME.hashCode();
     h = (h * 7) ^ term.hashCode();
-    h += (singlePosition?1:0);
+    h += (singlePosition ? 1 : 0);
     return h;
   }
-
 
 }

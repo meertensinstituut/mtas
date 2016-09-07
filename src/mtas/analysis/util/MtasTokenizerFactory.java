@@ -52,7 +52,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
    *           Signals that an I/O exception has occurred.
    */
   public MtasTokenizerFactory(Map<String, String> args) throws IOException {
-    this(args, null);   
+    this(args, null);
   }
 
   /**
@@ -92,10 +92,10 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * util.AttributeFactory)
    */
   @Override
-  public MtasTokenizer create(AttributeFactory factory) {
-    MtasTokenizer tokenizer = null;
+  public MtasTokenizer<?> create(AttributeFactory factory) {
+    MtasTokenizer<?> tokenizer = null;
     try {
-      tokenizer = create(factory, null);      
+      tokenizer = create(factory, null);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -111,7 +111,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer create(String configuration) throws IOException {
+  public MtasTokenizer<?> create(String configuration) throws IOException {
     return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
   }
 
@@ -126,14 +126,15 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer create(AttributeFactory factory, String configuration)
+  public MtasTokenizer<?> create(AttributeFactory factory, String configuration)
       throws IOException {
     if (configs != null && configs.size() > 0) {
       if (configuration == null && defaultArgument == null) {
         throw new IOException("no (default)configuration");
       } else if (configuration == null) {
         if (configs.get(defaultArgument) != null) {
-          return new MtasTokenizer(factory, configs.get(defaultArgument));
+          return new MtasTokenizer<String>(factory,
+              configs.get(defaultArgument));
         } else {
           throw new IOException(
               "default configuration " + defaultArgument + " not available");
@@ -143,7 +144,8 @@ public class MtasTokenizerFactory extends TokenizerFactory
         if (config == null) {
           if (defaultArgument != null) {
             if (configs.get(defaultArgument) != null) {
-              return new MtasTokenizer(factory, configs.get(defaultArgument));
+              return new MtasTokenizer<String>(factory,
+                  configs.get(defaultArgument));
             } else {
               throw new IOException("configuration " + configuration
                   + " not found and default configuration " + defaultArgument
@@ -154,11 +156,11 @@ public class MtasTokenizerFactory extends TokenizerFactory
                 + " not available and no default configuration");
           }
         } else {
-          return new MtasTokenizer(factory, config);
+          return new MtasTokenizer<String>(factory, config);
         }
       }
     } else if (config != null) {
-      return new MtasTokenizer(factory, config);
+      return new MtasTokenizer<String>(factory, config);
     } else {
       throw new IOException("no configuration");
     }
@@ -172,7 +174,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  private void init(ResourceLoader resourceLoader) throws IOException {    
+  private void init(ResourceLoader resourceLoader) throws IOException {
     if (config == null && configs == null) {
       if (resourceLoader == null) {
         return;
@@ -182,7 +184,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
         if (configFileArgument != null) {
           try {
             config = MtasConfiguration.readConfiguration(
-                resourceLoader.openResource(configFileArgument));            
+                resourceLoader.openResource(configFileArgument));
           } catch (IOException e) {
             throw new IOException("Problem loading configuration from "
                 + configFileArgument + ": " + e.getMessage());

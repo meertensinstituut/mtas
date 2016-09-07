@@ -22,13 +22,13 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
 
   /** The clause. */
   private SpanQuery clause;
-  
+
   /** The minimum recurrence. */
   private int minimumRecurrence;
-  
+
   /** The maximum recurrence. */
   private int maximumRecurrence;
-  
+
   /** The field. */
   private String field;
 
@@ -38,9 +38,12 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
   /**
    * Instantiates a new mtas span recurrence query.
    *
-   * @param clause the clause
-   * @param minimumRecurrence the minimum recurrence
-   * @param maximumRecurrence the maximum recurrence
+   * @param clause
+   *          the clause
+   * @param minimumRecurrence
+   *          the minimum recurrence
+   * @param maximumRecurrence
+   *          the maximum recurrence
    */
   public MtasSpanRecurrenceQuery(SpanQuery clause, int minimumRecurrence,
       int maximumRecurrence) {
@@ -67,7 +70,9 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     return clause;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -83,8 +88,11 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
   // return soq;
   // }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
   public Query rewrite(IndexReader reader) throws IOException {
@@ -97,7 +105,9 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#toString(java.lang.String)
    */
   @Override
@@ -110,7 +120,9 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     return buffer.toString();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
@@ -127,7 +139,9 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
         && maximumRecurrence == that.maximumRecurrence;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
@@ -139,8 +153,12 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     return h;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
@@ -161,10 +179,14 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     /**
      * Instantiates a new span recurrence weight.
      *
-     * @param subWeight the sub weight
-     * @param searcher the searcher
-     * @param terms the terms
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param subWeight
+     *          the sub weight
+     * @param searcher
+     *          the searcher
+     * @param terms
+     *          the terms
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public SpanRecurrenceWeight(SpanWeight subWeight, IndexSearcher searcher,
         Map<Term, TermContext> terms) throws IOException {
@@ -172,16 +194,25 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
       this.subWeight = subWeight;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.Map)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       subWeight.extractTermContexts(contexts);
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.search.spans.SpanWeight.Postings)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
@@ -203,7 +234,9 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
       }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
      */
     @Override

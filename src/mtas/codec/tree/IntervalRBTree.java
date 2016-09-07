@@ -7,6 +7,9 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 
 /**
  * The Class IntervalRBTree.
+ *
+ * @param <T>
+ *          the generic type
  */
 public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
 
@@ -24,17 +27,20 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Instantiates a new interval rb tree.
    *
-   * @param positionsHits the positions hits
+   * @param positionsHits
+   *          the positions hits
    */
   public IntervalRBTree(ArrayList<IntervalTreeNodeData<T>> positionsHits) {
-    this();    
+    this();
     for (IntervalTreeNodeData<T> positionsHit : positionsHits) {
       addRange(positionsHit.start, positionsHit.end, positionsHit.list);
     }
     close();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.tree.IntervalTree#addRangeEmpty(int, int)
    */
   @Override
@@ -49,7 +55,9 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.tree.IntervalTree#addSinglePoint(int, java.util.ArrayList)
    */
   @Override
@@ -58,7 +66,9 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
     addRange(position, position, list);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.tree.IntervalTree#addRange(int, int, java.util.ArrayList)
    */
   @Override
@@ -73,15 +83,18 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
       root.color = IntervalRBTreeNode.BLACK;
     }
   }
-  
 
   /**
    * Adds the range.
    *
-   * @param n the n
-   * @param left the left
-   * @param right the right
-   * @param list the list
+   * @param n
+   *          the n
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param list
+   *          the list
    * @return the interval rb tree node
    */
   private IntervalRBTreeNode<T> addRange(IntervalRBTreeNode<T> n, Integer left,
@@ -116,8 +129,10 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Update max min.
    *
-   * @param n the n
-   * @param c the c
+   * @param n
+   *          the n
+   * @param c
+   *          the c
    */
   private void updateMaxMin(IntervalRBTreeNode<T> n, IntervalRBTreeNode<T> c) {
     if (c != null) {
@@ -134,7 +149,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Rotate right.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return the interval rb tree node
    */
   private IntervalRBTreeNode<T> rotateRight(IntervalRBTreeNode<T> n) {
@@ -155,7 +171,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Rotate left.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return the interval rb tree node
    */
   private IntervalRBTreeNode<T> rotateLeft(IntervalRBTreeNode<T> n) {
@@ -176,7 +193,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Flip colors.
    *
-   * @param n the n
+   * @param n
+   *          the n
    */
   private void flipColors(IntervalRBTreeNode<T> n) {
     // n must have opposite color of its two children
@@ -191,7 +209,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Checks if is red.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return true, if is red
    */
   private boolean isRed(IntervalRBTreeNode<T> n) {
@@ -204,7 +223,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Size.
    *
-   * @param n the n
+   * @param n
+   *          the n
    * @return the int
    */
   private int size(IntervalRBTreeNode<T> n) {
@@ -216,7 +236,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   /**
    * Sets the max min.
    *
-   * @param n the new max min
+   * @param n
+   *          the new max min
    */
   private void setMaxMin(IntervalRBTreeNode<T> n) {
     n.min = n.left;
@@ -230,7 +251,5 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
       n.max = Math.max(n.max, n.rightChild.max);
     }
   }
-
-  
 
 }

@@ -2,20 +2,23 @@ package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.TreeSet;
+
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
-import mtas.codec.util.DataCollector.MtasDataCollector;
 
 /**
  * The Class MtasDataAdvanced.
  *
- * @param <T1> the generic type
- * @param <T2> the generic type
- * @param <T3> the generic type
+ * @param <T1>
+ *          the generic type
+ * @param <T2>
+ *          the generic type
  */
-abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends MtasDataItem<T1>>
-    extends MtasDataCollector<T1, T3> implements Serializable {
+abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
+    extends MtasDataCollector<T1, T2> implements Serializable {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
@@ -46,24 +49,44 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   /**
    * Instantiates a new mtas data advanced.
    *
-   * @param collectorType the collector type
-   * @param dataType the data type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param subCollectorTypes the sub collector types
-   * @param subDataTypes the sub data types
-   * @param subStatsTypes the sub stats types
-   * @param subStatsItems the sub stats items
-   * @param subSortTypes the sub sort types
-   * @param subSortDirections the sub sort directions
-   * @param subStart the sub start
-   * @param subNumber the sub number
-   * @param operations the operations
-   * @param segmentRegistration the segment registration
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param collectorType
+   *          the collector type
+   * @param dataType
+   *          the data type
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param start
+   *          the start
+   * @param number
+   *          the number
+   * @param subCollectorTypes
+   *          the sub collector types
+   * @param subDataTypes
+   *          the sub data types
+   * @param subStatsTypes
+   *          the sub stats types
+   * @param subStatsItems
+   *          the sub stats items
+   * @param subSortTypes
+   *          the sub sort types
+   * @param subSortDirections
+   *          the sub sort directions
+   * @param subStart
+   *          the sub start
+   * @param subNumber
+   *          the sub number
+   * @param operations
+   *          the operations
+   * @param segmentRegistration
+   *          the segment registration
+   * @param boundary
+   *          the boundary
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasDataAdvanced(String collectorType, String dataType,
       TreeSet<String> statsItems, String sortType, String sortDirection,
@@ -71,12 +94,12 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
       String[] subDataTypes, String[] subStatsTypes,
       TreeSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
-      MtasDataOperations<T1, T2> operations, boolean segmentRegistration)
-      throws IOException {
+      MtasDataOperations<T1, T2> operations, String segmentRegistration,
+      String boundary) throws IOException {
     super(collectorType, dataType, CodecUtil.STATS_ADVANCED, statsItems,
         sortType, sortDirection, start, number, subCollectorTypes, subDataTypes,
         subStatsTypes, subStatsItems, subSortTypes, subSortDirections, subStart,
-        subNumber, segmentRegistration);
+        subNumber, segmentRegistration, boundary);
     this.operations = operations;
   }
 
@@ -88,7 +111,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
    */
   @Override
   public final void error(String error) throws IOException {
-    add();
+    add(false);
     setError(newCurrentPosition, error, newCurrentExisting);
   }
 
@@ -103,7 +126,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   public final void error(String[] keys, String error) throws IOException {
     if (keys != null && keys.length > 0) {
       for (int i = 0; i < keys.length; i++) {
-        add(keys[i]);
+        add(keys[i], false);
         setError(newCurrentPosition, error, newCurrentExisting);
       }
     }
@@ -112,9 +135,12 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   /**
    * Sets the error.
    *
-   * @param newPosition the new position
-   * @param error the error
-   * @param currentExisting the current existing
+   * @param newPosition
+   *          the new position
+   * @param error
+   *          the error
+   * @param currentExisting
+   *          the current existing
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
@@ -141,7 +167,7 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
    * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
    */
   @Override
-  protected final void increaseNewListSize() {
+  protected final void increaseNewListSize() throws IOException {
     // register old situation
     int tmpOldSize = newKeyList.length;
     int tmpNewPosition = newPosition;
@@ -178,6 +204,56 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   /*
    * (non-Javadoc)
    * 
+   * @see
+   * mtas.codec.util.collector.MtasDataCollector#reduceToKeys(java.util.Set)
+   */
+  @SuppressWarnings("unchecked")
+  public void reduceToKeys(Set<String> keys) {
+    if (size > 0) {
+      int sizeCopy = size;
+      String[] keyListCopy = keyList.clone();
+      int[] errorNumberCopy = errorNumber.clone();
+      HashMap<String, Integer>[] errorListCopy = errorList.clone();
+      int[] sourceNumberListCopy = sourceNumberList.clone();
+      T1[] advancedValueSumListCopy = advancedValueSumList.clone();
+      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone();
+      T1[] advancedValueMinListCopy = advancedValueMinList.clone();
+      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList
+          .clone();
+      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone();
+      long[] advancedValueNListCopy = advancedValueNList.clone();
+      keyList = new String[keys.size()];
+      errorNumber = new int[keys.size()];
+      errorList = new HashMap[keys.size()];
+      sourceNumberList = new int[keys.size()];
+      advancedValueSumList = operations.createVector1(keys.size());
+      advancedValueMaxList = operations.createVector1(keys.size());
+      advancedValueMinList = operations.createVector1(keys.size());
+      advancedValueSumOfSquaresList = operations.createVector1(keys.size());
+      advancedValueSumOfLogsList = operations.createVector2(keys.size());
+      advancedValueNList = new long[keys.size()];
+      size = 0;
+      for (int i = 0; i < sizeCopy; i++) {
+        if (keys.contains(keyListCopy[i])) {
+          keyList[size] = keyListCopy[i];
+          errorNumber[size] = errorNumberCopy[i];
+          errorList[size] = errorListCopy[i];
+          sourceNumberList[size] = sourceNumberListCopy[i];
+          advancedValueSumList[size] = advancedValueSumListCopy[i];
+          advancedValueMaxList[size] = advancedValueMaxListCopy[i];
+          advancedValueMinList[size] = advancedValueMinListCopy[i];
+          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];
+          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];
+          advancedValueNList[size] = advancedValueNListCopy[i];
+          size++;
+        }
+      }
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.util.DataCollector.MtasDataCollector#copyToNew(int, int)
    */
   @Override
@@ -208,10 +284,14 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   /**
    * Sets the value.
    *
-   * @param newPosition the new position
-   * @param values the values
-   * @param number the number
-   * @param currentExisting the current existing
+   * @param newPosition
+   *          the new position
+   * @param values
+   *          the values
+   * @param number
+   *          the number
+   * @param currentExisting
+   *          the current existing
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
@@ -240,14 +320,22 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
   /**
    * Sets the value.
    *
-   * @param newPosition the new position
-   * @param valueSum the value sum
-   * @param valueSumOfLogs the value sum of logs
-   * @param valueSumOfSquares the value sum of squares
-   * @param valueMin the value min
-   * @param valueMax the value max
-   * @param valueN the value n
-   * @param currentExisting the current existing
+   * @param newPosition
+   *          the new position
+   * @param valueSum
+   *          the value sum
+   * @param valueSumOfLogs
+   *          the value sum of logs
+   * @param valueSumOfSquares
+   *          the value sum of squares
+   * @param valueMin
+   *          the value min
+   * @param valueMax
+   *          the value max
+   * @param valueN
+   *          the value n
+   * @param currentExisting
+   *          the current existing
    */
   private void setValue(int newPosition, T1 valueSum, T2 valueSumOfLogs,
       T1 valueSumOfSquares, T1 valueMin, T1 valueMax, long valueN,
@@ -332,8 +420,9 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
    * DataCollector.MtasDataCollector)
    */
   @Override
-  public void merge(MtasDataCollector<?, ?> newDataCollector)
-      throws IOException {
+  public void merge(MtasDataCollector<?, ?> newDataCollector,
+      HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
+      boolean increaseSourceNumber) throws IOException {
     closeNewList();
     if (!collectorType.equals(newDataCollector.getCollectorType())
         || !dataType.equals(newDataCollector.getDataType())
@@ -341,13 +430,17 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
         || !(newDataCollector instanceof MtasDataAdvanced)) {
       throw new IOException("cannot merge different dataCollectors");
     } else {
-      MtasDataAdvanced<T1, T2, T3> newMtasDataAdvanced = (MtasDataAdvanced<T1, T2, T3>) newDataCollector;
+      segmentRegistration = null;
+      @SuppressWarnings("unchecked")
+      MtasDataAdvanced<T1, T2> newMtasDataAdvanced = (MtasDataAdvanced<T1, T2>) newDataCollector;
       newMtasDataAdvanced.closeNewList();
       initNewList(newMtasDataAdvanced.getSize());
       if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
+        map.put(newDataCollector, this);
         for (int i = 0; i < newMtasDataAdvanced.getSize(); i++) {
           MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector[1];
-          subCollectors[0] = add(newMtasDataAdvanced.keyList[i]);
+          subCollectors[0] = add(newMtasDataAdvanced.keyList[i],
+              increaseSourceNumber);
           setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[i],
               newMtasDataAdvanced.errorList[i], newCurrentExisting);
           setValue(newCurrentPosition,
@@ -358,14 +451,16 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
               newMtasDataAdvanced.advancedValueMaxList[i],
               newMtasDataAdvanced.advancedValueNList[i], newCurrentExisting);
           if (hasSub() && newMtasDataAdvanced.hasSub()) {
-            subCollectors[0]
-                .merge(newMtasDataAdvanced.subCollectorListNextLevel[i]);
+            subCollectors[0].merge(
+                newMtasDataAdvanced.subCollectorListNextLevel[i], map,
+                increaseSourceNumber);
           }
         }
         closeNewList();
       } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
+        map.put(newDataCollector, this);
         if (newMtasDataAdvanced.getSize() > 0) {
-          MtasDataCollector subCollector = add();
+          MtasDataCollector<?, ?> subCollector = add(increaseSourceNumber);
           setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[0],
               newMtasDataAdvanced.errorList[0], newCurrentExisting);
           setValue(newCurrentPosition,
@@ -376,7 +471,8 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
               newMtasDataAdvanced.advancedValueMaxList[0],
               newMtasDataAdvanced.advancedValueNList[0], newCurrentExisting);
           if (hasSub() && newMtasDataAdvanced.hasSub()) {
-            subCollector.merge(newMtasDataAdvanced.subCollectorNextLevel);
+            subCollector.merge(newMtasDataAdvanced.subCollectorNextLevel, map,
+                increaseSourceNumber);
           }
         }
         closeNewList();
@@ -405,15 +501,16 @@ abstract class MtasDataAdvanced<T1 extends Number, T2 extends Number, T3 extends
    */
   @Override
   public final void initNewList(int maxNumberOfTerms, String segmentName,
-      int segmentNumber) throws IOException {
-    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber);
+      int segmentNumber, String boundary) throws IOException {
+    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);
     initNewListBasic(maxNumberOfTerms);
   }
 
   /**
    * Inits the new list basic.
    *
-   * @param maxNumberOfTerms the max number of terms
+   * @param maxNumberOfTerms
+   *          the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
     newAdvancedValueSumList = operations.createVector1(newSize);

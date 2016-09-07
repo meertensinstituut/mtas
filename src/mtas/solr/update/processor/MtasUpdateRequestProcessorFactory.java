@@ -43,8 +43,12 @@ public class MtasUpdateRequestProcessorFactory
   /** The config. */
   private MtasUpdateRequestProcessorConfig config = null;
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.update.processor.UpdateRequestProcessorFactory#init(org.apache.solr.common.util.NamedList)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.update.processor.UpdateRequestProcessorFactory#init(org.
+   * apache.solr.common.util.NamedList)
    */
   @Override
   @SuppressWarnings("rawtypes")
@@ -55,8 +59,10 @@ public class MtasUpdateRequestProcessorFactory
   /**
    * Inits the.
    *
-   * @param req the req
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param req
+   *          the req
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {
@@ -235,8 +241,14 @@ public class MtasUpdateRequestProcessorFactory
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.solr.update.processor.UpdateRequestProcessorFactory#getInstance(org.apache.solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse, org.apache.solr.update.processor.UpdateRequestProcessor)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.update.processor.UpdateRequestProcessorFactory#getInstance(
+   * org.apache.solr.request.SolrQueryRequest,
+   * org.apache.solr.response.SolrQueryResponse,
+   * org.apache.solr.update.processor.UpdateRequestProcessor)
    */
   @Override
   public UpdateRequestProcessor getInstance(SolrQueryRequest req,
@@ -262,7 +274,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
   }
 
   @Override
-  public void processAdd(AddUpdateCommand cmd) throws IOException  {
+  public void processAdd(AddUpdateCommand cmd) throws IOException {
     if (config != null && config.fieldMapping.size() > 0) {
       // get document
       SolrInputDocument doc = cmd.getSolrInputDocument();
@@ -310,13 +322,13 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                   }
                 }
               }
-              
+
               sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
-              
+
               // tokenizerFactory
-              result = new MtasUpdateRequestProcessorResultWriter(
-                  storedValue);
-              MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
+              result = new MtasUpdateRequestProcessorResultWriter(storedValue);
+              MtasTokenizer<?> tokenizer = tokenizerFactory
+                  .create(configuration);
               tokenizer.setReader(sizeReader);
               tokenizer.reset();
               // attributes
@@ -332,8 +344,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                   .getAttribute(FlagsAttribute.class);
 
               int numberOfPositions = 0;
-              int numberOfTokens = 0;                            
-              
+              int numberOfTokens = 0;
+
               while (tokenizer.incrementToken()) {
                 String term = null;
                 Integer offsetStart = null, offsetEnd = null, posIncr = null,
@@ -359,17 +371,18 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 numberOfPositions += posIncr;
                 result.addItem(term, offsetStart, offsetEnd, posIncr, payload,
                     flags);
-                // System.out.println(term);
-              }              
+                // System.out.print(term+" ");
+              }
 
               // update field
               doc.remove(field);
-              if(result.getTokenNumber()>0) {
+              if (result.getTokenNumber() > 0) {
                 doc.addField(field, result.getFileName());
               }
               result.close();
               // update size
-              setFields(doc, config.fieldTypeSizeField.get(fieldType), sizeReader.getTotalReadSize());
+              setFields(doc, config.fieldTypeSizeField.get(fieldType),
+                  sizeReader.getTotalReadSize());
               // update numberOfPositions
               setFields(doc,
                   config.fieldTypeNumberOfPositionsField.get(fieldType),
@@ -382,17 +395,16 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               doc.addField(config.fieldTypeErrorField.get(fieldType),
                   e.getMessage());
               // update size
-              setFields(doc,
-                  config.fieldTypeSizeField.get(fieldType), 0);
+              setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);
               // update numberOfPositions
               setFields(doc,
                   config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
               // update numberOfTokens
               setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
                   0);
-              if(result!=null) {
+              if (result != null) {
                 result.forceCloseAndDelete();
-                doc.remove(field);                
+                doc.remove(field);
               }
             }
           }
@@ -400,7 +412,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
       }
 
     }
-    // pass it up the chain 
+    // pass it up the chain
     super.processAdd(cmd);
   }
 

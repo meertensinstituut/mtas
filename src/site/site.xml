@@ -1,8 +1,58 @@
 <project name="Multi Tier Annotation Search">
+  <publishDate position="right" />
+  <version position="left" />
+  <bannerRight>
+    <name>Meertens Instituut</name>
+    <src>images/meertens.png</src>
+    <href>http://www.meertens.knaw.nl/</href>
+    <width>147</width>
+    <height>100</height>
+    <title>Meertens Instituut</title>
+  </bannerRight>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.5</version>
+  </skin>
   <body>
+    <breadcrumbs>
+      <item name="Mtas" href="index.html"/>
+    </breadcrumbs>
     <menu name="Mtas">
       <item name="Introduction" href="index.html"/>
-      <item name="Installation" href="installation.html"/>
+      <item name="Features" href="features.html"/>
+      <item name="Getting started" href="installation.html" collapse="true">
+        <item name="Lucene" href="installation_lucene.html"/>
+        <item name="Solr" href="installation_solr.html"/>
+      </item>
+      <item name="Indexing" href="indexing.html" collapse="true">
+        <item name="Configuration" href="indexing_configuration.html"/>
+        <item name="Formats" href="indexing_formats.html">
+          <item name="FoLiA" href="indexing_formats_folia.html" collapse="true"/>
+          <item name="TEI" href="indexing_formats_tei.html" collapse="true"/>
+          <item name="Sketch" href="indexing_formats_sketch.html" collapse="true"/>
+          <item name="CRM" href="indexing_formats_crm.html" collapse="true"/>
+        </item>        
+      </item>
+      <item name="Search" href="search.html" collapse="true">
+        <item name="Configuration" href="search_configuration.html"/>
+        <item name="Query" href="search_query.html">
+          <item name="Statistics" href="search_query_stats.html" collapse="true">
+            <item name="Positions" href="search_query_stats_positions.html"/>
+            <item name="Tokens" href="search_query_stats_tokens.html"/>
+            <item name="Spans" href="search_query_stats_spans.html"/>
+          </item>
+          <item name="Kwic/List" href="search_query_kwic_and_list.html"/>
+          <item name="Termvector" href="search_query_termvector.html"/>
+          <item name="Facet" href="search_query_facet.html"/>
+          <item name="Group" href="search_query_group.html"/>          
+          <item name="Prefix" href="search_query_prefix.html"/>          
+        </item> 
+        <item name="Type of statistics" href="search_stats.html"/>
+        <item name="Functions" href="search_functions.html"/>
+        <item name="CQL" href="search_cql.html"/>
+        <item name="Sharding" href="search_sharding.html"/>                 
+      </item>
       <item name="Download" href="download.html"/>      
     </menu>
     <menu ref="reports"/>

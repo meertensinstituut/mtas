@@ -12,19 +12,22 @@ public class MtasSpanMatchNone extends Spans {
 
   /** The doc id. */
   private int currentStartPosition, currentEndPosition, docId;
-  
+
   /**
    * Instantiates a new mtas span match none.
    *
-   * @param field the field
+   * @param field
+   *          the field
    */
   public MtasSpanMatchNone(String field) {
     currentStartPosition = NO_MORE_POSITIONS;
     currentEndPosition = NO_MORE_POSITIONS;
     docId = -1;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
@@ -32,7 +35,9 @@ public class MtasSpanMatchNone extends Spans {
     return currentStartPosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
@@ -40,7 +45,9 @@ public class MtasSpanMatchNone extends Spans {
     return currentStartPosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
@@ -48,7 +55,9 @@ public class MtasSpanMatchNone extends Spans {
     return currentEndPosition;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
@@ -56,15 +65,21 @@ public class MtasSpanMatchNone extends Spans {
     return 0;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-    
+
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -72,7 +87,9 @@ public class MtasSpanMatchNone extends Spans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
@@ -83,7 +100,9 @@ public class MtasSpanMatchNone extends Spans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
@@ -94,7 +113,9 @@ public class MtasSpanMatchNone extends Spans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
@@ -102,7 +123,9 @@ public class MtasSpanMatchNone extends Spans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override

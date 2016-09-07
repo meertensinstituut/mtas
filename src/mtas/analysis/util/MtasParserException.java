@@ -14,11 +14,12 @@ public class MtasParserException extends Exception {
   public MtasParserException() {
     super();
   }
-  
+
   /**
    * Instantiates a new mtas parser exception.
    *
-   * @param string the string
+   * @param string
+   *          the string
    */
   public MtasParserException(String string) {
     super(string);

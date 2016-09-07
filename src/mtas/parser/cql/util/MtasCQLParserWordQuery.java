@@ -22,69 +22,81 @@ public class MtasCQLParserWordQuery extends SpanQuery {
 
   /** The query. */
   SpanQuery query;
-  
+
   /** The term. */
   Term term;
-  
+
   /** The query name. */
   private static String QUERY_NAME = "mtasCQLParserWordQuery";
-  
+
   /** The Constant MTAS_CQL_TERM_QUERY. */
   public static final String MTAS_CQL_TERM_QUERY = "term";
-  
+
   /** The Constant MTAS_CQL_REGEXP_QUERY. */
   public static final String MTAS_CQL_REGEXP_QUERY = "regexp";
-  
+
   /** The Constant MTAS_CQL_WILDCARD_QUERY. */
   public static final String MTAS_CQL_WILDCARD_QUERY = "wildcard";
-  
+
   /**
    * Instantiates a new mtas cql parser word query.
    *
-   * @param field the field
-   * @param prefix the prefix
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
    */
   public MtasCQLParserWordQuery(String field, String prefix) {
-    term = new Term(field,prefix+MtasToken.DELIMITER);
+    term = new Term(field, prefix + MtasToken.DELIMITER);
     query = new MtasSpanPrefixQuery(term, true);
   }
-  
+
   /**
    * Instantiates a new mtas cql parser word query.
    *
-   * @param field the field
-   * @param prefix the prefix
-   * @param value the value
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param value
+   *          the value
    */
-  public MtasCQLParserWordQuery(String field, String prefix, String value ) {    
+  public MtasCQLParserWordQuery(String field, String prefix, String value) {
     this(field, prefix, value, MTAS_CQL_REGEXP_QUERY);
   }
-  
+
   /**
    * Instantiates a new mtas cql parser word query.
    *
-   * @param field the field
-   * @param prefix the prefix
-   * @param value the value
-   * @param type the type
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param value
+   *          the value
+   * @param type
+   *          the type
    */
-  public MtasCQLParserWordQuery(String field, String prefix, String value, String type) {     
-    if(type.equals(MTAS_CQL_REGEXP_QUERY)) {
-      term = new Term(field,prefix+MtasToken.DELIMITER+value+"\u0000*");
+  public MtasCQLParserWordQuery(String field, String prefix, String value,
+      String type) {
+    if (type.equals(MTAS_CQL_REGEXP_QUERY)) {
+      term = new Term(field, prefix + MtasToken.DELIMITER + value + "\u0000*");
       query = new MtasSpanRegexpQuery(term, true);
-    } else if(type.equals(MTAS_CQL_WILDCARD_QUERY)) {
-      term = new Term(field,prefix+MtasToken.DELIMITER+value);
+    } else if (type.equals(MTAS_CQL_WILDCARD_QUERY)) {
+      term = new Term(field, prefix + MtasToken.DELIMITER + value);
       query = new MtasSpanWildcardQuery(term, true);
-    } else if(type.equals(MTAS_CQL_TERM_QUERY)) {
-      term = new Term(field,prefix+MtasToken.DELIMITER+value);
+    } else if (type.equals(MTAS_CQL_TERM_QUERY)) {
+      term = new Term(field, prefix + MtasToken.DELIMITER + value);
       query = new MtasSpanTermQuery(term, true);
     } else {
-      term = new Term(field,prefix+MtasToken.DELIMITER+value);
+      term = new Term(field, prefix + MtasToken.DELIMITER + value);
       query = new MtasSpanTermQuery(term, true);
-    }     
+    }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -92,16 +104,23 @@ public class MtasCQLParserWordQuery extends SpanQuery {
     return term.field();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
   public Query rewrite(IndexReader reader) throws IOException {
     return query.rewrite(reader);
   }
-  
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
@@ -109,30 +128,36 @@ public class MtasCQLParserWordQuery extends SpanQuery {
     return query.createWeight(searcher, needsScores);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#toString(java.lang.String)
    */
   @Override
   public String toString(String field) {
     return query.toString(term.field());
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (obj== null)
+    if (obj == null)
       return false;
     if (getClass() != obj.getClass())
       return false;
     final MtasCQLParserWordQuery that = (MtasCQLParserWordQuery) obj;
-    return query.equals(that.query);    
+    return query.equals(that.query);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
@@ -141,5 +166,5 @@ public class MtasCQLParserWordQuery extends SpanQuery {
     h = (h * 7) ^ query.hashCode();
     return h;
   }
-  
+
 }

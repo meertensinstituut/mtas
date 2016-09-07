@@ -1,5 +1,6 @@
 package mtas.codec;
 
+import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.IOUtils;
 
 /**
  * The Class MtasFieldsConsumer.
@@ -440,7 +442,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       prefixIdIndex.put(field, new HashMap<String, Integer>());
     }
     if (!prefixReferenceIndex.get(field).containsKey(prefix)) {
-      int id = prefixReferenceIndex.get(field).size();
+      int id = 1 + prefixReferenceIndex.get(field).size();
       prefixReferenceIndex.get(field).put(prefix, outPrefix.getFilePointer());
       prefixIdIndex.get(field).put(prefix, id);
       outPrefix.writeString(prefix);
@@ -591,8 +593,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    */
   @Override
   public void write(Fields fields) throws IOException {
-    write(state.fieldInfos, fields);
     delegateFieldsConsumer.write(fields);
+    write(state.fieldInfos, fields);
   }
 
   /**
@@ -605,11 +607,12 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  private void write(FieldInfos fieldInfos, Fields fields) throws IOException {
+  private void write(FieldInfos fieldInfos, Fields fields) {
     IndexOutput outField, outDoc, outIndexDocId, outIndexObjectId,
         outIndexObjectPosition, outIndexObjectParent, outTerm, outObject,
         outPrefix;
     IndexOutput outTmpDoc, outTmpField;
+    HashSet<Closeable> closeables = new HashSet<Closeable>();
 
     // temporary temporary index in memory for doc
     TreeMap<Integer, Long> memoryIndexTemporaryObject = new TreeMap<Integer, Long>();
@@ -618,437 +621,471 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     // list of objectIds and references to objects
     TreeMap<Integer, Long> memoryIndexDocList = new TreeMap<Integer, Long>();
 
-    // create file tmpDoc
-    outTmpDoc = state.directory.createOutput(mtasTmpDocFileName, state.context);
-    // create file tmpField
-    outTmpField = state.directory.createOutput(mtasTmpFieldFileName,
-        state.context);
-    // create file indexDoc
-    outDoc = state.directory.createOutput(mtasDocFileName, state.context);
-    CodecUtil.writeIndexHeader(outDoc, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outDoc.writeString(delegatePostingsFormatName);
-    // create file indexDocId
-    outIndexDocId = state.directory.createOutput(mtasIndexDocIdFileName,
-        state.context);
-    CodecUtil.writeIndexHeader(outIndexDocId, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outIndexDocId.writeString(delegatePostingsFormatName);
-    // create file indexObjectId
-    outIndexObjectId = state.directory.createOutput(mtasIndexObjectIdFileName,
-        state.context);
-    CodecUtil.writeIndexHeader(outIndexObjectId, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outIndexObjectId.writeString(delegatePostingsFormatName);
-    // create file indexObjectPosition
-    outIndexObjectPosition = state.directory
-        .createOutput(mtasIndexObjectPositionFileName, state.context);
-    CodecUtil.writeIndexHeader(outIndexObjectPosition, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outIndexObjectPosition.writeString(delegatePostingsFormatName);
-    // create file indexObjectParent
-    outIndexObjectParent = state.directory
-        .createOutput(mtasIndexObjectParentFileName, state.context);
-    CodecUtil.writeIndexHeader(outIndexObjectParent, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outIndexObjectParent.writeString(delegatePostingsFormatName);
-    // create file term
-    outTerm = state.directory.createOutput(mtasTermFileName, state.context);
-    CodecUtil.writeIndexHeader(outTerm, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outTerm.writeString(delegatePostingsFormatName);
-    // create file prefix
-    outPrefix = state.directory.createOutput(mtasPrefixFileName, state.context);
-    CodecUtil.writeIndexHeader(outPrefix, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outPrefix.writeString(delegatePostingsFormatName);
-    // create file object
-    outObject = state.directory.createOutput(mtasObjectFileName, state.context);
-    CodecUtil.writeIndexHeader(outObject, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outObject.writeString(delegatePostingsFormatName);
-    // For each field
-    for (String field : fields) {
-      Terms terms = fields.terms(field);
-      if (terms == null) {
-        continue;
-      } else {
-        // new temporary object storage for this field
-        IndexOutput outTmpObject = state.directory
-            .createOutput(mtasTmpObjectFileName, state.context);
-        // new temporary index docs for this field
-        IndexOutput outTmpDocs = state.directory
-            .createOutput(mtasTmpDocsFileName, state.context);
-        // get fieldInfo
-        FieldInfo fieldInfo = fieldInfos.fieldInfo(field);
-        // get properties terms
-        boolean hasPositions = terms.hasPositions();
-        boolean hasFreqs = terms.hasFreqs();
-        boolean hasPayloads = fieldInfo.hasPayloads();
-        boolean hasOffsets = terms.hasOffsets();
-        // register references
-        Long smallestTermFilepointer = outTerm.getFilePointer();
-        Long smallestPrefixFilepointer = outTerm.getFilePointer();
-        int termCounter = 0;
-        // only if freqs, positions and payload available
-        if (hasFreqs && hasPositions && hasPayloads) {
-          // compute flags
-          int flags = PostingsEnum.POSITIONS | PostingsEnum.PAYLOADS;
-          if (hasOffsets) {
-            flags = flags | PostingsEnum.OFFSETS;
-          }
-          // get terms
-          TermsEnum termsEnum = terms.iterator();
-          PostingsEnum postingsEnum = null;
-          // for each term in field
-          while (true) {
-            BytesRef term = termsEnum.next();
-            if (term == null) {
-              break;
+    try {
+      // create file tmpDoc
+      closeables.add(outTmpDoc = state.directory
+          .createOutput(mtasTmpDocFileName, state.context));
+      // create file tmpField
+      closeables.add(outTmpField = state.directory
+          .createOutput(mtasTmpFieldFileName, state.context));
+      // create file indexDoc
+      closeables.add(outDoc = state.directory.createOutput(mtasDocFileName,
+          state.context));
+      CodecUtil.writeIndexHeader(outDoc, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outDoc.writeString(delegatePostingsFormatName);
+      // create file indexDocId
+      closeables.add(outIndexDocId = state.directory
+          .createOutput(mtasIndexDocIdFileName, state.context));
+      CodecUtil.writeIndexHeader(outIndexDocId, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outIndexDocId.writeString(delegatePostingsFormatName);
+      // create file indexObjectId
+      closeables.add(outIndexObjectId = state.directory
+          .createOutput(mtasIndexObjectIdFileName, state.context));
+      CodecUtil.writeIndexHeader(outIndexObjectId, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outIndexObjectId.writeString(delegatePostingsFormatName);
+      // create file indexObjectPosition
+      closeables.add(outIndexObjectPosition = state.directory
+          .createOutput(mtasIndexObjectPositionFileName, state.context));
+      CodecUtil.writeIndexHeader(outIndexObjectPosition, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outIndexObjectPosition.writeString(delegatePostingsFormatName);
+      // create file indexObjectParent
+      closeables.add(outIndexObjectParent = state.directory
+          .createOutput(mtasIndexObjectParentFileName, state.context));
+      CodecUtil.writeIndexHeader(outIndexObjectParent, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outIndexObjectParent.writeString(delegatePostingsFormatName);
+      // create file term
+      closeables.add(outTerm = state.directory.createOutput(mtasTermFileName,
+          state.context));
+      CodecUtil.writeIndexHeader(outTerm, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outTerm.writeString(delegatePostingsFormatName);
+      // create file prefix
+      closeables.add(outPrefix = state.directory
+          .createOutput(mtasPrefixFileName, state.context));
+      CodecUtil.writeIndexHeader(outPrefix, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outPrefix.writeString(delegatePostingsFormatName);
+      // create file object
+      closeables.add(outObject = state.directory
+          .createOutput(mtasObjectFileName, state.context));
+      CodecUtil.writeIndexHeader(outObject, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outObject.writeString(delegatePostingsFormatName);
+      // For each field
+      for (String field : fields) {
+        Terms terms = fields.terms(field);
+        if (terms == null) {
+          continue;
+        } else {
+          // new temporary object storage for this field
+          IndexOutput outTmpObject = state.directory
+              .createOutput(mtasTmpObjectFileName, state.context);
+          closeables.add(outTmpObject);
+          // new temporary index docs for this field
+          IndexOutput outTmpDocs = state.directory
+              .createOutput(mtasTmpDocsFileName, state.context);
+          closeables.add(outTmpDocs);
+          // get fieldInfo
+          FieldInfo fieldInfo = fieldInfos.fieldInfo(field);
+          // get properties terms
+          boolean hasPositions = terms.hasPositions();
+          boolean hasFreqs = terms.hasFreqs();
+          boolean hasPayloads = fieldInfo.hasPayloads();
+          boolean hasOffsets = terms.hasOffsets();
+          // register references
+          Long smallestTermFilepointer = outTerm.getFilePointer();
+          Long smallestPrefixFilepointer = outTerm.getFilePointer();
+          int termCounter = 0;
+          // only if freqs, positions and payload available
+          if (hasFreqs && hasPositions && hasPayloads) {
+            // compute flags
+            int flags = PostingsEnum.POSITIONS | PostingsEnum.PAYLOADS;
+            if (hasOffsets) {
+              flags = flags | PostingsEnum.OFFSETS;
             }
-            // store term and get ref
-            Long termRef = outTerm.getFilePointer();
-            outTerm.writeString(term.utf8ToString());
-            termCounter++;
-            // get postings
-            postingsEnum = termsEnum.postings(postingsEnum, flags);
-            // for each doc in field+term
+            // get terms
+            TermsEnum termsEnum = terms.iterator();
+            PostingsEnum postingsEnum = null;
+            // for each term in field
             while (true) {
-              Integer doc = postingsEnum.nextDoc();
-              if (doc.equals(DocIdSetIterator.NO_MORE_DOCS)) {
+              BytesRef term = termsEnum.next();
+              if (term == null) {
                 break;
               }
-              int freq = postingsEnum.freq();
-              // temporary storage objects and temporary index in memory for
-              // doc
-              memoryIndexTemporaryObject.clear();
-              Long offsetFilePointerTmpObject = outTmpObject.getFilePointer();
-              for (int i = 0; i < freq; i++) {
-                Long currentFilePointerTmpObject = outTmpObject
-                    .getFilePointer();
-                Integer mtasId;
-                int position = postingsEnum.nextPosition();
-                BytesRef payload = postingsEnum.getPayload();
-                if (hasOffsets) {
-                  mtasId = createObjectAndRegisterPrefix(field, outTmpObject,
-                      term, termRef, position, payload,
-                      postingsEnum.startOffset(), postingsEnum.endOffset(),
-                      outPrefix);
-                } else {
-                  mtasId = createObjectAndRegisterPrefix(field, outTmpObject,
-                      term, termRef, position, payload, outPrefix);
+              // store term and get ref
+              Long termRef = outTerm.getFilePointer();
+              outTerm.writeString(term.utf8ToString());
+              termCounter++;
+              // get postings
+              postingsEnum = termsEnum.postings(postingsEnum, flags);
+              // for each doc in field+term
+              while (true) {
+                Integer doc = postingsEnum.nextDoc();
+                if (doc.equals(DocIdSetIterator.NO_MORE_DOCS)) {
+                  break;
                 }
-                if (mtasId != null) {
-                  assert !memoryIndexTemporaryObject.containsKey(
-                      mtasId) : "mtasId should be unique in this selection";
-                  memoryIndexTemporaryObject.put(mtasId,
-                      currentFilePointerTmpObject);
+                int freq = postingsEnum.freq();
+                // temporary storage objects and temporary index in memory for
+                // doc
+                memoryIndexTemporaryObject.clear();
+                Long offsetFilePointerTmpObject = outTmpObject.getFilePointer();
+                for (int i = 0; i < freq; i++) {
+                  Long currentFilePointerTmpObject = outTmpObject
+                      .getFilePointer();
+                  Integer mtasId;
+                  int position = postingsEnum.nextPosition();
+                  BytesRef payload = postingsEnum.getPayload();
+                  if (hasOffsets) {
+                    mtasId = createObjectAndRegisterPrefix(field, outTmpObject,
+                        term, termRef, position, payload,
+                        postingsEnum.startOffset(), postingsEnum.endOffset(),
+                        outPrefix);
+                  } else {
+                    mtasId = createObjectAndRegisterPrefix(field, outTmpObject,
+                        term, termRef, position, payload, outPrefix);
+                  }
+                  if (mtasId != null) {
+                    assert !memoryIndexTemporaryObject.containsKey(
+                        mtasId) : "mtasId should be unique in this selection";
+                    memoryIndexTemporaryObject.put(mtasId,
+                        currentFilePointerTmpObject);
+                  }
+                } // end loop positions
+                // store temporary index for this doc
+                if (memoryIndexTemporaryObject.size() > 0) {
+                  // docId for this part
+                  outTmpDocs.writeVInt(doc);
+                  // number of objects/tokens in this part
+                  outTmpDocs.writeVInt(memoryIndexTemporaryObject.size());
+                  // offset to be used for references
+                  outTmpDocs.writeVLong(offsetFilePointerTmpObject);
+                  // loop over tokens
+                  for (Entry<Integer, Long> entry : memoryIndexTemporaryObject
+                      .entrySet()) {
+                    // mtasId object
+                    outTmpDocs.writeVInt(entry.getKey());
+                    // reference object
+                    outTmpDocs.writeVLong(
+                        (entry.getValue() - offsetFilePointerTmpObject));
+                  }
                 }
-              } // end loop positions
-              // store temporary index for this doc
-              if (memoryIndexTemporaryObject.size() > 0) {
-                // docId for this part
-                outTmpDocs.writeVInt(doc);
-                // number of objects/tokens in this part
-                outTmpDocs.writeVInt(memoryIndexTemporaryObject.size());
-                // offset to be used for references
-                outTmpDocs.writeVLong(offsetFilePointerTmpObject);
-                // loop over tokens
-                for (Entry<Integer, Long> entry : memoryIndexTemporaryObject
-                    .entrySet()) {
-                  // mtasId object
-                  outTmpDocs.writeVInt(entry.getKey());
-                  // reference object
-                  outTmpDocs.writeVLong(
-                      (entry.getValue() - offsetFilePointerTmpObject));
-                }
-              }
-              // clean up
-              memoryIndexTemporaryObject.clear();
-            } // end loop docs
-          } // end loop terms
-          // set fieldInfo
-          fieldInfos.fieldInfo(field).putAttribute(
-              MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION,
-              getPrefixStatsSinglePositionPrefixAttribute(field));
-          fieldInfos.fieldInfo(field).putAttribute(
-              MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION,
-              getPrefixStatsMultiplePositionPrefixAttribute(field));
-          fieldInfos.fieldInfo(field).putAttribute(
-              MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION,
-              getPrefixStatsSetPositionPrefixAttribute(field));
+                // clean up
+                memoryIndexTemporaryObject.clear();
+              } // end loop docs
+            } // end loop terms
+            // set fieldInfo
+            fieldInfos.fieldInfo(field).putAttribute(
+                MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION,
+                getPrefixStatsSinglePositionPrefixAttribute(field));
+            fieldInfos.fieldInfo(field).putAttribute(
+                MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION,
+                getPrefixStatsMultiplePositionPrefixAttribute(field));
+            fieldInfos.fieldInfo(field).putAttribute(
+                MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION,
+                getPrefixStatsSetPositionPrefixAttribute(field));
 
-        } // end processing field with freqs, positions and payload
-        // close temporary object storage and index docs
-        outTmpObject.close();
-        outTmpDocs.close();
+          } // end processing field with freqs, positions and payload
+          // close temporary object storage and index docs
+          outTmpObject.close();
+          closeables.remove(outTmpObject);
+          outTmpDocs.close();
+          closeables.remove(outTmpDocs);
 
-        // create (backwards) chained new temporary index docs
-        IndexInput inTmpDocs = state.directory.openInput(mtasTmpDocsFileName,
-            state.context);
-        IndexOutput outTmpDocsChained = state.directory
-            .createOutput(mtasTmpDocsChainedFileName, state.context);
-        memoryTmpDocChainList.clear();
-        while (true) {
-          try {
-            Long currentFilepointer = outTmpDocsChained.getFilePointer();
-            // copy docId
-            int docId = inTmpDocs.readVInt();
-            outTmpDocsChained.writeVInt(docId);
-            // copy size
-            int size = inTmpDocs.readVInt();
-            outTmpDocsChained.writeVInt(size);
-            // offset references
-            outTmpDocsChained.writeVLong(inTmpDocs.readVLong());
-            for (int t = 0; t < size; t++) {
-              outTmpDocsChained.writeVInt(inTmpDocs.readVInt());
+          // create (backwards) chained new temporary index docs
+          IndexInput inTmpDocs = state.directory.openInput(mtasTmpDocsFileName,
+              state.context);
+          closeables.add(inTmpDocs);
+          IndexOutput outTmpDocsChained = state.directory
+              .createOutput(mtasTmpDocsChainedFileName, state.context);
+          closeables.add(outTmpDocsChained);
+          memoryTmpDocChainList.clear();
+          while (true) {
+            try {
+              Long currentFilepointer = outTmpDocsChained.getFilePointer();
+              // copy docId
+              int docId = inTmpDocs.readVInt();
+              outTmpDocsChained.writeVInt(docId);
+              // copy size
+              int size = inTmpDocs.readVInt();
+              outTmpDocsChained.writeVInt(size);
+              // offset references
               outTmpDocsChained.writeVLong(inTmpDocs.readVLong());
-            }
-            // set back reference to part with same docId
-            if (memoryTmpDocChainList.containsKey(docId)) {
-              // reference to previous
-              outTmpDocsChained.writeVLong(memoryTmpDocChainList.get(docId));
-            } else {
-              // self reference indicates end of chain
-              outTmpDocsChained.writeVLong(currentFilepointer);
-            }
-            // update temporary index in memory
-            memoryTmpDocChainList.put(docId, currentFilepointer);
-          } catch (IOException ex) {
-            break;
-          }
-        }
-        outTmpDocsChained.close();
-        inTmpDocs.close();
-        state.directory.deleteFile(mtasTmpDocsFileName);
-
-        // set reference to tmpDoc in Field
-        if (memoryTmpDocChainList.size() > 0) {
-          outTmpField.writeString(field);
-          outTmpField.writeVLong(outTmpDoc.getFilePointer());
-          outTmpField.writeVInt(memoryTmpDocChainList.size());
-          outTmpField.writeVLong(smallestTermFilepointer);
-          outTmpField.writeVInt(termCounter);
-          outTmpField.writeVLong(smallestPrefixFilepointer);
-          outTmpField.writeVInt(prefixReferenceIndex.get(field).size());
-          // fill indexDoc
-          IndexInput inTmpDocsChained = state.directory
-              .openInput(mtasTmpDocsChainedFileName, state.context);
-          IndexInput inTmpObject = state.directory
-              .openInput(mtasTmpObjectFileName, state.context);
-          for (Entry<Integer, Long> entry : memoryTmpDocChainList.entrySet()) {
-            Integer docId = entry.getKey();
-            Long currentFilePointer, newFilePointer;
-            // list of objectIds and references to objects
-            memoryIndexDocList.clear();
-            // construct final object + indexObjectId for docId
-            currentFilePointer = entry.getValue();
-            // collect objects for document
-            tokenStatsMinPos = null;
-            tokenStatsMaxPos = null;
-            tokenStatsNumber = 0;
-            while (true) {
-              inTmpDocsChained.seek(currentFilePointer);
-              Integer docIdPart = inTmpDocsChained.readVInt();
-              assert docIdPart.equals(
-                  docId) : "conflicting docId in reference to temporaryIndexDocsChained";
-              // number of objects/tokens in part
-              int size = inTmpDocsChained.readVInt();
-              long offsetFilePointerTmpObject = inTmpDocsChained.readVLong();
-              assert size > 0 : "number of objects/tokens in part cannot be "
-                  + size;
               for (int t = 0; t < size; t++) {
-                int mtasId = inTmpDocsChained.readVInt();
-                Long tmpObjectRef = inTmpDocsChained.readVLong()
-                    + offsetFilePointerTmpObject;
-                assert !memoryIndexDocList.containsKey(
-                    mtasId) : "mtasId should be unique in this selection";
-                // initially, store ref to tmpObject
-                memoryIndexDocList.put(mtasId, tmpObjectRef);
+                outTmpDocsChained.writeVInt(inTmpDocs.readVInt());
+                outTmpDocsChained.writeVLong(inTmpDocs.readVLong());
               }
-              // reference to next part
-              newFilePointer = inTmpDocsChained.readVLong();
-              if (newFilePointer.equals(currentFilePointer)) {
-                break; // end of chained parts
+              // set back reference to part with same docId
+              if (memoryTmpDocChainList.containsKey(docId)) {
+                // reference to previous
+                outTmpDocsChained.writeVLong(memoryTmpDocChainList.get(docId));
               } else {
-                currentFilePointer = newFilePointer;
+                // self reference indicates end of chain
+                outTmpDocsChained.writeVLong(currentFilepointer);
               }
+              // update temporary index in memory
+              memoryTmpDocChainList.put(docId, currentFilepointer);
+            } catch (IOException ex) {
+              break;
             }
-            // now create new objects, sorted by mtasId
-            Long smallestObjectFilepointer = outObject.getFilePointer();
-            for (Entry<Integer, Long> objectEntry : memoryIndexDocList
-                .entrySet()) {
-              int mtasId = objectEntry.getKey();
-              Long tmpObjectRef = objectEntry.getValue();
-              Long objectRef = outObject.getFilePointer();
-              copyObjectAndUpdateStats(mtasId, inTmpObject, tmpObjectRef,
-                  outObject);
-              // update with new ref
-              memoryIndexDocList.put(mtasId, objectRef);
-            }
-            // check mtasIds properties
-            assert memoryIndexDocList.firstKey()
-                .equals(0) : "first mtasId should not be "
-                    + memoryIndexDocList.firstKey();
-            assert (1 + memoryIndexDocList.lastKey()
-                - memoryIndexDocList.firstKey()) == memoryIndexDocList
-                    .size() : "missing mtasId";
-            assert tokenStatsNumber.equals(memoryIndexDocList
-                .size()) : "incorrect number of items in tokenStats";
+          }
+          outTmpDocsChained.close();
+          closeables.remove(outTmpDocsChained);
+          inTmpDocs.close();
+          closeables.remove(inTmpDocs);
+          state.directory.deleteFile(mtasTmpDocsFileName);
 
-            // store item in tmpDoc
-            outTmpDoc.writeVInt(docId);
-            outTmpDoc.writeVLong(outIndexObjectId.getFilePointer());
+          // set reference to tmpDoc in Field
+          if (memoryTmpDocChainList.size() > 0) {
+            outTmpField.writeString(field);
+            outTmpField.writeVLong(outTmpDoc.getFilePointer());
+            outTmpField.writeVInt(memoryTmpDocChainList.size());
+            outTmpField.writeVLong(smallestTermFilepointer);
+            outTmpField.writeVInt(termCounter);
+            outTmpField.writeVLong(smallestPrefixFilepointer);
+            outTmpField.writeVInt(prefixReferenceIndex.get(field).size());
+            // fill indexDoc
+            IndexInput inTmpDocsChained = state.directory
+                .openInput(mtasTmpDocsChainedFileName, state.context);
+            closeables.add(inTmpDocsChained);
+            IndexInput inTmpObject = state.directory
+                .openInput(mtasTmpObjectFileName, state.context);
+            closeables.add(inTmpObject);
+            for (Entry<Integer, Long> entry : memoryTmpDocChainList
+                .entrySet()) {
+              Integer docId = entry.getKey();
+              Long currentFilePointer, newFilePointer;
+              // list of objectIds and references to objects
+              memoryIndexDocList.clear();
+              // construct final object + indexObjectId for docId
+              currentFilePointer = entry.getValue();
+              // collect objects for document
+              tokenStatsMinPos = null;
+              tokenStatsMaxPos = null;
+              tokenStatsNumber = 0;
+              while (true) {
+                inTmpDocsChained.seek(currentFilePointer);
+                Integer docIdPart = inTmpDocsChained.readVInt();
+                assert docIdPart.equals(
+                    docId) : "conflicting docId in reference to temporaryIndexDocsChained";
+                // number of objects/tokens in part
+                int size = inTmpDocsChained.readVInt();
+                long offsetFilePointerTmpObject = inTmpDocsChained.readVLong();
+                assert size > 0 : "number of objects/tokens in part cannot be "
+                    + size;
+                for (int t = 0; t < size; t++) {
+                  int mtasId = inTmpDocsChained.readVInt();
+                  Long tmpObjectRef = inTmpDocsChained.readVLong()
+                      + offsetFilePointerTmpObject;
+                  assert !memoryIndexDocList.containsKey(
+                      mtasId) : "mtasId should be unique in this selection";
+                  // initially, store ref to tmpObject
+                  memoryIndexDocList.put(mtasId, tmpObjectRef);
+                }
+                // reference to next part
+                newFilePointer = inTmpDocsChained.readVLong();
+                if (newFilePointer.equals(currentFilePointer)) {
+                  break; // end of chained parts
+                } else {
+                  currentFilePointer = newFilePointer;
+                }
+              }
+              // now create new objects, sorted by mtasId
+              Long smallestObjectFilepointer = outObject.getFilePointer();
+              for (Entry<Integer, Long> objectEntry : memoryIndexDocList
+                  .entrySet()) {
+                int mtasId = objectEntry.getKey();
+                Long tmpObjectRef = objectEntry.getValue();
+                Long objectRef = outObject.getFilePointer();
+                copyObjectAndUpdateStats(mtasId, inTmpObject, tmpObjectRef,
+                    outObject);
+                // update with new ref
+                memoryIndexDocList.put(mtasId, objectRef);
+              }
+              // check mtasIds properties
+              assert memoryIndexDocList.firstKey()
+                  .equals(0) : "first mtasId should not be "
+                      + memoryIndexDocList.firstKey();
+              assert (1 + memoryIndexDocList.lastKey()
+                  - memoryIndexDocList.firstKey()) == memoryIndexDocList
+                      .size() : "missing mtasId";
+              assert tokenStatsNumber.equals(memoryIndexDocList
+                  .size()) : "incorrect number of items in tokenStats";
 
-            int mtasId = 0;
-            // compute linear approximation (least squares method, integer
-            // constants)
-            long tmpN = memoryIndexDocList.size();
-            long tmpSumY = 0, tmpSumXY = 0;
-            long tmpSumX = 0, tmpSumXX = 0;
-            for (Entry<Integer, Long> objectEntry : memoryIndexDocList
-                .entrySet()) {
-              assert objectEntry.getKey().equals(mtasId) : "unexpected mtasId";
-              tmpSumY += objectEntry.getValue();
-              tmpSumX += mtasId;
-              tmpSumXY += mtasId * objectEntry.getValue();
-              tmpSumXX += mtasId * mtasId;
-              mtasId++;
-            }
-            int objectRefApproxQuotient = (int) (((tmpN * tmpSumXY)
-                - (tmpSumX * tmpSumY))
-                / ((tmpN * tmpSumXX) - (tmpSumX * tmpSumX)));
-            long objectRefApproxOffset = (tmpSumY
-                - objectRefApproxQuotient * tmpSumX) / tmpN;
-            Long objectRefApproxCorrection;
-            long maxAbsObjectRefApproxCorrection = 0;
-            // compute maximum correction
-            mtasId = 0;
-            for (Entry<Integer, Long> objectEntry : memoryIndexDocList
-                .entrySet()) {
-              objectRefApproxCorrection = (objectEntry.getValue()
-                  - (objectRefApproxOffset
-                      + (mtasId * objectRefApproxQuotient)));
-              maxAbsObjectRefApproxCorrection = Math.max(
-                  maxAbsObjectRefApproxCorrection,
-                  Math.abs(objectRefApproxCorrection));
-              mtasId++;
-            }
-            byte storageFlags;
-            if (maxAbsObjectRefApproxCorrection <= Long.valueOf(Byte.MAX_VALUE)
-                + 1) {
-              storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_BYTE;
-            } else if (maxAbsObjectRefApproxCorrection <= Long
-                .valueOf(Short.MAX_VALUE) + 1) {
-              storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_SHORT;
-            } else if (maxAbsObjectRefApproxCorrection <= Long
-                .valueOf(Integer.MAX_VALUE) + 1) {
-              storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER;
-            } else {
-              storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_LONG;
-            }
-            // update indexObjectId with correction on approximated ref (assume
-            // can be stored as int)
-            mtasId = 0;
-            for (Entry<Integer, Long> objectEntry : memoryIndexDocList
-                .entrySet()) {
-              objectRefApproxCorrection = (objectEntry.getValue()
-                  - (objectRefApproxOffset
-                      + (mtasId * objectRefApproxQuotient)));
-              if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {
-                outIndexObjectId
-                    .writeByte(objectRefApproxCorrection.byteValue());
-              } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_SHORT) {
-                outIndexObjectId
-                    .writeShort(objectRefApproxCorrection.shortValue());
-              } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER) {
-                outIndexObjectId.writeInt(objectRefApproxCorrection.intValue());
+              // store item in tmpDoc
+              outTmpDoc.writeVInt(docId);
+              outTmpDoc.writeVLong(outIndexObjectId.getFilePointer());
+
+              int mtasId = 0;
+              // compute linear approximation (least squares method, integer
+              // constants)
+              long tmpN = memoryIndexDocList.size();
+              long tmpSumY = 0, tmpSumXY = 0;
+              long tmpSumX = 0, tmpSumXX = 0;
+              for (Entry<Integer, Long> objectEntry : memoryIndexDocList
+                  .entrySet()) {
+                assert objectEntry.getKey()
+                    .equals(mtasId) : "unexpected mtasId";
+                tmpSumY += objectEntry.getValue();
+                tmpSumX += mtasId;
+                tmpSumXY += mtasId * objectEntry.getValue();
+                tmpSumXX += mtasId * mtasId;
+                mtasId++;
+              }
+              int objectRefApproxQuotient = (int) (((tmpN * tmpSumXY)
+                  - (tmpSumX * tmpSumY))
+                  / ((tmpN * tmpSumXX) - (tmpSumX * tmpSumX)));
+              long objectRefApproxOffset = (tmpSumY
+                  - objectRefApproxQuotient * tmpSumX) / tmpN;
+              Long objectRefApproxCorrection;
+              long maxAbsObjectRefApproxCorrection = 0;
+              // compute maximum correction
+              mtasId = 0;
+              for (Entry<Integer, Long> objectEntry : memoryIndexDocList
+                  .entrySet()) {
+                objectRefApproxCorrection = (objectEntry.getValue()
+                    - (objectRefApproxOffset
+                        + (mtasId * objectRefApproxQuotient)));
+                maxAbsObjectRefApproxCorrection = Math.max(
+                    maxAbsObjectRefApproxCorrection,
+                    Math.abs(objectRefApproxCorrection));
+                mtasId++;
+              }
+              byte storageFlags;
+              if (maxAbsObjectRefApproxCorrection <= Long
+                  .valueOf(Byte.MAX_VALUE) + 1) {
+                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_BYTE;
+              } else if (maxAbsObjectRefApproxCorrection <= Long
+                  .valueOf(Short.MAX_VALUE) + 1) {
+                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_SHORT;
+              } else if (maxAbsObjectRefApproxCorrection <= Long
+                  .valueOf(Integer.MAX_VALUE) + 1) {
+                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER;
               } else {
-                outIndexObjectId.writeLong(objectRefApproxCorrection);
+                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_LONG;
               }
-              mtasId++;
-            }
-            outTmpDoc.writeVLong(smallestObjectFilepointer);
-            outTmpDoc.writeVInt(objectRefApproxQuotient);
-            outTmpDoc.writeZLong(objectRefApproxOffset);
-            outTmpDoc.writeByte(storageFlags);
-            outTmpDoc.writeVInt(tokenStatsNumber);
-            outTmpDoc.writeVInt(tokenStatsMinPos);
-            outTmpDoc.writeVInt(tokenStatsMaxPos);
-            // clean up
-            memoryIndexDocList.clear();
-          } // end loop over docs
-          inTmpDocsChained.close();
-          inTmpObject.close();
-        }
-        // clean up
-        memoryTmpDocChainList.clear();
-        // remove temporary files
-        state.directory.deleteFile(mtasTmpObjectFileName);
-        state.directory.deleteFile(mtasTmpDocsChainedFileName);
-        // store references for field
+              // update indexObjectId with correction on approximated ref
+              // (assume
+              // can be stored as int)
+              mtasId = 0;
+              for (Entry<Integer, Long> objectEntry : memoryIndexDocList
+                  .entrySet()) {
+                objectRefApproxCorrection = (objectEntry.getValue()
+                    - (objectRefApproxOffset
+                        + (mtasId * objectRefApproxQuotient)));
+                if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {
+                  outIndexObjectId
+                      .writeByte(objectRefApproxCorrection.byteValue());
+                } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_SHORT) {
+                  outIndexObjectId
+                      .writeShort(objectRefApproxCorrection.shortValue());
+                } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER) {
+                  outIndexObjectId
+                      .writeInt(objectRefApproxCorrection.intValue());
+                } else {
+                  outIndexObjectId.writeLong(objectRefApproxCorrection);
+                }
+                mtasId++;
+              }
+              outTmpDoc.writeVLong(smallestObjectFilepointer);
+              outTmpDoc.writeVInt(objectRefApproxQuotient);
+              outTmpDoc.writeZLong(objectRefApproxOffset);
+              outTmpDoc.writeByte(storageFlags);
+              outTmpDoc.writeVInt(tokenStatsNumber);
+              outTmpDoc.writeVInt(tokenStatsMinPos);
+              outTmpDoc.writeVInt(tokenStatsMaxPos);
+              // clean up
+              memoryIndexDocList.clear();
+            } // end loop over docs
+            inTmpDocsChained.close();
+            closeables.remove(inTmpDocsChained);
+            inTmpObject.close();
+            closeables.remove(inTmpObject);
+          }
+          // clean up
+          memoryTmpDocChainList.clear();
+          // remove temporary files
+          state.directory.deleteFile(mtasTmpObjectFileName);
+          state.directory.deleteFile(mtasTmpDocsChainedFileName);
+          // store references for field
 
-      } // end processing field
-    } // end loop fields
-    // close temporary index doc
-    outTmpDoc.close();
-    // close indexField, indexObjectId and object
-    CodecUtil.writeFooter(outTmpField);
-    outTmpField.close();
-    CodecUtil.writeFooter(outIndexObjectId);
-    outIndexObjectId.close();
-    CodecUtil.writeFooter(outObject);
-    outObject.close();
-    CodecUtil.writeFooter(outTerm);
-    outTerm.close();
-    CodecUtil.writeFooter(outPrefix);
-    outPrefix.close();
+        } // end processing field
+      } // end loop fields
+      // close temporary index doc
+      outTmpDoc.close();
+      closeables.remove(outTmpDoc);
+      // close indexField, indexObjectId and object
+      CodecUtil.writeFooter(outTmpField);
+      outTmpField.close();
+      closeables.remove(outTmpField);
+      CodecUtil.writeFooter(outIndexObjectId);
+      outIndexObjectId.close();
+      closeables.remove(outIndexObjectId);
+      CodecUtil.writeFooter(outObject);
+      outObject.close();
+      closeables.remove(outObject);
+      CodecUtil.writeFooter(outTerm);
+      outTerm.close();
+      closeables.remove(outTerm);
+      CodecUtil.writeFooter(outPrefix);
+      outPrefix.close();
+      closeables.remove(outPrefix);
 
-    // create final doc, fill indexObjectPosition, indexObjectParent and
-    // indexTermPrefixPosition, create final field
-    IndexInput inTmpField = state.directory.openInput(mtasTmpFieldFileName,
-        state.context);
-    IndexInput inTmpDoc = state.directory.openInput(mtasTmpDocFileName,
-        state.context);
-    IndexInput inObjectId = state.directory.openInput(mtasIndexObjectIdFileName,
-        state.context);
-    IndexInput inObject = state.directory.openInput(mtasObjectFileName,
-        state.context);
-    IndexInput inTerm = state.directory.openInput(mtasTermFileName,
-        state.context);
-    outField = state.directory.createOutput(mtasIndexFieldFileName,
-        state.context);
-    CodecUtil.writeIndexHeader(outField, name,
-        MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
-        state.segmentSuffix);
-    outField.writeString(delegatePostingsFormatName);
+      // create final doc, fill indexObjectPosition, indexObjectParent and
+      // indexTermPrefixPosition, create final field
+      IndexInput inTmpField = state.directory.openInput(mtasTmpFieldFileName,
+          state.context);
+      closeables.add(inTmpField);
+      IndexInput inTmpDoc = state.directory.openInput(mtasTmpDocFileName,
+          state.context);
+      closeables.add(inTmpDoc);
+      IndexInput inObjectId = state.directory
+          .openInput(mtasIndexObjectIdFileName, state.context);
+      closeables.add(inObjectId);
+      IndexInput inObject = state.directory.openInput(mtasObjectFileName,
+          state.context);
+      closeables.add(inObject);
+      IndexInput inTerm = state.directory.openInput(mtasTermFileName,
+          state.context);
+      closeables.add(inTerm);
+      closeables.add(outField = state.directory
+          .createOutput(mtasIndexFieldFileName, state.context));
+      CodecUtil.writeIndexHeader(outField, name,
+          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),
+          state.segmentSuffix);
+      outField.writeString(delegatePostingsFormatName);
 
-    while (true) {
-      try {
-        // read from tmpField
-        String field = inTmpField.readString();
-        long fpTmpDoc = inTmpField.readVLong();
-        int numberDocs = inTmpField.readVInt();
-        long fpTerm = inTmpField.readVLong();
-        int numberTerms = inTmpField.readVInt();
-        long fpPrefix = inTmpField.readVLong();
-        int numberPrefixes = inTmpField.readVInt();
-        inTmpDoc.seek(fpTmpDoc);
-        long fpFirstDoc = outDoc.getFilePointer();
-        // get prefixId index
-        HashMap<String, Integer> prefixIdIndexField = prefixIdIndex.get(field);
-        // construct MtasRBTree for indexDocId
-        MtasRBTree mtasDocIdTree = new MtasRBTree(true, false);
-        for (int docCounter = 0; docCounter < numberDocs; docCounter++) {
-          try {
+      while (true) {
+        try {
+          // read from tmpField
+          String field = inTmpField.readString();
+          long fpTmpDoc = inTmpField.readVLong();
+          int numberDocs = inTmpField.readVInt();
+          long fpTerm = inTmpField.readVLong();
+          int numberTerms = inTmpField.readVInt();
+          long fpPrefix = inTmpField.readVLong();
+          int numberPrefixes = inTmpField.readVInt();
+          inTmpDoc.seek(fpTmpDoc);
+          long fpFirstDoc = outDoc.getFilePointer();
+          // get prefixId index
+          HashMap<String, Integer> prefixIdIndexField = prefixIdIndex
+              .get(field);
+          // construct MtasRBTree for indexDocId
+          MtasRBTree mtasDocIdTree = new MtasRBTree(true, false);
+          for (int docCounter = 0; docCounter < numberDocs; docCounter++) {
+
             // get info from tmpDoc
             int docId = inTmpDoc.readVInt();
             // filePointer indexObjectId
@@ -1085,7 +1122,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
               MtasToken<String> token = MtasCodecPostingsFormat
                   .getToken(inObject, inTerm, ref);
               String prefix = token.getPrefix();
-              Integer prefixId = prefixIdIndexField.get(prefix);
+              int prefixId = prefixIdIndexField.containsKey(prefix)
+                  ? prefixIdIndexField.get(prefix) : 0;
               token.setPrefixId(prefixId);
               assert token.getId().equals(mtasId) : "unexpected mtasId "
                   + mtasId;
@@ -1119,47 +1157,75 @@ public class MtasFieldsConsumer extends FieldsConsumer {
             outDoc.writeVInt(inTmpDoc.readVInt());
             // add to tree for indexDocId
             mtasDocIdTree.addIdFromDoc(docId, fpDoc);
-          } catch (IOException ex) {
-            break;
           }
+          long fpIndexDocId = storeTree(mtasDocIdTree, outIndexDocId,
+              fpFirstDoc);
 
+          // store in indexField
+          outField.writeString(field);
+          outField.writeVLong(fpFirstDoc);
+          outField.writeVLong(fpIndexDocId);
+          outField.writeVInt(numberDocs);
+          outField.writeVLong(fpTerm);
+          outField.writeVInt(numberTerms);
+          outField.writeVLong(fpPrefix);
+          outField.writeVInt(numberPrefixes);
+        } catch (EOFException e) {
+          break;
         }
-        long fpIndexDocId = storeTree(mtasDocIdTree, outIndexDocId, fpFirstDoc);
-
-        // store in indexField
-        outField.writeString(field);
-        outField.writeVLong(fpFirstDoc);
-        outField.writeVLong(fpIndexDocId);
-        outField.writeVInt(numberDocs);
-        outField.writeVLong(fpTerm);
-        outField.writeVInt(numberTerms);
-        outField.writeVLong(fpPrefix);
-        outField.writeVInt(numberPrefixes);
-      } catch (EOFException e) {
-        break;
+        // end loop over fields
       }
-      // end loop over fields
+      inTerm.close();
+      closeables.remove(inTerm);
+      inObject.close();
+      closeables.remove(inObject);
+      inObjectId.close();
+      closeables.remove(inObjectId);
+      inTmpDoc.close();
+      closeables.remove(inTmpDoc);
+      inTmpField.close();
+      closeables.remove(inTmpField);
+
+      // remove temporary files
+      state.directory.deleteFile(mtasTmpDocFileName);
+      state.directory.deleteFile(mtasTmpFieldFileName);
+      // close indexDoc, indexObjectPosition and indexObjectParent
+      CodecUtil.writeFooter(outDoc);
+      outDoc.close();
+      closeables.remove(outDoc);
+      CodecUtil.writeFooter(outIndexObjectPosition);
+      outIndexObjectPosition.close();
+      closeables.remove(outIndexObjectPosition);
+      CodecUtil.writeFooter(outIndexObjectParent);
+      outIndexObjectParent.close();
+      closeables.remove(outIndexObjectParent);
+      CodecUtil.writeFooter(outIndexDocId);
+      outIndexDocId.close();
+      closeables.remove(outIndexDocId);
+      CodecUtil.writeFooter(outField);
+      outField.close();
+      closeables.remove(outField);
+    } catch (IOException e) {
+      // ignore, can happen when merging segment already written by
+      // delegateFieldsConsumer
+    } finally {
+      IOUtils.closeWhileHandlingException(closeables);
+      try {
+        state.directory.deleteFile(mtasTmpDocsFileName);
+      } catch (IOException e) {
+        // ignore
+      }
+      try {
+        state.directory.deleteFile(mtasTmpDocFileName);
+      } catch (IOException e) {
+        // ignore
+      }
+      try {
+        state.directory.deleteFile(mtasTmpFieldFileName);
+      } catch (IOException e) {
+        // ignore
+      }
     }
-    inObject.close();
-    inObjectId.close();
-    inTmpDoc.close();
-    inTmpField.close();
-
-    // remove temporary files
-    state.directory.deleteFile(mtasTmpDocFileName);
-    state.directory.deleteFile(mtasTmpFieldFileName);
-    // close indexDoc, indexObjectPosition and indexObjectParent
-    CodecUtil.writeFooter(outDoc);
-    outDoc.close();
-    CodecUtil.writeFooter(outIndexObjectPosition);
-    outIndexObjectPosition.close();
-    CodecUtil.writeFooter(outIndexObjectParent);
-    outIndexObjectParent.close();
-    CodecUtil.writeFooter(outIndexDocId);
-    outIndexDocId.close();
-    CodecUtil.writeFooter(outField);
-    outField.close();
-
   }
 
   /**
@@ -1179,9 +1245,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    *          the payload
    * @param outPrefix
    *          the out prefix
-   * @return the integer
    * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @return the integer Signals that an I/O exception has occurred.
    */
   private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
@@ -1219,104 +1284,109 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
       Integer startOffset, Integer endOffset, IndexOutput outPrefix)
       throws IOException {
-    Integer mtasId = null;
-    if (payload != null) {
-      MtasPayloadDecoder payloadDecoder = new MtasPayloadDecoder();
-      payloadDecoder.init(startPosition, Arrays.copyOfRange(payload.bytes,
-          payload.offset, (payload.offset + payload.length)));
-      mtasId = payloadDecoder.getMtasId();
-      Integer mtasParentId = payloadDecoder.getMtasParentId();
-      byte[] mtasPayload = payloadDecoder.getMtasPayload();
-      MtasPosition mtasPosition = payloadDecoder.getMtasPosition();
-      if (mtasPosition == null) {
-        if (startOffset != null) {
-          mtasPosition = new MtasPosition(startOffset, endOffset);
+    try {
+      Integer mtasId = null;
+      if (payload != null) {
+        MtasPayloadDecoder payloadDecoder = new MtasPayloadDecoder();
+        payloadDecoder.init(startPosition, Arrays.copyOfRange(payload.bytes,
+            payload.offset, (payload.offset + payload.length)));
+        mtasId = payloadDecoder.getMtasId();
+        Integer mtasParentId = payloadDecoder.getMtasParentId();
+        byte[] mtasPayload = payloadDecoder.getMtasPayload();
+        MtasPosition mtasPosition = payloadDecoder.getMtasPosition();
+        MtasOffset mtasOffset = payloadDecoder.getMtasOffset();
+        if (mtasOffset == null) {
+          if (startOffset != null) {
+            mtasOffset = new MtasOffset(startOffset, endOffset);
+          }
         }
-      }
-      MtasOffset mtasOffset = payloadDecoder.getMtasOffset();
-      MtasOffset mtasRealOffset = payloadDecoder.getMtasRealOffset();
-      // only if really mtas object
-      if (mtasId != null) {
-        // compute flags
-        int objectFlags = 0;
-        if (mtasPosition != null) {
-          if (mtasPosition.checkType(MtasPosition.POSITION_RANGE)) {
-            objectFlags = objectFlags
-                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE;
-            registerPrefixStatsRangePositionValue(field, term.utf8ToString(),
-                outPrefix);
-          } else if (mtasPosition.checkType(MtasPosition.POSITION_SET)) {
-            objectFlags = objectFlags
-                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET;
-            registerPrefixStatsSetPositionValue(field, term.utf8ToString(),
-                outPrefix);
+        MtasOffset mtasRealOffset = payloadDecoder.getMtasRealOffset();
+        // only if really mtas object
+        if (mtasId != null) {
+          // compute flags
+          int objectFlags = 0;
+          if (mtasPosition != null) {
+            if (mtasPosition.checkType(MtasPosition.POSITION_RANGE)) {
+              objectFlags = objectFlags
+                  | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE;
+              registerPrefixStatsRangePositionValue(field, term.utf8ToString(),
+                  outPrefix);
+            } else if (mtasPosition.checkType(MtasPosition.POSITION_SET)) {
+              objectFlags = objectFlags
+                  | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET;
+              registerPrefixStatsSetPositionValue(field, term.utf8ToString(),
+                  outPrefix);
+            } else {
+              registerPrefixStatsSinglePositionValue(field, term.utf8ToString(),
+                  outPrefix);
+            }
           } else {
-            registerPrefixStatsSinglePositionValue(field, term.utf8ToString(),
-                outPrefix);
+            throw new IOException("no position");
           }
-        }
-        if (mtasParentId != null) {
-          objectFlags = objectFlags
-              | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT;
-        }
-        if (mtasOffset != null) {
-          objectFlags = objectFlags
-              | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET;
-        }
-        if (mtasRealOffset != null) {
-          objectFlags = objectFlags
-              | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET;
-        }
-        if (mtasPayload != null) {
-          objectFlags = objectFlags
-              | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD;
-        }
-        // create object
-        out.writeVInt(mtasId);
-        out.writeVInt(objectFlags);
-        if ((objectFlags
-            & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
-          out.writeVInt(mtasParentId);
-        }
-        if ((objectFlags
-            & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
-          int tmpStart = mtasPosition.getStart();
-          out.writeVInt(tmpStart);
-          out.writeVInt((mtasPosition.getEnd() - tmpStart));
-        } else if ((objectFlags
-            & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
-          TreeSet<Integer> positions = mtasPosition.getPositions();
-          out.writeVInt(positions.size());
-          int tmpPrevious = 0;
-          for (int position : positions) {
-            out.writeVInt((position - tmpPrevious));
-            tmpPrevious = position;
+          if (mtasParentId != null) {
+            objectFlags = objectFlags
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT;
           }
-        } else {
-          out.writeVInt(mtasPosition.getStart());
-        }
-        if ((objectFlags
-            & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
-          int tmpStart = mtasOffset.getStart();
-          out.writeVInt(mtasOffset.getStart());
-          out.writeVInt((mtasOffset.getEnd() - tmpStart));
-        }
-        if ((objectFlags
-            & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
-          int tmpStart = mtasRealOffset.getStart();
-          out.writeVInt(mtasRealOffset.getStart());
-          out.writeVInt((mtasRealOffset.getEnd() - tmpStart));
-        }
-        if ((objectFlags
-            & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
-          out.writeVInt(mtasPayload.length);
-          out.writeBytes(mtasPayload, mtasPayload.length);
-        }
-        out.writeVLong(termRef);
-      } // storage token
-    } // payload available
-
-    return mtasId;
+          if (mtasOffset != null) {
+            objectFlags = objectFlags
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET;
+          }
+          if (mtasRealOffset != null) {
+            objectFlags = objectFlags
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET;
+          }
+          if (mtasPayload != null) {
+            objectFlags = objectFlags
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD;
+          }
+          // create object
+          out.writeVInt(mtasId);
+          out.writeVInt(objectFlags);
+          if ((objectFlags
+              & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
+            out.writeVInt(mtasParentId);
+          }
+          if ((objectFlags
+              & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
+            int tmpStart = mtasPosition.getStart();
+            out.writeVInt(tmpStart);
+            out.writeVInt((mtasPosition.getEnd() - tmpStart));
+          } else if ((objectFlags
+              & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
+            int[] positions = mtasPosition.getPositions();
+            out.writeVInt(positions.length);
+            int tmpPrevious = 0;
+            for (int position : positions) {
+              out.writeVInt((position - tmpPrevious));
+              tmpPrevious = position;
+            }
+          } else {
+            out.writeVInt(mtasPosition.getStart());
+          }
+          if ((objectFlags
+              & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
+            int tmpStart = mtasOffset.getStart();
+            out.writeVInt(mtasOffset.getStart());
+            out.writeVInt((mtasOffset.getEnd() - tmpStart));
+          }
+          if ((objectFlags
+              & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
+            int tmpStart = mtasRealOffset.getStart();
+            out.writeVInt(mtasRealOffset.getStart());
+            out.writeVInt((mtasRealOffset.getEnd() - tmpStart));
+          }
+          if ((objectFlags
+              & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
+            out.writeVInt(mtasPayload.length);
+            out.writeBytes(mtasPayload, mtasPayload.length);
+          }
+          out.writeVLong(termRef);
+        } // storage token
+      } // payload available
+      return mtasId;
+    } catch (Exception e) {
+      throw new IOException(e.getMessage());
+    }
   }
 
   /**
@@ -1360,75 +1430,80 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   private Long storeTree(MtasTreeNode<?> node, boolean isSinglePoint,
       boolean storeAdditionalInformation, IndexOutput out,
       Long nodeRefApproxOffset, long refApproxOffset) throws IOException {
-    if (node != null) {
-      Boolean isRoot = false;
-      if (nodeRefApproxOffset == null) {
-        nodeRefApproxOffset = out.getFilePointer();
-        isRoot = true;
-      }
-      Long fpIndexObjectPositionLeftChild, fpIndexObjectPositionRightChild;
-      if (node.leftChild != null) {
-        fpIndexObjectPositionLeftChild = storeTree(node.leftChild,
-            isSinglePoint, storeAdditionalInformation, out, nodeRefApproxOffset,
-            refApproxOffset);
+    try {
+      if (node != null) {
+        Boolean isRoot = false;
+        if (nodeRefApproxOffset == null) {
+          nodeRefApproxOffset = out.getFilePointer();
+          isRoot = true;
+        }
+        Long fpIndexObjectPositionLeftChild, fpIndexObjectPositionRightChild;
+        if (node.leftChild != null) {
+          fpIndexObjectPositionLeftChild = storeTree(node.leftChild,
+              isSinglePoint, storeAdditionalInformation, out,
+              nodeRefApproxOffset, refApproxOffset);
+        } else {
+          fpIndexObjectPositionLeftChild = (long) 0; // tmp
+        }
+        if (node.rightChild != null) {
+          fpIndexObjectPositionRightChild = storeTree(node.rightChild,
+              isSinglePoint, storeAdditionalInformation, out,
+              nodeRefApproxOffset, refApproxOffset);
+        } else {
+          fpIndexObjectPositionRightChild = (long) 0; // tmp
+        }
+        Long fpIndexObjectPosition = out.getFilePointer();
+        if (node.leftChild == null) {
+          fpIndexObjectPositionLeftChild = fpIndexObjectPosition;
+        }
+        if (node.rightChild == null) {
+          fpIndexObjectPositionRightChild = fpIndexObjectPosition;
+        }
+        if (isRoot) {
+          out.writeVLong(nodeRefApproxOffset);
+          byte flag = 0;
+          if (isSinglePoint) {
+            flag |= MtasTree.SINGLE_POSITION_TREE;
+          }
+          if (storeAdditionalInformation) {
+            flag |= MtasTree.STORE_ADDITIONAL_ID;
+          }
+          out.writeByte(flag);
+        }
+        out.writeVInt(node.left);
+        out.writeVInt(node.right);
+        out.writeVInt(node.max);
+        out.writeVLong((fpIndexObjectPositionLeftChild - nodeRefApproxOffset));
+        out.writeVLong((fpIndexObjectPositionRightChild - nodeRefApproxOffset));
+        if (!isSinglePoint) {
+          out.writeVInt(node.ids.size());
+        }
+        HashMap<Integer, MtasTreeNodeId> ids = node.ids;
+        Long objectRefCorrected;
+        long objectRefCorrectedPrevious = 0;
+        // sort refs
+        List<MtasTreeNodeId> nodeIds = new ArrayList<MtasTreeNodeId>(
+            ids.values());
+        Collections.sort(nodeIds);
+        if (isSinglePoint && (nodeIds.size() != 1)) {
+          throw new IOException(
+              "singlePoint tree, but missing single point...");
+        }
+        for (MtasTreeNodeId nodeId : nodeIds) {
+          objectRefCorrected = (nodeId.ref - refApproxOffset);
+          out.writeVLong((objectRefCorrected - objectRefCorrectedPrevious));
+          objectRefCorrectedPrevious = objectRefCorrected;
+          if (storeAdditionalInformation) {
+            out.writeVInt(nodeId.additionalId);
+            out.writeVLong(nodeId.additionalRef);
+          }
+        }
+        return fpIndexObjectPosition;
       } else {
-        fpIndexObjectPositionLeftChild = (long) 0; // tmp
+        return null;
       }
-      if (node.rightChild != null) {
-        fpIndexObjectPositionRightChild = storeTree(node.rightChild,
-            isSinglePoint, storeAdditionalInformation, out, nodeRefApproxOffset,
-            refApproxOffset);
-      } else {
-        fpIndexObjectPositionRightChild = (long) 0; // tmp
-      }
-      Long fpIndexObjectPosition = out.getFilePointer();
-      if (node.leftChild == null) {
-        fpIndexObjectPositionLeftChild = fpIndexObjectPosition;
-      }
-      if (node.rightChild == null) {
-        fpIndexObjectPositionRightChild = fpIndexObjectPosition;
-      }
-      if (isRoot) {
-        out.writeVLong(nodeRefApproxOffset);
-        byte flag = 0;
-        if (isSinglePoint) {
-          flag |= MtasTree.SINGLE_POSITION_TREE;
-        }
-        if (storeAdditionalInformation) {
-          flag |= MtasTree.STORE_ADDITIONAL_ID;
-        }
-        out.writeByte(flag);
-      }
-      out.writeVInt(node.left);
-      out.writeVInt(node.right);
-      out.writeVInt(node.max);
-      out.writeVLong((fpIndexObjectPositionLeftChild - nodeRefApproxOffset));
-      out.writeVLong((fpIndexObjectPositionRightChild - nodeRefApproxOffset));
-      if (!isSinglePoint) {
-        out.writeVInt(node.ids.size());
-      }
-      HashMap<Integer, MtasTreeNodeId> ids = node.ids;
-      Long objectRefCorrected;
-      long objectRefCorrectedPrevious = 0;
-      // sort refs
-      List<MtasTreeNodeId> nodeIds = new ArrayList<MtasTreeNodeId>(
-          ids.values());
-      Collections.sort(nodeIds);
-      if (isSinglePoint && (nodeIds.size() != 1)) {
-        throw new IOException("singlePoint tree, but missing single point...");
-      }
-      for (MtasTreeNodeId nodeId : nodeIds) {
-        objectRefCorrected = (nodeId.ref - refApproxOffset);
-        out.writeVLong((objectRefCorrected - objectRefCorrectedPrevious));
-        objectRefCorrectedPrevious = objectRefCorrected;
-        if (storeAdditionalInformation) {
-          out.writeVInt(nodeId.additionalId);
-          out.writeVLong(nodeId.additionalRef);
-        }
-      }
-      return fpIndexObjectPosition;
-    } else {
-      return null;
+    } catch (Exception e) {
+      throw new IOException(e.getMessage());
     }
   }
 
@@ -1470,67 +1545,69 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    */
   private void copyObjectAndUpdateStats(int id, IndexInput in, Long inRef,
       IndexOutput out) throws IOException {
-    int mtasId, objectFlags;
-    // read
-    in.seek(inRef);
-    mtasId = in.readVInt();
-    assert id == mtasId : "wrong id detected while copying object";
-    objectFlags = in.readVInt();
-    out.writeVInt(mtasId);
-    out.writeVInt(objectFlags);
-    if ((objectFlags
-        & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
-      out.writeVInt(in.readVInt());
-    }
-    if ((objectFlags
-        & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
-      int minPos = in.readVInt();
-      int maxPos = in.readVInt();
-      out.writeVInt(minPos);
-      out.writeVInt(maxPos);
-      tokenStatsAdd(minPos, maxPos);
-    } else if ((objectFlags
-        & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
-      int size = in.readVInt();
-      out.writeVInt(size);
-      TreeSet<Integer> list = new TreeSet<Integer>();
-      int previousPosition = 0;
-      for (int t = 0; t < size; t++) {
+    try {
+      int mtasId, objectFlags;
+      // read
+      in.seek(inRef);
+      mtasId = in.readVInt();
+      assert id == mtasId : "wrong id detected while copying object";
+      objectFlags = in.readVInt();
+      out.writeVInt(mtasId);
+      out.writeVInt(objectFlags);
+      if ((objectFlags
+          & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
+        out.writeVInt(in.readVInt());
+      }
+      if ((objectFlags
+          & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
+        int minPos = in.readVInt();
+        int maxPos = in.readVInt();
+        out.writeVInt(minPos);
+        out.writeVInt(maxPos);
+        tokenStatsAdd(minPos, maxPos);
+      } else if ((objectFlags
+          & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
+        int size = in.readVInt();
+        out.writeVInt(size);
+        TreeSet<Integer> list = new TreeSet<Integer>();
+        int previousPosition = 0;
+        for (int t = 0; t < size; t++) {
+          int pos = in.readVInt();
+          out.writeVInt(pos);
+          previousPosition = (pos + previousPosition);
+          list.add(previousPosition);
+        }
+        assert list
+            .size() == size : "duplicate positions in set are not allowed";
+        tokenStatsAdd(list.first(), list.last());
+      } else {
         int pos = in.readVInt();
         out.writeVInt(pos);
-        previousPosition = (pos + previousPosition);
-        list.add(previousPosition);
+        tokenStatsAdd(pos, pos);
       }
-      assert list.size() == size : "duplicate positions in set are not allowed";
-      tokenStatsAdd(list.first(), list.last());
-    } else {
-      int pos = in.readVInt();
-      out.writeVInt(pos);
-      tokenStatsAdd(pos, pos);
+      if ((objectFlags
+          & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
+        out.writeVInt(in.readVInt());
+        out.writeVInt(in.readVInt());
+      }
+      if ((objectFlags
+          & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
+        out.writeVInt(in.readVInt());
+        out.writeVInt(in.readVInt());
+      }
+      if ((objectFlags
+          & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
+        int length = in.readVInt();
+        out.writeVInt(length);
+        byte[] payload = new byte[length];
+        in.readBytes(payload, 0, length);
+        out.writeBytes(payload, payload.length);
+      }
+      out.writeVLong(in.readVLong());
+    } catch (Exception e) {
+      throw new IOException(e.getMessage());
     }
-    if ((objectFlags
-        & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
-      out.writeVInt(in.readVInt());
-      out.writeVInt(in.readVInt());
-    }
-    if ((objectFlags
-        & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
-      out.writeVInt(in.readVInt());
-      out.writeVInt(in.readVInt());
-    }
-    if ((objectFlags
-        & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
-      int length = in.readVInt();
-      out.writeVInt(length);
-      byte[] payload = new byte[length];
-      in.readBytes(payload, 0, length);
-      out.writeBytes(payload, payload.length);
-    }
-    out.writeVLong(in.readVLong());
   }
-
-  /** The closed. */
-  private boolean closed;
 
   /*
    * (non-Javadoc)
@@ -1539,10 +1616,6 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    */
   @Override
   public void close() throws IOException {
-    if (closed) {
-      return;
-    }
-    closed = true;
     delegateFieldsConsumer.close();
   }
 

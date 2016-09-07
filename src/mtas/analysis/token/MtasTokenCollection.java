@@ -33,7 +33,8 @@ public class MtasTokenCollection {
   /**
    * Adds the.
    *
-   * @param token the token
+   * @param token
+   *          the token
    * @return the integer
    */
   public Integer add(MtasToken<?> token) {
@@ -45,7 +46,8 @@ public class MtasTokenCollection {
   /**
    * Gets the.
    *
-   * @param id the id
+   * @param id
+   *          the id
    * @return the mtas token
    */
   public MtasToken<?> get(Integer id) {
@@ -56,7 +58,8 @@ public class MtasTokenCollection {
    * Iterator.
    *
    * @return the iterator
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public Iterator<MtasToken<?>> iterator() throws MtasParserException {
     checkTokenCollectionIndex();
@@ -85,7 +88,8 @@ public class MtasTokenCollection {
   /**
    * Prints the.
    *
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public void print() throws MtasParserException {
     Iterator<MtasToken<?>> it = this.iterator();
@@ -99,7 +103,8 @@ public class MtasTokenCollection {
    * Gets the list.
    *
    * @return the list
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public String[][] getList() throws MtasParserException {
     String[][] result = new String[(tokenCollection.size() + 1)][];
@@ -113,15 +118,15 @@ public class MtasTokenCollection {
       MtasToken<?> token = it.next();
       String[] row = new String[15];
       row[0] = token.getId().toString();
-      if(token.getRealOffsetStart() != null) {
+      if (token.getRealOffsetStart() != null) {
         row[1] = token.getRealOffsetStart().toString();
         row[2] = token.getRealOffsetEnd().toString();
-        row[3] = token.getProvideRealOffset()?"1":null;
+        row[3] = token.getProvideRealOffset() ? "1" : null;
       }
-      if(token.getOffsetStart() != null) {
+      if (token.getOffsetStart() != null) {
         row[4] = token.getOffsetStart().toString();
         row[5] = token.getOffsetEnd().toString();
-        row[6] = token.getProvideOffset()?"1":null;
+        row[6] = token.getProvideOffset() ? "1" : null;
       }
       if (token.getPositionLength() != null) {
         if (token.getPositionStart().equals(token.getPositionEnd())) {
@@ -129,7 +134,8 @@ public class MtasTokenCollection {
           row[8] = token.getPositionEnd().toString();
           row[9] = null;
         } else if ((token.getPositions() == null)
-          || (token.getPositions().size() == (1 + token.getPositionEnd() - token.getPositionStart()))) {
+            || (token.getPositions().length == (1 + token.getPositionEnd()
+                - token.getPositionStart()))) {
           row[7] = token.getPositionStart().toString();
           row[8] = token.getPositionEnd().toString();
           row[9] = null;
@@ -139,16 +145,17 @@ public class MtasTokenCollection {
           row[9] = token.getPositions().toString();
         }
       }
-      if(token.getParentId()!=null) {
+      if (token.getParentId() != null) {
         row[10] = token.getParentId().toString();
-        row[11] = token.getProvideParentId()?"1":null;
+        row[11] = token.getProvideParentId() ? "1" : null;
       }
-      if(token.getPayload()!=null) {
-        BytesRef payload = token.getPayload(); 
-        row[12] = Float.toString(PayloadHelper.decodeFloat(Arrays.copyOfRange(payload.bytes, payload.offset, (payload.offset+payload.length))));
+      if (token.getPayload() != null) {
+        BytesRef payload = token.getPayload();
+        row[12] = Float.toString(PayloadHelper.decodeFloat(Arrays.copyOfRange(
+            payload.bytes, payload.offset, (payload.offset + payload.length))));
       }
       row[13] = token.getPrefix();
-      row[14] = token.getPostfix();      
+      row[14] = token.getPostfix();
       result[number] = row;
       number++;
     }
@@ -158,12 +165,20 @@ public class MtasTokenCollection {
   /**
    * Check.
    *
-   * @param autorepair the autorepair
-   * @throws MtasParserException the mtas parser exception
+   * @param autoRepair
+   *          the auto repair
+   * @param makeUnique
+   *          the make unique
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
-  public void check(Boolean autorepair) throws MtasParserException {
-    if (autorepair) {
+  public void check(Boolean autoRepair, Boolean makeUnique)
+      throws MtasParserException {
+    if (autoRepair) {
       autoRepair();
+    }
+    if (makeUnique) {
+      makeUnique();
     }
     checkTokenCollectionIndex();
     for (Integer i : tokenCollectionIndex) {
@@ -174,6 +189,34 @@ public class MtasTokenCollection {
           || tokenCollection.get(i).getValue() == null) {
         clear();
         break;
+      }
+    }
+  }
+
+  /**
+   * Make unique.
+   */
+  private void makeUnique() {
+    HashMap<String, ArrayList<MtasToken<?>>> currentPositionTokens = new HashMap<String, ArrayList<MtasToken<?>>>();
+    ArrayList<MtasToken<?>> currentValueTokens;
+    int currentStartPosition = -1;
+    MtasToken<?> currentToken = null;
+    for (Integer i : tokenCollection.keySet()) {
+      currentToken = tokenCollection.get(i);
+      if (currentToken.getPositionStart() > currentStartPosition) {
+        currentPositionTokens.clear();
+        currentStartPosition = currentToken.getPositionStart();
+      } else {
+        if (currentPositionTokens.containsKey(currentToken.getValue())) {
+          currentValueTokens = currentPositionTokens
+              .get(currentToken.getValue());
+
+        } else {
+          currentValueTokens = new ArrayList<MtasToken<?>>();
+          currentPositionTokens.put(currentToken.getValue(),
+              currentValueTokens);
+        }
+        currentValueTokens.add(currentToken);
       }
     }
   }
@@ -196,6 +239,8 @@ public class MtasTokenCollection {
           || (token.getPositionEnd() == null)) {
         trash.add(i);
       } else if (token.getValue() == null || (token.getValue().equals(""))) {
+        trash.add(i);
+      } else if (token.getPrefix() == null || (token.getPrefix().equals(""))) {
         trash.add(i);
       }
     }
@@ -256,7 +301,8 @@ public class MtasTokenCollection {
   /**
    * Check token collection index.
    *
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private void checkTokenCollectionIndex() throws MtasParserException {
     if (tokenCollectionIndex.size() != tokenCollection.size()) {
@@ -277,6 +323,10 @@ public class MtasTokenCollection {
         } else if (token.getValue() == null || (token.getValue().equals(""))) {
           throw new MtasParserException(
               "no value for token with id " + token.getId());
+        } else if (token.getPrefix() == null
+            || (token.getPrefix().equals(""))) {
+          throw new MtasParserException(
+              "no prefix for token with id " + token.getId());
         } else if ((token.getParentId() != null)
             && !tokenCollection.containsKey(token.getParentId())) {
           throw new MtasParserException(

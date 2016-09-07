@@ -53,7 +53,7 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
 
   // add id to node
   /**
-   * Adds the id.
+   * Adds the id and ref.
    *
    * @param id
    *          the id
@@ -61,6 +61,8 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
    *          the ref
    * @param additionalId
    *          the additional id
+   * @param additionalRef
+   *          the additional ref
    */
   final public void addIdAndRef(Integer id, Long ref, int additionalId,
       long additionalRef) {
@@ -70,7 +72,5 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
       ids.put(id, tnId);
     }
   }
-
- 
 
 }

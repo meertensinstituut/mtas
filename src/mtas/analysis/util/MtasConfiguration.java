@@ -21,24 +21,27 @@ public class MtasConfiguration {
 
   /** The configurations mtas. */
   public static String CONFIGURATIONS_MTAS = "mtas";
-  
+
   /** The configurations configurations. */
   public static String CONFIGURATIONS_CONFIGURATIONS = "configurations";
-  
+
   /** The configurations configuration. */
   public static String CONFIGURATIONS_CONFIGURATION = "configuration";
-  
+
   /** The configurations configuration name. */
   public static String CONFIGURATIONS_CONFIGURATION_NAME = "name";
 
   /** The tokenizer configuration file. */
   public static String TOKENIZER_CONFIGURATION_FILE = "file";
-  
+
   /** The charfilter configuration type. */
   public static String CHARFILTER_CONFIGURATION_TYPE = "type";
-  
+
   /** The charfilter configuration prefix. */
   public static String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
+
+  /** The charfilter configuration postfix. */
+  public static String CHARFILTER_CONFIGURATION_POSTFIX = "postfix";
 
   /** The name. */
   public String name;
@@ -57,7 +60,7 @@ public class MtasConfiguration {
    */
   public MtasConfiguration() {
     name = null;
-    attributes = new HashMap<String,String>();
+    attributes = new HashMap<String, String>();
     children = new ArrayList<MtasConfiguration>();
     parent = null;
   }
@@ -65,11 +68,15 @@ public class MtasConfiguration {
   /**
    * Read configurations.
    *
-   * @param resourceLoader the resource loader
-   * @param configFile the config file
-   * @param className the class name
+   * @param resourceLoader
+   *          the resource loader
+   * @param configFile
+   *          the config file
+   * @param className
+   *          the class name
    * @return the hash map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static HashMap<String, HashMap<String, String>> readConfigurations(
       ResourceLoader resourceLoader, String configFile, String className)
@@ -180,14 +187,17 @@ public class MtasConfiguration {
     }
     return configs;
   }
-  
+
   /**
    * Read mtas char filter configurations.
    *
-   * @param resourceLoader the resource loader
-   * @param configFile the config file
+   * @param resourceLoader
+   *          the resource loader
+   * @param configFile
+   *          the config file
    * @return the hash map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static HashMap<String, MtasConfiguration> readMtasCharFilterConfigurations(
       ResourceLoader resourceLoader, String configFile) throws IOException {
@@ -196,30 +206,37 @@ public class MtasConfiguration {
     if (configs == null) {
       throw new IOException("no configurations");
     } else {
-      HashMap<String, MtasConfiguration> result = new HashMap<String, MtasConfiguration>();      
+      HashMap<String, MtasConfiguration> result = new HashMap<String, MtasConfiguration>();
       for (String name : configs.keySet()) {
         HashMap<String, String> config = configs.get(name);
         if (config.containsKey(CHARFILTER_CONFIGURATION_TYPE)) {
           MtasConfiguration item = new MtasConfiguration();
-          item.attributes.put(CHARFILTER_CONFIGURATION_TYPE, config.get(CHARFILTER_CONFIGURATION_TYPE));
-          item.attributes.put(CHARFILTER_CONFIGURATION_PREFIX, config.get(CHARFILTER_CONFIGURATION_PREFIX));
+          item.attributes.put(CHARFILTER_CONFIGURATION_TYPE,
+              config.get(CHARFILTER_CONFIGURATION_TYPE));
+          item.attributes.put(CHARFILTER_CONFIGURATION_PREFIX,
+              config.get(CHARFILTER_CONFIGURATION_PREFIX));
+          item.attributes.put(CHARFILTER_CONFIGURATION_POSTFIX,
+              config.get(CHARFILTER_CONFIGURATION_POSTFIX));
           result.put(name, item);
         } else {
           throw new IOException("configuration " + name + " has no "
               + CHARFILTER_CONFIGURATION_TYPE);
-        }       
+        }
       }
       return result;
     }
-  }  
+  }
 
   /**
    * Read mtas tokenizer configurations.
    *
-   * @param resourceLoader the resource loader
-   * @param configFile the config file
+   * @param resourceLoader
+   *          the resource loader
+   * @param configFile
+   *          the config file
    * @return the hash map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static HashMap<String, MtasConfiguration> readMtasTokenizerConfigurations(
       ResourceLoader resourceLoader, String configFile) throws IOException {
@@ -246,9 +263,11 @@ public class MtasConfiguration {
   /**
    * Read configuration.
    *
-   * @param reader the reader
+   * @param reader
+   *          the reader
    * @return the mtas configuration
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static MtasConfiguration readConfiguration(InputStream reader)
       throws IOException {
@@ -316,27 +335,29 @@ public class MtasConfiguration {
     }
     return null;
   }
-  
-//  public String toString() {
-//    return toString(0);
-//  }
-//  
-//  private String toString(int indent) {
-//    String text = "";
-//    if(name!=null) {
-//      text+=(indent>0?String.format("%"+indent+"s", ""):"")+"name: "+name+"\n";
-//    }
-//    if(attributes!=null) {
-//      for(String key : attributes.keySet()) {
-//        text+=(indent>0?String.format("%"+indent+"s", ""):"")+key+": "+attributes.get(key)+"\n";
-//      }
-//    }
-//    if(children!=null) {
-//      for(MtasConfiguration child : children) {
-//        text+=(indent>0?String.format("%"+indent+"s", ""):"")+child.toString(indent+2);
-//      }
-//    }
-//    return text;    
-//  }
+
+  // public String toString() {
+  // return toString(0);
+  // }
+  //
+  // private String toString(int indent) {
+  // String text = "";
+  // if(name!=null) {
+  // text+=(indent>0?String.format("%"+indent+"s", ""):"")+"name: "+name+"\n";
+  // }
+  // if(attributes!=null) {
+  // for(String key : attributes.keySet()) {
+  // text+=(indent>0?String.format("%"+indent+"s", ""):"")+key+":
+  // "+attributes.get(key)+"\n";
+  // }
+  // }
+  // if(children!=null) {
+  // for(MtasConfiguration child : children) {
+  // text+=(indent>0?String.format("%"+indent+"s",
+  // ""):"")+child.toString(indent+2);
+  // }
+  // }
+  // return text;
+  // }
 
 }

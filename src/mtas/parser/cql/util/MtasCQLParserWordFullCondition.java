@@ -11,19 +11,21 @@ import org.apache.lucene.search.spans.SpanQuery;
 /**
  * The Class MtasCQLParserWordFullCondition.
  */
-public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePartCondition {
+public class MtasCQLParserWordFullCondition
+    extends MtasCQLParserBasicSentencePartCondition {
 
   /** The word condition. */
-  private MtasCQLParserWordCondition wordCondition;  
+  private MtasCQLParserWordCondition wordCondition;
 
   /**
    * Instantiates a new mtas cql parser word full condition.
    *
-   * @param condition the condition
+   * @param condition
+   *          the condition
    */
   public MtasCQLParserWordFullCondition(MtasCQLParserWordCondition condition) {
     minimumOccurence = 1;
-    maximumOccurence = 1;    
+    maximumOccurence = 1;
     optional = false;
     condition.simplify();
     if (condition.not()) {
@@ -44,8 +46,6 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
     return wordCondition;
   }
 
-  
-
   /**
    * Checks if is empty.
    *
@@ -54,9 +54,12 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
   public boolean isEmpty() {
     return wordCondition.isEmpty();
   }
-  
-  /* (non-Javadoc)
-   * @see mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#getQuery()
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#getQuery()
    */
   @Override
   public SpanQuery getQuery() throws ParseException {
@@ -70,12 +73,12 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
         q = wordCondition.getPositiveQuery(0);
       } else {
         if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {
-          q = new MtasSpanAndQuery(wordCondition.getPositiveQuery().toArray(
-              new SpanQuery[wordCondition.getPositiveQuery().size()]));
-        } else if (wordCondition.type().equals(
-            MtasCQLParserWordCondition.TYPE_OR)) {
-          q = new MtasSpanOrQuery(wordCondition.getPositiveQuery().toArray(
-              new SpanQuery[wordCondition.getPositiveQuery().size()]));
+          q = new MtasSpanAndQuery(wordCondition.getPositiveQuery()
+              .toArray(new SpanQuery[wordCondition.getPositiveQuery().size()]));
+        } else if (wordCondition.type()
+            .equals(MtasCQLParserWordCondition.TYPE_OR)) {
+          q = new MtasSpanOrQuery(wordCondition.getPositiveQuery()
+              .toArray(new SpanQuery[wordCondition.getPositiveQuery().size()]));
         } else {
           throw new ParseException("unknown type " + wordCondition.type());
         }
@@ -96,8 +99,8 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
         if (wordCondition.getNegativeQuery().size() == 1) {
           qNegative = wordCondition.getNegativeQuery(0);
         } else {
-          qNegative = new MtasSpanOrQuery(wordCondition.getNegativeQuery().toArray(
-              new SpanQuery[wordCondition.getNegativeQuery().size()]));
+          qNegative = new MtasSpanOrQuery(wordCondition.getNegativeQuery()
+              .toArray(new SpanQuery[wordCondition.getNegativeQuery().size()]));
         }
         q = new SpanNotQuery(qPositive, qNegative);
       } else if (wordCondition.type()
@@ -106,8 +109,8 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
         if (wordCondition.getPositiveQuery().size() == 1) {
           qPositive = wordCondition.getPositiveQuery(0);
         } else {
-          qPositive = new MtasSpanOrQuery(wordCondition.getPositiveQuery().toArray(
-              new SpanQuery[wordCondition.getPositiveQuery().size()]));
+          qPositive = new MtasSpanOrQuery(wordCondition.getPositiveQuery()
+              .toArray(new SpanQuery[wordCondition.getPositiveQuery().size()]));
         }
         if (wordCondition.getNegativeQuery().size() == 1) {
           qNegative = wordCondition.getNegativeQuery(0);
@@ -120,27 +123,29 @@ public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePa
         throw new ParseException("unknown type " + wordCondition.type());
       }
     }
-    if(not) {
+    if (not) {
       SpanQuery qPositive = new MtasSpanMatchAllQuery(wordCondition.field());
       q = new SpanNotQuery(qPositive, q);
     }
     return q;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object object) {
-    if(object==null) 
+    if (object == null)
       return false;
-    if(object instanceof MtasCQLParserWordFullCondition) {
-      MtasCQLParserWordFullCondition word = (MtasCQLParserWordFullCondition) object;      
-      if(!wordCondition.equals(word.wordCondition))
+    if (object instanceof MtasCQLParserWordFullCondition) {
+      MtasCQLParserWordFullCondition word = (MtasCQLParserWordFullCondition) object;
+      if (!wordCondition.equals(word.wordCondition))
         return false;
-      if(not!=word.not)
+      if (not != word.not)
         return false;
-      return true;    
+      return true;
     } else {
       return false;
     }

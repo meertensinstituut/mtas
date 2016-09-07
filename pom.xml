@@ -2,11 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<currentDevelopmentVersion>6.2.0</currentDevelopmentVersion>
+		<currentDevelopmentRelease>20160802</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>6.1.0</version>
+	<version>6.2.0</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -23,12 +25,12 @@
 	<developers>
 		<developer>
 			<name>Matthijs Brouwer</name>
-			<url>https://www.meertens.knaw.nl/cms/nl/medewerkers/144373-matthijsb</url>
+			<url>https://nl.linkedin.com/in/brouwermatthijs/</url>
 		</developer>
 		<developer>
-      <name>Marc Kemps-Snijders</name>
-      <url>https://www.meertens.knaw.nl/cms/nl/medewerkers/143329-marck</url>
-    </developer>
+			<name>Marc Kemps-Snijders</name>
+			<url>https://nl.linkedin.com/in/marc-kemps-snijders-1b33753</url>
+		</developer>
 	</developers>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -39,6 +41,24 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>gh-pages</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<excludes>
+                <exclude>**/.git/</exclude>
+              </excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
@@ -46,7 +66,7 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-			</plugin>			
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
@@ -145,27 +165,27 @@
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
-				<version>6.1.0</version>
+				<version>6.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-analyzers-common</artifactId>
-				<version>6.1.0</version>
+				<version>6.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-queryparser</artifactId>
-				<version>6.1.0</version>
+				<version>6.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-codecs</artifactId>
-				<version>6.1.0</version>
+				<version>6.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-core</artifactId>
-				<version>6.1.0</version>
+				<version>6.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
