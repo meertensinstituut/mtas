@@ -1,6 +1,6 @@
 # Statistics - tokens
 
-To produce statistics on the number of tokens within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the number of tokens within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|

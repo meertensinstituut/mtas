@@ -1,6 +1,6 @@
 # Statistics - spans
 
-To produce statistics on the occurrence of a span within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the occurrence of a span within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|

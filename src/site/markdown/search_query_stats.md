@@ -1,6 +1,6 @@
 # Statistics
 
-To produce statistics, besides the parameter to enable [mtas queries](search_query.html), the following parameter should be used.
+To get statistics, besides the parameter to enable [mtas queries](search_query.html), the following parameter should be used.
 
 | Parameter   |  Value | Obligatory  |
 |-------------|--------|-------------|
