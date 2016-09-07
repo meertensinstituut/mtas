@@ -9,10 +9,10 @@
 
 ### Search
 * Supports [CQL](search_cql.html) query language.
-* [Statistics](search_statistics.html) on number of [words](search_query_stats_positions.html), [tokens](search_query_stats_tokens.html) and [spans](search_query_stats_spans.html).
+* [Statistics](search_stats.html) on number of [words](search_query_stats_positions.html), [tokens](search_query_stats_tokens.html) and [spans](search_query_stats_spans.html).
 * Usage of [functions](search_functions.html) to produce statistics for custom defined relations between multiple spans and/or number of words.
-* [Facets](search_facet.html) with [statistics](search_statistics.html) on hits.
-* [Kwic and lists](search_kwic_and_list.html), [termvectors](search_termvector.html) and [grouping](search_group.html) for spans.
+* [Facets](search_query_facet.html) with [statistics](search_stats.html) on hits.
+* [Kwic and lists](search_query_kwic_and_list.html), [termvectors](search_query_termvector.html) and [grouping](search_query_group.html) for spans.
 
 
 ### Solr
