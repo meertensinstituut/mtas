@@ -47,7 +47,7 @@ public class MtasCQLParserSentenceCondition {
   public MtasCQLParserSentenceCondition(MtasCQLParserBasicSentenceCondition s)
       throws ParseException {
     sequenceList = new ArrayList<List<MtasCQLParserSentenceCondition>>();
-    basicSentence = s;
+    basicSentence = s;    
     minimumOccurence = 1;
     maximumOccurence = 1;
     simplified = false;

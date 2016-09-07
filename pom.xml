@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>6.2.0</currentDevelopmentVersion>
 		<currentDevelopmentRelease>20160802</currentDevelopmentRelease>
 	</properties>
@@ -84,7 +84,7 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
-			</plugin>
+			</plugin>						
 		</plugins>
 	</build>
 	<reporting>
@@ -194,5 +194,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 </project>

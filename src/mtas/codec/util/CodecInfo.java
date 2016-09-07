@@ -274,7 +274,7 @@ public class CodecInfo {
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
       MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
-          inTerm, hit.ref);
+          inTerm, hit.ref); 
       if (token != null) {
         if (prefixes.size() > 0) {
           if (prefixes.contains(token.getPrefix())) {

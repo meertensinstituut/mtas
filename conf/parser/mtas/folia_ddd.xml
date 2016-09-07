@@ -19,8 +19,12 @@
 
 		<!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
 		<autorepair value="true" />
+<<<<<<< HEAD
 		<makeunique value="true" />
     <!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
+=======
+		<!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
+>>>>>>> cac6601c611fd300b075447ee1eb8299e5bffc90
 
 		<!-- START REFERENCES -->
 		<references>

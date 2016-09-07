@@ -23,7 +23,10 @@ import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.parser.function.util.MtasFunctionParserFunctionDefault;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.lucene.search.spans.SpanQuery;
+import org.apache.lucene.util.automaton.Automata;
+import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
+import org.apache.lucene.util.automaton.Operations;
 import org.apache.lucene.util.automaton.RegExp;
 
 /**

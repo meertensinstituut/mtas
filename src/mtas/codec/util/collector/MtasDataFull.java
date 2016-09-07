@@ -158,6 +158,22 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);
   }
 
+  public void reduceToSegmentKeys() {
+    if(segmentRegistration != null) {
+      int sizeCopy = size;
+      String[] keyListCopy = keyList.clone();
+      T1[][] fullValueListCopy = fullValueList.clone(); 
+      size = 0;
+      for(int i=0; i< sizeCopy; i++) {
+        if(segmentKeys.contains(keyListCopy[i])) {
+          keyList[size] = keyListCopy[i];
+          fullValueList[size] = fullValueListCopy[i];
+          size++;
+        }
+      } 
+    }  
+  }
+
   /*
    * (non-Javadoc)
    * 

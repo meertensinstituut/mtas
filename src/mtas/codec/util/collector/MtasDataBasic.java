@@ -228,6 +228,24 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
         tmpOldSize);
   }
 
+  public void reduceToSegmentKeys() {
+    if (segmentRegistration != null) {
+      int sizeCopy = size;
+      String[] keyListCopy = keyList.clone();
+      T1[] basicValueSumListCopy = basicValueSumList.clone();
+      long[] basicValueNListCopy = basicValueNList.clone();
+      size = 0;
+      for (int i = 0; i < sizeCopy; i++) {
+        if (segmentKeys.contains(keyListCopy[i])) {
+          keyList[size] = keyListCopy[i];
+          basicValueSumList[size] = basicValueSumListCopy[i];
+          basicValueNList[size] = basicValueNListCopy[i];
+          size++;
+        }
+      }
+    }
+  }
+
   /*
    * (non-Javadoc)
    * 

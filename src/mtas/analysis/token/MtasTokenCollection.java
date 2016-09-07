@@ -1,5 +1,6 @@
 package mtas.analysis.token;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,7 +96,7 @@ public class MtasTokenCollection {
     Iterator<MtasToken<?>> it = this.iterator();
     while (it.hasNext()) {
       MtasToken<?> token = it.next();
-      System.out.println(token);
+      System.out.println(token);      
     }
   }
 
@@ -237,7 +238,7 @@ public class MtasTokenCollection {
         trash.add(i);
       } else if ((token.getPositionStart() == null)
           || (token.getPositionEnd() == null)) {
-        trash.add(i);
+        trash.add(i);        
       } else if (token.getValue() == null || (token.getValue().equals(""))) {
         trash.add(i);
       } else if (token.getPrefix() == null || (token.getPrefix().equals(""))) {

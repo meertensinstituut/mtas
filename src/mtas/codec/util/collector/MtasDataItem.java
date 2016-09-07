@@ -38,7 +38,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
 
   /** The error list. */
   protected HashMap<String, Integer> errorList;
-
+  
   /** The comparable sort value. */
   protected NumberComparator<?> comparableSortValue;
 
@@ -101,7 +101,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    */
   public abstract Map<String, Object> rewrite(boolean showDebugInfo)
       throws IOException;
-
+  
   /**
    * Gets the sub.
    *

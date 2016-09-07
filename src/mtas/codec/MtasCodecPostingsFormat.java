@@ -285,6 +285,10 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
     } catch (Exception e) {
       throw new IOException(e.getMessage());
     }
+    Long termRef = inObject.readVLong();
+    inTerm.seek(termRef);
+    token.setTermRef(termRef);
+    token.setValue(inTerm.readString());
     return token;
   }
 

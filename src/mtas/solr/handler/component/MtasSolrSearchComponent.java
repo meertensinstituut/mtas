@@ -436,8 +436,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
    * (non-Javadoc)
    * 
    * @see
-   * org.apache.solr.handler.component.SearchComponent#finishStage(org.apache.
-   * solr.handler.component.ResponseBuilder)
+   * org.apache.solr.handler.component.SearchComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder)
    */
   @Override
   public void finishStage(ResponseBuilder rb) {
@@ -549,7 +549,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
           return STAGE_GROUP;
         }
       }
-
     }
     return ResponseBuilder.STAGE_DONE;
   }
@@ -562,15 +561,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
    * @return the mtas fields
    */
 
-  /**
-   * Gets the mtas fields.
-   *
-   * @param rb
-   *          the rb
-   * @return the mtas fields
-   */
   private ComponentFields getMtasFields(ResponseBuilder rb) {
     return (ComponentFields) rb.req.getContext().get(ComponentFields.class);
   }
+
 
 }

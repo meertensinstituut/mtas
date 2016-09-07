@@ -201,6 +201,32 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
         tmpOldSize);
   }
 
+  public void reduceToSegmentKeys() {
+    if(segmentRegistration != null) {
+      int sizeCopy = size;
+      String[] keyListCopy = keyList.clone();
+      T1[] advancedValueSumListCopy = advancedValueSumList.clone(); 
+      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone(); 
+      T1[] advancedValueMinListCopy = advancedValueMinList.clone(); 
+      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList.clone(); 
+      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone(); 
+      long[] advancedValueNListCopy = advancedValueNList.clone(); 
+      size = 0;
+      for(int i=0; i< sizeCopy; i++) {
+        if(segmentKeys.contains(keyListCopy[i])) {
+          keyList[size] = keyListCopy[i];
+          advancedValueSumList[size] = advancedValueSumListCopy[i];
+          advancedValueMaxList[size] = advancedValueMaxListCopy[i];
+          advancedValueMinList[size] = advancedValueMinListCopy[i];
+          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];
+          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];
+          advancedValueNList[size] = advancedValueNListCopy[i];
+          size++;
+        }
+      } 
+    }  
+  }
+  
   /*
    * (non-Javadoc)
    * 

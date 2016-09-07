@@ -92,7 +92,7 @@ public final class MtasTokenizer<T> extends Tokenizer {
    *           Signals that an I/O exception has occurred.
    */
   public MtasTokenizer(MtasConfiguration config) throws IOException {
-    processConfiguration(config);
+    processConfiguration(config);    
   }
 
   /**

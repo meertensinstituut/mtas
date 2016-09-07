@@ -1,3 +1,1 @@
 #Mtas and Solr
-
-

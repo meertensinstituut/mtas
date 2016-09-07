@@ -41,7 +41,8 @@ final public class MtasSketchParser extends MtasBasicParser {
   /**
    * Instantiates a new mtas sketch parser.
    *
-   * @param config the config
+   * @param config
+   *          the config
    */
   public MtasSketchParser(MtasConfiguration config) {
     super(config);
@@ -363,7 +364,8 @@ final public class MtasSketchParser extends MtasBasicParser {
   /**
    * Prints the config types.
    *
-   * @param types the types
+   * @param types
+   *          the types
    * @return the string
    */
   private String printConfigTypes(HashMap<?, MtasParserType> types) {
@@ -378,15 +380,8 @@ final public class MtasSketchParser extends MtasBasicParser {
     return text;
   }
 
-  /**
-   * The Class MtasSketchParserMappingWord.
-   */
   private class MtasSketchParserMappingWord
       extends MtasParserMapping<MtasSketchParserMappingWord> {
-
-    /**
-     * Instantiates a new mtas sketch parser mapping word.
-     */
     public MtasSketchParserMappingWord() {
       super();
       this.position = SOURCE_OWN;
@@ -394,17 +389,13 @@ final public class MtasSketchParser extends MtasBasicParser {
       this.offset = SOURCE_OWN;
       this.type = MAPPING_TYPE_WORD;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
-     */
+    
     @Override
     protected MtasSketchParserMappingWord self() {
       return this;
     }
   }
+
 
   /**
    * The Class MtasSketchParserMappingWordAnnotation.

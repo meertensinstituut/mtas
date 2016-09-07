@@ -2138,8 +2138,9 @@ public class CodecCollector {
             .checkExistenceNecessaryKeys()) {
           needSecondRound = true;
         }
-      }
-    }
+        termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();
+      }      
+    }    
     return needSecondRound;
   }
 

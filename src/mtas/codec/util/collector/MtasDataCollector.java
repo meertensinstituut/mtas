@@ -891,7 +891,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Reduce to segment keys.
    */
-  public final void reduceToSegmentKeys() {
+  public void reduceToSegmentKeys() {
     if (segmentRegistration != null) {
       reduceToKeys(segmentKeys);
     }
