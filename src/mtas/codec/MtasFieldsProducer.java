@@ -1,6 +1,10 @@
 package mtas.codec;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +20,7 @@ import org.apache.lucene.index.IndexFormatTooOldException;
 import org.apache.lucene.index.SegmentReadState;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.store.IndexInput;
+import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
 
@@ -52,6 +57,7 @@ public class MtasFieldsProducer extends FieldsProducer {
     indexInputList = new HashMap<String, IndexInput>();
     indexInputOffsetList = new HashMap<String, Long>();
     version = MtasCodecPostingsFormat.VERSION_CURRENT;
+
     postingsFormatName = addIndexInputToList("object", openMtasFile(state, name,
         MtasCodecPostingsFormat.MTAS_OBJECT_EXTENSION), postingsFormatName);
     addIndexInputToList("term",
@@ -85,49 +91,14 @@ public class MtasFieldsProducer extends FieldsProducer {
               MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
               version, version),
           postingsFormatName);
-    } catch (IndexFormatTooOldException e1) {
-      version = MtasCodecPostingsFormat.VERSION_OLD_2;
-      try {
-        addIndexInputToList("doc",
-            openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
-            postingsFormatName);
-        addIndexInputToList("indexObjectPosition",
-            openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION,
-                version, version),
-            postingsFormatName);
-        addIndexInputToList("indexObjectParent",
-            openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
-                version, version),
-            postingsFormatName);
-      } catch (IndexFormatTooOldException e2) {
-        version = MtasCodecPostingsFormat.VERSION_OLD_1;
-        addIndexInputToList("doc",
-            openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),
-            postingsFormatName);
-        addIndexInputToList("indexObjectPosition",
-            openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION,
-                version, version),
-            postingsFormatName);
-        addIndexInputToList("indexObjectParent",
-            openMtasFile(state, name,
-                MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
-                version, version),
-            postingsFormatName);
-      }
-    }
-    if (version == MtasCodecPostingsFormat.VERSION_OLD_2) {
-      throw new IOException("This MTAS doesn't support index version " + version
-          + ", please upgrade");
+    } catch (IndexFormatTooOldException e) {
+      throw new IOException(
+          "This MTAS doesn't support your index version, please upgrade");
     }
     // Load the delegate postingsFormatName from this file
     this.delegateFieldsProducer = PostingsFormat.forName(postingsFormatName)
         .fieldsProducer(state);
-  }
+  }  
 
   /**
    * Adds the index input to list.

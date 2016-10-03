@@ -159,7 +159,7 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   }
 
   public void reduceToSegmentKeys() {
-    if(segmentRegistration != null) {
+    if(segmentRegistration != null && size>0) {
       int sizeCopy = size;
       String[] keyListCopy = keyList.clone();
       T1[][] fullValueListCopy = fullValueList.clone(); 

@@ -17,6 +17,7 @@ import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.Operations;
 import org.apache.lucene.util.automaton.RegExp;
+import org.apache.lucene.util.automaton.TooComplexToDeterminizeException;
 
 /**
  * The Class MtasToken.
@@ -727,24 +728,40 @@ public abstract class MtasToken<GenericType> {
    * @param valueList
    *          the value list
    * @return the list
+   * @throws IOException 
    */
   public static List<CompiledAutomaton> createAutomata(String prefix,
-      List<String> valueList) {
+      List<String> valueList) throws IOException {
     List<CompiledAutomaton> list = new ArrayList<CompiledAutomaton>();
-    int step = 100;
+    int step = 500;
     for (int i = 0; i < valueList.size(); i += step) {
-      int next = Math.min(valueList.size(), i + step);
-      List<Automaton> listAutomaton = new ArrayList<Automaton>();
-      for (int j = i; j < next; j++) {
-        String value = valueList.get(j);
-        value = value.replaceAll("([\\\"\\)\\(\\<\\>\\.\\@\\#\\]\\[\\{\\}])",
-            "\\\\\\1");
-        listAutomaton
-            .add((new RegExp(prefix + MtasToken.DELIMITER + value + "\u0000*"))
-                .toAutomaton());
-      }
-      Automaton automaton = Operations.union(listAutomaton);
-      CompiledAutomaton compiledAutomaton = new CompiledAutomaton(automaton);
+      int localStep = step;
+      boolean success=false;
+      CompiledAutomaton compiledAutomaton = null;
+      while(!success) {
+        success=true;
+        int next = Math.min(valueList.size(), i + localStep);
+        List<Automaton> listAutomaton = new ArrayList<Automaton>();
+        for (int j = i; j < next; j++) {
+          String value = valueList.get(j);
+          value = value.replaceAll("([\\\"\\)\\(\\<\\>\\.\\@\\#\\]\\[\\{\\}])",
+              "\\\\\\1");
+          listAutomaton
+              .add((new RegExp(prefix + MtasToken.DELIMITER + value + "\u0000*"))
+                  .toAutomaton());
+        }
+        Automaton automaton = Operations.union(listAutomaton);
+        try {
+          compiledAutomaton = new CompiledAutomaton(automaton);
+        } catch (TooComplexToDeterminizeException e) {
+          success=false;
+          if(localStep>1) {
+            localStep/=2;
+          } else {
+            throw new IOException("TooComplexToDeterminizeException");
+          }
+        }
+      }  
       list.add(compiledAutomaton);
     }
     return list;

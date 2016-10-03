@@ -229,7 +229,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   }
 
   public void reduceToSegmentKeys() {
-    if (segmentRegistration != null) {
+    if (segmentRegistration != null && size>0) {
       int sizeCopy = size;
       String[] keyListCopy = keyList.clone();
       T1[] basicValueSumListCopy = basicValueSumList.clone();

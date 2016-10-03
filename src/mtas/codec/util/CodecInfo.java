@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
+
 import mtas.analysis.token.MtasToken;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.tree.IntervalRBTree;
@@ -121,7 +123,7 @@ public class CodecInfo {
       } catch (Exception ex) {
         break;
       }
-    }
+    }  
     // prefixReferences
     prefixReferences = new HashMap<String, LinkedHashMap<String, Long>>();
   }
@@ -249,10 +251,14 @@ public class CodecInfo {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectPosition = indexInputList
         .get("indexObjectPosition");
-    ArrayList<MtasTreeHit<?>> hits = CodecSearchTree.searchMtasTree(
-        startPosition, endPosition, inIndexObjectPosition,
-        doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
-    return getPrefixFilteredObjects(hits, prefixes);
+    if (doc != null) {
+      ArrayList<MtasTreeHit<?>> hits = CodecSearchTree.searchMtasTree(
+          startPosition, endPosition, inIndexObjectPosition,
+          doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
+      return getPrefixFilteredObjects(hits, prefixes);
+    } else {
+      return new ArrayList<MtasToken<String>>();
+    }
   }
 
   /**
@@ -274,7 +280,7 @@ public class CodecInfo {
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
       MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
-          inTerm, hit.ref); 
+          inTerm, hit.ref);
       if (token != null) {
         if (prefixes.size() > 0) {
           if (prefixes.contains(token.getPrefix())) {
@@ -333,22 +339,12 @@ public class CodecInfo {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectPosition = indexInputList
         .get("indexObjectPosition");
-    ArrayList<MtasTreeHit<?>> hitItems = CodecSearchTree.searchMtasTree(
-        startPosition, endPosition, inIndexObjectPosition,
-        doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
-    ArrayList<MtasTreeHit<String>> hits = new ArrayList<MtasTreeHit<String>>();
-    if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
-      // old way
-      ArrayList<MtasToken<String>> objects = getObjects(hitItems);
-      for (MtasToken<String> token : objects) {
-        if (prefixes.contains(token.getPrefix())) {
-          MtasTreeHit<String> hit = new MtasTreeHit<String>(
-              token.getPositionStart(), token.getPositionEnd(),
-              token.getTokenRef(), 0, token.getValue());
-          hits.add(hit);
-        }
-      }
-    } else {
+    if (doc != null) {
+      ArrayList<MtasTreeHit<?>> hitItems = CodecSearchTree.searchMtasTree(
+          startPosition, endPosition, inIndexObjectPosition,
+          doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
+      ArrayList<MtasTreeHit<String>> hits = new ArrayList<MtasTreeHit<String>>();
+
       HashMap<String, Integer> prefixIds = getPrefixesIds(field, prefixes);
       if (prefixIds != null && prefixIds.size() > 0) {
         ArrayList<MtasTreeHit<?>> filteredHitItems = new ArrayList<MtasTreeHit<?>>();
@@ -362,13 +358,15 @@ public class CodecInfo {
           for (MtasToken<String> token : objects) {
             MtasTreeHit<String> hit = new MtasTreeHit<String>(
                 token.getPositionStart(), token.getPositionEnd(),
-                token.getTokenRef(), 0, token.getValue());
+                token.getTokenRef(), 0, 0, token.getValue());
             hits.add(hit);
           }
         }
       }
+      return hits;
+    } else {
+      return new ArrayList<MtasTreeHit<String>>();
     }
-    return hits;
   }
 
   /**
@@ -397,28 +395,36 @@ public class CodecInfo {
     // create tree interval hits
     IntervalRBTree<String> positionTree = new IntervalRBTree<String>(
         positionsHits);
-    if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
-      CodecSearchTree.searchMtasTreeWithIntervalTree(null, positionTree,
-          inIndexObjectPosition, doc.fpIndexObjectPosition,
-          doc.smallestObjectFilepointer);
-    } else {
-      // find prefixIds
-      HashMap<String, Integer> prefixIds = getPrefixesIds(field, prefixes);
-      // search matching tokens
+
+    // find prefixIds
+    HashMap<String, Integer> prefixIds = getPrefixesIds(field, prefixes);
+    // search matching tokens
+    if (prefixIds != null) {
       CodecSearchTree.searchMtasTreeWithIntervalTree(prefixIds.values(),
           positionTree, inIndexObjectPosition, doc.fpIndexObjectPosition,
           doc.smallestObjectFilepointer);
-    }
-    for (IntervalTreeNodeData<String> positionHit : positionsHits) {
-      for (MtasTreeHit<String> hit : positionHit.list) {
-        if (hit.data == null) {
-          MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
-              inTerm, hit.ref);
-          hit.data = token.getValue();
+
+      // reverse list
+      HashMap<Integer, String> idPrefixes = new HashMap<Integer, String>();
+      for (Entry<String, Integer> entry : prefixIds.entrySet()) {
+        idPrefixes.put(entry.getValue(), entry.getKey());
+      }
+      // term administration
+      HashMap<Long, String> refTerms = new HashMap<Long, String>();
+
+      for (IntervalTreeNodeData<String> positionHit : positionsHits) {
+        for (MtasTreeHit<String> hit : positionHit.list) {
+          if (hit.idData == null) {
+            hit.idData = idPrefixes.get(hit.additionalId);
+            if (!refTerms.containsKey(hit.additionalRef)) {
+              refTerms.put(hit.additionalRef,
+                  MtasCodecPostingsFormat.getTerm(inTerm, hit.additionalRef));
+            }
+            hit.refData = refTerms.get(hit.additionalRef);
+          }
         }
       }
-    }
-
+    } 
   }
 
   /**
@@ -463,7 +469,8 @@ public class CodecInfo {
         inTerm.seek(hit.ref);
         String term = inTerm.readString();
         MtasTreeHit<String> newHit = new MtasTreeHit<String>(hit.startPosition,
-            hit.endPosition, hit.ref, hit.additionalId, term);
+            hit.endPosition, hit.ref, hit.additionalId, hit.additionalRef,
+            term);
         terms.add(newHit);
       }
       return terms;
@@ -506,19 +513,21 @@ public class CodecInfo {
    *          the field
    * @return the prefixes
    */
-  private LinkedHashMap<String, Long> getPrefixes(String field) {
+  private LinkedHashMap<String, Long> getPrefixes(String field) {    
     if (fieldReferences.containsKey(field)) {
-      FieldReferences fr = fieldReferences.get(field);
+      FieldReferences fr = fieldReferences.get(field);      
       if (!prefixReferences.containsKey(field)) {
         LinkedHashMap<String, Long> refs = new LinkedHashMap<String, Long>();
         try {
-          IndexInput inPrefix = indexInputList.get("prefix");
+          IndexInput inPrefix = indexInputList.get("prefix");          
           inPrefix.seek(fr.refPrefix);
           for (int i = 0; i < fr.numberOfPrefixes; i++) {
             Long ref = inPrefix.getFilePointer();
-            refs.put(inPrefix.readString(), ref);
+            String prefix = inPrefix.readString();
+            refs.put(prefix, ref);
           }
         } catch (Exception e) {
+          e.printStackTrace();
           refs.clear();
         }
         prefixReferences.put(field, refs);
@@ -728,9 +737,6 @@ public class CodecInfo {
         fpIndexObjectPosition = inIndexDoc.readVLong(); // ref
                                                         // indexObjectPosition
         fpIndexObjectParent = inIndexDoc.readVLong(); // ref indexObjectParent
-        if (version == MtasCodecPostingsFormat.VERSION_OLD_1) {
-          inIndexDoc.readVLong(); // fpIndexTermPrefixPosition ref
-        }
         smallestObjectFilepointer = inIndexDoc.readVLong(); // offset
         objectRefApproxQuotient = inIndexDoc.readVInt(); // slope
         objectRefApproxOffset = inIndexDoc.readZLong(); // offset

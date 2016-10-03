@@ -3,8 +3,12 @@ package mtas.codec.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.Base64.Encoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,12 +25,12 @@ import mtas.parser.function.MtasFunctionParser;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.parser.function.util.MtasFunctionParserFunctionDefault;
+import mtas.search.spans.MtasSpanTermQuery;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.util.automaton.Automata;
-import org.apache.lucene.util.automaton.Automaton;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
-import org.apache.lucene.util.automaton.Operations;
 import org.apache.lucene.util.automaton.RegExp;
 
 /**
@@ -172,6 +176,8 @@ public class CodecComponent {
     /** The set position list. */
     public TreeSet<String> setPositionList;
 
+    public TreeSet<String> intersectingList;
+
     /**
      * Instantiates a new component prefix.
      *
@@ -183,6 +189,7 @@ public class CodecComponent {
       singlePositionList = new TreeSet<String>();
       multiplePositionList = new TreeSet<String>();
       setPositionList = new TreeSet<String>();
+      intersectingList = new TreeSet<String>();
     }
 
     /**
@@ -237,6 +244,13 @@ public class CodecComponent {
         }
       }
     }
+
+    public void addIntersecting(String prefix) {
+      if (!prefix.trim().equals("")) {
+        intersectingList.add(prefix);
+      }
+    }
+
   }
 
   /**
@@ -542,7 +556,8 @@ public class CodecComponent {
      *           Signals that an I/O exception has occurred.
      */
     public ComponentGroup(SpanQuery spanQuery, String field, String queryValue,
-        String queryType, String key, String groupingHitInsidePrefixes,
+        String queryType, String key, int number,
+        String groupingHitInsidePrefixes,
         String[] groupingHitInsideLeftPosition,
         String[] groupingHitInsideLeftPrefixes,
         String[] groupingHitInsideRightPosition,
@@ -564,7 +579,7 @@ public class CodecComponent {
       this.sortType = CodecUtil.STATS_TYPE_SUM;
       this.sortDirection = CodecUtil.SORT_DESC;
       this.start = 0;
-      this.number = 10;
+      this.number = number;
       HashSet<String> tmpPrefixes = new HashSet<String>();
       // analyze grouping condition
       if (groupingHitInsidePrefixes != null) {
@@ -1646,154 +1661,223 @@ public class CodecComponent {
    */
   public static class GroupHit {
 
-    /** The key. */
-    public String key;
+    private int hash, hashLeft, hashHit, hashRight;
+    private String key, keyLeft, keyHit, keyRight;
 
-    /** The data right. */
     public ArrayList<String>[] dataHit, dataLeft, dataRight;
+    public HashSet<String>[] missingHit, missingLeft, missingRight;
+    public HashSet<String>[] unknownHit, unknownLeft, unknownRight;
 
-    /**
-     * Sort.
-     *
-     * @param data
-     *          the data
-     * @return the array list
-     */
+    public static String KEY_START = MtasToken.DELIMITER + "grouphit"
+        + MtasToken.DELIMITER;
+
     private ArrayList<MtasTreeHit<String>> sort(
         ArrayList<MtasTreeHit<String>> data) {
       Collections.sort(data, new Comparator<MtasTreeHit<String>>() {
         @Override
         public int compare(MtasTreeHit<String> hit1, MtasTreeHit<String> hit2) {
-          return hit1.data.compareTo(hit2.data);
+          int compare = (hit1.additionalId > hit2.additionalId) ? 1
+              : ((hit1.additionalId < hit2.additionalId) ? -1 : 0);
+          compare = (compare == 0)
+              ? ((hit1.additionalRef > hit2.additionalRef) ? 1
+                  : (hit2.additionalRef < hit2.additionalRef) ? -1 : 0)
+              : compare;
+          return compare;
         }
       });
       return data;
     }
 
-    /**
-     * Instantiates a new group hit.
-     *
-     * @param list
-     *          the list
-     * @param start
-     *          the start
-     * @param end
-     *          the end
-     * @param hitStart
-     *          the hit start
-     * @param hitEnd
-     *          the hit end
-     * @param group
-     *          the group
-     */
     @SuppressWarnings("unchecked")
     public GroupHit(ArrayList<MtasTreeHit<String>> list, int start, int end,
-        int hitStart, int hitEnd, ComponentGroup group) {
+        int hitStart, int hitEnd, ComponentGroup group, HashSet<String> knownPrefixes)
+        throws UnsupportedEncodingException {
+      // compute dimensions
       int leftRangeStart = start;
-      int leftRangeEnd = Math.min(end, hitStart - 1);
-      int leftRange = 1 + leftRangeEnd - leftRangeStart;
-      int hitRangeStart = Math.max(hitStart, start);
-      int hitRangeEnd = Math.min(hitEnd, end);
-      int hitRange = 1 + hitRangeEnd - hitRangeStart;
+      int leftRangeEnd = Math.min(end - 1, hitStart - 1);
+      int leftRangeLength = Math.max(0, 1 + leftRangeEnd - leftRangeStart);
+      int hitLength = 1 + hitEnd - hitStart;
       int rightRangeStart = Math.max(start, hitEnd + 1);
-      int rightRangeEnd = end;
-      int rightRange = 1 + rightRangeEnd - rightRangeStart;
-      // System.out.print(start+"-"+end+"\t"+hitStart+"-"+hitEnd+"\t");
-      // if(leftRange>0) {
-      // System.out.print("L:"+leftRangeStart+"-"+leftRangeEnd+"\t");
-      // }
-      // if(hitRange>0) {
-      // System.out.print("H:"+hitRangeStart+"-"+hitRangeEnd+"\t");
-      // }
-      // if(rightRange>0) {
-      // System.out.print("R:"+rightRangeStart+"-"+rightRangeEnd+"\t");
-      // }
-      // System.out.println();
-      if (leftRange > 0) {
-        dataLeft = (ArrayList<String>[]) new ArrayList[leftRange];
-        for (int p = 0; p < leftRange; p++) {
+      int rightRangeEnd = end - 1;
+      int rightRangeLength = Math.max(0, 1 + rightRangeEnd - rightRangeStart);
+      // create initial arrays
+      if (leftRangeLength > 0) {
+        keyLeft = "";
+        dataLeft = (ArrayList<String>[]) new ArrayList[leftRangeLength];
+        missingLeft = (HashSet<String>[]) new HashSet[leftRangeLength];
+        unknownLeft = (HashSet<String>[]) new HashSet[leftRangeLength];
+        for (int p = 0; p < leftRangeLength; p++) {
           dataLeft[p] = new ArrayList<String>();
+          missingLeft[p] = new HashSet<String>();
+          unknownLeft[p] = new HashSet<String>();
         }
       } else {
+        keyLeft = null;
         dataLeft = null;
+        missingLeft = null;
+        unknownLeft = null;
       }
-      if (hitRange > 0) {
-        dataHit = (ArrayList<String>[]) new ArrayList[hitRange];
-        for (int p = 0; p < hitRange; p++) {
+      if (hitLength > 0) {
+        keyHit = "";
+        dataHit = (ArrayList<String>[]) new ArrayList[hitLength];
+        missingHit = (HashSet<String>[]) new HashSet[hitLength];
+        unknownHit = (HashSet<String>[]) new HashSet[hitLength];
+        for (int p = 0; p < hitLength; p++) {
           dataHit[p] = new ArrayList<String>();
+          missingHit[p] = new HashSet<String>();
+          unknownHit[p] = new HashSet<String>();
         }
       } else {
+        keyHit = null;
         dataHit = null;
+        missingHit = null;
+        unknownHit = null;
       }
-      if (rightRange > 0) {
-        dataRight = (ArrayList<String>[]) new ArrayList[rightRange];
-        for (int p = 0; p < rightRange; p++) {
+      if (rightRangeLength > 0) {
+        keyRight = "";
+        dataRight = (ArrayList<String>[]) new ArrayList[rightRangeLength];
+        missingRight = (HashSet<String>[]) new HashSet[rightRangeLength];
+        unknownRight = (HashSet<String>[]) new HashSet[rightRangeLength];
+        for (int p = 0; p < rightRangeLength; p++) {
           dataRight[p] = new ArrayList<String>();
+          missingRight[p] = new HashSet<String>();
+          unknownRight[p] = new HashSet<String>();
         }
       } else {
+        keyRight = null;
         dataRight = null;
+        missingRight = null;
+        unknownRight = null;
       }
+      
+      //construct missing sets
+      if (group.hitInside!=null) {
+        for (int p = hitStart; p <= hitEnd; p++) {
+          missingHit[p-hitStart].addAll(group.hitInside);
+        }
+      }
+      if (group.hitInsideLeft!=null) {        
+        for (int p = hitStart; p <= Math.min(hitEnd, hitStart+group.hitInsideLeft.length-1); p++) {
+          missingHit[p-hitStart].addAll(group.hitInsideLeft[p-hitStart]);
+        }
+      }
+      if (group.hitLeft!=null) {        
+        for (int p = hitStart; p <= Math.min(hitEnd, hitStart+group.hitLeft.length-1); p++) {
+          missingHit[p-hitStart].addAll(group.hitLeft[p-hitStart]);
+        }
+      }
+      if (group.hitInsideRight!=null) {        
+        for (int p = Math.max(hitStart, hitEnd-group.hitInsideRight.length+1); p <= hitEnd; p++) {
+          missingHit[p-hitStart].addAll(group.hitInsideRight[p-hitStart]);
+        }
+      }
+      if (group.hitRight!=null) {        
+        for (int p = hitStart; p <= Math.min(hitEnd, hitStart+group.hitRight.length-1); p++) {
+          missingHit[p-hitStart].addAll(group.hitRight[p-hitStart]);
+        }
+      }
+      if (group.left!=null) {        
+        for (int p = 0; p < Math.min(leftRangeLength,group.left.length); p++) {
+          missingLeft[p].addAll(group.left[p]);
+        }
+      }
+      if (group.hitRight!=null) {        
+        for (int p = 0; p <= Math.min(leftRangeLength,group.hitRight.length-dataHit.length); p++) {
+          missingLeft[p].addAll(group.hitRight[p+dataHit.length]);
+        }
+      }
+      if (group.right!=null) {        
+        for (int p = 0; p < Math.min(rightRangeLength,group.right.length); p++) {
+          missingRight[p].addAll(group.right[p]);
+        }
+      }
+      if (group.hitRight!=null) {        
+        for (int p = 0; p <= Math.min(rightRangeLength,group.hitLeft.length-dataHit.length); p++) {
+          missingRight[p].addAll(group.hitLeft[p+dataHit.length]);
+        }
+      }
+
+      //fill arrays and update missing administration
       ArrayList<MtasTreeHit<String>> sortedList = sort(list);
       for (MtasTreeHit<String> hit : sortedList) {
-        String prefix = CodecUtil.termPrefix(hit.data);
         // inside hit
-        if (group.hitInside != null && group.hitInside.contains(prefix)) {
+        if (group.hitInside != null && hit.idData != null
+            && group.hitInside.contains(hit.idData)) {
           for (int p = Math.max(hitStart, hit.startPosition); p <= Math
               .min(hitEnd, hit.endPosition); p++) {
-            dataHit[p - hitRangeStart].add(CodecUtil.termPrefixValue(hit.data));
-            // System.out.print(p+"."+prefix + ":" + value + "\t");
+            // keyHit += hit.refData;
+            dataHit[p - hitStart].add(hit.refData);
+            missingHit[p - hitStart].remove(MtasToken.getPrefixFromValue(hit.refData));
+            // System.out.print(p + "." + hit.idData + ":" + hit.refData +
+            // "\t");
           }
-        } else if (group.hitInsideLeft != null || group.hitLeft != null
-            || group.hitInsideRight != null || group.hitRight != null) {
+        } else if ((group.hitInsideLeft != null || group.hitLeft != null
+            || group.hitInsideRight != null || group.hitRight != null)
+            && hit.idData != null) {
           for (int p = Math.max(hitStart, hit.startPosition); p <= Math
               .min(hitEnd, hit.endPosition); p++) {
             int pHitLeft = p - hitStart;
             int pHitRight = hitEnd - p;
             if (group.hitInsideLeft != null
                 && pHitLeft <= (group.hitInsideLeft.length - 1)
-                && group.hitInsideLeft[pHitLeft].contains(prefix)) {
-              dataHit[p - hitRangeStart]
-                  .add(CodecUtil.termPrefixValue(hit.data));
-              // System.out.print(p+"."+prefix + ":" + value + "\t");
+                && group.hitInsideLeft[pHitLeft] != null
+                && group.hitInsideLeft[pHitLeft].contains(hit.idData)) {
+              // keyHit += hit.refData;
+              dataHit[p - hitStart].add(hit.refData);
+              missingHit[p - hitStart].remove(MtasToken.getPrefixFromValue(hit.refData));
+              // System.out.print(p+"."+hit.idData + ":" + hit.additionalRef +
+              // "\t");
             } else if (group.hitLeft != null
                 && pHitLeft <= (group.hitLeft.length - 1)
-                && group.hitLeft[pHitLeft].contains(prefix)) {
-              dataHit[p - hitRangeStart]
-                  .add(CodecUtil.termPrefixValue(hit.data));
-              // System.out.print(p+"."+prefix + ":" + value + "\t");
+                && group.hitLeft[pHitLeft] != null
+                && group.hitLeft[pHitLeft].contains(hit.idData)) {
+              // keyHit += hit.refData;
+              dataHit[p - hitStart].add(hit.refData);
+              missingHit[p - hitStart].remove(MtasToken.getPrefixFromValue(hit.refData));
+              // System.out.print(p+"."+hit.idData + ":" + hit.additionalRef +
+              // "\t");
             } else if (group.hitInsideRight != null
                 && pHitRight <= (group.hitInsideRight.length - 1)
-                && group.hitInsideRight[pHitRight].contains(prefix)) {
-              dataHit[p - hitRangeStart]
-                  .add(CodecUtil.termPrefixValue(hit.data));
-              // System.out.print(p+"."+prefix + ":" + value + "\t");
+                && group.hitInsideRight[pHitRight] != null
+                && group.hitInsideRight[pHitRight].contains(hit.idData)) {
+              // keyHit += hit.refData;
+              dataHit[p - hitStart].add(hit.refData);
+              missingHit[p - hitStart].remove(MtasToken.getPrefixFromValue(hit.refData));
+              // System.out.print(p+"."+hit.idData + ":" + hit.additionalRef +
+              // "\t");
             } else if (group.hitRight != null
                 && pHitRight <= (group.hitRight.length - 1)
-                && group.hitRight[pHitRight].contains(prefix)) {
-              dataHit[p - hitRangeStart]
-                  .add(CodecUtil.termPrefixValue(hit.data));
-              // System.out.print(p+"."+prefix + ":" + value + "\t");
+                && group.hitRight[pHitRight] != null
+                && group.hitRight[pHitRight].contains(hit.idData)) {
+              // keyHit += hit.refData;
+              dataHit[p - hitStart].add(hit.refData);
+              missingHit[p - hitStart].remove(MtasToken.getPrefixFromValue(hit.refData));
+              // System.out.print(p+"."+hit.idData + ":" + hit.additionalRef +
+              // "\t");
             }
           }
         }
         // left
         if (hit.startPosition < hitStart) {
-          if (group.left != null || (group.hitRight != null
-              && group.hitRight.length > (1 + hitEnd - hitStart))) {
+          if ((group.left != null || (group.hitRight != null
+              && group.hitRight.length > (1 + hitEnd - hitStart)))
+              && hit.idData != null) {
             for (int p = Math.min(hit.endPosition,
                 hitStart - 1); p >= hit.startPosition; p--) {
               int pLeft = hitStart - 1 - p;
               int pHitRight = hitEnd - p;
               if (group.left != null && pLeft <= (group.left.length - 1)
-                  && group.left[pLeft].contains(prefix)) {
-                dataLeft[p - leftRangeStart]
-                    .add(CodecUtil.termPrefixValue(hit.data));
+                  && group.left[pLeft] != null
+                  && group.left[pLeft].contains(hit.idData)) {
+                dataLeft[p - leftRangeStart].add(hit.refData);
+                missingLeft[p - leftRangeStart].remove(MtasToken.getPrefixFromValue(hit.refData));
                 // System.out.print("L"+p+"."+prefix + ":" + value + "\t");
               } else if (group.hitRight != null
                   && pHitRight <= (group.hitRight.length - 1)
-                  && group.hitRight[pHitRight].contains(prefix)) {
-                dataLeft[p - leftRangeStart]
-                    .add(CodecUtil.termPrefixValue(hit.data));
+                  && group.hitRight[pHitRight] != null
+                  && group.hitRight[pHitRight].contains(hit.idData)) {
+                dataLeft[p - leftRangeStart].add(hit.refData);
+                missingLeft[p - leftRangeStart].remove(MtasToken.getPrefixFromValue(hit.refData));
                 // System.out.print("L"+p+"."+prefix + ":" + value + "\t");
               }
             }
@@ -1801,36 +1885,139 @@ public class CodecComponent {
         }
         // right
         if (hit.endPosition > hitEnd) {
-          if (group.right != null || (group.hitLeft != null
-              && group.hitLeft.length > (1 + hitEnd - hitStart))) {
+          if ((group.right != null || (group.hitLeft != null
+              && group.hitLeft.length > (1 + hitEnd - hitStart)))
+              && hit.idData != null) {
             for (int p = Math.max(hit.startPosition,
                 hitEnd + 1); p <= hit.endPosition; p++) {
               int pRight = p - hitEnd - 1;
               int pHitLeft = p - hitStart;
               if (group.right != null && pRight <= (group.right.length - 1)
-                  && group.right[pRight].contains(prefix)) {
-                dataRight[p - rightRangeStart]
-                    .add(CodecUtil.termPrefixValue(hit.data));
+                  && group.right[pRight] != null
+                  && group.right[pRight].contains(hit.idData)) {
+                dataRight[p - rightRangeStart].add(hit.refData);
+                missingRight[p - rightRangeStart].remove(MtasToken.getPrefixFromValue(hit.refData));
                 // System.out.print("R"+p+"."+prefix + ":" + value + "\t");
               } else if (group.hitLeft != null
                   && pHitLeft <= (group.hitLeft.length - 1)
-                  && group.hitLeft[pHitLeft].contains(prefix)) {
-                dataRight[p - rightRangeStart]
-                    .add(CodecUtil.termPrefixValue(hit.data));
+                  && group.hitLeft[pHitLeft] != null
+                  && group.hitLeft[pHitLeft].contains(hit.idData)) {
+                dataRight[p - rightRangeStart].add(hit.refData);
+                missingRight[p - rightRangeStart].remove(MtasToken.getPrefixFromValue(hit.refData));
                 // System.out.print("R"+p+"."+prefix + ":" + value + "\t");
               }
             }
           }
-        }
-        // compute key
-        key = "";
-        key += "left: " + (dataLeft != null ? dataToString(dataLeft) : null)
-            + " - ";
-        key += "hit: " + (dataHit != null ? dataToString(dataHit) : null)
-            + " - ";
-        key += "right: " + (dataRight != null ? dataToString(dataRight) : null);
-        key = key.trim();
+        }        
       }
+      //register unknown
+      if (missingLeft!=null) {
+        for(int i=0; i<missingLeft.length; i++) {
+          for(String prefix : missingLeft[i]) {
+            if(!knownPrefixes.contains(prefix)) {
+              unknownLeft[i].add(prefix);
+            }
+          }
+        }
+      }
+      if (missingHit!=null) {
+        for(int i=0; i<missingHit.length; i++) {
+          for(String prefix : missingHit[i]) {
+            if(!knownPrefixes.contains(prefix)) {
+              unknownHit[i].add(prefix);
+            }
+          }
+        }
+      }
+      if (missingRight!=null) {
+        for(int i=0; i<missingRight.length; i++) {
+          for(String prefix : missingRight[i]) {
+            if(!knownPrefixes.contains(prefix)) {
+              unknownRight[i].add(prefix);
+            }
+          }
+        }
+      }
+      //construct keys
+      keyLeft = dataToString(dataLeft, missingLeft);
+      keyHit = dataToString(dataHit, missingHit);
+      keyRight = dataToString(dataRight, missingRight);
+      key = KEY_START;
+      if (keyLeft != null) {
+        key += keyLeft;
+        hashLeft = keyLeft.hashCode();
+      } else {
+        hashLeft = 1;
+      }
+      key += "|";
+      if (keyHit != null) {
+        key += keyHit;
+        hashHit = keyHit.hashCode();
+      } else {
+        hashHit = 1;
+      }
+      key += "|";
+      if (keyRight != null) {
+        key += keyRight;
+        hashRight = keyRight.hashCode();
+      } else {
+        hashRight = 1;
+      }
+      // compute hash
+      hash = hashHit * (hashLeft ^ 3) * (hashRight ^ 5);
+    }
+
+    @Override
+    public int hashCode() {
+      return hash;
+    }
+
+    private boolean dataEquals(ArrayList<String>[] d1, ArrayList<String>[] d2) {
+      ArrayList<String> a1, a2;
+      if (d1 == null && d2 == null) {
+        return true;
+      } else if (d1 == null || d2 == null) {
+        return false;
+      } else {
+        if (d1.length == d2.length) {
+          for (int i = 0; i < d1.length; i++) {
+            a1 = d1[i];
+            a2 = d2[i];
+            if (a1 != null && a2 != null && a1.size() == a2.size()) {
+              for (int j = 0; j < a1.size(); j++) {
+                if (!a1.get(j).equals(a2.get(j))) {
+                  return false;
+                }
+              }
+            } else {
+              return false;
+            }
+          }
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      GroupHit other = (GroupHit) obj;
+      if (hashCode() != other.hashCode())
+        return false;
+      if (!dataEquals(dataHit, other.dataHit))
+        return false;
+      if (!dataEquals(dataLeft, other.dataLeft))
+        return false;
+      if (!dataEquals(dataRight, other.dataRight))
+        return false;
+      return true;
     }
 
     /**
@@ -1839,15 +2026,42 @@ public class CodecComponent {
      * @param data
      *          the data
      * @return the string
+     * @throws UnsupportedEncodingException
      */
-    private String dataToString(ArrayList<String>[] data) {
+    private String dataToString(ArrayList<String>[] data, HashSet<String>[] missing)
+        throws UnsupportedEncodingException {
       String text = "";
-      if (data != null) {
+      Encoder encoder = Base64.getEncoder();
+      String prefix, postfix;
+      if (data != null && missing!=null && data.length==missing.length) {
         for (int i = 0; i < data.length; i++) {
-          text += (i > 0 ? ", " : "") + data[i].toString();
+          if (i > 0) {
+            text += ",";
+          }
+          for (int j = 0; j < data[i].size(); j++) {
+            if (j > 0) {
+              text += "&";
+            }
+            prefix = MtasToken.getPrefixFromValue(data[i].get(j));
+            postfix = MtasToken.getPostfixFromValue(data[i].get(j));
+            text += encoder.encodeToString(prefix.getBytes("utf-8"));
+            if (postfix != "") {
+              text += ".";
+              text += encoder.encodeToString(postfix.getBytes("utf-8"));
+            }
+          }
+          if(missing[i]!=null) {
+            String[] tmpMissing = missing[i].toArray(new String[missing[i].size()]);
+            for (int j = 0; j < tmpMissing.length; j++) {
+              if (j > 0 || data[i].size()>0) {
+                text += "&";
+              }
+              text += encoder.encodeToString(("!"+tmpMissing[j]).getBytes());
+            }
+          }  
         }
       }
-      return text.trim();
+      return text;
     }
 
     /**
@@ -1855,18 +2069,110 @@ public class CodecComponent {
      *
      * @return the key
      */
-    public String getKey() {
+    public String toString() {
       return key;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-      return (key != null) ? key.replaceAll("\u0001", ":") : key;
+    private static HashMap[] keyToSubSubObject(String key, StringBuilder newKey) {      
+      if (key != "") {
+        newKey.append(" [");
+        String prefix, postfix, parts[] = key.split(Pattern.quote("&"));
+        HashMap[] result = new HashMap[parts.length];
+        Pattern pattern = Pattern.compile("^([^\\.]*)\\.([^\\.]*)$");
+        Decoder decoder = Base64.getDecoder();
+        Matcher matcher;
+        String tmpNewKey = null;
+        for (int i = 0; i < parts.length; i++) {
+          if (parts[i].equals("")) {
+            result[i] = null;
+          } else {
+            HashMap<String, String> subResult = new HashMap<String, String>();
+            matcher = pattern.matcher(parts[i]);
+            if(tmpNewKey==null) {
+              tmpNewKey = "";
+            } else {
+              tmpNewKey+=" & ";
+            }
+            if (matcher.matches()) {
+              prefix = new String(decoder.decode(matcher.group(1)));
+              postfix = new String(decoder.decode(matcher.group(2)));
+              tmpNewKey+= prefix.replace("=", "\\=");
+              tmpNewKey+= "=\""+postfix.replace("\"", "\\\"")+"\"";
+              subResult.put("prefix", prefix);
+              subResult.put("value", postfix);
+            } else {
+              prefix = new String(decoder.decode(parts[i]));
+              tmpNewKey+= prefix.replace("=", "\\=");
+              if(prefix.startsWith("!")) {
+                subResult.put("missing", prefix.substring(1)); 
+              } else {
+                subResult.put("prefix", prefix);  
+              }                          
+            }
+            result[i] = subResult;
+          }
+        }
+        if(tmpNewKey!=null) {
+          newKey.append(tmpNewKey);
+        }
+        newKey.append("]");
+        return result;
+      } else {
+        newKey.append(" []");
+        return null;
+      }
+    }
+
+    private static HashMap keyToSubObject(String key, StringBuilder newKey) {
+      HashMap<Integer, HashMap[]> result = new HashMap<Integer, HashMap[]>();
+      if (key == null || key.trim().equals("")) {
+        return null;
+      } else {
+        String parts[] = key.split(Pattern.quote(","), -1);
+        if (parts.length > 0) {          
+          for (int i = 0; i < parts.length; i++) {
+            result.put(i, keyToSubSubObject(parts[i].trim(), newKey));                  
+          }
+          return result;
+        } else {
+          return null;
+        }
+      }
+    }
+
+    public static HashMap keyToObject(String key, StringBuilder newKey) {
+      if (key.startsWith(KEY_START)) {
+        String content = key.substring(KEY_START.length());
+        StringBuilder keyLeft= new StringBuilder(""), keyHit=new StringBuilder(""), keyRight=new StringBuilder("");
+        HashMap<String, HashMap<Integer, HashMap[]>> result = new HashMap<String, HashMap<Integer, HashMap[]>>();
+        HashMap<Integer, HashMap[]> resultLeft = null, resultHit = null,
+            resultRight = null;
+        String[] parts = content.split(Pattern.quote("|"), -1);
+        if (parts.length == 3) {
+          resultLeft = keyToSubObject(parts[0].trim(), keyLeft);
+          resultHit = keyToSubObject(parts[1].trim(), keyHit);
+          if (parts.length > 2) {
+            resultRight = keyToSubObject(parts[2].trim(), keyRight);
+          }
+        } else if (parts.length == 1) {
+          resultHit = keyToSubObject(parts[0].trim(), keyHit);
+        }
+        if (resultLeft != null) {
+          result.put("left", resultLeft);
+        }
+        result.put("hit", resultHit);
+        if (resultRight != null) {
+          result.put("right", resultRight);
+        }
+        newKey.append(keyLeft);
+        newKey.append(" |");
+        newKey.append(keyHit);
+        newKey.append(" |");
+        newKey.append(keyRight);
+        return result;
+      } else {
+        return null;
+      }
     }
 
   }

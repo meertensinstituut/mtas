@@ -413,9 +413,9 @@
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
 			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				config="mtas.xml" default="DBNL" />
+				config="mtas.xml" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				config="mtas.xml" default="DBNL" />
+				config="mtas.xml" />
 		</analyzer>
 	</fieldType>
 

@@ -75,7 +75,7 @@ public class MtasSolrResultMerge {
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
         }
-      }
+      }      
     }
   }
 

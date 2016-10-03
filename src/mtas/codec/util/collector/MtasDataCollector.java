@@ -864,8 +864,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
                 recomputeKeyList = segmentRecomputeKeyList.get(segmentName);
               }
               recomputeKeyList.add(key);
-            } else {
-              break;
             }
           }
         }
@@ -966,41 +964,49 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    *           Signals that an I/O exception has occurred.
    */
   public String validateSegmentValue(String key, T1 value, int maximumNumber,
-      int segmentNumber) throws IOException {
+      int segmentNumber, boolean test) throws IOException {
     if (!closed) {
       if (segmentRegistration != null) {
         if (maximumNumber > 0) {
-          segmentKeyValueList.get(segmentName).put(key, value);
           T1 tmpSegmentValueMaxListMin = segmentValueTopListLast
               .get(segmentName);
           T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
           if (segmentValueTopList.size() < maximumNumber) {
-            segmentValueTopList.add(value);
-            segmentValueTopListLast.put(segmentName,
-                (tmpSegmentValueMaxListMin == null) ? value
-                    : lastForComputingSegment(tmpSegmentValueMaxListMin,
-                        value));
-            if (segmentValueTopList.size() == maximumNumber) {
-              tmpSegmentValueMaxListMin = segmentValueTopListLast
-                  .get(segmentName);
+            if (!test) {
+              segmentKeyValueList.get(segmentName).put(key, value);
+              segmentValueTopList.add(value);
               segmentValueTopListLast.put(segmentName,
-                  tmpSegmentValueMaxListMin);
-              segmentValuesBoundary.put(segmentName,
-                  boundaryForSegmentComputing(segmentName));
+                  (tmpSegmentValueMaxListMin == null) ? value
+                      : lastForComputingSegment(tmpSegmentValueMaxListMin,
+                          value));
+              if (segmentValueTopList.size() == maximumNumber) {
+                tmpSegmentValueMaxListMin = segmentValueTopListLast
+                    .get(segmentName);
+                segmentValueTopListLast.put(segmentName,
+                    tmpSegmentValueMaxListMin);
+                segmentValuesBoundary.put(segmentName,
+                    boundaryForSegmentComputing(segmentName));
+              }
             }
             return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
           } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {
-            if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {
-              segmentValueTopList.add(value);
-              segmentValueTopList.remove(tmpSegmentValueMaxListMin);
-              tmpSegmentValueMaxListMin = lastForComputingSegment();
-              segmentValueTopListLast.put(segmentName,
-                  tmpSegmentValueMaxListMin);
-              segmentValuesBoundary.put(segmentName,
-                  boundaryForSegmentComputing(segmentName));
+            if (!test) {
+              segmentKeyValueList.get(segmentName).put(key, value);
+              if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {
+                segmentValueTopList.add(value);
+                segmentValueTopList.remove(tmpSegmentValueMaxListMin);
+                tmpSegmentValueMaxListMin = lastForComputingSegment();
+                segmentValueTopListLast.put(segmentName,
+                    tmpSegmentValueMaxListMin);
+                segmentValuesBoundary.put(segmentName,
+                    boundaryForSegmentComputing(segmentName));
+              }
             }
             return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
           } else if (segmentKeys.contains(key)) {
+            if(!test) {
+              segmentKeyValueList.get(segmentName).put(key, value);
+            }
             return SEGMENT_KEY;
           } else {
             return null;

@@ -5,11 +5,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -22,6 +26,7 @@ import mtas.codec.util.CodecComponent.ComponentGroup;
 import mtas.codec.util.CodecComponent.ComponentKwic;
 import mtas.codec.util.CodecComponent.ComponentList;
 import mtas.codec.util.CodecComponent.ComponentPosition;
+import mtas.codec.util.CodecComponent.ComponentPrefix;
 import mtas.codec.util.CodecComponent.ComponentSpan;
 import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
@@ -37,6 +42,12 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
+import mtas.search.spans.MtasSpanAndQuery;
+import mtas.search.spans.MtasSpanMatchAllQuery;
+import mtas.search.spans.MtasSpanSequenceItem;
+import mtas.search.spans.MtasSpanSequenceQuery;
+import mtas.search.spans.MtasSpanTermQuery;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.FieldInfo;
@@ -46,12 +57,15 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
+import org.apache.lucene.search.spans.SpanWithinQuery;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
@@ -61,7 +75,6 @@ import org.apache.lucene.util.automaton.CompiledAutomaton;
 /**
  * The Class CodecCollector.
  */
-@SuppressWarnings("deprecation")
 public class CodecCollector {
 
   /**
@@ -146,7 +159,8 @@ public class CodecCollector {
           : CodecInfo.getCodecInfoFromTerms(t);
 
       collectSpansPositionsAndTokens(spansQueryWeight, searcher, mtasCodecInfo,
-          r, lrc, field, t, docSet, docList, fieldInfo);
+          r, lrc, field, t, docSet, docList, fieldInfo,
+          rawReader.leaves().get(lrc.ord).reader().getFieldInfos());
       collectPrefixes(rawReader.leaves().get(lrc.ord).reader().getFieldInfos(),
           field, fieldInfo);
     }
@@ -214,7 +228,7 @@ public class CodecCollector {
       HashMap<SpanQuery, SpanWeight> spansQueryWeight, IndexSearcher searcher,
       CodecInfo mtasCodecInfo, LeafReader r, LeafReaderContext lrc,
       String field, Terms t, List<Integer> docSet, List<Integer> docList,
-      ComponentField fieldInfo) throws IOException {
+      ComponentField fieldInfo, FieldInfos fieldInfos) throws IOException {
 
     boolean needSpans = false;
     boolean needPositions = false;
@@ -475,10 +489,12 @@ public class CodecCollector {
                 if (spansDocId.equals(docId)) {
                   number = 0;
                   matchDataList = new ArrayList<Match>();
-                  while (spans.nextStartPosition() != Spans.NO_MORE_POSITIONS) {
+                  int tmpStartPosition;
+                  while ((tmpStartPosition = spans
+                      .nextStartPosition()) != Spans.NO_MORE_POSITIONS) {
                     number++;
                     if (matchData != null) {
-                      Match m = new Match(spans.startPosition(),
+                      Match m = new Match(tmpStartPosition,
                           spans.endPosition());
                       matchDataList.add(m);
                     }
@@ -581,8 +597,9 @@ public class CodecCollector {
       }
       if (fieldInfo.groupList.size() > 0) {
         // create group
-        createGroup(fieldInfo.groupList, spansMatchData, docSet, field,
-            lrc.docBase, mtasCodecInfo);
+        createGroup(fieldInfo.groupList, spansMatchData, docSet,
+            fieldInfos.fieldInfo(field), field, lrc.docBase, mtasCodecInfo,
+            searcher, lrc);
       }
       if (fieldInfo.kwicList.size() > 0) {
         // create kwic
@@ -597,8 +614,76 @@ public class CodecCollector {
       }
     }
     if (fieldInfo.termVectorList.size() > 0) {
-      createTermvector(fieldInfo.termVectorList, positionsData, docSet, field,
-          t, r, lrc);
+      createTermvectorFirstRound(fieldInfo.termVectorList, positionsData,
+          docSet, field, t, r, lrc);
+    }
+  }
+
+  private static HashSet<String> collectKnownPrefixes(FieldInfo fi)
+      throws IOException {
+    if (fi != null) {
+      HashSet<String> result = new HashSet<String>();
+      String singlePositionPrefixes = fi.getAttribute(
+          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
+      String multiplePositionPrefixes = fi.getAttribute(
+          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION);
+      String setPositionPrefixes = fi.getAttribute(
+          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION);
+      if (singlePositionPrefixes != null) {
+        String[] prefixes = singlePositionPrefixes
+            .split(Pattern.quote(MtasToken.DELIMITER));
+        for (int i = 0; i < prefixes.length; i++) {
+          String item = prefixes[i].trim();
+          if (!item.equals("")) {
+            result.add(item);
+          }
+        }
+      }
+      if (multiplePositionPrefixes != null) {
+        String[] prefixes = multiplePositionPrefixes
+            .split(Pattern.quote(MtasToken.DELIMITER));
+        for (int i = 0; i < prefixes.length; i++) {
+          String item = prefixes[i].trim();
+          if (!item.equals("")) {
+            result.add(item);
+          }
+        }
+      }
+      if (setPositionPrefixes != null) {
+        String[] prefixes = setPositionPrefixes
+            .split(Pattern.quote(MtasToken.DELIMITER));
+        for (int i = 0; i < prefixes.length; i++) {
+          String item = prefixes[i].trim();
+          if (!item.equals("")) {
+            result.add(item);
+          }
+        }
+      }
+      return result;
+    } else {
+      return null;
+    }
+  }
+  
+  private static HashSet<String> collectIntersectionPrefixes(FieldInfo fi)
+      throws IOException {
+    if (fi != null) {
+      HashSet<String> result = new HashSet<String>();
+      String intersectingPrefixes = fi.getAttribute(
+          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION);
+      if (intersectingPrefixes != null) {
+        String[] prefixes = intersectingPrefixes
+            .split(Pattern.quote(MtasToken.DELIMITER));
+        for (int i = 0; i < prefixes.length; i++) {
+          String item = prefixes[i].trim();
+          if (!item.equals("")) {
+            result.add(item);
+          }
+        }
+      }
+      return result;
+    } else {
+      return null;
     }
   }
 
@@ -625,6 +710,8 @@ public class CodecCollector {
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION);
         String setPositionPrefixes = fi.getAttribute(
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION);
+        String intersectingPrefixes = fi.getAttribute(
+            MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION);
         if (singlePositionPrefixes != null) {
           String[] prefixes = singlePositionPrefixes
               .split(Pattern.quote(MtasToken.DELIMITER));
@@ -646,7 +733,93 @@ public class CodecCollector {
             fieldInfo.prefix.addSetPosition(prefixes[i]);
           }
         }
+        if (intersectingPrefixes != null) {
+          String[] prefixes = intersectingPrefixes
+              .split(Pattern.quote(MtasToken.DELIMITER));
+          for (int i = 0; i < prefixes.length; i++) {
+            fieldInfo.prefix.addIntersecting(prefixes[i]);
+          }
+        }
       }
+    }
+  }
+
+  private static HashMap<GroupHit, Spans> collectSpansForOccurences(
+      HashSet<GroupHit> occurences, HashSet<String> prefixes, String field,
+      CodecInfo mtasCodecInfo, IndexSearcher searcher, LeafReaderContext lrc)
+      throws IOException {
+    HashMap<GroupHit, Spans> list = new HashMap<GroupHit, Spans>();
+    IndexReader reader = searcher.getIndexReader();
+    for (GroupHit hit : occurences) {
+      SpanQuery queryHit = createQueryFromGroupHit(prefixes, field, hit);
+      if (queryHit != null) {
+        SpanWeight weight = (SpanWeight) queryHit.rewrite(reader)
+            .createWeight(searcher, false);
+        Spans spans = weight.getSpans(lrc, SpanWeight.Postings.POSITIONS);
+        if (spans != null) {
+          list.put(hit, spans);
+        }
+      }
+    }
+    return list;
+  }
+
+  private static SpanQuery createQueryFromGroupHit(HashSet<String> prefixes,
+      String field, GroupHit hit) {
+    // initial check
+    if (prefixes == null || field == null || hit == null) {
+      return null;
+    } else {
+      SpanQuery query = null, leftQuery = null, hitQuery = null,
+          rightQuery = null;
+      // check for missing
+      if (hit.missingLeft != null && hit.missingLeft.length > 0) {
+        for (int i = 0; i < hit.missingLeft.length; i++) {
+          if (hit.missingLeft[i].size() != hit.unknownLeft[i].size()) {
+            return null;
+          }
+        }
+      }
+      if (hit.missingHit != null && hit.missingHit.length > 0) {
+        for (int i = 0; i < hit.missingHit.length; i++) {
+          if (hit.missingHit[i].size() != hit.unknownHit[i].size()) {
+            return null;
+          }
+        }
+      }
+      if (hit.missingRight != null && hit.missingRight.length > 0) {
+        for (int i = 0; i < hit.missingRight.length; i++) {
+          if (hit.missingRight[i].size() != hit.unknownRight[i].size()) {
+            return null;
+          }
+        }
+      }
+
+      if (hit.dataHit != null && hit.dataHit.length > 0) {
+        List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+        for (int i = 0; i < hit.dataHit.length; i++) {
+          SpanQuery item = null;
+          if (hit.dataHit[i].size() == 0) {
+            item = new MtasSpanMatchAllQuery(field);
+          } else if (hit.dataHit[i].size() == 1) {
+            Term term = new Term(field, hit.dataHit[i].get(0));
+            item = new MtasSpanTermQuery(term);
+          } else {
+            SpanQuery[] subList = new SpanQuery[hit.dataHit[i].size()];
+            for (int j = 0; j < hit.dataHit[i].size(); j++) {
+              Term term = new Term(field, hit.dataHit[i].get(j));
+              subList[j] = new MtasSpanTermQuery(term);
+            }
+            item = new MtasSpanAndQuery(subList);
+          }
+          items.add(new MtasSpanSequenceItem(item, false));
+        }
+        hitQuery = new MtasSpanSequenceQuery(items);
+      }
+      if (hitQuery != null) {
+        query = hitQuery;
+      }
+      return query;
     }
   }
 
@@ -1235,146 +1408,458 @@ public class CodecCollector {
    */
   private static void createGroup(List<ComponentGroup> groupList,
       HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
-      List<Integer> docSet, String field, int docBase, CodecInfo mtasCodecInfo)
+      List<Integer> docSet, FieldInfo fieldInfo, String field, int docBase,
+      CodecInfo mtasCodecInfo, IndexSearcher searcher, LeafReaderContext lrc)
       throws IOException {
 
     if (mtasCodecInfo != null && groupList != null) {
       ArrayList<Match> matchList;
-      Integer start, end;
       HashMap<Integer, ArrayList<Match>> matchData;
 
       for (ComponentGroup group : groupList) {
         if (group.prefixes.size() > 0) {
-          // compute prefixIds
           matchData = spansMatchData.get(group.spanQuery);
+          HashSet<String> knownPrefixes = collectKnownPrefixes(fieldInfo);
+          HashSet<String> intersectionPrefixes = collectIntersectionPrefixes(fieldInfo);
+          boolean intersectionGroupPrefixes = intersectionPrefixes(group, intersectionPrefixes);
+          boolean availablePrefixes = availablePrefixes(group, knownPrefixes);
+          // sort match lists
+          if (!intersectionGroupPrefixes) {
+            for (int docId : matchData.keySet()) {
+              sortMatchList(matchData.get(docId));
+            }
+          }
+          // init
           group.dataCollector.initNewList(1);
-          for (int docId : docSet) {
-            if (matchData != null
-                && (matchList = matchData.get(docId)) != null) {
-              // administration
-              HashMap<String, Long> occurences = new HashMap<String, Long>();
-              // loop over matches
-              Iterator<Match> it = matchList.listIterator();
-              ArrayList<IntervalTreeNodeData<String>> positionsHits = new ArrayList<IntervalTreeNodeData<String>>();
-              while (it.hasNext()) {
-                Match m = it.next();
-                if (group.hitInside != null) {
-                  start = m.startPosition;
-                  end = m.endPosition - 1;
-                } else {
-                  start = null;
-                  end = null;
-                }
-                if (group.hitLeft != null) {
-                  start = start == null ? m.startPosition
-                      : Math.min(start, m.startPosition);
-                  end = end == null ? m.startPosition + group.hitLeft.length - 1
-                      : Math.max(m.startPosition + group.hitLeft.length - 1,
-                          end);
-                }
-                if (group.hitRight != null) {
-                  start = start == null
-                      ? m.endPosition - group.hitRight.length + 1
-                      : Math.min(m.endPosition - group.hitRight.length + 1,
-                          start);
-                  end = end == null ? m.endPosition
-                      : Math.max(end, m.endPosition);
-                }
-                if (group.hitInsideLeft != null) {
-                  start = start == null ? m.startPosition
-                      : Math.min(start, m.startPosition);
-                  end = end == null
-                      ? Math.min(
-                          m.startPosition + group.hitInsideLeft.length - 1,
-                          m.endPosition - 1)
-                      : Math.max(Math.min(
-                          m.startPosition + group.hitInsideLeft.length - 1,
-                          m.endPosition - 1), end);
-                }
-                if (group.hitInsideRight != null) {
-                  start = start == null
-                      ? Math.max(m.startPosition,
-                          m.endPosition - group.hitInsideRight.length + 1)
-                      : Math.min(
-                          Math.max(m.startPosition,
-                              m.endPosition - group.hitInsideRight.length + 1),
-                          start);
-                  end = end == null ? m.endPosition
-                      : Math.max(end, m.endPosition);
-                }
-                if (group.left != null) {
-                  start = start == null ? m.startPosition - group.left.length
-                      : Math.min(m.startPosition - group.left.length, start);
-                  end = end == null ? m.startPosition - 1
-                      : Math.max(m.startPosition - 1, end);
-                }
-                if (group.right != null) {
-                  start = start == null ? m.endPosition + 1
-                      : Math.min(m.endPosition + 1, start);
-                  end = end == null ? m.endPosition + group.right.length
-                      : Math.max(m.endPosition + group.right.length, end);
-                }
-                positionsHits.add(new IntervalTreeNodeData<String>(start, end,
-                    m.startPosition, m.endPosition - 1));
-              }
-              // if(1>2) {
-              // for(IntervalTreeNodeData positionHit :
-              // positionsHits) {
-              // ArrayList<MtasTreeHit<String>> list =
-              // mtasCodecInfo
-              // .getPositionedTermsByPrefixesAndPositionRange(field,
-              // (docId - docBase), group.prefixes,
-              // positionHit.start,
-              // positionHit.end);
-              // GroupHit hit = new GroupHit(list,
-              // positionHit.start,
-              // positionHit.end, positionHit.hitStart,
-              // positionHit.hitEnd,
-              // group);
-              // String key = hit.toString();
-              // if (key != null) {
-              // if (occurences.containsKey(key)) {
-              // occurences.put(key, occurences.get(key) + 1);
-              // } else {
-              // occurences.put(key, Long.valueOf(1));
-              // }
-              // }
-              // }
-              // for (String key : occurences.keySet()) {
-              // group.dataCollector.add(new String[] { key },
-              // ArrayUtils.toPrimitive(new Long[] {
-              // occurences.get(key) }),
-              // 1);
-              // }
-              // } else {
+          int docId;
 
-              mtasCodecInfo.collectTermsByPrefixesForListOfHitPositions(field,
-                  (docId - docBase), group.prefixes, positionsHits);
+          HashMap<GroupHit, Long> occurencesSum = new HashMap<GroupHit, Long>();
+          HashMap<GroupHit, Integer> occurencesN = new HashMap<GroupHit, Integer>();
+          HashSet<GroupHit> occurencesInCurrentDocument = new HashSet<GroupHit>();
 
-              for (IntervalTreeNodeData<String> positionHit : positionsHits) {
-                GroupHit hit = new GroupHit(positionHit.list, positionHit.start,
-                    positionHit.end, positionHit.hitStart, positionHit.hitEnd,
-                    group);
-                String key = hit.toString();
-                if (key != null) {
-                  if (occurences.containsKey(key)) {
-                    occurences.put(key, occurences.get(key) + 1);
+          if (!availablePrefixes) {
+            HashMap<Integer, GroupHit> hits = new HashMap<Integer, GroupHit>();
+            for (int docCounter = 0; docCounter < docSet.size(); docCounter++) {
+              occurencesInCurrentDocument.clear();
+              docId = docSet.get(docCounter);
+              GroupHit hit, hitKey;
+              if (matchData != null
+                  && (matchList = matchData.get(docId)) != null
+                  && matchList.size() > 0) {
+                Iterator<Match> it = matchList.listIterator();
+                while (it.hasNext()) {
+                  Match m = it.next();
+                  IntervalTreeNodeData<String> positionHit = createPositionHit(
+                      m, group);
+                  int length = m.endPosition - m.startPosition;
+                  hitKey = null;
+                  if (!hits.containsKey(length)) {
+                    hit = new GroupHit(positionHit.list, positionHit.start,
+                        positionHit.end, positionHit.hitStart,
+                        positionHit.hitEnd, group, knownPrefixes);
+                    hits.put(length, hit);
                   } else {
-                    occurences.put(key, Long.valueOf(1));
+                    hit = hits.get(length);
+                    for (GroupHit hitKeyItem : occurencesSum.keySet()) {
+                      if (hitKeyItem.equals(hit)) {
+                        hitKey = hitKeyItem;
+                        break;
+                      }
+                    }
+                  }
+                  if (hitKey == null) {
+                    occurencesSum.put(hit, Long.valueOf(1));
+                    occurencesN.put(hit, 1);
+                    occurencesInCurrentDocument.add(hit);
+                  } else {
+                    occurencesSum.put(hitKey, occurencesSum.get(hitKey) + 1);
+                    if (!occurencesInCurrentDocument.contains(hitKey)) {
+                      if (occurencesN.containsKey(hitKey)) {
+                        occurencesN.put(hitKey, occurencesN.get(hitKey) + 1);
+                      } else {
+                        occurencesN.put(hitKey, 1);
+                      }
+                      occurencesInCurrentDocument.add(hitKey);
+                    }
                   }
                 }
               }
-              for (String key : occurences.keySet()) {
-                group.dataCollector.add(new String[] { key },
-                    ArrayUtils.toPrimitive(new Long[] { occurences.get(key) }),
-                    1);
-              }
-              // }
             }
+
+          } else {
+            int maximumNumberOfDocuments = 0;
+            int minimumNumberOfDocuments = 1;
+            int boundaryNumberOfDocuments = 5;
+            HashSet<GroupHit> administrationOccurrences = new HashSet<GroupHit>();
+            for (int docCounter = 0; docCounter < docSet.size(); docCounter++) {
+              occurencesInCurrentDocument.clear();
+              docId = docSet.get(docCounter);
+              if (matchData != null
+                  && (matchList = matchData.get(docId)) != null
+                  && matchList.size() > 0) {
+                // loop over matches
+                Iterator<Match> it = matchList.listIterator();
+                ArrayList<IntervalTreeNodeData<String>> positionsHits = new ArrayList<IntervalTreeNodeData<String>>();
+                while (it.hasNext()) {
+                  Match m = it.next();
+                  positionsHits.add(createPositionHit(m, group));
+                }
+                mtasCodecInfo.collectTermsByPrefixesForListOfHitPositions(field,
+                    (docId - docBase), group.prefixes, positionsHits);
+                // administration
+                for (IntervalTreeNodeData<String> positionHit : positionsHits) {
+                  // System.out.println(positionHit);
+                  GroupHit hit = new GroupHit(positionHit.list,
+                      positionHit.start, positionHit.end, positionHit.hitStart,
+                      positionHit.hitEnd, group, knownPrefixes);
+                  GroupHit hitKey = null;
+                  for (GroupHit hitKeyItem : occurencesSum.keySet()) {
+                    if (hitKeyItem.equals(hit)) {
+                      hitKey = hitKeyItem;
+                      break;
+                    }
+                  }
+                  if (hitKey == null) {
+                    occurencesSum.put(hit, Long.valueOf(1));
+                    occurencesN.put(hit, 1);
+                    occurencesInCurrentDocument.add(hit);
+                  } else {
+                    occurencesSum.put(hitKey, occurencesSum.get(hitKey) + 1);
+                    if (!occurencesInCurrentDocument.contains(hitKey)) {
+                      if (occurencesN.containsKey(hitKey)) {
+                        occurencesN.put(hitKey, occurencesN.get(hitKey) + 1);
+                      } else {
+                        occurencesN.put(hitKey, 1);
+                      }
+                      occurencesInCurrentDocument.add(hitKey);
+                    }
+                  }
+                }
+                
+
+                if (!intersectionGroupPrefixes) {
+                                    
+                  for (GroupHit groupHit : occurencesInCurrentDocument) {
+                    int tmpNumber = occurencesN.get(groupHit);
+                    maximumNumberOfDocuments = Math.max(maximumNumberOfDocuments, tmpNumber);
+                    if(tmpNumber > minimumNumberOfDocuments) {
+                      administrationOccurrences.add(groupHit);
+                    }                      
+                  }
+                  // collect spans
+                  if(maximumNumberOfDocuments>boundaryNumberOfDocuments) {                    
+                    if (administrationOccurrences.size() > 0) {
+                      HashMap<GroupHit, Spans> list = collectSpansForOccurences(
+                          administrationOccurrences, knownPrefixes, field, mtasCodecInfo,
+                          searcher, lrc);
+                      if (list.size() > 0) {
+//                        System.out.println("== START == segment " + lrc.ord
+//                            + " - doc " + docId + " - list:" + list.size());
+                        int subTotalOfGroupCollectsUsingSpan = collectGroupUsingSpans(
+                            list, docSet, docBase, docCounter, matchData,
+                            occurencesSum, occurencesN);
+//                        System.out.println(" - collected "
+//                            + subTotalOfGroupCollectsUsingSpan + " hits");
+//                        System.out.println(
+//                            "== END == segment " + lrc.ord + " - doc " + docId);
+                      }                      
+                    }
+                    administrationOccurrences.clear();
+                    maximumNumberOfDocuments = 0;
+                    minimumNumberOfDocuments = (int) Math.ceil(minimumNumberOfDocuments*1.2);
+                    boundaryNumberOfDocuments = (int) Math.ceil(boundaryNumberOfDocuments*1.2);
+                  }  
+                }
+              }
+            }
+          }
+
+          for (GroupHit hit : occurencesSum.keySet()) {
+            group.dataCollector.add(new String[] { hit.toString() },
+                occurencesSum.get(hit), occurencesN.get(hit));
           }
           group.dataCollector.closeNewList();
         }
       }
+    }
+  }
+
+  private static boolean availablePrefixes(ComponentGroup group,
+      HashSet<String> knownPrefixes) {
+    for (String prefix : group.prefixes) {
+      if (knownPrefixes.contains(prefix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  private static boolean intersectionPrefixes(ComponentGroup group,
+      HashSet<String> intersectionPrefixes) {
+    for (String prefix : group.prefixes) {
+      if (intersectionPrefixes.contains(prefix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static IntervalTreeNodeData<String> createPositionHit(Match m,
+      ComponentGroup group) {
+    Integer start = null, end = null;
+    if (group.hitInside != null || group.hitInsideLeft != null
+        || group.hitInsideRight != null) {
+      start = m.startPosition;
+      end = m.endPosition - 1;
+    } else {
+      start = null;
+      end = null;
+    }
+    if (group.hitLeft != null) {
+      start = m.startPosition;
+      end = Math.max(m.startPosition + group.hitLeft.length - 1,
+          m.endPosition - 1);
+    }
+    if (group.hitRight != null) {
+      start = Math.min(m.endPosition - group.hitRight.length + 1,
+          m.startPosition);
+      end = end == null ? m.endPosition : Math.max(end, m.endPosition);
+    }
+    if (group.left != null) {
+      start = start == null ? m.startPosition - group.left.length
+          : Math.min(m.startPosition - group.left.length, start);
+      end = end == null ? m.startPosition - 1
+          : Math.max(m.startPosition - 1, end);
+    }
+    if (group.right != null) {
+      start = start == null ? m.endPosition : Math.min(m.endPosition, start);
+      end = end == null ? m.endPosition + group.right.length
+          : Math.max(m.endPosition + group.right.length, end);
+    }
+    return new IntervalTreeNodeData<String>(start, end, m.startPosition,
+        m.endPosition - 1);
+  }
+
+  private static int collectGroupUsingSpans(HashMap<GroupHit, Spans> list,
+      List<Integer> docSet, int docBase, int docCounter,
+      HashMap<Integer, ArrayList<Match>> matchData,
+      HashMap<GroupHit, Long> occurencesSum,
+      HashMap<GroupHit, Integer> occurencesN) throws IOException {
+    int total = 0;
+    if (docCounter + 1 < docSet.size()) {
+      // analyze matches for future documents with spans from
+      // previous
+      int nextDocCounter = docCounter + 1;
+      long[] subSum = new long[list.size()];
+      int[] subN = new int[list.size()];
+      boolean[] newNextDocs = new boolean[list.size()];
+      boolean newNextDoc;
+      int[] spansNextDoc = new int[list.size()];
+      int nextDoc = 0;
+      ArrayList<Match> matchList;
+      GroupHit[] hitList = list.keySet().toArray(new GroupHit[list.size()]);
+      Spans[] spansList = new Spans[list.size()];
+      boolean[] finishedSpansList = new boolean[list.size()];
+      newNextDoc = true;
+      for (int i = 0; i < hitList.length; i++) {
+        newNextDocs[i] = true;
+        spansList[i] = list.get(hitList[i]);
+        spansNextDoc[i] = spansList[i]
+            .advance(docSet.get(nextDocCounter) - docBase);
+        nextDoc = (i == 0) ? spansNextDoc[i]
+            : Math.min(nextDoc, spansNextDoc[i]);
+      }
+      // loop over future documents
+      while (nextDoc < DocIdSetIterator.NO_MORE_DOCS) {
+        // find matches for next document
+        while (nextDocCounter < docSet.size()
+            && docSet.get(nextDocCounter) < (nextDoc + docBase)) {
+          nextDocCounter++;
+        }
+        if (nextDocCounter >= docSet.size()) {
+          break;
+        }
+        // matches found
+        if (docSet.get(nextDocCounter) == nextDoc + docBase) {
+          matchList = matchData.get(nextDoc + docBase);
+          if (matchList != null && matchList.size() > 0) {
+            int currentMatchPosition = 0;
+            int lastMatchStartPosition = matchList
+                .get(matchList.size() - 1).startPosition;
+            ArrayList<Match> newMatchList = new ArrayList<Match>(
+                matchList.size());
+            int currentSpanPosition = Spans.NO_MORE_POSITIONS;
+            for (int i = 0; i < spansList.length; i++) {
+              if (spansList[i].docID() == nextDoc) {
+                int tmpStartPosition = spansList[i].nextStartPosition();
+                if (tmpStartPosition < Spans.NO_MORE_POSITIONS) {
+                  finishedSpansList[i] = false;
+                } else {
+                  finishedSpansList[i] = true;
+                }
+                currentSpanPosition = (currentSpanPosition == Spans.NO_MORE_POSITIONS)
+                    ? tmpStartPosition
+                    : Math.min(currentSpanPosition, tmpStartPosition);
+              } else {
+                finishedSpansList[i] = true;
+              }
+            }
+            while (currentMatchPosition < matchList.size()
+                && currentSpanPosition < Spans.NO_MORE_POSITIONS) {
+              if (currentSpanPosition < matchList
+                  .get(currentMatchPosition).startPosition) {
+                // do nothing
+              } else if (currentSpanPosition > lastMatchStartPosition) {
+                // finish
+                break;
+              } else {
+                // advance matches
+                while (currentMatchPosition < matchList.size()
+                    && currentSpanPosition > matchList
+                        .get(currentMatchPosition).startPosition) {
+                  newMatchList.add(matchList.get(currentMatchPosition));
+                  currentMatchPosition++;
+                }
+                // equal startPosition
+                while (currentMatchPosition < matchList.size()
+                    && currentSpanPosition == matchList
+                        .get(currentMatchPosition).startPosition) {
+                  for (int i = 0; i < spansList.length; i++) {
+                    if (!finishedSpansList[i] && spansList[i].docID() == nextDoc
+                        && spansList[i].startPosition() == matchList
+                            .get(currentMatchPosition).startPosition
+                        && spansList[i].endPosition() == matchList
+                            .get(currentMatchPosition).endPosition) {
+                      // StringBuilder newKey = new StringBuilder("");
+                      // GroupHit.keyToObject(hitList[i].toString(), newKey);
+                      // System.out
+                      // .println("FOUND " + newKey + " - doc "
+                      // + (nextDoc + docBase) + " ["
+                      // + spansList[i].startPosition() + ","
+                      // + spansList[i].endPosition() + "] == ["
+                      // + matchList
+                      // .get(currentMatchPosition).startPosition
+                      // + ","
+                      // + matchList.get(currentMatchPosition).endPosition
+                      // + "]");
+                      total++;
+                      subSum[i]++;
+                      if (newNextDocs[i]) {
+                        subN[i]++;
+                        newNextDocs[i] = false;
+                        newNextDoc = false;
+                      }
+                    } else if (!finishedSpansList[i]
+                        && spansList[i].docID() == nextDoc
+                        && spansList[i].startPosition() == matchList
+                            .get(currentMatchPosition).startPosition) {
+//                      System.out
+//                          .println("NOT FOUND " + hitList[i] + " - doc "
+//                              + (nextDoc + docBase) + " ["
+//                              + spansList[i].startPosition() + ","
+//                              + spansList[i].endPosition() + "] ipv ["
+//                              + matchList
+//                                  .get(currentMatchPosition).startPosition
+//                              + ","
+//                              + matchList.get(currentMatchPosition).endPosition
+//                              + "]");
+                    }
+                  }
+                  currentMatchPosition++;
+                }
+              }
+              // advance spans
+              if (currentMatchPosition < matchList.size()) {
+                currentSpanPosition = Spans.NO_MORE_POSITIONS;
+                for (int i = 0; i < spansList.length; i++) {
+                  if (spansList[i].docID() == nextDoc) {
+                    if (!finishedSpansList[i]
+                        && spansList[i].startPosition() < matchList
+                            .get(currentMatchPosition).startPosition) {
+                      while (!finishedSpansList[i]
+                          && spansList[i].startPosition() < matchList
+                              .get(currentMatchPosition).startPosition) {
+                        int tmpStartPosition = spansList[i].nextStartPosition();
+                        if (tmpStartPosition == Spans.NO_MORE_POSITIONS) {
+                          finishedSpansList[i] = true;
+                        }
+                      }
+                    }
+                    if (!finishedSpansList[i]) {
+                      currentSpanPosition = (currentSpanPosition == Spans.NO_MORE_POSITIONS)
+                          ? spansList[i].startPosition()
+                          : Math.min(currentSpanPosition,
+                              spansList[i].startPosition());
+                    }
+                  } else {
+                    finishedSpansList[i] = true;
+                  }
+                }
+              }
+            }
+            if (!newNextDoc) {
+              while (currentMatchPosition < matchList.size()) {
+                newMatchList.add(matchList.get(currentMatchPosition));
+                currentMatchPosition++;
+              }
+              if (newMatchList.size() > 0) {
+                matchData.put(nextDoc + docBase, newMatchList);
+              } else {
+                matchData.remove(nextDoc + docBase);
+              }
+            }
+          }
+        }
+        // advance to next document
+        nextDocCounter++;
+        newNextDoc = true;
+        for (int i = 0; i < hitList.length; i++) {
+          newNextDocs[i] = true;
+        }
+        // advance spans
+        if (nextDocCounter < docSet.size()) {
+          nextDoc = Spans.NO_MORE_DOCS;
+          for (int i = 0; i < hitList.length; i++) {
+            if (spansNextDoc[i] < (docSet.get(nextDocCounter) - docBase)) {
+              spansNextDoc[i] = spansList[i]
+                  .advance(docSet.get(nextDocCounter) - docBase);
+            }
+            if (spansNextDoc[i] < Spans.NO_MORE_DOCS) {
+              nextDoc = (nextDoc == Spans.NO_MORE_DOCS) ? spansNextDoc[i]
+                  : Math.min(nextDoc, spansNextDoc[i]);
+            }
+          }
+        }
+      }
+      // update administration
+      for (int i = 0; i < hitList.length; i++) {
+        if (subSum[i] > 0) {
+          if (occurencesSum.containsKey(hitList[i])) {
+            occurencesSum.put(hitList[i],
+                occurencesSum.get(hitList[i]) + subSum[i]);
+            occurencesN.put(hitList[i], occurencesN.get(hitList[i]) + subN[i]);
+          }
+        }
+      }
+    }
+    return total;
+  }
+
+  private static void sortMatchList(ArrayList<Match> list) {
+    if (list != null) {
+      // light sorting on start position
+      Collections.sort(list, new Comparator<Match>() {
+        @Override
+        public int compare(Match m1, Match m2) {
+          if (m1.startPosition < m2.startPosition) {
+            return -1;
+          } else if (m1.startPosition > m2.startPosition) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }
+      });
     }
   }
 
@@ -1855,34 +2340,6 @@ public class CodecCollector {
   }
 
   /**
-   * Creates the termvector.
-   *
-   * @param termVectorList
-   *          the term vector list
-   * @param positionsData
-   *          the positions data
-   * @param docSet
-   *          the doc set
-   * @param field
-   *          the field
-   * @param t
-   *          the t
-   * @param r
-   *          the r
-   * @param lrc
-   *          the lrc
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
-  private static void createTermvector(List<ComponentTermVector> termVectorList,
-      HashMap<Integer, Integer> positionsData, List<Integer> docSet,
-      String field, Terms t, LeafReader r, LeafReaderContext lrc)
-      throws IOException {
-    createTermvectorFirstRound(termVectorList, positionsData, docSet, field, t,
-        r, lrc);
-  }
-
-  /**
    * Creates the termvector first round.
    *
    * @param termVectorList
@@ -1916,11 +2373,12 @@ public class CodecCollector {
       // loop over termvectors
       for (ComponentTermVector termVector : termVectorList) {
         termsEnum = t.intersect(termVector.compiledAutomaton, null);
-        termVector.subComponentFunction.dataCollector.initNewList(
-            (int) t.size(), segmentName, segmentNumber, termVector.boundary);
+        int initSize = Math.min((int) t.size(), 1000);
+        termVector.subComponentFunction.dataCollector.initNewList(initSize,
+            segmentName, segmentNumber, termVector.boundary);
         if (termVector.functions != null) {
           for (SubComponentFunction function : termVector.functions) {
-            function.dataCollector.initNewList((int) t.size());
+            function.dataCollector.initNewList(initSize);
           }
         }
         // only if documents
@@ -1937,20 +2395,43 @@ public class CodecCollector {
               || termVector.subComponentFunction.sortType
                   .equals(CodecUtil.STATS_TYPE_N)) {
             int termCounter = 0;
+
+            boolean continueAfterPreliminaryCheck, preliminaryCheck = false;
+            if (r.getLiveDocs() == null && (docSet.size() != r.numDocs())) {
+              preliminaryCheck = true;
+            }
             // loop over terms
             while ((term = termsEnum.next()) != null) {
               termDocId = -1;
-              // compute numbers;
-              TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                  docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-              // register
-              if (numberBasic.docNumber > 0) {
-                termCounter++;
-                registerStatus = registerValue(term, termVector, numberBasic,
-                    termNumberMaximum, segmentNumber, false);
-                if (registerStatus != null) {
-                  computeFullList.put(BytesRef.deepCopyOf(term),
-                      registerStatus);
+              continueAfterPreliminaryCheck = true;
+              if (preliminaryCheck) {
+                try {
+                  TermvectorNumberBasic preliminaryNumberBasic = computeTermvectorNumberBasic(
+                      termsEnum, r);
+                  if (preliminaryNumberBasic.docNumber > 0) {
+                    continueAfterPreliminaryCheck = preliminaryRegisterValue(
+                        term, termVector, preliminaryNumberBasic,
+                        termNumberMaximum, segmentNumber);
+                  } else {
+                    continueAfterPreliminaryCheck = false;
+                  }
+                } catch (IOException e) {
+                  continueAfterPreliminaryCheck = true;
+                }
+              }
+              if (continueAfterPreliminaryCheck) {
+                // compute numbers;
+                TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                    docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                // register
+                if (numberBasic.docNumber > 0) {
+                  termCounter++;
+                  registerStatus = registerValue(term, termVector, numberBasic,
+                      termNumberMaximum, segmentNumber, false);
+                  if (registerStatus != null) {
+                    computeFullList.put(BytesRef.deepCopyOf(term),
+                        registerStatus);
+                  }
                 }
               }
               // stop after termCounterMaximum
@@ -1999,7 +2480,6 @@ public class CodecCollector {
               function.dataCollector.closeSegmentKeyValueRegistration();
             }
           }
-
         }
         termVector.subComponentFunction.dataCollector.closeNewList();
         if (termVector.functions != null) {
@@ -2009,7 +2489,6 @@ public class CodecCollector {
         }
       }
     }
-
   }
 
   /**
@@ -2100,7 +2579,6 @@ public class CodecCollector {
         }
       }
     }
-
   }
 
   /**
@@ -2139,8 +2617,8 @@ public class CodecCollector {
           needSecondRound = true;
         }
         termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();
-      }      
-    }    
+      }
+    }
     return needSecondRound;
   }
 
@@ -2261,7 +2739,7 @@ public class CodecCollector {
         if (addItem) {
           key = MtasToken.getPostfixFromValue(term);
           String segmentStatus = dataCollector.validateSegmentValue(key,
-              sortValue, termNumberMaximum, segmentNumber);
+              sortValue, termNumberMaximum, segmentNumber, false);
           if (segmentStatus != null) {
             addItem = true;
             if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {
@@ -2274,7 +2752,7 @@ public class CodecCollector {
       } else {
         key = MtasToken.getPostfixFromValue(term);
         String segmentStatus = dataCollector.validateSegmentValue(key,
-            sortValue, termNumberMaximum, segmentNumber);
+            sortValue, termNumberMaximum, segmentNumber, false);
         if (segmentStatus != null) {
           addItem = true;
           if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {
@@ -2320,6 +2798,41 @@ public class CodecCollector {
       return computeFull ? new RegisterStatus(sortValue, addItemForced) : null;
     } else {
       return null;
+    }
+  }
+
+  private static boolean preliminaryRegisterValue(BytesRef term,
+      ComponentTermVector termVector, TermvectorNumberBasic number,
+      Integer termNumberMaximum, Integer segmentNumber) throws IOException {
+    long sortValue = 0;
+    if (!termVector.subComponentFunction.sortDirection
+        .equals(CodecUtil.SORT_DESC)) {
+      return true;
+    } else if (termVector.subComponentFunction.sortType
+        .equals(CodecUtil.STATS_TYPE_SUM)) {
+      sortValue = termVector.subComponentFunction.parserFunction
+          .getValueLong(number.valueSum, 0);
+    } else if (termVector.subComponentFunction.sortType
+        .equals(CodecUtil.STATS_TYPE_N)) {
+      sortValue = Long.valueOf(number.docNumber);
+    } else {
+      return true;
+    }
+    MtasDataCollector<Long, ?> dataCollector = (MtasDataCollector<Long, ?>) termVector.subComponentFunction.dataCollector;
+    if (termVector.list != null) {
+      String key = MtasToken.getPostfixFromValue(term);
+      return termVector.list.contains(key);
+    } else if (termVector.boundaryRegistration) {
+      return dataCollector.validateSegmentBoundary(sortValue);
+    } else {
+      String key = MtasToken.getPostfixFromValue(term);
+      String segmentStatus = dataCollector.validateSegmentValue(key, sortValue,
+          termNumberMaximum, segmentNumber, true);
+      if (segmentStatus != null) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
@@ -2397,6 +2910,20 @@ public class CodecCollector {
 
   }
 
+  private static TermvectorNumberBasic computeTermvectorNumberBasic(
+      TermsEnum termsEnum, LeafReader r) throws IOException {
+    TermvectorNumberBasic result = new TermvectorNumberBasic();
+    boolean hasDeletedDocuments = (r.getLiveDocs() != null);
+    if (!hasDeletedDocuments) {
+      result.valueSum[0] = termsEnum.totalTermFreq();
+      result.docNumber = termsEnum.docFreq();
+      if (result.valueSum[0] > -1) {
+        return result;
+      }
+    }
+    throw new IOException("should not call this");
+  }
+
   /**
    * Compute termvector number basic.
    *
@@ -2423,10 +2950,10 @@ public class CodecCollector {
     boolean hasDeletedDocuments = (r.getLiveDocs() != null);
     boolean subtractValue = false;
     if ((docSet.size() == r.numDocs()) && !hasDeletedDocuments) {
-      result.valueSum[0] = termsEnum.totalTermFreq();
-      result.docNumber = termsEnum.docFreq();
-      if (result.valueSum[0] > -1) {
-        return result;
+      try {
+        return computeTermvectorNumberBasic(termsEnum, r);
+      } catch (IOException e) {
+        // problem
       }
     }
     if (docSet.size() > Math.round(r.numDocs() / 2) && !hasDeletedDocuments) {
@@ -2447,6 +2974,9 @@ public class CodecCollector {
             result.valueSum[0] += postingsEnum.freq();
           }
         }
+      }
+      if (termDocId == DocIdSetIterator.NO_MORE_DOCS) {
+        break;
       }
     }
     return result;

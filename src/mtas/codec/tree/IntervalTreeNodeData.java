@@ -37,5 +37,11 @@ public class IntervalTreeNodeData<T> {
     this.hitEnd = hitEnd;
     list = new ArrayList<MtasTreeHit<T>>();
   }
+  
+  public String toString() {
+    String text = this.getClass().getName();
+    text+="(s"+start+"|hs"+hitStart+",hh"+hitEnd+"|e"+end+") - "+list;
+    return text;
+  }
 
 }

@@ -17,16 +17,14 @@ import org.apache.lucene.util.BytesRef;
 /**
  * The Class MtasCodecPostingsFormat.
  */
+/**
+ * @author matthijs
+ *
+ */
 public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant VERSION_START. */
-  public static final int VERSION_START = 1;
-
-  /** The Constant VERSION_OLD_1. */
-  public static final int VERSION_OLD_1 = 1;
-
-  /** The Constant VERSION_OLD_2. */
-  public static final int VERSION_OLD_2 = 2;
+  public static final int VERSION_START = 3;
 
   /** The Constant VERSION_CURRENT. */
   public static final int VERSION_CURRENT = 3;
@@ -62,19 +60,19 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   public static final int MTAS_STORAGE_LONG = 3;
 
   /** The Constant MTAS_TMP_FIELD_EXTENSION. */
-  public static final String MTAS_TMP_FIELD_EXTENSION = "mtas.field.tmp";
+  public static final String MTAS_TMP_FIELD_EXTENSION = "mtas.field.temporary";
 
   /** The Constant MTAS_TMP_OBJECT_EXTENSION. */
-  public static final String MTAS_TMP_OBJECT_EXTENSION = "mtas.object.tmp";
+  public static final String MTAS_TMP_OBJECT_EXTENSION = "mtas.object.temporary";
 
   /** The Constant MTAS_TMP_DOCS_EXTENSION. */
-  public static final String MTAS_TMP_DOCS_EXTENSION = "mtas.docs.tmp";
+  public static final String MTAS_TMP_DOCS_EXTENSION = "mtas.docs.temporary";
 
   /** The Constant MTAS_TMP_DOC_EXTENSION. */
-  public static final String MTAS_TMP_DOC_EXTENSION = "mtas.doc.tmp";
+  public static final String MTAS_TMP_DOC_EXTENSION = "mtas.doc.temporary";
 
   /** The Constant MTAS_TMP_DOCS_CHAINED_EXTENSION. */
-  public static final String MTAS_TMP_DOCS_CHAINED_EXTENSION = "mtas.docs.chained.tmp";
+  public static final String MTAS_TMP_DOCS_CHAINED_EXTENSION = "mtas.docs.chained.temporary";
 
   /** The Constant MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION. */
   public static final String MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION = "mtas.prefix.single.position";
@@ -85,6 +83,9 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /** The Constant MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION. */
   public static final String MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION = "mtas.prefix.set.position";
 
+  /** The Constant MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION. */
+  public static final String MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION = "mtas.prefix.intersection";
+  
   /** The Constant MTAS_OBJECT_EXTENSION. */
   public static final String MTAS_OBJECT_EXTENSION = "mtas.object";
 
@@ -134,8 +135,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Instantiates a new mtas codec postings format.
    *
-   * @param delegate
-   *          the delegate
+   * @param delegate the delegate
    */
   public MtasCodecPostingsFormat(PostingsFormat delegate) {
     super(MtasCodec.MTAS_CODEC_NAME);
@@ -159,8 +159,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Instantiates a new mtas codec postings format.
    *
-   * @param codecName
-   *          the codec name
+   * @param codecName the codec name
    */
   public MtasCodecPostingsFormat(String codecName) {
     super(codecName);
@@ -217,15 +216,11 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /**
    * Gets the token.
    *
-   * @param inObject
-   *          the in object
-   * @param inTerm
-   *          the in term
-   * @param ref
-   *          the ref
+   * @param inObject the in object
+   * @param inTerm the in term
+   * @param ref the ref
    * @return the token
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasToken<String> getToken(IndexInput inObject,
       IndexInput inTerm, Long ref) throws IOException {
@@ -286,6 +281,23 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       throw new IOException(e.getMessage());
     }
     return token;
+  }
+  
+  /**
+   * Gets the term.
+   *
+   * @param inTerm the in term
+   * @param ref the ref
+   * @return the term
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public static String getTerm(IndexInput inTerm, Long ref) throws IOException {
+    try {
+      inTerm.seek(ref);
+      return inTerm.readString();
+    } catch (Exception e) {
+      throw new IOException(e.getMessage());
+    }
   }
 
 }

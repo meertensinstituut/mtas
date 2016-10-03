@@ -44,6 +44,9 @@ public class MtasSolrComponentGroup {
   /** The Constant NAME_MTAS_GROUP_KEY. */
   public static final String NAME_MTAS_GROUP_KEY = "key";
 
+  /** The Constant NAME_MTAS_GROUP_NUMBER. */
+  public static final String NAME_MTAS_GROUP_NUMBER = "number";
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_LEFT = "grouping.left";
 
@@ -71,6 +74,10 @@ public class MtasSolrComponentGroup {
   /** The Constant NAME_MTAS_GROUP_GROUPING_PREFIXES. */
   public static final String NAME_MTAS_GROUP_GROUPING_PREFIXES = "prefixes";
 
+  /** The Constant DEFAULT_NUMBER. */
+  private static final int DEFAULT_NUMBER = 10;
+  
+  
   /**
    * Instantiates a new mtas solr component group.
    *
@@ -101,6 +108,7 @@ public class MtasSolrComponentGroup {
       String[] queryTypes = new String[ids.size()];
       String[] queryValues = new String[ids.size()];
       String[] keys = new String[ids.size()];
+      String[] numbers = new String[ids.size()];
       String[][] groupingLeftPosition = new String[ids.size()][];
       String[][] groupingLeftPrefixes = new String[ids.size()][];
       String[][] groupingRightPosition = new String[ids.size()][];
@@ -121,6 +129,8 @@ public class MtasSolrComponentGroup {
             .get(PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_KEY,
                 String.valueOf(tmpCounter))
             .trim();
+        numbers[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_GROUP + "."
+            + id + "." + NAME_MTAS_GROUP_NUMBER, null);
         queryTypes[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_TYPE,
             null);
@@ -226,9 +236,11 @@ public class MtasSolrComponentGroup {
         }
         String key = (keys[i] == null) || (keys[i].isEmpty())
             ? String.valueOf(i) + ":" + fields[i] + ":" + queryValues[i]
-            : keys[i].trim();
+            : keys[i].trim();            
+        int number = (numbers[i] == null) || (numbers[i].isEmpty()) ? DEFAULT_NUMBER
+                : Integer.parseInt(numbers[i]);
         mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
-            fields[i], queryValues[i], queryTypes[i], key,
+            fields[i], queryValues[i], queryTypes[i], key, number,
             groupingHitInsidePrefixes[i], groupingHitInsideLeftPosition[i],
             groupingHitInsideLeftPrefixes[i], groupingHitInsideRightPosition[i],
             groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],

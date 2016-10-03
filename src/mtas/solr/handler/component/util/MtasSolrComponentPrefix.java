@@ -146,10 +146,13 @@ public class MtasSolrComponentPrefix {
           MtasSolrResultUtil.encode(prefix.multiplePositionList));
       mtasPrefixResponse.add("_encoded_setPosition",
           MtasSolrResultUtil.encode(prefix.setPositionList));
+      mtasPrefixResponse.add("_encoded_intersecting",
+          MtasSolrResultUtil.encode(prefix.intersectingList));
     } else {
       mtasPrefixResponse.add("singlePosition", prefix.singlePositionList);
       mtasPrefixResponse.add("multiplePosition", prefix.multiplePositionList);
       mtasPrefixResponse.add("setPosition", prefix.setPositionList);
+      mtasPrefixResponse.add("intersecting", prefix.intersectingList);
     }
     return mtasPrefixResponse;
   }

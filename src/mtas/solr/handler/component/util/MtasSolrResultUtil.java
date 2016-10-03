@@ -8,10 +8,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -24,7 +26,9 @@ import org.apache.solr.common.util.Base64;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
+import mtas.analysis.token.MtasToken;
 import mtas.codec.util.DataCollector;
+import mtas.codec.util.CodecComponent.GroupHit;
 import mtas.codec.util.collector.MtasDataItem;
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.TokenMgrError;
@@ -36,7 +40,9 @@ public class MtasSolrResultUtil {
 
   /** The Constant QUERY_TYPE_CQL. */
   public static final String QUERY_TYPE_CQL = "cql";
-
+  
+  public static final Pattern patternKeyStartGrouphit = Pattern.compile("^"+GroupHit.KEY_START);
+    
   /**
    * Rewrite.
    *
@@ -109,7 +115,7 @@ public class MtasSolrResultUtil {
               nnl.setVal(j, mdi);
             }
           }
-          nl.setVal(i, nnl);
+          nl.setVal(i, rewriteToArray(nnl));
         } else if (o.dataCollector.getCollectorType()
             .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
           NamedList<Object> nnl = o.getData(showDebugInfo);
@@ -133,6 +139,26 @@ public class MtasSolrResultUtil {
         nl.addAll(items);
       }
     }
+  }
+
+  private static ArrayList<NamedList<Object>> rewriteToArray(NamedList<Object> nnl) {
+    ArrayList<NamedList<Object>> al = new ArrayList<NamedList<Object>>();
+    String key;     
+    Iterator<Entry<String, Object>> it = nnl.iterator();
+    while(it.hasNext()) {
+      Entry<String, Object> entry = it.next();
+      NamedList<Object> item = (NamedList<Object>) entry.getValue();
+      key = entry.getKey();
+      if(key.startsWith(GroupHit.KEY_START)) {
+        StringBuilder newKey = new StringBuilder("");
+        item.add("group", GroupHit.keyToObject(key, newKey));
+        item.add("key", newKey.toString().trim());
+      } else {
+        item.add("key", key);
+      }  
+      al.add(item);
+    }
+    return al;
   }
 
   /**

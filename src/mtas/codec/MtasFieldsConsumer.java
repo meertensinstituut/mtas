@@ -323,20 +323,26 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /** The state. */
   private SegmentWriteState state;
 
+   private HashMap<String, HashMap<String, Integer>> lastPrefixEnd;
+   private HashMap<String, HashMap<String, Integer>>
+   currentDocForlastPrefixEnd;
+
+   private HashMap<String, HashSet<String>> intersectingPrefixes;
+
   /** The single position prefix. */
-  private HashMap<String, HashSet<String>> singlePositionPrefix;
+   private HashMap<String, HashSet<String>> singlePositionPrefix;
 
   /** The multiple position prefix. */
-  private HashMap<String, HashSet<String>> multiplePositionPrefix;
+   private HashMap<String, HashSet<String>> multiplePositionPrefix;
 
   /** The set position prefix. */
-  private HashMap<String, HashSet<String>> setPositionPrefix;
+   private HashMap<String, HashSet<String>> setPositionPrefix;
 
   /** The prefix reference index. */
-  private HashMap<String, HashMap<String, Long>> prefixReferenceIndex;
+   private HashMap<String, HashMap<String, Long>> prefixReferenceIndex;
 
   /** The prefix id index. */
-  private HashMap<String, HashMap<String, Integer>> prefixIdIndex;
+   private HashMap<String, HashMap<String, Integer>> prefixIdIndex;
 
   /** The token stats min pos. */
   Integer tokenStatsMinPos;
@@ -363,10 +369,14 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Instantiates a new mtas fields consumer.
    *
-   * @param fieldsConsumer the fields consumer
-   * @param state the state
-   * @param name the name
-   * @param delegatePostingsFormatName the delegate postings format name
+   * @param fieldsConsumer
+   *          the fields consumer
+   * @param state
+   *          the state
+   * @param name
+   *          the name
+   * @param delegatePostingsFormatName
+   *          the delegate postings format name
    */
   public MtasFieldsConsumer(FieldsConsumer fieldsConsumer,
       SegmentWriteState state, String name, String delegatePostingsFormatName) {
@@ -374,12 +384,6 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     this.state = state;
     this.name = name;
     this.delegatePostingsFormatName = delegatePostingsFormatName;
-    // prefix stats
-    singlePositionPrefix = new HashMap<String, HashSet<String>>();
-    multiplePositionPrefix = new HashMap<String, HashSet<String>>();
-    setPositionPrefix = new HashMap<String, HashSet<String>>();
-    prefixReferenceIndex = new HashMap<String, HashMap<String, Long>>();
-    prefixIdIndex = new HashMap<String, HashMap<String, Integer>>();
     // temporary fileNames
     mtasTmpFieldFileName = IndexFileNames.segmentFileName(
         state.segmentInfo.name, state.segmentSuffix,
@@ -423,13 +427,17 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix.
    *
-   * @param field the field
-   * @param prefix the prefix
-   * @param outPrefix the out prefix
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  private void registerPrefix(String field, String prefix,
-      IndexOutput outPrefix) throws IOException {
+  private void registerPrefix(String field,
+      String prefix, IndexOutput outPrefix) throws IOException {
     if (!prefixReferenceIndex.containsKey(field)) {
       prefixReferenceIndex.put(field, new HashMap<String, Long>());
       prefixIdIndex.put(field, new HashMap<String, Integer>());
@@ -442,19 +450,52 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     }
   }
 
+  private void registerPrefixIntersection(
+      String field, String prefix, String tmp, Integer docId, int start,
+      int end, HashMap<String, HashSet<Integer>> docFieldAdministration) {
+    if (!intersectingPrefixes.containsKey(field)) {
+      intersectingPrefixes.put(field, new HashSet<String>());
+    } else if(intersectingPrefixes.get(field).contains(prefix)) {
+      return;
+    }
+    HashSet<Integer> docFieldPrefixAdministration;
+    if(!docFieldAdministration.containsKey(prefix)) {
+      docFieldPrefixAdministration = new HashSet<Integer>();
+      docFieldAdministration.put(prefix, docFieldPrefixAdministration);
+    } else {
+      docFieldPrefixAdministration = docFieldAdministration.get(prefix);
+      //check
+      for(int p=start; p<=end; p++) {
+        if(docFieldPrefixAdministration.contains(p)) {
+          intersectingPrefixes.get(field).add(prefix);
+          docFieldAdministration.remove(prefix);
+          return;
+        }
+      }
+    }
+    //update
+    for(int p=start; p<=end; p++) {
+      docFieldPrefixAdministration.add(p);
+    }    
+  }
+
   /**
    * Register prefix stats single position value.
    *
-   * @param field the field
-   * @param value the value
-   * @param outPrefix the out prefix
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param value
+   *          the value
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  public void registerPrefixStatsSinglePositionValue(String field, String value,
-      IndexOutput outPrefix) throws IOException {
+  public void registerPrefixStatsSinglePositionValue(String field,
+      String prefix, IndexOutput outPrefix) throws IOException {
     initPrefixStatsField(field);
-    String prefix = MtasToken.getPrefixFromValue(value);
-    registerPrefix(field, prefix, outPrefix);
+    registerPrefix(field, prefix,
+        outPrefix);
     if (!multiplePositionPrefix.get(field).contains(prefix)) {
       singlePositionPrefix.get(field).add(prefix);
     }
@@ -463,16 +504,20 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix stats range position value.
    *
-   * @param field the field
-   * @param value the value
-   * @param outPrefix the out prefix
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param value
+   *          the value
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  public void registerPrefixStatsRangePositionValue(String field, String value,
-      IndexOutput outPrefix) throws IOException {
+  public void registerPrefixStatsRangePositionValue(String field,
+      String prefix, IndexOutput outPrefix) throws IOException {
     initPrefixStatsField(field);
-    String prefix = MtasToken.getPrefixFromValue(value);
-    registerPrefix(field, prefix, outPrefix);
+    registerPrefix(field, prefix,
+        outPrefix);
     singlePositionPrefix.get(field).remove(prefix);
     multiplePositionPrefix.get(field).add(prefix);
   }
@@ -480,16 +525,20 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix stats set position value.
    *
-   * @param field the field
-   * @param value the value
-   * @param outPrefix the out prefix
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param value
+   *          the value
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  public void registerPrefixStatsSetPositionValue(String field, String value,
-      IndexOutput outPrefix) throws IOException {
-    initPrefixStatsField(field);
-    String prefix = MtasToken.getPrefixFromValue(value);
-    registerPrefix(field, prefix, outPrefix);
+  public void registerPrefixStatsSetPositionValue(String field,
+      String prefix, IndexOutput outPrefix) throws IOException {
+    initPrefixStatsField( field);
+    registerPrefix(field, prefix,
+        outPrefix);
     singlePositionPrefix.get(field).remove(prefix);
     multiplePositionPrefix.get(field).add(prefix);
     setPositionPrefix.get(field).add(prefix);
@@ -498,7 +547,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Inits the prefix stats field.
    *
-   * @param field the field
+   * @param field
+   *          the field
    */
   private void initPrefixStatsField(String field) {
     if (!singlePositionPrefix.containsKey(field)) {
@@ -515,7 +565,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats single position prefix attribute.
    *
-   * @param field the field
+   * @param field
+   *          the field
    * @return the prefix stats single position prefix attribute
    */
   public String getPrefixStatsSinglePositionPrefixAttribute(String field) {
@@ -526,7 +577,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats multiple position prefix attribute.
    *
-   * @param field the field
+   * @param field
+   *          the field
    * @return the prefix stats multiple position prefix attribute
    */
   public String getPrefixStatsMultiplePositionPrefixAttribute(String field) {
@@ -537,7 +589,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats set position prefix attribute.
    *
-   * @param field the field
+   * @param field
+   *          the field
    * @return the prefix stats set position prefix attribute
    */
   public String getPrefixStatsSetPositionPrefixAttribute(String field) {
@@ -545,25 +598,22 @@ public class MtasFieldsConsumer extends FieldsConsumer {
         MtasToken.DELIMITER);
   }
 
-  /**
-   * Prefix stats to string.
-   *
-   * @return the string
-   */
-  public String prefixStatsToString() {
-    String text = "";
-    text += "PrefixStats\n";
-    for (String field : singlePositionPrefix.keySet()) {
-      text += "* Field " + field + ":\n";
-      text += "  - single-position: " + singlePositionPrefix.get(field) + "\n";
-      text += "  - multiple-position: " + multiplePositionPrefix.get(field)
-          + "\n";
+  public String getPrefixStatsIntersectionPrefixAttribute(String field) {
+    if (intersectingPrefixes.containsKey(field)) {
+      return StringUtils.join(intersectingPrefixes.get(field).toArray(),
+          MtasToken.DELIMITER);
+    } else {
+      return "";
     }
-    return text;
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.codecs.FieldsConsumer#merge(org.apache.lucene.index.MergeState)
+  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.FieldsConsumer#merge(org.apache.lucene.index.
+   * MergeState)
    */
   @Override
   public void merge(MergeState mergeState) throws IOException {
@@ -585,9 +635,12 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Write.
    *
-   * @param fieldInfos the field infos
-   * @param fields the fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param fieldInfos
+   *          the field infos
+   * @param fields
+   *          the fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void write(FieldInfos fieldInfos, Fields fields) {
     IndexOutput outField, outDoc, outIndexDocId, outIndexObjectId,
@@ -595,7 +648,13 @@ public class MtasFieldsConsumer extends FieldsConsumer {
         outPrefix;
     IndexOutput outTmpDoc, outTmpField;
     HashSet<Closeable> closeables = new HashSet<Closeable>();
-
+    // prefix stats
+    intersectingPrefixes = new HashMap<String, HashSet<String>>();
+    singlePositionPrefix = new HashMap<String, HashSet<String>>();
+    multiplePositionPrefix = new HashMap<String, HashSet<String>>();
+    setPositionPrefix = new HashMap<String, HashSet<String>>();
+    prefixReferenceIndex = new HashMap<String, HashMap<String, Long>>();
+    prefixIdIndex = new HashMap<String, HashMap<String, Integer>>();
     // temporary temporary index in memory for doc
     TreeMap<Integer, Long> memoryIndexTemporaryObject = new TreeMap<Integer, Long>();
     // create (backwards) chained new temporary index docs
@@ -689,7 +748,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           boolean hasOffsets = terms.hasOffsets();
           // register references
           Long smallestTermFilepointer = outTerm.getFilePointer();
-          Long smallestPrefixFilepointer = outTerm.getFilePointer();
+          Long smallestPrefixFilepointer = outPrefix.getFilePointer();
           int termCounter = 0;
           // only if freqs, positions and payload available
           if (hasFreqs && hasPositions && hasPayloads) {
@@ -715,8 +774,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
               postingsEnum = termsEnum.postings(postingsEnum, flags);
               // for each doc in field+term
               while (true) {
-                Integer doc = postingsEnum.nextDoc();
-                if (doc.equals(DocIdSetIterator.NO_MORE_DOCS)) {
+                Integer docId = postingsEnum.nextDoc();
+                if (docId.equals(DocIdSetIterator.NO_MORE_DOCS)) {
                   break;
                 }
                 int freq = postingsEnum.freq();
@@ -749,7 +808,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
                 // store temporary index for this doc
                 if (memoryIndexTemporaryObject.size() > 0) {
                   // docId for this part
-                  outTmpDocs.writeVInt(doc);
+                  outTmpDocs.writeVInt(docId);
                   // number of objects/tokens in this part
                   outTmpDocs.writeVInt(memoryIndexTemporaryObject.size());
                   // offset to be used for references
@@ -778,7 +837,6 @@ public class MtasFieldsConsumer extends FieldsConsumer {
             fieldInfos.fieldInfo(field).putAttribute(
                 MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION,
                 getPrefixStatsSetPositionPrefixAttribute(field));
-
           } // end processing field with freqs, positions and payload
           // close temporary object storage and index docs
           outTmpObject.close();
@@ -947,13 +1005,13 @@ public class MtasFieldsConsumer extends FieldsConsumer {
               }
               byte storageFlags;
               if (maxAbsObjectRefApproxCorrection <= Long
-                  .valueOf(Byte.MAX_VALUE) + 1) {
+                  .valueOf(Byte.MAX_VALUE)) {
                 storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_BYTE;
               } else if (maxAbsObjectRefApproxCorrection <= Long
-                  .valueOf(Short.MAX_VALUE) + 1) {
+                  .valueOf(Short.MAX_VALUE)) {
                 storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_SHORT;
               } else if (maxAbsObjectRefApproxCorrection <= Long
-                  .valueOf(Integer.MAX_VALUE) + 1) {
+                  .valueOf(Integer.MAX_VALUE)) {
                 storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER;
               } else {
                 storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_LONG;
@@ -1067,7 +1125,6 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           // construct MtasRBTree for indexDocId
           MtasRBTree mtasDocIdTree = new MtasRBTree(true, false);
           for (int docCounter = 0; docCounter < numberDocs; docCounter++) {
-
             // get info from tmpDoc
             int docId = inTmpDoc.readVInt();
             // filePointer indexObjectId
@@ -1089,6 +1146,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
             inObjectId.seek(fpIndexObjectId);
             long refCorrection;
             long ref;
+            HashMap<String, HashSet<Integer>> docFieldAdministration = new HashMap<String, HashSet<Integer>>();
             for (int mtasId = 0; mtasId < size; mtasId++) {
               if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {
                 refCorrection = inObjectId.readByte();
@@ -1103,7 +1161,9 @@ public class MtasFieldsConsumer extends FieldsConsumer {
                   + refCorrection;
               MtasToken<String> token = MtasCodecPostingsFormat
                   .getToken(inObject, inTerm, ref);
-              String prefix = token.getPrefix();
+              String prefix = token.getPrefix();              
+              registerPrefixIntersection(field, prefix, token.getPostfix(),
+                  docId, token.getPositionStart(), token.getPositionEnd(), docFieldAdministration);
               int prefixId = prefixIdIndexField.containsKey(prefix)
                   ? prefixIdIndexField.get(prefix) : 0;
               token.setPrefixId(prefixId);
@@ -1152,6 +1212,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           outField.writeVInt(numberTerms);
           outField.writeVLong(fpPrefix);
           outField.writeVInt(numberPrefixes);
+          // register intersection
+          fieldInfos.fieldInfo(field).putAttribute(
+              MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION,
+              getPrefixStatsIntersectionPrefixAttribute(field));
         } catch (EOFException e) {
           break;
         }
@@ -1207,7 +1271,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       } catch (IOException e) {
         // ignore
       }
-    }
+    }   
   }
 
   /**
@@ -1240,17 +1304,27 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Creates the object and register prefix.
    *
-   * @param field the field
-   * @param out the out
-   * @param term the term
-   * @param termRef the term ref
-   * @param startPosition the start position
-   * @param payload the payload
-   * @param startOffset the start offset
-   * @param endOffset the end offset
-   * @param outPrefix the out prefix
+   * @param field
+   *          the field
+   * @param out
+   *          the out
+   * @param term
+   *          the term
+   * @param termRef
+   *          the term ref
+   * @param startPosition
+   *          the start position
+   * @param payload
+   *          the payload
+   * @param startOffset
+   *          the start offset
+   * @param endOffset
+   *          the end offset
+   * @param outPrefix
+   *          the out prefix
    * @return the integer
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
@@ -1258,6 +1332,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       throws IOException {
     try {
       Integer mtasId = null;
+      String prefix = MtasToken.getPrefixFromValue(term.utf8ToString());
       if (payload != null) {
         MtasPayloadDecoder payloadDecoder = new MtasPayloadDecoder();
         payloadDecoder.init(startPosition, Arrays.copyOfRange(payload.bytes,
@@ -1281,16 +1356,13 @@ public class MtasFieldsConsumer extends FieldsConsumer {
             if (mtasPosition.checkType(MtasPosition.POSITION_RANGE)) {
               objectFlags = objectFlags
                   | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE;
-              registerPrefixStatsRangePositionValue(field, term.utf8ToString(),
-                  outPrefix);
+              registerPrefixStatsRangePositionValue(field, prefix, outPrefix);
             } else if (mtasPosition.checkType(MtasPosition.POSITION_SET)) {
               objectFlags = objectFlags
                   | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET;
-              registerPrefixStatsSetPositionValue(field, term.utf8ToString(),
-                  outPrefix);
+              registerPrefixStatsSetPositionValue(field, prefix, outPrefix);
             } else {
-              registerPrefixStatsSinglePositionValue(field, term.utf8ToString(),
-                  outPrefix);
+              registerPrefixStatsSinglePositionValue(field, prefix, outPrefix);
             }
           } else {
             throw new IOException("no position");
@@ -1354,7 +1426,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           }
           out.writeVLong(termRef);
         } // storage token
-      } // payload available
+      }
       return mtasId;
     } catch (Exception e) {
       throw new IOException(e.getMessage());
@@ -1364,11 +1436,15 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Store tree.
    *
-   * @param tree the tree
-   * @param out the out
-   * @param refApproxOffset the ref approx offset
+   * @param tree
+   *          the tree
+   * @param out
+   *          the out
+   * @param refApproxOffset
+   *          the ref approx offset
    * @return the long
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private Long storeTree(MtasTree<?> tree, IndexOutput out,
       long refApproxOffset) throws IOException {
@@ -1379,14 +1455,21 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Store tree.
    *
-   * @param node the node
-   * @param isSinglePoint the is single point
-   * @param storeAdditionalInformation the store additional information
-   * @param out the out
-   * @param nodeRefApproxOffset the node ref approx offset
-   * @param refApproxOffset the ref approx offset
+   * @param node
+   *          the node
+   * @param isSinglePoint
+   *          the is single point
+   * @param storeAdditionalInformation
+   *          the store additional information
+   * @param out
+   *          the out
+   * @param nodeRefApproxOffset
+   *          the node ref approx offset
+   * @param refApproxOffset
+   *          the ref approx offset
    * @return the long
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private Long storeTree(MtasTreeNode<?> node, boolean isSinglePoint,
       boolean storeAdditionalInformation, IndexOutput out,
@@ -1421,6 +1504,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           fpIndexObjectPositionRightChild = fpIndexObjectPosition;
         }
         if (isRoot) {
+          assert nodeRefApproxOffset >= 0 : "nodeRefApproxOffset < 0 : "
+              + nodeRefApproxOffset;
           out.writeVLong(nodeRefApproxOffset);
           byte flag = 0;
           if (isSinglePoint) {
@@ -1431,10 +1516,17 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           }
           out.writeByte(flag);
         }
+        assert node.left >= 0 : "node.left < 0 : " + node.left;
         out.writeVInt(node.left);
+        assert node.right >= 0 : "node.right < 0 : " + node.right;
         out.writeVInt(node.right);
+        assert node.max >= 0 : "node.max < 0 : " + node.max;
         out.writeVInt(node.max);
+        assert fpIndexObjectPositionLeftChild >= nodeRefApproxOffset : "fpIndexObjectPositionLeftChild<nodeRefApproxOffset : "
+            + fpIndexObjectPositionLeftChild + " and " + nodeRefApproxOffset;
         out.writeVLong((fpIndexObjectPositionLeftChild - nodeRefApproxOffset));
+        assert fpIndexObjectPositionRightChild >= nodeRefApproxOffset : "fpIndexObjectPositionRightChild<nodeRefApproxOffset"
+            + fpIndexObjectPositionRightChild + " and " + nodeRefApproxOffset;
         out.writeVLong((fpIndexObjectPositionRightChild - nodeRefApproxOffset));
         if (!isSinglePoint) {
           out.writeVInt(node.ids.size());
@@ -1450,12 +1542,20 @@ public class MtasFieldsConsumer extends FieldsConsumer {
           throw new IOException(
               "singlePoint tree, but missing single point...");
         }
+        int counter = 0;
         for (MtasTreeNodeId nodeId : nodeIds) {
+          counter++;
           objectRefCorrected = (nodeId.ref - refApproxOffset);
+          assert objectRefCorrected >= objectRefCorrectedPrevious : "objectRefCorrected<objectRefCorrectedPrevious : "
+              + objectRefCorrected + " and " + objectRefCorrectedPrevious;
           out.writeVLong((objectRefCorrected - objectRefCorrectedPrevious));
           objectRefCorrectedPrevious = objectRefCorrected;
           if (storeAdditionalInformation) {
+            assert nodeId.additionalId >= 0 : "nodeId.additionalId < 0 for item "
+                + counter + " : " + nodeId.additionalId;
             out.writeVInt(nodeId.additionalId);
+            assert nodeId.additionalRef >= 0 : "nodeId.additionalRef < 0 for item "
+                + counter + " : " + nodeId.additionalRef;
             out.writeVLong(nodeId.additionalRef);
           }
         }
@@ -1471,8 +1571,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Token stats add.
    *
-   * @param min the min
-   * @param max the max
+   * @param min
+   *          the min
+   * @param max
+   *          the max
    */
   private void tokenStatsAdd(int min, int max) {
     tokenStatsNumber++;
@@ -1491,11 +1593,16 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Copy object and update stats.
    *
-   * @param id the id
-   * @param in the in
-   * @param inRef the in ref
-   * @param out the out
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param id
+   *          the id
+   * @param in
+   *          the in
+   * @param inRef
+   *          the in ref
+   * @param out
+   *          the out
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void copyObjectAndUpdateStats(int id, IndexInput in, Long inRef,
       IndexOutput out) throws IOException {

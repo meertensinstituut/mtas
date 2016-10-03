@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+import mtas.codec.util.CodecUtil;
+
 /**
  * The Class MtasDataItem.
  *
@@ -285,6 +287,26 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
         value = (T) Double.valueOf(value.doubleValue() - newValue.longValue());
       } else {
         throw new IOException("incompatible NumberComparators");
+      }
+    }
+    
+    public NumberComparator<T> recomputeBoundary(int n) throws IOException {
+      if(sortDirection.equals(CodecUtil.SORT_DESC)) {
+        if (value instanceof Integer) {
+          return new NumberComparator(Math.floorDiv((Integer) value, n));
+        } else if (value instanceof Long) {
+          return new NumberComparator(Math.floorDiv((Long) value, n));
+        } else if (value instanceof Float) {
+          return new NumberComparator(((Float) value)/n);
+        } else if (value instanceof Double) {
+          return new NumberComparator(((Double) value)/n);
+        } else {
+          throw new IOException("unknown NumberComparator");
+        }
+      } else if(sortDirection.equals(CodecUtil.SORT_ASC)) {
+        return new NumberComparator(getValue());
+      } else {
+        throw new IOException("unknown sortDirection "+sortDirection);
       }
     }
 

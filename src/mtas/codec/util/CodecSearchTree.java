@@ -94,7 +94,9 @@ public class CodecSearchTree {
         for (int i = 0; i < treeItem.objectRefs.length; i++) {
           list.add(new MtasTreeHit<>(treeItem.left, treeItem.right,
               treeItem.objectRefs[i],
-              treeItem.objectIds == null ? 0 : treeItem.objectIds[i]));
+              treeItem.additionalIds == null ? 0 : treeItem.additionalIds[i],
+              treeItem.additionalRefs == null ? 0
+                  : treeItem.additionalRefs[i]));
         }
         // check leftChild
         if (!treeItem.leftChild.equals(treeItem.ref)) {
@@ -220,7 +222,9 @@ public class CodecSearchTree {
         for (int i = 0; i < treeItem.objectRefs.length; i++) {
           list.add(new MtasTreeHit<>(treeItem.left, treeItem.right,
               treeItem.objectRefs[i],
-              treeItem.objectIds == null ? 0 : treeItem.objectIds[i]));
+              treeItem.additionalIds == null ? 0 : treeItem.additionalIds[i],
+              treeItem.additionalRefs == null ? 0
+                  : treeItem.additionalRefs[i]));
         }
       }
       // check leftChild
@@ -322,7 +326,7 @@ public class CodecSearchTree {
         }
       }
       return new MtasTreeItem(left, right, max, objectRefs, objectAdditionalIds,
-          ref, leftChild, rightChild);
+          objectAdditionalRefs, ref, leftChild, rightChild);
     } catch (Exception e) {
       throw new IOException(e.getMessage());
     }
@@ -340,7 +344,9 @@ public class CodecSearchTree {
     public long[] objectRefs;
 
     /** The object ids. */
-    public int[] objectIds;
+    public int[] additionalIds;
+
+    public long[] additionalRefs;
 
     /** The right child. */
     public Long ref, leftChild, rightChild;
@@ -356,7 +362,7 @@ public class CodecSearchTree {
      *          the max
      * @param objectRefs
      *          the object refs
-     * @param objectIds
+     * @param additionalIds
      *          the object ids
      * @param ref
      *          the ref
@@ -366,12 +372,14 @@ public class CodecSearchTree {
      *          the right child
      */
     public MtasTreeItem(int left, int right, int max, long[] objectRefs,
-        int[] objectIds, Long ref, Long leftChild, Long rightChild) {
+        int[] additionalIds, long[] additionalRefs, Long ref, Long leftChild,
+        Long rightChild) {
       this.left = left;
       this.right = right;
       this.max = max;
       this.objectRefs = objectRefs;
-      this.objectIds = objectIds;
+      this.additionalIds = additionalIds;
+      this.additionalRefs = additionalRefs;
       this.ref = ref;
       this.leftChild = leftChild;
       this.rightChild = rightChild;
@@ -398,8 +406,10 @@ public class CodecSearchTree {
     /** The additional id. */
     public int additionalId;
 
-    /** The data. */
-    public T data;
+    /** The additional ref. */
+    public long additionalRef;
+
+    public T data, idData, refData;
 
     /**
      * Instantiates a new mtas tree hit.
@@ -414,11 +424,15 @@ public class CodecSearchTree {
      *          the additional id
      */
     public MtasTreeHit(int startPosition, int endPosition, long ref,
-        int additionalId) {
+        int additionalId, long additionalRef) {
       this.startPosition = startPosition;
       this.endPosition = endPosition;
       this.ref = ref;
       this.additionalId = additionalId;
+      this.additionalRef = additionalRef;
+      data = null;
+      idData = null;
+      refData = null;
     }
 
     /**
@@ -436,9 +450,11 @@ public class CodecSearchTree {
      *          the data
      */
     public MtasTreeHit(int startPosition, int endPosition, long ref,
-        int additionalId, T data) {
-      this(startPosition, endPosition, ref, additionalId);
+        int additionalId, long additionalRef, T data) {
+      this(startPosition, endPosition, ref, additionalId, additionalRef);
       this.data = data;
+      this.idData = null;
+      this.refData = null;
     }
 
     /*
@@ -449,7 +465,7 @@ public class CodecSearchTree {
     @Override
     public String toString() {
       return "hit[" + startPosition + "," + endPosition + "," + ref + ","
-          + additionalId + "] - " + data;
+          + additionalId + "," + additionalRef + "] - " + idData + " - " +refData;
     }
   }
 
@@ -588,7 +604,7 @@ public class CodecSearchTree {
       IntervalTreeNode<T, N> checkItem = checkList.remove(checkList.size() - 1);
       searchMtasTreeItemWithIntervalTree(additionalIds, checkItem,
           treeItem.left, treeItem.right, treeItem.objectRefs,
-          treeItem.objectIds, checkList);
+          treeItem.additionalIds, treeItem.additionalRefs, checkList);
     } while (checkList.size() > 0);
   }
 
@@ -617,7 +633,7 @@ public class CodecSearchTree {
   private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeItemWithIntervalTree(
       Collection<Integer> requiredAdditionalIds,
       IntervalTreeNode<T, N> intervalTreeItem, int startPosition,
-      int endPosition, long[] refs, int[] additionalIds,
+      int endPosition, long[] refs, int[] additionalIds, long[] additionalRefs,
       ArrayList<IntervalTreeNode<T, N>> checkList) {
     if (startPosition <= intervalTreeItem.max) {
       // match current node
@@ -627,7 +643,7 @@ public class CodecSearchTree {
         if (requiredAdditionalIds == null || additionalIds == null) {
           for (int i = 0; i < refs.length; i++) {
             MtasTreeHit<T> hit = new MtasTreeHit<T>(startPosition, endPosition,
-                refs[i], 0, null);
+                refs[i], 0, 0);
             for (ArrayList<MtasTreeHit<T>> list : intervalTreeItem.lists) {
               list.add(hit);
             }
@@ -635,9 +651,11 @@ public class CodecSearchTree {
         } else {
           for (int i = 0; i < refs.length; i++) {
             MtasTreeHit<T> hit = new MtasTreeHit<T>(startPosition, endPosition,
-                refs[i], additionalIds[i], null);
+                refs[i], additionalIds[i], additionalRefs[i]);
             for (ArrayList<MtasTreeHit<T>> list : intervalTreeItem.lists) {
-              list.add(hit);
+              if (requiredAdditionalIds.contains(hit.additionalId)) {
+                list.add(hit);
+              }
             }
           }
         }
