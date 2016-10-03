@@ -11,10 +11,8 @@ import mtas.codec.util.DataCollector;
 /**
  * The Class MtasDataBasic.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataCollector<T1, T2> implements Serializable {
@@ -40,44 +38,25 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /**
    * Instantiates a new mtas data basic.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param operations
-   *          the operations
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param operations the operations
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataBasic(String collectorType, String dataType,
       TreeSet<String> statsItems, String sortType, String sortDirection,
@@ -126,12 +105,9 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /**
    * Sets the error.
    *
-   * @param newPosition
-   *          the new position
-   * @param error
-   *          the error
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param error the error
+   * @param currentExisting the current existing
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
@@ -151,14 +127,10 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /**
    * Sets the value.
    *
-   * @param newPosition
-   *          the new position
-   * @param valueSum
-   *          the value sum
-   * @param valueN
-   *          the value n
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param valueSum the value sum
+   * @param valueN the value n
+   * @param currentExisting the current existing
    */
   protected void setValue(int newPosition, T1 valueSum, long valueN,
       boolean currentExisting) {
@@ -177,14 +149,10 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /**
    * Sets the value.
    *
-   * @param newPosition
-   *          the new position
-   * @param values
-   *          the values
-   * @param number
-   *          the number
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param values the values
+   * @param number the number
+   * @param currentExisting the current existing
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
@@ -228,8 +196,11 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
         tmpOldSize);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
+   */
   public void reduceToSegmentKeys() {
-    if (segmentRegistration != null && size>0) {
+    if (segmentRegistration != null && size > 0) {
       int sizeCopy = size;
       String[] keyListCopy = keyList.clone();
       T1[] basicValueSumListCopy = basicValueSumList.clone();
@@ -419,8 +390,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /**
    * Inits the new list basic.
    *
-   * @param maxNumberOfTerms
-   *          the max number of terms
+   * @param maxNumberOfTerms the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
     newBasicValueSumList = operations.createVector1(newSize);

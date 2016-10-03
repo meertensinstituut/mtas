@@ -76,13 +76,11 @@ public class MtasSolrComponentGroup {
 
   /** The Constant DEFAULT_NUMBER. */
   private static final int DEFAULT_NUMBER = 10;
-  
-  
+
   /**
    * Instantiates a new mtas solr component group.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentGroup(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -91,12 +89,9 @@ public class MtasSolrComponentGroup {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -129,8 +124,8 @@ public class MtasSolrComponentGroup {
             .get(PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_KEY,
                 String.valueOf(tmpCounter))
             .trim();
-        numbers[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_GROUP + "."
-            + id + "." + NAME_MTAS_GROUP_NUMBER, null);
+        numbers[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_NUMBER, null);
         queryTypes[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_TYPE,
             null);
@@ -236,9 +231,9 @@ public class MtasSolrComponentGroup {
         }
         String key = (keys[i] == null) || (keys[i].isEmpty())
             ? String.valueOf(i) + ":" + fields[i] + ":" + queryValues[i]
-            : keys[i].trim();            
-        int number = (numbers[i] == null) || (numbers[i].isEmpty()) ? DEFAULT_NUMBER
-                : Integer.parseInt(numbers[i]);
+            : keys[i].trim();
+        int number = (numbers[i] == null) || (numbers[i].isEmpty())
+            ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
         mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
             fields[i], queryValues[i], queryTypes[i], key, number,
             groupingHitInsidePrefixes[i], groupingHitInsideLeftPosition[i],
@@ -255,16 +250,11 @@ public class MtasSolrComponentGroup {
   /**
    * Prepare.
    *
-   * @param solrParams
-   *          the solr params
-   * @param gids
-   *          the gids
-   * @param name
-   *          the name
-   * @param positions
-   *          the positions
-   * @param prefixes
-   *          the prefixes
+   * @param solrParams the solr params
+   * @param gids the gids
+   * @param name the name
+   * @param positions the positions
+   * @param prefixes the prefixes
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) {
@@ -283,12 +273,9 @@ public class MtasSolrComponentGroup {
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -375,13 +362,10 @@ public class MtasSolrComponentGroup {
   /**
    * Creates the.
    *
-   * @param group
-   *          the group
-   * @param encode
-   *          the encode
+   * @param group the group
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public SimpleOrderedMap<Object> create(ComponentGroup group, Boolean encode)
@@ -405,8 +389,7 @@ public class MtasSolrComponentGroup {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -438,12 +421,9 @@ public class MtasSolrComponentGroup {
   /**
    * Distributed process.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)

@@ -33,8 +33,7 @@ public class MtasTokenCollection {
   /**
    * Adds the.
    *
-   * @param token
-   *          the token
+   * @param token the token
    * @return the integer
    */
   public Integer add(MtasToken<?> token) {
@@ -46,8 +45,7 @@ public class MtasTokenCollection {
   /**
    * Gets the.
    *
-   * @param id
-   *          the id
+   * @param id the id
    * @return the mtas token
    */
   public MtasToken<?> get(Integer id) {
@@ -58,8 +56,7 @@ public class MtasTokenCollection {
    * Iterator.
    *
    * @return the iterator
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public Iterator<MtasToken<?>> iterator() throws MtasParserException {
     checkTokenCollectionIndex();
@@ -88,14 +85,13 @@ public class MtasTokenCollection {
   /**
    * Prints the.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public void print() throws MtasParserException {
     Iterator<MtasToken<?>> it = this.iterator();
     while (it.hasNext()) {
       MtasToken<?> token = it.next();
-      System.out.println(token);      
+      System.out.println(token);
     }
   }
 
@@ -103,8 +99,7 @@ public class MtasTokenCollection {
    * Gets the list.
    *
    * @return the list
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public String[][] getList() throws MtasParserException {
     String[][] result = new String[(tokenCollection.size() + 1)][];
@@ -165,12 +160,9 @@ public class MtasTokenCollection {
   /**
    * Check.
    *
-   * @param autoRepair
-   *          the auto repair
-   * @param makeUnique
-   *          the make unique
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @param autoRepair the auto repair
+   * @param makeUnique the make unique
+   * @throws MtasParserException the mtas parser exception
    */
   public void check(Boolean autoRepair, Boolean makeUnique)
       throws MtasParserException {
@@ -237,7 +229,7 @@ public class MtasTokenCollection {
         trash.add(i);
       } else if ((token.getPositionStart() == null)
           || (token.getPositionEnd() == null)) {
-        trash.add(i);        
+        trash.add(i);
       } else if (token.getValue() == null || (token.getValue().equals(""))) {
         trash.add(i);
       } else if (token.getPrefix() == null || (token.getPrefix().equals(""))) {
@@ -301,8 +293,7 @@ public class MtasTokenCollection {
   /**
    * Check token collection index.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   private void checkTokenCollectionIndex() throws MtasParserException {
     if (tokenCollectionIndex.size() != tokenCollection.size()) {

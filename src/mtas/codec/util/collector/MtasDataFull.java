@@ -12,10 +12,8 @@ import mtas.codec.util.DataCollector;
 /**
  * The Class MtasDataFull.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataCollector<T1, T2> implements Serializable {
@@ -32,44 +30,25 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   /**
    * Instantiates a new mtas data full.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param operations
-   *          the operations
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param operations the operations
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataFull(String collectorType, String dataType,
       TreeSet<String> statsItems, String sortType, String sortDirection,
@@ -118,12 +97,9 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   /**
    * Sets the error.
    *
-   * @param newPosition
-   *          the new position
-   * @param error
-   *          the error
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param error the error
+   * @param currentExisting the current existing
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
@@ -158,20 +134,23 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
+   */
   public void reduceToSegmentKeys() {
-    if(segmentRegistration != null && size>0) {
+    if (segmentRegistration != null && size > 0) {
       int sizeCopy = size;
       String[] keyListCopy = keyList.clone();
-      T1[][] fullValueListCopy = fullValueList.clone(); 
+      T1[][] fullValueListCopy = fullValueList.clone();
       size = 0;
-      for(int i=0; i< sizeCopy; i++) {
-        if(segmentKeys.contains(keyListCopy[i])) {
+      for (int i = 0; i < sizeCopy; i++) {
+        if (segmentKeys.contains(keyListCopy[i])) {
           keyList[size] = keyListCopy[i];
           fullValueList[size] = fullValueListCopy[i];
           size++;
         }
-      } 
-    }  
+      }
+    }
   }
 
   /*
@@ -236,14 +215,10 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   /**
    * Sets the value.
    *
-   * @param newPosition
-   *          the new position
-   * @param values
-   *          the values
-   * @param number
-   *          the number
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param values the values
+   * @param number the number
+   * @param currentExisting the current existing
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
@@ -380,8 +355,7 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   /**
    * Inits the new list basic.
    *
-   * @param maxNumberOfTerms
-   *          the max number of terms
+   * @param maxNumberOfTerms the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
     newFullValueList = operations.createMatrix1(newSize);

@@ -38,8 +38,7 @@ public class MtasSolrComponentPrefix {
   /**
    * Instantiates a new mtas solr component prefix.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentPrefix(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -48,12 +47,9 @@ public class MtasSolrComponentPrefix {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -97,12 +93,9 @@ public class MtasSolrComponentPrefix {
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -129,10 +122,8 @@ public class MtasSolrComponentPrefix {
   /**
    * Creates the.
    *
-   * @param prefix
-   *          the prefix
-   * @param encode
-   *          the encode
+   * @param prefix the prefix
+   * @param encode the encode
    * @return the simple ordered map
    */
   public SimpleOrderedMap<Object> create(ComponentPrefix prefix,
@@ -160,8 +151,7 @@ public class MtasSolrComponentPrefix {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -193,12 +183,9 @@ public class MtasSolrComponentPrefix {
   /**
    * Distributed process.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -227,8 +214,7 @@ public class MtasSolrComponentPrefix {
   /**
    * Repair prefix items.
    *
-   * @param mtasResponse
-   *          the mtas response
+   * @param mtasResponse the mtas response
    */
   @SuppressWarnings("unchecked")
   private void repairPrefixItems(NamedList<Object> mtasResponse) {

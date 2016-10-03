@@ -7,8 +7,7 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 /**
  * The Class IntervalTreeNodeData.
  *
- * @param <T>
- *          the generic type
+ * @param <T> the generic type
  */
 public class IntervalTreeNodeData<T> {
 
@@ -21,14 +20,10 @@ public class IntervalTreeNodeData<T> {
   /**
    * Instantiates a new interval tree node data.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
-   * @param hitStart
-   *          the hit start
-   * @param hitEnd
-   *          the hit end
+   * @param start the start
+   * @param end the end
+   * @param hitStart the hit start
+   * @param hitEnd the hit end
    */
   public IntervalTreeNodeData(int start, int end, int hitStart, int hitEnd) {
     this.start = start;
@@ -37,10 +32,14 @@ public class IntervalTreeNodeData<T> {
     this.hitEnd = hitEnd;
     list = new ArrayList<MtasTreeHit<T>>();
   }
-  
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
   public String toString() {
     String text = this.getClass().getName();
-    text+="(s"+start+"|hs"+hitStart+",hh"+hitEnd+"|e"+end+") - "+list;
+    text += "(s" + start + "|hs" + hitStart + ",hh" + hitEnd + "|e" + end
+        + ") - " + list;
     return text;
   }
 

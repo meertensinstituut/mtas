@@ -14,12 +14,6 @@ import mtas.codec.util.CodecUtil;
  * @param <T1> the generic type
  * @param <T2> the generic type
  */
-/**
- * @author matthijs
- *
- * @param <T1>
- * @param <T2>
- */
 public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     implements Serializable, Comparable<MtasDataItem<T1, T2>> {
 
@@ -40,7 +34,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
 
   /** The error list. */
   protected HashMap<String, Integer> errorList;
-  
+
   /** The comparable sort value. */
   protected NumberComparator<?> comparableSortValue;
 
@@ -53,20 +47,13 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   /**
    * Instantiates a new mtas data item.
    *
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItem(MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
@@ -85,25 +72,21 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   /**
    * Adds the.
    *
-   * @param newItem
-   *          the new item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param newItem the new item
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract void add(MtasDataItem<T1, T2> newItem) throws IOException;
 
   /**
    * Rewrite.
    *
-   * @param showDebugInfo
-   *          the show debug info
+   * @param showDebugInfo the show debug info
    * @return the map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract Map<String, Object> rewrite(boolean showDebugInfo)
       throws IOException;
-  
+
   /**
    * Gets the sub.
    *
@@ -117,8 +100,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    * Gets the compare value type.
    *
    * @return the compare value type
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   protected abstract int getCompareValueType() throws IOException;
 
@@ -184,8 +166,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   /**
    * The Class NumberComparator.
    *
-   * @param <T>
-   *          the generic type
+   * @param <T> the generic type
    */
   public class NumberComparator<T extends Number & Comparable<T>>
       implements Comparable<T>, Serializable, Cloneable {
@@ -199,8 +180,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
     /**
      * Instantiates a new number comparator.
      *
-     * @param value
-     *          the value
+     * @param value the value
      */
     public NumberComparator(T value) {
       this.value = value;
@@ -247,10 +227,8 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
     /**
      * Adds the.
      *
-     * @param newValue
-     *          the new value
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param newValue the new value
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     @SuppressWarnings("unchecked")
     public void add(T newValue) throws IOException {
@@ -270,10 +248,8 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
     /**
      * Subtract.
      *
-     * @param newValue
-     *          the new value
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param newValue the new value
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     @SuppressWarnings("unchecked")
     public void subtract(T newValue) throws IOException {
@@ -289,24 +265,31 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
         throw new IOException("incompatible NumberComparators");
       }
     }
-    
+
+    /**
+     * Recompute boundary.
+     *
+     * @param n the n
+     * @return the number comparator
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public NumberComparator<T> recomputeBoundary(int n) throws IOException {
-      if(sortDirection.equals(CodecUtil.SORT_DESC)) {
+      if (sortDirection.equals(CodecUtil.SORT_DESC)) {
         if (value instanceof Integer) {
           return new NumberComparator(Math.floorDiv((Integer) value, n));
         } else if (value instanceof Long) {
           return new NumberComparator(Math.floorDiv((Long) value, n));
         } else if (value instanceof Float) {
-          return new NumberComparator(((Float) value)/n);
+          return new NumberComparator(((Float) value) / n);
         } else if (value instanceof Double) {
-          return new NumberComparator(((Double) value)/n);
+          return new NumberComparator(((Double) value) / n);
         } else {
           throw new IOException("unknown NumberComparator");
         }
-      } else if(sortDirection.equals(CodecUtil.SORT_ASC)) {
+      } else if (sortDirection.equals(CodecUtil.SORT_ASC)) {
         return new NumberComparator(getValue());
       } else {
-        throw new IOException("unknown sortDirection "+sortDirection);
+        throw new IOException("unknown sortDirection " + sortDirection);
       }
     }
 

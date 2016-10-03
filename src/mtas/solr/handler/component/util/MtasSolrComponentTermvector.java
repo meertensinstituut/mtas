@@ -92,16 +92,17 @@ public class MtasSolrComponentTermvector {
 
   /** The Constant NAME_MTAS_TERMVECTOR_LIST. */
   public static final String NAME_MTAS_TERMVECTOR_LIST = "list";
-  
+
+  /** The Constant SHARD_NUMBER_MULTIPLIER. */
   private static final int SHARD_NUMBER_MULTIPLIER = 2;
-  
+
+  /** The Constant DEFAULT_NUMBER. */
   private static final int DEFAULT_NUMBER = 10;
 
   /**
    * Instantiates a new mtas solr component termvector.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentTermvector(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -110,12 +111,9 @@ public class MtasSolrComponentTermvector {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -230,8 +228,8 @@ public class MtasSolrComponentTermvector {
             : regexps[i].trim();
         String startValue = (startValues[i] == null)
             || (startValues[i].isEmpty()) ? null : startValues[i].trim();
-        int number = (numbers[i] == null) || (numbers[i].isEmpty()) ? DEFAULT_NUMBER
-            : Integer.parseInt(numbers[i]);
+        int number = (numbers[i] == null) || (numbers[i].isEmpty())
+            ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
         int numberFinal = (numberShards[i] == null)
             || (numberShards[i].isEmpty()) ? number
                 : Integer.parseInt(numberShards[i]);
@@ -267,12 +265,9 @@ public class MtasSolrComponentTermvector {
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -286,7 +281,7 @@ public class MtasSolrComponentTermvector {
             String oldNumber = sreq.params.get(PARAM_MTAS_TERMVECTOR + "." + key
                 + "." + NAME_MTAS_TERMVECTOR_NUMBER);
             int number;
-            if(oldNumber!=null) {
+            if (oldNumber != null) {
               number = Integer.valueOf(oldNumber) * SHARD_NUMBER_MULTIPLIER;
             } else {
               number = DEFAULT_NUMBER * SHARD_NUMBER_MULTIPLIER;
@@ -294,7 +289,7 @@ public class MtasSolrComponentTermvector {
             sreq.params.add(
                 PARAM_MTAS_TERMVECTOR + "." + key + "."
                     + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS,
-                String.valueOf(number));            
+                String.valueOf(number));
           }
         } else {
           sreq.params.remove(PARAM_MTAS_TERMVECTOR);
@@ -326,13 +321,10 @@ public class MtasSolrComponentTermvector {
   /**
    * Creates the.
    *
-   * @param termVector
-   *          the term vector
-   * @param encode
-   *          the encode
+   * @param termVector the term vector
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public SimpleOrderedMap<Object> create(ComponentTermVector termVector,
@@ -379,8 +371,7 @@ public class MtasSolrComponentTermvector {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -441,22 +432,22 @@ public class MtasSolrComponentTermvector {
               }
               Object o = mtasResponse.get("termvector");
               if (o != null && o instanceof ArrayList) {
-                ArrayList<?> tvList = (ArrayList<?>) o;                
+                ArrayList<?> tvList = (ArrayList<?>) o;
                 for (int i = 0; i < tmpCounter; i++) {
-                  for(int j=0; j<tvList.size(); j++) {
+                  for (int j = 0; j < tvList.size(); j++) {
                     NamedList item = (NamedList) tvList.get(j);
                     String key = (String) item.get("key");
                     ArrayList list = (ArrayList) item.get("list");
-                    if(key!=null && list!=null && key.equals(keys[i])) {
+                    if (key != null && list != null && key.equals(keys[i])) {
                       int number;
-                      if(numbers[i]!=null) {
+                      if (numbers[i] != null) {
                         number = Integer.parseInt(numbers[i]);
                       } else {
                         number = DEFAULT_NUMBER;
                       }
-                      if(list.size()>number) {
+                      if (list.size() > number) {
                         item.add("list", list.subList(0, number));
-                      }  
+                      }
                     }
                   }
                 }
@@ -472,12 +463,9 @@ public class MtasSolrComponentTermvector {
   /**
    * Distributed process finish.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void distributedProcessFinish(ResponseBuilder rb,
@@ -506,12 +494,9 @@ public class MtasSolrComponentTermvector {
   /**
    * Distributed process missing top.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public void distributedProcessMissingTop(ResponseBuilder rb,
@@ -640,10 +625,12 @@ public class MtasSolrComponentTermvector {
           }
         }
       }
-//      System.out.println("BOUNDARIES: " + comparatorBoundariesList);
-//      System.out.println("MERGED: " + mergedComparatorLists);
-//      System.out.println("MERGED boundary : " + mergedComparatorBoundaryList);
-//      System.out.println("SUMMED boundary : " + summedComparatorBoundaryList);
+      // System.out.println("BOUNDARIES: " + comparatorBoundariesList);
+      // System.out.println("MERGED: " + mergedComparatorLists);
+      // System.out.println("MERGED boundary : " +
+      // mergedComparatorBoundaryList);
+      // System.out.println("SUMMED boundary : " +
+      // summedComparatorBoundaryList);
       // compute which termvectors to recompute
       HashMap<String, HashMap<String, NumberComparator>> recomputeList = new HashMap<String, HashMap<String, NumberComparator>>();
       for (ComponentTermVector tv : tvList) {
@@ -673,8 +660,8 @@ public class MtasSolrComponentTermvector {
 
           NumberComparator mainNewBoundary = mergedComparatorBoundaryList
               .get(key).recomputeBoundary(sortedHashMap.size());
-//          System.out.println(
-//              "MAIN NEW BOUNDARY for '" + key + "' : " + mainNewBoundary);
+          // System.out.println(
+          // "MAIN NEW BOUNDARY for '" + key + "' : " + mainNewBoundary);
 
           NumberComparator sum = null;
           int number = 0;
@@ -705,7 +692,7 @@ public class MtasSolrComponentTermvector {
                     compare *= -1;
                   }
                   if (compare < 0) {
-                    recomputeSubList.put(shardAddress, newBoundary);                    
+                    recomputeSubList.put(shardAddress, newBoundary);
                   }
                 } else {
                   recomputeSubList.put(shardAddress, newBoundary);
@@ -870,9 +857,9 @@ public class MtasSolrComponentTermvector {
             }
           }
         }
-        if(paramsNewRequest.getParameterNames().size()>0) {
+        if (paramsNewRequest.getParameterNames().size() > 0) {
           requestParamList.put(shardAddress, paramsNewRequest);
-        }  
+        }
       }
 
       // new requests
@@ -889,21 +876,18 @@ public class MtasSolrComponentTermvector {
             .getOriginalParams().getParams(MtasSolrSearchComponent.PARAM_MTAS));
         sreq.params.add(PARAM_MTAS_TERMVECTOR,
             rb.req.getOriginalParams().getParams(PARAM_MTAS_TERMVECTOR));
-        rb.addRequest(searchComponent, sreq);        
+        rb.addRequest(searchComponent, sreq);
       }
-    }   
+    }
 
   }
 
   /**
    * Distributed process missing key.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void distributedProcessMissingKey(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
@@ -1006,13 +990,10 @@ public class MtasSolrComponentTermvector {
   /**
    * Compute missing termvector items per shard.
    *
-   * @param requests
-   *          the requests
-   * @param args
-   *          the args
+   * @param requests the requests
+   * @param args the args
    * @return the hash map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private HashMap<String, HashMap<String, HashSet<String>>> computeMissingTermvectorItemsPerShard(

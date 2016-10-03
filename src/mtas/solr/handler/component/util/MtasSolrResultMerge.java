@@ -14,10 +14,15 @@ import org.apache.solr.handler.component.ShardResponse;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
- * The Class MtasMergeStrategy.
+ * The Class MtasSolrResultMerge.
  */
 public class MtasSolrResultMerge {
 
+  /**
+   * Merge.
+   *
+   * @param rb the rb
+   */
   @SuppressWarnings("unchecked")
   public void merge(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
@@ -75,21 +80,17 @@ public class MtasSolrResultMerge {
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
         }
-      }      
+      }
     }
   }
 
   /**
    * Merge named list.
    *
-   * @param sreq
-   *          the sreq
-   * @param mtasResponse
-   *          the mtas response
-   * @param key
-   *          the key
-   * @param preferredPurpose
-   *          the preferred purpose
+   * @param sreq the sreq
+   * @param mtasResponse the mtas response
+   * @param key the key
+   * @param preferredPurpose the preferred purpose
    */
   @SuppressWarnings("unchecked")
   private void mergeNamedList(ShardRequest sreq, NamedList<Object> mtasResponse,
@@ -139,16 +140,11 @@ public class MtasSolrResultMerge {
   /**
    * Merge array list.
    *
-   * @param sreq
-   *          the sreq
-   * @param mtasResponse
-   *          the mtas response
-   * @param key
-   *          the key
-   * @param preferredPurpose
-   *          the preferred purpose
-   * @param mergeAllShardResponses
-   *          the merge all shard responses
+   * @param sreq the sreq
+   * @param mtasResponse the mtas response
+   * @param key the key
+   * @param preferredPurpose the preferred purpose
+   * @param mergeAllShardResponses the merge all shard responses
    */
   @SuppressWarnings("unchecked")
   private void mergeArrayList(ShardRequest sreq, NamedList<Object> mtasResponse,
@@ -208,10 +204,8 @@ public class MtasSolrResultMerge {
   /**
    * Merge responses tree set.
    *
-   * @param originalList
-   *          the original list
-   * @param shardList
-   *          the shard list
+   * @param originalList the original list
+   * @param shardList the shard list
    */
   private void mergeResponsesTreeSet(TreeSet<Object> originalList,
       TreeSet<Object> shardList) {
@@ -223,12 +217,9 @@ public class MtasSolrResultMerge {
   /**
    * Merge responses array list.
    *
-   * @param originalList
-   *          the original list
-   * @param shardList
-   *          the shard list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param originalList the original list
+   * @param shardList the shard list
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private void mergeResponsesArrayList(ArrayList<Object> originalList,
@@ -275,12 +266,9 @@ public class MtasSolrResultMerge {
   /**
    * Merge responses named list.
    *
-   * @param mainResponse
-   *          the main response
-   * @param shardResponse
-   *          the shard response
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param mainResponse the main response
+   * @param shardResponse the shard response
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private void mergeResponsesNamedList(NamedList<Object> mainResponse,
@@ -335,8 +323,7 @@ public class MtasSolrResultMerge {
   /**
    * Adjustable parts cloned.
    *
-   * @param original
-   *          the original
+   * @param original the original
    * @return the object
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })

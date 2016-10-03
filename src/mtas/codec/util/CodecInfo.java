@@ -39,14 +39,10 @@ public class CodecInfo {
   /**
    * Instantiates a new codec info.
    *
-   * @param indexInputList
-   *          the index input list
-   * @param indexInputOffsetList
-   *          the index input offset list
-   * @param version
-   *          the version
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param indexInputList the index input list
+   * @param indexInputOffsetList the index input offset list
+   * @param version the version
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public CodecInfo(HashMap<String, IndexInput> indexInputList,
       HashMap<String, Long> indexInputOffsetList, int version)
@@ -60,11 +56,9 @@ public class CodecInfo {
   /**
    * Gets the codec info from terms.
    *
-   * @param t
-   *          the t
+   * @param t the t
    * @return the codec info from terms
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public static CodecInfo getCodecInfoFromTerms(Terms t) throws IOException {
@@ -98,8 +92,7 @@ public class CodecInfo {
   /**
    * Inits the.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void init() throws IOException {
     // move to begin
@@ -123,7 +116,7 @@ public class CodecInfo {
       } catch (Exception ex) {
         break;
       }
-    }  
+    }
     // prefixReferences
     prefixReferences = new HashMap<String, LinkedHashMap<String, Long>>();
   }
@@ -131,15 +124,11 @@ public class CodecInfo {
   /**
    * Gets the object by id.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param mtasId
-   *          the mtas id
+   * @param field the field
+   * @param docId the doc id
+   * @param mtasId the mtas id
    * @return the object by id
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasToken<?> getObjectById(String field, int docId, int mtasId)
       throws IOException {
@@ -173,15 +162,11 @@ public class CodecInfo {
   /**
    * Gets the objects by parent id.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param position
-   *          the position
+   * @param field the field
+   * @param docId the doc id
+   * @param position the position
    * @return the objects by parent id
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public List<MtasToken<String>> getObjectsByParentId(String field, int docId,
       int position) throws IOException {
@@ -196,15 +181,11 @@ public class CodecInfo {
   /**
    * Gets the objects by position.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param position
-   *          the position
+   * @param field the field
+   * @param docId the doc id
+   * @param position the position
    * @return the objects by position
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ArrayList<MtasToken<String>> getObjectsByPosition(String field,
       int docId, int position) throws IOException {
@@ -231,19 +212,13 @@ public class CodecInfo {
   /**
    * Gets the prefix filtered objects by positions.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param prefixes
-   *          the prefixes
-   * @param startPosition
-   *          the start position
-   * @param endPosition
-   *          the end position
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param startPosition the start position
+   * @param endPosition the end position
    * @return the prefix filtered objects by positions
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ArrayList<MtasToken<String>> getPrefixFilteredObjectsByPositions(
       String field, int docId, ArrayList<String> prefixes, int startPosition,
@@ -264,13 +239,10 @@ public class CodecInfo {
   /**
    * Gets the prefix filtered objects.
    *
-   * @param hits
-   *          the hits
-   * @param prefixes
-   *          the prefixes
+   * @param hits the hits
+   * @param prefixes the prefixes
    * @return the prefix filtered objects
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private ArrayList<MtasToken<String>> getPrefixFilteredObjects(
       List<MtasTreeHit<?>> hits, ArrayList<String> prefixes)
@@ -297,17 +269,12 @@ public class CodecInfo {
   /**
    * Gets the positioned terms by prefixes and position.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param prefixes
-   *          the prefixes
-   * @param position
-   *          the position
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param position the position
    * @return the positioned terms by prefixes and position
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ArrayList<MtasTreeHit<String>> getPositionedTermsByPrefixesAndPosition(
       String field, int docId, ArrayList<String> prefixes, int position)
@@ -319,19 +286,13 @@ public class CodecInfo {
   /**
    * Gets the positioned terms by prefixes and position range.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param prefixes
-   *          the prefixes
-   * @param startPosition
-   *          the start position
-   * @param endPosition
-   *          the end position
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param startPosition the start position
+   * @param endPosition the end position
    * @return the positioned terms by prefixes and position range
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ArrayList<MtasTreeHit<String>> getPositionedTermsByPrefixesAndPositionRange(
       String field, int docId, ArrayList<String> prefixes, int startPosition,
@@ -372,16 +333,11 @@ public class CodecInfo {
   /**
    * Collect terms by prefixes for list of hit positions.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
-   * @param prefixes
-   *          the prefixes
-   * @param positionsHits
-   *          the positions hits
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param positionsHits the positions hits
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void collectTermsByPrefixesForListOfHitPositions(String field,
       int docId, ArrayList<String> prefixes,
@@ -424,17 +380,15 @@ public class CodecInfo {
           }
         }
       }
-    } 
+    }
   }
 
   /**
    * Gets the objects.
    *
-   * @param hits
-   *          the hits
+   * @param hits the hits
    * @return the objects
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ArrayList<MtasToken<String>> getObjects(List<MtasTreeHit<?>> hits)
       throws IOException {
@@ -454,11 +408,9 @@ public class CodecInfo {
   /**
    * Gets the terms.
    *
-   * @param refs
-   *          the refs
+   * @param refs the refs
    * @return the terms
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public ArrayList<MtasTreeHit<String>> getTerms(ArrayList<MtasTreeHit<?>> refs)
       throws IOException {
@@ -482,10 +434,8 @@ public class CodecInfo {
   /**
    * Gets the prefixes ids.
    *
-   * @param field
-   *          the field
-   * @param prefixes
-   *          the prefixes
+   * @param field the field
+   * @param prefixes the prefixes
    * @return the prefixes ids
    */
   HashMap<String, Integer> getPrefixesIds(String field,
@@ -509,17 +459,16 @@ public class CodecInfo {
   /**
    * Gets the prefixes.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefixes
    */
-  private LinkedHashMap<String, Long> getPrefixes(String field) {    
+  private LinkedHashMap<String, Long> getPrefixes(String field) {
     if (fieldReferences.containsKey(field)) {
-      FieldReferences fr = fieldReferences.get(field);      
+      FieldReferences fr = fieldReferences.get(field);
       if (!prefixReferences.containsKey(field)) {
         LinkedHashMap<String, Long> refs = new LinkedHashMap<String, Long>();
         try {
-          IndexInput inPrefix = indexInputList.get("prefix");          
+          IndexInput inPrefix = indexInputList.get("prefix");
           inPrefix.seek(fr.refPrefix);
           for (int i = 0; i < fr.numberOfPrefixes; i++) {
             Long ref = inPrefix.getFilePointer();
@@ -543,10 +492,8 @@ public class CodecInfo {
   /**
    * Gets the doc.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
+   * @param field the field
+   * @param docId the doc id
    * @return the doc
    */
   public IndexDoc getDoc(String field, int docId) {
@@ -569,10 +516,8 @@ public class CodecInfo {
   /**
    * Gets the next doc.
    *
-   * @param field
-   *          the field
-   * @param previousDocId
-   *          the previous doc id
+   * @param field the field
+   * @param previousDocId the previous doc id
    * @return the next doc
    */
   public IndexDoc getNextDoc(String field, int previousDocId) {
@@ -602,10 +547,8 @@ public class CodecInfo {
   /**
    * Gets the number of positions.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
+   * @param field the field
+   * @param docId the doc id
    * @return the number of positions
    */
   public Integer getNumberOfPositions(String field, int docId) {
@@ -621,13 +564,10 @@ public class CodecInfo {
   /**
    * Gets the all number of positions.
    *
-   * @param field
-   *          the field
-   * @param docBase
-   *          the doc base
+   * @param field the field
+   * @param docBase the doc base
    * @return the all number of positions
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public HashMap<Integer, Integer> getAllNumberOfPositions(String field,
       int docBase) throws IOException {
@@ -649,10 +589,8 @@ public class CodecInfo {
   /**
    * Gets the number of tokens.
    *
-   * @param field
-   *          the field
-   * @param docId
-   *          the doc id
+   * @param field the field
+   * @param docId the doc id
    * @return the number of tokens
    */
   public Integer getNumberOfTokens(String field, int docId) {
@@ -668,13 +606,10 @@ public class CodecInfo {
   /**
    * Gets the all number of tokens.
    *
-   * @param field
-   *          the field
-   * @param docBase
-   *          the doc base
+   * @param field the field
+   * @param docBase the doc base
    * @return the all number of tokens
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public HashMap<Integer, Integer> getAllNumberOfTokens(String field,
       int docBase) throws IOException {
@@ -721,10 +656,8 @@ public class CodecInfo {
     /**
      * Instantiates a new index doc.
      *
-     * @param ref
-     *          the ref
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param ref the ref
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public IndexDoc(Long ref) throws IOException {
       try {
@@ -764,20 +697,13 @@ public class CodecInfo {
     /**
      * Instantiates a new field references.
      *
-     * @param refIndexDoc
-     *          the ref index doc
-     * @param refIndexDocId
-     *          the ref index doc id
-     * @param numberOfDocs
-     *          the number of docs
-     * @param refTerm
-     *          the ref term
-     * @param numberOfTerms
-     *          the number of terms
-     * @param refPrefix
-     *          the ref prefix
-     * @param numberOfPrefixes
-     *          the number of prefixes
+     * @param refIndexDoc the ref index doc
+     * @param refIndexDocId the ref index doc id
+     * @param numberOfDocs the number of docs
+     * @param refTerm the ref term
+     * @param numberOfTerms the number of terms
+     * @param refPrefix the ref prefix
+     * @param numberOfPrefixes the number of prefixes
      */
     public FieldReferences(long refIndexDoc, long refIndexDocId,
         int numberOfDocs, long refTerm, int numberOfTerms, long refPrefix,

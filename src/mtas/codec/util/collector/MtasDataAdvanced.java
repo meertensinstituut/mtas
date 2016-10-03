@@ -12,10 +12,8 @@ import mtas.codec.util.DataCollector;
 /**
  * The Class MtasDataAdvanced.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataCollector<T1, T2> implements Serializable {
@@ -49,44 +47,25 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Instantiates a new mtas data advanced.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param operations
-   *          the operations
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param operations the operations
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataAdvanced(String collectorType, String dataType,
       TreeSet<String> statsItems, String sortType, String sortDirection,
@@ -135,12 +114,9 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Sets the error.
    *
-   * @param newPosition
-   *          the new position
-   * @param error
-   *          the error
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param error the error
+   * @param currentExisting the current existing
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
@@ -201,19 +177,23 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
         tmpOldSize);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
+   */
   public void reduceToSegmentKeys() {
-    if(segmentRegistration != null && size>0) {
+    if (segmentRegistration != null && size > 0) {
       int sizeCopy = size;
       String[] keyListCopy = keyList.clone();
-      T1[] advancedValueSumListCopy = advancedValueSumList.clone(); 
-      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone(); 
-      T1[] advancedValueMinListCopy = advancedValueMinList.clone(); 
-      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList.clone(); 
-      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone(); 
-      long[] advancedValueNListCopy = advancedValueNList.clone(); 
+      T1[] advancedValueSumListCopy = advancedValueSumList.clone();
+      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone();
+      T1[] advancedValueMinListCopy = advancedValueMinList.clone();
+      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList
+          .clone();
+      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone();
+      long[] advancedValueNListCopy = advancedValueNList.clone();
       size = 0;
-      for(int i=0; i< sizeCopy; i++) {
-        if(segmentKeys.contains(keyListCopy[i])) {
+      for (int i = 0; i < sizeCopy; i++) {
+        if (segmentKeys.contains(keyListCopy[i])) {
           keyList[size] = keyListCopy[i];
           advancedValueSumList[size] = advancedValueSumListCopy[i];
           advancedValueMaxList[size] = advancedValueMaxListCopy[i];
@@ -223,10 +203,10 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
           advancedValueNList[size] = advancedValueNListCopy[i];
           size++;
         }
-      } 
-    }  
+      }
+    }
   }
-  
+
   /*
    * (non-Javadoc)
    * 
@@ -310,14 +290,10 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Sets the value.
    *
-   * @param newPosition
-   *          the new position
-   * @param values
-   *          the values
-   * @param number
-   *          the number
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param values the values
+   * @param number the number
+   * @param currentExisting the current existing
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
@@ -346,22 +322,14 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Sets the value.
    *
-   * @param newPosition
-   *          the new position
-   * @param valueSum
-   *          the value sum
-   * @param valueSumOfLogs
-   *          the value sum of logs
-   * @param valueSumOfSquares
-   *          the value sum of squares
-   * @param valueMin
-   *          the value min
-   * @param valueMax
-   *          the value max
-   * @param valueN
-   *          the value n
-   * @param currentExisting
-   *          the current existing
+   * @param newPosition the new position
+   * @param valueSum the value sum
+   * @param valueSumOfLogs the value sum of logs
+   * @param valueSumOfSquares the value sum of squares
+   * @param valueMin the value min
+   * @param valueMax the value max
+   * @param valueN the value n
+   * @param currentExisting the current existing
    */
   private void setValue(int newPosition, T1 valueSum, T2 valueSumOfLogs,
       T1 valueSumOfSquares, T1 valueMin, T1 valueMax, long valueN,
@@ -535,8 +503,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Inits the new list basic.
    *
-   * @param maxNumberOfTerms
-   *          the max number of terms
+   * @param maxNumberOfTerms the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
     newAdvancedValueSumList = operations.createVector1(newSize);

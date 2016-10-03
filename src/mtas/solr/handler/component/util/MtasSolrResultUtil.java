@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ import org.apache.solr.common.util.Base64;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
-import mtas.analysis.token.MtasToken;
 import mtas.codec.util.DataCollector;
 import mtas.codec.util.CodecComponent.GroupHit;
 import mtas.codec.util.collector.MtasDataItem;
@@ -40,16 +38,16 @@ public class MtasSolrResultUtil {
 
   /** The Constant QUERY_TYPE_CQL. */
   public static final String QUERY_TYPE_CQL = "cql";
-  
-  public static final Pattern patternKeyStartGrouphit = Pattern.compile("^"+GroupHit.KEY_START);
-    
+
+  /** The Constant patternKeyStartGrouphit. */
+  public static final Pattern patternKeyStartGrouphit = Pattern
+      .compile("^" + GroupHit.KEY_START);
+
   /**
    * Rewrite.
    *
-   * @param al
-   *          the al
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param al the al
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static void rewrite(ArrayList<?> al) throws IOException {
@@ -65,10 +63,8 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite.
    *
-   * @param nl
-   *          the nl
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param nl the nl
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void rewrite(NamedList<Object> nl) throws IOException {
     rewrite(nl, true);
@@ -77,12 +73,9 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite.
    *
-   * @param nl
-   *          the nl
-   * @param doCollapse
-   *          the do collapse
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param nl the nl
+   * @param doCollapse the do collapse
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private static void rewrite(NamedList<Object> nl, boolean doCollapse)
@@ -141,21 +134,28 @@ public class MtasSolrResultUtil {
     }
   }
 
-  private static ArrayList<NamedList<Object>> rewriteToArray(NamedList<Object> nnl) {
+  /**
+   * Rewrite to array.
+   *
+   * @param nnl the nnl
+   * @return the array list
+   */
+  private static ArrayList<NamedList<Object>> rewriteToArray(
+      NamedList<Object> nnl) {
     ArrayList<NamedList<Object>> al = new ArrayList<NamedList<Object>>();
-    String key;     
+    String key;
     Iterator<Entry<String, Object>> it = nnl.iterator();
-    while(it.hasNext()) {
+    while (it.hasNext()) {
       Entry<String, Object> entry = it.next();
       NamedList<Object> item = (NamedList<Object>) entry.getValue();
       key = entry.getKey();
-      if(key.startsWith(GroupHit.KEY_START)) {
+      if (key.startsWith(GroupHit.KEY_START)) {
         StringBuilder newKey = new StringBuilder("");
         item.add("group", GroupHit.keyToObject(key, newKey));
         item.add("key", newKey.toString().trim());
       } else {
         item.add("key", key);
-      }  
+      }
       al.add(item);
     }
     return al;
@@ -164,14 +164,10 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite merge list.
    *
-   * @param key
-   *          the key
-   * @param subKey
-   *          the sub key
-   * @param snl
-   *          the snl
-   * @param tnl
-   *          the tnl
+   * @param key the key
+   * @param subKey the sub key
+   * @param snl the snl
+   * @param tnl the tnl
    */
   @SuppressWarnings({ "unchecked", "unused" })
   private static void rewriteMergeList(String key, String subKey,
@@ -196,14 +192,10 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite merge data.
    *
-   * @param key
-   *          the key
-   * @param subKey
-   *          the sub key
-   * @param snl
-   *          the snl
-   * @param tnl
-   *          the tnl
+   * @param key the key
+   * @param subKey the sub key
+   * @param snl the snl
+   * @param tnl the tnl
    */
   @SuppressWarnings({ "unused", "unchecked" })
   private static void rewriteMergeData(String key, String subKey,
@@ -224,8 +216,7 @@ public class MtasSolrResultUtil {
   /**
    * Encode.
    *
-   * @param o
-   *          the o
+   * @param o the o
    * @return the string
    */
   public static String encode(Object o) {
@@ -245,8 +236,7 @@ public class MtasSolrResultUtil {
   /**
    * Decode.
    *
-   * @param s
-   *          the s
+   * @param s the s
    * @return the object
    */
   static Object decode(String s) {
@@ -265,8 +255,7 @@ public class MtasSolrResultUtil {
   /**
    * Decode.
    *
-   * @param l
-   *          the l
+   * @param l the l
    * @return the array list
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -284,8 +273,7 @@ public class MtasSolrResultUtil {
   /**
    * Decode.
    *
-   * @param nl
-   *          the nl
+   * @param nl the nl
    * @return the named list
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -327,10 +315,8 @@ public class MtasSolrResultUtil {
   /**
    * Gets the ids from parameters.
    *
-   * @param params
-   *          the params
-   * @param prefix
-   *          the prefix
+   * @param params the params
+   * @param prefix the prefix
    * @return the ids from parameters
    */
   public static SortedSet<String> getIdsFromParameters(SolrParams params,
@@ -352,18 +338,12 @@ public class MtasSolrResultUtil {
   /**
    * Compare and check.
    *
-   * @param list
-   *          the list
-   * @param original
-   *          the original
-   * @param nameNew
-   *          the name new
-   * @param nameOriginal
-   *          the name original
-   * @param unique
-   *          the unique
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param list the list
+   * @param original the original
+   * @param nameNew the name new
+   * @param nameOriginal the name original
+   * @param unique the unique
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void compareAndCheck(String[] list, String[] original,
       String nameNew, String nameOriginal, Boolean unique) throws IOException {
@@ -387,15 +367,11 @@ public class MtasSolrResultUtil {
   /**
    * Construct query.
    *
-   * @param queryValue
-   *          the query value
-   * @param queryType
-   *          the query type
-   * @param field
-   *          the field
+   * @param queryValue the query value
+   * @param queryType the query type
+   * @param field the field
    * @return the span query
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static SpanQuery constructQuery(String queryValue, String queryType,
       String field) throws IOException {

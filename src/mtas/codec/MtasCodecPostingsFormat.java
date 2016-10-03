@@ -17,10 +17,6 @@ import org.apache.lucene.util.BytesRef;
 /**
  * The Class MtasCodecPostingsFormat.
  */
-/**
- * @author matthijs
- *
- */
 public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant VERSION_START. */
@@ -85,7 +81,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION. */
   public static final String MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION = "mtas.prefix.intersection";
-  
+
   /** The Constant MTAS_OBJECT_EXTENSION. */
   public static final String MTAS_OBJECT_EXTENSION = "mtas.object";
 
@@ -282,7 +278,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
     }
     return token;
   }
-  
+
   /**
    * Gets the term.
    *
