@@ -73,6 +73,12 @@ public class MtasSolrResultMerge {
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
         } else if (rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {
+          // merge distinct
+          if (rb.req.getParams().getBool(MtasSolrComponentDistinct.PARAM_MTAS_DISTINCT,
+              false)) {
+            mergeArrayList(sreq, mtasResponse, "distinct",
+                ShardRequest.PURPOSE_PRIVATE, true);
+          }
           // merge kwic
           if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
               false)) {

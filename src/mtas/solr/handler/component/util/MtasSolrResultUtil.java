@@ -120,7 +120,7 @@ public class MtasSolrResultUtil {
           } else {
             nl.setVal(i, null);
           }
-        }
+        } 
       }
     }
     // collapse
