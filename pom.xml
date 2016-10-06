@@ -3,7 +3,7 @@
 	<properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>6.2.0</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20161003</currentDevelopmentRelease>
+		<currentDevelopmentRelease>20161006</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
