@@ -2,6 +2,7 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -42,6 +43,18 @@ public class MtasSolrComponentKwic {
   /** The Constant NAME_MTAS_KWIC_QUERY_VALUE. */
   public static final String NAME_MTAS_KWIC_QUERY_VALUE = "query.value";
 
+  /** The Constant NAME_MTAS_KWIC_QUERY_PREFIX. */
+  public static final String NAME_MTAS_KWIC_QUERY_PREFIX = "query.prefix";
+
+  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
+  public static final String NAME_MTAS_KWIC_QUERY_VARIABLE = "query.variable";
+  
+  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
+  public static final String SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME = "name";
+  
+  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
+  public static final String SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE = "value";
+
   /** The Constant NAME_MTAS_KWIC_KEY. */
   public static final String NAME_MTAS_KWIC_KEY = "key";
 
@@ -66,8 +79,7 @@ public class MtasSolrComponentKwic {
   /**
    * Instantiates a new mtas solr component kwic.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentKwic(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -76,8 +88,7 @@ public class MtasSolrComponentKwic {
   /**
    * Gets the positive integer.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -91,12 +102,9 @@ public class MtasSolrComponentKwic {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -107,6 +115,8 @@ public class MtasSolrComponentKwic {
       String[] fields = new String[ids.size()];
       String[] queryTypes = new String[ids.size()];
       String[] queryValues = new String[ids.size()];
+      String[] queryPrefixes = new String[ids.size()];
+      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];      
       String[] keys = new String[ids.size()];
       String[] prefixes = new String[ids.size()];
       String[] numbers = new String[ids.size()];
@@ -122,6 +132,47 @@ public class MtasSolrComponentKwic {
         queryValues[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_VALUE,
             null);
+        queryPrefixes[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_PREFIX,
+            null);
+        Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
+            rb.req.getParams(),
+            PARAM_MTAS_KWIC + "." + id + "."
+                + NAME_MTAS_KWIC_QUERY_VARIABLE);
+        queryVariables[tmpCounter] = new HashMap<String, String[]>();
+        if (vIds.size() > 0) {
+          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+          for (String vId : vIds) {
+            String name = rb.req.getParams()
+                .get(PARAM_MTAS_KWIC + "." + id + "."
+                    + NAME_MTAS_KWIC_QUERY_VARIABLE + "." + vId
+                    + "." + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME,
+                    null);
+            if (name != null) {
+              if (!tmpVariables.containsKey(name)) {
+                tmpVariables.put(name, new ArrayList<String>());
+              }
+              String value = rb.req.getParams()
+                  .get(PARAM_MTAS_KWIC + "." + id + "."
+                      + NAME_MTAS_KWIC_QUERY_VARIABLE + "." + vId
+                      + "." + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE,
+                      null);
+              if (value != null) {
+                ArrayList<String> list = new ArrayList<String>();
+                String[] subList = value.split("(?<!\\\\),");
+                for(int i=0; i<subList.length; i++) {
+                  list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                }                    
+                tmpVariables.get(name).addAll(list);                    
+              }
+            }
+          }
+          for (String name : tmpVariables.keySet()) {
+            queryVariables[tmpCounter].put(name,
+                tmpVariables.get(name)
+                    .toArray(new String[tmpVariables.get(name).size()]));
+          }
+        }        
         keys[tmpCounter] = rb.req.getParams()
             .get(PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_KEY,
                 String.valueOf(tmpCounter))
@@ -158,6 +209,8 @@ public class MtasSolrComponentKwic {
           NAME_MTAS_KWIC_QUERY_VALUE, NAME_MTAS_KWIC_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(queryTypes, fields,
           NAME_MTAS_KWIC_QUERY_TYPE, NAME_MTAS_KWIC_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(queryPrefixes, fields,
+          NAME_MTAS_KWIC_QUERY_PREFIX, NAME_MTAS_KWIC_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(prefixes, fields,
           NAME_MTAS_KWIC_PREFIX, NAME_MTAS_KWIC_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(numbers, fields, NAME_MTAS_KWIC_NUMBER,
@@ -173,7 +226,7 @@ public class MtasSolrComponentKwic {
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
         SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
-            queryTypes[i], fields[i]);
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i]);
         // minimize number of queries
         if (cf.spanQueryList.contains(q)) {
           q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -199,8 +252,7 @@ public class MtasSolrComponentKwic {
   /**
    * Creates the.
    *
-   * @param kwic
-   *          the kwic
+   * @param kwic the kwic
    * @return the simple ordered map
    */
   public SimpleOrderedMap<Object> create(ComponentKwic kwic) {
@@ -330,12 +382,9 @@ public class MtasSolrComponentKwic {
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -351,7 +400,11 @@ public class MtasSolrComponentKwic {
             sreq.params.remove(
                 PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_FIELD);
             sreq.params.remove(
+                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_TYPE);
+            sreq.params.remove(
                 PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_VALUE);
+            sreq.params.remove(
+                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_PREFIX);            
             sreq.params
                 .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_KEY);
             sreq.params.remove(
@@ -373,8 +426,7 @@ public class MtasSolrComponentKwic {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {

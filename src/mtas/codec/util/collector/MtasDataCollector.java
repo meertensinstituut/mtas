@@ -91,6 +91,9 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /** The source number list. */
   protected int[] sourceNumberList;
 
+  /** The did segment registration. */
+  private boolean withTotal;
+
   /** The segment registration. */
   public transient String segmentRegistration;
 
@@ -240,6 +243,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     this.start = start;
     this.number = number;
     this.segmentRegistration = segmentRegistration;
+    this.withTotal = false;
     if (segmentRegistration != null) {
       segmentKeys = new HashSet<String>();
       segmentKeyValueList = new LinkedHashMap<String, HashMap<String, T1>>();
@@ -909,6 +913,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             }
             return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
           } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {
+            //System.out.println(key+" "+value+" "+tmpSegmentValueBoundary);
             if (!test) {
               segmentKeyValueList.get(segmentName).put(key, value);
               if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {
@@ -1406,6 +1411,22 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    */
   public int getSize() {
     return size;
+  }
+  
+  public boolean withTotal() {
+    return withTotal;
+  }
+  
+  public void setWithTotal() throws IOException {
+    if(collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
+      if(segmentName!=null) {
+        throw new IOException("can't get total with segmentRegistration"); 
+      } else {
+        withTotal = true;
+      }  
+    } else {
+      throw new IOException("can't get total for dataCollector of type "+collectorType);
+    }
   }
 
 }

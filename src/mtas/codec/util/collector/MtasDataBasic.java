@@ -319,7 +319,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
         || !statsType.equals(newDataCollector.getStatsType())
         || !(newDataCollector instanceof MtasDataBasic)) {
       throw new IOException("cannot merge different dataCollectors");
-    } else {
+    } else {      
       segmentRegistration = null;
       @SuppressWarnings("unchecked")
       MtasDataBasic<T1, T2> newMtasDataBasic = (MtasDataBasic<T1, T2>) newDataCollector;

@@ -2,6 +2,7 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -40,6 +41,18 @@ public class MtasSolrComponentGroup {
 
   /** The Constant NAME_MTAS_GROUP_QUERY_VALUE. */
   public static final String NAME_MTAS_GROUP_QUERY_VALUE = "query.value";
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_PREFIX. */
+  public static final String NAME_MTAS_GROUP_QUERY_PREFIX = "query.prefix";
+
+  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
+  public static final String NAME_MTAS_GROUP_QUERY_VARIABLE = "query.variable";
+  
+  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
+  public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME = "name";
+  
+  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
+  public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE = "value";
 
   /** The Constant NAME_MTAS_GROUP_KEY. */
   public static final String NAME_MTAS_GROUP_KEY = "key";
@@ -102,6 +115,8 @@ public class MtasSolrComponentGroup {
       String[] fields = new String[ids.size()];
       String[] queryTypes = new String[ids.size()];
       String[] queryValues = new String[ids.size()];
+      String[] queryPrefixes = new String[ids.size()];
+      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];      
       String[] keys = new String[ids.size()];
       String[] numbers = new String[ids.size()];
       String[][] groupingLeftPosition = new String[ids.size()][];
@@ -132,6 +147,47 @@ public class MtasSolrComponentGroup {
         queryValues[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_VALUE,
             null);
+        queryPrefixes[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_PREFIX,
+            null);
+        Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
+            rb.req.getParams(),
+            PARAM_MTAS_GROUP + "." + id + "."
+                + NAME_MTAS_GROUP_QUERY_VARIABLE);
+        queryVariables[tmpCounter] = new HashMap<String, String[]>();
+        if (vIds.size() > 0) {
+          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+          for (String vId : vIds) {
+            String name = rb.req.getParams()
+                .get(PARAM_MTAS_GROUP + "." + id + "."
+                    + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId
+                    + "." + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME,
+                    null);
+            if (name != null) {
+              if (!tmpVariables.containsKey(name)) {
+                tmpVariables.put(name, new ArrayList<String>());
+              }
+              String value = rb.req.getParams()
+                  .get(PARAM_MTAS_GROUP + "." + id + "."
+                      + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId
+                      + "." + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE,
+                      null);
+              if (value != null) {
+                ArrayList<String> list = new ArrayList<String>();
+                String[] subList = value.split("(?<!\\\\),");
+                for(int i=0; i<subList.length; i++) {
+                  list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                }                    
+                tmpVariables.get(name).addAll(list);                    
+              }
+            }
+          }
+          for (String name : tmpVariables.keySet()) {
+            queryVariables[tmpCounter].put(name,
+                tmpVariables.get(name)
+                    .toArray(new String[tmpVariables.get(name).size()]));
+          }
+        }        
         groupingHitInsidePrefixes[tmpCounter] = null;
         // collect
         SortedSet<String> gids;
@@ -222,7 +278,7 @@ public class MtasSolrComponentGroup {
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
         SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
-            queryTypes[i], fields[i]);
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i]);
         // minimize number of queries
         if (cf.spanQueryList.contains(q)) {
           q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -235,7 +291,7 @@ public class MtasSolrComponentGroup {
         int number = (numbers[i] == null) || (numbers[i].isEmpty())
             ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
         mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
-            fields[i], queryValues[i], queryTypes[i], key, number,
+            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i], key, number,
             groupingHitInsidePrefixes[i], groupingHitInsideLeftPosition[i],
             groupingHitInsideLeftPrefixes[i], groupingHitInsideRightPosition[i],
             groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],

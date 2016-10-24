@@ -10,7 +10,7 @@ By [configuring](search_configuration.html) the mtas query parser in solrconfig.
 
 Search for documents containing the word "de" with a query.
 
-`q={!mtas_cql+field%3D"text"+cql%3D"[t%3D\"de\"]"}&fl=*&start=0&rows=0&wt=json&indent=true`
+`q={!mtas_cql+field%3D"text"+query%3D"[t%3D\"de\"]"}&fl=*&start=0&rows=0&wt=json&indent=true`
 
 ``` json
 "response":{"numFound":1664241,"start":0,"docs":[]
@@ -23,7 +23,7 @@ Search for documents containing the word "de" with a filter query.
 
 **Request and response**  
 
-`fq={!mtas_cql+field%3D"text"+cql%3D"[t%3D\"de\"]"}&q=*%3A*&fl=*&start=0&rows=0&wt=json&indent=true`
+`fq={!mtas_cql+field%3D"text"+query%3D"[t%3D\"de\"]"}&q=*%3A*&fl=*&start=0&rows=0&wt=json&indent=true`
 
 ``` json
 "response":{"numFound":1664241,"start":0,"docs":[]

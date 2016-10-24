@@ -22,7 +22,7 @@ import org.apache.lucene.search.spans.SpanWeight;
 public class MtasSpanWildcardQuery extends SpanQuery {
 
   /** The Constant MTAS_WILDCARD_EXPAND_BOUNDARY. */
-  private static final int MTAS_WILDCARD_EXPAND_BOUNDARY = 1000;
+  private static final int MTAS_WILDCARD_EXPAND_BOUNDARY = 1000000;
 
   /** The query name. */
   private static String QUERY_NAME = "mtasSpanWildcardQuery";
@@ -90,7 +90,7 @@ public class MtasSpanWildcardQuery extends SpanQuery {
       SpanQuery[] clauses = ((SpanOrQuery) q).getClauses();
       if (clauses.length > MTAS_WILDCARD_EXPAND_BOUNDARY) {
         // TODO : forward index solution
-        throw new IOException("JAN-ODIJK-EXCEPTION: Wildcard expression \""
+        throw new IOException("Wildcard expression \""
             + CodecUtil.termValue(term.text()) + "\" expands to "
             + clauses.length + " terms, too many (boundary "
             + MTAS_WILDCARD_EXPAND_BOUNDARY + ")!");

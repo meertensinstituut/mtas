@@ -22,7 +22,7 @@ import org.apache.lucene.search.spans.SpanWeight;
 public class MtasSpanRegexpQuery extends SpanQuery {
 
   /** The Constant MTAS_REGEXP_EXPAND_BOUNDARY. */
-  private static final int MTAS_REGEXP_EXPAND_BOUNDARY = 1000;
+  private static final int MTAS_REGEXP_EXPAND_BOUNDARY = 1000000;
 
   /** The prefix. */
   private String prefix;
@@ -62,7 +62,7 @@ public class MtasSpanRegexpQuery extends SpanQuery {
    */
   public MtasSpanRegexpQuery(Term term, boolean singlePosition) {
     super();
-    RegexpQuery req = new RegexpQuery(term);
+    RegexpQuery req = new RegexpQuery(term);    
     query = new SpanMultiTermQueryWrapper<RegexpQuery>(req);
     this.term = term;
     this.singlePosition = singlePosition;
@@ -90,7 +90,7 @@ public class MtasSpanRegexpQuery extends SpanQuery {
       SpanQuery[] clauses = ((SpanOrQuery) q).getClauses();
       if (clauses.length > MTAS_REGEXP_EXPAND_BOUNDARY) {
         // TODO : forward index solution
-        throw new IOException("JAN-ODIJK-EXCEPTION: Regexp \""
+        throw new IOException("Regexp \""
             + CodecUtil.termValue(term.text()) + "\" expands to "
             + clauses.length + " terms, too many (boundary "
             + MTAS_REGEXP_EXPAND_BOUNDARY + ")!");

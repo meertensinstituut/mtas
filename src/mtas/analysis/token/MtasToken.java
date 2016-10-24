@@ -698,9 +698,15 @@ public abstract class MtasToken<GenericType> {
    * @return the list
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static List<CompiledAutomaton> createAutomata(String prefix,
+  public static List<CompiledAutomaton> createAutomata(String prefix, String regexp,
       List<String> valueList) throws IOException {
     List<CompiledAutomaton> list = new ArrayList<CompiledAutomaton>();
+    Automaton automatonRegexp = null;
+    if(regexp!=null) {
+      RegExp re = new RegExp(
+          prefix + MtasToken.DELIMITER + regexp + "\u0000*");
+      automatonRegexp = re.toAutomaton();
+    }
     int step = 500;
     for (int i = 0; i < valueList.size(); i += step) {
       int localStep = step;
@@ -718,7 +724,13 @@ public abstract class MtasToken<GenericType> {
               (new RegExp(prefix + MtasToken.DELIMITER + value + "\u0000*"))
                   .toAutomaton());
         }
-        Automaton automaton = Operations.union(listAutomaton);
+        Automaton automatonList = Operations.union(listAutomaton);
+        Automaton automaton;
+        if(automatonRegexp!=null) {
+          automaton = Operations.intersection(automatonList, automatonRegexp);
+        } else {
+          automaton = automatonList;
+        }
         try {
           compiledAutomaton = new CompiledAutomaton(automaton);
         } catch (TooComplexToDeterminizeException e) {

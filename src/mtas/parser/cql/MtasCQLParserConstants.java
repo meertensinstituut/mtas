@@ -53,15 +53,17 @@ public interface MtasCQLParserConstants {
   /** RegularExpression Id. */
   int NUMBER = 25;
   /** RegularExpression Id. */
-  int QUOTED_VALUE = 26;
+  int VARIABLE = 26;
   /** RegularExpression Id. */
-  int UNQUOTED_VALUE = 27;
+  int QUOTED_VALUE = 27;
   /** RegularExpression Id. */
-  int OCTOTHORPE = 28;
+  int UNQUOTED_VALUE = 28;
   /** RegularExpression Id. */
-  int DIGIT = 29;
+  int OCTOTHORPE = 29;
   /** RegularExpression Id. */
-  int ALLOWED_UNQUOTED_CHARACTER = 30;
+  int DIGIT = 30;
+  /** RegularExpression Id. */
+  int ALLOWED_UNQUOTED_CHARACTER = 31;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -94,6 +96,7 @@ public interface MtasCQLParserConstants {
     "\"!=\"",
     "\"=\"",
     "<NUMBER>",
+    "<VARIABLE>",
     "<QUOTED_VALUE>",
     "<UNQUOTED_VALUE>",
     "<OCTOTHORPE>",

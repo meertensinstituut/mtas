@@ -20,13 +20,25 @@ import org.apache.lucene.index.Term;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MtasCQLParser implements MtasCQLParserConstants {
-  public SpanQuery parse(String field, String defaultPrefix) throws ParseException
+  public SpanQuery parse(String field, String defaultPrefix, HashMap<String, String[] > variables) throws ParseException
   {
-    return cql(field, defaultPrefix);
+    HashSet<String> usedVariables = new HashSet<String>();
+    SpanQuery query = cql(field, defaultPrefix, variables, usedVariables);
+    if(variables!=null && variables.size() > usedVariables.size()) {
+      for(String key : variables.keySet()) {
+        if(!usedVariables.contains(key)) {
+          throw new ParseException("variable $"+key+" not used");
+        }
+      }
+      throw new ParseException("unused variables defined");
+    }
+    return query;
   }
 
   private String unquoteString(String unfiltered)
@@ -39,10 +51,19 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return unfiltered;
   }
 
-  final private SpanQuery cql(String field, String defaultPrefix) throws ParseException, ParseException {
+  private String variableString(String variable)
+  {
+    if (variable.startsWith("$"))
+    {
+      variable = variable.substring(1, variable.length());
+    }
+    return variable;
+  }
+
+  final private SpanQuery cql(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   SpanQuery q;
   ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
-    q = cqlBlock(field, defaultPrefix);
+    q = cqlBlock(field, defaultPrefix, variables, usedVariables);
     itemList.add(new MtasSpanSequenceItem(q, false));
     label_1:
     while (true) {
@@ -51,7 +72,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       } else {
         break label_1;
       }
-      q = cqlBlock(field, defaultPrefix);
+      q = cqlBlock(field, defaultPrefix, variables, usedVariables);
       itemList.add(new MtasSpanSequenceItem(q, false));
     }
     jj_consume_token(0);
@@ -66,7 +87,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private SpanQuery cqlBlock(String field, String defaultPrefix) throws ParseException, ParseException {
+  final private SpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   MtasCQLParserSentenceCondition s1 = null, s2 = null;
   SpanQuery q1 = null, q2 = null;
   Token end = null;
@@ -76,10 +97,10 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   String OPERATOR_WITHIN = "within";
   String OPERATOR_NOT_WITHIN = "not_within";
     if (jj_2_2(1000)) {
-      s1 = sentence(field, defaultPrefix);
+      s1 = sentence(field, defaultPrefix, variables, usedVariables);
     } else if (jj_2_3(1000)) {
       jj_consume_token(BRACKET_START);
-      q1 = cqlBlock(field, defaultPrefix);
+      q1 = cqlBlock(field, defaultPrefix, variables, usedVariables);
       jj_consume_token(BRACKET_END);
     } else {
       jj_consume_token(-1);
@@ -103,10 +124,10 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         throw new ParseException();
       }
       if (jj_2_8(1000)) {
-        s2 = sentence(field, defaultPrefix);
+        s2 = sentence(field, defaultPrefix, variables, usedVariables);
       } else if (jj_2_9(1000)) {
         jj_consume_token(BRACKET_START);
-        q2 = cqlBlock(field, defaultPrefix);
+        q2 = cqlBlock(field, defaultPrefix, variables, usedVariables);
         jj_consume_token(BRACKET_END);
       } else {
         jj_consume_token(-1);
@@ -153,7 +174,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix) throws ParseException, ParseException {
+  final private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   MtasCQLParserSentenceCondition sentenceCondition;
   MtasCQLParserSentencePartCondition condition;
   Token questionMark = null;
@@ -161,13 +182,13 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   Token maxValue = null;
   int minimumOccurence = 1;
   int maximumOccurence = 1;
-    condition = sentencePart(field, defaultPrefix);
+    condition = sentencePart(field, defaultPrefix, variables, usedVariables);
     sentenceCondition = condition.createFullSentence();
     {if (true) return sentenceCondition;}
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix) throws ParseException, ParseException {
+  final private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   Token operator;
   MtasCQLParserSentencePartCondition condition, sentencePart;
   MtasCQLParserBasicSentenceCondition basicSentence;
@@ -177,11 +198,11 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   int minimumOccurence = 1;
   int maximumOccurence = 1;
     if (jj_2_15(1000)) {
-      basicSentence = basicSentence(field, defaultPrefix);
+      basicSentence = basicSentence(field, defaultPrefix, variables, usedVariables);
       condition = new MtasCQLParserSentencePartCondition(basicSentence);
     } else if (jj_2_16(1000)) {
       jj_consume_token(BRACKET_START);
-      sentencePart = sentencePart(field, defaultPrefix);
+      sentencePart = sentencePart(field, defaultPrefix, variables, usedVariables);
       jj_consume_token(BRACKET_END);
       if (jj_2_14(1000)) {
           questionMark = null;
@@ -234,7 +255,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       } else {
         ;
       }
-      sentencePart = sentencePart(field, defaultPrefix);
+      sentencePart = sentencePart(field, defaultPrefix, variables, usedVariables);
         if (operator == null)
         {
           condition.setOr(false);
@@ -251,12 +272,12 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix) throws ParseException, ParseException {
+  final private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   MtasCQLParserWordFullCondition subWordCondition;
   MtasCQLParserGroupFullCondition subGroupCondition;
   MtasCQLParserBasicSentenceCondition condition = new MtasCQLParserBasicSentenceCondition();
     if (jj_2_19(1000)) {
-      subWordCondition = word(field, defaultPrefix);
+      subWordCondition = word(field, defaultPrefix, variables, usedVariables);
       condition.addWord(subWordCondition);
     } else if (jj_2_20(1000)) {
       subGroupCondition = group(field);
@@ -273,7 +294,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         break label_2;
       }
       if (jj_2_22(1000)) {
-        subWordCondition = word(field, defaultPrefix);
+        subWordCondition = word(field, defaultPrefix, variables, usedVariables);
         condition.addWord(subWordCondition);
       } else if (jj_2_23(1000)) {
         subGroupCondition = group(field);
@@ -408,7 +429,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasCQLParserWordFullCondition word(String field, String defaultPrefix) throws ParseException, ParseException {
+  final private MtasCQLParserWordFullCondition word(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   Token questionMark = null;
   Token value;
   MtasCQLParserWordFullCondition wordCondition;
@@ -419,16 +440,16 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   int maximumOccurence = 1;
     if (jj_2_39(1000)) {
       value = jj_consume_token(QUOTED_VALUE);
-      condition = new MtasCQLParserDefaultPrefixCondition(field, defaultPrefix, unquoteString(value.image));
+      condition = new MtasCQLParserDefaultPrefixCondition(field, defaultPrefix, unquoteString(value.image), variables, usedVariables);
     } else if (jj_2_40(1000)) {
       jj_consume_token(WORD_START);
       if (jj_2_37(1000)) {
-        subCondition = wordCondition(field);
+        subCondition = wordCondition(field, variables, usedVariables);
         if (jj_2_35(1000)) {
           jj_consume_token(AND);
           condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
           condition.addCondition(subCondition);
-          subCondition = wordCondition(field);
+          subCondition = wordCondition(field, variables, usedVariables);
           condition.addCondition(subCondition);
           label_3:
           while (true) {
@@ -438,14 +459,14 @@ public class MtasCQLParser implements MtasCQLParserConstants {
               break label_3;
             }
             jj_consume_token(AND);
-            subCondition = wordCondition(field);
+            subCondition = wordCondition(field, variables, usedVariables);
             condition.addCondition(subCondition);
           }
         } else if (jj_2_36(1000)) {
           jj_consume_token(OR);
           condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
           condition.addCondition(subCondition);
-          subCondition = wordCondition(field);
+          subCondition = wordCondition(field, variables, usedVariables);
           condition.addCondition(subCondition);
           label_4:
           while (true) {
@@ -455,7 +476,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
               break label_4;
             }
             jj_consume_token(OR);
-            subCondition = wordCondition(field);
+            subCondition = wordCondition(field, variables, usedVariables);
             condition.addCondition(subCondition);
           }
         } else {
@@ -463,7 +484,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
           throw new ParseException();
         }
       } else if (jj_2_38(1000)) {
-        condition = wordCondition(field);
+        condition = wordCondition(field, variables, usedVariables);
       } else {
         jj_consume_token(-1);
         throw new ParseException();
@@ -523,7 +544,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasCQLParserWordCondition wordCondition(String field) throws ParseException, ParseException {
+  final private MtasCQLParserWordCondition wordCondition(String field, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   Token negation = null;
   MtasCQLParserWordCondition condition, subCondition;
     if (jj_2_66(1000)) {
@@ -536,9 +557,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       if (jj_2_63(1000)) {
         condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
         if (jj_2_47(1000)) {
-          subCondition = wordAtomCondition(field);
+          subCondition = wordAtomCondition(field, variables, usedVariables);
         } else if (jj_2_48(1000)) {
-          subCondition = wordCondition(field);
+          subCondition = wordCondition(field, variables, usedVariables);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -546,9 +567,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         condition.addCondition(subCondition);
         jj_consume_token(AND);
         if (jj_2_49(1000)) {
-          subCondition = wordAtomCondition(field);
+          subCondition = wordAtomCondition(field, variables, usedVariables);
         } else if (jj_2_50(1000)) {
-          subCondition = wordCondition(field);
+          subCondition = wordCondition(field, variables, usedVariables);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -563,9 +584,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
           }
           jj_consume_token(AND);
           if (jj_2_52(1000)) {
-            subCondition = wordAtomCondition(field);
+            subCondition = wordAtomCondition(field, variables, usedVariables);
           } else if (jj_2_53(1000)) {
-            subCondition = wordCondition(field);
+            subCondition = wordCondition(field, variables, usedVariables);
           } else {
             jj_consume_token(-1);
             throw new ParseException();
@@ -575,9 +596,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       } else if (jj_2_64(1000)) {
         condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
         if (jj_2_54(1000)) {
-          subCondition = wordAtomCondition(field);
+          subCondition = wordAtomCondition(field, variables, usedVariables);
         } else if (jj_2_55(1000)) {
-          subCondition = wordCondition(field);
+          subCondition = wordCondition(field, variables, usedVariables);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -585,9 +606,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         condition.addCondition(subCondition);
         jj_consume_token(OR);
         if (jj_2_56(1000)) {
-          subCondition = wordAtomCondition(field);
+          subCondition = wordAtomCondition(field, variables, usedVariables);
         } else if (jj_2_57(1000)) {
-          subCondition = wordCondition(field);
+          subCondition = wordCondition(field, variables, usedVariables);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -602,9 +623,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
           }
           jj_consume_token(OR);
           if (jj_2_59(1000)) {
-            subCondition = wordAtomCondition(field);
+            subCondition = wordAtomCondition(field, variables, usedVariables);
           } else if (jj_2_60(1000)) {
-            subCondition = wordCondition(field);
+            subCondition = wordCondition(field, variables, usedVariables);
           } else {
             jj_consume_token(-1);
             throw new ParseException();
@@ -613,9 +634,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         }
       } else if (jj_2_65(1000)) {
         if (jj_2_61(1000)) {
-          condition = wordAtomCondition(field);
+          condition = wordAtomCondition(field, variables, usedVariables);
         } else if (jj_2_62(1000)) {
-          condition = wordCondition(field);
+          condition = wordCondition(field, variables, usedVariables);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -633,7 +654,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       {if (true) return condition;}
     } else if (jj_2_67(1000)) {
       //plain atom is a valid condition
-          subCondition = wordAtomCondition(field);
+          subCondition = wordAtomCondition(field, variables, usedVariables);
       //System.out.println("=== wordCondition ===\n" + subCondition + "\n");
       {if (true) return subCondition;}
     } else {
@@ -645,7 +666,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasCQLParserWordCondition wordAtomCondition(String field) throws ParseException, ParseException {
+  final private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException, ParseException {
   Token negation = null;
   Token nequals = null;
   Token prefix;
@@ -655,7 +676,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     } else {
       ;
     }
-    if (jj_2_73(1000)) {
+    if (jj_2_75(1000)) {
       jj_consume_token(OCTOTHORPE);
       if (jj_2_69(1000)) {
         value = jj_consume_token(NUMBER);
@@ -695,11 +716,40 @@ public class MtasCQLParser implements MtasCQLParserConstants {
           {if (true) throw new ParseException("invalid range");}
         }
         {if (true) return condition;}
-    } else if (jj_2_74(1000)) {
+    } else if (jj_2_76(1000)) {
       prefix = jj_consume_token(UNQUOTED_VALUE);
       if (jj_2_71(1000)) {
         nequals = jj_consume_token(TOKEN_NOTEQUALS);
       } else if (jj_2_72(1000)) {
+        jj_consume_token(TOKEN_EQUALS);
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      value = jj_consume_token(VARIABLE);
+        if (nequals != null)
+        {
+          //use RegexpQuery combined with SpanMultiTermQueryWrapper
+          {if (true) throw new ParseException("TODO: not implemented '" + prefix.image + nequals.image + value.image + "'");}
+        }
+        else
+        {
+          MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
+          Term term = new Term(field, prefix.image + MtasToken.DELIMITER + value.image);
+          SpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, variableString(value.image), MtasCQLParserWordQuery.MTAS_CQL_VARIABLE_QUERY, variables, usedVariables);
+          if (negation != null)
+          {
+            condition.swapNot();
+          }
+          condition.addPositiveQuery(q);
+          //System.out.println("=== wordAtomCondition ===\n" + condition + "\n");
+          {if (true) return condition;}
+        }
+    } else if (jj_2_77(1000)) {
+      prefix = jj_consume_token(UNQUOTED_VALUE);
+      if (jj_2_73(1000)) {
+        nequals = jj_consume_token(TOKEN_NOTEQUALS);
+      } else if (jj_2_74(1000)) {
         jj_consume_token(TOKEN_EQUALS);
       } else {
         jj_consume_token(-1);
@@ -715,7 +765,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         {
           MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
           Term term = new Term(field, prefix.image + MtasToken.DELIMITER + unquoteString(value.image));
-          SpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, unquoteString(value.image), MtasCQLParserWordQuery.MTAS_CQL_REGEXP_QUERY);
+          SpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, unquoteString(value.image), MtasCQLParserWordQuery.MTAS_CQL_REGEXP_QUERY, variables, usedVariables);
           if (negation != null)
           {
             condition.swapNot();
@@ -1249,107 +1299,25 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     finally { jj_save(73, xla); }
   }
 
-  private boolean jj_3R_11() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_39()) {
-    jj_scanpos = xsp;
-    if (jj_3_40()) {
-    jj_scanpos = xsp;
-    if (jj_3_41()) return true;
-    }
-    }
-    xsp = jj_scanpos;
-    if (jj_3_45()) jj_scanpos = xsp;
-    return false;
+  private boolean jj_2_75(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_75(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(74, xla); }
   }
 
-  private boolean jj_3_68() {
-    if (jj_scan_token(NEGATION)) return true;
-    return false;
+  private boolean jj_2_76(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_76(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(75, xla); }
   }
 
-  private boolean jj_3R_15() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_68()) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_3_73()) {
-    jj_scanpos = xsp;
-    if (jj_3_74()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_13() {
-    if (jj_scan_token(QUESTION_MARK)) return true;
-    return false;
-  }
-
-  private boolean jj_3_12() {
-    if (jj_scan_token(CURLY_BRACKET_START)) return true;
-    if (jj_scan_token(NUMBER)) return true;
-    if (jj_scan_token(CURLY_BRACKET_END)) return true;
-    return false;
-  }
-
-  private boolean jj_3_11() {
-    if (jj_scan_token(CURLY_BRACKET_START)) return true;
-    if (jj_scan_token(NUMBER)) return true;
-    if (jj_scan_token(KOMMA)) return true;
-    if (jj_scan_token(NUMBER)) return true;
-    if (jj_scan_token(CURLY_BRACKET_END)) return true;
-    return false;
-  }
-
-  private boolean jj_3_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_11()) {
-    jj_scanpos = xsp;
-    if (jj_3_12()) {
-    jj_scanpos = xsp;
-    if (jj_3_13()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_67() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3_16() {
-    if (jj_scan_token(BRACKET_START)) return true;
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(BRACKET_END)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_14()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3_15() {
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_10() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_15()) {
-    jj_scanpos = xsp;
-    if (jj_3_16()) return true;
-    }
-    xsp = jj_scanpos;
-    if (jj_3_18()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3_62() {
-    if (jj_3R_14()) return true;
-    return false;
+  private boolean jj_2_77(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_77(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(76, xla); }
   }
 
   private boolean jj_3_61() {
@@ -1637,6 +1605,16 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
+  private boolean jj_3_74() {
+    if (jj_scan_token(TOKEN_EQUALS)) return true;
+    return false;
+  }
+
+  private boolean jj_3_73() {
+    if (jj_scan_token(TOKEN_NOTEQUALS)) return true;
+    return false;
+  }
+
   private boolean jj_3_5() {
     if (jj_scan_token(NOT_CONTAINING)) return true;
     return false;
@@ -1644,6 +1622,18 @@ public class MtasCQLParser implements MtasCQLParserConstants {
 
   private boolean jj_3_4() {
     if (jj_scan_token(CONTAINING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_77() {
+    if (jj_scan_token(UNQUOTED_VALUE)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_73()) {
+    jj_scanpos = xsp;
+    if (jj_3_74()) return true;
+    }
+    if (jj_scan_token(QUOTED_VALUE)) return true;
     return false;
   }
 
@@ -1791,7 +1781,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_74() {
+  private boolean jj_3_76() {
     if (jj_scan_token(UNQUOTED_VALUE)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -1799,7 +1789,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     jj_scanpos = xsp;
     if (jj_3_72()) return true;
     }
-    if (jj_scan_token(QUOTED_VALUE)) return true;
+    if (jj_scan_token(VARIABLE)) return true;
     return false;
   }
 
@@ -1893,7 +1883,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_73() {
+  private boolean jj_3_75() {
     if (jj_scan_token(OCTOTHORPE)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -1901,6 +1891,112 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     jj_scanpos = xsp;
     if (jj_3_70()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_39()) {
+    jj_scanpos = xsp;
+    if (jj_3_40()) {
+    jj_scanpos = xsp;
+    if (jj_3_41()) return true;
+    }
+    }
+    xsp = jj_scanpos;
+    if (jj_3_45()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3_68() {
+    if (jj_scan_token(NEGATION)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_68()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3_75()) {
+    jj_scanpos = xsp;
+    if (jj_3_76()) {
+    jj_scanpos = xsp;
+    if (jj_3_77()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_13() {
+    if (jj_scan_token(QUESTION_MARK)) return true;
+    return false;
+  }
+
+  private boolean jj_3_12() {
+    if (jj_scan_token(CURLY_BRACKET_START)) return true;
+    if (jj_scan_token(NUMBER)) return true;
+    if (jj_scan_token(CURLY_BRACKET_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_scan_token(CURLY_BRACKET_START)) return true;
+    if (jj_scan_token(NUMBER)) return true;
+    if (jj_scan_token(KOMMA)) return true;
+    if (jj_scan_token(NUMBER)) return true;
+    if (jj_scan_token(CURLY_BRACKET_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3_14() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_11()) {
+    jj_scanpos = xsp;
+    if (jj_3_12()) {
+    jj_scanpos = xsp;
+    if (jj_3_13()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_67() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_16() {
+    if (jj_scan_token(BRACKET_START)) return true;
+    if (jj_3R_10()) return true;
+    if (jj_scan_token(BRACKET_END)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_14()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3_15() {
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_15()) {
+    jj_scanpos = xsp;
+    if (jj_3_16()) return true;
+    }
+    xsp = jj_scanpos;
+    if (jj_3_18()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3_62() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
@@ -1923,7 +2019,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
    private static void jj_la1_init_0() {
       jj_la1_0 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[74];
+  final private JJCalls[] jj_2_rtns = new JJCalls[77];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -2107,7 +2203,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[31];
+    boolean[] la1tokens = new boolean[32];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2121,7 +2217,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         }
       }
     }
-    for (int i = 0; i < 31; i++) {
+    for (int i = 0; i < 32; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -2148,7 +2244,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 74; i++) {
+    for (int i = 0; i < 77; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -2229,6 +2325,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
             case 71: jj_3_72(); break;
             case 72: jj_3_73(); break;
             case 73: jj_3_74(); break;
+            case 74: jj_3_75(); break;
+            case 75: jj_3_76(); break;
+            case 76: jj_3_77(); break;
           }
         }
         p = p.next;

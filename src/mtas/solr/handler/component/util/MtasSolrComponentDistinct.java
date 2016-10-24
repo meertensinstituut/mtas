@@ -163,7 +163,6 @@ public class MtasSolrComponentDistinct {
     }
     mtasDistinctResponse.add("list", mtasDistinctItemResponses);
     MtasSolrResultUtil.rewrite(mtasDistinctResponse);
-    System.out.println(mtasDistinctResponse.get("list"));
     return mtasDistinctResponse;
   }
 

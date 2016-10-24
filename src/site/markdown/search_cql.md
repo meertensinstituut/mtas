@@ -22,23 +22,23 @@ The optional postfix associated with a token can be queried within CQL by provid
 
 | Syntax                                | Description                      | Example      |
 |---------------------------------------|----------------------------------|--------------|
-| [token](#token)                       | Matches a single position token  | `[t=\"de\"]` |
+| [token](#token)                       | Matches a single position token  | `[t="de"]` |
 | [multi-position](#multi-position)     | Matches a (single or) multi position token   | `<s/>`       |
 | [sequence](#sequence)                 | Matches a sequence               | `[pos="ADJ"]{2}[pos="N"]` |
 
 | Syntax                                | Description                      | Example      |
 |---------------------------------------|----------------------------------|--------------|
-| [cql](#cql)**{** \<number\> **}**     | Matches provided number of occurrence from [cql](#cql)| `[pos=\"ADJ\"]{2}` |
-| [cql](#cql)**{** \<number\> , \<number\>**}** | Matches each number between provided start and end of occurrence from [cql](#cql)| `[pos=\"ADJ\"]{2,3}` |
+| [cql](#cql)**{** \<number\> **}**     | Matches provided number of occurrence from [cql](#cql)| `[pos="ADJ"]{2}` |
+| [cql](#cql)**{** \<number\> , \<number\>**}** | Matches each number between provided start and end of occurrence from [cql](#cql)| `[pos="ADJ"]{2,3}` |
 
 
 
 | Syntax                                | Description                                     | Example |
 |---------------------------------------|-------------------------------------------------|---------|
-| **\(** [cql](#cql) **\) within \(** [cql](#cql) **\)**  | Matches cql expression within another cql expression   | `([t=\"de\"]) within (<s/>)` |
-| **\(** [cql](#cql) **\) !within \(** [cql](#cql) **\)**  | Matches cql expression not within another cql expression   | `([t=\"de\"]) !within (<s/>)` |
-| **\(** [cql](#cql) **\) containing \(** [cql](#cql) **\)**  | Matches cql expression containing another cql expression   | `(<s/>) containing ([t=\"de\"])` |
-| **\(** [cql](#cql) **\) !containing \(** [cql](#cql) **\)**  | Matches cql expression not containing another cql expression   | `(<s/>) !containing ([t=\"de\"])` |
+| **\(** [cql](#cql) **\) within \(** [cql](#cql) **\)**  | Matches cql expression within another cql expression   | `([t="de"]) within (<s/>)` |
+| **\(** [cql](#cql) **\) !within \(** [cql](#cql) **\)**  | Matches cql expression not within another cql expression   | `([t="de"]) !within (<s/>)` |
+| **\(** [cql](#cql) **\) containing \(** [cql](#cql) **\)**  | Matches cql expression containing another cql expression   | `(<s/>) containing ([t="de"])` |
+| **\(** [cql](#cql) **\) !containing \(** [cql](#cql) **\)**  | Matches cql expression not containing another cql expression   | `(<s/>) !containing ([t="de"])` |
 
 <a name="#token"></a>
 
@@ -90,5 +90,5 @@ The optional postfix associated with a token can be queried within CQL by provid
 
 | Syntax                                | Description                      | Example      |
 |---------------------------------------|----------------------------------|--------------|
-| [cql](#cql)  [cql](#cql)  [cql](#cql)... | A sequence of [cql](#cql)  | `[t="de"][pos=\"ADJ\"]{2}[pos="N"]` |
+| [cql](#cql)  [cql](#cql)  [cql](#cql)... | A sequence of [cql](#cql)  | `[t="de"][pos="ADJ"]{2}[pos="N"]` |
 

@@ -19,14 +19,19 @@ public class MtasCQLParserTestWord {
 
   @org.junit.Test
   public void test() {
-    basicTests();
-    basicNotTests();
+    try {
+      basicTests();
+      basicNotTests();
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }    
   }
   
   private void testCQLParse(String field, String defaultPrefix, String cql, SpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));
     try {
-      assertEquals(p.parse(field, defaultPrefix) ,q);
+      assertEquals(p.parse(field, defaultPrefix, null) ,q);
       System.out.println("Tested CQL parsing:\t"+cql);
     } catch (ParseException e) {
       System.out.println("Error CQL parsing:\t"+cql);
@@ -38,7 +43,7 @@ public class MtasCQLParserTestWord {
     MtasCQLParser p1 = new MtasCQLParser(new BufferedReader(new StringReader(cql1)));   
     MtasCQLParser p2 = new MtasCQLParser(new BufferedReader(new StringReader(cql2)));   
     try {
-      assertEquals(p1.parse(field, defaultPrefix) ,p2.parse(field, defaultPrefix));
+      assertEquals(p1.parse(field, defaultPrefix,null) ,p2.parse(field, defaultPrefix, null));
       System.out.println("Tested CQL equivalent:\t"+cql1+" and "+cql2);
     } catch (ParseException e) {
       System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
@@ -46,7 +51,7 @@ public class MtasCQLParserTestWord {
     }
   }
   
-  private void basicNotTests() {
+  private void basicNotTests() throws ParseException {
     basicNotTest1();
     basicNotTest2();
     basicNotTest3();
@@ -54,7 +59,7 @@ public class MtasCQLParserTestWord {
     basicNotTest5();
   }
   
-  private void basicTests() {
+  private void basicTests() throws ParseException {
     basicTest1();
     basicTest2();
     basicTest3();
@@ -70,11 +75,11 @@ public class MtasCQLParserTestWord {
     basicTest13(); 
   }
   
-  private void basicNotTest1() {
+  private void basicNotTest1() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\" & !lemma=\"de\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de",null, null);
     SpanQuery q = new SpanNotQuery(q1,q2);
     testCQLParse(field, null, cql, q);    
   }
@@ -86,12 +91,12 @@ public class MtasCQLParserTestWord {
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicNotTest3() {
+  private void basicNotTest3() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\" & !(lemma=\"de\" | lemma=\"een\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","een");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","een",null, null);
     SpanQuery q4 = new MtasSpanOrQuery(new SpanQuery[]{q2,q3});
     SpanQuery q = new SpanNotQuery(q1,q4);
     testCQLParse(field, null, cql, q);    
@@ -111,27 +116,27 @@ public class MtasCQLParserTestWord {
     testCQLEquivalent(field, null, cql1, cql2);      
   }
   
-  private void basicTest1() {
+  private void basicTest1() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]";
-    SpanQuery q = new MtasCQLParserWordQuery(field, "lemma", "koe");
+    SpanQuery q = new MtasCQLParserWordQuery(field, "lemma", "koe",null, null);
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest2() {
+  private void basicTest2() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\" & pos=\"N\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     SpanQuery q = new MtasSpanAndQuery(new SpanQuery[]{q1,q2});
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest3() {
+  private void basicTest3() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\" | lemma=\"paard\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","paard");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q2});
     testCQLParse(field, null, cql, q);    
   }
@@ -143,60 +148,60 @@ public class MtasCQLParserTestWord {
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicTest5() {
+  private void basicTest5() throws ParseException {
     String field = "testveld";
     String cql = "[(lemma=\"koe\" | lemma=\"paard\") & pos=\"N\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","paard");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     SpanQuery q3 = new MtasSpanOrQuery(new SpanQuery[]{q1,q2});
-    SpanQuery q4 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q4 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     SpanQuery q = new MtasSpanAndQuery(new SpanQuery[]{q3,q4});
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest6() {
+  private void basicTest6() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"N\" & (lemma=\"koe\" | lemma=\"paard\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","N");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","paard");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     SpanQuery q4 = new MtasSpanOrQuery(new SpanQuery[]{q2,q3});
     SpanQuery q = new MtasSpanAndQuery(new SpanQuery[]{q1,q4});
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest7() {
+  private void basicTest7() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\" | (lemma=\"koe\" & pos=\"N\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     SpanQuery q4 = new MtasSpanAndQuery(new SpanQuery[]{q2,q3});
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q4});
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest8() {
+  private void basicTest8() throws ParseException {
     String field = "testveld";
     String cql = "[(lemma=\"de\" & pos=\"LID\") | (lemma=\"koe\" & pos=\"N\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","de");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q4 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","de",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q4 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     SpanQuery q5 = new MtasSpanAndQuery(new SpanQuery[]{q1,q2});
     SpanQuery q6 = new MtasSpanAndQuery(new SpanQuery[]{q3,q4});
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q5,q6});
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest9() {
+  private void basicTest9() throws ParseException {
     String field = "testveld";
     String cql = "[((lemma=\"de\"|lemma=\"het\") & pos=\"LID\") | (lemma=\"koe\" & pos=\"N\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","de");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","het");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q5 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","de",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","het",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q5 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     SpanQuery q6 = new MtasSpanOrQuery(new SpanQuery[]{q1,q2});    
     SpanQuery q7 = new MtasSpanAndQuery(new SpanQuery[]{q6,q3});
     SpanQuery q8 = new MtasSpanAndQuery(new SpanQuery[]{q4,q5});
@@ -204,15 +209,15 @@ public class MtasCQLParserTestWord {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest10() {
+  private void basicTest10() throws ParseException {
     String field = "testveld";
     String cql = "[((lemma=\"de\"|lemma=\"het\") & pos=\"LID\") | ((lemma=\"koe\"|lemma=\"paard\") & pos=\"N\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","de");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","het");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q5 = new MtasCQLParserWordQuery(field,"lemma","paard");
-    SpanQuery q6 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","de",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","het",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q5 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
+    SpanQuery q6 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     SpanQuery q7 = new MtasSpanOrQuery(new SpanQuery[]{q1,q2});    
     SpanQuery q8 = new MtasSpanAndQuery(new SpanQuery[]{q7,q3});
     SpanQuery q9 = new MtasSpanOrQuery(new SpanQuery[]{q4,q5});    
@@ -236,20 +241,20 @@ public class MtasCQLParserTestWord {
     testCQLParse(field, null, cql3, q3);
   }  
   
-  private void basicTest12() {
+  private void basicTest12() throws ParseException {
     String field = "testveld";
     String cql = "[(t_lc=\"de\"|t_lc=\"het\"|t_lc=\"paard\")]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"t_lc","het");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","paard");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"t_lc","het",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","paard",null, null);
     SpanQuery q = new MtasSpanOrQuery(new SpanQuery[]{q1,q2,q3});
     testCQLParse(field, null, cql, q);   
   }
   
-  private void basicTest13() {
+  private void basicTest13() throws ParseException {
     String field = "testveld";
     String cql = "\"de\"";
-    SpanQuery q = new MtasCQLParserWordQuery(field,"t_lc","de");
+    SpanQuery q = new MtasCQLParserWordQuery(field,"t_lc","de",null, null);
     testCQLParse(field, "t_lc", cql, q);   
   }
 }

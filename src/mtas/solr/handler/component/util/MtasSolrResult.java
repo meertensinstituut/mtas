@@ -144,6 +144,9 @@ public class MtasSolrResult implements Serializable {
    */
   void merge(MtasSolrResult newItem) throws IOException {
     HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>>();
+    if(newItem.dataCollector.withTotal()) {
+      dataCollector.setWithTotal();
+    }
     dataCollector.merge(newItem.dataCollector, map, true);
     if (newItem.functionData != null) {
       if (functionData == null) {
@@ -330,11 +333,16 @@ public class MtasSolrResult implements Serializable {
               subSortDirection, subStart, subNumber, functionData);
           if (dataItem.getSub().getCollectorType()
               .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-            mtasResponseListItem.add(dataItem.getSub().getCollectorType(),
+            if (css.dataCollector.withTotal()) {
+              mtasResponseListItem.add(
+                  DataCollector.COLLECTOR_TYPE_LIST + "Total",
+                  css.dataCollector.getSize());
+            }
+            mtasResponseListItem.add(DataCollector.COLLECTOR_TYPE_LIST,
                 css.getNamedList(showDebugInfo));
           } else if (dataItem.getSub().getCollectorType()
               .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
-            mtasResponseListItem.add(dataItem.getSub().getCollectorType(),
+            mtasResponseListItem.add(DataCollector.COLLECTOR_TYPE_DATA,
                 css.getData(showDebugInfo));
           }
         }

@@ -26,14 +26,19 @@ public class MtasCQLParserTestSentence {
 
   @org.junit.Test
   public void test() {
-    basicTests();
+    try {
+      basicTests();
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
   
   private void testCQLParse(String field, String defaultPrefix, String cql, SpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));   
     try {
       System.out.print("CQL parsing:\t"+cql);
-      assertEquals(p.parse(field, defaultPrefix) ,q);
+      assertEquals(p.parse(field, defaultPrefix, null) ,q);
       System.out.print("\n");
     } catch (ParseException e) {
       System.out.println("Error CQL parsing:\t"+cql);
@@ -46,7 +51,7 @@ public class MtasCQLParserTestSentence {
     MtasCQLParser p2 = new MtasCQLParser(new BufferedReader(new StringReader(cql2)));
     try {
       System.out.print("CQL equivalent:\t"+cql1+" and "+cql2);
-      assertEquals(p1.parse(field, defaultPrefix) ,p2.parse(field, defaultPrefix));
+      assertEquals(p1.parse(field, defaultPrefix, null) ,p2.parse(field, defaultPrefix, null));
       System.out.print("\n");
     } catch (ParseException e) {
       System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
@@ -54,7 +59,7 @@ public class MtasCQLParserTestSentence {
     }
   }
   
-  private void basicTests() {
+  private void basicTests() throws ParseException {
     basicTest1();
     basicTest2();
     basicTest3();
@@ -76,11 +81,11 @@ public class MtasCQLParserTestSentence {
     basicTest19();
   }
   
-  private void basicTest1() {
+  private void basicTest1() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"] [lemma=\"koe\"]";    
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q2, false));
@@ -95,21 +100,21 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicTest3() {
+  private void basicTest3() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"] | [lemma=\"koe\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
     SpanQuery q = new MtasSpanOrQuery(q1,q2);
     testCQLParse(field, null, cql, q);       
   }
   
-  private void basicTest4() {
+  private void basicTest4() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"] | ([lemma=\"de\"] [lemma=\"koe\"])";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de", null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q2, false));
     items.add(new MtasSpanSequenceItem(q3, false));
@@ -139,12 +144,12 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicTest8() {
+  private void basicTest8() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]([pos=\"N\"]|[pos=\"ADJ\"])";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","ADJ");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N", null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","ADJ", null, null);
     SpanQuery q4 = new MtasSpanOrQuery(q2,q3);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q1, false));
@@ -153,13 +158,13 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);
   }
   
-  private void basicTest9() {
+  private void basicTest9() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]([pos=\"N\"]|[pos=\"ADJ\"]){2,3}[lemma=\"paard\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","ADJ");
-    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","paard");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N", null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","ADJ", null, null);
+    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     SpanQuery q5 = new MtasSpanOrQuery(new MtasSpanRecurrenceQuery(q2,2,3),new MtasSpanRecurrenceQuery(q3,2,3));
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q1, false));
@@ -169,12 +174,12 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);  
   }
   
-  private void basicTest10() {
+  private void basicTest10() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"]? [pos=\"ADJ\"]{1,3} [lemma=\"koe\"]";    
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","ADJ");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","ADJ",null, null);
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q1, true));
     items.add(new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q2,1,3), false));
@@ -183,29 +188,29 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
 
-  private void basicTest11() {
+  private void basicTest11() throws ParseException {
     String field = "testveld";
     String cql = "<sentence/> containing [lemma=\"koe\"]"; 
     SpanQuery q1 = new MtasCQLParserGroupQuery(field,"sentence");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     SpanQuery q = new SpanContainingQuery(q1, q2);
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest12() {
+  private void basicTest12() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"] within <sentence/>"; 
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     SpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
     SpanQuery q = new SpanWithinQuery(q2, q1);
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest13() {
+  private void basicTest13() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]([t=\"de\"] within <sentence/>)"; 
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"t","de");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"t","de",null, null);
     SpanQuery q3 = new MtasCQLParserGroupQuery(field,"sentence");
     SpanQuery q4 = new SpanWithinQuery(q3, q2);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
@@ -215,13 +220,13 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest14() {
+  private void basicTest14() throws ParseException {
     String field = "testveld";
     String cql = "([t=\"de\"] within <sentence/>)[lemma=\"koe\"]"; 
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t","de");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t","de",null, null);
     SpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
     SpanQuery q3 = new SpanWithinQuery(q2, q1);
-    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q3, false));
     items.add(new MtasSpanSequenceItem(q4, false));
@@ -229,15 +234,15 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest15() {
+  private void basicTest15() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"](<sentence/> containing [t=\"de\"]) within <sentence/>[lemma=\"paard\"]";
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     SpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t","de");
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t","de",null, null);
     SpanQuery q4 = new SpanContainingQuery(q2, q3);
     SpanQuery q5 = new MtasCQLParserGroupQuery(field,"sentence");
-    SpanQuery q6 = new MtasCQLParserWordQuery(field,"lemma","paard");    
+    SpanQuery q6 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);    
     List<MtasSpanSequenceItem> items1 = new ArrayList<MtasSpanSequenceItem>();
     items1.add(new MtasSpanSequenceItem(q5, false));
     items1.add(new MtasSpanSequenceItem(q6, false));
@@ -250,12 +255,12 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest16() {
+  private void basicTest16() throws ParseException {
     String field = "testveld";
     String cql = "(<entity=\"loc\"/> within (<s/> containing [t_lc=\"amsterdam\"])) !containing ([t_lc=\"amsterdam\"])"; 
     SpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
     SpanQuery q2 = new MtasCQLParserGroupQuery(field,"s");
-    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","amsterdam");
+    SpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","amsterdam",null, null);
     SpanQuery q4 = new SpanContainingQuery(q2, q3);
     SpanQuery q5 = new SpanWithinQuery(q4, q1);
     SpanQuery q = new SpanNotQuery(q5,new SpanContainingQuery(q5, q3));
@@ -275,11 +280,11 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest18() {
+  private void basicTest18() throws ParseException {
     String field = "testveld";
     String cql = "\"de\" [pos=\"N\"]"; 
-    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de");
-    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N");
+    SpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de",null, null);
+    SpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q2, false));

@@ -191,6 +191,7 @@ public class CodecCollector {
         }
       }
     }
+
   }
 
   /**
@@ -617,6 +618,8 @@ public class CodecCollector {
       }
     }
     if (fieldInfo.termVectorList.size() > 0) {
+      createTermvectorFull(fieldInfo.termVectorList, positionsData, docSet,
+          field, t, r, lrc);
       createTermvectorFirstRound(fieldInfo.termVectorList, positionsData,
           docSet, field, t, r, lrc);
     }
@@ -1474,6 +1477,7 @@ public class CodecCollector {
       HashMap<Integer, ArrayList<Match>> matchData;
 
       for (ComponentGroup group : groupList) {
+        group.dataCollector.setWithTotal();
         if (group.prefixes.size() > 0) {
           matchData = spansMatchData.get(group.spanQuery);
           HashSet<String> knownPrefixes = collectKnownPrefixes(fieldInfo);
@@ -1567,7 +1571,6 @@ public class CodecCollector {
                     (docId - docBase), group.prefixes, positionsHits);
                 // administration
                 for (IntervalTreeNodeData<String> positionHit : positionsHits) {
-                  // System.out.println(positionHit);
                   GroupHit hit = new GroupHit(positionHit.list,
                       positionHit.start, positionHit.end, positionHit.hitStart,
                       positionHit.hitEnd, group, knownPrefixes);
@@ -2261,6 +2264,7 @@ public class CodecCollector {
       // check type
       if (dataCollector.getCollectorType()
           .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
+        dataCollector.setWithTotal();
         // only if documents and facets
         if (docSet.length > 0 && list.size() > 0) {
           HashMap<String, Integer[]> docLists = new HashMap<String, Integer[]>();
@@ -2539,6 +2543,166 @@ public class CodecCollector {
     }
   }
 
+  private static void createTermvectorFull(
+      List<ComponentTermVector> termVectorList,
+      HashMap<Integer, Integer> positionsData, List<Integer> docSet,
+      String field, Terms t, LeafReader r, LeafReaderContext lrc)
+      throws IOException {
+    if (t != null) {
+      BytesRef term;
+      TermsEnum termsEnum;
+      PostingsEnum postingsEnum = null;
+      String segmentName = "segment" + lrc.ord;
+      int segmentNumber = lrc.parent.leaves().size();
+      // loop over termvectors
+      for (ComponentTermVector termVector : termVectorList) {
+        if (termVector.full || termVector.list != null) {
+          if (termVector.full) {
+            termVector.subComponentFunction.dataCollector.setWithTotal();
+          }
+
+          List<CompiledAutomaton> listAutomata;
+          if (termVector.list == null) {
+            listAutomata = new ArrayList<CompiledAutomaton>();
+            listAutomata.add(termVector.compiledAutomaton);
+          } else {
+            listAutomata = MtasToken.createAutomata(termVector.prefix,
+                termVector.regexp, new ArrayList<String>(termVector.list));
+          }
+
+          for (CompiledAutomaton compiledAutomaton : listAutomata) {
+            termsEnum = t.intersect(compiledAutomaton, null);
+            int initSize = Math.min((int) t.size(), 1000);
+            termVector.subComponentFunction.dataCollector.initNewList(initSize,
+                segmentName, segmentNumber, termVector.boundary);
+            boolean doBasic = termVector.subComponentFunction.dataCollector
+                .getStatsType().equals(CodecUtil.STATS_BASIC);
+            if (termVector.functions != null) {
+              for (SubComponentFunction function : termVector.functions) {
+                function.dataCollector.initNewList(initSize);
+                doBasic = doBasic ? (function.parserFunction.sumRule()
+                    && !function.parserFunction.needPositions()
+                    && function.dataCollector.getStatsType()
+                        .equals(CodecUtil.STATS_BASIC))
+                    : doBasic;
+              }
+            }
+            // only if documents
+            if (docSet.size() > 0) {
+              int termDocId;
+              // loop over terms
+              while ((term = termsEnum.next()) != null) {
+                termDocId = -1;
+                if (doBasic) {
+                  // compute numbers;
+                  TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                      docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                  // register
+                  if (numberBasic.docNumber > 0) {
+                    long valueLong = 0;
+                    try {
+                      valueLong = termVector.subComponentFunction.parserFunction
+                          .getValueLong(numberBasic.valueSum, 1);
+                    } catch (IOException e) {
+                      termVector.subComponentFunction.dataCollector.error(
+                          new String[] { MtasToken.getPostfixFromValue(term) },
+                          e.getMessage());
+                    }
+                    String key = MtasToken.getPostfixFromValue(term);
+                    termVector.subComponentFunction.dataCollector.add(
+                        new String[] { key }, valueLong, numberBasic.docNumber);
+                    if (termVector.functions != null) {
+                      for (SubComponentFunction function : termVector.functions) {
+                        if (function.dataType
+                            .equals(CodecUtil.DATA_TYPE_LONG)) {
+                          long valueFunction = function.parserFunction
+                              .getValueLong(numberBasic.valueSum, 0);
+                          function.dataCollector.add(new String[] { key },
+                              valueFunction, numberBasic.docNumber);
+                        } else if (function.dataType
+                            .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+                          double valueFunction = function.parserFunction
+                              .getValueDouble(numberBasic.valueSum, 0);
+                          function.dataCollector.add(new String[] { key },
+                              valueFunction, numberBasic.docNumber);
+                        }
+                      }
+                    }
+
+                  }
+                } else {
+                  TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                      docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                      positionsData);
+                  if (numberFull.docNumber > 0) {
+                    long[] valuesLong = new long[numberFull.docNumber];
+                    String key = MtasToken.getPostfixFromValue(term);
+                    for (int i = 0; i < numberFull.docNumber; i++) {
+                      try {
+                        valuesLong[i] = termVector.subComponentFunction.parserFunction
+                            .getValueLong(new long[] { numberFull.args[i] },
+                                numberFull.positions[i]);
+                      } catch (IOException e) {
+                        termVector.subComponentFunction.dataCollector
+                            .error(new String[] { key }, e.getMessage());
+                      }
+                    }
+                    termVector.subComponentFunction.dataCollector.add(
+                        new String[] { key }, valuesLong, valuesLong.length);
+                    if (termVector.functions != null) {
+                      for (SubComponentFunction function : termVector.functions) {
+                        if (function.dataType
+                            .equals(CodecUtil.DATA_TYPE_LONG)) {
+                          valuesLong = new long[numberFull.docNumber];
+                          for (int i = 0; i < numberFull.docNumber; i++) {
+                            try {
+                              valuesLong[i] = function.parserFunction
+                                  .getValueLong(
+                                      new long[] { numberFull.args[i] },
+                                      numberFull.positions[i]);
+                            } catch (IOException e) {
+                              function.dataCollector.error(new String[] { key },
+                                  e.getMessage());
+                            }
+                          }
+                          function.dataCollector.add(new String[] { key },
+                              valuesLong, valuesLong.length);
+                        } else if (function.dataType
+                            .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+                          double[] valuesDouble = new double[numberFull.docNumber];
+                          for (int i = 0; i < numberFull.docNumber; i++) {
+                            try {
+                              valuesDouble[i] = function.parserFunction
+                                  .getValueDouble(
+                                      new long[] { numberFull.args[i] },
+                                      numberFull.positions[i]);
+                            } catch (IOException e) {
+                              function.dataCollector.error(new String[] { key },
+                                  e.getMessage());
+                            }
+                          }
+                          function.dataCollector.add(new String[] { key },
+                              valuesDouble, valuesDouble.length);
+                        }
+                      }
+                    }
+                  }
+
+                }
+              }
+            }
+            termVector.subComponentFunction.dataCollector.closeNewList();
+            if (termVector.functions != null) {
+              for (SubComponentFunction function : termVector.functions) {
+                function.dataCollector.closeNewList();
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Creates the termvector first round.
    *
@@ -2572,119 +2736,123 @@ public class CodecCollector {
       int segmentNumber = lrc.parent.leaves().size();
       // loop over termvectors
       for (ComponentTermVector termVector : termVectorList) {
-        termsEnum = t.intersect(termVector.compiledAutomaton, null);
-        int initSize = Math.min((int) t.size(), 1000);
-        termVector.subComponentFunction.dataCollector.initNewList(initSize,
-            segmentName, segmentNumber, termVector.boundary);
-        if (termVector.functions != null) {
-          for (SubComponentFunction function : termVector.functions) {
-            function.dataCollector.initNewList(initSize);
+        if (!termVector.full && termVector.list == null) {
+          termsEnum = t.intersect(termVector.compiledAutomaton, null);
+          int initSize = Math.min((int) t.size(), 1000);
+          termVector.subComponentFunction.dataCollector.initNewList(initSize,
+              segmentName, segmentNumber, termVector.boundary);
+          if (termVector.functions != null) {
+            for (SubComponentFunction function : termVector.functions) {
+              function.dataCollector.initNewList(initSize);
+            }
           }
-        }
-        // only if documents
-        if (docSet.size() > 0) {
-          int termDocId;
-          int termNumberMaximum = termVector.number;
-          HashMap<BytesRef, RegisterStatus> computeFullList = new HashMap<BytesRef, RegisterStatus>();
-          RegisterStatus registerStatus;
-          // basic, don't need full values
-          if (termVector.subComponentFunction.sortType
-              .equals(CodecUtil.SORT_TERM)
-              || termVector.subComponentFunction.sortType
-                  .equals(CodecUtil.STATS_TYPE_SUM)
-              || termVector.subComponentFunction.sortType
-                  .equals(CodecUtil.STATS_TYPE_N)) {
-            int termCounter = 0;
+          // only if documents
+          if (docSet.size() > 0) {
+            int termDocId;
+            int termNumberMaximum = termVector.number;
+            HashMap<BytesRef, RegisterStatus> computeFullList = new HashMap<BytesRef, RegisterStatus>();
+            RegisterStatus registerStatus;
+            // basic, don't need full values
+            if (termVector.subComponentFunction.sortType
+                .equals(CodecUtil.SORT_TERM)
+                || termVector.subComponentFunction.sortType
+                    .equals(CodecUtil.STATS_TYPE_SUM)
+                || termVector.subComponentFunction.sortType
+                    .equals(CodecUtil.STATS_TYPE_N)) {
+              int termCounter = 0;
 
-            boolean continueAfterPreliminaryCheck, preliminaryCheck = false;
-            if (r.getLiveDocs() == null && (docSet.size() != r.numDocs())) {
-              preliminaryCheck = true;
-            }
-            // loop over terms
-            while ((term = termsEnum.next()) != null) {
-              termDocId = -1;
-              continueAfterPreliminaryCheck = true;
-              if (preliminaryCheck) {
-                try {
-                  TermvectorNumberBasic preliminaryNumberBasic = computeTermvectorNumberBasic(
-                      termsEnum, r);
-                  if (preliminaryNumberBasic.docNumber > 0) {
-                    continueAfterPreliminaryCheck = preliminaryRegisterValue(
-                        term, termVector, preliminaryNumberBasic,
-                        termNumberMaximum, segmentNumber);
-                  } else {
-                    continueAfterPreliminaryCheck = false;
-                  }
-                } catch (IOException e) {
-                  continueAfterPreliminaryCheck = true;
-                }
+              boolean continueAfterPreliminaryCheck, preliminaryCheck = false;
+              if (r.getLiveDocs() == null && (docSet.size() != r.numDocs())) {
+                preliminaryCheck = true;
               }
-              if (continueAfterPreliminaryCheck) {
-                // compute numbers;
-                TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                    docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                // register
-                if (numberBasic.docNumber > 0) {
-                  termCounter++;
-                  registerStatus = registerValue(term, termVector, numberBasic,
-                      termNumberMaximum, segmentNumber, false);
-                  if (registerStatus != null) {
-                    computeFullList.put(BytesRef.deepCopyOf(term),
-                        registerStatus);
-                  }
-                }
-              }
-              // stop after termCounterMaximum
-              if (termVector.subComponentFunction.sortType.equals(
-                  CodecUtil.SORT_TERM) && termCounter >= termNumberMaximum) {
-                break;
-              }
-            }
-            // rerun for full
-            if (computeFullList.size() > 0) {
-              termsEnum = t.intersect(termVector.compiledAutomaton, null);
+              // loop over terms
               while ((term = termsEnum.next()) != null) {
                 termDocId = -1;
-                // only if (probably) needed
-                if (computeFullList.containsKey(term)) {
-                  registerStatus = computeFullList.get(term);
-                  if (termVector.subComponentFunction.sortType
-                      .equals(CodecUtil.SORT_TERM) || termVector.list != null
-                      || termVector.boundaryRegistration || registerStatus.force
-                      || termVector.subComponentFunction.dataCollector
-                          .validateSegmentBoundary(registerStatus.sortValue)) {
-                    TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                        docSet, termDocId, termsEnum, r, lrc, postingsEnum,
-                        positionsData);
-                    if (numberFull.docNumber > 0) {
-                      termCounter++;
-                      registerValue(term, termVector, numberFull,
+                continueAfterPreliminaryCheck = true;
+                if (preliminaryCheck) {
+                  try {
+                    TermvectorNumberBasic preliminaryNumberBasic = computeTermvectorNumberBasic(
+                        termsEnum, r);
+                    if (preliminaryNumberBasic.docNumber > 0) {
+                      continueAfterPreliminaryCheck = preliminaryRegisterValue(
+                          term, termVector, preliminaryNumberBasic,
                           termNumberMaximum, segmentNumber);
+                    } else {
+                      continueAfterPreliminaryCheck = false;
+                    }
+                  } catch (IOException e) {
+                    continueAfterPreliminaryCheck = true;
+                  }
+                }
+                if (continueAfterPreliminaryCheck) {
+                  // compute numbers;
+                  TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                      docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                  // register
+                  if (numberBasic.docNumber > 0) {
+                    termCounter++;
+                    registerStatus = registerValue(term, termVector,
+                        numberBasic, termNumberMaximum, segmentNumber, false);
+                    if (registerStatus != null) {
+                      computeFullList.put(BytesRef.deepCopyOf(term),
+                          registerStatus);
                     }
                   }
                 }
+                // stop after termCounterMaximum
+                if (termVector.subComponentFunction.sortType.equals(
+                    CodecUtil.SORT_TERM) && termCounter >= termNumberMaximum) {
+                  break;
+                }
               }
-              computeFullList.clear();
+              // rerun for full
+              if (computeFullList.size() > 0) {
+                termsEnum = t.intersect(termVector.compiledAutomaton, null);
+                while ((term = termsEnum.next()) != null) {
+                  termDocId = -1;
+                  // only if (probably) needed
+                  if (computeFullList.containsKey(term)) {
+                    registerStatus = computeFullList.get(term);
+                    if (termVector.subComponentFunction.sortType
+                        .equals(CodecUtil.SORT_TERM) || termVector.list != null
+                        || termVector.boundaryRegistration
+                        || registerStatus.force
+                        || termVector.subComponentFunction.dataCollector
+                            .validateSegmentBoundary(
+                                registerStatus.sortValue)) {
+                      TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                          docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                          positionsData);
+                      if (numberFull.docNumber > 0) {
+                        termCounter++;
+                        registerValue(term, termVector, numberFull,
+                            termNumberMaximum, segmentNumber);
+                      }
+                    }
+                  }
+                }
+                computeFullList.clear();
+              }
+            } else {
+              throw new IOException(
+                  "sort '" + termVector.subComponentFunction.sortType + " "
+                      + termVector.subComponentFunction.sortDirection
+                      + "' not supported");
             }
-          } else {
-            throw new IOException(
-                "sort '" + termVector.subComponentFunction.sortType + " "
-                    + termVector.subComponentFunction.sortDirection
-                    + "' not supported");
+            // finish if segments are used
+            termVector.subComponentFunction.dataCollector
+                .closeSegmentKeyValueRegistration();
+            if (termVector.functions != null) {
+              for (SubComponentFunction function : termVector.functions) {
+                function.dataCollector.closeSegmentKeyValueRegistration();
+              }
+            }
           }
-          // finish if segments are used
-          termVector.subComponentFunction.dataCollector
-              .closeSegmentKeyValueRegistration();
+          termVector.subComponentFunction.dataCollector.closeNewList();
           if (termVector.functions != null) {
             for (SubComponentFunction function : termVector.functions) {
-              function.dataCollector.closeSegmentKeyValueRegistration();
+              function.dataCollector.closeNewList();
             }
-          }
-        }
-        termVector.subComponentFunction.dataCollector.closeNewList();
-        if (termVector.functions != null) {
-          for (SubComponentFunction function : termVector.functions) {
-            function.dataCollector.closeNewList();
           }
         }
       }
@@ -2723,55 +2891,56 @@ public class CodecCollector {
       String segmentName = "segment" + lrc.ord;
       int segmentNumber = lrc.parent.leaves().size();
       for (ComponentTermVector termVector : termVectorList) {
-        if (termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList != null
-            && termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList
-                .containsKey(segmentName)) {
-          HashSet<String> recomputeKeyList = termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList
-              .get(segmentName);
-          if (recomputeKeyList.size() > 0) {
-            List<CompiledAutomaton> listCompiledAutomata = MtasToken
-                .createAutomata(termVector.prefix,
-                    new ArrayList<String>(recomputeKeyList));
-            for (CompiledAutomaton compiledAutomaton : listCompiledAutomata) {
-              termsEnum = t.intersect(compiledAutomaton, null);
-              termVector.subComponentFunction.dataCollector
-                  .initNewList(
-                      termVector.subComponentFunction.dataCollector.segmentKeys
-                          .size(),
-                      segmentName, segmentNumber, termVector.boundary);
-              RegisterStatus registerStatus = null;
-              if (termVector.functions != null) {
-                for (SubComponentFunction function : termVector.functions) {
-                  function.dataCollector.initNewList((int) t.size(),
-                      segmentName, segmentNumber, null);
+        if (!termVector.full && termVector.list == null) {
+          if (termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList != null
+              && termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList
+                  .containsKey(segmentName)) {
+            HashSet<String> recomputeKeyList = termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList
+                .get(segmentName);
+            if (recomputeKeyList.size() > 0) {
+              List<CompiledAutomaton> listCompiledAutomata = MtasToken
+                  .createAutomata(termVector.prefix, termVector.regexp,
+                      new ArrayList<String>(recomputeKeyList));
+              for (CompiledAutomaton compiledAutomaton : listCompiledAutomata) {
+                termsEnum = t.intersect(compiledAutomaton, null);
+                termVector.subComponentFunction.dataCollector.initNewList(
+                    termVector.subComponentFunction.dataCollector.segmentKeys
+                        .size(),
+                    segmentName, segmentNumber, termVector.boundary);
+                RegisterStatus registerStatus = null;
+                if (termVector.functions != null) {
+                  for (SubComponentFunction function : termVector.functions) {
+                    function.dataCollector.initNewList((int) t.size(),
+                        segmentName, segmentNumber, null);
+                  }
                 }
-              }
-              if (docSet.size() > 0) {
-                int termDocId;
-                while ((term = termsEnum.next()) != null) {
-                  termDocId = -1;
-                  // compute numbers;
-                  TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                      docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                  if (numberBasic.docNumber > 0) {
-                    registerStatus = registerValue(term, termVector,
-                        numberBasic, 0, segmentNumber, true);
-                    if (registerStatus != null) {
-                      TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                          docSet, termDocId, termsEnum, r, lrc, postingsEnum,
-                          positionsData);
-                      if (numberFull.docNumber > 0) {
-                        registerValue(term, termVector, numberFull, 0,
-                            segmentNumber);
+                if (docSet.size() > 0) {
+                  int termDocId;
+                  while ((term = termsEnum.next()) != null) {
+                    termDocId = -1;
+                    // compute numbers;
+                    TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                        docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                    if (numberBasic.docNumber > 0) {
+                      registerStatus = registerValue(term, termVector,
+                          numberBasic, 0, segmentNumber, true);
+                      if (registerStatus != null) {
+                        TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                            docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                            positionsData);
+                        if (numberFull.docNumber > 0) {
+                          registerValue(term, termVector, numberFull, 0,
+                              segmentNumber);
+                        }
                       }
                     }
                   }
                 }
-              }
-              termVector.subComponentFunction.dataCollector.closeNewList();
-              if (termVector.functions != null) {
-                for (SubComponentFunction function : termVector.functions) {
-                  function.dataCollector.closeNewList();
+                termVector.subComponentFunction.dataCollector.closeNewList();
+                if (termVector.functions != null) {
+                  for (SubComponentFunction function : termVector.functions) {
+                    function.dataCollector.closeNewList();
+                  }
                 }
               }
             }
@@ -2794,30 +2963,32 @@ public class CodecCollector {
       List<ComponentTermVector> termVectorList) throws IOException {
     boolean needSecondRound = false;
     for (ComponentTermVector termVector : termVectorList) {
-      if (termVector.subComponentFunction.dataCollector.segmentRegistration != null
-          && (termVector.subComponentFunction.dataCollector.segmentRegistration
-              .equals(MtasDataCollector.SEGMENT_SORT_ASC)
-              || termVector.subComponentFunction.dataCollector.segmentRegistration
-                  .equals(MtasDataCollector.SEGMENT_SORT_DESC))
-          && termVector.number > 0) {
-        termVector.subComponentFunction.dataCollector.recomputeSegmentKeys();
-        if (!termVector.subComponentFunction.dataCollector
-            .checkExistenceNecessaryKeys()) {
-          needSecondRound = true;
+      if (!termVector.full && termVector.list == null) {
+        if (termVector.subComponentFunction.dataCollector.segmentRegistration != null
+            && (termVector.subComponentFunction.dataCollector.segmentRegistration
+                .equals(MtasDataCollector.SEGMENT_SORT_ASC)
+                || termVector.subComponentFunction.dataCollector.segmentRegistration
+                    .equals(MtasDataCollector.SEGMENT_SORT_DESC))
+            && termVector.number > 0) {
+          termVector.subComponentFunction.dataCollector.recomputeSegmentKeys();
+          if (!termVector.subComponentFunction.dataCollector
+              .checkExistenceNecessaryKeys()) {
+            needSecondRound = true;
+          }
+          termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();
+        } else if (termVector.subComponentFunction.dataCollector.segmentRegistration != null
+            && (termVector.subComponentFunction.dataCollector.segmentRegistration
+                .equals(MtasDataCollector.SEGMENT_BOUNDARY_ASC)
+                || termVector.subComponentFunction.dataCollector.segmentRegistration
+                    .equals(MtasDataCollector.SEGMENT_BOUNDARY_DESC))
+            && termVector.number > 0) {
+          termVector.subComponentFunction.dataCollector.recomputeSegmentKeys();
+          if (!termVector.subComponentFunction.dataCollector
+              .checkExistenceNecessaryKeys()) {
+            needSecondRound = true;
+          }
+          termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();
         }
-        termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();
-      } else if (termVector.subComponentFunction.dataCollector.segmentRegistration != null
-          && (termVector.subComponentFunction.dataCollector.segmentRegistration
-              .equals(MtasDataCollector.SEGMENT_BOUNDARY_ASC)
-              || termVector.subComponentFunction.dataCollector.segmentRegistration
-                  .equals(MtasDataCollector.SEGMENT_BOUNDARY_DESC))
-          && termVector.number > 0) {
-        termVector.subComponentFunction.dataCollector.recomputeSegmentKeys();
-        if (!termVector.subComponentFunction.dataCollector
-            .checkExistenceNecessaryKeys()) {
-          needSecondRound = true;
-        }
-        termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();
       }
     }
     return needSecondRound;
@@ -3141,9 +3312,7 @@ public class CodecCollector {
           }
         }
       }
-
     }
-
   }
 
   /**

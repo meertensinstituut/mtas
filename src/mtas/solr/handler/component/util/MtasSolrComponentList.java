@@ -45,6 +45,18 @@ public class MtasSolrComponentList {
   /** The Constant NAME_MTAS_LIST_QUERY_VALUE. */
   public static final String NAME_MTAS_LIST_QUERY_VALUE = "query.value";
 
+  /** The Constant NAME_MTAS_LIST_QUERY_PREFIX. */
+  public static final String NAME_MTAS_LIST_QUERY_PREFIX = "query.prefix";
+
+  /** The Constant NAME_MTAS_LIST_QUERY_VARIABLE. */
+  public static final String NAME_MTAS_LIST_QUERY_VARIABLE = "query.variable";
+
+  /** The Constant SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME. */
+  public static final String SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME = "name";
+
+  /** The Constant SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE. */
+  public static final String SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE = "value";
+
   /** The Constant NAME_MTAS_LIST_KEY. */
   public static final String NAME_MTAS_LIST_KEY = "key";
 
@@ -69,8 +81,7 @@ public class MtasSolrComponentList {
   /**
    * Instantiates a new mtas solr component list.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentList(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -79,12 +90,9 @@ public class MtasSolrComponentList {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -95,6 +103,8 @@ public class MtasSolrComponentList {
       String[] fields = new String[ids.size()];
       String[] queryTypes = new String[ids.size()];
       String[] queryValues = new String[ids.size()];
+      String[] queryPrefixes = new String[ids.size()];
+      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];      
       String[] keys = new String[ids.size()];
       String[] prefixes = new String[ids.size()];
       String[] starts = new String[ids.size()];
@@ -114,6 +124,47 @@ public class MtasSolrComponentList {
         queryValues[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_LIST + "." + id + "." + NAME_MTAS_LIST_QUERY_VALUE,
             null);
+        queryPrefixes[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_LIST + "." + id + "." + NAME_MTAS_LIST_QUERY_PREFIX,
+            null);
+        Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
+            rb.req.getParams(),
+            PARAM_MTAS_LIST + "." + id + "."
+                + NAME_MTAS_LIST_QUERY_VARIABLE);
+        queryVariables[tmpCounter] = new HashMap<String, String[]>();
+        if (vIds.size() > 0) {
+          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+          for (String vId : vIds) {
+            String name = rb.req.getParams()
+                .get(PARAM_MTAS_LIST + "." + id + "."
+                    + NAME_MTAS_LIST_QUERY_VARIABLE + "." + vId
+                    + "." + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME,
+                    null);
+            if (name != null) {
+              if (!tmpVariables.containsKey(name)) {
+                tmpVariables.put(name, new ArrayList<String>());
+              }
+              String value = rb.req.getParams()
+                  .get(PARAM_MTAS_LIST + "." + id + "."
+                      + NAME_MTAS_LIST_QUERY_VARIABLE + "." + vId
+                      + "." + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE,
+                      null);
+              if (value != null) {
+                ArrayList<String> list = new ArrayList<String>();
+                String[] subList = value.split("(?<!\\\\),");
+                for(int i=0; i<subList.length; i++) {
+                  list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                }                    
+                tmpVariables.get(name).addAll(list);                    
+              }
+            }
+          }
+          for (String name : tmpVariables.keySet()) {
+            queryVariables[tmpCounter].put(name,
+                tmpVariables.get(name)
+                    .toArray(new String[tmpVariables.get(name).size()]));
+          }
+        }        
         prefixes[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_LIST + "." + id + "." + NAME_MTAS_LIST_PREFIX, null);
         starts[tmpCounter] = rb.req.getParams()
@@ -144,6 +195,8 @@ public class MtasSolrComponentList {
           NAME_MTAS_LIST_QUERY_VALUE, NAME_MTAS_LIST_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(prefixes, queryTypes,
           NAME_MTAS_LIST_QUERY_TYPE, NAME_MTAS_LIST_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(prefixes, queryPrefixes,
+          NAME_MTAS_LIST_QUERY_PREFIX, NAME_MTAS_LIST_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(prefixes, fields,
           NAME_MTAS_LIST_PREFIX, NAME_MTAS_LIST_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(starts, fields, NAME_MTAS_LIST_START,
@@ -159,7 +212,7 @@ public class MtasSolrComponentList {
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
         SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
-            queryTypes[i], fields[i]);
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i]);
         // minimize number of queries
         if (cf.spanQueryList.contains(q)) {
           q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -167,7 +220,8 @@ public class MtasSolrComponentList {
           cf.spanQueryList.add(q);
         }
         String key = (keys[i] == null) || (keys[i].isEmpty())
-            ? String.valueOf(i) + ":" + fields[i] + ":" + queryValues[i]
+            ? String.valueOf(i) + ":" + fields[i] + ":" + queryValues[i] + ":"
+                + queryPrefixes[i]
             : keys[i].trim();
         String prefix = prefixes[i];
         int start = (starts[i] == null) || (starts[i].isEmpty()) ? 0
@@ -179,9 +233,9 @@ public class MtasSolrComponentList {
         int right = (rights[i] == null) || rights[i].isEmpty() ? 0
             : Integer.parseInt(rights[i]);
         String output = outputs[i];
-        mtasFields.list.get(fields[i]).listList
-            .add(new ComponentList(q, fields[i], queryValues[i], queryTypes[i],
-                key, prefix, start, number, left, right, output));
+        mtasFields.list.get(fields[i]).listList.add(new ComponentList(q,
+            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i], queryVariables[i], key,
+            prefix, start, number, left, right, output));
       }
     }
   }
@@ -189,12 +243,9 @@ public class MtasSolrComponentList {
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -230,6 +281,16 @@ public class MtasSolrComponentList {
                 PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_QUERY_VALUE);
             sreq.params.remove(
                 PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_QUERY_TYPE);
+            sreq.params.remove(
+                PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_QUERY_PREFIX);
+            Set<String> subKeys = MtasSolrResultUtil
+                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_QUERY_VARIABLE);
+            for (String subKey : subKeys) {
+              sreq.params.remove(
+                  PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_QUERY_VARIABLE+"."+subKey+"."+SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME);
+              sreq.params.remove(
+                  PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_QUERY_VARIABLE+"."+subKey+"."+SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE);               
+            }
             sreq.params
                 .remove(PARAM_MTAS_LIST + "." + key + "." + NAME_MTAS_LIST_KEY);
             sreq.params.remove(
@@ -253,10 +314,8 @@ public class MtasSolrComponentList {
   /**
    * Distributed process.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
+   * @param rb the rb
+   * @param mtasFields the mtas fields
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb,
@@ -325,6 +384,24 @@ public class MtasSolrComponentList {
                 params.add(PARAM_MTAS_LIST + "." + requestId + "."
                     + NAME_MTAS_LIST_QUERY_TYPE, list.queryType);
                 params.add(PARAM_MTAS_LIST + "." + requestId + "."
+                    + NAME_MTAS_LIST_QUERY_PREFIX, list.queryPrefix);
+                int subRequestId=0;
+                for(String name : list.queryVariables.keySet()) {
+                  if(list.queryVariables.get(name)==null || list.queryVariables.get(name).length==0) {
+                    params.add(PARAM_MTAS_LIST + "." + requestId + "."
+                        + NAME_MTAS_LIST_QUERY_VARIABLE+ "."+subRequestId+"."+SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME, name);
+                    subRequestId++;
+                  } else {
+                    for(String value : list.queryVariables.get(name)) {
+                      params.add(PARAM_MTAS_LIST + "." + requestId + "."
+                          + NAME_MTAS_LIST_QUERY_VARIABLE+ "."+subRequestId+"."+SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME, name);
+                      params.add(PARAM_MTAS_LIST + "." + requestId + "."
+                          + NAME_MTAS_LIST_QUERY_VARIABLE+ "."+subRequestId+"."+SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE, value);
+                      subRequestId++;
+                    }
+                  }
+                }
+                params.add(PARAM_MTAS_LIST + "." + requestId + "."
                     + NAME_MTAS_LIST_KEY, list.key);
                 params.add(PARAM_MTAS_LIST + "." + requestId + "."
                     + NAME_MTAS_LIST_PREFIX, list.prefix);
@@ -373,8 +450,7 @@ public class MtasSolrComponentList {
   /**
    * Creates the.
    *
-   * @param list
-   *          the list
+   * @param list the list
    * @return the simple ordered map
    */
   public SimpleOrderedMap<Object> create(ComponentList list) {
@@ -504,8 +580,7 @@ public class MtasSolrComponentList {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {

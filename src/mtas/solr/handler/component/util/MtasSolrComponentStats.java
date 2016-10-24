@@ -3,6 +3,8 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -85,6 +87,9 @@ public class MtasSolrComponentStats {
   /** The Constant NAME_MTAS_STATS_SPANS_QUERY. */
   public static final String NAME_MTAS_STATS_SPANS_QUERY = "query";
 
+  /** The Constant NAME_MTAS_STATS_SPANS_QUERY. */
+  public static final String NAME_MTAS_STATS_SPANS_EXPAND = "expand";
+
   /** The Constant NAME_MTAS_STATS_SPANS_KEY. */
   public static final String NAME_MTAS_STATS_SPANS_KEY = "key";
 
@@ -101,19 +106,31 @@ public class MtasSolrComponentStats {
   public static final String NAME_MTAS_STATS_SPANS_FUNCTION = "function";
 
   /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION. */
-  public static final String NAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION = "expression";
+  public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION = "expression";
 
   /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION_KEY. */
-  public static final String NAME_MTAS_STATS_SPANS_FUNCTION_KEY = "key";
+  public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY = "key";
 
   /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION_TYPE. */
-  public static final String NAME_MTAS_STATS_SPANS_FUNCTION_TYPE = "type";
+  public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE = "type";
 
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE = "type";
 
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE = "value";
+
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX. */
+  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX = "prefix";
+
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE. */
+  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE = "variable";
+
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME. */
+  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME = "name";
+
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE. */
+  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE = "value";
 
   /**
    * Instantiates a new mtas solr component stats.
@@ -325,6 +342,9 @@ public class MtasSolrComponentStats {
       String[][] functionTypes = new String[ids.size()][];
       String[][] queryTypes = new String[ids.size()][];
       String[][] queryValues = new String[ids.size()][];
+      String[][] queryPrefixes = new String[ids.size()][];
+      HashMap<String, String[]>[][] queryVariables = new HashMap[ids.size()][];
+      Boolean[] expand = new Boolean[ids.size()];
       for (String id : ids) {
         fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + "."
             + id + "." + NAME_MTAS_STATS_SPANS_FIELD, null);
@@ -349,17 +369,17 @@ public class MtasSolrComponentStats {
               .get(
                   PARAM_MTAS_STATS_SPANS + "." + id + "."
                       + NAME_MTAS_STATS_SPANS_FUNCTION + "." + functionId + "."
-                      + NAME_MTAS_STATS_SPANS_FUNCTION_KEY,
+                      + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY,
                   String.valueOf(tmpSubCounter))
               .trim();
           functionExpressions[tmpCounter][tmpSubCounter] = rb.req.getParams()
               .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
                   + NAME_MTAS_STATS_SPANS_FUNCTION + "." + functionId + "."
-                  + NAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION, null);
+                  + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION, null);
           functionTypes[tmpCounter][tmpSubCounter] = rb.req.getParams()
               .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
                   + NAME_MTAS_STATS_SPANS_FUNCTION + "." + functionId + "."
-                  + NAME_MTAS_STATS_SPANS_FUNCTION_TYPE, null);
+                  + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE, null);
           tmpSubCounter++;
         }
 
@@ -370,6 +390,8 @@ public class MtasSolrComponentStats {
           int tmpQCounter = 0;
           queryTypes[tmpCounter] = new String[qIds.size()];
           queryValues[tmpCounter] = new String[qIds.size()];
+          queryPrefixes[tmpCounter] = new String[qIds.size()];
+          queryVariables[tmpCounter] = new HashMap[qIds.size()];
           for (String qId : qIds) {
             queryTypes[tmpCounter][tmpQCounter] = rb.req.getParams()
                 .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
@@ -379,11 +401,62 @@ public class MtasSolrComponentStats {
                 .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
                     + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE, null);
+            queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()
+                .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
+                    + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
+                    + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX, null);
+            Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
+                rb.req.getParams(),
+                PARAM_MTAS_STATS_SPANS + "." + id + "."
+                    + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
+                    + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
+            queryVariables[tmpCounter][tmpQCounter] = new HashMap<String, String[]>();
+            if (vIds.size() > 0) {
+              HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+              for (String vId : vIds) {
+                String name = rb.req.getParams()
+                    .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
+                        + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
+                        + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + "." + vId
+                        + "." + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME,
+                        null);
+                if (name != null) {
+                  if (!tmpVariables.containsKey(name)) {
+                    tmpVariables.put(name, new ArrayList<String>());
+                  }
+                  String value = rb.req.getParams()
+                      .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
+                          + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
+                          + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + "." + vId
+                          + "." + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE,
+                          null);
+                  if (value != null) {
+                    ArrayList<String> list = new ArrayList<String>();
+                    String[] subList = value.split("(?<!\\\\),");
+                    for(int i=0; i<subList.length; i++) {
+                      list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                    }                    
+                    tmpVariables.get(name).addAll(list);                    
+                  }
+                }
+              }
+              for (String name : tmpVariables.keySet()) {
+                queryVariables[tmpCounter][tmpQCounter].put(name,
+                    tmpVariables.get(name)
+                        .toArray(new String[tmpVariables.get(name).size()]));
+              }
+            }
             tmpQCounter++;
           }
         } else {
           throw new IOException("no " + NAME_MTAS_STATS_SPANS_QUERY
               + " for mtas stats span " + id);
+        }
+        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS
+            + "." + id + "." + NAME_MTAS_STATS_SPANS_EXPAND, false)) {
+          expand[tmpCounter] = true;
+        } else {
+          expand[tmpCounter] = false;
         }
         tmpCounter++;
       }
@@ -412,10 +485,11 @@ public class MtasSolrComponentStats {
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
         int queryNumber = queryValues[i].length;
-        SpanQuery ql[] = new SpanQuery[queryNumber];
+        SpanQuery[] ql = new SpanQuery[queryNumber];
         for (int j = 0; j < queryNumber; j++) {
           SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
-              queryTypes[i][j], fields[i]);
+              queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],
+              fields[i]);
           // minimize number of queries
           if (cf.spanQueryList.contains(q)) {
             q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -443,11 +517,148 @@ public class MtasSolrComponentStats {
         } catch (ParseException e) {
           throw new IOException(e.getMessage());
         }
+        if(expand[i]) {          
+          HashMap<String, String[]>[][] expandedQueryVariables = expandedQueryVariables(queryVariables[i]);
+          for(int e=0; e<expandedQueryVariables.length; e++) {
+            SpanQuery[] eql = new SpanQuery[queryNumber];
+            for (int j = 0; j < queryNumber; j++) {
+              SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
+                  queryTypes[i][j], queryPrefixes[i][j], expandedQueryVariables[e][j],
+                  fields[i]);
+              // minimize number of queries
+              if (cf.spanQueryList.contains(q)) {
+                q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
+              } else {
+                cf.spanQueryList.add(q);
+              }
+              eql[j] = q;
+            }                
+            String newKey = generateKey(key+" ("+e+")", expandedQueryVariables[e]);
+            try {
+              mtasFields.list.get(fields[i]).statsSpanList
+                  .add(new ComponentSpan(eql, newKey, minimum, maximum, type,
+                      functionKey, functionExpression, functionType));
+            } catch (ParseException ee) {
+              throw new IOException(ee.getMessage());
+            }
+          }  
+        }
       }
     } else {
       throw new IOException("missing parameters stats spans");
     }
   }
+
+  private String generateKey(String key, HashMap<String, String[]>[] queryVariables) {
+    String newKey = key;
+    newKey+=" -";
+    for(int q=0; q<queryVariables.length;q++) {
+      if(queryVariables[q]!=null && queryVariables[q].size()>0) {
+        for(String name : queryVariables[q].keySet()) {
+          newKey+= " q"+q+":$"+name+"=";
+          if(queryVariables[q].get(name)!=null && queryVariables[q].get(name).length==1) {
+            newKey+= "'"+queryVariables[q].get(name)[0].replace("\\", "\\\\").replace(",", "\\,")+"'";
+          } else {
+            newKey+= "-";
+          }
+        }
+      } 
+    }
+    return newKey;
+  }
+
+  private HashMap<String, String[]>[][] expandedQueryVariables(
+      HashMap<String, String[]>[] queryVariables) {    
+    HashMap<String, String[]>[][] subResult = new HashMap[queryVariables.length][];
+    int e = 0;
+    for(int q=0; q<queryVariables.length;q++) {
+      subResult[q] = expandedQueryVariables(queryVariables[q]);
+    }
+    ArrayList<HashMap<String, String[]>[]> result = new ArrayList<HashMap<String, String[]>[]>();    
+    generatePermutations(result, 0, subResult);
+    return result.toArray(new HashMap[result.size()][]);
+  }
+    
+    private void generatePermutations(
+      ArrayList<HashMap<String, String[]>[]> result,
+      int index, HashMap<String, String[]>[][] subResult) {
+    HashMap<String, String[]>[] value = subResult[index];
+    if(index==0) {
+      for(int i=0; i<value.length; i++) {
+        HashMap<String, String[]>[] resultItem = new HashMap[subResult.length];
+        resultItem[index] = value[i]; 
+        result.add(resultItem);
+      }
+    } else {
+      ArrayList<HashMap<String, String[]>[]> newResult = new ArrayList<HashMap<String, String[]>[]>();
+      for(int e=0; e<result.size(); e++) {
+        for(int i=0; i<value.length; i++) {
+          HashMap<String, String[]>[] resultItem = result.get(e);
+          resultItem[index] = value[i]; 
+          newResult.add(resultItem);
+        }
+      }
+      result.clear();
+      result.addAll(newResult);
+    }
+    index++;  
+    if(index<subResult.length) {
+      generatePermutations(result, index, subResult);
+    }    
+  }
+
+    private HashMap<String, String[]>[] expandedQueryVariables(
+        HashMap<String, String[]> queryVariables) {    
+      ArrayList<HashMap<String, String[]>> result = new ArrayList<HashMap<String, String[]>>();
+      Set<String> keys = queryVariables.keySet();
+      generatePermutationsQueryVariables(result, keys, queryVariables);
+      return result.toArray(new HashMap[result.size()]);
+    }   
+    
+    private void generatePermutationsQueryVariables(ArrayList<HashMap<String, String[]>> result, Set<String> keys, HashMap<String, String[]> queryVariables) {
+      if(keys!=null && keys.size()>0) {
+        Set<String> newKeys = new HashSet<String>();
+        Iterator<String> it = keys.iterator();
+        String key = it.next();
+        String[] value = queryVariables.get(key);
+        if(result.size()==0) {
+          HashMap<String, String[]> newItem;
+          if(value==null || value.length==0) {
+            newItem = new HashMap<String, String[]>(); 
+            newItem.put(key, value);
+            result.add(newItem);
+          } else {
+            for(int j=0;j<value.length;j++) {
+              newItem = new HashMap<String, String[]>(); 
+              newItem.put(key, new String[]{value[j]});
+              result.add(newItem);
+            }
+          }          
+        } else {
+          ArrayList<HashMap<String, String[]>> newResult = new ArrayList<HashMap<String, String[]>>();          
+          for(int i=0;i<result.size();i++) {
+            HashMap<String, String[]> newItem;
+            if(value==null || value.length==0) {
+              newItem = (HashMap<String, String[]>) result.get(i).clone();
+              newItem.put(key, value);
+              newResult.add(newItem);
+            } else {
+              for(int j=0;j<value.length;j++) {
+                newItem = (HashMap<String, String[]>) result.get(i).clone();
+                newItem.put(key, new String[]{value[j]});
+                newResult.add(newItem);                
+              }
+            } 
+          }
+          result.clear();
+          result.addAll(newResult);
+        }
+        while(it.hasNext()) {
+          newKeys.add(it.next());
+        }
+        generatePermutationsQueryVariables(result,newKeys,queryVariables);
+      }
+    }
 
   /**
    * Modify request.
@@ -467,7 +678,78 @@ public class MtasSolrComponentStats {
       // remove stats for other requests
       sreq.params.remove(PARAM_MTAS_STATS);
       sreq.params.remove(PARAM_MTAS_STATS_POSITIONS);
+      Set<String> keys = MtasSolrResultUtil
+          .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);
+      for (String key : keys) {
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_POSITIONS_KEY);
+        sreq.params.remove(PARAM_MTAS_STATS + "." + key + "."
+            + NAME_MTAS_STATS_POSITIONS_FIELD);
+        sreq.params.remove(PARAM_MTAS_STATS + "." + key + "."
+            + NAME_MTAS_STATS_POSITIONS_TYPE);
+        sreq.params.remove(PARAM_MTAS_STATS + "." + key + "."
+            + NAME_MTAS_STATS_POSITIONS_MAXIMUM);
+        sreq.params.remove(PARAM_MTAS_STATS + "." + key + "."
+            + NAME_MTAS_STATS_POSITIONS_MINIMUM);
+      }
+      sreq.params.remove(PARAM_MTAS_STATS_TOKENS);
+      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+          PARAM_MTAS_STATS_TOKENS);
+      for (String key : keys) {
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_TOKENS_KEY);
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_TOKENS_FIELD);
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_TOKENS_TYPE);
+        sreq.params.remove(PARAM_MTAS_STATS + "." + key + "."
+            + NAME_MTAS_STATS_TOKENS_MAXIMUM);
+        sreq.params.remove(PARAM_MTAS_STATS + "." + key + "."
+            + NAME_MTAS_STATS_TOKENS_MINIMUM);
+      }
       sreq.params.remove(PARAM_MTAS_STATS_SPANS);
+      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+          PARAM_MTAS_STATS_SPANS);
+      for (String key : keys) {
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_KEY);
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FIELD);
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_TYPE);
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_MAXIMUM);
+        sreq.params.remove(
+            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_MINIMUM);
+        Set<String> subKeys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS+ "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION);
+        for (String subKey : subKeys) {
+          sreq.params.remove(
+              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);
+          sreq.params.remove(
+              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY);
+          sreq.params.remove(
+              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);
+        }
+        subKeys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS+ "." + key + "." + NAME_MTAS_STATS_SPANS_QUERY);
+        for (String subKey : subKeys) {
+          sreq.params.remove(
+              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);
+          sreq.params.remove(
+              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);
+          sreq.params.remove(
+              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);
+          Set<String> subSubKeys = MtasSolrResultUtil
+              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS+ "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
+          for (String subSubKey : subSubKeys) {
+            sreq.params.remove(
+                PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE+"."+subSubKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);
+            sreq.params.remove(
+                PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE+"."+subSubKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);              
+          }
+        }
+      }
     }
   }
 

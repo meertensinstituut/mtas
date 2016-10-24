@@ -38,7 +38,7 @@ public class MtasSolrResultUtil {
 
   /** The Constant QUERY_TYPE_CQL. */
   public static final String QUERY_TYPE_CQL = "cql";
-
+  
   /** The Constant patternKeyStartGrouphit. */
   public static final Pattern patternKeyStartGrouphit = Pattern
       .compile("^" + GroupHit.KEY_START);
@@ -81,7 +81,7 @@ public class MtasSolrResultUtil {
   private static void rewrite(NamedList<Object> nl, boolean doCollapse)
       throws IOException {
     boolean showDebugInfo = false;
-    HashMap<String, NamedList<Object>> collapseNamedList = null;
+    HashMap<String, NamedList<Object>> collapseNamedList = new HashMap<String, NamedList<Object>>();
     int length = nl.size();
     for (int i = 0; i < length; i++) {
       if (nl.getVal(i) instanceof NamedList) {
@@ -99,22 +99,38 @@ public class MtasSolrResultUtil {
         MtasSolrResult o = (MtasSolrResult) nl.getVal(i);
         if (o.dataCollector.getCollectorType()
             .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-          NamedList<Object> nnl = o.getNamedList(showDebugInfo);
-          for (int j = 0; j < nnl.size(); j++) {
-            if (nnl.getVal(j) != null
-                && nnl.getVal(j) instanceof MtasDataItem) {
-              MtasDataItem mdi = (MtasDataItem) nnl.getVal(j);
-              mdi.rewrite(showDebugInfo);
-              nnl.setVal(j, mdi);
+          if(!o.dataCollector.withTotal()) {
+            NamedList<Object> nnl = o.getNamedList(showDebugInfo);
+            for (int j = 0; j < nnl.size(); j++) {
+              if (nnl.getVal(j) != null
+                  && nnl.getVal(j) instanceof MtasDataItem) {
+                MtasDataItem mdi = (MtasDataItem) nnl.getVal(j);
+                mdi.rewrite(showDebugInfo);
+                nnl.setVal(j, mdi);
+              }
             }
+            nl.setVal(i, rewriteToArray(nnl));
+          } else {
+            NamedList<Object> tmpResponse = new SimpleOrderedMap<>();
+            tmpResponse.add(nl.getName(i)+"Total", o.dataCollector.getSize());
+            NamedList<Object> nnl = o.getNamedList(showDebugInfo);
+            for (int j = 0; j < nnl.size(); j++) {
+              if (nnl.getVal(j) != null
+                  && nnl.getVal(j) instanceof MtasDataItem) {
+                MtasDataItem mdi = (MtasDataItem) nnl.getVal(j);
+                mdi.rewrite(showDebugInfo);
+                nnl.setVal(j, mdi);
+              }
+            }
+            tmpResponse.add(nl.getName(i), rewriteToArray(nnl));            
+            nl.setVal(i, null);
+            collapseNamedList.put(nl.getName(i),tmpResponse);
           }
-          nl.setVal(i, rewriteToArray(nnl));
         } else if (o.dataCollector.getCollectorType()
             .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
           NamedList<Object> nnl = o.getData(showDebugInfo);
           if (nnl.size() > 0) {
-            rewrite(nnl);
-            collapseNamedList = new HashMap<String, NamedList<Object>>();
+            rewrite(nnl);            
             collapseNamedList.put(nl.getName(i), nnl);
             nl.setVal(i, nnl);
           } else {
@@ -124,7 +140,7 @@ public class MtasSolrResultUtil {
       }
     }
     // collapse
-    if (doCollapse && collapseNamedList != null) {
+    if (doCollapse && collapseNamedList.size()>0) {
       for (String key : collapseNamedList.keySet()) {
         nl.remove(key);
       }
@@ -226,8 +242,9 @@ public class MtasSolrResultUtil {
       objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
       objectOutputStream.writeObject(o);
       objectOutputStream.close();
-      return Base64.byteArrayToBase64(byteArrayOutputStream.toByteArray());
-    } catch (IOException e) {
+      byte[] byteArray = byteArrayOutputStream.toByteArray();
+      return Base64.byteArrayToBase64(byteArray);          
+    } catch (IOException e) {    
       e.printStackTrace();
       return null;
     }
@@ -374,7 +391,7 @@ public class MtasSolrResultUtil {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static SpanQuery constructQuery(String queryValue, String queryType,
-      String field) throws IOException {
+      String queryPrefix, HashMap<String, String[]> queryVariables, String field) throws IOException {
     if (queryType == null || queryType.isEmpty()) {
       throw new IOException("no (valid) type for query " + queryValue);
     } else if (queryValue == null || queryValue.isEmpty()) {
@@ -384,7 +401,7 @@ public class MtasSolrResultUtil {
     if (queryType.equals(QUERY_TYPE_CQL)) {
       MtasCQLParser p = new MtasCQLParser(reader);
       try {
-        return p.parse(field, null);
+        return p.parse(field, queryPrefix, queryVariables);        
       } catch (mtas.parser.cql.ParseException e) {
         throw new IOException("couldn't parse " + queryType + " query "
             + queryValue + " (" + e.getMessage() + ")");
@@ -392,7 +409,7 @@ public class MtasSolrResultUtil {
         throw new IOException("couldn't parse " + queryType + " query "
             + queryValue + " (" + e.getMessage() + ")");
       }
-    } else {
+    } else {    
       throw new IOException(
           "unknown queryType " + queryType + " for query " + queryValue);
     }
