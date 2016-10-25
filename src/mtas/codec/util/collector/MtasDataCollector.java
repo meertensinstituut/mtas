@@ -1177,7 +1177,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @param error the error
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract void error(String keys[], String error) throws IOException;
+  public abstract void error(String key, String error) throws IOException;
 
   /**
    * Adds the.
@@ -1232,7 +1232,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @return the mtas data collector[]
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
+  public abstract MtasDataCollector<?, ?> add(String key, long valueSum,
       long valueN) throws IOException;
 
   /**
@@ -1244,7 +1244,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @return the mtas data collector[]
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract MtasDataCollector<?, ?>[] add(String[] keys, long[] values,
+  public abstract MtasDataCollector<?, ?> add(String key, long[] values,
       int number) throws IOException;
 
   /**
@@ -1256,7 +1256,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @return the mtas data collector[]
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
+  public abstract MtasDataCollector<?, ?> add(String key, double valueSum,
       long valueN) throws IOException;
 
   /**
@@ -1268,7 +1268,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @return the mtas data collector[]
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
+  public abstract MtasDataCollector<?, ?> add(String key, double[] values,
       int number) throws IOException;
 
   /*

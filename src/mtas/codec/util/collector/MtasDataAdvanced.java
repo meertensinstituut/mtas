@@ -102,12 +102,10 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
    * java.lang.String)
    */
   @Override
-  public final void error(String[] keys, String error) throws IOException {
-    if (keys != null && keys.length > 0) {
-      for (int i = 0; i < keys.length; i++) {
-        add(keys[i], false);
-        setError(newCurrentPosition, error, newCurrentExisting);
-      }
+  public final void error(String key, String error) throws IOException {
+    if (key != null) {
+      add(key, false);
+      setError(newCurrentPosition, error, newCurrentExisting);      
     }
   }
 

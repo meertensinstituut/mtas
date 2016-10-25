@@ -1639,8 +1639,8 @@ public class CodecCollector {
           }
 
           for (GroupHit hit : occurencesSum.keySet()) {
-            group.dataCollector.add(new String[] { hit.toString() },
-                occurencesSum.get(hit), occurencesN.get(hit));
+            group.dataCollector.add(hit.toString(), occurencesSum.get(hit),
+                occurencesN.get(hit));
           }
           group.dataCollector.closeNewList();
         }
@@ -2046,7 +2046,7 @@ public class CodecCollector {
                   // register list
                   if (distinct.list != null) {
                     distinct.list.get(segmentDocId + lrc.docBase).add(
-                        new String[] { MtasToken.getPostfixFromValue(term) },
+                        MtasToken.getPostfixFromValue(term),
                         new long[] { postingsEnum.freq() }, 1);
                   }
                 }
@@ -2235,7 +2235,7 @@ public class CodecCollector {
     }
     TreeMap<String, int[]> list = facetData.get(cf.baseFields[level]);
     if (dataCollector != null) {
-      MtasDataCollector<?, ?>[] subDataCollectors = null;
+      MtasDataCollector<?, ?> subDataCollector = null;
       dataCollector.initNewList(1);
       if (cf.baseFunctionList[level] != null) {
         SubComponentFunction[] tmpList;
@@ -2291,7 +2291,6 @@ public class CodecCollector {
                 for (String key : list.keySet()) {
                   if (docLists.get(key).length > 0) {
                     // initialise
-                    String[] keys = new String[] { key };
                     Integer[] subDocSet = docLists.get(key);
                     int length = cf.baseParsers[level].needArgumentsNumber();
                     long[] valueSum = new long[length];
@@ -2313,11 +2312,11 @@ public class CodecCollector {
                       try {
                         value = cf.baseParsers[level].getValueLong(valueSum,
                             valuePositions);
-                        subDataCollectors = dataCollector.add(keys, value,
+                        subDataCollector = dataCollector.add(key, value,
                             subDocSet.length);
                       } catch (IOException e) {
-                        dataCollector.error(keys, e.getMessage());
-                        subDataCollectors = null;
+                        dataCollector.error(key, e.getMessage());
+                        subDataCollector = null;
                       }
                       if (cf.baseFunctionList[level] != null
                           && cf.baseFunctionList[level]
@@ -2330,34 +2329,28 @@ public class CodecCollector {
                             try {
                               long valueLong = function.parserFunction
                                   .getValueLong(valueSum, valuePositions);
-                              function.dataCollector.add(keys, valueLong,
+                              function.dataCollector.add(key, valueLong,
                                   subDocSet.length);
                             } catch (IOException e) {
-                              function.dataCollector.error(keys,
-                                  e.getMessage());
+                              function.dataCollector.error(key, e.getMessage());
                             }
                           } else if (function.dataType
                               .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
                             try {
                               double valueDouble = function.parserFunction
                                   .getValueDouble(valueSum, valuePositions);
-                              function.dataCollector.add(keys, valueDouble,
+                              function.dataCollector.add(key, valueDouble,
                                   subDocSet.length);
                             } catch (IOException e) {
-                              function.dataCollector.error(keys,
-                                  e.getMessage());
+                              function.dataCollector.error(key, e.getMessage());
                             }
                           }
                         }
                       }
-                      if (subDataCollectors != null) {
-                        for (MtasDataCollector<?, ?> subDataCollector : subDataCollectors) {
-                          if (subDataCollector != null) {
-                            createFacetBase(cf, (level + 1), subDataCollector,
-                                positionsData, spansNumberData, facetData,
-                                subDocSet);
-                          }
-                        }
+                      if (subDataCollector != null) {
+                        createFacetBase(cf, (level + 1), subDataCollector,
+                            positionsData, spansNumberData, facetData,
+                            subDocSet);
                       }
                     }
                   }
@@ -2418,7 +2411,7 @@ public class CodecCollector {
                                           .getValueLong(tmpArgs, tmpPositions);
                                       functionNumber[i]++;
                                     } catch (IOException e) {
-                                      function.dataCollector.error(keys,
+                                      function.dataCollector.error(key,
                                           e.getMessage());
                                     }
                                   } else if (function.dataType
@@ -2429,7 +2422,7 @@ public class CodecCollector {
                                               tmpPositions);
                                       functionNumber[i]++;
                                     } catch (IOException e) {
-                                      function.dataCollector.error(keys,
+                                      function.dataCollector.error(key,
                                           e.getMessage());
                                     }
                                   }
@@ -2437,11 +2430,11 @@ public class CodecCollector {
                               }
                             }
                           } catch (IOException e) {
-                            dataCollector.error(keys, e.getMessage());
+                            dataCollector.error(key, e.getMessage());
                           }
                         }
                         if (number > 0) {
-                          subDataCollectors = dataCollector.add(keys, values,
+                          subDataCollector = dataCollector.add(key, values,
                               number);
                           if (cf.baseFunctionList[level] != null
                               && cf.baseFunctionList[level]
@@ -2450,25 +2443,21 @@ public class CodecCollector {
                               SubComponentFunction function = functionList[i];
                               if (function.dataType
                                   .equals(CodecUtil.DATA_TYPE_LONG)) {
-                                function.dataCollector.add(keys,
+                                function.dataCollector.add(key,
                                     functionValuesLong[i], functionNumber[i]);
                               } else if (function.dataType
                                   .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
-                                function.dataCollector.add(keys,
+                                function.dataCollector.add(key,
                                     functionValuesDouble[i], functionNumber[i]);
                               }
                             }
                           }
-                          if (subDataCollectors != null) {
-                            for (MtasDataCollector<?, ?> subDataCollector : subDataCollectors) {
-                              if (subDataCollector != null) {
+                          if (subDataCollector != null) {                            
                                 createFacetBase(cf, (level + 1),
                                     subDataCollector, positionsData,
                                     spansNumberData, facetData,
                                     Arrays.copyOfRange(restrictedSubDocSet, 0,
-                                        number));
-                              }
-                            }
+                                        number));                                                          
                           }
                         }
                       }
@@ -2605,25 +2594,25 @@ public class CodecCollector {
                           .getValueLong(numberBasic.valueSum, 1);
                     } catch (IOException e) {
                       termVector.subComponentFunction.dataCollector.error(
-                          new String[] { MtasToken.getPostfixFromValue(term) },
+                          MtasToken.getPostfixFromValue(term),
                           e.getMessage());
                     }
                     String key = MtasToken.getPostfixFromValue(term);
                     termVector.subComponentFunction.dataCollector.add(
-                        new String[] { key }, valueLong, numberBasic.docNumber);
+                        key, valueLong, numberBasic.docNumber);
                     if (termVector.functions != null) {
                       for (SubComponentFunction function : termVector.functions) {
                         if (function.dataType
                             .equals(CodecUtil.DATA_TYPE_LONG)) {
                           long valueFunction = function.parserFunction
                               .getValueLong(numberBasic.valueSum, 0);
-                          function.dataCollector.add(new String[] { key },
+                          function.dataCollector.add(key,
                               valueFunction, numberBasic.docNumber);
                         } else if (function.dataType
                             .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
                           double valueFunction = function.parserFunction
                               .getValueDouble(numberBasic.valueSum, 0);
-                          function.dataCollector.add(new String[] { key },
+                          function.dataCollector.add(key,
                               valueFunction, numberBasic.docNumber);
                         }
                       }
@@ -2644,11 +2633,11 @@ public class CodecCollector {
                                 numberFull.positions[i]);
                       } catch (IOException e) {
                         termVector.subComponentFunction.dataCollector
-                            .error(new String[] { key }, e.getMessage());
+                            .error(key, e.getMessage());
                       }
                     }
                     termVector.subComponentFunction.dataCollector.add(
-                        new String[] { key }, valuesLong, valuesLong.length);
+                        key, valuesLong, valuesLong.length);
                     if (termVector.functions != null) {
                       for (SubComponentFunction function : termVector.functions) {
                         if (function.dataType
@@ -2661,11 +2650,11 @@ public class CodecCollector {
                                       new long[] { numberFull.args[i] },
                                       numberFull.positions[i]);
                             } catch (IOException e) {
-                              function.dataCollector.error(new String[] { key },
+                              function.dataCollector.error(key,
                                   e.getMessage());
                             }
                           }
-                          function.dataCollector.add(new String[] { key },
+                          function.dataCollector.add(key,
                               valuesLong, valuesLong.length);
                         } else if (function.dataType
                             .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
@@ -2677,11 +2666,11 @@ public class CodecCollector {
                                       new long[] { numberFull.args[i] },
                                       numberFull.positions[i]);
                             } catch (IOException e) {
-                              function.dataCollector.error(new String[] { key },
+                              function.dataCollector.error(key,
                                   e.getMessage());
                             }
                           }
-                          function.dataCollector.add(new String[] { key },
+                          function.dataCollector.add(key,
                               valuesDouble, valuesDouble.length);
                         }
                       }
@@ -3160,7 +3149,7 @@ public class CodecCollector {
       }
       if (termVector.subComponentFunction.statsType
           .equals(CodecUtil.STATS_BASIC)) {
-        dataCollector.add(new String[] { key }, value, number.docNumber);
+        dataCollector.add(key, value, number.docNumber);
       } else {
         computeFull = true;
       }
@@ -3172,12 +3161,12 @@ public class CodecCollector {
             if (function.dataType.equals(CodecUtil.DATA_TYPE_LONG)) {
               long valueFunction = function.parserFunction
                   .getValueLong(number.valueSum, 0);
-              function.dataCollector.add(new String[] { key }, valueFunction,
+              function.dataCollector.add(key, valueFunction,
                   number.docNumber);
             } else if (function.dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {
               double valueFunction = function.parserFunction
                   .getValueDouble(number.valueSum, 0);
-              function.dataCollector.add(new String[] { key }, valueFunction,
+              function.dataCollector.add(key, valueFunction,
                   number.docNumber);
             }
           } else {
@@ -3272,12 +3261,12 @@ public class CodecCollector {
           valuesLong[i] = termVector.subComponentFunction.parserFunction
               .getValueLong(new long[] { number.args[i] }, number.positions[i]);
         } catch (IOException e) {
-          dataCollector.error(new String[] { key }, e.getMessage());
+          dataCollector.error(key, e.getMessage());
         }
       }
       if (!termVector.subComponentFunction.statsType
           .equals(CodecUtil.STATS_BASIC)) {
-        dataCollector.add(new String[] { key }, valuesLong, valuesLong.length);
+        dataCollector.add(key, valuesLong, valuesLong.length);
       }
       for (SubComponentFunction function : termVector.functions) {
         if (!function.parserFunction.sumRule()
@@ -3290,11 +3279,11 @@ public class CodecCollector {
                 valuesLong[i] = function.parserFunction.getValueLong(
                     new long[] { number.args[i] }, number.positions[i]);
               } catch (IOException e) {
-                function.dataCollector.error(new String[] { key },
+                function.dataCollector.error(key,
                     e.getMessage());
               }
             }
-            function.dataCollector.add(new String[] { key }, valuesLong,
+            function.dataCollector.add(key, valuesLong,
                 valuesLong.length);
           } else if (function.dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {
             double[] valuesDouble = new double[number.docNumber];
@@ -3303,11 +3292,11 @@ public class CodecCollector {
                 valuesDouble[i] = function.parserFunction.getValueDouble(
                     new long[] { number.args[i] }, number.positions[i]);
               } catch (IOException e) {
-                function.dataCollector.error(new String[] { key },
+                function.dataCollector.error(key,
                     e.getMessage());
               }
             }
-            function.dataCollector.add(new String[] { key }, valuesDouble,
+            function.dataCollector.add(key, valuesDouble,
                 valuesDouble.length);
           }
         }

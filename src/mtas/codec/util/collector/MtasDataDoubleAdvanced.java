@@ -145,7 +145,7 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * long, long)
    */
   @Override
-  public MtasDataCollector<?, ?>[] add(String[] keys, long valueSum,
+  public MtasDataCollector<?, ?> add(String key, long valueSum,
       long valueN) throws IOException {
     throw new IOException("not supported");
   }
@@ -158,18 +158,15 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * long[], int)
    */
   @Override
-  public MtasDataCollector<?, ?>[] add(String[] keys, long[] values, int number)
+  public MtasDataCollector<?, ?> add(String key, long[] values, int number)
       throws IOException {
-    if (keys != null && keys.length > 0) {
+    if (key != null) {
       Double[] newValues = new Double[number];
       for (int i = 0; i < values.length; i++)
         newValues[i] = Long.valueOf(values[i]).doubleValue();
-      MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
-      for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i], false);
-        setValue(newCurrentPosition, newValues, number, newCurrentExisting);
-      }
-      return subCollectors;
+      MtasDataCollector<?, ?> subCollector = add(key, false);
+        setValue(newCurrentPosition, newValues, number, newCurrentExisting);      
+      return subCollector;
     } else {
       return null;
     }
@@ -183,7 +180,7 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * double, long)
    */
   @Override
-  public MtasDataCollector<?, ?>[] add(String[] keys, double valueSum,
+  public MtasDataCollector<?, ?> add(String key, double valueSum,
       long valueN) throws IOException {
     throw new IOException("not supported");
   }
@@ -196,16 +193,13 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * double[], int)
    */
   @Override
-  public MtasDataCollector<?, ?>[] add(String[] keys, double[] values,
+  public MtasDataCollector<?, ?> add(String key, double[] values,
       int number) throws IOException {
-    if (keys != null && keys.length > 0) {
-      MtasDataCollector<?, ?>[] subCollectors = new MtasDataCollector<?, ?>[keys.length];
-      for (int i = 0; i < keys.length; i++) {
-        subCollectors[i] = add(keys[i], false);
+    if (key != null) {
+      MtasDataCollector<?, ?> subCollector = add(key, false);
         setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
-            newCurrentExisting);
-      }
-      return subCollectors;
+            newCurrentExisting);      
+      return subCollector;
     } else {
       return null;
     }
