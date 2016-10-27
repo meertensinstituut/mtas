@@ -29,23 +29,29 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The segment sort asc. */
-  public static String SEGMENT_SORT_ASC = "segment_asc";
+  /** The Constant SEGMENT_SORT_ASC. */
+  public static final String SEGMENT_SORT_ASC = "segment_asc";
 
-  /** The segment sort desc. */
-  public static String SEGMENT_SORT_DESC = "segment_desc";
+  /** The Constant SEGMENT_SORT_DESC. */
+  public static final String SEGMENT_SORT_DESC = "segment_desc";
 
-  /** The segment boundary asc. */
-  public static String SEGMENT_BOUNDARY_ASC = "segment_boundary_asc";
+  /** The Constant SEGMENT_BOUNDARY_ASC. */
+  public static final String SEGMENT_BOUNDARY_ASC = "segment_boundary_asc";
 
-  /** The segment boundary desc. */
-  public static String SEGMENT_BOUNDARY_DESC = "segment_boundary_desc";
+  /** The Constant SEGMENT_BOUNDARY_DESC. */
+  public static final String SEGMENT_BOUNDARY_DESC = "segment_boundary_desc";
 
-  /** The segment key. */
-  public static String SEGMENT_KEY = "key";
+  /** The Constant SEGMENT_KEY. */
+  public static final String SEGMENT_KEY = "key";
 
-  /** The segment new. */
-  public static String SEGMENT_NEW = "new";
+  /** The Constant SEGMENT_NEW. */
+  public static final String SEGMENT_NEW = "new";
+
+  /** The Constant SEGMENT_KEY_OR_NEW. */
+  public static final String SEGMENT_KEY_OR_NEW = "key_or_new";
+
+  /** The Constant SEGMENT_POSSIBLE_KEY. */
+  public static final String SEGMENT_POSSIBLE_KEY = "possible_key";
 
   /** The size. */
   protected int size;
@@ -91,7 +97,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /** The source number list. */
   protected int[] sourceNumberList;
 
-  /** The did segment registration. */
+  /** The with total. */
   private boolean withTotal;
 
   /** The segment registration. */
@@ -105,7 +111,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   /** The segment keys. */
   public transient HashSet<String> segmentKeys;
-
+    
   /** The segment values boundary. */
   protected transient LinkedHashMap<String, T1> segmentValuesBoundary;
 
@@ -174,6 +180,8 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   /** The new error list. */
   protected transient HashMap<String, Integer>[] newErrorList;
+  
+  public transient HashSet<String> newKnownKeyFoundInSegment;
 
   /** The new sub collector types. */
   private transient String[] newSubCollectorTypes;
@@ -432,6 +440,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
       newSourceNumberList = new int[newSize];
       newErrorNumber = new int[newSize];
       newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
+      newKnownKeyFoundInSegment = new HashSet<String>();
       if (hasSub) {
         newSubCollectorListNextLevel = new MtasDataCollector[newSize];
       }
@@ -551,7 +560,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             "collector should be " + DataCollector.COLLECTOR_TYPE_LIST);
       } else if (key == null) {
         throw new IOException("key shouldn't be null");
-      } else {
+      } else {        
         // check previous added
         if ((newPosition > 0)
             && newKeyList[(newPosition - 1)].compareTo(key) >= 0) {
@@ -594,6 +603,8 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
               }
               newCurrentPosition = newPosition - 1;
               newCurrentExisting = true;
+              //register known key found again in segment
+              newKnownKeyFoundInSegment.add(key);                            
               // ready
               if (hasSub) {
                 return newSubCollectorListNextLevel[newCurrentPosition];
@@ -878,6 +889,42 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Validate segment value.
    *
+   * @param value the value
+   * @param maximumNumber the maximum number
+   * @param segmentNumber the segment number
+   * @param alreadyFound the already found
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String validateSegmentValue(T1 value, int maximumNumber,
+      int segmentNumber) throws IOException {
+    if (!closed) {
+      if (segmentRegistration != null) {
+        if (maximumNumber > 0) {
+          T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
+          if (segmentValueTopList.size() < maximumNumber) {
+            return SEGMENT_KEY_OR_NEW;
+          } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {
+            return SEGMENT_KEY_OR_NEW;
+          } else if (segmentKeys.size() > newKnownKeyFoundInSegment.size()) {
+            return SEGMENT_POSSIBLE_KEY;
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } else {
+      throw new IOException("already closed");
+    }
+  }
+
+  /**
+   * Validate segment value old.
+   *
    * @param key the key
    * @param value the value
    * @param maximumNumber the maximum number
@@ -886,7 +933,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @return the string
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public String validateSegmentValue(String key, T1 value, int maximumNumber,
+  public String validateSegmentValueOld(String key, T1 value, int maximumNumber,
       int segmentNumber, boolean test) throws IOException {
     if (!closed) {
       if (segmentRegistration != null) {
@@ -913,7 +960,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             }
             return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
           } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {
-            //System.out.println(key+" "+value+" "+tmpSegmentValueBoundary);
+            // System.out.println(key+" "+value+" "+tmpSegmentValueBoundary);
             if (!test) {
               segmentKeyValueList.get(segmentName).put(key, value);
               if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {
@@ -1173,7 +1220,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Error.
    *
-   * @param keys the keys
+   * @param key the key
    * @param error the error
    * @throws IOException Signals that an I/O exception has occurred.
    */
@@ -1226,10 +1273,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Adds the.
    *
-   * @param keys the keys
+   * @param key the key
    * @param valueSum the value sum
    * @param valueN the value n
-   * @return the mtas data collector[]
+   * @return the mtas data collector
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract MtasDataCollector<?, ?> add(String key, long valueSum,
@@ -1238,10 +1285,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Adds the.
    *
-   * @param keys the keys
+   * @param key the key
    * @param values the values
    * @param number the number
-   * @return the mtas data collector[]
+   * @return the mtas data collector
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract MtasDataCollector<?, ?> add(String key, long[] values,
@@ -1250,10 +1297,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Adds the.
    *
-   * @param keys the keys
+   * @param key the key
    * @param valueSum the value sum
    * @param valueN the value n
-   * @return the mtas data collector[]
+   * @return the mtas data collector
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract MtasDataCollector<?, ?> add(String key, double valueSum,
@@ -1262,10 +1309,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   /**
    * Adds the.
    *
-   * @param keys the keys
+   * @param key the key
    * @param values the values
    * @param number the number
-   * @return the mtas data collector[]
+   * @return the mtas data collector
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract MtasDataCollector<?, ?> add(String key, double[] values,
@@ -1412,20 +1459,31 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   public int getSize() {
     return size;
   }
-  
+
+  /**
+   * With total.
+   *
+   * @return true, if successful
+   */
   public boolean withTotal() {
     return withTotal;
   }
-  
+
+  /**
+   * Sets the with total.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public void setWithTotal() throws IOException {
-    if(collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-      if(segmentName!=null) {
-        throw new IOException("can't get total with segmentRegistration"); 
+    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
+      if (segmentName != null) {
+        throw new IOException("can't get total with segmentRegistration");
       } else {
         withTotal = true;
-      }  
+      }
     } else {
-      throw new IOException("can't get total for dataCollector of type "+collectorType);
+      throw new IOException(
+          "can't get total for dataCollector of type " + collectorType);
     }
   }
 
