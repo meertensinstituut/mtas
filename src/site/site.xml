@@ -24,6 +24,7 @@
       <item name="Getting started" href="installation.html" collapse="true">
         <item name="Lucene" href="installation_lucene.html"/>
         <item name="Solr" href="installation_solr.html"/>
+        <item name="Docker" href="installation_docker.html"/>
       </item>
       <item name="Indexing" href="indexing.html" collapse="true">
         <item name="Configuration" href="indexing_configuration.html"/>

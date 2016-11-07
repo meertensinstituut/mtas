@@ -2,6 +2,7 @@
 <mtas>
   <configurations type="mtas.analysis.util.MtasTokenizerFactory">
     <configuration name="test" file="mtas/folia_test.xml" />
+    <configuration name="TEST" file="mtas/folia_dbnl.xml" />
     <configuration name="CRM" file="mtas/crm_test.xml" />
     <configuration name="DBNL" file="mtas/folia_dbnl.xml" />
     <configuration name="DDD" file="mtas/folia_ddd.xml" />
@@ -10,6 +11,7 @@
   </configurations>
   <configurations type="mtas.analysis.util.MtasCharFilterFactory">
     <configuration name="test" type="file" />
+    <configuration name="TEST" type="file" prefix="/Users/matthijs/Software/Mtas/demo/data/" />
     <configuration name="CRM" type="file" prefix="/Users/matthijs/Software/Mtas/data/CRM/data/files/" postfix=".txt" />
     <configuration name="DBNL" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="DDD" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />

@@ -1,0 +1,80 @@
+#set($h1 = '#')
+#set($h2 = '##')
+#set($h3 = '###')
+#set($h4 = '####')
+$h1 Mtas and Solr
+
+Mtas can be used as plugin for Apache Solr
+
+Prerequisites
+
+- Installed [Apache Solr](http://lucene.apache.org/solr/)
+- Currently supported and advised version is ${currentDevelopmentVersion}
+
+Start with a new Solr core.
+
+$h3 Libraries
+
+Add the `mtas-${currentDevelopmentVersion}.jar` to the `lib` directory of the new Solr core. 
+A prebuilt `mtas-${currentDevelopmentVersion}.jar` is available from the [download](download.html) page.
+
+Furthermore, add the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math/) to the `lib` directory of the new Solr core.
+
+$h3 Solrconfig.xml
+
+Some changes have to be made within the `solrconfig.xml` file, elements have to be added to the `<config/>` or existing elements have te be adjusted:
+
+Define a new **mtas searchComponent**: 
+
+```console
+<searchComponent name="mtas" class="mtas.solr.handler.component.MtasSolrSearchComponent"/>
+```
+
+Add this component to the select requestHandler by inserting the following within the 
+`<requestHandler/>` with name `"/select"`:
+
+``` console 
+<arr name="last-components">
+  <str>mtas</str>
+</arr>
+```   
+
+Define a new **mtas_cql queryParser**:
+
+```console
+<queryParser name="mtas_cql" class="mtas.solr.search.MtasSolrCQLQParserPlugin"/>
+``` 
+
+Define a new **mtas requestHandler**:
+
+```console
+<requestHandler name="/mtas" class="mtas.solr.handler.MtasRequestHandler" />
+```
+
+Define a new updateRequestProcessorChain:
+
+```console
+<updateRequestProcessorChain name="mtasUpdateProcessor">
+  <processor class="mtas.solr.update.processor.MtasUpdateRequestProcessorFactory" />
+  <processor class="solr.LogUpdateProcessorFactory" />
+  <processor class="solr.RunUpdateProcessorFactory" />
+</updateRequestProcessorChain>
+```
+
+Define or adjust the update requestHandler with this updateRequestProcessorChain:
+
+```console
+<requestHandler name="/update" class="solr.UpdateRequestHandler">
+  <lst name="defaults">
+    <str name="update.chain">mtasUpdateProcessor</str>
+  </lst>    
+</requestHandler>
+```
+   
+Finally, in this instruction we will use a classic schema instead of the managed-schema. Therefore define the correct schemaFactory.
+
+```console
+<schemaFactory class="ClassicIndexSchemaFactory"/>
+```    
+  
+

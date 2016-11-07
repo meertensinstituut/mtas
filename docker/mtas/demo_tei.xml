@@ -20,7 +20,7 @@
 		<!-- START GENERAL SETTINGS MTAS TEI PARSER -->
 		<autorepair value="true" />
 		<makeunique value="true" />
-    <!-- END GENERAL SETTINGS MTAS TEI PARSER -->
+        <!-- END GENERAL SETTINGS MTAS TEI PARSER -->
 
 		<!-- START REFERENCES -->
 		<references>

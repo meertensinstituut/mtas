@@ -282,10 +282,10 @@ public class CodecComponent {
     public HashMap<Integer, String> uniqueKey;
 
     /** The stats. */
-    public HashMap<Integer, MtasDataCollector> stats;
+    public HashMap<Integer, MtasDataCollector<?,?>> stats;
     
     /** The list. */
-    public HashMap<Integer, MtasDataCollector> list;
+    public HashMap<Integer, MtasDataCollector<?,?>> list;
 
     /**
      * Instantiates a new component distinct.
@@ -315,9 +315,9 @@ public class CodecComponent {
             prefix + MtasToken.DELIMITER + regexp + "\u0000*");
         compiledAutomaton = new CompiledAutomaton(re.toAutomaton());
       }
-      this.stats = new HashMap<Integer, MtasDataCollector>();
+      this.stats = new HashMap<Integer, MtasDataCollector<?,?>>();
       if (this.number > 0) {
-        this.list = new HashMap<Integer, MtasDataCollector>();
+        this.list = new HashMap<Integer, MtasDataCollector<?,?>>();
       } else {
         this.list = null;
       }
@@ -2106,12 +2106,12 @@ public class CodecComponent {
      * @param newKey the new key
      * @return the hash map[]
      */
-    private static HashMap[] keyToSubSubObject(String key,
+    private static HashMap<String, String>[] keyToSubSubObject(String key,
         StringBuilder newKey) {
       if (key != "") {
         newKey.append(" [");
         String prefix, postfix, parts[] = key.split(Pattern.quote("&"));
-        HashMap[] result = new HashMap[parts.length];
+        HashMap<String,String>[] result = new HashMap[parts.length];
         Pattern pattern = Pattern.compile("^([^\\.]*)\\.([^\\.]*)$");
         Decoder decoder = Base64.getDecoder();
         Matcher matcher;
@@ -2164,8 +2164,8 @@ public class CodecComponent {
      * @param newKey the new key
      * @return the hash map
      */
-    private static HashMap keyToSubObject(String key, StringBuilder newKey) {
-      HashMap<Integer, HashMap[]> result = new HashMap<Integer, HashMap[]>();
+    private static HashMap<Integer, HashMap<String,String>[]> keyToSubObject(String key, StringBuilder newKey) {
+      HashMap<Integer, HashMap<String,String>[]> result = new HashMap();
       if (key == null || key.trim().equals("")) {
         return null;
       } else {
@@ -2188,13 +2188,13 @@ public class CodecComponent {
      * @param newKey the new key
      * @return the hash map
      */
-    public static HashMap keyToObject(String key, StringBuilder newKey) {
+    public static HashMap<String, HashMap<Integer, HashMap<String,String>[]>> keyToObject(String key, StringBuilder newKey) {
       if (key.startsWith(KEY_START)) {
         String content = key.substring(KEY_START.length());
         StringBuilder keyLeft = new StringBuilder(""),
             keyHit = new StringBuilder(""), keyRight = new StringBuilder("");
-        HashMap<String, HashMap<Integer, HashMap[]>> result = new HashMap<String, HashMap<Integer, HashMap[]>>();
-        HashMap<Integer, HashMap[]> resultLeft = null, resultHit = null,
+        HashMap<String, HashMap<Integer, HashMap<String,String>[]>> result = new HashMap<String, HashMap<Integer, HashMap<String,String>[]>>();
+        HashMap<Integer, HashMap<String,String>[]> resultLeft = null, resultHit = null,
             resultRight = null;
         String[] parts = content.split(Pattern.quote("|"), -1);
         if (parts.length == 3) {

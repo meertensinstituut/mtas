@@ -111,7 +111,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   /** The segment keys. */
   public transient HashSet<String> segmentKeys;
-    
+
   /** The segment values boundary. */
   protected transient LinkedHashMap<String, T1> segmentValuesBoundary;
 
@@ -180,7 +180,8 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   /** The new error list. */
   protected transient HashMap<String, Integer>[] newErrorList;
-  
+
+  /** The new known key found in segment. */
   public transient HashSet<String> newKnownKeyFoundInSegment;
 
   /** The new sub collector types. */
@@ -560,7 +561,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             "collector should be " + DataCollector.COLLECTOR_TYPE_LIST);
       } else if (key == null) {
         throw new IOException("key shouldn't be null");
-      } else {        
+      } else {
         // check previous added
         if ((newPosition > 0)
             && newKeyList[(newPosition - 1)].compareTo(key) >= 0) {
@@ -603,8 +604,8 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
               }
               newCurrentPosition = newPosition - 1;
               newCurrentExisting = true;
-              //register known key found again in segment
-              newKnownKeyFoundInSegment.add(key);                            
+              // register known key found again in segment
+              newKnownKeyFoundInSegment.add(key);
               // ready
               if (hasSub) {
                 return newSubCollectorListNextLevel[newCurrentPosition];
@@ -892,7 +893,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @param value the value
    * @param maximumNumber the maximum number
    * @param segmentNumber the segment number
-   * @param alreadyFound the already found
    * @return the string
    * @throws IOException Signals that an I/O exception has occurred.
    */
@@ -923,7 +923,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   }
 
   /**
-   * Validate segment value old.
+   * Validate segment value.
    *
    * @param key the key
    * @param value the value
@@ -933,7 +933,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @return the string
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public String validateSegmentValueOld(String key, T1 value, int maximumNumber,
+  public String validateSegmentValue(String key, T1 value, int maximumNumber,
       int segmentNumber, boolean test) throws IOException {
     if (!closed) {
       if (segmentRegistration != null) {

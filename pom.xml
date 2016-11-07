@@ -1,7 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<properties>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>6.2.0</currentDevelopmentVersion>
 		<currentDevelopmentRelease>20161027</currentDevelopmentRelease>
 	</properties>
@@ -36,6 +38,11 @@
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
+				<directory>src/docker</directory>
+				<filtering>true</filtering>
+				<targetPath>${basedir}/docker</targetPath>
+			</resource>
+			<resource>
 				<directory>resources</directory>
 			</resource>
 		</resources>
@@ -51,8 +58,8 @@
 								<include>**/*</include>
 							</includes>
 							<excludes>
-                <exclude>**/.git/</exclude>
-              </excludes>
+								<exclude>**/.git/</exclude>
+							</excludes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
 					</filesets>
@@ -84,7 +91,7 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
-			</plugin>						
+			</plugin>
 		</plugins>
 	</build>
 	<reporting>

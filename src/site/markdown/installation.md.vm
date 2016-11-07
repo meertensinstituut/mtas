@@ -1,8 +1,12 @@
-#Getting started
+#set($h1 = '#')
+#set($h2 = '##')
+#set($h3 = '###')
+#set($h4 = '####')
+$h1 Getting started
 
 Prebuilt jar libraries are available from the [download](download.html) page, current version is [${currentDevelopmentVersion}, release ${currentDevelopmentRelease}](https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar) (development)
 
-###Build from Source with Maven
+$h3 Build from Source with Maven
 
 Download the source code from GitHub
 
@@ -18,11 +22,13 @@ mvn package
 
 After a successful build, the directory `target` will contain the new jar library.
 
-###Installation
+$h3 Installation
 
 Mtas can be used as plugin for [Apache Solr](http://lucene.apache.org/solr/) or as library in combination with [Apache Lucene](http://lucene.apache.org/). 
 
 - Getting started with [Mtas and Lucene](installation_lucene.html)
 - Getting started with [Mtas and Solr](installation_solr.html)
+
+or see [Mtas and Docker](installation_docker.html) to get started quickly. 
 
 Versioning follows the required version of both Solr and Lucene, the latest available version is ${currentDevelopmentVersion}.

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="demo" version="1.6">
+
+  <field name="_version_" type="long" indexed="true" multiValued="false" stored="false" docValues="true" />
+  <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="type" type="text" required="true" multiValued="false" indexed="true" stored="true" />
+  <field name="title" type="text" required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="genre" type="string" required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="text" type="mtas" required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="error" type="string" indexed="true" stored="true" />
+  <field name="numberOfTokens" type="int" indexed="true" stored="true" />
+  <field name="numberOfPositions" type="int" indexed="true" stored="true" />
+  <field name="size" type="int" indexed="true" stored="true" />
+  
+  <uniqueKey>id</uniqueKey>
+
+  <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
+  <fieldType name="int" class="solr.TrieIntField" precisionStep="8" positionIncrementGap="0" />
+  <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0" />
+  <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory" />
+      <filter class="solr.LowerCaseFilterFactory" />
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory" />
+      <filter class="solr.LowerCaseFilterFactory" />
+    </analyzer>
+  </fieldType>
+  <fieldType name="mtas_config" class="solr.TextField" postingsFormat="MtasCodec">
+    <analyzer type="index">
+      <charFilter class="mtas.analysis.util.MtasCharFilterFactory" config="mtas.xml" />
+      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml" />
+    </analyzer>
+  </fieldType>
+  <fieldType name="mtas" class="mtas.solr.schema.MtasPreAnalyzedField"
+    followIndexAnalyzer="mtas_config" defaultConfiguration="default"
+    configurationFromField="type" setNumberOfTokens="numberOfTokens"
+    setNumberOfPositions="numberOfPositions" setSize="size"
+    setError="error" postingsFormat="MtasCodec">
+    <analyzer type="query">
+      <tokenizer class="solr.WhitespaceTokenizerFactory" />
+      <filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory" prefix="t" />
+    </analyzer>
+  </fieldType>
+
+</schema>
+
