@@ -1,0 +1,36 @@
+
+
+div.post {
+	color: #000000;
+  background-color: #EEEEEE;
+  border-color: #000000;
+  border-width: 1px;
+  border-style: solid;
+  margin: 10px;
+}  
+
+div.error {
+	color: #FFFFFF;
+	background-color: #FF0000;
+	border-color: #000000;
+	border-width: 1px;
+	border-style: solid;
+	margin: 10px;
+}
+
+div.output {
+  color: #000000;
+  background-color: #FFFFFF;
+  border-color: #000000;
+  border-width: 1px;
+  border-style: solid;
+  margin: 10px;
+}
+
+input.button {
+	color: #000000;
+  background-color: #DDDDDD;
+	border-color: #000000;
+  border-width: 1px;
+  border-style: solid;
+}

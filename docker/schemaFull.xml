@@ -6,6 +6,7 @@
   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="type" type="text" required="true" multiValued="false" indexed="true" stored="true" />
   <field name="title" type="text" required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="author" type="text" required="false" multiValued="false" indexed="true" stored="true" />
   <field name="genre" type="string" required="false" multiValued="true" indexed="true" stored="true" />
   <field name="text" type="mtas" required="false" multiValued="false" indexed="true" stored="true" />
   <field name="error" type="string" indexed="true" stored="true" />

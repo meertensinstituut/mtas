@@ -19,7 +19,7 @@ USER root
 
 WORKDIR "/root"
 
-RUN mkdir lib && mkdir data && mkdir data/mtas
+RUN mkdir lib && mkdir data && mkdir data/mtas && mkdir folia-samples && mkdir site && mkdir site/js
 
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/solrconfig.xml /root/data/ 
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas.xml /root/data/
@@ -27,11 +27,17 @@ ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas/
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas/demo_tei.xml /root/data/mtas/
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/schemaBasic.xml /root/data/
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/schemaFull.xml /root/data/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/folia-samples/beets1.xml.gz /root/folia-samples/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/folia-samples/beets2.xml.gz /root/folia-samples/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/folia-samples/beets3.xml.gz /root/folia-samples/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/index.html /root/site/ 
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/example_demo1.html /root/site/ 
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/js/solr.js /root/site/ 
 
 ADD http://archive.apache.org/dist/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz /root/
 ADD http://apache.cs.uu.nl/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz /root/lib/
 ADD https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar /root/lib/
-ADD http://code.jquery.com/jquery-3.1.1.min.js /root/lib/
+ADD http://code.jquery.com/jquery-3.1.1.min.js /root/site/js/
 
 RUN tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 && rm lib/commons-math3-3.6.1-bin.tar.gz
 
@@ -63,6 +69,13 @@ RUN service apache2 stop \
 && a2enmod proxy_html \
 && sed -i '/<\/VirtualHost>/ i ProxyPass /solr http://localhost:8983/solr\nProxyPassReverse /solr http://localhost:8983/solr' /etc/apache2/sites-enabled/000-default.conf
 
+RUN rm /var/www/html/index.html \
+&& mkdir /var/www/html/demo \ 
+&& cp -rp folia-samples /var/www/html/demo/ \
+&& gunzip -r /var/www/html/demo \
+&& cp -rp site/* /var/www/html/ \
+&& chmod -R 755 /var/www/html \
+
 RUN printf "service solr start\nservice apache2 start\n" > /start.sh && chmod 755 /start.sh
 
 RUN mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && echo "name=demo1" > demo1/core.properties \
@@ -74,8 +87,6 @@ RUN mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && echo "name=demo1" > de
 && mv demo1 /var/solr/data/ && mv demo2 /var/solr/data/
 
 CMD bash -C '/start.sh'; 'bash'
-
-
 
 
 
