@@ -21,17 +21,17 @@ WORKDIR "/root"
 
 RUN mkdir lib && mkdir data && mkdir data/mtas
 
-COPY solrconfig.xml /root/data/ 
-COPY mtas.xml /root/data/
-COPY mtas/demo_folia.xml /root/data/mtas/
-COPY mtas/demo_tei.xml /root/data/mtas/
-COPY schemaBasic.xml /root/data/
-COPY schemaFull.xml /root/data/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/solrconfig.xml /root/data/ 
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas.xml /root/data/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas/demo_folia.xml /root/data/mtas/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas/demo_tei.xml /root/data/mtas/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/schemaBasic.xml /root/data/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/schemaFull.xml /root/data/
 
 ADD http://archive.apache.org/dist/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz /root/
 ADD http://apache.cs.uu.nl/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz /root/lib/
 ADD https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar /root/lib/
-ADD https://code.jquery.com/jquery-3.1.1.min.js /root/lib/
+ADD http://code.jquery.com/jquery-3.1.1.min.js /root/lib/
 
 RUN tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 && rm lib/commons-math3-3.6.1-bin.tar.gz
 
