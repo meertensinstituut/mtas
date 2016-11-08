@@ -1,7 +1,7 @@
 # Automatically generated Dockerfile 
-# - Build ${timestamp}
-# - Lucene/Solr version ${currentDevelopmentVersion}
-# - Mtas release ${currentDevelopmentRelease} 
+# - Build 2016-11-07 18:42
+# - Lucene/Solr version 6.2.0
+# - Mtas release 20161027 
 #
 # To run this image after installing Docker, use the following command:
 # 
@@ -9,9 +9,9 @@
 FROM ubuntu:16.04
 MAINTAINER Matthijs Brouwer
 
-LABEL mtas.timestamp="${timestamp}"
-LABEL mtas.lucene="${currentDevelopmentVersion}"
-LABEL mtas.release="${currentDevelopmentRelease}"
+LABEL mtas.timestamp="2016-11-07 18:42"
+LABEL mtas.lucene="6.2.0"
+LABEL mtas.release="20161027"
 
 EXPOSE 8983 80
   
@@ -37,7 +37,7 @@ ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/js/solr.js /root/site/js/
 
 ADD http://apache.cs.uu.nl/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz /root/lib/
-ADD https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar /root/lib/
+ADD https://github.com/meertensinstituut/mtas/releases/download/20161027/mtas-6.2.0.jar /root/lib/
 ADD http://code.jquery.com/jquery-3.1.1.min.js /root/site/js/
 
 RUN tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 && rm lib/commons-math3-3.6.1-bin.tar.gz
@@ -49,8 +49,8 @@ python-software-properties \
 apache2 \
 curl 
 
-RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
-&& curl -o /root/solr-${currentDevelopmentVersion}.tgz -O $solrurl
+RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.2.0/solr-6.2.0.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
+&& curl -o /root/solr-6.2.0.tgz -O $solrurl
 
 RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
 && curl -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl
@@ -62,8 +62,8 @@ RUN add-apt-repository -y ppa:webupd8team/java \
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN tar xzf solr-${currentDevelopmentVersion}.tgz solr-${currentDevelopmentVersion}/bin/install_solr_service.sh --strip-components=2 \
-&& bash ./install_solr_service.sh solr-${currentDevelopmentVersion}.tgz && rm install_solr_service.sh && rm -rf solr-${currentDevelopmentVersion}.tgz
+RUN tar xzf solr-6.2.0.tgz solr-6.2.0/bin/install_solr_service.sh --strip-components=2 \
+&& bash ./install_solr_service.sh solr-6.2.0.tgz && rm install_solr_service.sh && rm -rf solr-6.2.0.tgz
 
 RUN service apache2 stop \
 && a2enmod proxy \
@@ -87,7 +87,7 @@ RUN rm /var/www/html/index.html \
 RUN printf "service solr start\nservice apache2 start\n" > /start.sh && chmod 755 /start.sh
 
 RUN mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && echo "name=demo1" > demo1/core.properties \
-&& cp lib/commons-math3-3.6.1.jar demo1/lib/ && cp lib/mtas-${currentDevelopmentVersion}.jar demo1/lib/ \
+&& cp lib/commons-math3-3.6.1.jar demo1/lib/ && cp lib/mtas-6.2.0.jar demo1/lib/ \
 && cp data/solrconfig.xml demo1/conf/ && cp data/schemaBasic.xml demo1/conf/schema.xml \
 && cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ \  
 && chmod -R 777 demo1 && cp -rp demo1 demo2 \
