@@ -6,7 +6,7 @@ $h1 Mtas and Solr
 
 Mtas can be used as plugin for Apache Solr
 
-Prerequisites
+$h3 Prerequisites
 
 - Installed [Apache Solr](http://lucene.apache.org/solr/)
 - Currently supported and advised version is ${currentDevelopmentVersion}
@@ -71,10 +71,104 @@ Define or adjust the update requestHandler with this updateRequestProcessorChain
 </requestHandler>
 ```
    
-Finally, in this instruction we will use a classic schema instead of the managed-schema. Therefore define the correct schemaFactory.
+Finally, in this instruction we will use a classic schema instead of the 
+managed-schema. So the configuration must contain:
 
 ```console
 <schemaFactory class="ClassicIndexSchemaFactory"/>
 ```    
   
+$h3 Schema.xml
+
+We extend a (classic) schema with one (or multiple) fields that may contain 
+annotated text, e.g.
+
+```console
+<field name="text" type="mtas" required="false" multiValued="false" indexed="true" stored="true" />
+```   
+
+We define the referred mtas fieldType by
+
+```console
+<fieldType name="mtas" class="solr.TextField" postingsFormat="MtasCodec">
+  <analyzer type="index">
+    <charFilter class="mtas.analysis.util.MtasCharFilterFactory" type="url" prefix="http://localhost/demo/" postfix="" />
+    <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" configFile="folia.xml" />
+  </analyzer>
+  <analyzer type="query">
+    <tokenizer class="solr.WhitespaceTokenizerFactory" />
+    <filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory" prefix="t" />
+  </analyzer>
+</fieldType>
+```
+
+The charFilter with class *mtas.analysis.util.MtasCharFilterFactory* in the 
+index analyzer contains an obligatory attribute `type` and two optional attributes 
+`prefix` and `postfix`. The *type* can be *url* or *file*, referring to either an external
+url or a file on the filesystem. On indexing, the optional *prefix* and *postfix* attributes 
+will be added to the provided value, resulting in a full url or location of a file. 
+
+The tokenizer with class *mtas.analysis.util.MtasTokenizerFactory* in the index analyzer
+has an attribute `configFile` containing the name of the required tokenizer configuration.
+
+The filter in the query analyzer contains an obligatory attribute `prefix` defining the 
+assumed prefix when this field will be queried directly within Solr.
+
+See [Indexing configuration](indexing_configuration.html) for morte information about
+the definition of a tokenizer configuration.
+
+**Multiple tokenize configurations**
+
+If multiple tokenizer configurations are required, the mtas fieldType has to be 
+defined slightly different: 
+
+```console
+<fieldType name="mtas_config" class="solr.TextField" postingsFormat="MtasCodec">
+  <analyzer type="index">
+    <charFilter class="mtas.analysis.util.MtasCharFilterFactory" config="mtas.xml" />
+    <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml" />
+  </analyzer>
+</fieldType>
+<fieldType name="mtas" class="mtas.solr.schema.MtasPreAnalyzedField"
+  followIndexAnalyzer="mtas_config" defaultConfiguration="default"
+  configurationFromField="type" setNumberOfTokens="numberOfTokens"
+  setNumberOfPositions="numberOfPositions" setSize="size"
+  setError="error" postingsFormat="MtasCodec">
+  <analyzer type="query">
+    <tokenizer class="solr.WhitespaceTokenizerFactory" />
+    <filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory" prefix="t" />
+  </analyzer>
+</fieldType>
+```
+
+An additional fieldType (here named mtas_config) is defined, containing 
+only an index analyzer. Both the charFilter and tokenizer within this analyzer have
+an attribute `config` referring to a mtas configuration file. Depending on the required 
+tokenizer configuration, for the charFilter this file will define *type*, *prefix* and *postfix* and for the tokenizer this file 
+will define the *configFile*. An example of a mtas configuration file is added below.
+
+The mtas fieldType is defined with class *mtas.solr.schema.MtasPreAnalyzedField*, 
+an obligatory attribute `followIndexAnalyzer` referring to the additional fieldType
+we defined before. The optional attribute `defaultConfiguration` contains the name 
+of the default configuration to be used, and the obligatory attribute 
+`configurationFromField` contains the name of the field defining the required 
+configuration. The optional attributes `setNumberOfTokens`, 
+`setNumberOfPositions`, `setSize` and `setError` define fields that may be filled
+with respectively number of tokens, number of positions, filesize and possible errors.
+
+**Example of a mtas configuration file**
+
+```console
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+  <configurations type="mtas.analysis.util.MtasTokenizerFactory">
+    <configuration name="folia" file="folia.xml" />
+    <configuration name="tei" file="tei.xml" />
+  </configurations>
+  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
+    <configuration name="folia" type="url" prefix="http://www.mycompany.com/archive/" postfix=".xml" />
+    <configuration name="tei" type="file" prefix="/storage/tei/" postfix="" />
+  </configurations>
+</mtas>
+``` 
 

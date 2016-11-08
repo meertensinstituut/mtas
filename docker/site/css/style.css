@@ -1,30 +1,44 @@
 
 
 div.post {
+	padding: 10px;
+}
+
+div.post textarea {
+	width: 100%;
+	height: auto;
 	color: #000000;
   background-color: #EEEEEE;
+	border-color: #000000;
+  border-width: 1px;
+  border-style: solid;   
+  padding: 0 5px 0 5px;
+} 
+
+div.error, div.output {
   border-color: #000000;
   border-width: 1px;
   border-style: solid;
-  margin: 10px;
-}  
+  margin: 10px; 
+  padding: 0 5px 0 5px;
+}
 
-div.error {
+div.error pre, div.output pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+div.error  {
 	color: #FFFFFF;
 	background-color: #FF0000;
-	border-color: #000000;
-	border-width: 1px;
-	border-style: solid;
-	margin: 10px;
 }
 
 div.output {
   color: #000000;
   background-color: #FFFFFF;
-  border-color: #000000;
-  border-width: 1px;
-  border-style: solid;
-  margin: 10px;
 }
 
 input.button {

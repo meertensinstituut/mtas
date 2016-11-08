@@ -14,12 +14,12 @@ LABEL mtas.lucene="${currentDevelopmentVersion}"
 LABEL mtas.release="${currentDevelopmentRelease}"
 
 EXPOSE 8983 80
-
+  
 USER root 
 
 WORKDIR "/root"
 
-RUN mkdir lib && mkdir data && mkdir data/mtas && mkdir folia-samples && mkdir site && mkdir site/js
+RUN mkdir lib && mkdir data && mkdir data/mtas && mkdir folia-samples && mkdir site && mkdir site/js && mkdir site/css
 
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/solrconfig.xml /root/data/ 
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/mtas.xml /root/data/
@@ -32,7 +32,9 @@ ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/folia
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/folia-samples/beets3.xml.gz /root/folia-samples/
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/index.html /root/site/ 
 ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/example_demo1.html /root/site/ 
-ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/js/solr.js /root/site/ 
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/example_demo2.html /root/site/ 
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/css/style.css /root/site/css/
+ADD https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/site/js/solr.js /root/site/js/
 
 ADD http://archive.apache.org/dist/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz /root/
 ADD http://apache.cs.uu.nl/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz /root/lib/
@@ -74,7 +76,7 @@ RUN rm /var/www/html/index.html \
 && cp -rp folia-samples /var/www/html/demo/ \
 && gunzip -r /var/www/html/demo \
 && cp -rp site/* /var/www/html/ \
-&& chmod -R 755 /var/www/html \
+&& chmod -R 755 /var/www/html 
 
 RUN printf "service solr start\nservice apache2 start\n" > /start.sh && chmod 755 /start.sh
 
