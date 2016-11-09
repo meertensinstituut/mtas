@@ -2195,8 +2195,9 @@ public class CodecCollector {
                       long[] tmpArgs;
                       for (int docId : subDocSet) {
                         tmpArgs = args.get(docId);
-                        valuePositions += (positionsData == null) ? 0
-                            : positionsData.get(docId);
+                        if(positionsData!=null && positionsData.containsKey(docId) && positionsData.get(docId)!=null) {
+                          valuePositions += positionsData.get(docId).longValue();
+                        }  
                         if (tmpArgs != null) {
                           for (int i = 0; i < length; i++) {
                             valueSum[i] += tmpArgs[i];
@@ -2254,7 +2255,6 @@ public class CodecCollector {
                 for (String key : list.keySet()) {
                   if (docLists.get(key).length > 0) {
                     // initialise
-                    String[] keys = new String[] { key };
                     Integer[] subDocSet = docLists.get(key);
                     // collect
                     if (subDocSet.length > 0) {
