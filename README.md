@@ -9,4 +9,5 @@ docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/ma
 docker run -t -i -p 8080:80 --name mtas mtas
 ```
 
-This will provide a website on port 8080 on the ip of your docker host.
+This will provide a website on port 8080 on the ip of your docker host with 
+more information.
