@@ -5,7 +5,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>6.2.0</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20161027</currentDevelopmentRelease>
+		<currentDevelopmentRelease>20161109</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>

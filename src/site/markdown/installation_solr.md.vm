@@ -114,7 +114,7 @@ has an attribute `configFile` containing the name of the required tokenizer conf
 The filter in the query analyzer contains an obligatory attribute `prefix` defining the 
 assumed prefix when this field will be queried directly within Solr.
 
-See [Indexing configuration](indexing_configuration.html) for morte information about
+See [configuration](indexing_configuration.html) for more information about
 the definition of a tokenizer configuration.
 
 **Multiple tokenize configurations**

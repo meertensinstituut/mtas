@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
-&& printf "echo \"  Version ${timestamp}\"\n" >> /start.sh \
+&& printf "echo \"  Timestamp ${timestamp}\"\n" >> /start.sh \
 && printf "echo \"  Lucene/Solr version ${currentDevelopmentVersion}\"\n" >> /start.sh \
 && printf "echo \"  Mtas release ${currentDevelopmentRelease}\"\n" >> /start.sh \
 && printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh \
