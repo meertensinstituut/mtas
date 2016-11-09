@@ -2,7 +2,7 @@
 
 See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/)
 
-Or try the docker image providing a demonstration 
+Or build and run a Docker image providing a demonstration 
 scenario with indexing and querying of some sample documents.
 
 ```console
