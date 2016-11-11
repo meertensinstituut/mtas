@@ -32,9 +32,9 @@ public class MtasCQLParserTestWord {
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));
     try {
       assertEquals(p.parse(field, defaultPrefix, null) ,q);
-      System.out.println("Tested CQL parsing:\t"+cql);
+      //System.out.println("Tested CQL parsing:\t"+cql);
     } catch (ParseException e) {
-      System.out.println("Error CQL parsing:\t"+cql);
+      //System.out.println("Error CQL parsing:\t"+cql);
       e.printStackTrace();
     }
   }
@@ -44,9 +44,9 @@ public class MtasCQLParserTestWord {
     MtasCQLParser p2 = new MtasCQLParser(new BufferedReader(new StringReader(cql2)));   
     try {
       assertEquals(p1.parse(field, defaultPrefix,null) ,p2.parse(field, defaultPrefix, null));
-      System.out.println("Tested CQL equivalent:\t"+cql1+" and "+cql2);
+      //System.out.println("Tested CQL equivalent:\t"+cql1+" and "+cql2);
     } catch (ParseException e) {
-      System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
+      //System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
       e.printStackTrace();
     }
   }

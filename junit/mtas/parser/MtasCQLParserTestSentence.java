@@ -37,11 +37,11 @@ public class MtasCQLParserTestSentence {
   private void testCQLParse(String field, String defaultPrefix, String cql, SpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));   
     try {
-      System.out.print("CQL parsing:\t"+cql);
+      //System.out.print("CQL parsing:\t"+cql);
       assertEquals(p.parse(field, defaultPrefix, null) ,q);
-      System.out.print("\n");
+      //System.out.print("\n");
     } catch (ParseException e) {
-      System.out.println("Error CQL parsing:\t"+cql);
+      //System.out.println("Error CQL parsing:\t"+cql);
       e.printStackTrace();
     }
   }
@@ -50,11 +50,11 @@ public class MtasCQLParserTestSentence {
     MtasCQLParser p1 = new MtasCQLParser(new BufferedReader(new StringReader(cql1)));   
     MtasCQLParser p2 = new MtasCQLParser(new BufferedReader(new StringReader(cql2)));
     try {
-      System.out.print("CQL equivalent:\t"+cql1+" and "+cql2);
+      //System.out.print("CQL equivalent:\t"+cql1+" and "+cql2);
       assertEquals(p1.parse(field, defaultPrefix, null) ,p2.parse(field, defaultPrefix, null));
-      System.out.print("\n");
+      //System.out.print("\n");
     } catch (ParseException e) {
-      System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
+      //System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
       e.printStackTrace();
     }
   }
