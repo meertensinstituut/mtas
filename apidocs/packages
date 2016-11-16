@@ -15,6 +15,7 @@ mtas.queries
 mtas.search
 mtas.search.similarities
 mtas.search.spans
+mtas.search.spans.util
 mtas.solr.handler.component
 mtas.solr.handler.component.util
 mtas.solr.handler
