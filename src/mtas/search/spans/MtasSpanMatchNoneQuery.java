@@ -5,27 +5,24 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import mtas.search.similarities.MtasSimScorer;
-import org.apache.lucene.codecs.FieldsProducer;
+import mtas.search.spans.util.MtasSpanQuery;
+
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanMatchNoneQuery.
  */
-public class MtasSpanMatchNoneQuery extends SpanQuery {
+public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
 
   /** The field. */
   private String field;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanMatchNoneQuery";
 
   /**
    * Instantiates a new mtas span match none query.
@@ -118,12 +115,8 @@ public class MtasSpanMatchNoneQuery extends SpanQuery {
             }
           }
         }
-        // get fieldsproducer
-        Method fpm = r.getClass().getMethod("getPostingsReader",
-            (Class<?>[]) null);
-        FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);
         // get MtasFieldsProducer using terms
-        return new MtasSpanMatchNone(field);        
+        return new MtasSpanMatchNoneSpans(field);        
       } catch (Exception e) {
         throw new IOException("Can't get reader");
       }
@@ -162,7 +155,7 @@ public class MtasSpanMatchNoneQuery extends SpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([])");
+    buffer.append(this.getClass().getSimpleName() + "([])");
     return buffer.toString();
   }
 
@@ -190,7 +183,7 @@ public class MtasSpanMatchNoneQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ field.hashCode();
     return h;
   }

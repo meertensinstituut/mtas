@@ -1,4 +1,4 @@
-package mtas.search.spans;
+package mtas.search.spans.util;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -12,9 +12,9 @@ import org.apache.lucene.payloads.PayloadSpanCollector;
 import org.apache.lucene.search.spans.TermSpans;
 
 /**
- * The Class MtasTermSpans.
+ * The Class MtasExtendedTermSpans.
  */
-public class MtasTermSpans extends TermSpans {
+public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
 
   /** The mtas position. */
   protected MtasPosition mtasPosition = null;
@@ -26,28 +26,23 @@ public class MtasTermSpans extends TermSpans {
   private PayloadSpanCollector payloadSpanCollector;
 
   /**
-   * Instantiates a new mtas term spans.
+   * Instantiates a new mtas extended term spans.
    *
-   * @param postings
-   *          the postings
-   * @param term
-   *          the term
+   * @param postings the postings
+   * @param term the term
    */
-  public MtasTermSpans(PostingsEnum postings, Term term) {
+  public MtasExtendedTermSpans(PostingsEnum postings, Term term) {
     this(postings, term, false);
   }
 
   /**
-   * Instantiates a new mtas term spans.
+   * Instantiates a new mtas extended term spans.
    *
-   * @param postings
-   *          the postings
-   * @param term
-   *          the term
-   * @param assumeSinglePosition
-   *          the assume single position
+   * @param postings the postings
+   * @param term the term
+   * @param assumeSinglePosition the assume single position
    */
-  public MtasTermSpans(PostingsEnum postings, Term term,
+  public MtasExtendedTermSpans(PostingsEnum postings, Term term,
       boolean assumeSinglePosition) {
     super(null, postings, term, 1);
     payloadSpanCollector = new PayloadSpanCollector();
@@ -108,8 +103,7 @@ public class MtasTermSpans extends TermSpans {
   /**
    * Process encoded payload.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void processEncodedPayload() throws IOException {
     if (!readPayload) {

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
+import mtas.search.spans.util.MtasSpans;
 
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
@@ -11,7 +12,7 @@ import org.apache.lucene.search.spans.Spans;
 /**
  * The Class MtasSpanMatchAll.
  */
-public class MtasSpanMatchAll extends Spans {
+public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
 
   /** The field. */
   private String field;
@@ -31,7 +32,7 @@ public class MtasSpanMatchAll extends Spans {
    * @param field
    *          the field
    */
-  public MtasSpanMatchAll(CodecInfo mtasCodecInfo, String field) {
+  public MtasSpanMatchAllSpans(CodecInfo mtasCodecInfo, String field) {
     super();
     this.mtasCodecInfo = mtasCodecInfo;
     this.field = field;

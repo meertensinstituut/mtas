@@ -150,7 +150,7 @@ public class MtasSpanPositionQuery extends SpanQuery {
         // get MtasFieldsProducer using terms
         Terms t = fp.terms(field);
         if (t == null) {
-          return new MtasSpanMatchNone(field);
+          return new MtasSpanMatchNoneSpans(field);
         } else {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
           return new MtasSpanPosition(mtasCodecInfo, field, start, end);

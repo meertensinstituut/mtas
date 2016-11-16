@@ -25,12 +25,16 @@ import mtas.codec.tree.MtasTreeNodeId;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsConsumer;
+import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexFileNames;
+import org.apache.lucene.index.MappedMultiFields;
 import org.apache.lucene.index.MergeState;
+import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.ReaderSlice;
 import org.apache.lucene.index.SegmentWriteState;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -602,7 +606,25 @@ public class MtasFieldsConsumer extends FieldsConsumer {
    */
   @Override
   public void merge(MergeState mergeState) throws IOException {
-    delegateFieldsConsumer.merge(mergeState);
+    final List<Fields> fields = new ArrayList<>();
+    final List<ReaderSlice> slices = new ArrayList<>();
+
+    int docBase = 0;
+
+    for(int readerIndex=0;readerIndex<mergeState.fieldsProducers.length;readerIndex++) {
+      final FieldsProducer f = mergeState.fieldsProducers[readerIndex];
+
+      final int maxDoc = mergeState.maxDocs[readerIndex];
+      f.checkIntegrity();
+      slices.add(new ReaderSlice(docBase, maxDoc, readerIndex));
+      fields.add(f);
+      docBase += maxDoc;
+    }
+
+    Fields mergedFields = new MappedMultiFields(mergeState, 
+                                                new MultiFields(fields.toArray(Fields.EMPTY_ARRAY),
+                                                                slices.toArray(ReaderSlice.EMPTY_ARRAY)));
+    write(mergedFields);
   }
 
   /*

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
+import mtas.search.spans.util.MtasSpanQuery;
+
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -14,20 +16,16 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanMatchAllQuery.
  */
-public class MtasSpanMatchAllQuery extends SpanQuery {
+public class MtasSpanMatchAllQuery extends MtasSpanQuery {
 
   /** The field. */
   private String field;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanMatchAllQuery";
 
   /**
    * Instantiates a new mtas span match all query.
@@ -127,10 +125,10 @@ public class MtasSpanMatchAllQuery extends SpanQuery {
         // get MtasFieldsProducer using terms
         Terms t = fp.terms(field);
         if (t == null) {
-          return new MtasSpanMatchNone(field);
+          return new MtasSpanMatchNoneSpans(field);
         } else {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
-          return new MtasSpanMatchAll(mtasCodecInfo, field);
+          return new MtasSpanMatchAllSpans(mtasCodecInfo, field);
         }
       } catch (Exception e) {
         throw new IOException("Can't get reader");
@@ -170,7 +168,7 @@ public class MtasSpanMatchAllQuery extends SpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([])");
+    buffer.append(this.getClass().getSimpleName() + "([])");
     return buffer.toString();
   }
 
@@ -198,7 +196,7 @@ public class MtasSpanMatchAllQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ field.hashCode();
     return h;
   }

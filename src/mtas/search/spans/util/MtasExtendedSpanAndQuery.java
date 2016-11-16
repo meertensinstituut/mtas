@@ -1,33 +1,27 @@
-package mtas.search.spans;
+package mtas.search.spans.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.lucene.search.spans.SpanOrQuery;
+import org.apache.lucene.search.spans.SpanNearQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 
-import mtas.search.spans.util.MtasSpanUniquePositionQuery;
-
 /**
- * The Class MtasSpanOrQuery.
+ * The Class MtasExtendedSpanAndQuery.
  */
-public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
+public class MtasExtendedSpanAndQuery extends SpanNearQuery {
 
   /** The clauses. */
   private List<SpanQuery> clauses;
 
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanOrQuery";
-
   /**
-   * Instantiates a new mtas span or query.
+   * Instantiates a new mtas extended span and query.
    *
-   * @param clauses
-   *          the clauses
+   * @param clauses the clauses
    */
-  public MtasSpanOrQuery(SpanQuery... clauses) {
-    super(new SpanOrQuery(clauses));
+  public MtasExtendedSpanAndQuery(SpanQuery... clauses) {
+    super(clauses, -1 * (clauses.length - 1), false);
     this.clauses = new ArrayList<>(clauses.length);
     for (SpanQuery clause : clauses) {
       this.clauses.add(clause);
@@ -38,12 +32,12 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
    * (non-Javadoc)
    * 
    * @see
-   * mtas.search.spans.MtasSpanUniquePositionQuery#toString(java.lang.String)
+   * org.apache.lucene.search.spans.SpanNearQuery#toString(java.lang.String)
    */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     Iterator<SpanQuery> i = clauses.iterator();
     while (i.hasNext()) {
       SpanQuery clause = i.next();
@@ -59,7 +53,7 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
   /*
    * (non-Javadoc)
    * 
-   * @see mtas.search.spans.MtasSpanUniquePositionQuery#equals(java.lang.Object)
+   * @see org.apache.lucene.search.spans.SpanNearQuery#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
@@ -69,18 +63,18 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final MtasSpanOrQuery that = (MtasSpanOrQuery) obj;
+    final MtasExtendedSpanAndQuery that = (MtasExtendedSpanAndQuery) obj;
     return clauses.equals(that.clauses);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see mtas.search.spans.MtasSpanUniquePositionQuery#hashCode()
+   * @see org.apache.lucene.search.spans.SpanNearQuery#hashCode()
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ super.hashCode();
     return h;
   }

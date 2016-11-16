@@ -4,10 +4,12 @@ import java.io.IOException;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasSpans;
+
 /**
  * The Class MtasEndSpans.
  */
-public class MtasEndSpans extends Spans {
+public class MtasSpanEndSpans extends Spans implements MtasSpans {
 
   /** The spans. */
   Spans spans;
@@ -18,7 +20,7 @@ public class MtasEndSpans extends Spans {
    * @param spans
    *          the spans
    */
-  public MtasEndSpans(Spans spans) {
+  public MtasSpanEndSpans(Spans spans) {
     super();
     this.spans = spans;
   }

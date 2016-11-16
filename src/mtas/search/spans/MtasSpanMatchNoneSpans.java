@@ -5,10 +5,12 @@ import java.io.IOException;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasSpans;
+
 /**
  * The Class MtasSpanMatchNone.
  */
-public class MtasSpanMatchNone extends Spans {
+public class MtasSpanMatchNoneSpans extends Spans implements MtasSpans {
 
   /** The doc id. */
   private int currentStartPosition, currentEndPosition, docId;
@@ -19,7 +21,7 @@ public class MtasSpanMatchNone extends Spans {
    * @param field
    *          the field
    */
-  public MtasSpanMatchNone(String field) {
+  public MtasSpanMatchNoneSpans(String field) {
     currentStartPosition = NO_MORE_POSITIONS;
     currentEndPosition = NO_MORE_POSITIONS;
     docId = -1;

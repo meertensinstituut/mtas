@@ -1,4 +1,4 @@
-package mtas.search.spans;
+package mtas.search.spans.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import org.apache.lucene.search.spans.Spans;
 /**
  * The Class MtasSpanUniquePosition.
  */
-public class MtasSpanUniquePosition extends Spans {
+public class MtasSpanUniquePosition extends Spans implements MtasSpans {
 
   /** The spans. */
   Spans spans;

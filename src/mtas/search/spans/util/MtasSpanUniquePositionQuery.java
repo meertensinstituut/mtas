@@ -1,4 +1,4 @@
-package mtas.search.spans;
+package mtas.search.spans.util;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,7 +19,7 @@ import org.apache.lucene.search.spans.Spans;
 /**
  * The Class MtasSpanUniquePositionQuery.
  */
-abstract public class MtasSpanUniquePositionQuery extends SpanQuery {
+abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
 
   /** The clause. */
   private SpanQuery clause;

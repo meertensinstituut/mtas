@@ -14,16 +14,15 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasSpanQuery;
+
 /**
  * The Class MtasSpanEndQuery.
  */
-public class MtasSpanEndQuery extends SpanQuery {
+public class MtasSpanEndQuery extends MtasSpanQuery {
 
   /** The query. */
   private SpanQuery query;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanEndQuery";
 
   /**
    * Instantiates a new mtas span end query.
@@ -57,7 +56,7 @@ public class MtasSpanEndQuery extends SpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     buffer.append(this.query.toString(field));
     buffer.append("])");
     return buffer.toString();
@@ -135,7 +134,7 @@ public class MtasSpanEndQuery extends SpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
-      return new MtasEndSpans(spanWeight.getSpans(context, requiredPostings));
+      return new MtasSpanEndSpans(spanWeight.getSpans(context, requiredPostings));
     }
 
     /*
@@ -174,7 +173,7 @@ public class MtasSpanEndQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
   }
