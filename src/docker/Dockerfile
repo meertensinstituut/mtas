@@ -42,6 +42,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && a2enmod proxy_balancer \
 && a2enmod proxy_connect \
 && a2enmod proxy_html \
+&& a2enmod xml2enc \
 && sed -i '/<\/VirtualHost>/ i ProxyPass /solr http://localhost:8983/solr\nProxyPassReverse /solr http://localhost:8983/solr' /etc/apache2/sites-enabled/000-default.conf \
 && rm -rf /var/www/html/* \
 && mkdir /var/www/html/demo \ 

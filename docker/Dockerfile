@@ -1,7 +1,7 @@
 # Automatically generated Dockerfile 
-# - Build 2016-12-15 07:09
+# - Build 2016-12-15 07:39
 # - Lucene/Solr version 6.3.0
-# - Mtas release 20161116 
+# - Mtas release 20161215 
 #
 
 FROM ubuntu:16.04
@@ -15,7 +15,7 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/20161116/mtas-6.3.0.jar /root/lib/
+ADD https://github.com/meertensinstituut/mtas/releases/download/20161215/mtas-6.3.0.jar /root/lib/
 
 RUN apt-get update && apt-get install -y lsof software-properties-common python-software-properties apache2 curl subversion \
 && solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.3.0/solr-6.3.0.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
@@ -42,6 +42,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && a2enmod proxy_balancer \
 && a2enmod proxy_connect \
 && a2enmod proxy_html \
+&& a2enmod xml2enc \
 && sed -i '/<\/VirtualHost>/ i ProxyPass /solr http://localhost:8983/solr\nProxyPassReverse /solr http://localhost:8983/solr' /etc/apache2/sites-enabled/000-default.conf \
 && rm -rf /var/www/html/* \
 && mkdir /var/www/html/demo \ 
@@ -51,9 +52,9 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
-&& printf "echo \"  Timestamp 2016-12-15 07:09\"\n" >> /start.sh \
+&& printf "echo \"  Timestamp 2016-12-15 07:39\"\n" >> /start.sh \
 && printf "echo \"  Lucene/Solr version 6.3.0\"\n" >> /start.sh \
-&& printf "echo \"  Mtas release 20161116\"\n" >> /start.sh \
+&& printf "echo \"  Mtas release 20161215\"\n" >> /start.sh \
 && printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh \
 && printf "echo \"=======================================================================\"\n" >> /start.sh \
 && printf "echo\n" >> /start.sh \
