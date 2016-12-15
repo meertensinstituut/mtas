@@ -18,7 +18,7 @@ import org.apache.lucene.search.spans.Spans;
 /**
  * The Class MtasSpanUniquePositionQuery.
  */
-abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
+public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
 
   /** The clause. */
   private MtasSpanQuery clause;

@@ -31,7 +31,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
    */
   public MtasSpanOrQuery(MtasSpanQuery... clauses) {
     super();
-    baseQuery = new MtasSpanUniquePositionQuery(new SpanOrQuery(clauses));
+    baseQuery = new SpanOrQuery(clauses);
     this.clauses = new ArrayList<>(clauses.length);
     for (MtasSpanQuery clause : clauses) {
       this.clauses.add(clause);
