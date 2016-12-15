@@ -1,6 +1,6 @@
 package mtas.search.spans;
 
-import org.apache.lucene.search.spans.SpanQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasSpanSequenceItem.
@@ -8,7 +8,7 @@ import org.apache.lucene.search.spans.SpanQuery;
 public class MtasSpanSequenceItem {
 
   /** The span query. */
-  private SpanQuery spanQuery;
+  private MtasSpanQuery spanQuery;
 
   /** The optional. */
   private boolean optional;
@@ -21,7 +21,7 @@ public class MtasSpanSequenceItem {
    * @param optional
    *          the optional
    */
-  public MtasSpanSequenceItem(SpanQuery spanQuery, boolean optional) {
+  public MtasSpanSequenceItem(MtasSpanQuery spanQuery, boolean optional) {
     this.spanQuery = spanQuery;
     this.optional = optional;
   }
@@ -31,7 +31,7 @@ public class MtasSpanSequenceItem {
    *
    * @return the query
    */
-  public SpanQuery getQuery() {
+  public MtasSpanQuery getQuery() {
     return spanQuery;
   }
 
@@ -41,7 +41,7 @@ public class MtasSpanSequenceItem {
    * @param spanQuery
    *          the new query
    */
-  public void setQuery(SpanQuery spanQuery) {
+  public void setQuery(MtasSpanQuery spanQuery) {
     this.spanQuery = spanQuery;
   }
 

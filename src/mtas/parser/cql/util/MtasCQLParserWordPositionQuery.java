@@ -3,34 +3,30 @@ package mtas.parser.cql.util;
 import java.io.IOException;
 
 import mtas.search.spans.MtasSpanPositionQuery;
+import mtas.search.spans.util.MtasSpanQuery;
+
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 /**
  * The Class MtasCQLParserWordPositionQuery.
  */
-public class MtasCQLParserWordPositionQuery extends SpanQuery {
+public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
 
   /** The query. */
-  SpanQuery query;
+  MtasSpanQuery query;
 
   /** The term. */
   Term term;
 
-  /** The query name. */
-  private static String QUERY_NAME = "mtasCQLParserWordPositionQuery";
-
   /**
    * Instantiates a new mtas cql parser word position query.
    *
-   * @param field
-   *          the field
-   * @param position
-   *          the position
+   * @param field the field
+   * @param position the position
    */
   public MtasCQLParserWordPositionQuery(String field, int position) {
     term = new Term(field);
@@ -40,12 +36,9 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
   /**
    * Instantiates a new mtas cql parser word position query.
    *
-   * @param field
-   *          the field
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param field the field
+   * @param start the start
+   * @param end the end
    */
   public MtasCQLParserWordPositionQuery(String field, int start, int end) {
     term = new Term(field);
@@ -69,7 +62,7 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public Query rewrite(IndexReader reader) throws IOException {
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return query.rewrite(reader);
   }
 
@@ -120,7 +113,7 @@ public class MtasCQLParserWordPositionQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
   }

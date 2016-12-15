@@ -31,7 +31,8 @@ abstract public class MtasParser {
   /**
    * Inits the parser.
    *
-   * @throws MtasConfigException the mtas config exception
+   * @throws MtasConfigException
+   *           the mtas config exception
    */
   protected void initParser() throws MtasConfigException {
     if (config != null) {
@@ -51,10 +52,13 @@ abstract public class MtasParser {
   /**
    * Creates the token collection.
    *
-   * @param reader the reader
+   * @param reader
+   *          the reader
    * @return the mtas token collection
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
+   * @throws MtasParserException
+   *           the mtas parser exception
+   * @throws MtasConfigException
+   *           the mtas config exception
    */
   public abstract MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException;
@@ -119,10 +123,16 @@ abstract public class MtasParser {
     /** The updateable mappings with offset. */
     HashSet<Integer> updateableMappingsWithOffset = new HashSet<Integer>();
 
+    HashMap<String, Integer> referredStartPosition = new HashMap<String, Integer>();
+    HashMap<String, Integer> referredEndPosition = new HashMap<String, Integer>();
+    HashMap<String, Integer> referredStartOffset = new HashMap<String, Integer>();
+    HashMap<String, Integer> referredEndOffset = new HashMap<String, Integer>();
+
     /**
      * Instantiates a new mtas parser object.
      *
-     * @param type the type
+     * @param type
+     *          the type
      */
     MtasParserObject(MtasParserType type) {
       objectType = type;
@@ -132,7 +142,8 @@ abstract public class MtasParser {
     /**
      * Register updateable mapping at parent.
      *
-     * @param mappingId the mapping id
+     * @param mappingId
+     *          the mapping id
      */
     public void registerUpdateableMappingAtParent(Integer mappingId) {
       updateableMappingsAsParent.add(mappingId);
@@ -141,7 +152,8 @@ abstract public class MtasParser {
     /**
      * Register updateable mappings at parent.
      *
-     * @param mappingIds the mapping ids
+     * @param mappingIds
+     *          the mapping ids
      */
     public void registerUpdateableMappingsAtParent(
         HashSet<Integer> mappingIds) {
@@ -167,7 +179,8 @@ abstract public class MtasParser {
     /**
      * Adds the updateable mapping with position.
      *
-     * @param mappingId the mapping id
+     * @param mappingId
+     *          the mapping id
      */
     public void addUpdateableMappingWithPosition(Integer mappingId) {
       updateableMappingsWithPosition.add(mappingId);
@@ -176,7 +189,8 @@ abstract public class MtasParser {
     /**
      * Adds the updateable id with offset.
      *
-     * @param id the id
+     * @param id
+     *          the id
      */
     public void addUpdateableIdWithOffset(String id) {
       updateableIdsWithOffset.add(id);
@@ -185,7 +199,8 @@ abstract public class MtasParser {
     /**
      * Adds the updateable mapping with offset.
      *
-     * @param mappingId the mapping id
+     * @param mappingId
+     *          the mapping id
      */
     public void addUpdateableMappingWithOffset(Integer mappingId) {
       updateableMappingsWithOffset.add(mappingId);
@@ -194,8 +209,10 @@ abstract public class MtasParser {
     /**
      * Update mappings.
      *
-     * @param idPositions the id positions
-     * @param idOffsets the id offsets
+     * @param idPositions
+     *          the id positions
+     * @param idOffsets
+     *          the id offsets
      */
     public void updateMappings(HashMap<String, TreeSet<Integer>> idPositions,
         HashMap<String, Integer[]> idOffsets) {
@@ -228,7 +245,8 @@ abstract public class MtasParser {
     /**
      * Gets the attribute.
      *
-     * @param name the name
+     * @param name
+     *          the name
      * @return the attribute
      */
     public String getAttribute(String name) {
@@ -260,7 +278,8 @@ abstract public class MtasParser {
     /**
      * Sets the text.
      *
-     * @param text the new text
+     * @param text
+     *          the new text
      */
     public void setText(String text) {
       objectText = text;
@@ -269,7 +288,8 @@ abstract public class MtasParser {
     /**
      * Adds the text.
      *
-     * @param text the text
+     * @param text
+     *          the text
      */
     public void addText(String text) {
       if (objectText == null) {
@@ -291,7 +311,8 @@ abstract public class MtasParser {
     /**
      * Sets the unknown ancestor number.
      *
-     * @param i the new unknown ancestor number
+     * @param i
+     *          the new unknown ancestor number
      */
     public void setUnknownAncestorNumber(Integer i) {
       objectUnknownAncestorNumber = i;
@@ -309,7 +330,8 @@ abstract public class MtasParser {
     /**
      * Sets the real offset start.
      *
-     * @param start the new real offset start
+     * @param start
+     *          the new real offset start
      */
     public void setRealOffsetStart(Integer start) {
       objectRealOffsetStart = start;
@@ -327,7 +349,8 @@ abstract public class MtasParser {
     /**
      * Sets the real offset end.
      *
-     * @param end the new real offset end
+     * @param end
+     *          the new real offset end
      */
     public void setRealOffsetEnd(Integer end) {
       objectRealOffsetEnd = end;
@@ -345,7 +368,8 @@ abstract public class MtasParser {
     /**
      * Sets the offset start.
      *
-     * @param start the new offset start
+     * @param start
+     *          the new offset start
      */
     public void setOffsetStart(Integer start) {
       objectOffsetStart = start;
@@ -354,7 +378,8 @@ abstract public class MtasParser {
     /**
      * Adds the offset start.
      *
-     * @param start the start
+     * @param start
+     *          the start
      */
     public void addOffsetStart(Integer start) {
       if ((start != null)
@@ -366,7 +391,8 @@ abstract public class MtasParser {
     /**
      * Adds the offset end.
      *
-     * @param end the end
+     * @param end
+     *          the end
      */
     public void addOffsetEnd(Integer end) {
       if ((end != null)
@@ -387,7 +413,8 @@ abstract public class MtasParser {
     /**
      * Sets the offset end.
      *
-     * @param end the new offset end
+     * @param end
+     *          the new offset end
      */
     public void setOffsetEnd(Integer end) {
       objectOffsetEnd = end;
@@ -419,7 +446,8 @@ abstract public class MtasParser {
     /**
      * Adds the position.
      *
-     * @param position the position
+     * @param position
+     *          the position
      */
     public void addPosition(Integer position) {
       objectPositions.add(position);
@@ -428,7 +456,8 @@ abstract public class MtasParser {
     /**
      * Adds the positions.
      *
-     * @param positions the positions
+     * @param positions
+     *          the positions
      */
     public void addPositions(TreeSet<Integer> positions) {
       objectPositions.addAll(positions);
@@ -446,7 +475,8 @@ abstract public class MtasParser {
     /**
      * Adds the ref id.
      *
-     * @param id the id
+     * @param id
+     *          the id
      */
     public void addRefId(String id) {
       if (id != null) {
@@ -461,6 +491,29 @@ abstract public class MtasParser {
      */
     public HashSet<String> getRefIds() {
       return refIds;
+    }
+
+    public void setReferredStartPosition(String id, Integer position) {
+      referredStartPosition.put(id, position);
+    }
+
+    public void setReferredEndPosition(String id, Integer position) {
+      referredEndPosition.put(id, position);
+    }
+
+    public void setReferredStartOffset(String id, Integer offset) {
+      referredStartOffset.put(id, offset);
+    }
+
+    public void setReferredEndOffset(String id, Integer offset) {
+      referredEndOffset.put(id, offset);
+    }
+
+    public void clearReferred() {
+      referredStartPosition.clear();
+      referredEndPosition.clear();
+      referredStartOffset.clear();
+      referredEndOffset.clear();
     }
 
   }

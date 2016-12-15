@@ -12,7 +12,6 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
@@ -22,13 +21,10 @@ import org.apache.lucene.search.spans.Spans;
 abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
 
   /** The clause. */
-  private SpanQuery clause;
+  private MtasSpanQuery clause;
 
   /** The field. */
   private String field;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanUniquePositionQuery";
 
   /**
    * Instantiates a new mtas span unique position query.
@@ -36,7 +32,7 @@ abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    * @param clause
    *          the clause
    */
-  public MtasSpanUniquePositionQuery(SpanQuery clause) {
+  public MtasSpanUniquePositionQuery(MtasSpanQuery clause) {
     field = clause.getField();
     this.clause = clause;
   }
@@ -46,7 +42,7 @@ abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    *
    * @return the clause
    */
-  public SpanQuery getClause() {
+  public MtasSpanQuery getClause() {
     return clause;
   }
 
@@ -84,7 +80,7 @@ abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ clause.hashCode();
     return h;
   }
@@ -97,7 +93,7 @@ abstract public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     buffer.append(clause.toString(field));
     buffer.append("])");
     return buffer.toString();

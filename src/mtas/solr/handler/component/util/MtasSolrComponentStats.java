@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -25,6 +24,7 @@ import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecComponent.SubComponentFunction;
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.parser.function.ParseException;
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
@@ -87,7 +87,7 @@ public class MtasSolrComponentStats {
   /** The Constant NAME_MTAS_STATS_SPANS_QUERY. */
   public static final String NAME_MTAS_STATS_SPANS_QUERY = "query";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_QUERY. */
+  /** The Constant NAME_MTAS_STATS_SPANS_EXPAND. */
   public static final String NAME_MTAS_STATS_SPANS_EXPAND = "expand";
 
   /** The Constant NAME_MTAS_STATS_SPANS_KEY. */
@@ -105,13 +105,13 @@ public class MtasSolrComponentStats {
   /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION. */
   public static final String NAME_MTAS_STATS_SPANS_FUNCTION = "function";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION. */
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION. */
   public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION = "expression";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION_KEY. */
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY. */
   public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY = "key";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION_TYPE. */
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE = "type";
 
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE. */
@@ -119,6 +119,12 @@ public class MtasSolrComponentStats {
 
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE = "value";
+
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE. */
+  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE = "ignore";
+
+  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH. */
+  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
 
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX = "prefix";
@@ -135,8 +141,7 @@ public class MtasSolrComponentStats {
   /**
    * Instantiates a new mtas solr component stats.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentStats(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -145,12 +150,9 @@ public class MtasSolrComponentStats {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -168,12 +170,9 @@ public class MtasSolrComponentStats {
   /**
    * Prepare positions.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void preparePositions(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -245,12 +244,9 @@ public class MtasSolrComponentStats {
   /**
    * Prepare tokens.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareTokens(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -319,12 +315,9 @@ public class MtasSolrComponentStats {
   /**
    * Prepare spans.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepareSpans(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -342,6 +335,8 @@ public class MtasSolrComponentStats {
       String[][] functionTypes = new String[ids.size()][];
       String[][] queryTypes = new String[ids.size()][];
       String[][] queryValues = new String[ids.size()][];
+      String[][] queryIgnores = new String[ids.size()][];
+      String[][] queryMaximumIgnoreLengths = new String[ids.size()][];
       String[][] queryPrefixes = new String[ids.size()][];
       HashMap<String, String[]>[][] queryVariables = new HashMap[ids.size()][];
       Boolean[] expand = new Boolean[ids.size()];
@@ -390,6 +385,8 @@ public class MtasSolrComponentStats {
           int tmpQCounter = 0;
           queryTypes[tmpCounter] = new String[qIds.size()];
           queryValues[tmpCounter] = new String[qIds.size()];
+          queryIgnores[tmpCounter] = new String[qIds.size()];
+          queryMaximumIgnoreLengths[tmpCounter] = new String[qIds.size()];
           queryPrefixes[tmpCounter] = new String[qIds.size()];
           queryVariables[tmpCounter] = new HashMap[qIds.size()];
           for (String qId : qIds) {
@@ -401,6 +398,16 @@ public class MtasSolrComponentStats {
                 .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
                     + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE, null);
+            queryIgnores[tmpCounter][tmpQCounter] = rb.req.getParams()
+                .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
+                    + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
+                    + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE, null);
+            queryMaximumIgnoreLengths[tmpCounter][tmpQCounter] = rb.req
+                .getParams().get(
+                    PARAM_MTAS_STATS_SPANS + "." + id + "."
+                        + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
+                        + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH,
+                    null);
             queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()
                 .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
                     + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
@@ -433,10 +440,11 @@ public class MtasSolrComponentStats {
                   if (value != null) {
                     ArrayList<String> list = new ArrayList<String>();
                     String[] subList = value.split("(?<!\\\\),");
-                    for(int i=0; i<subList.length; i++) {
-                      list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
-                    }                    
-                    tmpVariables.get(name).addAll(list);                    
+                    for (int i = 0; i < subList.length; i++) {
+                      list.add(
+                          subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                    }
+                    tmpVariables.get(name).addAll(list);
                   }
                 }
               }
@@ -452,8 +460,8 @@ public class MtasSolrComponentStats {
           throw new IOException("no " + NAME_MTAS_STATS_SPANS_QUERY
               + " for mtas stats span " + id);
         }
-        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS
-            + "." + id + "." + NAME_MTAS_STATS_SPANS_EXPAND, false)) {
+        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + "." + id + "."
+            + NAME_MTAS_STATS_SPANS_EXPAND, false)) {
           expand[tmpCounter] = true;
         } else {
           expand[tmpCounter] = false;
@@ -485,11 +493,13 @@ public class MtasSolrComponentStats {
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
         int queryNumber = queryValues[i].length;
-        SpanQuery[] ql = new SpanQuery[queryNumber];
+        MtasSpanQuery[] ql = new MtasSpanQuery[queryNumber];
         for (int j = 0; j < queryNumber; j++) {
-          SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
+          Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)
+              ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);
+          MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
               queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],
-              fields[i]);
+              fields[i], queryIgnores[i][j], maximumIgnoreLength);
           // minimize number of queries
           if (cf.spanQueryList.contains(q)) {
             q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -517,14 +527,18 @@ public class MtasSolrComponentStats {
         } catch (ParseException e) {
           throw new IOException(e.getMessage());
         }
-        if(expand[i]) {          
-          HashMap<String, String[]>[][] expandedQueryVariables = expandedQueryVariables(queryVariables[i]);
-          for(int e=0; e<expandedQueryVariables.length; e++) {
-            SpanQuery[] eql = new SpanQuery[queryNumber];
+        if (expand[i]) {
+          HashMap<String, String[]>[][] expandedQueryVariables = expandedQueryVariables(
+              queryVariables[i]);
+          for (int e = 0; e < expandedQueryVariables.length; e++) {
+            MtasSpanQuery[] eql = new MtasSpanQuery[queryNumber];
             for (int j = 0; j < queryNumber; j++) {
-              SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
-                  queryTypes[i][j], queryPrefixes[i][j], expandedQueryVariables[e][j],
-                  fields[i]);
+              Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)
+                  ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);
+              MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
+                  queryTypes[i][j], queryPrefixes[i][j],
+                  expandedQueryVariables[e][j], fields[i], queryIgnores[i][j],
+                  maximumIgnoreLength);
               // minimize number of queries
               if (cf.spanQueryList.contains(q)) {
                 q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -532,8 +546,9 @@ public class MtasSolrComponentStats {
                 cf.spanQueryList.add(q);
               }
               eql[j] = q;
-            }                
-            String newKey = generateKey(key+" ("+e+")", expandedQueryVariables[e]);
+            }
+            String newKey = generateKey(key + " (" + e + ")",
+                expandedQueryVariables[e]);
             try {
               mtasFields.list.get(fields[i]).statsSpanList
                   .add(new ComponentSpan(eql, newKey, minimum, maximum, type,
@@ -541,7 +556,7 @@ public class MtasSolrComponentStats {
             } catch (ParseException ee) {
               throw new IOException(ee.getMessage());
             }
-          }  
+          }
         }
       }
     } else {
@@ -549,126 +564,161 @@ public class MtasSolrComponentStats {
     }
   }
 
-  private String generateKey(String key, HashMap<String, String[]>[] queryVariables) {
+  /**
+   * Generate key.
+   *
+   * @param key the key
+   * @param queryVariables the query variables
+   * @return the string
+   */
+  private String generateKey(String key,
+      HashMap<String, String[]>[] queryVariables) {
     String newKey = key;
-    newKey+=" -";
-    for(int q=0; q<queryVariables.length;q++) {
-      if(queryVariables[q]!=null && queryVariables[q].size()>0) {
-        for(String name : queryVariables[q].keySet()) {
-          newKey+= " q"+q+":$"+name+"=";
-          if(queryVariables[q].get(name)!=null && queryVariables[q].get(name).length==1) {
-            newKey+= "'"+queryVariables[q].get(name)[0].replace("\\", "\\\\").replace(",", "\\,")+"'";
+    newKey += " -";
+    for (int q = 0; q < queryVariables.length; q++) {
+      if (queryVariables[q] != null && queryVariables[q].size() > 0) {
+        for (String name : queryVariables[q].keySet()) {
+          newKey += " q" + q + ":$" + name + "=";
+          if (queryVariables[q].get(name) != null
+              && queryVariables[q].get(name).length == 1) {
+            newKey += "'" + queryVariables[q].get(name)[0].replace("\\", "\\\\")
+                .replace(",", "\\,") + "'";
           } else {
-            newKey+= "-";
+            newKey += "-";
           }
         }
-      } 
+      }
     }
     return newKey;
   }
 
+  /**
+   * Expanded query variables.
+   *
+   * @param queryVariables the query variables
+   * @return the hash map[][]
+   */
   private HashMap<String, String[]>[][] expandedQueryVariables(
-      HashMap<String, String[]>[] queryVariables) {    
+      HashMap<String, String[]>[] queryVariables) {
     HashMap<String, String[]>[][] subResult = new HashMap[queryVariables.length][];
     int e = 0;
-    for(int q=0; q<queryVariables.length;q++) {
+    for (int q = 0; q < queryVariables.length; q++) {
       subResult[q] = expandedQueryVariables(queryVariables[q]);
     }
-    ArrayList<HashMap<String, String[]>[]> result = new ArrayList<HashMap<String, String[]>[]>();    
+    ArrayList<HashMap<String, String[]>[]> result = new ArrayList<HashMap<String, String[]>[]>();
     generatePermutations(result, 0, subResult);
     return result.toArray(new HashMap[result.size()][]);
   }
-    
-    private void generatePermutations(
-      ArrayList<HashMap<String, String[]>[]> result,
-      int index, HashMap<String, String[]>[][] subResult) {
+
+  /**
+   * Generate permutations.
+   *
+   * @param result the result
+   * @param index the index
+   * @param subResult the sub result
+   */
+  private void generatePermutations(
+      ArrayList<HashMap<String, String[]>[]> result, int index,
+      HashMap<String, String[]>[][] subResult) {
     HashMap<String, String[]>[] value = subResult[index];
-    if(index==0) {
-      for(int i=0; i<value.length; i++) {
+    if (index == 0) {
+      for (int i = 0; i < value.length; i++) {
         HashMap<String, String[]>[] resultItem = new HashMap[subResult.length];
-        resultItem[index] = value[i]; 
+        resultItem[index] = value[i];
         result.add(resultItem);
       }
     } else {
       ArrayList<HashMap<String, String[]>[]> newResult = new ArrayList<HashMap<String, String[]>[]>();
-      for(int e=0; e<result.size(); e++) {
-        for(int i=0; i<value.length; i++) {
+      for (int e = 0; e < result.size(); e++) {
+        for (int i = 0; i < value.length; i++) {
           HashMap<String, String[]>[] resultItem = result.get(e);
-          resultItem[index] = value[i]; 
+          resultItem[index] = value[i];
           newResult.add(resultItem);
         }
       }
       result.clear();
       result.addAll(newResult);
     }
-    index++;  
-    if(index<subResult.length) {
+    index++;
+    if (index < subResult.length) {
       generatePermutations(result, index, subResult);
-    }    
+    }
   }
 
-    private HashMap<String, String[]>[] expandedQueryVariables(
-        HashMap<String, String[]> queryVariables) {    
-      ArrayList<HashMap<String, String[]>> result = new ArrayList<HashMap<String, String[]>>();
-      Set<String> keys = queryVariables.keySet();
-      generatePermutationsQueryVariables(result, keys, queryVariables);
-      return result.toArray(new HashMap[result.size()]);
-    }   
-    
-    private void generatePermutationsQueryVariables(ArrayList<HashMap<String, String[]>> result, Set<String> keys, HashMap<String, String[]> queryVariables) {
-      if(keys!=null && keys.size()>0) {
-        Set<String> newKeys = new HashSet<String>();
-        Iterator<String> it = keys.iterator();
-        String key = it.next();
-        String[] value = queryVariables.get(key);
-        if(result.size()==0) {
-          HashMap<String, String[]> newItem;
-          if(value==null || value.length==0) {
-            newItem = new HashMap<String, String[]>(); 
-            newItem.put(key, value);
-            result.add(newItem);
-          } else {
-            for(int j=0;j<value.length;j++) {
-              newItem = new HashMap<String, String[]>(); 
-              newItem.put(key, new String[]{value[j]});
-              result.add(newItem);
-            }
-          }          
+  /**
+   * Expanded query variables.
+   *
+   * @param queryVariables the query variables
+   * @return the hash map[]
+   */
+  private HashMap<String, String[]>[] expandedQueryVariables(
+      HashMap<String, String[]> queryVariables) {
+    ArrayList<HashMap<String, String[]>> result = new ArrayList<HashMap<String, String[]>>();
+    Set<String> keys = queryVariables.keySet();
+    generatePermutationsQueryVariables(result, keys, queryVariables);
+    return result.toArray(new HashMap[result.size()]);
+  }
+
+  /**
+   * Generate permutations query variables.
+   *
+   * @param result the result
+   * @param keys the keys
+   * @param queryVariables the query variables
+   */
+  private void generatePermutationsQueryVariables(
+      ArrayList<HashMap<String, String[]>> result, Set<String> keys,
+      HashMap<String, String[]> queryVariables) {
+    if (keys != null && keys.size() > 0) {
+      Set<String> newKeys = new HashSet<String>();
+      Iterator<String> it = keys.iterator();
+      String key = it.next();
+      String[] value = queryVariables.get(key);
+      if (result.size() == 0) {
+        HashMap<String, String[]> newItem;
+        if (value == null || value.length == 0) {
+          newItem = new HashMap<String, String[]>();
+          newItem.put(key, value);
+          result.add(newItem);
         } else {
-          ArrayList<HashMap<String, String[]>> newResult = new ArrayList<HashMap<String, String[]>>();          
-          for(int i=0;i<result.size();i++) {
-            HashMap<String, String[]> newItem;
-            if(value==null || value.length==0) {
-              newItem = (HashMap<String, String[]>) result.get(i).clone();
-              newItem.put(key, value);
-              newResult.add(newItem);
-            } else {
-              for(int j=0;j<value.length;j++) {
-                newItem = (HashMap<String, String[]>) result.get(i).clone();
-                newItem.put(key, new String[]{value[j]});
-                newResult.add(newItem);                
-              }
-            } 
+          for (int j = 0; j < value.length; j++) {
+            newItem = new HashMap<String, String[]>();
+            newItem.put(key, new String[] { value[j] });
+            result.add(newItem);
           }
-          result.clear();
-          result.addAll(newResult);
         }
-        while(it.hasNext()) {
-          newKeys.add(it.next());
+      } else {
+        ArrayList<HashMap<String, String[]>> newResult = new ArrayList<HashMap<String, String[]>>();
+        for (int i = 0; i < result.size(); i++) {
+          HashMap<String, String[]> newItem;
+          if (value == null || value.length == 0) {
+            newItem = (HashMap<String, String[]>) result.get(i).clone();
+            newItem.put(key, value);
+            newResult.add(newItem);
+          } else {
+            for (int j = 0; j < value.length; j++) {
+              newItem = (HashMap<String, String[]>) result.get(i).clone();
+              newItem.put(key, new String[] { value[j] });
+              newResult.add(newItem);
+            }
+          }
         }
-        generatePermutationsQueryVariables(result,newKeys,queryVariables);
+        result.clear();
+        result.addAll(newResult);
       }
+      while (it.hasNext()) {
+        newKeys.add(it.next());
+      }
+      generatePermutationsQueryVariables(result, newKeys, queryVariables);
     }
+  }
 
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -711,42 +761,63 @@ public class MtasSolrComponentStats {
       keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
           PARAM_MTAS_STATS_SPANS);
       for (String key : keys) {
-        sreq.params.remove(
-            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_KEY);
-        sreq.params.remove(
-            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FIELD);
-        sreq.params.remove(
-            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_TYPE);
-        sreq.params.remove(
-            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_MAXIMUM);
-        sreq.params.remove(
-            PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_MINIMUM);
+        sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+            + NAME_MTAS_STATS_SPANS_KEY);
+        sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+            + NAME_MTAS_STATS_SPANS_FIELD);
+        sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+            + NAME_MTAS_STATS_SPANS_TYPE);
+        sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+            + NAME_MTAS_STATS_SPANS_MAXIMUM);
+        sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+            + NAME_MTAS_STATS_SPANS_MINIMUM);
         Set<String> subKeys = MtasSolrResultUtil
-            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS+ "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION);
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS
+                + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION);
         for (String subKey : subKeys) {
-          sreq.params.remove(
-              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);
-          sreq.params.remove(
-              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY);
-          sreq.params.remove(
-              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_FUNCTION + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_FUNCTION + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_FUNCTION + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);
         }
-        subKeys = MtasSolrResultUtil
-            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS+ "." + key + "." + NAME_MTAS_STATS_SPANS_QUERY);
+        subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+            PARAM_MTAS_STATS_SPANS + "." + key + "."
+                + NAME_MTAS_STATS_SPANS_QUERY);
         for (String subKey : subKeys) {
-          sreq.params.remove(
-              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);
-          sreq.params.remove(
-              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);
-          sreq.params.remove(
-              PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);
-          Set<String> subSubKeys = MtasSolrResultUtil
-              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS+ "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);
+          sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+              + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+              + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);
+          Set<String> subSubKeys = MtasSolrResultUtil.getIdsFromParameters(
+              rb.req.getParams(),
+              PARAM_MTAS_STATS_SPANS + "." + key + "."
+                  + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+                  + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
           for (String subSubKey : subSubKeys) {
-            sreq.params.remove(
-                PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE+"."+subSubKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);
-            sreq.params.remove(
-                PARAM_MTAS_STATS + "." + key + "." + NAME_MTAS_STATS_SPANS_FUNCTION+"."+subKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE+"."+subSubKey+"."+SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);              
+            sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+                + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+                + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + "." + subSubKey
+                + "." + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);
+            sreq.params.remove(PARAM_MTAS_STATS_SPANS + "." + key + "."
+                + NAME_MTAS_STATS_SPANS_QUERY + "." + subKey + "."
+                + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + "." + subSubKey
+                + "." + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);
           }
         }
       }
@@ -756,13 +827,10 @@ public class MtasSolrComponentStats {
   /**
    * Creates the position.
    *
-   * @param position
-   *          the position
-   * @param encode
-   *          the encode
+   * @param position the position
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public SimpleOrderedMap<Object> createPosition(ComponentPosition position,
       Boolean encode) throws IOException {
@@ -785,13 +853,10 @@ public class MtasSolrComponentStats {
   /**
    * Creates the token.
    *
-   * @param token
-   *          the token
-   * @param encode
-   *          the encode
+   * @param token the token
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public SimpleOrderedMap<Object> createToken(ComponentToken token,
       Boolean encode) throws IOException {
@@ -813,13 +878,10 @@ public class MtasSolrComponentStats {
   /**
    * Creates the span.
    *
-   * @param span
-   *          the span
-   * @param encode
-   *          the encode
+   * @param span the span
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public SimpleOrderedMap<Object> createSpan(ComponentSpan span, Boolean encode)
@@ -857,8 +919,7 @@ public class MtasSolrComponentStats {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -890,12 +951,9 @@ public class MtasSolrComponentStats {
   /**
    * Distributed process.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)

@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import mtas.parser.cql.MtasCQLParser;
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.request.SolrQueryRequest;
@@ -29,17 +29,21 @@ public class MtasCQLQParser extends QParser {
   /** The mtas cql qparser query. */
   public static String MTAS_CQL_QPARSER_QUERY = "query";
 
-  /** The mtas cql qparser default prefix. */
-  public static String MTAS_CQL_QPARSER_DEFAULT_PREFIX = "defaultPrefix";
+  /** The mtas cql qparser query. */
+  public static String MTAS_CQL_QPARSER_IGNORE = "ignore";
 
-  /** The mtas cql qparser cql toberemoved. */
-  public static String MTAS_CQL_QPARSER_CQL_TOBEREMOVED = "cql";
+  /** The mtas cql qparser default prefix. */
+  public static String MTAS_CQL_QPARSER_PREFIX = "prefix";
 
   /** The field. */
   String field = null;
 
   /** The query. */
   String query = null;
+  
+  String ignoreQuery = null;
+  
+  Integer maximumIgnoreLength = null;
 
   /** The default prefix. */
   String defaultPrefix = null;
@@ -73,15 +77,15 @@ public class MtasCQLQParser extends QParser {
     if ((localParams.getParams(MTAS_CQL_QPARSER_QUERY) != null)
         && (localParams.getParams(MTAS_CQL_QPARSER_QUERY).length == 1)) {
       query = localParams.getParams(MTAS_CQL_QPARSER_QUERY)[0];
-    } else if ((localParams.getParams(MTAS_CQL_QPARSER_CQL_TOBEREMOVED) != null)
-        && (localParams
-            .getParams(MTAS_CQL_QPARSER_CQL_TOBEREMOVED).length == 1)) {
-      query = localParams.getParams(MTAS_CQL_QPARSER_CQL_TOBEREMOVED)[0];
     }
-    if ((localParams.getParams(MTAS_CQL_QPARSER_DEFAULT_PREFIX) != null)
+    if ((localParams.getParams(MTAS_CQL_QPARSER_IGNORE) != null)
+        && (localParams.getParams(MTAS_CQL_QPARSER_IGNORE).length == 1)) {
+      ignoreQuery = localParams.getParams(MTAS_CQL_QPARSER_IGNORE)[0];
+    }
+    if ((localParams.getParams(MTAS_CQL_QPARSER_PREFIX) != null)
         && (localParams
-            .getParams(MTAS_CQL_QPARSER_DEFAULT_PREFIX).length == 1)) {
-      defaultPrefix = localParams.getParams(MTAS_CQL_QPARSER_DEFAULT_PREFIX)[0];
+            .getParams(MTAS_CQL_QPARSER_PREFIX).length == 1)) {
+      defaultPrefix = localParams.getParams(MTAS_CQL_QPARSER_PREFIX)[0];
     }
     variables = new HashMap<String, String[]>();
     Iterator<String> it = localParams.getParameterNamesIterator();
@@ -116,11 +120,22 @@ public class MtasCQLQParser extends QParser {
     } else if (query == null) {
       throw new SyntaxError("no " + MTAS_CQL_QPARSER_QUERY);
     } else {
-      Reader reader = new BufferedReader(new StringReader(query));
-      MtasCQLParser p = new MtasCQLParser(reader);
-      SpanQuery q = null;
+      MtasSpanQuery q = null, iq =null;
+      if(ignoreQuery!=null) {
+        Reader ignoreReader = new BufferedReader(new StringReader(ignoreQuery));
+        MtasCQLParser ignoreParser = new MtasCQLParser(ignoreReader);
+        try {
+          iq = ignoreParser.parse(field, null, null, null, null);
+        } catch (mtas.parser.cql.TokenMgrError e) {
+          throw new SyntaxError(e.getMessage());
+        } catch (mtas.parser.cql.ParseException e) {
+          throw new SyntaxError(e.getMessage());
+        }
+      }
+      Reader queryReader = new BufferedReader(new StringReader(query));
+      MtasCQLParser queryParser = new MtasCQLParser(queryReader);
       try {
-        q = p.parse(field, null, variables);
+        q = queryParser.parse(field, defaultPrefix, variables, iq, maximumIgnoreLength);
       } catch (mtas.parser.cql.TokenMgrError e) {
         throw new SyntaxError(e.getMessage());
       } catch (mtas.parser.cql.ParseException e) {

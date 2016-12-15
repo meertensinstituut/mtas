@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mtas.analysis.parser.MtasBasicParser.MtasParserMapping;
+import mtas.analysis.parser.MtasParser.MtasParserObject;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasBufferedReader;
@@ -27,19 +29,19 @@ import mtas.analysis.util.MtasParserException;
 public class MtasCRMParser extends MtasBasicParser {
 
   /** The word type. */
-  private MtasParserType wordType = null;
+  private MtasParserType<MtasParserMapping<?>> wordType = null;
 
   /** The word annotation types. */
-  private HashMap<String, MtasParserType> wordAnnotationTypes = new HashMap<String, MtasParserType>();
+  private HashMap<String, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<String, MtasParserType<MtasParserMapping<?>>>();
 
   /** The crm sentence types. */
-  private HashMap<String, MtasParserType> crmSentenceTypes = new HashMap<String, MtasParserType>();
+  private HashMap<String, MtasParserType<MtasParserMapping<?>>> crmSentenceTypes = new HashMap<String, MtasParserType<MtasParserMapping<?>>>();
 
   /** The crm clause types. */
-  private HashMap<String, MtasParserType> crmClauseTypes = new HashMap<String, MtasParserType>();
+  private HashMap<String, MtasParserType<MtasParserMapping<?>>> crmClauseTypes = new HashMap<String, MtasParserType<MtasParserMapping<?>>>();
 
   /** The crm pair types. */
-  private HashMap<String, MtasParserType> crmPairTypes = new HashMap<String, MtasParserType>();
+  private HashMap<String, MtasParserType<MtasParserMapping<?>>> crmPairTypes = new HashMap<String, MtasParserType<MtasParserMapping<?>>>();
 
   /** The functions. */
   private HashMap<String, HashMap<String, MtasCRMParserFunction>> functions = new HashMap<String, HashMap<String, MtasCRMParserFunction>>();
@@ -86,7 +88,7 @@ public class MtasCRMParser extends MtasBasicParser {
     super.initParser();
     if (config != null) {
       // always word, no mappings
-      wordType = new MtasParserType(MAPPING_TYPE_WORD, null, false);
+      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD, null, false);
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
         if (current.name.equals("mappings")) {
@@ -99,50 +101,50 @@ public class MtasCRMParser extends MtasBasicParser {
                 if (typeMapping.equals(MAPPING_TYPE_WORD)) {
                   MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();
                   m.processConfig(mapping);
-                  wordType.addMapping(m);
+                  wordType.addItem(m);
                 } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)
                     && (nameMapping != null)) {
                   MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();
                   m.processConfig(mapping);
                   if (wordAnnotationTypes.containsKey(nameMapping)) {
-                    wordAnnotationTypes.get(nameMapping).addMapping(m);
+                    wordAnnotationTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(typeMapping,
                         nameMapping, false);
-                    t.addMapping(m);
+                    t.addItem(m);
                     wordAnnotationTypes.put(nameMapping, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_CRM_SENTENCE)) {
                   MtasCRMParserMappingCRMSentence m = new MtasCRMParserMappingCRMSentence();
                   m.processConfig(mapping);
                   if (crmSentenceTypes.containsKey(nameMapping)) {
-                    crmSentenceTypes.get(nameMapping).addMapping(m);
+                    crmSentenceTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(MAPPING_TYPE_GROUP,
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_GROUP,
                         nameMapping, true);
-                    t.addMapping(m);
+                    t.addItem(m);
                     crmSentenceTypes.put(nameMapping, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_CRM_CLAUSE)) {
                   MtasCRMParserMappingCRMSentence m = new MtasCRMParserMappingCRMSentence();
                   m.processConfig(mapping);
                   if (crmClauseTypes.containsKey(nameMapping)) {
-                    crmClauseTypes.get(nameMapping).addMapping(m);
+                    crmClauseTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(MAPPING_TYPE_GROUP,
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_GROUP,
                         nameMapping, true);
-                    t.addMapping(m);
+                    t.addItem(m);
                     crmClauseTypes.put(nameMapping, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_CRM_PAIR)) {
                   MtasCRMParserMappingCRMPair m = new MtasCRMParserMappingCRMPair();
                   m.processConfig(mapping);
                   if (crmPairTypes.containsKey(nameMapping)) {
-                    crmPairTypes.get(nameMapping).addMapping(m);
+                    crmPairTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(MAPPING_TYPE_RELATION,
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_RELATION,
                         nameMapping, true);
-                    t.addMapping(m);
+                    t.addItem(m);
                     crmPairTypes.put(nameMapping, t);
                   }
                 } else {
@@ -231,22 +233,8 @@ public class MtasCRMParser extends MtasBasicParser {
     HashMap<String, TreeSet<Integer>> idPositions = new HashMap<String, TreeSet<Integer>>();
     HashMap<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
 
-    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = new HashMap<String, HashMap<Integer, HashSet<String>>>();
-    updateList.put(UPDATE_TYPE_OFFSET, new HashMap<Integer, HashSet<String>>());
-    updateList.put(UPDATE_TYPE_POSITION,
-        new HashMap<Integer, HashSet<String>>());
-
-    HashMap<String, ArrayList<MtasParserObject>> currentList = new HashMap<String, ArrayList<MtasParserObject>>();
-    currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_RELATION_ANNOTATION,
-        new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_REF, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP_ANNOTATION,
-        new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD_ANNOTATION,
-        new ArrayList<MtasParserObject>());
+    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = createUpdateList();
+    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList(); 
 
     tokenCollection = new MtasTokenCollection();
     MtasToken.resetId();
@@ -838,13 +826,13 @@ public class MtasCRMParser extends MtasBasicParser {
    *          the types
    * @return the string
    */
-  private String printConfigTypes(HashMap<?, MtasParserType> types) {
+  private String printConfigTypes(HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     String text = "";
-    for (Entry<?, MtasParserType> entry : types.entrySet()) {
-      text += "- " + entry.getKey() + ": " + entry.getValue().mappings.size()
+    for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types.entrySet()) {
+      text += "- " + entry.getKey() + ": " + entry.getValue().items.size()
           + " mapping(s)\n";
-      for (int i = 0; i < entry.getValue().mappings.size(); i++) {
-        text += "\t" + entry.getValue().mappings.get(i) + "\n";
+      for (int i = 0; i < entry.getValue().items.size(); i++) {
+        text += "\t" + entry.getValue().items.get(i) + "\n";
       }
     }
     return text;

@@ -7,8 +7,7 @@ import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanRecurrenceQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
-
-import org.apache.lucene.search.spans.SpanQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasCQLParserBasicSentenceCondition.
@@ -24,15 +23,21 @@ public class MtasCQLParserBasicSentenceCondition {
   /** The optional parts. */
   private boolean simplified, optional, optionalParts;
 
+  private MtasSpanQuery ignoreClause;
+  
+  private Integer maximumIgnoreLength;
+  
   /**
    * Instantiates a new mtas cql parser basic sentence condition.
    */
-  public MtasCQLParserBasicSentenceCondition() {
+  public MtasCQLParserBasicSentenceCondition(MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     partList = new ArrayList<MtasCQLParserBasicSentencePartCondition>();
     minimumOccurence = 1;
     maximumOccurence = 1;
     optional = false;
     simplified = false;
+    this.ignoreClause = ignore;
+    this.maximumIgnoreLength = maximumIgnoreLength;
   }
 
   /**
@@ -271,7 +276,7 @@ public class MtasCQLParserBasicSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public SpanQuery getQuery() throws ParseException {
+  public MtasSpanQuery getQuery() throws ParseException {
     simplify();
     MtasSpanSequenceItem currentQuery = null;
     List<MtasSpanSequenceItem> currentQueryList = null;
@@ -283,8 +288,8 @@ public class MtasCQLParserBasicSentenceCondition {
         currentQuery = null;
       }
       if (part.getMaximumOccurence() > 1) {
-        SpanQuery q = new MtasSpanRecurrenceQuery(part.getQuery(),
-            part.getMinimumOccurence(), part.getMaximumOccurence());
+        MtasSpanQuery q = new MtasSpanRecurrenceQuery(part.getQuery(),
+            part.getMinimumOccurence(), part.getMaximumOccurence(), ignoreClause, maximumIgnoreLength);
         currentQuery = new MtasSpanSequenceItem(q, part.isOptional());
       } else {
         currentQuery = new MtasSpanSequenceItem(part.getQuery(),
@@ -297,12 +302,12 @@ public class MtasCQLParserBasicSentenceCondition {
       }
     }
     if (currentQueryList != null) {
-      return new MtasSpanSequenceQuery(currentQueryList);
+      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);
     } else if (currentQuery.isOptional()) {
       currentQueryList = new ArrayList<MtasSpanSequenceItem>();
       currentQueryList.add(currentQuery);
       currentQuery = null;
-      return new MtasSpanSequenceQuery(currentQueryList);
+      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);
     } else {
       return currentQuery.getQuery();
     }

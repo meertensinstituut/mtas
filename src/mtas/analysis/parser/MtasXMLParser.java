@@ -15,6 +15,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import mtas.analysis.parser.MtasBasicParser.MtasParserMapping;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
@@ -48,31 +49,49 @@ abstract class MtasXMLParser extends MtasBasicParser {
   private HashMap<String, QName> qNames = new HashMap<String, QName>();
 
   /** The relation types. */
-  private HashMap<QName, MtasParserType> relationTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> relationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
 
   /** The relation annotation types. */
-  private HashMap<QName, MtasParserType> relationAnnotationTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> relationAnnotationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
 
   /** The ref types. */
-  private HashMap<QName, MtasParserType> refTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> refTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
 
   /** The group types. */
-  private HashMap<QName, MtasParserType> groupTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
 
   /** The group annotation types. */
-  private HashMap<QName, MtasParserType> groupAnnotationTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> groupAnnotationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
 
   /** The word types. */
-  private HashMap<QName, MtasParserType> wordTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> wordTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
 
   /** The word annotation types. */
-  private HashMap<QName, MtasParserType> wordAnnotationTypes = new HashMap<QName, MtasParserType>();
+  private HashMap<QName, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+
+  private HashMap<QName, MtasParserType<MtasParserVariable>> variableTypes = new HashMap<QName, MtasParserType<MtasParserVariable>>();
+
+  private static String XML_VARIABLES = "variables";
+
+  private static String XML_VARIABLE = "variable";
+
+  /** The xml mapping type. */
+  private static String XML_VARIABLE_NAME = "name";
+
+  /** The xml mapping name. */
+  private static String XML_VARIABLE_VALUE = "value";
 
   /** The xml references. */
   private static String XML_REFERENCES = "references";
 
   /** The xml reference. */
   private static String XML_REFERENCE = "reference";
+
+  /** The xml mapping type. */
+  private static String XML_REFERENCE_NAME = "name";
+
+  /** The xml mapping name. */
+  private static String XML_REFERENCE_REF = "ref";
 
   /** The xml mappings. */
   private static String XML_MAPPINGS = "mappings";
@@ -89,12 +108,14 @@ abstract class MtasXMLParser extends MtasBasicParser {
   /**
    * Instantiates a new mtas xml parser.
    *
-   * @param config the config
+   * @param config
+   *          the config
    */
   public MtasXMLParser(MtasConfiguration config) {
     super(config);
     try {
       initParser();
+      //System.out.print(printConfig());
     } catch (MtasConfigException e) {
       e.printStackTrace();
     }
@@ -109,21 +130,23 @@ abstract class MtasXMLParser extends MtasBasicParser {
   public String printConfig() {
     String text = "";
     text += "=== CONFIGURATION ===\n";
+    text += "type: " + variableTypes.size() + " x variable\n";
+    text += printConfigVariableTypes(variableTypes);
     text += "type: " + groupTypes.size() + " x group\n";
-    text += printConfigTypes(groupTypes);
+    text += printConfigMappingTypes(groupTypes);
     text += "type: " + groupAnnotationTypes.size() + " x groupAnnotation";
-    text += printConfigTypes(groupAnnotationTypes);
+    text += printConfigMappingTypes(groupAnnotationTypes);
     text += "type: " + wordTypes.size() + " x word\n";
-    text += printConfigTypes(wordTypes);
+    text += printConfigMappingTypes(wordTypes);
     text += "type: " + wordAnnotationTypes.size() + " x wordAnnotation";
-    text += printConfigTypes(wordAnnotationTypes);
+    text += printConfigMappingTypes(wordAnnotationTypes);
     text += "type: " + relationTypes.size() + " x relation\n";
-    text += printConfigTypes(relationTypes);
+    text += printConfigMappingTypes(relationTypes);
     text += "type: " + relationAnnotationTypes.size()
         + " x relationAnnotation\n";
-    text += printConfigTypes(relationAnnotationTypes);
+    text += printConfigMappingTypes(relationAnnotationTypes);
     text += "type: " + refTypes.size() + " x references\n";
-    text += printConfigTypes(refTypes);
+    text += printConfigMappingTypes(refTypes);
     text += "=== CONFIGURATION ===\n";
     return text;
   }
@@ -131,16 +154,33 @@ abstract class MtasXMLParser extends MtasBasicParser {
   /**
    * Prints the config types.
    *
-   * @param types the types
+   * @param types
+   *          the types
    * @return the string
    */
-  private String printConfigTypes(HashMap<QName, MtasParserType> types) {
+  private String printConfigMappingTypes(
+      HashMap<QName, MtasParserType<MtasParserMapping<?>>> types) {
     String text = "";
-    for (Entry<QName, MtasParserType> entry : types.entrySet()) {
+    for (Entry<QName, MtasParserType<MtasParserMapping<?>>> entry : types
+        .entrySet()) {
       text += "- " + entry.getKey().getLocalPart() + ": "
-          + entry.getValue().mappings.size() + " mapping(s)\n";
-      for (int i = 0; i < entry.getValue().mappings.size(); i++) {
-        text += "\t" + entry.getValue().mappings.get(i) + "\n";
+          + entry.getValue().items.size() + " mapping(s)\n";
+      for (int i = 0; i < entry.getValue().items.size(); i++) {
+        text += "\t" + entry.getValue().items.get(i) + "\n";
+      }
+    }
+    return text;
+  }
+
+  private String printConfigVariableTypes(
+      HashMap<QName, MtasParserType<MtasParserVariable>> types) {
+    String text = "";
+    for (Entry<QName, MtasParserType<MtasParserVariable>> entry : types
+        .entrySet()) {
+      text += "- " + entry.getKey().getLocalPart() + ": "
+          + entry.getValue().items.size() + " variables(s)\n";
+      for (int i = 0; i < entry.getValue().items.size(); i++) {
+        text += "\t" + entry.getValue().items.get(i) + "\n";
       }
     }
     return text;
@@ -165,15 +205,38 @@ abstract class MtasXMLParser extends MtasBasicParser {
       // loop again
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
-        if (current.name.equals(XML_REFERENCES)) {
+        if (current.name.equals(XML_VARIABLES)) {
+          for (int j = 0; j < current.children.size(); j++) {
+            if (current.children.get(j).name.equals(XML_VARIABLE)) {
+              MtasConfiguration variable = current.children.get(j);
+              String nameVariable = variable.attributes.get(XML_VARIABLE_NAME);
+              String valueVariable = variable.attributes
+                  .get(XML_VARIABLE_VALUE);
+              if ((nameVariable != null) && (valueVariable != null)) {
+                MtasParserVariable v = new MtasParserVariable(nameVariable,
+                    valueVariable);
+                v.processConfig(variable);
+                QName qn = getQName(nameVariable);
+                if (variableTypes.containsKey(qn)) {
+                  variableTypes.get(qn).addItem(v);
+                } else {
+                  MtasParserType<MtasParserVariable> t = new MtasParserType<MtasParserVariable>(
+                      nameVariable, valueVariable, false);
+                  t.addItem(v);
+                  variableTypes.put(qn, t);
+                }
+              }
+            }
+          }
+        } else if (current.name.equals(XML_REFERENCES)) {
           for (int j = 0; j < current.children.size(); j++) {
             if (current.children.get(j).name.equals(XML_REFERENCE)) {
               MtasConfiguration reference = current.children.get(j);
-              String name = reference.attributes.get("name");
-              String ref = reference.attributes.get("ref");
+              String name = reference.attributes.get(XML_REFERENCE_NAME);
+              String ref = reference.attributes.get(XML_REFERENCE_REF);
               if ((name != null) && (ref != null)) {
-                MtasParserType t = new MtasParserType(MAPPING_TYPE_REF, name,
-                    false, ref);
+                MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MAPPING_TYPE_REF, name, false, ref);
                 refTypes.put(getQName(t.getName()), t);
               }
             }
@@ -190,11 +253,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   m.processConfig(mapping);
                   QName qn = getQName(nameMapping);
                   if (relationTypes.containsKey(qn)) {
-                    relationTypes.get(qn).addMapping(m);
+                    relationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping, false);
-                    t.addMapping(m);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
+                    t.addItem(m);
                     relationTypes.put(qn, t);
                   }
                 } else if (typeMapping
@@ -203,11 +266,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   m.processConfig(mapping);
                   QName qn = getQName(nameMapping);
                   if (relationAnnotationTypes.containsKey(qn)) {
-                    relationAnnotationTypes.get(qn).addMapping(m);
+                    relationAnnotationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping, false);
-                    t.addMapping(m);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
+                    t.addItem(m);
                     relationAnnotationTypes.put(qn, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_WORD)) {
@@ -215,11 +278,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   m.processConfig(mapping);
                   QName qn = getQName(nameMapping);
                   if (wordTypes.containsKey(qn)) {
-                    wordTypes.get(qn).addMapping(m);
+                    wordTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping, false);
-                    t.addMapping(m);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
+                    t.addItem(m);
                     wordTypes.put(qn, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)) {
@@ -227,11 +290,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   m.processConfig(mapping);
                   QName qn = getQName(nameMapping);
                   if (wordAnnotationTypes.containsKey(qn)) {
-                    wordAnnotationTypes.get(qn).addMapping(m);
+                    wordAnnotationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping, false);
-                    t.addMapping(m);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
+                    t.addItem(m);
                     wordAnnotationTypes.put(qn, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_GROUP)) {
@@ -239,11 +302,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   m.processConfig(mapping);
                   QName qn = getQName(nameMapping);
                   if (groupTypes.containsKey(qn)) {
-                    groupTypes.get(qn).addMapping(m);
+                    groupTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping, false);
-                    t.addMapping(m);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
+                    t.addItem(m);
                     groupTypes.put(qn, t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_GROUP_ANNOTATION)) {
@@ -251,11 +314,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   m.processConfig(mapping);
                   QName qn = getQName(nameMapping);
                   if (groupAnnotationTypes.containsKey(qn)) {
-                    groupAnnotationTypes.get(qn).addMapping(m);
+                    groupAnnotationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
-                        nameMapping, false);
-                    t.addMapping(m);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
+                    t.addItem(m);
                     groupAnnotationTypes.put(qn, t);
                   }
                 } else {
@@ -288,22 +351,9 @@ abstract class MtasXMLParser extends MtasBasicParser {
     HashMap<String, TreeSet<Integer>> idPositions = new HashMap<String, TreeSet<Integer>>();
     HashMap<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
 
-    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = new HashMap<String, HashMap<Integer, HashSet<String>>>();
-    updateList.put(UPDATE_TYPE_OFFSET, new HashMap<Integer, HashSet<String>>());
-    updateList.put(UPDATE_TYPE_POSITION,
-        new HashMap<Integer, HashSet<String>>());
-
-    HashMap<String, ArrayList<MtasParserObject>> currentList = new HashMap<String, ArrayList<MtasParserObject>>();
-    currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_RELATION_ANNOTATION,
-        new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_REF, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP_ANNOTATION,
-        new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD_ANNOTATION,
-        new ArrayList<MtasParserObject>());
+    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = createUpdateList();
+    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList();
+    HashMap<String, HashMap<String, String>> variables = createVariables();
 
     tokenCollection = new MtasTokenCollection();
     MtasToken.resetId();
@@ -313,8 +363,8 @@ abstract class MtasXMLParser extends MtasBasicParser {
       QName qname;
       try {
         int event = streamReader.getEventType();
-        MtasParserType currentType, tmpCurrentType;
-        MtasParserObject currentObject = null;
+        MtasParserType<?> currentType, tmpCurrentType, tmpVariableType;
+        MtasParserObject currentObject = null, variableObject = null;
         while (true) {
           switch (event) {
           case XMLStreamConstants.START_DOCUMENT:
@@ -343,166 +393,178 @@ abstract class MtasXMLParser extends MtasBasicParser {
                 throw new MtasParserException("No " + rootTag);
               }
               // parse content
-            } else if (parsingContent) {
-              // check for relation : not within word, not within
-              // groupAnnotation
-              if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                      .size() == 0)
-                  && (tmpCurrentType = relationTypes.get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentList.get(MAPPING_TYPE_RELATION).add(currentObject);
-                  unknownAncestors = 0;
-                }
-                // check for relation annotation: not within word, but within
-                // relation
-              } else if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_RELATION).size() > 0)
-                  && (tmpCurrentType = relationAnnotationTypes
-                      .get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
-                      .add(currentObject);
-                  unknownAncestors = 0;
-                }
-                // check for group: not within word, not within relation, not
-                // within groupAnnotation
-              } else if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                      .size() == 0)
-                  && (tmpCurrentType = groupTypes.get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentList.get(MAPPING_TYPE_GROUP).add(currentObject);
-                  unknownAncestors = 0;
-                }
-                // check for group annotation: not within word, not within
-                // relation, but within group
-              } else if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_GROUP).size() > 0)
-                  && (tmpCurrentType = groupAnnotationTypes
-                      .get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                      .add(currentObject);
-                  unknownAncestors = 0;
-                }
-                // check for word: not within relation, not within
-                // groupAnnotation, not within word, not within wordAnnotation
-              } else if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                      .size() == 0)
-                  && (currentList.get(MAPPING_TYPE_WORD).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size() == 0)
-                  && (tmpCurrentType = wordTypes.get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setOffsetStart(lastOffset);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentObject.addPosition(position.getAndIncrement());
-                  currentList.get(MAPPING_TYPE_WORD).add(currentObject);
-                  unknownAncestors = 0;
-                }
-                // check for word annotation: not within relation, not within
-                // groupAnnotation, but within word
-              } else if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                  && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                      .size() == 0)
-                  && (currentList.get(MAPPING_TYPE_WORD).size() > 0)
-                  && (tmpCurrentType = wordAnnotationTypes
-                      .get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)
-                    .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
-                    .getPositions());
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
-                      .add(currentObject);
-                  unknownAncestors = 0;
-                }
-                // check for references: within relation
-              } else if ((currentList.get(MAPPING_TYPE_RELATION).size() > 0)
-                  && (tmpCurrentType = refTypes.get(qname)) != null) {
-                currentObject = new MtasParserObject(tmpCurrentType);
-                collectAttributes(currentObject, streamReader);
-                currentObject.setUnknownAncestorNumber(unknownAncestors);
-                currentObject.setRealOffsetStart(lastOffset);
-                if (!prevalidateObject(currentObject, currentList)) {
-                  unknownAncestors++;
-                } else {
-                  currentType = tmpCurrentType;
-                  currentList.get(MAPPING_TYPE_REF).add(currentObject);
-                  unknownAncestors = 0;
-                  // add reference to ancestor relations
-                  for (MtasParserObject currentRelation : currentList
-                      .get(MAPPING_TYPE_RELATION)) {
-                    currentRelation.addRefId(currentObject
-                        .getAttribute(currentType.getRefAttributeName()));
-                    // register mapping for relation (for recursive relations)
-                    TreeSet<String> keyMapList;
-                    if (currentRelation.getId() != null) {
-                      if (relationKeyMap.containsKey(currentRelation.getId())) {
-                        keyMapList = relationKeyMap
-                            .get(currentRelation.getId());
-                      } else {
-                        keyMapList = new TreeSet<String>();
-                        relationKeyMap.put(currentRelation.getId(), keyMapList);
-                      }
-                      keyMapList.add(currentObject
+            } else {
+              if((tmpVariableType = variableTypes.get(qname)) != null) {
+                variableObject = new MtasParserObject(tmpVariableType);
+                collectAttributes(variableObject, streamReader);
+                computeVariablesFromObject(variableObject, currentList,
+                    variables);
+               
+              }
+              if (parsingContent) {
+                // check for relation : not within word, not within
+                // groupAnnotation
+                if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                        .size() == 0)
+                    && (tmpCurrentType = relationTypes.get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentList.get(MAPPING_TYPE_RELATION).add(currentObject);
+                    unknownAncestors = 0;
+                  }
+                  // check for relation annotation: not within word, but within
+                  // relation
+                } else if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_RELATION).size() > 0)
+                    && (tmpCurrentType = relationAnnotationTypes
+                        .get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
+                        .add(currentObject);
+                    unknownAncestors = 0;
+                  }
+                  // check for group: not within word, not within relation, not
+                  // within groupAnnotation
+                } else if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_RELATION).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                        .size() == 0)
+                    && (tmpCurrentType = groupTypes.get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentList.get(MAPPING_TYPE_GROUP).add(currentObject);
+                    unknownAncestors = 0;
+                  }
+                  // check for group annotation: not within word, not within
+                  // relation, but within group
+                } else if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_RELATION).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_GROUP).size() > 0)
+                    && (tmpCurrentType = groupAnnotationTypes
+                        .get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                        .add(currentObject);
+                    unknownAncestors = 0;
+                  }
+                  // check for word: not within relation, not within
+                  // groupAnnotation, not within word, not within wordAnnotation
+                } else if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                        .size() == 0)
+                    && (currentList.get(MAPPING_TYPE_WORD).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
+                        .size() == 0)
+                    && (tmpCurrentType = wordTypes.get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setOffsetStart(lastOffset);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentObject.addPosition(position.getAndIncrement());
+                    currentList.get(MAPPING_TYPE_WORD).add(currentObject);
+                    unknownAncestors = 0;
+                  }
+                  // check for word annotation: not within relation, not within
+                  // groupAnnotation, but within word
+                } else if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
+                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                        .size() == 0)
+                    && (currentList.get(MAPPING_TYPE_WORD).size() > 0)
+                    && (tmpCurrentType = wordAnnotationTypes
+                        .get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)
+                      .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
+                      .getPositions());
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
+                        .add(currentObject);
+                    unknownAncestors = 0;
+                  }
+                  // check for references: within relation
+                } else if ((currentList.get(MAPPING_TYPE_RELATION).size() > 0)
+                    && (tmpCurrentType = refTypes.get(qname)) != null) {
+                  currentObject = new MtasParserObject(tmpCurrentType);
+                  collectAttributes(currentObject, streamReader);
+                  currentObject.setUnknownAncestorNumber(unknownAncestors);
+                  currentObject.setRealOffsetStart(lastOffset);
+                  if (!prevalidateObject(currentObject, currentList)) {
+                    unknownAncestors++;
+                  } else {
+                    currentType = tmpCurrentType;
+                    currentList.get(MAPPING_TYPE_REF).add(currentObject);
+                    unknownAncestors = 0;
+                    // add reference to ancestor relations
+                    for (MtasParserObject currentRelation : currentList
+                        .get(MAPPING_TYPE_RELATION)) {
+                      currentRelation.addRefId(currentObject
                           .getAttribute(currentType.getRefAttributeName()));
+                      // register mapping for relation (for recursive relations)
+                      TreeSet<String> keyMapList;
+                      if (currentRelation.getId() != null) {
+                        if (relationKeyMap
+                            .containsKey(currentRelation.getId())) {
+                          keyMapList = relationKeyMap
+                              .get(currentRelation.getId());
+                        } else {
+                          keyMapList = new TreeSet<String>();
+                          relationKeyMap.put(currentRelation.getId(),
+                              keyMapList);
+                        }
+                        keyMapList.add(currentObject
+                            .getAttribute(currentType.getRefAttributeName()));
+                      }
                     }
                   }
+                } else {
+                  unknownAncestors++;
                 }
-              } else {
-                unknownAncestors++;
+                // check for start content
+              } else if (qname.equals(getQName(contentTag))) {
+                parsingContent = true;
+                // unexpected
+              } else if (!allowNonContent) {
+                throw new MtasParserException(
+                    "Unexpected " + qname.getLocalPart() + " in document");
               }
-              // check for start content
-            } else if (qname.equals(getQName(contentTag))) {
-              parsingContent = true;
-              // unexpected
-            } else if (!allowNonContent) {
-              throw new MtasParserException(
-                  "Unexpected " + qname.getLocalPart() + " in document");
             }
             // set offset (end of start-element)
             lastOffset = streamReader.getLocation().getCharacterOffset();
@@ -757,6 +819,15 @@ abstract class MtasXMLParser extends MtasBasicParser {
     } catch (XMLStreamException e) {
       throw new MtasParserException("No valid XML: " + e.getMessage());
     }
+    // update tokens with variable
+    for (Entry<Integer, HashSet<String>> updateItem : updateList
+        .get(UPDATE_TYPE_VARIABLE).entrySet()) {
+      MtasToken<?> token = tokenCollection.get(updateItem.getKey());
+      String encodedPrefix = token.getPrefix();
+      String encodedPostfix = token.getPostfix();
+      token.setValue(
+          decodeAndUpdateWithVariables(encodedPrefix, encodedPostfix, variables));      
+    }
     // update tokens with offset
     for (Entry<Integer, HashSet<String>> updateItem : updateList
         .get(UPDATE_TYPE_OFFSET).entrySet()) {
@@ -808,14 +879,17 @@ abstract class MtasXMLParser extends MtasBasicParser {
     // final check
     tokenCollection.check(autorepair, makeunique);
     return tokenCollection;
-  }
+  }  
 
   /**
    * Recursive collect.
    *
-   * @param refId the ref id
-   * @param relationKeyMap the relation key map
-   * @param maxRecursion the max recursion
+   * @param refId
+   *          the ref id
+   * @param relationKeyMap
+   *          the relation key map
+   * @param maxRecursion
+   *          the max recursion
    * @return the collection<? extends string>
    */
   private Collection<? extends String> recursiveCollect(String refId,
@@ -835,7 +909,8 @@ abstract class MtasXMLParser extends MtasBasicParser {
   /**
    * Gets the q name.
    *
-   * @param key the key
+   * @param key
+   *          the key
    * @return the q name
    */
   private QName getQName(String key) {
@@ -850,8 +925,10 @@ abstract class MtasXMLParser extends MtasBasicParser {
   /**
    * Collect attributes.
    *
-   * @param currentObject the current object
-   * @param streamReader the stream reader
+   * @param currentObject
+   *          the current object
+   * @param streamReader
+   *          the stream reader
    */
   public void collectAttributes(MtasParserObject currentObject,
       XMLStreamReader streamReader) {
@@ -982,6 +1059,15 @@ abstract class MtasXMLParser extends MtasBasicParser {
     @Override
     protected MtasXMLParserMappingGroupAnnotation self() {
       return this;
+    }
+
+    @Override
+    protected void setStartEnd(String start, String end) {
+      super.setStartEnd(start, end);
+      if (start != null && end != null) {
+        position = SOURCE_REFS;
+        offset = SOURCE_REFS;
+      }
     }
 
   }

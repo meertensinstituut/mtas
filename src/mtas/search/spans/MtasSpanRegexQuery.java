@@ -3,6 +3,7 @@ package mtas.search.spans;
 import java.io.IOException;
 
 import mtas.codec.util.CodecUtil;
+import mtas.search.spans.util.MtasSpanQuery;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -18,7 +19,7 @@ import org.apache.lucene.search.spans.SpanWeight;
 /**
  * The Class MtasSpanRegexQuery.
  */
-public class MtasSpanRegexQuery extends SpanQuery {
+public class MtasSpanRegexQuery extends MtasSpanQuery {
 
   /** The Constant MTAS_REGEX_EXPAND_BOUNDARY. */
   private static final int MTAS_REGEX_EXPAND_BOUNDARY = 1000000;
@@ -38,9 +39,6 @@ public class MtasSpanRegexQuery extends SpanQuery {
   /** The query. */
   private SpanMultiTermQueryWrapper<RegexpQuery> query;
 
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanRegexQuery";
-
   /*
    * (non-Javadoc)
    * 
@@ -48,7 +46,7 @@ public class MtasSpanRegexQuery extends SpanQuery {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public Query rewrite(IndexReader reader) throws IOException {
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     Query q = query.rewrite(reader);
     if (q instanceof SpanOrQuery) {
       SpanQuery[] clauses = ((SpanOrQuery) q).getClauses();
@@ -59,7 +57,7 @@ public class MtasSpanRegexQuery extends SpanQuery {
             + clauses.length + " terms, too many (boundary "
             + MTAS_REGEX_EXPAND_BOUNDARY + ")!");
       }
-      SpanQuery[] newClauses = new SpanQuery[clauses.length];
+      MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.length];
       for (int i = 0; i < clauses.length; i++) {
         if (clauses[i] instanceof SpanTermQuery) {
           newClauses[i] = new MtasSpanTermQuery((SpanTermQuery) clauses[i],
@@ -68,7 +66,7 @@ public class MtasSpanRegexQuery extends SpanQuery {
           throw new IOException("no SpanTermQuery after rewrite");
         }
       }
-      return new SpanOrQuery(newClauses);
+      return new MtasSpanOrQuery(newClauses);
     } else {
       throw new IOException("no SpanOrQuery after rewrite");
     }
@@ -83,7 +81,7 @@ public class MtasSpanRegexQuery extends SpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     if (value == null) {
       buffer.append(this.query.getField() + ":" + prefix);
     } else {
@@ -141,7 +139,7 @@ public class MtasSpanRegexQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ term.hashCode();
     h += (singlePosition ? 1 : 0);
     return h;

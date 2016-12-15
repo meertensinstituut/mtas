@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mtas.analysis.parser.MtasBasicParser.MtasParserMapping;
+import mtas.analysis.parser.MtasParser.MtasParserObject;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasBufferedReader;
@@ -30,13 +32,13 @@ final public class MtasSketchParser extends MtasBasicParser {
   private Boolean autorepair = true;
 
   /** The word type. */
-  private MtasParserType wordType = null;
+  private MtasParserType<MtasParserMapping<?>> wordType = null;
 
   /** The word annotation types. */
-  private HashMap<Integer, MtasParserType> wordAnnotationTypes = new HashMap<Integer, MtasParserType>();
+  private HashMap<Integer, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<Integer, MtasParserType<MtasParserMapping<?>>>();
 
   /** The group types. */
-  private HashMap<String, MtasParserType> groupTypes = new HashMap<String, MtasParserType>();
+  private HashMap<String, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<String, MtasParserType<MtasParserMapping<?>>>();
 
   /**
    * Instantiates a new mtas sketch parser.
@@ -65,7 +67,7 @@ final public class MtasSketchParser extends MtasBasicParser {
     if (config != null) {
 
       // always word, no mappings
-      wordType = new MtasParserType(MAPPING_TYPE_WORD, null, false);
+      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD, null, false);
 
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
@@ -79,17 +81,17 @@ final public class MtasSketchParser extends MtasBasicParser {
                 if (typeMapping.equals(MAPPING_TYPE_WORD)) {
                   MtasSketchParserMappingWord m = new MtasSketchParserMappingWord();
                   m.processConfig(mapping);
-                  wordType.addMapping(m);
+                  wordType.addItem(m);
                 } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)
                     && (nameMapping != null)) {
                   MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
                   m.processConfig(mapping);
                   if (wordAnnotationTypes.containsKey(nameMapping)) {
-                    wordAnnotationTypes.get(nameMapping).addMapping(m);
+                    wordAnnotationTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(typeMapping,
                         nameMapping, false);
-                    t.addMapping(m);
+                    t.addItem(m);
                     wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_GROUP)
@@ -97,11 +99,11 @@ final public class MtasSketchParser extends MtasBasicParser {
                   MtasSketchParserMappingGroup m = new MtasSketchParserMappingGroup();
                   m.processConfig(mapping);
                   if (groupTypes.containsKey(nameMapping)) {
-                    groupTypes.get(nameMapping).addMapping(m);
+                    groupTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType t = new MtasParserType(typeMapping,
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(typeMapping,
                         nameMapping, false);
-                    t.addMapping(m);
+                    t.addItem(m);
                     groupTypes.put(nameMapping, t);
                   }
                 } else {
@@ -130,22 +132,8 @@ final public class MtasSketchParser extends MtasBasicParser {
     HashMap<String, TreeSet<Integer>> idPositions = new HashMap<String, TreeSet<Integer>>();
     HashMap<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
 
-    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = new HashMap<String, HashMap<Integer, HashSet<String>>>();
-    updateList.put(UPDATE_TYPE_OFFSET, new HashMap<Integer, HashSet<String>>());
-    updateList.put(UPDATE_TYPE_POSITION,
-        new HashMap<Integer, HashSet<String>>());
-
-    HashMap<String, ArrayList<MtasParserObject>> currentList = new HashMap<String, ArrayList<MtasParserObject>>();
-    currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_RELATION_ANNOTATION,
-        new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_REF, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP_ANNOTATION,
-        new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD_ANNOTATION,
-        new ArrayList<MtasParserObject>());
+    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = createUpdateList();
+    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList(); 
 
     tokenCollection = new MtasTokenCollection();
     MtasToken.resetId();
@@ -368,13 +356,13 @@ final public class MtasSketchParser extends MtasBasicParser {
    *          the types
    * @return the string
    */
-  private String printConfigTypes(HashMap<?, MtasParserType> types) {
+  private String printConfigTypes(HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     String text = "";
-    for (Entry<?, MtasParserType> entry : types.entrySet()) {
-      text += "- " + entry.getKey() + ": " + entry.getValue().mappings.size()
+    for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types.entrySet()) {
+      text += "- " + entry.getKey() + ": " + entry.getValue().items.size()
           + " mapping(s)\n";
-      for (int i = 0; i < entry.getValue().mappings.size(); i++) {
-        text += "\t" + entry.getValue().mappings.get(i) + "\n";
+      for (int i = 0; i < entry.getValue().items.size(); i++) {
+        text += "\t" + entry.getValue().items.get(i) + "\n";
       }
     }
     return text;

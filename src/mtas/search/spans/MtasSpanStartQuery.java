@@ -9,21 +9,19 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasSpanQuery;
+
 /**
  * The Class MtasSpanStartQuery.
  */
-public class MtasSpanStartQuery extends SpanQuery {
+public class MtasSpanStartQuery extends MtasSpanQuery {
 
   /** The query. */
   private SpanQuery query;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanStartQuery";
 
   /**
    * Instantiates a new mtas span start query.
@@ -43,7 +41,7 @@ public class MtasSpanStartQuery extends SpanQuery {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public Query rewrite(IndexReader reader) throws IOException {
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     query.rewrite(reader);
     return this;
   }
@@ -57,7 +55,7 @@ public class MtasSpanStartQuery extends SpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     buffer.append(this.query.toString(field));
     buffer.append("])");
     return buffer.toString();
@@ -135,7 +133,7 @@ public class MtasSpanStartQuery extends SpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
-      return new MtasStartSpans(spanWeight.getSpans(ctx, requiredPostings));
+      return new MtasSpanStartSpans(spanWeight.getSpans(ctx, requiredPostings));
     }
 
     /*
@@ -174,7 +172,7 @@ public class MtasSpanStartQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
   }

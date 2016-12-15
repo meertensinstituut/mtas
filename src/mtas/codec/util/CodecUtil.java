@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.parser.function.util.MtasFunctionParserFunction;
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.codec.util.CodecComponent.ComponentField;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 /**
@@ -237,12 +237,12 @@ public class CodecUtil {
       InvocationTargetException, IOException {
     if (fieldStats != null) {
       IndexReader reader = searcher.getIndexReader();
-      HashMap<SpanQuery, SpanWeight> spansQueryWeight = new HashMap<SpanQuery, SpanWeight>();
+      HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight = new HashMap<MtasSpanQuery, SpanWeight>();
       // only if spanQueryList is not empty
       if (fieldStats.spanQueryList.size() > 0) {
-        for (SpanQuery sq : fieldStats.spanQueryList) {
+        for (MtasSpanQuery sq : fieldStats.spanQueryList) {
           spansQueryWeight.put(sq,
-              ((SpanQuery) sq.rewrite(reader)).createWeight(searcher, false));
+              ((MtasSpanQuery) sq.rewrite(reader)).createWeight(searcher, false));
         }
       }
       // collect

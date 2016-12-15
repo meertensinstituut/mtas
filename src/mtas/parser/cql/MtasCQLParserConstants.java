@@ -19,51 +19,55 @@ public interface MtasCQLParserConstants {
   /** RegularExpression Id. */
   int NOT_WITHIN = 8;
   /** RegularExpression Id. */
-  int GROUP_START = 9;
+  int INTERSECTING = 9;
   /** RegularExpression Id. */
-  int GROUP_END = 10;
+  int NOT_INTERSECTING = 10;
   /** RegularExpression Id. */
-  int WORD_START = 11;
+  int GROUP_START = 11;
   /** RegularExpression Id. */
-  int WORD_END = 12;
+  int GROUP_END = 12;
   /** RegularExpression Id. */
-  int BRACKET_START = 13;
+  int WORD_START = 13;
   /** RegularExpression Id. */
-  int BRACKET_END = 14;
+  int WORD_END = 14;
   /** RegularExpression Id. */
-  int CURLY_BRACKET_START = 15;
+  int BRACKET_START = 15;
   /** RegularExpression Id. */
-  int CURLY_BRACKET_END = 16;
+  int BRACKET_END = 16;
   /** RegularExpression Id. */
-  int SLASH = 17;
+  int CURLY_BRACKET_START = 17;
   /** RegularExpression Id. */
-  int QUESTION_MARK = 18;
+  int CURLY_BRACKET_END = 18;
   /** RegularExpression Id. */
-  int NEGATION = 19;
+  int SLASH = 19;
   /** RegularExpression Id. */
-  int AND = 20;
+  int QUESTION_MARK = 20;
   /** RegularExpression Id. */
-  int OR = 21;
+  int NEGATION = 21;
   /** RegularExpression Id. */
-  int KOMMA = 22;
+  int AND = 22;
   /** RegularExpression Id. */
-  int TOKEN_NOTEQUALS = 23;
+  int OR = 23;
   /** RegularExpression Id. */
-  int TOKEN_EQUALS = 24;
+  int KOMMA = 24;
   /** RegularExpression Id. */
-  int NUMBER = 25;
+  int TOKEN_NOTEQUALS = 25;
   /** RegularExpression Id. */
-  int VARIABLE = 26;
+  int TOKEN_EQUALS = 26;
   /** RegularExpression Id. */
-  int QUOTED_VALUE = 27;
+  int NUMBER = 27;
   /** RegularExpression Id. */
-  int UNQUOTED_VALUE = 28;
+  int VARIABLE = 28;
   /** RegularExpression Id. */
-  int OCTOTHORPE = 29;
+  int QUOTED_VALUE = 29;
   /** RegularExpression Id. */
-  int DIGIT = 30;
+  int UNQUOTED_VALUE = 30;
   /** RegularExpression Id. */
-  int ALLOWED_UNQUOTED_CHARACTER = 31;
+  int OCTOTHORPE = 31;
+  /** RegularExpression Id. */
+  int DIGIT = 32;
+  /** RegularExpression Id. */
+  int ALLOWED_UNQUOTED_CHARACTER = 33;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -79,6 +83,8 @@ public interface MtasCQLParserConstants {
     "\"!containing\"",
     "\"within\"",
     "\"!within\"",
+    "\"intersecting\"",
+    "\"!intersecting\"",
     "\"<\"",
     "\">\"",
     "\"[\"",

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mtas.search.spans.MtasSpanAndQuery;
+import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanOrQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 
-import org.apache.lucene.search.spans.SpanNotQuery;
-import org.apache.lucene.search.spans.SpanQuery;
 
 /**
  * The Class MtasCQLParserWordCondition.
@@ -21,7 +21,7 @@ public class MtasCQLParserWordCondition {
   public static String TYPE_OR = "or";
 
   /** The negative query list. */
-  private List<SpanQuery> positiveQueryList, negativeQueryList;
+  private List<MtasSpanQuery> positiveQueryList, negativeQueryList;
 
   /** The condition list. */
   private List<MtasCQLParserWordCondition> conditionList;
@@ -51,8 +51,8 @@ public class MtasCQLParserWordCondition {
     this.type = type;
     not = false;
     simplified = true;
-    positiveQueryList = new ArrayList<SpanQuery>();
-    negativeQueryList = new ArrayList<SpanQuery>();
+    positiveQueryList = new ArrayList<MtasSpanQuery>();
+    negativeQueryList = new ArrayList<MtasSpanQuery>();
     conditionList = new ArrayList<MtasCQLParserWordCondition>();
   }
 
@@ -97,7 +97,7 @@ public class MtasCQLParserWordCondition {
    * @param q
    *          the q
    */
-  public void addPositiveQuery(SpanQuery q) {
+  public void addPositiveQuery(MtasSpanQuery q) {
     positiveQueryList.add(q);
   }
 
@@ -107,7 +107,7 @@ public class MtasCQLParserWordCondition {
    * @param q
    *          the q
    */
-  public void addNegativeQuery(SpanQuery q) {
+  public void addNegativeQuery(MtasSpanQuery q) {
     negativeQueryList.add(q);
   }
 
@@ -116,7 +116,7 @@ public class MtasCQLParserWordCondition {
    *
    * @return the positive query
    */
-  public List<SpanQuery> getPositiveQuery() {
+  public List<MtasSpanQuery> getPositiveQuery() {
     return positiveQueryList;
   }
 
@@ -127,7 +127,7 @@ public class MtasCQLParserWordCondition {
    *          the index
    * @return the positive query
    */
-  public SpanQuery getPositiveQuery(int index) {
+  public MtasSpanQuery getPositiveQuery(int index) {
     if ((index >= 0) && (index < positiveQueryList.size())) {
       return positiveQueryList.get(index);
     } else {
@@ -140,7 +140,7 @@ public class MtasCQLParserWordCondition {
    *
    * @return the negative query
    */
-  public List<SpanQuery> getNegativeQuery() {
+  public List<MtasSpanQuery> getNegativeQuery() {
     return negativeQueryList;
   }
 
@@ -151,7 +151,7 @@ public class MtasCQLParserWordCondition {
    *          the index
    * @return the negative query
    */
-  public SpanQuery getNegativeQuery(int index) {
+  public MtasSpanQuery getNegativeQuery(int index) {
     if ((index >= 0) && (index < negativeQueryList.size())) {
       return negativeQueryList.get(index);
     } else {
@@ -237,7 +237,7 @@ public class MtasCQLParserWordCondition {
       throw new Error("unknown type");
     }
     swapNot();
-    List<SpanQuery> queryList = positiveQueryList;
+    List<MtasSpanQuery> queryList = positiveQueryList;
     positiveQueryList = negativeQueryList;
     negativeQueryList = queryList;
     for (MtasCQLParserWordCondition c : conditionList) {
@@ -282,8 +282,8 @@ public class MtasCQLParserWordCondition {
           } else if (c.isSimplePositive()) {
             // A | B | ( C & D )
             if (c.type().equals(TYPE_AND)) {
-              SpanQuery q = new MtasSpanAndQuery(c.positiveQueryList
-                  .toArray(new SpanQuery[c.positiveQueryList.size()]));
+              MtasSpanQuery q = new MtasSpanAndQuery(c.positiveQueryList
+                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));
               if (c.not()) {
                 negativeQueryList.add(q);
               } else {
@@ -291,8 +291,8 @@ public class MtasCQLParserWordCondition {
               }
               // A & B & ( C | D )
             } else {
-              SpanQuery q = new MtasSpanOrQuery(c.positiveQueryList
-                  .toArray(new SpanQuery[c.positiveQueryList.size()]));
+              MtasSpanQuery q = new MtasSpanOrQuery(c.positiveQueryList
+                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));
               if (c.not()) {
                 negativeQueryList.add(q);
               } else {
@@ -302,8 +302,8 @@ public class MtasCQLParserWordCondition {
           } else if (c.isSimpleNegative()) {
             // A | B | ( !C | !D )
             if (c.type().equals(TYPE_OR)) {
-              SpanQuery q = new MtasSpanAndQuery(c.negativeQueryList
-                  .toArray(new SpanQuery[c.negativeQueryList.size()]));
+              MtasSpanQuery q = new MtasSpanAndQuery(c.negativeQueryList
+                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));
               if (c.not()) {
                 positiveQueryList.add(q);
               } else {
@@ -311,8 +311,8 @@ public class MtasCQLParserWordCondition {
               }
               // A | B | ( !C & !D )
             } else {
-              SpanQuery q = new MtasSpanOrQuery(c.negativeQueryList
-                  .toArray(new SpanQuery[c.negativeQueryList.size()]));
+              MtasSpanQuery q = new MtasSpanOrQuery(c.negativeQueryList
+                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));
               if (c.not()) {
                 positiveQueryList.add(q);
               } else {
@@ -328,11 +328,11 @@ public class MtasCQLParserWordCondition {
             }
             // A | B | ( C & !D )
             if (c.type().equals(TYPE_AND)) {
-              SpanQuery positiveQuery = new MtasSpanAndQuery(c.positiveQueryList
-                  .toArray(new SpanQuery[c.positiveQueryList.size()]));
-              SpanQuery negativeQuery = new MtasSpanAndQuery(c.negativeQueryList
-                  .toArray(new SpanQuery[c.negativeQueryList.size()]));
-              SpanQuery q = new SpanNotQuery(positiveQuery, negativeQuery);
+              MtasSpanQuery positiveQuery = new MtasSpanAndQuery(c.positiveQueryList
+                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));
+              MtasSpanQuery negativeQuery = new MtasSpanAndQuery(c.negativeQueryList
+                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));
+              MtasSpanQuery q = new MtasSpanNotQuery(positiveQuery, negativeQuery);
               if (c.not()) {
                 negativeQueryList.add(q);
               } else {
@@ -340,11 +340,11 @@ public class MtasCQLParserWordCondition {
               }
               // A & B & ( C | !D )
             } else {
-              SpanQuery positiveQuery = new MtasSpanOrQuery(c.positiveQueryList
-                  .toArray(new SpanQuery[c.positiveQueryList.size()]));
-              SpanQuery negativeQuery = new MtasSpanOrQuery(c.negativeQueryList
-                  .toArray(new SpanQuery[c.negativeQueryList.size()]));
-              SpanQuery q = new SpanNotQuery(positiveQuery, negativeQuery);
+              MtasSpanQuery positiveQuery = new MtasSpanOrQuery(c.positiveQueryList
+                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));
+              MtasSpanQuery negativeQuery = new MtasSpanOrQuery(c.negativeQueryList
+                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));
+              MtasSpanQuery q = new MtasSpanNotQuery(positiveQuery, negativeQuery);
               if (c.not()) {
                 negativeQueryList.add(q);
               } else {
@@ -390,13 +390,13 @@ public class MtasCQLParserWordCondition {
       text += firstIndent + "Type: " + type;
       text += (not ? " (not)\n" : "\n");
       if (positiveQueryList.size() > 0) {
-        for (SpanQuery q : positiveQueryList) {
+        for (MtasSpanQuery q : positiveQueryList) {
           text += indent + "List Positive Subqueries: " + q.toString(field)
               + "\n";
         }
       }
       if (negativeQueryList.size() > 0) {
-        for (SpanQuery q : negativeQueryList) {
+        for (MtasSpanQuery q : negativeQueryList) {
           text += indent + "List Negative Queries: " + q.toString(field) + "\n";
         }
       }

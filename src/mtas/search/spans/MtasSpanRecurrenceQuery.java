@@ -10,18 +10,19 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
+
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasSpanRecurrenceQuery.
  */
-public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
+public class MtasSpanRecurrenceQuery extends MtasSpanQuery
+    implements Cloneable {
 
   /** The clause. */
-  private SpanQuery clause;
+  private MtasSpanQuery clause;
 
   /** The minimum recurrence. */
   private int minimumRecurrence;
@@ -29,24 +30,26 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
   /** The maximum recurrence. */
   private int maximumRecurrence;
 
+  /** The ignore clause. */
+  private MtasSpanQuery ignoreClause;
+
+  /** The maximum ignore length. */
+  private Integer maximumIgnoreLength;
+
   /** The field. */
   private String field;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanRecurrenceQuery";
 
   /**
    * Instantiates a new mtas span recurrence query.
    *
-   * @param clause
-   *          the clause
-   * @param minimumRecurrence
-   *          the minimum recurrence
-   * @param maximumRecurrence
-   *          the maximum recurrence
+   * @param clause the clause
+   * @param minimumRecurrence the minimum recurrence
+   * @param maximumRecurrence the maximum recurrence
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasSpanRecurrenceQuery(SpanQuery clause, int minimumRecurrence,
-      int maximumRecurrence) {
+  public MtasSpanRecurrenceQuery(MtasSpanQuery clause, int minimumRecurrence,
+      int maximumRecurrence, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     if (minimumRecurrence > maximumRecurrence) {
       throw new IllegalArgumentException(
           "minimumRecurrence > maximumRecurrence");
@@ -59,6 +62,18 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     this.maximumRecurrence = maximumRecurrence;
     field = clause.getField();
     this.clause = clause;
+    if (field != null && ignore != null) {
+      if (ignore.getField() == null || field.equals(ignore.getField())) {
+        this.ignoreClause = ignore;
+        this.maximumIgnoreLength = maximumIgnoreLength;
+      } else {
+        throw new IllegalArgumentException(
+            "ignore must have same field as clauses");
+      }
+    } else {
+      this.ignoreClause = null;
+      this.maximumIgnoreLength = null;
+    }
   }
 
   /**
@@ -66,7 +81,7 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
    *
    * @return the clause
    */
-  public SpanQuery getClause() {
+  public MtasSpanQuery getClause() {
     return clause;
   }
 
@@ -95,11 +110,15 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public Query rewrite(IndexReader reader) throws IOException {
-    SpanQuery query = (SpanQuery) clause.rewrite(reader);
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    MtasSpanQuery query = clause.rewrite(reader);
+    MtasSpanQuery ignoreQuery = null;
+    if (ignoreClause != null) {
+      ignoreQuery = ignoreClause.rewrite(reader);
+    }
     if (query != clause) { // clause rewrote: must clone
       return new MtasSpanRecurrenceQuery(query, minimumRecurrence,
-          maximumRecurrence);
+          maximumRecurrence, ignoreQuery, maximumIgnoreLength);
     } else {
       return this; // no rewrote
     }
@@ -113,9 +132,11 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("mtasSpanRecurrence([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     buffer.append(clause.toString(clause.getField()));
     buffer.append("," + minimumRecurrence + "," + maximumRecurrence);
+    buffer.append(", ");
+    buffer.append(ignoreClause);
     buffer.append("])");
     return buffer.toString();
   }
@@ -133,10 +154,13 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final MtasSpanRecurrenceQuery that = (MtasSpanRecurrenceQuery) obj;
-    return clause.equals(that.clause)
-        && minimumRecurrence == that.minimumRecurrence
-        && maximumRecurrence == that.maximumRecurrence;
+    final MtasSpanRecurrenceQuery other = (MtasSpanRecurrenceQuery) obj;
+    return clause.equals(other.clause)
+        && minimumRecurrence == other.minimumRecurrence
+        && maximumRecurrence == other.maximumRecurrence
+        && ((ignoreClause == null && other.ignoreClause == null)
+            || ignoreClause != null && other.ignoreClause != null
+                && ignoreClause.equals(other.ignoreClause));
   }
 
   /*
@@ -146,7 +170,7 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ clause.hashCode();
     h = (h * 11) ^ minimumRecurrence;
     h = (h * 13) ^ maximumRecurrence;
@@ -164,7 +188,12 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     SpanWeight subWeight = clause.createWeight(searcher, false);
-    return new SpanRecurrenceWeight(subWeight, searcher,
+    SpanWeight ignoreWeight = null;
+    if (ignoreClause != null) {
+      ignoreWeight = ignoreClause.createWeight(searcher, false);
+    }
+    return new SpanRecurrenceWeight(subWeight, ignoreWeight,
+        maximumIgnoreLength, searcher,
         needsScores ? getTermContexts(subWeight) : null);
   }
 
@@ -176,22 +205,29 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
     /** The sub weight. */
     final SpanWeight subWeight;
 
+    /** The ignore weight. */
+    final SpanWeight ignoreWeight;
+
+    /** The maximum ignore length. */
+    final Integer maximumIgnoreLength;
+
     /**
      * Instantiates a new span recurrence weight.
      *
-     * @param subWeight
-     *          the sub weight
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param subWeight the sub weight
+     * @param ignoreWeight the ignore weight
+     * @param maximumIgnoreLength the maximum ignore length
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public SpanRecurrenceWeight(SpanWeight subWeight, IndexSearcher searcher,
+    public SpanRecurrenceWeight(SpanWeight subWeight, SpanWeight ignoreWeight,
+        Integer maximumIgnoreLength, IndexSearcher searcher,
         Map<Term, TermContext> terms) throws IOException {
       super(MtasSpanRecurrenceQuery.this, searcher, terms);
       this.subWeight = subWeight;
+      this.ignoreWeight = ignoreWeight;
+      this.maximumIgnoreLength = maximumIgnoreLength;
     }
 
     /*
@@ -224,12 +260,17 @@ public class MtasSpanRecurrenceQuery extends SpanQuery implements Cloneable {
         if (terms == null) {
           return null; // field does not exist
         }
-        Spans subSpan = subWeight.getSpans(context, requiredPostings);
-        if (subSpan == null) {
+        Spans subSpans = subWeight.getSpans(context, requiredPostings);
+        if (subSpans == null) {
           return null;
         } else {
-          return new MtasSpanRecurrence(MtasSpanRecurrenceQuery.this, subSpan,
-              minimumRecurrence, maximumRecurrence);
+          Spans ignoreSpans = null;
+          if (ignoreWeight != null) {
+            ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);
+          }
+          return new MtasSpanRecurrenceSpans(MtasSpanRecurrenceQuery.this,
+              subSpans, minimumRecurrence, maximumRecurrence, ignoreSpans,
+              maximumIgnoreLength);
         }
       }
     }

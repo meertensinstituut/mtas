@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
+import mtas.search.spans.util.MtasSpanQuery;
+
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -14,23 +16,19 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanPositionQuery.
  */
-public class MtasSpanPositionQuery extends SpanQuery {
+public class MtasSpanPositionQuery extends MtasSpanQuery {
 
   /** The field. */
   private String field;
 
   /** The end. */
   private int start, end;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanPositionQuery";
 
   /**
    * Instantiates a new mtas span position query.
@@ -153,7 +151,7 @@ public class MtasSpanPositionQuery extends SpanQuery {
           return new MtasSpanMatchNoneSpans(field);
         } else {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
-          return new MtasSpanPosition(mtasCodecInfo, field, start, end);
+          return new MtasSpanPositionSpans(mtasCodecInfo, field, start, end);
         }
       } catch (Exception e) {
         throw new IOException("Can't get reader");
@@ -194,7 +192,7 @@ public class MtasSpanPositionQuery extends SpanQuery {
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
     buffer.append(
-        QUERY_NAME + "([" + start + (start != end ? "," + end : "") + "])");
+        this.getClass().getSimpleName() + "([" + start + (start != end ? "," + end : "") + "])");
     return buffer.toString();
   }
 
@@ -222,7 +220,7 @@ public class MtasSpanPositionQuery extends SpanQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ field.hashCode();
     h = (h * 13) ^ start;
     h = (h * 17) ^ end;

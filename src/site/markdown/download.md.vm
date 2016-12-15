@@ -13,9 +13,9 @@
     <tr>
       <td>$context.get("currentDevelopmentVersion")</td>
       <td>$context.get("currentDevelopmentRelease")</td>
-      <td><a href='https://github.com/matthijsbrouwer/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar'>Binary (jar)</a></td>
-      <td><a href='https://github.com/matthijsbrouwer/mtas/archive/${currentDevelopmentRelease}.tar.gz'>Source (tgz)</a></td>
-      <td><a href='https://github.com/matthijsbrouwer/mtas/archive/${currentDevelopmentRelease}.zip'>Source (zip)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar'>Binary (jar)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/${currentDevelopmentRelease}.tar.gz'>Source (tgz)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/${currentDevelopmentRelease}.zip'>Source (zip)</a></td>
       <td>Development version</td>
     </tr>
   </tbody>

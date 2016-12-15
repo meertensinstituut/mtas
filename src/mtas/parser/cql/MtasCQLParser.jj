@@ -23,11 +23,12 @@ import mtas.parser.cql.util.MtasCQLParserSentencePartCondition;
 import mtas.parser.cql.util.MtasCQLParserGroupQuery;
 import mtas.parser.cql.util.MtasCQLParserWordQuery;
 import mtas.parser.cql.util.MtasCQLParserDefaultPrefixCondition;
-import org.apache.lucene.search.spans.SpanContainingQuery;
-import org.apache.lucene.search.spans.SpanNotQuery;
-import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.search.spans.SpanWithinQuery;
 import org.apache.lucene.index.Term;
+import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.MtasSpanContainingQuery;
+import mtas.search.spans.MtasSpanWithinQuery;
+import mtas.search.spans.MtasSpanIntersectingQuery;
+import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import java.util.ArrayList;
@@ -38,10 +39,10 @@ import java.util.regex.Pattern;
 
 public class MtasCQLParser
 {
-  public SpanQuery parse(String field, String defaultPrefix, HashMap<String, String[] > variables) throws ParseException
+  public MtasSpanQuery parse(String field, String defaultPrefix, HashMap<String, String[] > variables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException
   {
     HashSet<String> usedVariables = new HashSet<String>();
-    SpanQuery query = cql(field, defaultPrefix, variables, usedVariables);
+    MtasSpanQuery query = cql(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
     if(variables!=null && variables.size() > usedVariables.size()) {
       for(String key : variables.keySet()) {
         if(!usedVariables.contains(key)) {
@@ -101,6 +102,16 @@ TOKEN :
 TOKEN :
 {
   < NOT_WITHIN : "!within" >
+}
+
+TOKEN :
+{
+  < INTERSECTING : "intersecting" >
+}
+
+TOKEN :
+{
+  < NOT_INTERSECTING : "!intersecting" >
 }
 
 TOKEN :
@@ -234,18 +245,18 @@ TOKEN :
   >
 }
 
-private SpanQuery cql(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasSpanQuery cql(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
-  SpanQuery q;
+  MtasSpanQuery q;
   ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
 }
 {
-  q = cqlBlock(field, defaultPrefix, variables, usedVariables)
+  q = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
   {
     itemList.add(new MtasSpanSequenceItem(q, false));
   }
   (
-    q = cqlBlock(field, defaultPrefix, variables, usedVariables)
+    q = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
     {
       itemList.add(new MtasSpanSequenceItem(q, false));
     }
@@ -254,7 +265,7 @@ private SpanQuery cql(String field, String defaultPrefix, HashMap<String, String
   {
     if (itemList.size() > 1)
     {
-      return new MtasSpanSequenceQuery(itemList);
+      return new MtasSpanSequenceQuery(itemList, ignore, maximumIgnoreLength);
     }
     else
     {
@@ -263,22 +274,24 @@ private SpanQuery cql(String field, String defaultPrefix, HashMap<String, String
   }
 }
 
-private SpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasSpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore,Integer maximumIgnoreLength) throws ParseException :
 {
   MtasCQLParserSentenceCondition s1 = null, s2 = null;
-  SpanQuery q1 = null, q2 = null;
+  MtasSpanQuery q1 = null, q2 = null;
   Token end = null;
   String operator = null;
   String OPERATOR_CONTAINING = "containing";
   String OPERATOR_NOT_CONTAINING = "not_containing";
   String OPERATOR_WITHIN = "within";
   String OPERATOR_NOT_WITHIN = "not_within";
+  String OPERATOR_INTERSECTING = "intersecting";
+  String OPERATOR_NOT_INTERSECTING = "not_intersecting";
 }
 {
   (
-    s1 = sentence(field, defaultPrefix, variables, usedVariables)
+    s1 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
   | 
-    < BRACKET_START > q1 = cqlBlock(field, defaultPrefix, variables, usedVariables) < BRACKET_END >
+    < BRACKET_START > q1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength) < BRACKET_END >
   )
   [
     (
@@ -298,10 +311,18 @@ private SpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, S
       {
         operator = OPERATOR_NOT_WITHIN;
       }
+      | < INTERSECTING >
+      {
+        operator = OPERATOR_INTERSECTING;
+      }
+    | < NOT_INTERSECTING >
+      {
+        operator = OPERATOR_NOT_INTERSECTING;
+      }
     )
     (
-      s2 = sentence(field, defaultPrefix, variables, usedVariables)
-    | < BRACKET_START > q2 = cqlBlock(field, defaultPrefix, variables, usedVariables) < BRACKET_END >
+      s2 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+    | < BRACKET_START > q2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength) < BRACKET_END >
     )
   ]
   {
@@ -317,19 +338,27 @@ private SpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, S
       }
       if (operator.equals(OPERATOR_CONTAINING))
       {
-        return new SpanContainingQuery(q1, q2);
+        return new MtasSpanContainingQuery(q1, q2);
       }
       else if (operator.equals(OPERATOR_NOT_CONTAINING))
       {
-        return new SpanNotQuery(q1, new SpanContainingQuery(q1, q2));
+        return new MtasSpanNotQuery(q1, new MtasSpanContainingQuery(q1, q2));
       }
       else if (operator.equals(OPERATOR_WITHIN))
       {
-        return new SpanWithinQuery(q2, q1);
+        return new MtasSpanWithinQuery(q2, q1);
       }
       else if (operator.equals(OPERATOR_NOT_WITHIN))
       {
-        return new SpanNotQuery(q1, new SpanWithinQuery(q2, q1));
+        return new MtasSpanNotQuery(q1, new MtasSpanWithinQuery(q2, q1));
+      }
+      else if (operator.equals(OPERATOR_INTERSECTING))
+      {
+        return new MtasSpanIntersectingQuery(q2, q1);
+      }
+      else if (operator.equals(OPERATOR_NOT_INTERSECTING))
+      {
+        return new MtasSpanNotQuery(q1, new MtasSpanIntersectingQuery(q2, q1));
       }
       else
       {
@@ -343,7 +372,7 @@ private SpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, S
   }
 }
 
-private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasCQLParserSentenceCondition sentenceCondition;
   MtasCQLParserSentencePartCondition condition;
@@ -354,14 +383,14 @@ private MtasCQLParserSentenceCondition sentence(String field, String defaultPref
   int maximumOccurence = 1;
 }
 {
-  condition = sentencePart(field, defaultPrefix, variables, usedVariables)
+  condition = sentencePart(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
   {
     sentenceCondition = condition.createFullSentence();
     return sentenceCondition;
   }
 }
 
-private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   Token operator;
   MtasCQLParserSentencePartCondition condition, sentencePart;
@@ -374,13 +403,13 @@ private MtasCQLParserSentencePartCondition sentencePart(String field, String def
 }
 {
   (
-    basicSentence = basicSentence(field, defaultPrefix, variables, usedVariables)
+    basicSentence = basicSentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
     {
-      condition = new MtasCQLParserSentencePartCondition(basicSentence);
+      condition = new MtasCQLParserSentencePartCondition(basicSentence, ignore, maximumIgnoreLength);
     }
   |
     (
-      < BRACKET_START > sentencePart = sentencePart(field, defaultPrefix, variables, usedVariables) < BRACKET_END >
+      < BRACKET_START > sentencePart = sentencePart(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength) < BRACKET_END >
       [
         {
           questionMark = null;
@@ -392,7 +421,7 @@ private MtasCQLParserSentencePartCondition sentencePart(String field, String def
         )
       ]
       {
-        condition = new MtasCQLParserSentencePartCondition(sentencePart.createFullSentence());
+        condition = new MtasCQLParserSentencePartCondition(sentencePart.createFullSentence(), ignore, maximumIgnoreLength);
         if (questionMark != null)
         {
           minimumOccurence = 0;
@@ -420,7 +449,7 @@ private MtasCQLParserSentencePartCondition sentencePart(String field, String def
     }
     [ operator = < OR > ]
     (
-      sentencePart = sentencePart(field, defaultPrefix, variables, usedVariables)
+      sentencePart = sentencePart(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
       {
         if (operator == null)
         {
@@ -439,11 +468,11 @@ private MtasCQLParserSentencePartCondition sentencePart(String field, String def
   }
 }
 
-private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasCQLParserWordFullCondition subWordCondition;
   MtasCQLParserGroupFullCondition subGroupCondition;
-  MtasCQLParserBasicSentenceCondition condition = new MtasCQLParserBasicSentenceCondition();
+  MtasCQLParserBasicSentenceCondition condition = new MtasCQLParserBasicSentenceCondition(ignore, maximumIgnoreLength);
 }
 { 
   (
@@ -568,13 +597,13 @@ private MtasCQLParserGroupCondition groupCondition(String field) throws ParseExc
   {
     if (value != null)
     {
-      SpanQuery q = new MtasCQLParserGroupQuery(field, prefix.image, unquoteString(value.image));
+      MtasSpanQuery q = new MtasCQLParserGroupQuery(field, prefix.image, unquoteString(value.image));
       MtasCQLParserGroupCondition condition = new MtasCQLParserGroupCondition(field, q);
       return condition;
     }
     else
     {
-      SpanQuery q = new MtasCQLParserGroupQuery(field, prefix.image, null);
+      MtasSpanQuery q = new MtasCQLParserGroupQuery(field, prefix.image, null);
       MtasCQLParserGroupCondition condition = new MtasCQLParserGroupCondition(field, q);
       return condition;
     }
@@ -802,12 +831,12 @@ private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap<Strin
         MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
         if (startPosition != null && endPosition != null)
         {
-          SpanQuery q = new MtasCQLParserWordPositionQuery(field, startPosition, endPosition);
+          MtasSpanQuery q = new MtasCQLParserWordPositionQuery(field, startPosition, endPosition);
           condition.addPositiveQuery(q);
         }
         else if (startPosition != null)
         {
-          SpanQuery q = new MtasCQLParserWordPositionQuery(field, startPosition, startPosition);
+          MtasSpanQuery q = new MtasCQLParserWordPositionQuery(field, startPosition, startPosition);
           condition.addPositiveQuery(q);
         }
         else
@@ -836,7 +865,7 @@ private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap<Strin
         {
           MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
           Term term = new Term(field, prefix.image + MtasToken.DELIMITER + value.image);
-          SpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, variableString(value.image), MtasCQLParserWordQuery.MTAS_CQL_VARIABLE_QUERY, variables, usedVariables);
+          MtasSpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, variableString(value.image), MtasCQLParserWordQuery.MTAS_CQL_VARIABLE_QUERY, variables, usedVariables);
           if (negation != null)
           {
             condition.swapNot();
@@ -864,7 +893,7 @@ private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap<Strin
         {
           MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
           Term term = new Term(field, prefix.image + MtasToken.DELIMITER + unquoteString(value.image));
-          SpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, unquoteString(value.image), MtasCQLParserWordQuery.MTAS_CQL_REGEXP_QUERY, variables, usedVariables);
+          MtasSpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, unquoteString(value.image), MtasCQLParserWordQuery.MTAS_CQL_REGEXP_QUERY, variables, usedVariables);
           if (negation != null)
           {
             condition.swapNot();

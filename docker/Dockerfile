@@ -1,5 +1,5 @@
 # Automatically generated Dockerfile 
-# - Build 2016-11-16 09:40
+# - Build 2016-12-14 09:45
 # - Lucene/Solr version 6.3.0
 # - Mtas release 20161116 
 #
@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
-&& printf "echo \"  Timestamp 2016-11-16 09:40\"\n" >> /start.sh \
+&& printf "echo \"  Timestamp 2016-12-14 09:45\"\n" >> /start.sh \
 && printf "echo \"  Lucene/Solr version 6.3.0\"\n" >> /start.sh \
 && printf "echo \"  Mtas release 20161116\"\n" >> /start.sh \
 && printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh \

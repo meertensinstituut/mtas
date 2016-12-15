@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -15,6 +14,7 @@ import org.apache.solr.handler.component.ShardRequest;
 
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecUtil;
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentKwic;
@@ -46,13 +46,19 @@ public class MtasSolrComponentKwic {
   /** The Constant NAME_MTAS_KWIC_QUERY_PREFIX. */
   public static final String NAME_MTAS_KWIC_QUERY_PREFIX = "query.prefix";
 
+  /** The Constant NAME_MTAS_KWIC_QUERY_IGNORE. */
+  public static final String NAME_MTAS_KWIC_QUERY_IGNORE = "query.ignore";
+
+  /** The Constant NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH. */
+  public static final String NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumQueryLength";
+
   /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
   public static final String NAME_MTAS_KWIC_QUERY_VARIABLE = "query.variable";
-  
-  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
+
+  /** The Constant SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME = "name";
-  
-  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
+
+  /** The Constant SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE = "value";
 
   /** The Constant NAME_MTAS_KWIC_KEY. */
@@ -116,7 +122,9 @@ public class MtasSolrComponentKwic {
       String[] queryTypes = new String[ids.size()];
       String[] queryValues = new String[ids.size()];
       String[] queryPrefixes = new String[ids.size()];
-      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];      
+      String[] queryIgnores = new String[ids.size()];
+      String[] queryMaximumIgnoreLengths = new String[ids.size()];
+      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];
       String[] keys = new String[ids.size()];
       String[] prefixes = new String[ids.size()];
       String[] numbers = new String[ids.size()];
@@ -135,44 +143,47 @@ public class MtasSolrComponentKwic {
         queryPrefixes[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_PREFIX,
             null);
+        queryIgnores[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_IGNORE,
+            null);
+        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams()
+            .get(PARAM_MTAS_KWIC + "." + id + "."
+                + NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH, null);
         Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
             rb.req.getParams(),
-            PARAM_MTAS_KWIC + "." + id + "."
-                + NAME_MTAS_KWIC_QUERY_VARIABLE);
+            PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_VARIABLE);
         queryVariables[tmpCounter] = new HashMap<String, String[]>();
         if (vIds.size() > 0) {
           HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
           for (String vId : vIds) {
-            String name = rb.req.getParams()
-                .get(PARAM_MTAS_KWIC + "." + id + "."
-                    + NAME_MTAS_KWIC_QUERY_VARIABLE + "." + vId
-                    + "." + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME,
-                    null);
+            String name = rb.req.getParams().get(
+                PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_VARIABLE
+                    + "." + vId + "." + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME,
+                null);
             if (name != null) {
               if (!tmpVariables.containsKey(name)) {
                 tmpVariables.put(name, new ArrayList<String>());
               }
               String value = rb.req.getParams()
                   .get(PARAM_MTAS_KWIC + "." + id + "."
-                      + NAME_MTAS_KWIC_QUERY_VARIABLE + "." + vId
-                      + "." + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE,
-                      null);
+                      + NAME_MTAS_KWIC_QUERY_VARIABLE + "." + vId + "."
+                      + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE, null);
               if (value != null) {
                 ArrayList<String> list = new ArrayList<String>();
                 String[] subList = value.split("(?<!\\\\),");
-                for(int i=0; i<subList.length; i++) {
-                  list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
-                }                    
-                tmpVariables.get(name).addAll(list);                    
+                for (int i = 0; i < subList.length; i++) {
+                  list.add(
+                      subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                }
+                tmpVariables.get(name).addAll(list);
               }
             }
           }
           for (String name : tmpVariables.keySet()) {
-            queryVariables[tmpCounter].put(name,
-                tmpVariables.get(name)
-                    .toArray(new String[tmpVariables.get(name).size()]));
+            queryVariables[tmpCounter].put(name, tmpVariables.get(name)
+                .toArray(new String[tmpVariables.get(name).size()]));
           }
-        }        
+        }
         keys[tmpCounter] = rb.req.getParams()
             .get(PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_KEY,
                 String.valueOf(tmpCounter))
@@ -211,6 +222,11 @@ public class MtasSolrComponentKwic {
           NAME_MTAS_KWIC_QUERY_TYPE, NAME_MTAS_KWIC_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(queryPrefixes, fields,
           NAME_MTAS_KWIC_QUERY_PREFIX, NAME_MTAS_KWIC_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(queryIgnores, fields,
+          NAME_MTAS_KWIC_QUERY_IGNORE, NAME_MTAS_KWIC_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(queryMaximumIgnoreLengths, fields,
+          NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH, NAME_MTAS_KWIC_FIELD,
+          false);
       MtasSolrResultUtil.compareAndCheck(prefixes, fields,
           NAME_MTAS_KWIC_PREFIX, NAME_MTAS_KWIC_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(numbers, fields, NAME_MTAS_KWIC_NUMBER,
@@ -225,8 +241,11 @@ public class MtasSolrComponentKwic {
           NAME_MTAS_KWIC_FIELD, false);
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
-        SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
-            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i]);
+        Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i] == null)
+            ? null : Integer.parseInt(queryMaximumIgnoreLengths[i]);
+        MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i],
+            queryIgnores[i], maximumIgnoreLength);
         // minimize number of queries
         if (cf.spanQueryList.contains(q)) {
           q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -403,8 +422,12 @@ public class MtasSolrComponentKwic {
                 PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_TYPE);
             sreq.params.remove(
                 PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_VALUE);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_PREFIX);            
+            sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
+                + NAME_MTAS_KWIC_QUERY_PREFIX);
+            sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
+                + NAME_MTAS_KWIC_QUERY_IGNORE);
+            sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
+                + NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH);
             sreq.params
                 .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_KEY);
             sreq.params.remove(

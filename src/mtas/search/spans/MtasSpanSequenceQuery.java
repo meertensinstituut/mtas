@@ -13,32 +13,37 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
+
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasSpanSequenceQuery.
  */
-public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
+public class MtasSpanSequenceQuery extends MtasSpanQuery implements Cloneable {
 
   /** The items. */
   private List<MtasSpanSequenceItem> items;
 
+  /** The ignore clause. */
+  private MtasSpanQuery ignoreClause;
+
+  /** The maximum ignore length. */
+  private Integer maximumIgnoreLength;
+
   /** The field. */
   private String field;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanSequenceQuery";
 
   /**
    * Instantiates a new mtas span sequence query.
    *
-   * @param items
-   *          the items
+   * @param items the items
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items) {
+  public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
+      MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     this.items = items;
     // get field and do checks
     for (MtasSpanSequenceItem item : items) {
@@ -48,6 +53,18 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
           && !item.getQuery().getField().equals(field)) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
+    }
+    if (field != null && ignore != null) {
+      if (ignore.getField() == null || field.equals(ignore.getField())) {
+        this.ignoreClause = ignore;
+        this.maximumIgnoreLength = maximumIgnoreLength;
+      } else {
+        throw new IllegalArgumentException(
+            "ignore must have same field as clauses");
+      }
+    } else {
+      this.ignoreClause = null;
+      this.maximumIgnoreLength = null;
     }
   }
 
@@ -73,7 +90,8 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
     for (int i = 0; i < sz; i++) {
       newItems.add(items.get(i).clone());
     }
-    MtasSpanSequenceQuery soq = new MtasSpanSequenceQuery(newItems);
+    MtasSpanSequenceQuery soq = new MtasSpanSequenceQuery(newItems,
+        ignoreClause, maximumIgnoreLength);
     return soq;
   }
 
@@ -84,15 +102,23 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public Query rewrite(IndexReader reader) throws IOException {
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanSequenceQuery clone = null;
     for (int i = 0; i < items.size(); i++) {
-      SpanQuery c = items.get(i).getQuery();
-      SpanQuery query = (SpanQuery) c.rewrite(reader);
+      MtasSpanQuery c = items.get(i).getQuery();
+      MtasSpanQuery query = (MtasSpanQuery) c.rewrite(reader);
       if (query != c) { // clause rewrote: must clone
-        if (clone == null)
+        if (clone == null) {
           clone = this.clone();
+        }
         clone.items.get(i).setQuery(query);
+      }
+    }
+    if (ignoreClause != null) {
+      MtasSpanQuery query = (MtasSpanQuery) ignoreClause.rewrite(reader);
+      if (query != ignoreClause) {
+        clone = this.clone();
+        clone.ignoreClause = query;
       }
     }
     if (clone != null) {
@@ -110,11 +136,11 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
+    buffer.append(this.getClass().getSimpleName() + "([");
     Iterator<MtasSpanSequenceItem> i = items.iterator();
     while (i.hasNext()) {
       MtasSpanSequenceItem item = i.next();
-      SpanQuery clause = item.getQuery();
+      MtasSpanQuery clause = item.getQuery();
       buffer.append(clause.toString(field));
       if (item.isOptional()) {
         buffer.append("{OPTIONAL}");
@@ -123,7 +149,10 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
         buffer.append(", ");
       }
     }
-    buffer.append("])");
+    buffer.append("]");
+    buffer.append(", ");
+    buffer.append(ignoreClause);
+    buffer.append(")");
     return buffer.toString();
   }
 
@@ -141,7 +170,10 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
     if (getClass() != obj.getClass())
       return false;
     MtasSpanSequenceQuery other = (MtasSpanSequenceQuery) obj;
-    return field.equals(other.field) && items.equals(other.items);
+    return field.equals(other.field) && items.equals(other.items)
+        && ((ignoreClause == null && other.ignoreClause == null)
+            || ignoreClause != null && other.ignoreClause != null
+                && ignoreClause.equals(other.ignoreClause));
   }
 
   /*
@@ -151,8 +183,9 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
    */
   @Override
   public int hashCode() {
-    int h = field.hashCode();
-    h = (h * 7) ^ items.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 3) ^ field.hashCode();
+    h = (h * 5) ^ items.hashCode();
     return h;
   }
 
@@ -166,26 +199,29 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
-    List<MtasSpanSequenceWeight> subWeights = new ArrayList<MtasSpanSequenceWeight>();
+    List<MtasSpanSequenceQueryWeight> subWeights = new ArrayList<MtasSpanSequenceQueryWeight>();
+    SpanWeight ignoreWeight = null;
     for (MtasSpanSequenceItem item : items) {
-      subWeights.add(new MtasSpanSequenceWeight(
+      subWeights.add(new MtasSpanSequenceQueryWeight(
           item.getQuery().createWeight(searcher, false), item.isOptional()));
     }
-    return new SpanSequenceWeight(subWeights, searcher,
-        needsScores ? getTermContexts(subWeights) : null);
+    if (ignoreClause != null) {
+      ignoreWeight = ignoreClause.createWeight(searcher, false);
+    }
+    return new SpanSequenceWeight(subWeights, ignoreWeight, maximumIgnoreLength,
+        searcher, needsScores ? getTermContexts(subWeights) : null);
   }
 
   /**
    * Gets the term contexts.
    *
-   * @param items
-   *          the items
+   * @param items the items
    * @return the term contexts
    */
   protected Map<Term, TermContext> getTermContexts(
-      List<MtasSpanSequenceWeight> items) {
+      List<MtasSpanSequenceQueryWeight> items) {
     List<SpanWeight> weights = new ArrayList<SpanWeight>();
-    for (MtasSpanSequenceWeight item : items) {
+    for (MtasSpanSequenceQueryWeight item : items) {
       weights.add(item.spanWeight);
     }
     return getTermContexts(weights);
@@ -197,25 +233,32 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
   public class SpanSequenceWeight extends SpanWeight {
 
     /** The sub weights. */
-    final List<MtasSpanSequenceWeight> subWeights;
+    final List<MtasSpanSequenceQueryWeight> subWeights;
+
+    /** The ignore weight. */
+    final SpanWeight ignoreWeight;
+
+    /** The maximum ignore length. */
+    final Integer maximumIgnoreLength;
 
     /**
      * Instantiates a new span sequence weight.
      *
-     * @param subWeights
-     *          the sub weights
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param subWeights the sub weights
+     * @param ignoreWeight the ignore weight
+     * @param maximumIgnoreLength the maximum ignore length
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public SpanSequenceWeight(List<MtasSpanSequenceWeight> subWeights,
+    public SpanSequenceWeight(List<MtasSpanSequenceQueryWeight> subWeights,
+        SpanWeight ignoreWeight, Integer maximumIgnoreLength,
         IndexSearcher searcher, Map<Term, TermContext> terms)
         throws IOException {
       super(MtasSpanSequenceQuery.this, searcher, terms);
       this.subWeights = subWeights;
+      this.ignoreWeight = ignoreWeight;
+      this.maximumIgnoreLength = maximumIgnoreLength;
     }
 
     /*
@@ -227,8 +270,11 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
-      for (MtasSpanSequenceWeight w : subWeights) {
+      for (MtasSpanSequenceQueryWeight w : subWeights) {
         w.spanWeight.extractTermContexts(contexts);
+      }
+      if (ignoreWeight != null) {
+        ignoreWeight.extractTermContexts(contexts);
       }
     }
 
@@ -247,18 +293,20 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
       if (terms == null) {
         return null; // field does not exist
       }
-      List<MtasSpanSequenceSpans> setSequenceSpans = new ArrayList<>(
+      List<MtasSpanSequenceQuerySpans> setSequenceSpans = new ArrayList<>(
           items.size());
+      Spans ignoreSpans = null;
       boolean allSpansEmpty = true;
-      for (MtasSpanSequenceWeight w : subWeights) {
+      for (MtasSpanSequenceQueryWeight w : subWeights) {
         Spans sequenceSpans = w.spanWeight.getSpans(context, requiredPostings);
         if (sequenceSpans != null) {
           setSequenceSpans
-              .add(new MtasSpanSequenceSpans(sequenceSpans, w.optional));
+              .add(new MtasSpanSequenceQuerySpans(sequenceSpans, w.optional));
           allSpansEmpty = false;
         } else {
           if (w.optional) {
-            setSequenceSpans.add(new MtasSpanSequenceSpans(null, w.optional));
+            setSequenceSpans
+                .add(new MtasSpanSequenceQuerySpans(null, w.optional));
           } else {
             return null;
           }
@@ -266,8 +314,11 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
       }
       if (allSpansEmpty) {
         return null; // at least one required
+      } else if (ignoreWeight != null) {
+        ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);
       }
-      return new MtasSpanSequence(MtasSpanSequenceQuery.this, setSequenceSpans);
+      return new MtasSpanSequenceSpans(MtasSpanSequenceQuery.this,
+          setSequenceSpans, ignoreSpans, maximumIgnoreLength);
     }
 
     /*
@@ -277,17 +328,20 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
      */
     @Override
     public void extractTerms(Set<Term> terms) {
-      for (MtasSpanSequenceWeight w : subWeights) {
+      for (MtasSpanSequenceQueryWeight w : subWeights) {
         w.spanWeight.extractTerms(terms);
+      }
+      if (ignoreWeight != null) {
+        ignoreWeight.extractTerms(terms);
       }
     }
 
   }
 
   /**
-   * The Class MtasSpanSequenceSpans.
+   * The Class MtasSpanSequenceQuerySpans.
    */
-  public class MtasSpanSequenceSpans {
+  public class MtasSpanSequenceQuerySpans {
 
     /** The spans. */
     public Spans spans;
@@ -296,23 +350,21 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
     public boolean optional;
 
     /**
-     * Instantiates a new mtas span sequence spans.
+     * Instantiates a new mtas span sequence query spans.
      *
-     * @param spans
-     *          the spans
-     * @param optional
-     *          the optional
+     * @param spans the spans
+     * @param optional the optional
      */
-    public MtasSpanSequenceSpans(Spans spans, boolean optional) {
+    public MtasSpanSequenceQuerySpans(Spans spans, boolean optional) {
       this.spans = spans;
       this.optional = optional;
     }
   }
 
   /**
-   * The Class MtasSpanSequenceWeight.
+   * The Class MtasSpanSequenceQueryWeight.
    */
-  public class MtasSpanSequenceWeight {
+  public class MtasSpanSequenceQueryWeight {
 
     /** The span weight. */
     public SpanWeight spanWeight;
@@ -321,14 +373,13 @@ public class MtasSpanSequenceQuery extends SpanQuery implements Cloneable {
     public boolean optional;
 
     /**
-     * Instantiates a new mtas span sequence weight.
+     * Instantiates a new mtas span sequence query weight.
      *
-     * @param spanWeight
-     *          the span weight
-     * @param optional
-     *          the optional
+     * @param spanWeight the span weight
+     * @param optional the optional
      */
-    public MtasSpanSequenceWeight(SpanWeight spanWeight, boolean optional) {
+    public MtasSpanSequenceQueryWeight(SpanWeight spanWeight,
+        boolean optional) {
       this.spanWeight = spanWeight;
       this.optional = optional;
     }

@@ -25,8 +25,9 @@ import mtas.parser.function.MtasFunctionParser;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.parser.function.util.MtasFunctionParserFunctionDefault;
+import mtas.search.spans.util.MtasSpanQuery;
+
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RegExp;
 
@@ -43,8 +44,8 @@ public class CodecComponent {
     /** The list. */
     public Map<String, ComponentField> list;
 
-    /** The do distinct. */
-    public boolean doDistinct;
+    /** The do document. */
+    public boolean doDocument;
 
     /** The do kwic. */
     public boolean doKwic;
@@ -81,7 +82,7 @@ public class CodecComponent {
      */
     public ComponentFields() {
       list = new HashMap<String, ComponentField>();
-      doDistinct = false;
+      doDocument = false;
       doKwic = false;
       doList = false;
       doGroup = false;
@@ -106,8 +107,8 @@ public class CodecComponent {
     /** The unique key field. */
     public String uniqueKeyField;
 
-    /** The distinct list. */
-    public List<ComponentDistinct> distinctList;
+    /** The document list. */
+    public List<ComponentDocument> documentList;
 
     /** The kwic list. */
     public List<ComponentKwic> kwicList;
@@ -134,7 +135,7 @@ public class CodecComponent {
     public List<ComponentSpan> statsSpanList;
 
     /** The span query list. */
-    public List<SpanQuery> spanQueryList;
+    public List<MtasSpanQuery> spanQueryList;
 
     /** The prefix. */
     public ComponentPrefix prefix;
@@ -148,7 +149,7 @@ public class CodecComponent {
     public ComponentField(String field, String uniqueKeyField) {
       this.field = field;
       this.uniqueKeyField = uniqueKeyField;
-      distinctList = new ArrayList<ComponentDistinct>();
+      documentList = new ArrayList<ComponentDocument>();
       kwicList = new ArrayList<ComponentKwic>();
       listList = new ArrayList<ComponentList>();
       groupList = new ArrayList<ComponentGroup>();
@@ -157,7 +158,7 @@ public class CodecComponent {
       statsPositionList = new ArrayList<ComponentPosition>();
       statsTokenList = new ArrayList<ComponentToken>();
       statsSpanList = new ArrayList<ComponentSpan>();
-      spanQueryList = new ArrayList<SpanQuery>();
+      spanQueryList = new ArrayList<MtasSpanQuery>();
       prefix = null;
     }
   }
@@ -259,9 +260,9 @@ public class CodecComponent {
   }
 
   /**
-   * The Class ComponentDistinct.
+   * The Class ComponentDocument.
    */
-  public static class ComponentDistinct {
+  public static class ComponentDocument {
 
     /** The regexp. */
     public String key, prefix, regexp;
@@ -282,13 +283,13 @@ public class CodecComponent {
     public HashMap<Integer, String> uniqueKey;
 
     /** The stats. */
-    public HashMap<Integer, MtasDataCollector<?,?>> stats;
-    
+    public HashMap<Integer, MtasDataCollector<?, ?>> stats;
+
     /** The list. */
-    public HashMap<Integer, MtasDataCollector<?,?>> list;
+    public HashMap<Integer, MtasDataCollector<?, ?>> list;
 
     /**
-     * Instantiates a new component distinct.
+     * Instantiates a new component document.
      *
      * @param key the key
      * @param prefix the prefix
@@ -297,7 +298,7 @@ public class CodecComponent {
      * @param number the number
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public ComponentDistinct(String key, String prefix, String statsType,
+    public ComponentDocument(String key, String prefix, String statsType,
         String regexp, int number) throws IOException {
       this.key = key;
       this.prefix = prefix;
@@ -315,9 +316,9 @@ public class CodecComponent {
             prefix + MtasToken.DELIMITER + regexp + "\u0000*");
         compiledAutomaton = new CompiledAutomaton(re.toAutomaton());
       }
-      this.stats = new HashMap<Integer, MtasDataCollector<?,?>>();
+      this.stats = new HashMap<Integer, MtasDataCollector<?, ?>>();
       if (this.number > 0) {
-        this.list = new HashMap<Integer, MtasDataCollector<?,?>>();
+        this.list = new HashMap<Integer, MtasDataCollector<?, ?>>();
       } else {
         this.list = null;
       }
@@ -330,7 +331,7 @@ public class CodecComponent {
   public static class ComponentKwic {
 
     /** The query. */
-    public SpanQuery query;
+    public MtasSpanQuery query;
 
     /** The key. */
     public String key;
@@ -384,7 +385,7 @@ public class CodecComponent {
      * @param output the output
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public ComponentKwic(SpanQuery query, String key, String prefixes,
+    public ComponentKwic(MtasSpanQuery query, String key, String prefixes,
         Integer number, int start, int left, int right, String output)
         throws IOException {
       this.query = query;
@@ -428,11 +429,13 @@ public class CodecComponent {
   public static class ComponentList {
 
     /** The span query. */
-    public SpanQuery spanQuery;
+    public MtasSpanQuery spanQuery;
 
     /** The key. */
-    public String field, queryValue, queryType, queryPrefix, key;
-    
+    public String field, queryValue, queryType, queryPrefix, queryIgnore,
+        queryMaximumIgnoreLength, key;
+
+    /** The query variables. */
     public HashMap<String, String[]> queryVariables;
 
     /** The tokens. */
@@ -478,6 +481,10 @@ public class CodecComponent {
      * @param field the field
      * @param queryValue the query value
      * @param queryType the query type
+     * @param queryPrefix the query prefix
+     * @param queryVariables the query variables
+     * @param queryIgnore the query ignore
+     * @param queryMaximumIgnoreLength the query maximum ignore length
      * @param key the key
      * @param prefix the prefix
      * @param start the start
@@ -487,14 +494,17 @@ public class CodecComponent {
      * @param output the output
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public ComponentList(SpanQuery spanQuery, String field, String queryValue,
-        String queryType, String queryPrefix, HashMap<String, String[]> queryVariables, String key, String prefix, int start, int number,
-        int left, int right, String output) throws IOException {
+    public ComponentList(MtasSpanQuery spanQuery, String field, String queryValue,
+        String queryType, String queryPrefix,
+        HashMap<String, String[]> queryVariables, String queryIgnore,
+        String queryMaximumIgnoreLength, String key, String prefix, int start,
+        int number, int left, int right, String output) throws IOException {
       this.spanQuery = spanQuery;
       this.field = field;
       this.queryValue = queryValue;
       this.queryType = queryType;
       this.queryPrefix = queryPrefix;
+      this.queryIgnore = queryIgnore;
       this.queryVariables = queryVariables;
       this.key = key;
       this.left = left;
@@ -540,7 +550,7 @@ public class CodecComponent {
   public static class ComponentGroup {
 
     /** The span query. */
-    public SpanQuery spanQuery;
+    public MtasSpanQuery spanQuery;
 
     /** The sort direction. */
     public String dataType, statsType, sortType, sortDirection;
@@ -552,7 +562,7 @@ public class CodecComponent {
     public Integer start, number;
 
     /** The key. */
-    public String field, queryValue, queryType, queryPrefix, key;
+    public String field, queryValue, queryType, queryPrefix, queryIgnore, key;
 
     /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
@@ -574,6 +584,8 @@ public class CodecComponent {
      * @param field the field
      * @param queryValue the query value
      * @param queryType the query type
+     * @param queryPrefix the query prefix
+     * @param queryIgnore the query ignore
      * @param key the key
      * @param number the number
      * @param groupingHitInsidePrefixes the grouping hit inside prefixes
@@ -591,9 +603,9 @@ public class CodecComponent {
      * @param groupingRightPrefixes the grouping right prefixes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public ComponentGroup(SpanQuery spanQuery, String field, String queryValue,
-        String queryType, String queryPrefix, String key, int number,
-        String groupingHitInsidePrefixes,
+    public ComponentGroup(MtasSpanQuery spanQuery, String field, String queryValue,
+        String queryType, String queryPrefix, String queryIgnore, String key,
+        int number, String groupingHitInsidePrefixes,
         String[] groupingHitInsideLeftPosition,
         String[] groupingHitInsideLeftPrefixes,
         String[] groupingHitInsideRightPosition,
@@ -608,6 +620,7 @@ public class CodecComponent {
       this.queryValue = queryValue;
       this.queryType = queryType;
       this.queryPrefix = queryPrefix;
+      this.queryIgnore = queryIgnore;
       this.key = key;
       this.dataType = CodecUtil.DATA_TYPE_LONG;
       this.statsItems = CodecUtil.createStatsItems("n,sum,mean");
@@ -648,7 +661,7 @@ public class CodecComponent {
       dataCollector = DataCollector.getCollector(
           DataCollector.COLLECTOR_TYPE_LIST, this.dataType, this.statsType,
           this.statsItems, this.sortType, this.sortDirection, this.start,
-          this.number, null, null);      
+          this.number, null, null);
     }
 
   }
@@ -665,7 +678,7 @@ public class CodecComponent {
   private static HashSet<String>[] createPositionedPrefixes(
       HashSet<String> prefixList, String[] position, String[] prefixes)
       throws IOException {
-    Pattern p = Pattern.compile("([0-9]+)(\\-([0-9]+))?");
+    Pattern p = Pattern.compile("^([0-9]+)(\\-([0-9]+))?$");
     Matcher m;
     if (position == null && prefixes == null) {
       return null;
@@ -735,7 +748,7 @@ public class CodecComponent {
   public static class ComponentFacet {
 
     /** The span queries. */
-    public SpanQuery[] spanQueries;
+    public MtasSpanQuery[] spanQueries;
 
     /** The base sort directions. */
     public String[] baseFields, baseFieldTypes, baseTypes, baseSortTypes,
@@ -816,7 +829,7 @@ public class CodecComponent {
      * @throws ParseException the parse exception
      */
     @SuppressWarnings("unchecked")
-    public ComponentFacet(SpanQuery[] spanQueries, String field, String key,
+    public ComponentFacet(MtasSpanQuery[] spanQueries, String field, String key,
         String[] baseFields, String[] baseFieldTypes, String[] baseTypes,
         String[] baseSortTypes, String[] baseSortDirections,
         Integer[] baseNumbers, Double[] baseMinimumDoubles,
@@ -917,7 +930,7 @@ public class CodecComponent {
           dataCollector = DataCollector.getCollector(this.baseCollectorTypes[0],
               this.baseDataTypes[0], this.baseStatsTypes[0],
               this.baseStatsItems[0], this.baseSortTypes[0],
-              this.baseSortDirections[0], 0, this.baseNumbers[0], null, null);          
+              this.baseSortDirections[0], 0, this.baseNumbers[0], null, null);
         } else {
           String[] subBaseCollectorTypes = Arrays
               .copyOfRange(baseCollectorTypes, 1, baseDataTypes.length);
@@ -940,7 +953,7 @@ public class CodecComponent {
               this.baseSortDirections[0], 0, this.baseNumbers[0],
               subBaseCollectorTypes, subBaseDataTypes, subBaseStatsTypes,
               subBaseStatsItems, subBaseSortTypes, subBaseSortDirections,
-              subStarts, subNumbers, null, null);          
+              subStarts, subNumbers, null, null);
         }
       } else {
         throw new IOException("no baseFields");
@@ -1074,7 +1087,7 @@ public class CodecComponent {
       this.key = key;
       this.prefix = prefix;
       this.regexp = regexp;
-      this.full = (full!=null && full)?true:false;
+      this.full = (full != null && full) ? true : false;
       sortType = sortType == null ? CodecUtil.SORT_TERM : sortType;
       sortDirection = sortDirection == null ? (sortType == CodecUtil.SORT_TERM)
           ? CodecUtil.SORT_ASC : CodecUtil.SORT_DESC : sortDirection;
@@ -1083,16 +1096,27 @@ public class CodecComponent {
         this.boundary = null;
         this.number = Integer.MAX_VALUE;
         this.startValue = null;
-        if(!this.full) {
+        if (!this.full) {
           sortType = CodecUtil.SORT_TERM;
           sortDirection = CodecUtil.SORT_ASC;
-        }  
+        }
       } else {
         this.list = null;
         this.startValue = startValue;
         if (boundary == null) {
           this.boundary = null;
-          this.number = number;
+          if (number < -1) {
+            throw new IOException("number should not be " + number);
+          } else if (number >= 0) {
+            this.number = number;
+          } else {
+            if (!full) {
+              throw new IOException(
+                  "number " + number + " only supported for full termvector");
+            } else {
+              this.number = Integer.MAX_VALUE;
+            }
+          }
         } else {
           this.boundary = boundary;
           this.number = Integer.MAX_VALUE;
@@ -1116,8 +1140,8 @@ public class CodecComponent {
       } else if (!full && !sortType.equals(CodecUtil.SORT_TERM)) {
         if (!(sortType.equals(CodecUtil.STATS_TYPE_SUM)
             || sortType.equals(CodecUtil.STATS_TYPE_N))) {
-          throw new IOException(
-              "sortType '" + sortType + "' only supported with full termVector");
+          throw new IOException("sortType '" + sortType
+              + "' only supported with full termVector");
         }
       }
       if (!sortDirection.equals(CodecUtil.SORT_ASC)
@@ -1127,7 +1151,7 @@ public class CodecComponent {
       }
       boundaryRegistration = this.boundary != null;
       String segmentRegistration = null;
-      if(this.full) {
+      if (this.full) {
         this.boundary = null;
         segmentRegistration = null;
       } else if (this.boundary != null) {
@@ -1198,8 +1222,8 @@ public class CodecComponent {
   public static class ComponentSpan {
 
     /** The queries. */
-    public SpanQuery[] queries;
-    
+    public MtasSpanQuery[] queries;
+
     /** The key. */
     public String key;
 
@@ -1241,7 +1265,7 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws ParseException the parse exception
      */
-    public ComponentSpan(SpanQuery[] queries, String key, Double minimumDouble,
+    public ComponentSpan(MtasSpanQuery[] queries, String key, Double minimumDouble,
         Double maximumDouble, String type, String[] functionKey,
         String[] functionExpression, String[] functionType)
         throws IOException, ParseException {
@@ -1751,36 +1775,55 @@ public class CodecComponent {
       if (group.hitInsideLeft != null) {
         for (int p = hitStart; p <= Math.min(hitEnd,
             hitStart + group.hitInsideLeft.length - 1); p++) {
-          missingHit[p - hitStart].addAll(group.hitInsideLeft[p - hitStart]);
+          if (group.hitInsideLeft[p - hitStart] != null) {
+            missingHit[p - hitStart].addAll(group.hitInsideLeft[p - hitStart]);
+          }
         }
       }
       if (group.hitLeft != null) {
         for (int p = hitStart; p <= Math.min(hitEnd,
             hitStart + group.hitLeft.length - 1); p++) {
-          missingHit[p - hitStart].addAll(group.hitLeft[p - hitStart]);
+          if (group.hitLeft[p - hitStart] != null) {
+            missingHit[p - hitStart].addAll(group.hitLeft[p - hitStart]);
+          }
         }
       }
       if (group.hitInsideRight != null) {
+        System.out.println(missingHit.length + " items in missingHit");
+        System.out.println(
+            group.hitInsideRight.length + " items in group.hitInsideRight");
+        for (int p = 0; p < group.hitInsideRight.length; p++) {
+          System.out.println(" - " + group.hitInsideRight[p]);
+        }
         for (int p = Math.max(hitStart,
             hitEnd - group.hitInsideRight.length + 1); p <= hitEnd; p++) {
-          missingHit[p - hitStart].addAll(group.hitInsideRight[p - hitStart]);
+          System.out.println("Test voor p is " + (p - hitStart));
+          if (group.hitInsideRight[hitEnd - p] != null) {
+            missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);
+          }
         }
       }
       if (group.hitRight != null) {
         for (int p = hitStart; p <= Math.min(hitEnd,
             hitStart + group.hitRight.length - 1); p++) {
-          missingHit[p - hitStart].addAll(group.hitRight[p - hitStart]);
+          if (group.hitRight[p - hitStart] != null) {
+            missingHit[p - hitStart].addAll(group.hitRight[p - hitStart]);
+          }
         }
       }
       if (group.left != null) {
         for (int p = 0; p < Math.min(leftRangeLength, group.left.length); p++) {
-          missingLeft[p].addAll(group.left[p]);
+          if (group.left[p] != null) {
+            missingLeft[p].addAll(group.left[p]);
+          }
         }
       }
       if (group.hitRight != null) {
         for (int p = 0; p <= Math.min(leftRangeLength,
             group.hitRight.length - dataHit.length); p++) {
-          missingLeft[p].addAll(group.hitRight[p + dataHit.length]);
+          if (group.hitRight[p + dataHit.length] != null) {
+            missingLeft[p].addAll(group.hitRight[p + dataHit.length]);
+          }
         }
       }
       if (group.right != null) {
@@ -2111,7 +2154,7 @@ public class CodecComponent {
       if (key != "") {
         newKey.append(" [");
         String prefix, postfix, parts[] = key.split(Pattern.quote("&"));
-        HashMap<String,String>[] result = new HashMap[parts.length];
+        HashMap<String, String>[] result = new HashMap[parts.length];
         Pattern pattern = Pattern.compile("^([^\\.]*)\\.([^\\.]*)$");
         Decoder decoder = Base64.getDecoder();
         Matcher matcher;
@@ -2164,8 +2207,9 @@ public class CodecComponent {
      * @param newKey the new key
      * @return the hash map
      */
-    private static HashMap<Integer, HashMap<String,String>[]> keyToSubObject(String key, StringBuilder newKey) {
-      HashMap<Integer, HashMap<String,String>[]> result = new HashMap();
+    private static HashMap<Integer, HashMap<String, String>[]> keyToSubObject(
+        String key, StringBuilder newKey) {
+      HashMap<Integer, HashMap<String, String>[]> result = new HashMap();
       if (key == null || key.trim().equals("")) {
         return null;
       } else {
@@ -2188,14 +2232,15 @@ public class CodecComponent {
      * @param newKey the new key
      * @return the hash map
      */
-    public static HashMap<String, HashMap<Integer, HashMap<String,String>[]>> keyToObject(String key, StringBuilder newKey) {
+    public static HashMap<String, HashMap<Integer, HashMap<String, String>[]>> keyToObject(
+        String key, StringBuilder newKey) {
       if (key.startsWith(KEY_START)) {
         String content = key.substring(KEY_START.length());
         StringBuilder keyLeft = new StringBuilder(""),
             keyHit = new StringBuilder(""), keyRight = new StringBuilder("");
-        HashMap<String, HashMap<Integer, HashMap<String,String>[]>> result = new HashMap<String, HashMap<Integer, HashMap<String,String>[]>>();
-        HashMap<Integer, HashMap<String,String>[]> resultLeft = null, resultHit = null,
-            resultRight = null;
+        HashMap<String, HashMap<Integer, HashMap<String, String>[]>> result = new HashMap<String, HashMap<Integer, HashMap<String, String>[]>>();
+        HashMap<Integer, HashMap<String, String>[]> resultLeft = null,
+            resultHit = null, resultRight = null;
         String[] parts = content.split(Pattern.quote("|"), -1);
         if (parts.length == 3) {
           resultLeft = keyToSubObject(parts[0].trim(), keyLeft);

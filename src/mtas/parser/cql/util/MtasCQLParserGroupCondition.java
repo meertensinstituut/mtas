@@ -1,6 +1,6 @@
 package mtas.parser.cql.util;
 
-import org.apache.lucene.search.spans.SpanQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasCQLParserGroupCondition.
@@ -8,7 +8,7 @@ import org.apache.lucene.search.spans.SpanQuery;
 public class MtasCQLParserGroupCondition {
 
   /** The condition. */
-  private SpanQuery condition;
+  private MtasSpanQuery condition;
 
   /** The field. */
   private String field;
@@ -21,7 +21,7 @@ public class MtasCQLParserGroupCondition {
    * @param condition
    *          the condition
    */
-  public MtasCQLParserGroupCondition(String field, SpanQuery condition) {
+  public MtasCQLParserGroupCondition(String field, MtasSpanQuery condition) {
     this.field = field;
     this.condition = condition;
   }
@@ -40,7 +40,7 @@ public class MtasCQLParserGroupCondition {
    *
    * @return the query
    */
-  public SpanQuery getQuery() {
+  public MtasSpanQuery getQuery() {
     return condition;
   }
 

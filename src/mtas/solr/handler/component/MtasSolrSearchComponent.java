@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import mtas.codec.MtasCodecPostingsFormat;
-import mtas.codec.util.CodecComponent.ComponentDistinct;
+import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentGroup;
@@ -18,7 +18,7 @@ import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecUtil;
 import mtas.solr.handler.component.util.MtasSolrResultMerge;
-import mtas.solr.handler.component.util.MtasSolrComponentDistinct;
+import mtas.solr.handler.component.util.MtasSolrComponentDocument;
 import mtas.solr.handler.component.util.MtasSolrComponentFacet;
 import mtas.solr.handler.component.util.MtasSolrComponentGroup;
 import mtas.solr.handler.component.util.MtasSolrComponentKwic;
@@ -78,8 +78,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   public static final int STAGE_GROUP = ResponseBuilder.STAGE_EXECUTE_QUERY
       + 60;
   
-  /** The Constant STAGE_DISTINCT. */
-  public static final int STAGE_DISTINCT = ResponseBuilder.STAGE_GET_FIELDS
+  /** The Constant STAGE_DOCUMENT. */
+  public static final int STAGE_DOCUMENT = ResponseBuilder.STAGE_GET_FIELDS
       + 10;
 
   /** The mtas solr result merge. */
@@ -106,8 +106,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The search kwic. */
   private MtasSolrComponentKwic searchKwic;
   
-  /** The search distinct. */
-  private MtasSolrComponentDistinct searchDistinct;
+  /** The search document. */
+  private MtasSolrComponentDocument searchDocument;
 
   /*
    * (non-Javadoc)
@@ -147,11 +147,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
       mtasSolrResultMerge = new MtasSolrResultMerge();
 
       ComponentFields mtasFields = new ComponentFields();
-      // get settings distinct
-      if (rb.req.getParams().getBool(MtasSolrComponentDistinct.PARAM_MTAS_DISTINCT,
+      // get settings document
+      if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,
           false)) {
-        searchDistinct = new MtasSolrComponentDistinct(this);
-        searchDistinct.prepare(rb, mtasFields);
+        searchDocument = new MtasSolrComponentDocument(this);
+        searchDocument.prepare(rb, mtasFields);
       }
       // get settings kwic
       if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
@@ -216,7 +216,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
     if (mtasFields != null) {
       DocSet docSet = rb.getResults().docSet;
       DocList docList = rb.getResults().docList;
-      if (mtasFields.doStats || mtasFields.doDistinct || mtasFields.doKwic || mtasFields.doList
+      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic || mtasFields.doList
           || mtasFields.doGroup || mtasFields.doFacet || mtasFields.doTermVector
           || mtasFields.doPrefix) {
         SolrIndexSearcher searcher = rb.req.getSearcher();
@@ -248,15 +248,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
           }
         }
         NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
-        if (mtasFields.doDistinct) {
-          ArrayList<NamedList<?>> mtasDistinctResponses = new ArrayList<NamedList<?>>();
+        if (mtasFields.doDocument) {
+          ArrayList<NamedList<?>> mtasDocumentResponses = new ArrayList<NamedList<?>>();
           for (String field : mtasFields.list.keySet()) {
-            for (ComponentDistinct distinct : mtasFields.list.get(field).distinctList) {
-              mtasDistinctResponses.add(searchDistinct.create(distinct));
+            for (ComponentDocument document : mtasFields.list.get(field).documentList) {
+              mtasDocumentResponses.add(searchDocument.create(document));
             }
           }
           // add to response
-          mtasResponse.add("distinct", mtasDistinctResponses);
+          mtasResponse.add("document", mtasDocumentResponses);
         }
         if (mtasFields.doKwic) {
           ArrayList<NamedList<?>> mtasKwicResponses = new ArrayList<NamedList<?>>();
@@ -436,8 +436,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
       if (sreq.params.getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
         searchList.modifyRequest(rb, who, sreq);
       }
-      if (sreq.params.getBool(MtasSolrComponentDistinct.PARAM_MTAS_DISTINCT, false)) {
-        searchDistinct.modifyRequest(rb, who, sreq);
+      if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+        searchDocument.modifyRequest(rb, who, sreq);
       }
       if (sreq.params.getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {
         searchKwic.modifyRequest(rb, who, sreq);
@@ -498,9 +498,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
           false)) {
         searchList.finishStage(rb);
       }
-      if (rb.req.getParams().getBool(MtasSolrComponentDistinct.PARAM_MTAS_DISTINCT,
+      if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,
           false)) {
-        searchDistinct.finishStage(rb);
+        searchDocument.finishStage(rb);
       }
       if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
           false)) {
@@ -548,9 +548,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
       } else if (rb.stage == STAGE_GROUP) {
         ComponentFields mtasFields = getMtasFields(rb);
         searchGroup.distributedProcess(rb, mtasFields);
-      } else if (rb.stage == STAGE_DISTINCT) {
+      } else if (rb.stage == STAGE_DOCUMENT) {
         ComponentFields mtasFields = getMtasFields(rb);
-        searchDistinct.distributedProcess(rb, mtasFields);
+        searchDocument.distributedProcess(rb, mtasFields);
       }
       // compute new stage and return if not finished
       if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
@@ -585,9 +585,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
         } 
       } else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS
           && rb.stage < ResponseBuilder.STAGE_DONE) {
-        if (rb.stage < STAGE_DISTINCT && rb.req.getParams()
-            .getBool(MtasSolrComponentDistinct.PARAM_MTAS_DISTINCT, false)) {
-          return STAGE_DISTINCT;
+        if (rb.stage < STAGE_DOCUMENT && rb.req.getParams()
+            .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+          return STAGE_DOCUMENT;
         }
       }
     }
@@ -597,8 +597,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the mtas fields.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    * @return the mtas fields
    */
 

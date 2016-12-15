@@ -2,17 +2,24 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasIgnoreItem;
+import mtas.search.spans.util.MtasSpans;
+
 /**
- * The Class MtasSpanRecurrence.
+ * The Class MtasSpanRecurrenceSpans.
  */
-public class MtasSpanRecurrence extends Spans {
+public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
 
   /** The spans. */
-  Spans spans;
+  private Spans spans;
+
+  /** The ignore item. */
+  private MtasIgnoreItem ignoreItem;    
 
   /** The minimum recurrence. */
   int minimumRecurrence;
@@ -39,7 +46,7 @@ public class MtasSpanRecurrence extends Spans {
   boolean lastSpan; // last span for this document added to queue
 
   /**
-   * Instantiates a new mtas span recurrence.
+   * Instantiates a new mtas span recurrence spans.
    *
    * @param mtasSpanRecurrenceQuery
    *          the mtas span recurrence query
@@ -49,9 +56,12 @@ public class MtasSpanRecurrence extends Spans {
    *          the minimum recurrence
    * @param maximumRecurrence
    *          the maximum recurrence
+   * @param ignoreSpans
+   *          the ignore spans
    */
-  public MtasSpanRecurrence(MtasSpanRecurrenceQuery mtasSpanRecurrenceQuery,
-      Spans spans, int minimumRecurrence, int maximumRecurrence) {
+  public MtasSpanRecurrenceSpans(
+      MtasSpanRecurrenceQuery mtasSpanRecurrenceQuery, Spans spans,
+      int minimumRecurrence, int maximumRecurrence, Spans ignoreSpans, Integer maximumIgnoreLength) {
     assert minimumRecurrence <= maximumRecurrence : "minimumRecurrence > maximumRecurrence";
     assert minimumRecurrence > 0 : "minimumRecurrence < 1 not supported";
     this.spans = spans;
@@ -59,6 +69,7 @@ public class MtasSpanRecurrence extends Spans {
     this.maximumRecurrence = maximumRecurrence;
     queueSpans = new ArrayList<Match>();
     queueMatches = new ArrayList<Match>();
+    ignoreItem = new MtasIgnoreItem(ignoreSpans, maximumIgnoreLength);
     resetQueue();
   }
 
@@ -222,6 +233,7 @@ public class MtasSpanRecurrence extends Spans {
     if (!queueMatches.isEmpty()) {
       return true;
     } else {
+      ignoreItem.advanceToDoc(spans.docID());
       while (true) {
         // try to get something in queue of spans
         if (queueSpans.isEmpty() && !collectSpan()) {
@@ -232,6 +244,7 @@ public class MtasSpanRecurrence extends Spans {
         // create a list of matches with same startPosition as firstMatch
         List<Match> matches = new ArrayList<Match>();
         matches.add(firstMatch);
+        //matches.addAll(expandWithIgnoreItem(spans.docID(), firstMatch));
         // try to collect spans until lastStartPosition not equal to
         // startPosition of firstMatch
         while (!lastSpan && (lastStartPosition == firstMatch.startPosition())) {
@@ -239,7 +252,9 @@ public class MtasSpanRecurrence extends Spans {
         }
         while (!queueSpans.isEmpty() && (queueSpans.get(0)
             .startPosition() == firstMatch.startPosition())) {
-          matches.add(queueSpans.remove(0));
+          Match additionalMatch = queueSpans.remove(0);
+          matches.add(additionalMatch);
+          matches.addAll(expandWithIgnoreItem(spans.docID(), additionalMatch));
         }
         // construct all matches for this startPosition
         for (Match match : matches) {
@@ -250,11 +265,14 @@ public class MtasSpanRecurrence extends Spans {
         }
         // check for something in queue of matches
         if (!queueMatches.isEmpty()) {
+          ignoreItem.removeBefore(spans.docID(), queueMatches.get(0).startPosition());
           return true;
         }
       }
     }
   }
+
+  
 
   /**
    * Find matches.
@@ -269,14 +287,15 @@ public class MtasSpanRecurrence extends Spans {
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
       int largestMatchingEndPosition = match.endPosition();
+      HashSet<Integer> list = ignoreItem.getFullList(spans.docID(), match.endPosition());
       // try to find matches with existing queue
       if (!queueSpans.isEmpty()) {
         Match span;
         for (int i = 0; i < queueSpans.size(); i++) {
           span = queueSpans.get(i);
-          if (match.endPosition() == span.startPosition()) {
-            findMatches(new Match(match.startPosition(), span.endPosition()),
-                (n - 1));
+          if (match.endPosition() == span.startPosition() || (list!=null && list.contains(span.startPosition()))) {
+            findMatches(new Match(match.startPosition(),
+                span.endPosition()), (n - 1));
             largestMatchingEndPosition = Math.max(largestMatchingEndPosition,
                 span.endPosition());
           }
@@ -291,7 +310,7 @@ public class MtasSpanRecurrence extends Spans {
           queueSpans.add(span);
           lastStartPosition = spans.startPosition();
           // check if this provides new match
-          if (match.endPosition() == span.startPosition()) {
+          if (match.endPosition() == span.startPosition() || (list!=null && list.contains(span.startPosition()))) {
             findMatches(new Match(match.startPosition(), span.endPosition()),
                 (n - 1));
             largestMatchingEndPosition = Math.max(largestMatchingEndPosition,
@@ -305,6 +324,22 @@ public class MtasSpanRecurrence extends Spans {
         queueMatches.add(match);
       }
     }
+  }
+  
+  private List<Match> expandWithIgnoreItem(int docId, Match match) {
+    List<Match> list = new ArrayList<Match>();
+    try {
+      HashSet<Integer> ignoreList = ignoreItem.getFullList(docId,
+          match.endPosition);
+      if (ignoreList != null) {
+        for (Integer endPosition : ignoreList) {
+          list.add(new Match(match.startPosition, endPosition));
+        }
+      }
+    } catch (IOException e) {
+      // do nothing
+    }
+    return list;
   }
 
   /**
@@ -386,5 +421,7 @@ public class MtasSpanRecurrence extends Spans {
   public float positionsCost() {
     return 0;
   }
+
+  
 
 }

@@ -1,24 +1,27 @@
 package mtas.search.spans;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanOrQuery;
 import org.apache.lucene.search.spans.SpanQuery;
+import org.apache.lucene.search.spans.SpanWeight;
 
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 /**
  * The Class MtasSpanOrQuery.
  */
-public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
+public class MtasSpanOrQuery extends MtasSpanQuery {
 
   /** The clauses. */
-  private List<SpanQuery> clauses;
-
-  /** The query name. */
-  private static String QUERY_NAME = "mtasSpanOrQuery";
+  private List<MtasSpanQuery> clauses;
+  
+  private SpanQuery baseQuery;
 
   /**
    * Instantiates a new mtas span or query.
@@ -26,12 +29,24 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
    * @param clauses
    *          the clauses
    */
-  public MtasSpanOrQuery(SpanQuery... clauses) {
-    super(new SpanOrQuery(clauses));
+  public MtasSpanOrQuery(MtasSpanQuery... clauses) {
+    super();
+    baseQuery = new MtasSpanUniquePositionQuery(new SpanOrQuery(clauses));
     this.clauses = new ArrayList<>(clauses.length);
-    for (SpanQuery clause : clauses) {
+    for (MtasSpanQuery clause : clauses) {
       this.clauses.add(clause);
     }
+  }
+  
+  @Override
+  public String getField() {
+    return baseQuery.getField();
+  }
+
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+    return baseQuery.createWeight(searcher, needsScores);
   }
 
   /*
@@ -43,8 +58,8 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(QUERY_NAME + "([");
-    Iterator<SpanQuery> i = clauses.iterator();
+    buffer.append(this.getClass().getSimpleName() + "([");
+    Iterator<MtasSpanQuery> i = clauses.iterator();
     while (i.hasNext()) {
       SpanQuery clause = i.next();
       buffer.append(clause.toString(field));
@@ -80,9 +95,9 @@ public class MtasSpanOrQuery extends MtasSpanUniquePositionQuery {
    */
   @Override
   public int hashCode() {
-    int h = QUERY_NAME.hashCode();
-    h = (h * 7) ^ super.hashCode();
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 7) ^ baseQuery.hashCode();
     return h;
-  }
+  }  
 
 }

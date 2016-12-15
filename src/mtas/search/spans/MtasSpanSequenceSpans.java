@@ -4,21 +4,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
-import mtas.search.spans.MtasSpanSequenceQuery.MtasSpanSequenceSpans;
+import mtas.search.spans.MtasSpanSequenceQuery.MtasSpanSequenceQuerySpans;
+import mtas.search.spans.util.MtasIgnoreItem;
+import mtas.search.spans.util.MtasSpans;
 
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
- * The Class MtasSpanSequence.
+ * The Class MtasSpanSequenceSpans.
  */
-public class MtasSpanSequence extends Spans {
+public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
 
   /** The queue spans. */
   private List<QueueItem> queueSpans;
+
+  /** The ignore item. */
+  private MtasIgnoreItem ignoreItem;
 
   /** The queue matches. */
   private List<Match> queueMatches;
@@ -30,22 +36,24 @@ public class MtasSpanSequence extends Spans {
   Match currentMatch;
 
   /**
-   * Instantiates a new mtas span sequence.
+   * Instantiates a new mtas span sequence spans.
    *
-   * @param mtasSpanSequenceQuery
-   *          the mtas span sequence query
-   * @param setSequenceSpans
-   *          the set sequence spans
+   * @param mtasSpanSequenceQuery the mtas span sequence query
+   * @param setSequenceSpans the set sequence spans
+   * @param ignoreSpans the ignore spans
+   * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasSpanSequence(MtasSpanSequenceQuery mtasSpanSequenceQuery,
-      List<MtasSpanSequenceSpans> setSequenceSpans) {
+  public MtasSpanSequenceSpans(MtasSpanSequenceQuery mtasSpanSequenceQuery,
+      List<MtasSpanSequenceQuerySpans> setSequenceSpans, Spans ignoreSpans,
+      Integer maximumIgnoreLength) {
     super();
     docId = -1;
     queueSpans = new ArrayList<QueueItem>();
     queueMatches = new ArrayList<Match>();
-    for (MtasSpanSequenceSpans sequenceSpans : setSequenceSpans) {
+    for (MtasSpanSequenceQuerySpans sequenceSpans : setSequenceSpans) {
       queueSpans.add(new QueueItem(sequenceSpans));
     }
+    ignoreItem = new MtasIgnoreItem(ignoreSpans, maximumIgnoreLength);
     resetQueue();
   }
 
@@ -144,8 +152,7 @@ public class MtasSpanSequence extends Spans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -153,7 +160,11 @@ public class MtasSpanSequence extends Spans {
     } else {
       // try to find docId with match for all items from sequence
       Integer spanDocId, newDocId = null, minOptionalDocId = null;
+      boolean allItemsOptional = true;
       for (QueueItem item : queueSpans) {
+        if (!item.sequenceSpans.optional) {
+          allItemsOptional = false;
+        }
         if (!item.noMoreDocs) {
           if (newDocId == null) {
             spanDocId = item.sequenceSpans.spans.nextDoc();
@@ -206,12 +217,17 @@ public class MtasSpanSequence extends Spans {
           }
         }
       }
+      // if all items are optional
+      if (allItemsOptional && newDocId == null && minOptionalDocId != null) {
+        newDocId = minOptionalDocId;
+      }
       // nothing found
       if (newDocId == null) {
         docId = NO_MORE_DOCS;
         return true;
       } else {
         docId = newDocId;
+        ignoreItem.advanceToDoc(docId);
         // try and glue together
         if (findMatches()) {
           return true;
@@ -242,11 +258,9 @@ public class MtasSpanSequence extends Spans {
   /**
    * Advance to doc.
    *
-   * @param target
-   *          the target
+   * @param target the target
    * @return the integer
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Integer advanceToDoc(int target) throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -285,6 +299,7 @@ public class MtasSpanSequence extends Spans {
       }
       // find match
       docId = newDocId;
+      ignoreItem.advanceToDoc(docId);
       // try and glue together
       if (findMatches()) {
         return null;
@@ -301,8 +316,7 @@ public class MtasSpanSequence extends Spans {
    * Find matches.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     Boolean status = _findMatches();
@@ -316,8 +330,7 @@ public class MtasSpanSequence extends Spans {
    * _find matches.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean _findMatches() throws IOException {
     // queue not empty
@@ -342,6 +355,8 @@ public class MtasSpanSequence extends Spans {
       Integer minStartPositionNext = null;
       Integer minStartPosition = null;
       Integer minOptionalStartPosition = null;
+      // adjusted minimum ignoreItem
+      boolean adjustedMinimumIgnoreItem = false;
       // fill queue if necessary and possible
       for (int i = 0; i < queueSpans.size(); i++) {
         QueueItem item = queueSpans.get(i);
@@ -370,10 +385,24 @@ public class MtasSpanSequence extends Spans {
           }
           // fill queue
           if ((minStartPositionPrevious == null) || subMatchesOptional) {
-            fillQueue(item, null, maxEndPositionPrevious, minStartPositionNext);
+            fillQueue(item, null, maxEndPositionPrevious, minStartPositionNext,
+                minStartPosition == null && minOptionalStartPosition == null);
           } else {
             fillQueue(item, minStartPositionPrevious, maxEndPositionPrevious,
-                minStartPositionNext);
+                minStartPositionNext,
+                minStartPosition == null && minOptionalStartPosition == null);
+          }
+          // try to adjust minimum ignoreItem
+          if (!adjustedMinimumIgnoreItem) {
+            if (!item.sequenceSpans.optional && item.filledPosition) {
+              if (minOptionalStartPosition != null) {
+                ignoreItem.removeBefore(docId,
+                    Math.min(minOptionalStartPosition, item.lowestPosition));
+              } else {
+                ignoreItem.removeBefore(docId, item.lowestPosition);
+              }
+              adjustedMinimumIgnoreItem = true;
+            }
           }
           // check for available positions
           if (!item.sequenceSpans.optional && item.noMorePositions
@@ -473,6 +502,7 @@ public class MtasSpanSequence extends Spans {
             queueMatches.add(m);
           }
         }
+        ignoreItem.removeBefore(docId, queueMatches.get(0).startPosition);
         return true;
       }
     }
@@ -481,16 +511,14 @@ public class MtasSpanSequence extends Spans {
   /**
    * _glue.
    *
-   * @param subMatchesQueue
-   *          the sub matches queue
-   * @param subMatchesOptional
-   *          the sub matches optional
-   * @param item
-   *          the item
+   * @param subMatchesQueue the sub matches queue
+   * @param subMatchesOptional the sub matches optional
+   * @param item the item
    * @return the list
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private List<Match> _glue(List<Match> subMatchesQueue,
-      Boolean subMatchesOptional, QueueItem item) {
+      Boolean subMatchesOptional, QueueItem item) throws IOException {
     List<Match> newSubMatchesQueue = new ArrayList<Match>();
     // no previous queue, only use current item
     if (subMatchesQueue.isEmpty()) {
@@ -596,11 +624,23 @@ public class MtasSpanSequence extends Spans {
       } else if (!subMatchesOptional && !item.sequenceSpans.optional) {
         if (item.filledPosition) {
           for (Match m : subMatchesQueue) {
-            if (item.queue.containsKey(m.endPosition)) {
-              for (Integer endPosition : item.queue.get(m.endPosition)) {
-                Match o = new Match(m.startPosition, endPosition);
-                if (!newSubMatchesQueue.contains(o)) {
-                  newSubMatchesQueue.add(o);
+            HashSet<Integer> ignoreList = ignoreItem.getFullList(docId,
+                m.endPosition);
+            Integer[] checkList;
+            if (ignoreList == null) {
+              checkList = new Integer[] { m.endPosition };
+            } else {
+              checkList = new Integer[1 + ignoreList.size()];
+              checkList = ignoreList.toArray(checkList);
+              checkList[ignoreList.size()] = m.endPosition;
+            }
+            for (Integer checkEndPosition : checkList) {
+              if (item.queue.containsKey(checkEndPosition)) {
+                for (Integer endPosition : item.queue.get(checkEndPosition)) {
+                  Match o = new Match(m.startPosition, endPosition);
+                  if (!newSubMatchesQueue.contains(o)) {
+                    newSubMatchesQueue.add(o);
+                  }
                 }
               }
             }
@@ -614,19 +654,16 @@ public class MtasSpanSequence extends Spans {
   /**
    * Fill queue.
    *
-   * @param item
-   *          the item
-   * @param minStartPosition
-   *          the min start position
-   * @param maxStartPosition
-   *          the max start position
-   * @param minEndPosition
-   *          the min end position
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param item the item
+   * @param minStartPosition the min start position
+   * @param maxStartPosition the max start position
+   * @param minEndPosition the min end position
+   * @param adjustIgnore the adjust ignore
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void fillQueue(QueueItem item, Integer minStartPosition,
-      Integer maxStartPosition, Integer minEndPosition) throws IOException {
+      Integer maxStartPosition, Integer minEndPosition, boolean adjustIgnore)
+      throws IOException {
     int newStartPosition, newEndPosition;
     Integer firstRetrievedPosition = null;
     // remove everything below minStartPosition
@@ -664,7 +701,8 @@ public class MtasSpanSequence extends Spans {
           // do nothing
         } else {
           newEndPosition = item.sequenceSpans.spans.endPosition();
-          if ((minEndPosition == null) || (newEndPosition >= minEndPosition)) {
+          if ((minEndPosition == null) || (newEndPosition >= minEndPosition
+              - ignoreItem.getMaxSize(docId, newEndPosition))) {
             item.add(newStartPosition, newEndPosition);
             if (firstRetrievedPosition == null) {
               firstRetrievedPosition = newStartPosition;
@@ -714,15 +752,14 @@ public class MtasSpanSequence extends Spans {
     private HashMap<Integer, List<Integer>> queue;
 
     /** The sequence spans. */
-    public MtasSpanSequenceSpans sequenceSpans;
+    public MtasSpanSequenceQuerySpans sequenceSpans;
 
     /**
      * Instantiates a new queue item.
      *
-     * @param sequenceSpans
-     *          the sequence spans
+     * @param sequenceSpans the sequence spans
      */
-    QueueItem(MtasSpanSequenceSpans sequenceSpans) {
+    QueueItem(MtasSpanSequenceQuerySpans sequenceSpans) {
       noMoreDocs = false;
       this.sequenceSpans = sequenceSpans;
       queue = new HashMap<Integer, List<Integer>>();
@@ -744,10 +781,8 @@ public class MtasSpanSequence extends Spans {
     /**
      * Adds the.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     public void add(int startPosition, int endPosition) {
       if (!queue.keySet().contains(startPosition)) {
@@ -767,8 +802,7 @@ public class MtasSpanSequence extends Spans {
     /**
      * Del.
      *
-     * @param position
-     *          the position
+     * @param position the position
      */
     public void del(int position) {
       ArrayList<Integer> removePositions = new ArrayList<Integer>();
@@ -813,10 +847,8 @@ public class MtasSpanSequence extends Spans {
     /**
      * Instantiates a new match.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
@@ -855,6 +887,16 @@ public class MtasSpanSequence extends Spans {
         }
       }
       return false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      return "[" + startPosition + "," + endPosition + "]";
     }
 
   }

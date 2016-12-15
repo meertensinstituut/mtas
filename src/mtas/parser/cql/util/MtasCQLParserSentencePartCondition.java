@@ -1,6 +1,7 @@
 package mtas.parser.cql.util;
 
 import mtas.parser.cql.ParseException;
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasCQLParserSentencePartCondition.
@@ -28,6 +29,10 @@ public class MtasCQLParserSentencePartCondition {
   /** The full condition. */
   private MtasCQLParserSentenceCondition fullCondition = null;
 
+  private MtasSpanQuery ignoreClause;
+  
+  private Integer maximumIgnoreLength;
+  
   /**
    * Instantiates a new mtas cql parser sentence part condition.
    *
@@ -35,11 +40,13 @@ public class MtasCQLParserSentencePartCondition {
    *          the bs
    */
   public MtasCQLParserSentencePartCondition(
-      MtasCQLParserBasicSentenceCondition bs) {
+      MtasCQLParserBasicSentenceCondition bs, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     firstMinimumOccurence = 1;
     firstMaximumOccurence = 1;
     firstOptional = false;
     firstBasicSentence = bs;
+    this.ignoreClause = ignore;
+    this.maximumIgnoreLength = maximumIgnoreLength;
   }
 
   /**
@@ -48,11 +55,13 @@ public class MtasCQLParserSentencePartCondition {
    * @param s
    *          the s
    */
-  public MtasCQLParserSentencePartCondition(MtasCQLParserSentenceCondition s) {
+  public MtasCQLParserSentencePartCondition(MtasCQLParserSentenceCondition s, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     firstMinimumOccurence = 1;
     firstMaximumOccurence = 1;
     firstOptional = false;
     firstSentence = s;
+    this.ignoreClause = ignore;
+    this.maximumIgnoreLength = maximumIgnoreLength;
   }
 
   /**
@@ -169,7 +178,7 @@ public class MtasCQLParserSentencePartCondition {
       if (secondSentencePart == null) {
         if (firstBasicSentence != null) {
           fullCondition = new MtasCQLParserSentenceCondition(
-              firstBasicSentence);
+              firstBasicSentence, ignoreClause, maximumIgnoreLength);
           fullCondition.setOccurence(firstMinimumOccurence,
               firstMaximumOccurence);
           return fullCondition;
@@ -185,11 +194,11 @@ public class MtasCQLParserSentencePartCondition {
             firstBasicSentence.setOccurence(firstMinimumOccurence,
                 firstMaximumOccurence);
             fullCondition = new MtasCQLParserSentenceCondition(
-                firstBasicSentence);
+                firstBasicSentence, ignoreClause, maximumIgnoreLength);
           } else {
             firstSentence.setOccurence(firstMinimumOccurence,
                 firstMaximumOccurence);
-            fullCondition = new MtasCQLParserSentenceCondition(firstSentence);
+            fullCondition = new MtasCQLParserSentenceCondition(firstSentence, ignoreClause, maximumIgnoreLength);
           }
           fullCondition.addSentenceToEndLatestSequence(
               secondSentencePart.createFullSentence());
@@ -198,7 +207,7 @@ public class MtasCQLParserSentencePartCondition {
               .createFullSentence();
           if (firstBasicSentence != null) {
             sentence.addSentenceAsFirstOption(
-                new MtasCQLParserSentenceCondition(firstBasicSentence));
+                new MtasCQLParserSentenceCondition(firstBasicSentence, ignoreClause, maximumIgnoreLength));
           } else {
             sentence.addSentenceAsFirstOption(firstSentence);
           }

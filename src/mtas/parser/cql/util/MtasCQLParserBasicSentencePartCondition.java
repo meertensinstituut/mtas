@@ -1,8 +1,7 @@
 package mtas.parser.cql.util;
 
-import org.apache.lucene.search.spans.SpanQuery;
-
 import mtas.parser.cql.ParseException;
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasCQLParserBasicSentencePartCondition.
@@ -22,7 +21,7 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public abstract SpanQuery getQuery() throws ParseException;
+  public abstract MtasSpanQuery getQuery() throws ParseException;
 
   /**
    * Gets the minimum occurence.

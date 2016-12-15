@@ -9,12 +9,12 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
 import mtas.search.spans.util.MtasSpanQuery;
+
 
 /**
  * The Class MtasSpanEndQuery.
@@ -22,7 +22,7 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasSpanEndQuery extends MtasSpanQuery {
 
   /** The query. */
-  private SpanQuery query;
+  private MtasSpanQuery query;
 
   /**
    * Instantiates a new mtas span end query.
@@ -30,7 +30,7 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    * @param query
    *          the query
    */
-  public MtasSpanEndQuery(SpanQuery query) {
+  public MtasSpanEndQuery(MtasSpanQuery query) {
     super();
     this.query = query;
   }
@@ -42,7 +42,7 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public Query rewrite(IndexReader reader) throws IOException {
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     query.rewrite(reader);
     return this;
   }

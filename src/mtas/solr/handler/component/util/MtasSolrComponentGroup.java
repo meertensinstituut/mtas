@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -19,6 +18,7 @@ import org.apache.solr.handler.component.ShardResponse;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentGroup;
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
@@ -44,13 +44,18 @@ public class MtasSolrComponentGroup {
 
   /** The Constant NAME_MTAS_GROUP_QUERY_PREFIX. */
   public static final String NAME_MTAS_GROUP_QUERY_PREFIX = "query.prefix";
+  
+  /** The Constant NAME_MTAS_GROUP_QUERY_IGNORE. */
+  public static final String NAME_MTAS_GROUP_QUERY_IGNORE = "query.ignore";
+  
+  public static final String NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumQueryLength";
 
   /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
   public static final String NAME_MTAS_GROUP_QUERY_VARIABLE = "query.variable";
-  
+
   /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME = "name";
-  
+
   /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE = "value";
 
@@ -93,7 +98,8 @@ public class MtasSolrComponentGroup {
   /**
    * Instantiates a new mtas solr component group.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentGroup(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -102,9 +108,12 @@ public class MtasSolrComponentGroup {
   /**
    * Prepare.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -116,7 +125,9 @@ public class MtasSolrComponentGroup {
       String[] queryTypes = new String[ids.size()];
       String[] queryValues = new String[ids.size()];
       String[] queryPrefixes = new String[ids.size()];
-      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];      
+      String[] queryIgnores = new String[ids.size()];
+      String[] queryMaximumIgnoreLengths = new String[ids.size()];
+      HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];
       String[] keys = new String[ids.size()];
       String[] numbers = new String[ids.size()];
       String[][] groupingLeftPosition = new String[ids.size()][];
@@ -150,44 +161,47 @@ public class MtasSolrComponentGroup {
         queryPrefixes[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_PREFIX,
             null);
+        queryIgnores[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_IGNORE,
+            null);
+        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH,
+            null);
         Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
             rb.req.getParams(),
-            PARAM_MTAS_GROUP + "." + id + "."
-                + NAME_MTAS_GROUP_QUERY_VARIABLE);
+            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_VARIABLE);
         queryVariables[tmpCounter] = new HashMap<String, String[]>();
         if (vIds.size() > 0) {
           HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
           for (String vId : vIds) {
             String name = rb.req.getParams()
                 .get(PARAM_MTAS_GROUP + "." + id + "."
-                    + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId
-                    + "." + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME,
-                    null);
+                    + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId + "."
+                    + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME, null);
             if (name != null) {
               if (!tmpVariables.containsKey(name)) {
                 tmpVariables.put(name, new ArrayList<String>());
               }
               String value = rb.req.getParams()
                   .get(PARAM_MTAS_GROUP + "." + id + "."
-                      + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId
-                      + "." + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE,
-                      null);
+                      + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId + "."
+                      + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE, null);
               if (value != null) {
                 ArrayList<String> list = new ArrayList<String>();
                 String[] subList = value.split("(?<!\\\\),");
-                for(int i=0; i<subList.length; i++) {
-                  list.add(subList[i].replace("\\,", ",").replace("\\\\", "\\"));
-                }                    
-                tmpVariables.get(name).addAll(list);                    
+                for (int i = 0; i < subList.length; i++) {
+                  list.add(
+                      subList[i].replace("\\,", ",").replace("\\\\", "\\"));
+                }
+                tmpVariables.get(name).addAll(list);
               }
             }
           }
           for (String name : tmpVariables.keySet()) {
-            queryVariables[tmpCounter].put(name,
-                tmpVariables.get(name)
-                    .toArray(new String[tmpVariables.get(name).size()]));
+            queryVariables[tmpCounter].put(name, tmpVariables.get(name)
+                .toArray(new String[tmpVariables.get(name).size()]));
           }
-        }        
+        }
         groupingHitInsidePrefixes[tmpCounter] = null;
         // collect
         SortedSet<String> gids;
@@ -277,8 +291,11 @@ public class MtasSolrComponentGroup {
           NAME_MTAS_GROUP_QUERY_TYPE, NAME_MTAS_GROUP_FIELD, false);
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
-        SpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
-            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i]);
+        Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i] == null)
+            ? null : Integer.parseInt(queryMaximumIgnoreLengths[i]);
+        MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i],
+            queryIgnores[i], maximumIgnoreLength);
         // minimize number of queries
         if (cf.spanQueryList.contains(q)) {
           q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));
@@ -291,9 +308,10 @@ public class MtasSolrComponentGroup {
         int number = (numbers[i] == null) || (numbers[i].isEmpty())
             ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
         mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
-            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i], key, number,
-            groupingHitInsidePrefixes[i], groupingHitInsideLeftPosition[i],
-            groupingHitInsideLeftPrefixes[i], groupingHitInsideRightPosition[i],
+            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i], queryIgnores[i], key,
+            number, groupingHitInsidePrefixes[i],
+            groupingHitInsideLeftPosition[i], groupingHitInsideLeftPrefixes[i],
+            groupingHitInsideRightPosition[i],
             groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],
             groupingHitLeftPrefixes[i], groupingHitRightPosition[i],
             groupingHitRightPrefixes[i], groupingLeftPosition[i],
@@ -306,11 +324,16 @@ public class MtasSolrComponentGroup {
   /**
    * Prepare.
    *
-   * @param solrParams the solr params
-   * @param gids the gids
-   * @param name the name
-   * @param positions the positions
-   * @param prefixes the prefixes
+   * @param solrParams
+   *          the solr params
+   * @param gids
+   *          the gids
+   * @param name
+   *          the name
+   * @param positions
+   *          the positions
+   * @param prefixes
+   *          the prefixes
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) {
@@ -329,9 +352,12 @@ public class MtasSolrComponentGroup {
   /**
    * Modify request.
    *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+   * @param rb
+   *          the rb
+   * @param who
+   *          the who
+   * @param sreq
+   *          the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -354,6 +380,12 @@ public class MtasSolrComponentGroup {
                 + NAME_MTAS_GROUP_QUERY_TYPE);
             sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
                 + NAME_MTAS_GROUP_QUERY_VALUE);
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_QUERY_PREFIX);
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_QUERY_IGNORE);
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH);
             subKeys = MtasSolrResultUtil
                 .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP + "."
                     + key + "." + NAME_MTAS_GROUP_GROUPING_LEFT);
@@ -418,10 +450,13 @@ public class MtasSolrComponentGroup {
   /**
    * Creates the.
    *
-   * @param group the group
-   * @param encode the encode
+   * @param group
+   *          the group
+   * @param encode
+   *          the encode
    * @return the simple ordered map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public SimpleOrderedMap<Object> create(ComponentGroup group, Boolean encode)
@@ -445,7 +480,8 @@ public class MtasSolrComponentGroup {
   /**
    * Finish stage.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -477,9 +513,12 @@ public class MtasSolrComponentGroup {
   /**
    * Distributed process.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)

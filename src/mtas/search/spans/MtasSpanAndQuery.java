@@ -3,7 +3,6 @@ package mtas.search.spans;
 import java.io.IOException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanNearQuery;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasExtendedSpanAndQuery;
@@ -15,14 +14,14 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasSpanAndQuery extends MtasSpanQuery {
 
   /** The base query. */
-  private SpanNearQuery baseQuery;
+  SpanNearQuery baseQuery;
 
   /**
    * Instantiates a new mtas span and query.
    *
    * @param clauses the clauses
    */
-  public MtasSpanAndQuery(SpanQuery... clauses) {
+  public MtasSpanAndQuery(MtasSpanQuery... clauses) {
     super();
     baseQuery = new MtasExtendedSpanAndQuery(clauses);
   }

@@ -307,7 +307,8 @@ public class MtasSolrComponentTermvector {
                 + "." + NAME_MTAS_TERMVECTOR_NUMBER);
             int number;
             if (oldNumber != null) {
-              number = Integer.valueOf(oldNumber) * SHARD_NUMBER_MULTIPLIER;
+              int oldNumberValue = Integer.valueOf(oldNumber);
+              number = (oldNumberValue>=0) ? oldNumberValue * SHARD_NUMBER_MULTIPLIER : oldNumberValue;
             } else {
               number = DEFAULT_NUMBER * SHARD_NUMBER_MULTIPLIER;
             }
@@ -478,7 +479,8 @@ public class MtasSolrComponentTermvector {
                       if (key.equals(keys[i])) {
                         int number;
                         if (numbers[i] != null) {
-                          number = Integer.parseInt(numbers[i]);
+                          int numberValue = Integer.parseInt(numbers[i]);
+                          number = numberValue>=0 ? numberValue : Integer.MAX_VALUE;                          
                         } else {
                           number = DEFAULT_NUMBER;
                         }
@@ -643,7 +645,7 @@ public class MtasSolrComponentTermvector {
           TreeMap<String, NumberComparator> mergedComparatorList;
           if (mergedComparatorLists.containsKey(tv.key)) {
             mergedComparatorList = mergedComparatorLists.get(tv.key);
-            if (mergedComparatorList.size() < tv.number) {
+            if (mergedComparatorList.size() < tv.number || tv.number<=0) {
               // do nothing
             } else {
               SortedSet<Map.Entry<String, NumberComparator>> sortedSet = new TreeSet<Map.Entry<String, NumberComparator>>(

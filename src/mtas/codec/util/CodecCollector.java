@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.tree.IntervalTreeNodeData;
-import mtas.codec.util.CodecComponent.ComponentDistinct;
+import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentGroup;
@@ -45,6 +45,7 @@ import mtas.search.spans.MtasSpanMatchAllQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.MtasSpanTermQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.FieldInfo;
@@ -59,7 +60,6 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.Bits;
@@ -91,7 +91,7 @@ public class CodecCollector {
   public static void collect(String field, IndexSearcher searcher,
       IndexReader reader, IndexReader rawReader, ArrayList<Integer> fullDocList,
       ArrayList<Integer> fullDocSet, ComponentField fieldInfo,
-      HashMap<SpanQuery, SpanWeight> spansQueryWeight)
+      HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
 
@@ -199,7 +199,7 @@ public class CodecCollector {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void collectSpansPositionsAndTokens(
-      HashMap<SpanQuery, SpanWeight> spansQueryWeight, IndexSearcher searcher,
+      HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight, IndexSearcher searcher,
       CodecInfo mtasCodecInfo, LeafReader r, LeafReaderContext lrc,
       String field, Terms t, List<Integer> docSet, List<Integer> docList,
       ComponentField fieldInfo, FieldInfos fieldInfos) throws IOException {
@@ -211,8 +211,8 @@ public class CodecCollector {
     // results
     HashMap<Integer, Integer> positionsData = null;
     HashMap<Integer, Integer> tokensData = null;
-    HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData = null;
-    HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData = null;
+    HashMap<MtasSpanQuery, HashMap<Integer, Integer>> spansNumberData = null;
+    HashMap<MtasSpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData = null;
     HashMap<String, TreeMap<String, int[]>> facetData = null;
     HashMap<String, String> facetDataType = null;
 
@@ -235,8 +235,8 @@ public class CodecCollector {
     // compute from spans for selected docs
     if (fieldInfo.spanQueryList.size() > 0) {
       // check for statsSpans
-      spansNumberData = new HashMap<SpanQuery, HashMap<Integer, Integer>>();
-      spansMatchData = new HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>>();
+      spansNumberData = new HashMap<MtasSpanQuery, HashMap<Integer, Integer>>();
+      spansMatchData = new HashMap<MtasSpanQuery, HashMap<Integer, ArrayList<Match>>>();
       facetData = new HashMap<String, TreeMap<String, int[]>>();
       facetDataType = new HashMap<String, String>();
       // spans
@@ -252,7 +252,7 @@ public class CodecCollector {
           arguments.addAll(cs.functionNeedArguments());
           for (int a : arguments) {
             if (cs.queries.length > a) {
-              SpanQuery q = cs.queries[a];
+              MtasSpanQuery q = cs.queries[a];
               if (!spansNumberData.containsKey(q)) {
                 spansNumberData.put(q, new HashMap<Integer, Integer>());
               }
@@ -314,7 +314,7 @@ public class CodecCollector {
             HashSet<Integer> arguments = cf.baseParsers[i].needArgument();
             for (int a : arguments) {
               if (cf.spanQueries.length > a) {
-                SpanQuery q = cf.spanQueries[a];
+                MtasSpanQuery q = cf.spanQueries[a];
                 if (!spansNumberData.containsKey(q)) {
                   spansNumberData.put(q, new HashMap<Integer, Integer>());
                 }
@@ -326,7 +326,7 @@ public class CodecCollector {
               arguments = function.needArgument();
               for (int a : arguments) {
                 if (cf.spanQueries.length > a) {
-                  SpanQuery q = cf.spanQueries[a];
+                  MtasSpanQuery q = cf.spanQueries[a];
                   if (!spansNumberData.containsKey(q)) {
                     spansNumberData.put(q, new HashMap<Integer, Integer>());
                   }
@@ -421,7 +421,7 @@ public class CodecCollector {
         }
       }
 
-      for (SpanQuery sq : fieldInfo.spanQueryList) {
+      for (MtasSpanQuery sq : fieldInfo.spanQueryList) {
         // what to collect
         if (spansNumberData.containsKey(sq)) {
           numberData = spansNumberData.get(sq);
@@ -557,9 +557,9 @@ public class CodecCollector {
       createTokens(fieldInfo.statsTokenList, tokensData, docSet);
     }
 
-    if (fieldInfo.distinctList.size() > 0) {
-      // create kwic
-      createDistinct(fieldInfo.distinctList, docList, field, lrc.docBase,
+    if (fieldInfo.documentList.size() > 0) {
+      // create document
+      createDocument(fieldInfo.documentList, docList, field, lrc.docBase,
           fieldInfo.uniqueKeyField, searcher, t, r, lrc);
     }
 
@@ -755,7 +755,7 @@ public class CodecCollector {
     HashMap<GroupHit, Spans> list = new HashMap<GroupHit, Spans>();
     IndexReader reader = searcher.getIndexReader();
     for (GroupHit hit : occurences) {
-      SpanQuery queryHit = createQueryFromGroupHit(prefixes, field, hit);
+      MtasSpanQuery queryHit = createQueryFromGroupHit(prefixes, field, hit);
       if (queryHit != null) {
         SpanWeight weight = (SpanWeight) queryHit.rewrite(reader)
             .createWeight(searcher, false);
@@ -776,13 +776,13 @@ public class CodecCollector {
    * @param hit the hit
    * @return the span query
    */
-  private static SpanQuery createQueryFromGroupHit(HashSet<String> prefixes,
+  private static MtasSpanQuery createQueryFromGroupHit(HashSet<String> prefixes,
       String field, GroupHit hit) {
     // initial check
     if (prefixes == null || field == null || hit == null) {
       return null;
     } else {
-      SpanQuery query = null, leftQuery = null, hitQuery = null,
+      MtasSpanQuery query = null, leftQuery = null, hitQuery = null,
           rightQuery = null;
       // check for missing
       if (hit.missingLeft != null && hit.missingLeft.length > 0) {
@@ -810,14 +810,14 @@ public class CodecCollector {
       if (hit.dataHit != null && hit.dataHit.length > 0) {
         List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
         for (int i = 0; i < hit.dataHit.length; i++) {
-          SpanQuery item = null;
+          MtasSpanQuery item = null;
           if (hit.dataHit[i].size() == 0) {
             item = new MtasSpanMatchAllQuery(field);
           } else if (hit.dataHit[i].size() == 1) {
             Term term = new Term(field, hit.dataHit[i].get(0));
             item = new MtasSpanTermQuery(term);
           } else {
-            SpanQuery[] subList = new SpanQuery[hit.dataHit[i].size()];
+            MtasSpanQuery[] subList = new MtasSpanQuery[hit.dataHit[i].size()];
             for (int j = 0; j < hit.dataHit[i].size(); j++) {
               Term term = new Term(field, hit.dataHit[i].get(j));
               subList[j] = new MtasSpanTermQuery(term);
@@ -826,7 +826,7 @@ public class CodecCollector {
           }
           items.add(new MtasSpanSequenceItem(item, false));
         }
-        hitQuery = new MtasSpanSequenceQuery(items);
+        hitQuery = new MtasSpanSequenceQuery(items, null, null);
       }
       if (hitQuery != null) {
         query = hitQuery;
@@ -887,8 +887,8 @@ public class CodecCollector {
    * @return the hash map
    */
   private static HashMap<Integer, long[]> computeArguments(
-      HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
-      SpanQuery[] queries, Integer[] docSet) {
+      HashMap<MtasSpanQuery, HashMap<Integer, Integer>> spansNumberData,
+      MtasSpanQuery[] queries, Integer[] docSet) {
     HashMap<Integer, long[]> args = new HashMap<Integer, long[]>();
     for (int q = 0; q < queries.length; q++) {
       HashMap<Integer, Integer> tmpData = spansNumberData.get(queries[q]);
@@ -1027,7 +1027,7 @@ public class CodecCollector {
    */
   private static void createStats(List<ComponentSpan> statsSpanList,
       HashMap<Integer, Integer> positionsData,
-      HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
+      HashMap<MtasSpanQuery, HashMap<Integer, Integer>> spansNumberData,
       Integer[] docSet) throws IOException {
     if (statsSpanList != null) {
       for (ComponentSpan span : statsSpanList) {
@@ -1208,8 +1208,8 @@ public class CodecCollector {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void createList(List<ComponentList> listList,
-      HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
-      HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
+      HashMap<MtasSpanQuery, HashMap<Integer, Integer>> spansNumberData,
+      HashMap<MtasSpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
       List<Integer> docSet, String field, int docBase, String uniqueKeyField,
       CodecInfo mtasCodecInfo, IndexSearcher searcher) throws IOException {
     if (listList != null) {
@@ -1380,7 +1380,7 @@ public class CodecCollector {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void createGroup(List<ComponentGroup> groupList,
-      HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
+      HashMap<MtasSpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
       List<Integer> docSet, FieldInfo fieldInfo, String field, int docBase,
       CodecInfo mtasCodecInfo, IndexSearcher searcher, LeafReaderContext lrc)
       throws IOException {
@@ -1880,9 +1880,9 @@ public class CodecCollector {
   }
 
   /**
-   * Creates the distinct.
+   * Creates the document.
    *
-   * @param distinctList the distinct list
+   * @param documentList the document list
    * @param docList the doc list
    * @param field the field
    * @param docBase the doc base
@@ -1893,12 +1893,12 @@ public class CodecCollector {
    * @param lrc the lrc
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  private static void createDistinct(List<ComponentDistinct> distinctList,
+  private static void createDocument(List<ComponentDocument> documentList,
       List<Integer> docList, String field, int docBase, String uniqueKeyField,
       IndexSearcher searcher, Terms t, LeafReader r, LeafReaderContext lrc)
       throws IOException {
-    if (distinctList != null) {
-      for (ComponentDistinct distinct : distinctList) {
+    if (documentList != null) {
+      for (ComponentDocument document : documentList) {
         // initialize
         for (int docId : docList) {
           // get unique id
@@ -1910,18 +1910,18 @@ public class CodecCollector {
               CodecUtil.STATS_TYPE_SUM, null);
           // get other doc info
           if (indxfld != null) {
-            distinct.uniqueKey.put(docId, indxfld.stringValue());
+            document.uniqueKey.put(docId, indxfld.stringValue());
             MtasDataCollector<?, ?> stats = DataCollector.getCollector(
-                DataCollector.COLLECTOR_TYPE_DATA, distinct.dataType,
-                distinct.statsType, distinct.statsItems, null, null, null, null,
+                DataCollector.COLLECTOR_TYPE_DATA, document.dataType,
+                document.statsType, document.statsItems, null, null, null, null,
                 null, null);
-            distinct.stats.put(docId, stats);
-            if (distinct.list != null) {
+            document.stats.put(docId, stats);
+            if (document.list != null) {
               MtasDataCollector<?, ?> list = DataCollector.getCollector(
                   DataCollector.COLLECTOR_TYPE_LIST, CodecUtil.DATA_TYPE_LONG,
                   listStatsType, listStatsItems, CodecUtil.STATS_TYPE_SUM,
-                  CodecUtil.SORT_DESC, 0, distinct.number, null, null);
-              distinct.list.put(docId, list);
+                  CodecUtil.SORT_DESC, 0, document.number, null, null);
+              document.list.put(docId, list);
             }
           }
         }
@@ -1932,14 +1932,14 @@ public class CodecCollector {
         TermsEnum termsEnum;
         PostingsEnum postingsEnum = null;
         // loop over termvectors
-        for (ComponentDistinct distinct : distinctList) {
-          termsEnum = t.intersect(distinct.compiledAutomaton, null);
+        for (ComponentDocument document : documentList) {
+          termsEnum = t.intersect(document.compiledAutomaton, null);
           // init
           int initSize = Math.min((int) t.size(), 1000);
           for (int docId : docList) {
-            distinct.stats.get(docId).initNewList(1);
-            if (distinct.list != null) {
-              distinct.list.get(docId).initNewList(initSize);
+            document.stats.get(docId).initNewList(1);
+            if (document.list != null) {
+              document.list.get(docId).initNewList(initSize);
             }
           }
           // fill
@@ -1953,11 +1953,11 @@ public class CodecCollector {
                 if ((segmentDocId == termDocId) || ((termDocId = postingsEnum
                     .advance(segmentDocId)) == segmentDocId)) {
                   // register stats
-                  distinct.stats.get(segmentDocId + lrc.docBase)
+                  document.stats.get(segmentDocId + lrc.docBase)
                       .add(new long[] { postingsEnum.freq() }, 1);
                   // register list
-                  if (distinct.list != null) {
-                    distinct.list.get(segmentDocId + lrc.docBase).add(
+                  if (document.list != null) {
+                    document.list.get(segmentDocId + lrc.docBase).add(
                         MtasToken.getPostfixFromValue(term),
                         new long[] { postingsEnum.freq() }, 1);
                   }
@@ -1968,9 +1968,9 @@ public class CodecCollector {
 
           // close
           for (int docId : docList) {
-            distinct.stats.get(docId).closeNewList();
-            if (distinct.list != null) {
-              distinct.list.get(docId).closeNewList();
+            document.stats.get(docId).closeNewList();
+            if (document.list != null) {
+              document.list.get(docId).closeNewList();
             }
           }
         }
@@ -1992,7 +1992,7 @@ public class CodecCollector {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void createKwic(List<ComponentKwic> kwicList,
-      HashMap<SpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
+      HashMap<MtasSpanQuery, HashMap<Integer, ArrayList<Match>>> spansMatchData,
       List<Integer> docList, String field, int docBase, String uniqueKeyField,
       CodecInfo mtasCodecInfo, IndexSearcher searcher) throws IOException {
     if (kwicList != null) {
@@ -2082,18 +2082,20 @@ public class CodecCollector {
               int number = 0;
               for (Match m : matchList) {
                 if (kwic.number != null) {
-                  if (number >= kwic.number) {
+                  if (number >= (kwic.start + kwic.number)) {
                     break;
                   }
                 }
-                int startPosition = m.startPosition;
-                int endPosition = m.endPosition - 1;
-                ArrayList<MtasToken<String>> tokens;
-                tokens = mtasCodecInfo.getPrefixFilteredObjectsByPositions(
-                    field, (docId - docBase), kwic.prefixes,
-                    Math.max(mDoc.minPosition, startPosition - kwic.left),
-                    Math.min(mDoc.maxPosition, endPosition + kwic.right));
-                kwicItemList.add(new KwicToken(m, tokens));
+                if (number >= kwic.start) {
+                  int startPosition = m.startPosition;
+                  int endPosition = m.endPosition - 1;
+                  ArrayList<MtasToken<String>> tokens;
+                  tokens = mtasCodecInfo.getPrefixFilteredObjectsByPositions(
+                      field, (docId - docBase), kwic.prefixes,
+                      Math.max(mDoc.minPosition, startPosition - kwic.left),
+                      Math.min(mDoc.maxPosition, endPosition + kwic.right));
+                  kwicItemList.add(new KwicToken(m, tokens));
+                }
                 number++;
               }
               kwic.tokens.put(docId, kwicItemList);
@@ -2119,7 +2121,7 @@ public class CodecCollector {
   private static void createFacetBase(ComponentFacet cf, int level,
       MtasDataCollector<?, ?> dataCollector,
       HashMap<Integer, Integer> positionsData,
-      HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
+      HashMap<MtasSpanQuery, HashMap<Integer, Integer>> spansNumberData,
       HashMap<String, TreeMap<String, int[]>> facetData, Integer[] docSet)
       throws IOException {
     for (MtasFunctionParserFunction function : cf.baseFunctionParserFunctions[level]) {
@@ -2195,9 +2197,12 @@ public class CodecCollector {
                       long[] tmpArgs;
                       for (int docId : subDocSet) {
                         tmpArgs = args.get(docId);
-                        if(positionsData!=null && positionsData.containsKey(docId) && positionsData.get(docId)!=null) {
-                          valuePositions += positionsData.get(docId).longValue();
-                        }  
+                        if (positionsData != null
+                            && positionsData.containsKey(docId)
+                            && positionsData.get(docId) != null) {
+                          valuePositions += positionsData.get(docId)
+                              .longValue();
+                        }
                         if (tmpArgs != null) {
                           for (int i = 0; i < length; i++) {
                             valueSum[i] += tmpArgs[i];
@@ -2399,7 +2404,7 @@ public class CodecCollector {
    */
   private static void createFacet(List<ComponentFacet> facetList,
       HashMap<Integer, Integer> positionsData,
-      HashMap<SpanQuery, HashMap<Integer, Integer>> spansNumberData,
+      HashMap<MtasSpanQuery, HashMap<Integer, Integer>> spansNumberData,
       HashMap<String, TreeMap<String, int[]>> facetData, List<Integer> docSet,
       String field, int docBase, String uniqueKeyField, CodecInfo mtasCodecInfo,
       IndexSearcher searcher) throws IOException {

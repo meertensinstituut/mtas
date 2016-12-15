@@ -3,8 +3,7 @@ package mtas.parser.cql.util;
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanEndQuery;
 import mtas.search.spans.MtasSpanStartQuery;
-
-import org.apache.lucene.search.spans.SpanQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 
 /**
  * The Class MtasCQLParserGroupFullCondition.
@@ -131,7 +130,7 @@ public class MtasCQLParserGroupFullCondition
    * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#getQuery()
    */
   @Override
-  public SpanQuery getQuery() throws ParseException {
+  public MtasSpanQuery getQuery() throws ParseException {
     if (type.equals(MtasCQLParserGroupFullCondition.GROUP_START)) {
       return new MtasSpanStartQuery(groupCondition.getQuery());
     } else if (type.equals(MtasCQLParserGroupFullCondition.GROUP_END)) {
