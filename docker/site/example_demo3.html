@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi Tier Annotation Search</title>
+    <script type="text/javascript" src="./js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="./js/solr.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+  <body>
+  
+    <h1>Multi Tier Annotation Search - example demo3</h1>
+       
+    <div>
+      Go to <a href="index.html">main page</a>.
+    </div>         
+    
+    <hr noshade /> 
+    
+    <h3>Create index</h3>
+    Post to /solr/demo3/update
+    <div class="solr" data-type="json" data-url="/solr/demo3/update?wt=json&commitWithin=1000">
+      <div class="post"><textarea data-autoresize></textarea></div>
+      <input class="button post" type="button" value="create index" />
+      <input class="button reset" type="button" value="reset" />
+      <div class="output"></div>
+      <div class="error"></div>
+    </div>
+    
+    <hr noshade /> 
+    
+    <h3>Empty index</h3>
+    Post to /solr/demo3/update
+    <div class="solr" data-type="json" data-url="/solr/demo3/update?wt=json&commitWithin=1000">
+      <div class="post"><textarea data-autoresize>{
+  "delete": {
+    "query": "*:*"
+  }
+}</textarea></div>
+      <input class="button post" type="button" value="delete index" />
+      <input class="button reset" type="button" value="reset" />
+      <div class="output"></div>
+      <div class="error"></div>
+    </div>
+    
+    <hr noshade /> 
+    
+    <h3>Query</h3>
+    
+    <div>
+      description
+      <div class="solr" data-type="post" data-url="/solr/demo3/select?indent=true&wt=json">
+        <div class="post"><textarea data-autoresize></textarea></div>
+        <input class="button post" type="button" value="post" />
+        <input class="button reset" type="button" value="reset" />
+        <div class="output"></div>
+        <div class="error"></div>
+      </div>
+    </div>
+    
+    <br />
+    
+    <hr noshade />
+    
+    <div>
+      Go to <a href="index.html">main page</a>.
+    </div>
+    
+  </body>
+</html>

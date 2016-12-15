@@ -50,7 +50,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     docId = -1;
     queueSpans = new ArrayList<QueueItem>();
     queueMatches = new ArrayList<Match>();
-    for (MtasSpanSequenceQuerySpans sequenceSpans : setSequenceSpans) {
+    for (MtasSpanSequenceQuerySpans sequenceSpans : setSequenceSpans) {      
       queueSpans.add(new QueueItem(sequenceSpans));
     }
     ignoreItem = new MtasIgnoreItem(ignoreSpans, maximumIgnoreLength);
@@ -166,7 +166,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
           allItemsOptional = false;
         }
         if (!item.noMoreDocs) {
-          if (newDocId == null) {
+          if(item.sequenceSpans.spans==null) {
+            spanDocId = NO_MORE_DOCS;
+          } else if (newDocId == null) {
             spanDocId = item.sequenceSpans.spans.nextDoc();
           } else {
             if (!item.sequenceSpans.optional) {
@@ -270,7 +272,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     } else {
       Integer spanDocId, newDocId = target;
       for (QueueItem item : queueSpans) {
-        if (item.sequenceSpans.spans.docID() < newDocId) {
+        if(item.sequenceSpans.spans==null) {
+          spanDocId = NO_MORE_DOCS;
+        } else if (item.sequenceSpans.spans.docID() < newDocId) {
           spanDocId = item.sequenceSpans.spans.advance(newDocId);
           if (spanDocId.equals(NO_MORE_DOCS)) {
             item.noMoreDocs = true;
@@ -362,7 +366,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
         QueueItem item = queueSpans.get(i);
         // if span is optional, check docId
         if (!item.sequenceSpans.optional
-            || (item.sequenceSpans.spans.docID() == docId)) {
+            || (item.sequenceSpans.spans!=null && item.sequenceSpans.spans.docID() == docId)) {
           // compute minimum startPosition until next non-optional item
           // used as lower boundary on endPosition next
           minStartPositionNext = null;

@@ -16,7 +16,13 @@ For each field containing Mtas tokenized text, every token is associated with a 
 
 The optional postfix associated with a token can be queried within CQL by providing a *value*. This is a regular expression, the supported syntax is documented in the RegExp class provided by Lucene. By using a [termvector query](search_query_termvector.html), for each [prefix](#prefix) a list of postfix values can be produced. 
 
-<a name="#cql"></a>
+<a name="variable"></a>
+
+#### Variable
+
+The optional postfix associated with a token can also be queried within CQL by providing a *variable*. Each variable may occur only once in a CQL query, and should be provided as a comma separated list together with this query. Each provided variable has to occur in the query.
+
+<a name="cql"></a>
 
 ## CQL
 
@@ -28,8 +34,8 @@ The optional postfix associated with a token can be queried within CQL by provid
 
 | Syntax                                | Description                      | Example      |
 |---------------------------------------|----------------------------------|--------------|
-| [cql](#cql)**{** \<number\> **}**     | Matches provided number of occurrence from [cql](#cql)| `[pos="ADJ"]{2}` |
-| [cql](#cql)**{** \<number\> , \<number\>**}** | Matches each number between provided start and end of occurrence from [cql](#cql)| `[pos="ADJ"]{2,3}` |
+| [cql](#cql) **{** \<number\> **}**     | Matches provided number of occurrence from [cql](#cql)| `[pos="ADJ"]{2}` |
+| [cql](#cql) **{** \<number\> , \<number\>**}** | Matches each number between provided start and end of occurrence from [cql](#cql)| `[pos="ADJ"]{2,3}` |
 
 
 
@@ -39,14 +45,17 @@ The optional postfix associated with a token can be queried within CQL by provid
 | **\(** [cql](#cql) **\) !within \(** [cql](#cql) **\)**  | Matches cql expression not within another cql expression   | `([t="de"]) !within (<s/>)` |
 | **\(** [cql](#cql) **\) containing \(** [cql](#cql) **\)**  | Matches cql expression containing another cql expression   | `(<s/>) containing ([t="de"])` |
 | **\(** [cql](#cql) **\) !containing \(** [cql](#cql) **\)**  | Matches cql expression not containing another cql expression   | `(<s/>) !containing ([t="de"])` |
+| **\(** [cql](#cql) **\) intersecting \(** [cql](#cql) **\)**  | Matches cql expression intersecting another cql expression   | `(<s/>) intersecting (<div/>)` |
+| **\(** [cql](#cql) **\) !intersecting \(** [cql](#cql) **\)**  | Matches cql expression not intersecting another cql expression   | `(<s/>) !intersecting (<div/>)` |
 
-<a name="#token"></a>
+<a name="token"></a>
 
 ## Token
 
 | Syntax                              | Description                                     | Example |
 |-------------------------------------|-------------------------------------------------|---------|
 | **\[ \]**                               | Matches each single position token | `[]` |
+| **"** [value](#value) **"** | Matches a single position token with condition defined by a basic [single-position-expression](#single-position-expression), where the prefix is the default prefix provided with the query | `"de"` |
 | **\[** [single-position-expression](#single-position-expression) **\]**  | Matches single position token with condition defined by an [single-position-expression](#single-position-expression)   | `[t="de"]` |
 
 <a name="single-position-expression"></a>
@@ -56,6 +65,7 @@ The optional postfix associated with a token can be queried within CQL by provid
 | Expression  | Syntax                                      | Example |
 |-------------|---------------------------------------------|---------|
 | basic       | [prefix](#prefix) **= \"**[value](#value)**\"** | `t="de"`
+| variable       | [prefix](#prefix) **= $**[variable-name] | `t=$1`
 | not         | **\!** [single-position-expression](#single-position-expression) | `!t="de"` |
 | and         | **\(** [single-position-expression](#single-position-expression) **\&** [single-position-expression](#single-position-expression) **\&** ... **\)** | `t="de" & pos="LID"`|
 | or          | **\(** [single-position-expression](#single-position-expression) **\|** [single-position-expression](#single-position-expression) **\|** ... **\)** | `t="de" | t="het"` |
@@ -63,7 +73,7 @@ The optional postfix associated with a token can be queried within CQL by provid
 | range       | **\#** \<position\> **-** \<position\>   | `#100-110` |
 
 
-<a name="#multi-position"></a>
+<a name="multi-position"></a>
 
 ## Multi-position
 
@@ -84,7 +94,7 @@ The optional postfix associated with a token can be queried within CQL by provid
 | basic       | [prefix](#prefix) **= \"**[value](#value)**\"** |
 
 
-<a name="#sequence"></a>
+<a name="sequence"></a>
 
 ## Sequence
 

@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && tar xzf solr-6.3.0.tgz solr-6.3.0/bin/install_solr_service.sh --strip-components=2 \
 && bash ./install_solr_service.sh solr-6.3.0.tgz && rm install_solr_service.sh && rm -rf solr-6.3.0.tgz \
 && service apache2 stop \
+&& echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf \
 && a2enmod proxy \
 && a2enmod proxy_http \
 && a2enmod proxy_ajp \
@@ -43,6 +44,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && a2enmod proxy_connect \
 && a2enmod proxy_html \
 && a2enmod xml2enc \
+&& a2enconf fqdn \
 && sed -i '/<\/VirtualHost>/ i ProxyPass /solr http://localhost:8983/solr\nProxyPassReverse /solr http://localhost:8983/solr' /etc/apache2/sites-enabled/000-default.conf \
 && rm -rf /var/www/html/* \
 && mkdir /var/www/html/demo \ 
@@ -71,8 +73,12 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && cp -rp demo1 demo2 \
 && cp data/schemaFull.xml demo2/conf/schema.xml \
 && echo "name=demo2" > demo2/core.properties\
+&& cp -rp demo1 demo3 \
+&& cp data/schemaFull.xml demo3/conf/schema.xml \
+&& echo "name=demo3" > demo3/core.properties\
 && mv demo1 /var/solr/data/ \
-&& mv demo2 /var/solr/data/
+&& mv demo2 /var/solr/data/ \
+&& mv demo3 /var/solr/data/
 
 CMD bash -C '/start.sh'; 'bash'
 

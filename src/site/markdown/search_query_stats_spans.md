@@ -13,12 +13,24 @@ Multiple statistics on the occurrence of a span can be produced within the same 
 | mtas.stats.spans.\<identifier\>.key         | \<string\>   | key used in response           | no          |
 | mtas.stats.spans.\<identifier\>.field       | \<string\>   | mtas field                      | yes         |
 | mtas.stats.spans.\<identifier\>.query.\<identifier query\>.type       | \<string\>   | query language: [cql](search_cql.html)  | yes         |
-| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.value       | \<string\>   | query: [cql](search_cql.html)            | yes         |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.value      | \<string\>   | query: [cql](search_cql.html)            | yes         |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.prefix     | \<string\>   | default prefix            | no         |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.ignore      | \<string\>   | ignore query: [cql](search_cql.html)            | no         |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.maximumIgnoreLength      | \<integer\>   | maximum number of succeeding occurrences to ignore            | no         |
 | mtas.stats.spans.\<identifier\>.type        | \<string\>   | required [type of statistics](search_stats.html) | no          |
 | mtas.stats.spans.\<identifier\>.minimum     | \<double\>   | minimum number of occurrences span  | no          |
 | mtas.stats.spans.\<identifier\>.maximum     | \<double\>   | maximum number of occurrences span  | no          |
 
 The *key* is added to the response and may be used to distinguish between multiple statistics on the occurrence of spans, and should therefore be unique. The optional *minimum* and *maximum* can be used to focus only on documents satisfying a condition on the number of occurrences of the spans. When multiple queries are provided, the provided boundary will hold on the sum of occurrences of the resulting spans.
+
+## Variables
+
+The query may contain one or more variables, and the value(s) of these variables have to be defined 
+
+| Parameter                                       | Value        | Info                           | Obligatory  |
+|-------------------------------------------------|--------------|--------------------------------|-------------|
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.variable\<identifier variable\>.name      | \<string\>   | name of variable                 | yes        |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.variable\<identifier variable\>.value      | \<string\>   | comma separated list of values  | yes        |
 
 ## Functions
 
@@ -39,8 +51,11 @@ Again, the *key* is added to the response and may be used to distinguish between
 2. [Minimum and Maximum](#minimum-and-maximum) : statistics on the occurrence of a word with restrictions on the number of occurrences.
 3. [Subset](#subset) : statistics on the occurrence of a word within a subset of documents.
 4. [Multiple](#multiple) : statistics on the occurrence of multiple words.
-5. [Functions](#functions) : statistics using functions.
-6. [Multiple and Functions](#multiple-and-functions) : statistics using functions on the occurrence of multiple words.
+5. [Prefix](#prefix) : default prefix for query
+5. [Ignore](#ignore) : query with ignore
+6. [Ignore and maximumIgnoreLength](#ignore-and-maximum-ignore-length) : query with ignore and maximumIgnoreLength
+6. [Functions](#functions) : statistics using functions.
+7. [Multiple and Functions](#multiple-and-functions) : statistics using functions on the occurrence of multiple words.
 
 ---
 
@@ -193,6 +208,80 @@ Total and average number of occurrences of the word "de" and "het", and the numb
           "sum":31329504,
           "n":2064808}]}}}
 ```
+
+<a name="prefix"></a>  
+
+### Prefix
+
+**Example**  
+Total and average number of occurrences of the word "de" followed by an adjective.
+
+**CQL**  
+`"de" [pos="ADJ"]`
+
+**Request and response**  
+`q=*%3A*&mtas=true&mtas.stats=true&mtas.stats.spans=true&mtas.stats.spans.0.field=text&mtas.stats.spans.0.query.0.type=cql&mtas.stats.spans.0.query.0.value="de" [pos%3D"ADJ"]&mtas.stats.spans.0.query.0.prefix=t_lc&mtas.stats.spans.0.key=example - prefix&mtas.stats.spans.0.type=n%2Csum%2Cmean&rows=0&wt=json&indent=true`
+
+``` json
+"mtas":{
+    "stats":{
+      "spans":[{
+          "key":"example - prefix",
+          "mean":2.1725308115815127,
+          "sum":4485859,
+          "n":2064808}]}}
+```
+
+<a name="ignore"></a>  
+
+### Ignore
+
+**Example**  
+Total and average number of occurrences of an article followed by a noun, ignoring adjectives.
+
+**CQL**  
+`[pos="LID"][pos="N"]`
+
+**Ignore** 
+`[pos="ADJ"]`
+
+
+**Request and response**  
+`q=*%3A*&mtas=true&mtas.stats=true&mtas.stats.spans=true&mtas.stats.spans.0.field=text&mtas.stats.spans.0.query.0.type=cql&mtas.stats.spans.0.query.0.value=[t_lc%3D"de"]&mtas.stats.spans.0.key=functions+-+de&mtas.stats.spans.0.type=n%2Csum%2Cmean&mtas.stats.spans.0.function.0.expression=%24q0%2F%24n&mtas.stats.spans.0.function.0.key=relative+frequency&mtas.stats.spans.0.function.0.type=mean%2Cstandarddeviation%2Cdistribution(start%3D0%2Cend%3D0.1%2Cnumber%3D10)&mtas.stats.spans.0.function.1.expression=%24n&mtas.stats.spans.0.function.1.key=number+of+words&mtas.stats.spans.0.function.1.type=n%2Csum&rows=0&wt=json&indent=true`
+
+``` json
+"mtas":{
+    "stats":{
+      "spans":[{
+          "key":"functions - de",
+          "mean":12.34790062804871,
+          "sum":25496044,
+          "n":2064808,
+          "functions":{
+            "number of words":{
+              "sum":337230767,
+              "n":2064808},
+            "relative frequency":{
+              "distribution(start=0,end=0.1,number=10)":{
+                "[0.000,0.010)":950500,
+                "[0.010,0.020)":80369,
+                "[0.020,0.030)":115695,
+                "[0.030,0.040)":139752,
+                "[0.040,0.050)":162877,
+                "[0.050,0.060)":168598,
+                "[0.060,0.070)":145493,
+                "[0.070,0.080)":109117,
+                "[0.080,0.090)":77214,
+                "[0.090,0.100)":51243},
+              "mean":0.030196372045937097,
+              "errorList":{"division by zero":691633},
+              "standarddeviation":0.03428066513492476,
+              "errorNumber":691633}}}]}}
+```
+
+<a name="ignore-and-maximum-ignore-length"></a>  
+
+### Ignore and maximumIgnoreLength
 
 <a name="functions"></a>  
 
