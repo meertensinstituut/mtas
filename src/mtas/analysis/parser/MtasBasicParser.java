@@ -772,7 +772,7 @@ abstract public class MtasBasicParser extends MtasParser {
       // directly
       if (mappingValue.get("source").equals(MtasParserMapping.SOURCE_STRING)) {
         if (mappingValue.get("type")
-            .equals(MtasParserMapping.PARSER_TYPE_STRING)) {
+            .equals(MtasParserMapping.PARSER_TYPE_STRING)) {          
           String subvalue = computeFilteredPrefixedValue(
               mappingValue.get("type"), mappingValue.get("text"), null, null);
           if (subvalue != null) {
@@ -805,9 +805,15 @@ abstract public class MtasBasicParser extends MtasParser {
             // add attribute to value
           } else if (mappingValue.get("type")
               .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
+            String tmpValue = null;
+            if(mappingValue.get("name").equals("#")) {
+              tmpValue = checkObjects[0].getId();
+            } else {
+              tmpValue = checkObjects[0].getAttribute(mappingValue.get("name"));
+            }
             String subvalue = computeFilteredPrefixedValue(
                 mappingValue.get("type"),
-                checkObjects[0].getAttribute(mappingValue.get("name")),
+                tmpValue,
                 mappingValue.get("filter"),
                 value.equals("") ? null : mappingValue.get("prefix"));
             if (subvalue != null) {

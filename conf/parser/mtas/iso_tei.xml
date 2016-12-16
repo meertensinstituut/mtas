@@ -59,6 +59,14 @@
 						<item type="text" filter="ascii,lowercase" />
 					</post>
 				</token>
+				<token type="string" offset="false" realoffset="false" parent="true">
+          <pre>
+            <item type="string" value="w.id" />
+          </pre>
+          <post>
+            <item type="attribute" name="#" />
+          </post>
+        </token>
 			</mapping>
 			<mapping type="word" name="anchor" start="synch" end="synch">
 				<token type="string" offset="false" realoffset="false" parent="false">
@@ -131,6 +139,15 @@
           <pre>
             <item type="name" />
           </pre>
+        </token>
+        <token type="string" offset="false" realoffset="false" parent="true">
+          <pre>
+            <item type="name" />
+            <item type="string" value=".id" />
+          </pre>
+          <post>
+            <item type="attribute" name="#" />
+          </post>
         </token>
       </mapping>
 			<!-- END GROUPS -->
