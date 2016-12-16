@@ -2,7 +2,9 @@ package mtas.search.spans;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
@@ -13,8 +15,8 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
   /** The base query. */
   private SpanContainingQuery baseQuery;
 
-  public MtasSpanContainingQuery(SpanQuery q1, SpanQuery q2) {
-    super();
+  public MtasSpanContainingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
+    super();    
     baseQuery = new SpanContainingQuery(q1, q2);
   }
 
@@ -35,6 +37,13 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
   }
 
   @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);
+    return this;
+  }  
+  
+  
+  @Override  
   public boolean equals(Object obj) {
     if (this == obj)
       return true;

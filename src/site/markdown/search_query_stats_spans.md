@@ -53,7 +53,7 @@ Again, the *key* is added to the response and may be used to distinguish between
 4. [Multiple](#multiple) : statistics on the occurrence of multiple words.
 5. [Prefix](#prefix) : default prefix for query
 5. [Ignore](#ignore) : query with ignore
-6. [Ignore and maximumIgnoreLength](#ignore-and-maximum-ignore-length) : query with ignore and maximumIgnoreLength
+6. [Ignore and maximumIgnoreLength](#ignore-and-maximumignorelength) : query with ignore and maximumIgnoreLength
 6. [Functions](#functions) : statistics using functions.
 7. [Multiple and Functions](#multiple-and-functions) : statistics using functions on the occurrence of multiple words.
 
@@ -279,7 +279,7 @@ Total and average number of occurrences of an article followed by a noun, ignori
               "errorNumber":691633}}}]}}
 ```
 
-<a name="ignore-and-maximum-ignore-length"></a>  
+<a name="ignore-and-maximumignorelength"></a>  
 
 ### Ignore and maximumIgnoreLength
 

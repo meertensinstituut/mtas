@@ -43,7 +43,7 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    query.rewrite(reader);
+    query = query.rewrite(reader);
     return this;
   }
 

@@ -11,5 +11,5 @@ public abstract class MtasSpanQuery extends SpanQuery {
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return this;
   }
-  
+   
 }

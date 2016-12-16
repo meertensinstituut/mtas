@@ -21,7 +21,7 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasSpanStartQuery extends MtasSpanQuery {
 
   /** The query. */
-  private SpanQuery query;
+  private MtasSpanQuery query;
 
   /**
    * Instantiates a new mtas span start query.
@@ -29,7 +29,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    * @param query
    *          the query
    */
-  public MtasSpanStartQuery(SpanQuery query) {
+  public MtasSpanStartQuery(MtasSpanQuery query) {
     super();
     this.query = query;
   }
@@ -42,7 +42,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    query.rewrite(reader);
+    query = query.rewrite(reader);
     return this;
   }
 
