@@ -47,8 +47,8 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && a2enconf fqdn \
 && sed -i '/<\/VirtualHost>/ i ProxyPass /solr http://localhost:8983/solr\nProxyPassReverse /solr http://localhost:8983/solr' /etc/apache2/sites-enabled/000-default.conf \
 && rm -rf /var/www/html/* \
-&& mkdir /var/www/html/demo \ 
-&& cp -rp data/*samples /var/www/html/demo/ \
+&& mkdir /var/www/html/demo \
+&& cp -rp data/*-samples /var/www/html/demo/ \
 && gunzip -r /var/www/html/demo \
 && cp -rp data/site/* /var/www/html \
 && chmod -R 755 /var/www/html \
@@ -68,7 +68,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && cp lib/mtas-6.3.0.jar demo1/lib/ \
 && cp data/solrconfig.xml demo1/conf/ \
 && cp data/schemaBasic.xml demo1/conf/schema.xml \
-&& cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ \  
+&& cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ \
 && chmod -R 777 demo1 \
 && cp -rp demo1 demo2 \
 && cp data/schemaFull.xml demo2/conf/schema.xml \
