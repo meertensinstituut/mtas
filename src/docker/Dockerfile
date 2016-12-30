@@ -49,6 +49,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && rm -rf /var/www/html/* \
 && mkdir /var/www/html/demo \ 
 && cp -rp data/folia-samples /var/www/html/demo/ \
+&& cp -rp data/isotei-samples /var/www/html/demo/ \
 && gunzip -r /var/www/html/demo \
 && cp -rp data/site/* /var/www/html/ \
 && chmod -R 755 /var/www/html \
