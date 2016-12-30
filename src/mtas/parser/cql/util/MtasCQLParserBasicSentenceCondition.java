@@ -21,7 +21,7 @@ public class MtasCQLParserBasicSentenceCondition {
   private int minimumOccurence, maximumOccurence;
 
   /** The optional parts. */
-  private boolean simplified, optional, optionalParts;
+  private boolean simplified, optional;
 
   private MtasSpanQuery ignoreClause;
   
@@ -66,10 +66,10 @@ public class MtasCQLParserBasicSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public void addGroup(MtasCQLParserGroupFullCondition w)
+  public void addGroup(MtasCQLParserGroupFullCondition g)
       throws ParseException {
     if (!simplified) {
-      partList.add(w);
+      partList.add(g);
     } else {
       throw new ParseException("already simplified");
     }
@@ -146,20 +146,6 @@ public class MtasCQLParserBasicSentenceCondition {
     return optional;
   }
 
-  /**
-   * Checks for optional parts.
-   *
-   * @return true, if successful
-   * @throws ParseException
-   *           the parse exception
-   */
-  public boolean hasOptionalParts() throws ParseException {
-    if (simplified) {
-      return optionalParts;
-    } else {
-      throw new ParseException("can't be called when not simplified");
-    }
-  }
 
   /**
    * Sets the optional.
@@ -182,11 +168,11 @@ public class MtasCQLParserBasicSentenceCondition {
   public void simplify() throws ParseException {
     if (!simplified) {
       simplified = true;
-      optionalParts = true;
+      boolean optionalParts = true;
       List<MtasCQLParserBasicSentencePartCondition> newPartList;
       MtasCQLParserBasicSentencePartCondition lastPart = null;
       newPartList = new ArrayList<MtasCQLParserBasicSentencePartCondition>();
-      // try and merge equal word conditions
+      // try and merge equal basicSentencePart (word/group) conditions
       for (MtasCQLParserBasicSentencePartCondition part : partList) {
         if ((lastPart == null) || !lastPart.equals(part)) {
           lastPart = part;
@@ -209,8 +195,6 @@ public class MtasCQLParserBasicSentenceCondition {
               newMaximumOccurence = lastPart.getMaximumOccurence()
                   + part.getMaximumOccurence();
               lastPart.setOccurence(newMinimumOccurence, newMaximumOccurence);
-              lastPart.setOptional(false);
-              optionalParts = false;
             } else {
               lastPart = part;
               newPartList.add(part);
@@ -230,15 +214,12 @@ public class MtasCQLParserBasicSentenceCondition {
             } else {
               lastPart = part;
               newPartList.add(part);
-              if (!part.isOptional()) {
-                optionalParts = false;
-              }
+              optionalParts = false;
             }
           } else {
             if ((lastPart.getMinimumOccurence() == 1)
                 && (part.getMinimumOccurence() == 1)) {
-              newMinimumOccurence = lastPart.getMinimumOccurence()
-                  + part.getMinimumOccurence() - 1;
+              newMinimumOccurence = 1;
               newMaximumOccurence = lastPart.getMaximumOccurence()
                   + part.getMaximumOccurence();
               lastPart.setOccurence(newMinimumOccurence, newMaximumOccurence);
@@ -246,9 +227,6 @@ public class MtasCQLParserBasicSentenceCondition {
             } else {
               lastPart = part;
               newPartList.add(part);
-              if (!part.isOptional()) {
-                optionalParts = false;
-              }
             }
           }
         }
@@ -265,7 +243,7 @@ public class MtasCQLParserBasicSentenceCondition {
    *
    * @return the part list
    */
-  public List<MtasCQLParserBasicSentencePartCondition> getPartList() {
+  private List<MtasCQLParserBasicSentencePartCondition> getPartList() {
     return partList;
   }
 

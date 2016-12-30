@@ -49,9 +49,8 @@ public class MtasCQLParserTestSentence {
     MtasCQLParser p1 = new MtasCQLParser(new BufferedReader(new StringReader(cql1)));   
     MtasCQLParser p2 = new MtasCQLParser(new BufferedReader(new StringReader(cql2)));
     try {
-      //System.out.print("CQL equivalent:\t"+cql1+" and "+cql2);
-      assertEquals(p1.parse(field, defaultPrefix, null, null, null) ,p2.parse(field, defaultPrefix, null, null, null));
-      //System.out.print("\n");
+      //System.out.println("CQL equivalent:\t"+cql1+" and "+cql2);
+      assertEquals(p1.parse(field, defaultPrefix, null, null, null) ,p2.parse(field, defaultPrefix, null, null, null));      
     } catch (ParseException e) {
       //System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
       e.printStackTrace();
@@ -78,6 +77,7 @@ public class MtasCQLParserTestSentence {
     basicTest17();
     basicTest18();
     basicTest19();
+    basicTest20();
   }
   
   private void basicTest1() throws ParseException {
@@ -304,5 +304,24 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q = new MtasSpanRecurrenceQuery(q3,3,4,null, null); 
     testCQLParse(field, null, cql, q);    
   }
+  
+  private void basicTest20() {
+    String field = "testveld";
+    String cql1 = "[pos=\"N\"]?[pos=\"ADJ\"]";
+    String cql2 = "([pos=\"N\"])?[pos=\"ADJ\"]";
+    testCQLEquivalent(field, null, cql1, cql2);
+    String cql3 = "[pos=\"N\"][pos=\"ADJ\"]?";
+    String cql4 = "[pos=\"N\"]([pos=\"ADJ\"])?";
+    testCQLEquivalent(field, null, cql3, cql4);
+    String cql5 = "[pos=\"N\"][pos=\"ADJ\"]?[pos=\"N\"]";
+    String cql6 = "[pos=\"N\"]([pos=\"ADJ\"])?[pos=\"N\"]";
+    testCQLEquivalent(field, null, cql5, cql6);
+    String cql7 = "[pos=\"N\"]?[pos=\"ADJ\"]?[pos=\"N\"]";
+    String cql8 = "([pos=\"N\"])?([pos=\"ADJ\"])?[pos=\"N\"]";
+    testCQLEquivalent(field, null, cql7, cql8);
+    String cql9 = "[pos=\"N\"][pos=\"ADJ\"]?[pos=\"N\"]?";
+    String cql10 = "[pos=\"N\"]([pos=\"ADJ\"])?([pos=\"N\"])?";
+    testCQLEquivalent(field, null, cql9, cql10);
+  }  
   
 }

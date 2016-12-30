@@ -62,10 +62,10 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   }
 
   final private MtasSpanQuery cql(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException, ParseException {
-  MtasSpanQuery q;
+  MtasSpanSequenceItem si;
   ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
-    q = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
-    itemList.add(new MtasSpanSequenceItem(q, false));
+    si = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
+    itemList.add(si);
     label_1:
     while (true) {
       if (jj_2_1(1000)) {
@@ -73,8 +73,8 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       } else {
         break label_1;
       }
-      q = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
-      itemList.add(new MtasSpanSequenceItem(q, false));
+      si = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
+      itemList.add(si);
     }
     jj_consume_token(0);
     if (itemList.size() > 1)
@@ -88,8 +88,9 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final private MtasSpanQuery cqlBlock(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore,Integer maximumIgnoreLength) throws ParseException, ParseException {
-  MtasCQLParserSentenceCondition s1 = null, s2 = null;
+  final private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore,Integer maximumIgnoreLength) throws ParseException, ParseException {
+  MtasCQLParserSentenceCondition sc1 = null, sc2 = null;
+  MtasSpanSequenceItem si1 = null, si2=null;
   MtasSpanQuery q1 = null, q2 = null;
   Token end = null;
   String operator = null;
@@ -100,10 +101,10 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   String OPERATOR_INTERSECTING = "intersecting";
   String OPERATOR_NOT_INTERSECTING = "not_intersecting";
     if (jj_2_2(1000)) {
-      s1 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
+      sc1 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
     } else if (jj_2_3(1000)) {
       jj_consume_token(BRACKET_START);
-      q1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
+      si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
       jj_consume_token(BRACKET_END);
     } else {
       jj_consume_token(-1);
@@ -133,10 +134,10 @@ public class MtasCQLParser implements MtasCQLParserConstants {
         throw new ParseException();
       }
       if (jj_2_10(1000)) {
-        s2 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
+        sc2 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
       } else if (jj_2_11(1000)) {
         jj_consume_token(BRACKET_START);
-        q2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
+        si2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
         jj_consume_token(BRACKET_END);
       } else {
         jj_consume_token(-1);
@@ -145,39 +146,45 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     } else {
       ;
     }
-    if (s1 != null)
+    if (sc1 != null)
     {
-      q1 = s1.getQuery();
+      si1 = new MtasSpanSequenceItem(sc1.getQuery(),sc1.isOptional());
     }
     if (operator != null)
     {
-      if (s2 != null)
+      if (sc2 != null)
       {
-        q2 = s2.getQuery();
+        si2 = new MtasSpanSequenceItem(sc2.getQuery(),sc2.isOptional());
       }
       if (operator.equals(OPERATOR_CONTAINING))
       {
-        {if (true) return new MtasSpanContainingQuery(q1, q2);}
+        MtasSpanQuery q = new MtasSpanContainingQuery(si1.getQuery(), si2.getQuery());
+        {if (true) return new MtasSpanSequenceItem(q, si1.isOptional());}
       }
       else if (operator.equals(OPERATOR_NOT_CONTAINING))
       {
-        {if (true) return new MtasSpanNotQuery(q1, new MtasSpanContainingQuery(q1, q2));}
+        MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanContainingQuery(si1.getQuery(), si2.getQuery()));
+        {if (true) return new MtasSpanSequenceItem(q, si1.isOptional());}
       }
       else if (operator.equals(OPERATOR_WITHIN))
       {
-        {if (true) return new MtasSpanWithinQuery(q2, q1);}
+        MtasSpanQuery q = new MtasSpanWithinQuery(si2.getQuery(), si1.getQuery());
+        {if (true) return new MtasSpanSequenceItem(q, si1.isOptional());}
       }
       else if (operator.equals(OPERATOR_NOT_WITHIN))
       {
-        {if (true) return new MtasSpanNotQuery(q1, new MtasSpanWithinQuery(q2, q1));}
+        MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanWithinQuery(si2.getQuery(), si1.getQuery()));
+        {if (true) return new MtasSpanSequenceItem(q, si1.isOptional());}
       }
       else if (operator.equals(OPERATOR_INTERSECTING))
       {
-        {if (true) return new MtasSpanIntersectingQuery(q2, q1);}
+        MtasSpanQuery q = new MtasSpanIntersectingQuery(si1.getQuery(), si2.getQuery());
+        {if (true) return new MtasSpanSequenceItem(q, si1.isOptional());}
       }
       else if (operator.equals(OPERATOR_NOT_INTERSECTING))
       {
-        {if (true) return new MtasSpanNotQuery(q1, new MtasSpanIntersectingQuery(q2, q1));}
+        MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanIntersectingQuery(si1.getQuery(), si2.getQuery()));
+        {if (true) return new MtasSpanSequenceItem(q, si1.isOptional());}
       }
       else
       {
@@ -186,7 +193,7 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     }
     else
     {
-      {if (true) return q1;}
+      {if (true) return si1;}
     }
     throw new Error("Missing return statement in function");
   }
@@ -1351,31 +1358,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     finally { jj_save(78, xla); }
   }
 
-  private boolean jj_3_66() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_56()) {
-    jj_scanpos = xsp;
-    if (jj_3_57()) return true;
-    }
-    if (jj_scan_token(OR)) return true;
-    xsp = jj_scanpos;
-    if (jj_3_58()) {
-    jj_scanpos = xsp;
-    if (jj_3_59()) return true;
-    }
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_60()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_55() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
   private boolean jj_3_54() {
     if (jj_3R_15()) return true;
     return false;
@@ -1517,18 +1499,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_11() {
-    if (jj_scan_token(BRACKET_START)) return true;
-    if (jj_3R_7()) return true;
-    if (jj_scan_token(BRACKET_END)) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
   private boolean jj_3R_12() {
     if (jj_scan_token(GROUP_START)) return true;
     Token xsp;
@@ -1548,18 +1518,25 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
+  private boolean jj_3_11() {
+    if (jj_scan_token(BRACKET_START)) return true;
+    if (jj_3R_7()) return true;
+    if (jj_scan_token(BRACKET_END)) return true;
+    return false;
+  }
+
   private boolean jj_3_75() {
     if (jj_scan_token(TOKEN_NOTEQUALS)) return true;
     return false;
   }
 
-  private boolean jj_3_9() {
-    if (jj_scan_token(NOT_INTERSECTING)) return true;
+  private boolean jj_3_10() {
+    if (jj_3R_8()) return true;
     return false;
   }
 
-  private boolean jj_3_8() {
-    if (jj_scan_token(INTERSECTING)) return true;
+  private boolean jj_3_9() {
+    if (jj_scan_token(NOT_INTERSECTING)) return true;
     return false;
   }
 
@@ -1575,13 +1552,13 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_7() {
-    if (jj_scan_token(NOT_WITHIN)) return true;
+  private boolean jj_3_8() {
+    if (jj_scan_token(INTERSECTING)) return true;
     return false;
   }
 
-  private boolean jj_3_6() {
-    if (jj_scan_token(WITHIN)) return true;
+  private boolean jj_3_7() {
+    if (jj_scan_token(NOT_WITHIN)) return true;
     return false;
   }
 
@@ -1590,8 +1567,8 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_5() {
-    if (jj_scan_token(NOT_CONTAINING)) return true;
+  private boolean jj_3_6() {
+    if (jj_scan_token(WITHIN)) return true;
     return false;
   }
 
@@ -1612,17 +1589,17 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_4() {
-    if (jj_scan_token(CONTAINING)) return true;
-    return false;
-  }
-
   private boolean jj_3_44() {
     if (jj_scan_token(CURLY_BRACKET_START)) return true;
     if (jj_scan_token(NUMBER)) return true;
     if (jj_scan_token(KOMMA)) return true;
     if (jj_scan_token(NUMBER)) return true;
     if (jj_scan_token(CURLY_BRACKET_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3_5() {
+    if (jj_scan_token(NOT_CONTAINING)) return true;
     return false;
   }
 
@@ -1633,6 +1610,39 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     jj_scanpos = xsp;
     if (jj_3_25()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_scan_token(CONTAINING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_47() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_44()) {
+    jj_scanpos = xsp;
+    if (jj_3_45()) {
+    jj_scanpos = xsp;
+    if (jj_3_46()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_74() {
+    if (jj_scan_token(TOKEN_EQUALS)) return true;
+    return false;
+  }
+
+  private boolean jj_3_22() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_73() {
+    if (jj_scan_token(TOKEN_NOTEQUALS)) return true;
     return false;
   }
 
@@ -1670,51 +1680,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_47() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_44()) {
-    jj_scanpos = xsp;
-    if (jj_3_45()) {
-    jj_scanpos = xsp;
-    if (jj_3_46()) return true;
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_74() {
-    if (jj_scan_token(TOKEN_EQUALS)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
-  private boolean jj_3_22() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_73() {
-    if (jj_scan_token(TOKEN_NOTEQUALS)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_7() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_2()) {
-    jj_scanpos = xsp;
-    if (jj_3_3()) return true;
-    }
-    xsp = jj_scanpos;
-    if (jj_3_12()) jj_scanpos = xsp;
-    return false;
-  }
-
   private boolean jj_3_21() {
     if (jj_3R_11()) return true;
     return false;
@@ -1723,6 +1688,11 @@ public class MtasCQLParser implements MtasCQLParserConstants {
   private boolean jj_3_43() {
     if (jj_scan_token(WORD_START)) return true;
     if (jj_scan_token(WORD_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_8()) return true;
     return false;
   }
 
@@ -1763,6 +1733,18 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
+  private boolean jj_3R_7() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_2()) {
+    jj_scanpos = xsp;
+    if (jj_3_3()) return true;
+    }
+    xsp = jj_scanpos;
+    if (jj_3_12()) jj_scanpos = xsp;
+    return false;
+  }
+
   private boolean jj_3_38() {
     if (jj_scan_token(OR)) return true;
     if (jj_3R_14()) return true;
@@ -1782,11 +1764,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
 
   private boolean jj_3_19() {
     if (jj_scan_token(OR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_7()) return true;
     return false;
   }
 
@@ -1822,6 +1799,11 @@ public class MtasCQLParser implements MtasCQLParserConstants {
 
   private boolean jj_3_72() {
     if (jj_scan_token(UNQUOTED_VALUE)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_7()) return true;
     return false;
   }
 
@@ -2044,6 +2026,31 @@ public class MtasCQLParser implements MtasCQLParserConstants {
 
   private boolean jj_3_56() {
     if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_66() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_56()) {
+    jj_scanpos = xsp;
+    if (jj_3_57()) return true;
+    }
+    if (jj_scan_token(OR)) return true;
+    xsp = jj_scanpos;
+    if (jj_3_58()) {
+    jj_scanpos = xsp;
+    if (jj_3_59()) return true;
+    }
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_60()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_55() {
+    if (jj_3R_14()) return true;
     return false;
   }
 

@@ -10,22 +10,15 @@ import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
-
 /**
  * The Class MtasCQLParserSentenceCondition.
  */
 public class MtasCQLParserSentenceCondition {
 
-  // parent list: multiple items for OR
   /** The sequence list. */
+  // parent list: multiple items for OR
   // child list: sequence
   private List<List<MtasCQLParserSentenceCondition>> sequenceList;
-
-  /** The sentence sequence. */
-  private List<MtasCQLParserSentenceCondition> sentenceSequence = null;
-
-  /** The sentence current. */
-  private MtasCQLParserSentenceCondition sentenceCurrent = null;
 
   /** The basic sentence. */
   private MtasCQLParserBasicSentenceCondition basicSentence = null;
@@ -34,10 +27,10 @@ public class MtasCQLParserSentenceCondition {
   private int minimumOccurence, maximumOccurence;
 
   /** The optional parts. */
-  private boolean basic, simplified, optional, optionalParts;
-  
+  private boolean basic, simplified, optional;
+
   private MtasSpanQuery ignore;
-  
+
   private Integer maximumIgnoreLength;
 
   /**
@@ -48,10 +41,10 @@ public class MtasCQLParserSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public MtasCQLParserSentenceCondition(MtasCQLParserBasicSentenceCondition s, MtasSpanQuery ignore, Integer maximumIgnoreLength)
-      throws ParseException {
+  public MtasCQLParserSentenceCondition(MtasCQLParserBasicSentenceCondition s,
+      MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
     sequenceList = new ArrayList<List<MtasCQLParserSentenceCondition>>();
-    basicSentence = s;    
+    basicSentence = s;
     minimumOccurence = 1;
     maximumOccurence = 1;
     simplified = false;
@@ -69,8 +62,8 @@ public class MtasCQLParserSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public MtasCQLParserSentenceCondition(MtasCQLParserSentenceCondition sp, MtasSpanQuery ignore, Integer maximumIgnoreLength)
-      throws ParseException {
+  public MtasCQLParserSentenceCondition(MtasCQLParserSentenceCondition sp,
+      MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
     sequenceList = new ArrayList<List<MtasCQLParserSentenceCondition>>();
     addSentenceToEndLatestSequence(sp);
     minimumOccurence = 1;
@@ -100,8 +93,12 @@ public class MtasCQLParserSentenceCondition {
           basicSentence.addBasicSentence(s);
         }
       } else {
-        sentenceCurrent = new MtasCQLParserSentenceCondition(s, ignore, maximumIgnoreLength);
-        sentenceSequence.add(sentenceCurrent);
+        MtasCQLParserSentenceCondition sentenceCurrent = new MtasCQLParserSentenceCondition(
+            s, ignore, maximumIgnoreLength);
+        if (sequenceList.size() == 0) {
+          sequenceList.add(new ArrayList<MtasCQLParserSentenceCondition>());
+        }
+        sequenceList.get(sequenceList.size() - 1).add(sentenceCurrent);
       }
     } else {
       throw new ParseException("already simplified");
@@ -116,37 +113,42 @@ public class MtasCQLParserSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public void addBasicSentenceAsOption(MtasCQLParserBasicSentenceCondition s)
-      throws ParseException {
-    if (!simplified) {
-      if (isBasic()) {
-        if (basicSentence == null) {
-          basicSentence = s;
-        } else {
-          // add previous basic sentence as first option
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence, ignore, maximumIgnoreLength);
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          basicSentence = null;
-          // create new option for current basic sentence
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = new MtasCQLParserSentenceCondition(s, ignore, maximumIgnoreLength);
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          // not basic anymore
-          basic = false;
-        }
-      } else {
-        sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-        sentenceCurrent = new MtasCQLParserSentenceCondition(s, ignore, maximumIgnoreLength);
-        sentenceSequence.add(sentenceCurrent);
-        sequenceList.add(sentenceSequence);
-      }
-    } else {
-      throw new ParseException("already simplified");
-    }
-  }
+  // public void addBasicSentenceAsOption(MtasCQLParserBasicSentenceCondition s)
+  // throws ParseException {
+  // if (!simplified) {
+  // MtasCQLParserSentenceCondition sentenceCurrent;
+  // List<MtasCQLParserSentenceCondition> sentenceSequence;
+  // if (isBasic()) {
+  // if (basicSentence == null) {
+  // basicSentence = s;
+  // } else {
+  // // add previous basic sentence as first option
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence,
+  // ignore, maximumIgnoreLength);
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // basicSentence = null;
+  // // create new option for current basic sentence
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = new MtasCQLParserSentenceCondition(s, ignore,
+  // maximumIgnoreLength);
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // // not basic anymore
+  // basic = false;
+  // }
+  // } else {
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = new MtasCQLParserSentenceCondition(s, ignore,
+  // maximumIgnoreLength);
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // }
+  // } else {
+  // throw new ParseException("already simplified");
+  // }
+  // }
 
   /**
    * Adds the sentence to start first sequence.
@@ -156,43 +158,47 @@ public class MtasCQLParserSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public void addSentenceToStartFirstSequence(MtasCQLParserSentenceCondition s)
-      throws ParseException {
-    if (!simplified) {
-      if (isBasic()) {
-        if (basicSentence == null) {
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = s;
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          // not basic anymore
-          basic = false;
-        } else {
-          // add sentence as first item in new sequence
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          // add sentence to first option
-          sentenceCurrent = s;
-          sentenceSequence.add(sentenceCurrent);
-          // add basic sentence as second item
-          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence, ignore, maximumIgnoreLength);
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          basicSentence = null;
-          // not simple anymore
-          basic = false;
-        }
-      } else {
-        sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-        sentenceSequence.add(s);
-        sentenceSequence.addAll(sequenceList.get(0));
-        sequenceList.set(0, sentenceSequence);
-        sentenceSequence = sequenceList.get((sequenceList.size() - 1));
-        sentenceCurrent = sentenceSequence.get((sentenceSequence.size() - 1));
-      }
-    } else {
-      throw new ParseException("already simplified");
-    }
-  }
+  // public void addSentenceToStartFirstSequence(MtasCQLParserSentenceCondition
+  // s)
+  // throws ParseException {
+  // if (!simplified) {
+  // MtasCQLParserSentenceCondition sentenceCurrent;
+  // List<MtasCQLParserSentenceCondition> sentenceSequence;
+  // if (isBasic()) {
+  // if (basicSentence == null) {
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = s;
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // // not basic anymore
+  // basic = false;
+  // } else {
+  // // add sentence as first item in new sequence
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // // add sentence to first option
+  // sentenceCurrent = s;
+  // sentenceSequence.add(sentenceCurrent);
+  // // add basic sentence as second item
+  // sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence,
+  // ignore, maximumIgnoreLength);
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // basicSentence = null;
+  // // not simple anymore
+  // basic = false;
+  // }
+  // } else {
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceSequence.add(s);
+  // sentenceSequence.addAll(sequenceList.get(0));
+  // sequenceList.set(0, sentenceSequence);
+  // sentenceSequence = sequenceList.get((sequenceList.size() - 1));
+  // sentenceCurrent = sentenceSequence.get((sentenceSequence.size() - 1));
+  // }
+  // } else {
+  // throw new ParseException("already simplified");
+  // }
+  // }
 
   /**
    * Adds the sentence to end latest sequence.
@@ -205,6 +211,8 @@ public class MtasCQLParserSentenceCondition {
   public void addSentenceToEndLatestSequence(MtasCQLParserSentenceCondition s)
       throws ParseException {
     if (!simplified) {
+      MtasCQLParserSentenceCondition sentenceCurrent;
+      List<MtasCQLParserSentenceCondition> sentenceSequence;
       if (isBasic()) {
         if (basicSentence == null) {
           sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
@@ -216,7 +224,8 @@ public class MtasCQLParserSentenceCondition {
         } else {
           // add previous basic sentence as first option
           sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence, ignore, maximumIgnoreLength);
+          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence,
+              ignore, maximumIgnoreLength);
           sentenceSequence.add(sentenceCurrent);
           sequenceList.add(sentenceSequence);
           basicSentence = null;
@@ -228,11 +237,10 @@ public class MtasCQLParserSentenceCondition {
         }
       } else {
         sentenceCurrent = s;
-        if (sentenceSequence == null) {
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sequenceList.add(sentenceSequence);
+        if (sequenceList.size() == 0) {
+          sequenceList.add(new ArrayList<MtasCQLParserSentenceCondition>());
         }
-        sentenceSequence.add(sentenceCurrent);
+        sequenceList.get(sequenceList.size() - 1).add(sentenceCurrent);
       }
     } else {
       throw new ParseException("already simplified");
@@ -250,6 +258,8 @@ public class MtasCQLParserSentenceCondition {
   public void addSentenceAsFirstOption(MtasCQLParserSentenceCondition s)
       throws ParseException {
     if (!simplified) {
+      MtasCQLParserSentenceCondition sentenceCurrent;
+      List<MtasCQLParserSentenceCondition> sentenceSequence;
       if (isBasic()) {
         if (basicSentence == null) {
           sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
@@ -266,7 +276,8 @@ public class MtasCQLParserSentenceCondition {
           sequenceList.add(sentenceSequence);
           // add previous basic sentence as new option
           sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence, ignore, maximumIgnoreLength);
+          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence,
+              ignore, maximumIgnoreLength);
           sentenceSequence.add(sentenceCurrent);
           sequenceList.add(sentenceSequence);
           basicSentence = null;
@@ -295,49 +306,52 @@ public class MtasCQLParserSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public void addSentenceAsOption(MtasCQLParserSentenceCondition s)
-      throws ParseException {
-    if (!simplified) {
-      if (isBasic()) {
-        if (basicSentence == null) {
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = s;
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          // not simple anymore
-          basic = false;
-        } else {
-          // add previous basic sentence as first option
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence, ignore, maximumIgnoreLength);
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          basicSentence = null;
-          // add sentence as new option
-          sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-          sentenceCurrent = s;
-          sentenceSequence.add(sentenceCurrent);
-          sequenceList.add(sentenceSequence);
-          // not simple anymore
-          basic = false;
-        }
-      } else {
-        sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
-        sentenceCurrent = s;
-        sentenceSequence.add(sentenceCurrent);
-        sequenceList.add(sentenceSequence);
-      }
-    } else {
-      throw new ParseException("already simplified");
-    }
-  }
+  // public void addSentenceAsOption(MtasCQLParserSentenceCondition s)
+  // throws ParseException {
+  // if (!simplified) {
+  // MtasCQLParserSentenceCondition sentenceCurrent;
+  // List<MtasCQLParserSentenceCondition> sentenceSequence;
+  // if (isBasic()) {
+  // if (basicSentence == null) {
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = s;
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // // not simple anymore
+  // basic = false;
+  // } else {
+  // // add previous basic sentence as first option
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = new MtasCQLParserSentenceCondition(basicSentence,
+  // ignore, maximumIgnoreLength);
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // basicSentence = null;
+  // // add sentence as new option
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = s;
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // // not simple anymore
+  // basic = false;
+  // }
+  // } else {
+  // sentenceSequence = new ArrayList<MtasCQLParserSentenceCondition>();
+  // sentenceCurrent = s;
+  // sentenceSequence.add(sentenceCurrent);
+  // sequenceList.add(sentenceSequence);
+  // }
+  // } else {
+  // throw new ParseException("already simplified");
+  // }
+  // }
 
   /**
    * Checks if is basic.
    *
    * @return true, if is basic
    */
-  public boolean isBasic() {
+  private boolean isBasic() {
     return basic;
   }
 
@@ -346,7 +360,7 @@ public class MtasCQLParserSentenceCondition {
    *
    * @return true, if is single
    */
-  public boolean isSingle() {
+  private boolean isSingle() {
     return basic ? true : ((sequenceList.size() > 1) ? false : true);
   }
 
@@ -362,22 +376,22 @@ public class MtasCQLParserSentenceCondition {
         for (List<MtasCQLParserSentenceCondition> sequence : sequenceList) {
           simplifySequence(sequence);
         }
-      }
-      // flatten
-      if (sequenceList.size() > 1) {
-        List<List<MtasCQLParserSentenceCondition>> newSequenceList = new ArrayList<List<MtasCQLParserSentenceCondition>>();
-        for (List<MtasCQLParserSentenceCondition> sequence : sequenceList) {
-          if (sequence.size() == 1) {
-            MtasCQLParserSentenceCondition subSentence = sequence.get(0);
-            if (subSentence.isBasic()) {
-              newSequenceList.add(sequence);
-            } else {
-              newSequenceList.addAll(subSentence.getsequenceList());
+        // flatten
+        if (sequenceList.size() > 1) {
+          List<List<MtasCQLParserSentenceCondition>> newSequenceList = new ArrayList<List<MtasCQLParserSentenceCondition>>();
+          for (List<MtasCQLParserSentenceCondition> sequence : sequenceList) {
+            if (sequence.size() == 1) {
+              MtasCQLParserSentenceCondition subSentence = sequence.get(0);
+              if (subSentence.isBasic()) {
+                newSequenceList.add(sequence);
+              } else {
+                newSequenceList.addAll(subSentence.sequenceList);
+              }
             }
           }
+          sequenceList = newSequenceList;
         }
-        sequenceList = newSequenceList;
-      }
+      } 
       simplified = true;
     }
   }
@@ -399,90 +413,66 @@ public class MtasCQLParserSentenceCondition {
       if (lastSentence == null) {
         lastSentence = sentence;
       } else if (lastSentence.isBasic() && sentence.isBasic()) {
-        // if no recurrence or equal queries
-        // opt1 optPart1 opt2 optPart2 merge opt optPart
-        // ..-.....-.....-........-.....+.....-.....-
-        // ..+.....-.....-........-.....-............
-        // ..+.....+.....-........-.....+.....-.....-
-        // ..-.....-.....+........-.....-............
-        // ..+.....-.....+........-.....-............
-        // ..+.....+.....+........-.....+.....+.....-
-        // ..-.....-.....+........+.....+.....-.....-
-        // ..+.....-.....+........+.....+.....+.....-
-        // ..+.....+.....+........+.....+.....+.....+
-        if ((((lastSentence.getMaximumOccurence() == 1)
-            && (sentence.getMaximumOccurence() == 1))
-            || lastSentence.getQuery().equals(sentence.getQuery())
-                && ((!lastSentence.isOptional() && !sentence.isOptional()))
-            || lastSentence.hasOptionalParts()
-            || sentence.hasOptionalParts())) {
-          // create new basic sentence
-          MtasCQLParserBasicSentenceCondition newBasicSentence = new MtasCQLParserBasicSentenceCondition(ignore, maximumIgnoreLength);
-          newBasicSentence.addBasicSentence(lastSentence.basicSentence);
-          newBasicSentence.addBasicSentence(sentence.basicSentence);
-          // make optional
-          if (lastSentence.isOptional() && sentence.isOptional()) {
-            newBasicSentence.setOptional(true);
-          }
-          lastSentence = new MtasCQLParserSentenceCondition(newBasicSentence, ignore, maximumIgnoreLength);
-          lastSentence.simplify();
+        if (!lastSentence.isOptional() && !sentence.isOptional()
+            && sentence.getMaximumOccurence() == 1
+            && lastSentence.getMaximumOccurence() == 1) {
+          lastSentence.basicSentence.addBasicSentence(sentence.basicSentence);
         } else {
           newSequence.add(lastSentence);
           lastSentence = sentence;
         }
-      } else if (lastSentence.isBasic()) {
-        if (sentence.isSingle()
-            && (!sentence.isOptional() || sentence.hasOptionalParts())
-            && ((sentence.getMaximumOccurence() == 1)
-                && (lastSentence.getMaximumOccurence() == 1))) {
-          for (MtasCQLParserSentenceCondition subSentence : sentence
-              .getsequenceList().get(0)) {
+      } else if (lastSentence.isBasic() && !sentence.isBasic()) {
+        if (sentence.isSingle() && !sentence.isOptional()
+            && sentence.getMaximumOccurence() == 1
+            && lastSentence.getMaximumOccurence() == 1) {
+          // add all items from (first) sequenceList potentially to the new
+          // sequence
+          for (MtasCQLParserSentenceCondition subSentence : sentence.sequenceList
+              .get(0)) {
             newSequence.add(lastSentence);
             lastSentence = subSentence;
           }
         } else {
+          // add sentence potentially to the new sequence
           newSequence.add(lastSentence);
           lastSentence = sentence;
         }
-      } else if (sentence.isBasic()) {
-        if (lastSentence.isSingle()
-            && (!lastSentence.isOptional() || lastSentence.hasOptionalParts())
-            && ((sentence.getMaximumOccurence() == 1)
-                && (lastSentence.getMaximumOccurence() == 1))) {
+      } else if (!lastSentence.isBasic() && sentence.isBasic()) {
+        if (lastSentence.isSingle() && !lastSentence.isOptional()
+            && sentence.getMaximumOccurence() == 1
+            && lastSentence.getMaximumOccurence() == 1) {
+          // add basic sentence to end latest sequence
           lastSentence
-              .addBasicSentenceToEndLatestSequence(sentence.getBasicSentence());
+              .addBasicSentenceToEndLatestSequence(sentence.basicSentence);
         } else {
+          // add sentence potentially to the new sequence
           newSequence.add(lastSentence);
           lastSentence = sentence;
         }
       } else {
-        newSequence.add(lastSentence);
-        lastSentence = sentence;
+        if (sentence.isSingle() && !sentence.isOptional()
+            && lastSentence.isSingle() && !lastSentence.isOptional()
+            && sentence.getMaximumOccurence() == 1
+            && lastSentence.getMaximumOccurence() == 1) {
+          // combine sentences
+          for (MtasCQLParserSentenceCondition subSentence : sentence.sequenceList
+              .get(0)) {
+            lastSentence.sequenceList.get(0).add(subSentence);
+          }
+        } else {
+          // add sentence potentially to the new sequence (both not basic)
+          newSequence.add(lastSentence);
+          lastSentence = sentence;
+        }
       }
     }
+    // add last to newSequence
     if (lastSentence != null) {
       newSequence.add(lastSentence);
     }
+    // replace content sequence with newSequence
     sequence.clear();
     sequence.addAll(newSequence);
-  }
-
-  /**
-   * Gets the sequence list.
-   *
-   * @return the sequence list
-   */
-  public List<List<MtasCQLParserSentenceCondition>> getsequenceList() {
-    return sequenceList;
-  }
-
-  /**
-   * Gets the basic sentence.
-   *
-   * @return the basic sentence
-   */
-  public MtasCQLParserBasicSentenceCondition getBasicSentence() {
-    return basicSentence;
   }
 
   /**
@@ -540,13 +530,13 @@ public class MtasCQLParserSentenceCondition {
    * @throws ParseException
    *           the parse exception
    */
-  public boolean hasOptionalParts() throws ParseException {
-    if (simplified) {
-      return optionalParts;
-    } else {
-      throw new ParseException("can't be called when not simplified");
-    }
-  }
+  // public boolean hasOptionalParts() throws ParseException {
+  // if (simplified) {
+  // return optionalParts;
+  // } else {
+  // throw new ParseException("can't be called when not simplified");
+  // }
+  // }
 
   /**
    * Sets the optional.
@@ -584,7 +574,8 @@ public class MtasCQLParserSentenceCondition {
             new MtasSpanSequenceItem(sentence.getQuery(), sentence.optional));
       }
       if (maximumOccurence > 1) {
-        return new MtasSpanRecurrenceQuery(new MtasSpanSequenceQuery(clauses, ignore, maximumIgnoreLength),
+        return new MtasSpanRecurrenceQuery(
+            new MtasSpanSequenceQuery(clauses, ignore, maximumIgnoreLength),
             minimumOccurence, maximumOccurence, ignore, maximumIgnoreLength);
       } else {
         return new MtasSpanSequenceQuery(clauses, ignore, maximumIgnoreLength);

@@ -80,5 +80,10 @@ public class MtasSpanSequenceItem {
       return false;
     }
   }
+  
+  @Override
+  public String toString() {
+    return "["+spanQuery.toString()+" - "+(optional?"OPTIONAL":"NOT OPTIONAL")+"]";
+  }
 
 }

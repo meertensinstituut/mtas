@@ -64,23 +64,7 @@ public class MtasCQLParserSentencePartCondition {
     this.maximumIgnoreLength = maximumIgnoreLength;
   }
 
-  /**
-   * Gets the first minimum occurence.
-   *
-   * @return the first minimum occurence
-   */
-  public int getFirstMinimumOccurence() {
-    return firstMinimumOccurence;
-  }
-
-  /**
-   * Gets the first maximum occurence.
-   *
-   * @return the first maximum occurence
-   */
-  public int getFirstMaximumOccurence() {
-    return firstMaximumOccurence;
-  }
+  
 
   /**
    * Sets the first occurence.
@@ -108,15 +92,6 @@ public class MtasCQLParserSentencePartCondition {
   }
 
   /**
-   * Checks if is first optional.
-   *
-   * @return true, if is first optional
-   */
-  public boolean isFirstOptional() {
-    return firstOptional;
-  }
-
-  /**
    * Sets the first optional.
    *
    * @param status
@@ -126,7 +101,7 @@ public class MtasCQLParserSentencePartCondition {
    */
   public void setFirstOptional(boolean status) throws ParseException {
     if (fullCondition == null) {
-      firstOptional = status;
+      firstOptional = status;      
     } else {
       throw new ParseException("fullCondition already generated");
     }
@@ -179,29 +154,32 @@ public class MtasCQLParserSentencePartCondition {
         if (firstBasicSentence != null) {
           fullCondition = new MtasCQLParserSentenceCondition(
               firstBasicSentence, ignoreClause, maximumIgnoreLength);
-          fullCondition.setOccurence(firstMinimumOccurence,
-              firstMaximumOccurence);
-          return fullCondition;
+          
         } else {
-          fullCondition = firstSentence;
-          fullCondition.setOccurence(firstMinimumOccurence,
-              firstMaximumOccurence);
-          return fullCondition;
+          fullCondition = firstSentence;          
         }
+        fullCondition.setOccurence(firstMinimumOccurence,
+            firstMaximumOccurence);
+        if(firstOptional) {
+          fullCondition.setOptional(firstOptional);
+        }
+        return fullCondition;
       } else {
         if (!orOperator) {
           if (firstBasicSentence != null) {
             firstBasicSentence.setOccurence(firstMinimumOccurence,
                 firstMaximumOccurence);
+            firstBasicSentence.setOptional(firstOptional);
             fullCondition = new MtasCQLParserSentenceCondition(
                 firstBasicSentence, ignoreClause, maximumIgnoreLength);
           } else {
             firstSentence.setOccurence(firstMinimumOccurence,
                 firstMaximumOccurence);
+            firstSentence.setOptional(firstOptional);
             fullCondition = new MtasCQLParserSentenceCondition(firstSentence, ignoreClause, maximumIgnoreLength);
           }
           fullCondition.addSentenceToEndLatestSequence(
-              secondSentencePart.createFullSentence());
+              secondSentencePart.createFullSentence());          
         } else {
           MtasCQLParserSentenceCondition sentence = secondSentencePart
               .createFullSentence();
@@ -212,7 +190,7 @@ public class MtasCQLParserSentencePartCondition {
             sentence.addSentenceAsFirstOption(firstSentence);
           }
           fullCondition = sentence;
-        }
+        }        
         return fullCondition;
       }
     } else {

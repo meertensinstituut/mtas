@@ -287,7 +287,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
       int largestMatchingEndPosition = match.endPosition();
-      HashSet<Integer> list = ignoreItem.getFullList(spans.docID(), match.endPosition());
+      HashSet<Integer> list = ignoreItem.getFullEndPositionList(spans.docID(), match.endPosition());
       // try to find matches with existing queue
       if (!queueSpans.isEmpty()) {
         Match span;
@@ -329,7 +329,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   private List<Match> expandWithIgnoreItem(int docId, Match match) {
     List<Match> list = new ArrayList<Match>();
     try {
-      HashSet<Integer> ignoreList = ignoreItem.getFullList(docId,
+      HashSet<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
           match.endPosition);
       if (ignoreList != null) {
         for (Integer endPosition : ignoreList) {

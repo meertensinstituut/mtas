@@ -345,7 +345,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
       return false;
       // try to find matches
     } else {
-      // submatches: try to build matches while collecting
+      // subMatches: try to build matches while collecting
       Integer subMatchesStartPosition = null;
       Boolean subMatchesOptional = true;
       List<Match> subMatchesQueue = new ArrayList<Match>();
@@ -379,7 +379,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
                 minStartPositionNext = (minStartPositionNext == null)
                     ? queueSpans.get(j).lowestPosition
                     : Math.min(minStartPositionNext,
-                        queueSpans.get(j).lowestPosition);
+                        queueSpans.get(j).lowestPosition);                    
                 // computing restrictions not possible
               } else {
                 minStartPositionNext = null;
@@ -628,7 +628,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
       } else if (!subMatchesOptional && !item.sequenceSpans.optional) {
         if (item.filledPosition) {
           for (Match m : subMatchesQueue) {
-            HashSet<Integer> ignoreList = ignoreItem.getFullList(docId,
+            HashSet<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
                 m.endPosition);
             Integer[] checkList;
             if (ignoreList == null) {
@@ -706,7 +706,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
         } else {
           newEndPosition = item.sequenceSpans.spans.endPosition();
           if ((minEndPosition == null) || (newEndPosition >= minEndPosition
-              - ignoreItem.getMaxSize(docId, newEndPosition))) {
+              - ignoreItem.getMinStartPosition(docId, newEndPosition))) {
             item.add(newStartPosition, newEndPosition);
             if (firstRetrievedPosition == null) {
               firstRetrievedPosition = newStartPosition;
