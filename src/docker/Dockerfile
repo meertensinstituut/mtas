@@ -48,10 +48,9 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && sed -i '/<\/VirtualHost>/ i ProxyPass /solr http://localhost:8983/solr\nProxyPassReverse /solr http://localhost:8983/solr' /etc/apache2/sites-enabled/000-default.conf \
 && rm -rf /var/www/html/* \
 && mkdir /var/www/html/demo \ 
-&& cp -rp data/folia-samples /var/www/html/demo/ \
-&& cp -rp data/isotei-samples /var/www/html/demo/ \
+&& cp -rp data/*samples /var/www/html/demo/ \
 && gunzip -r /var/www/html/demo \
-&& cp -rp data/site/* /var/www/html/ \
+&& cp -rp data/site/* /var/www/html \
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
@@ -73,10 +72,10 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 777 demo1 \
 && cp -rp demo1 demo2 \
 && cp data/schemaFull.xml demo2/conf/schema.xml \
-&& echo "name=demo2" > demo2/core.properties\
+&& echo "name=demo2" > demo2/core.properties \
 && cp -rp demo1 demo3 \
 && cp data/schemaFull.xml demo3/conf/schema.xml \
-&& echo "name=demo3" > demo3/core.properties\
+&& echo "name=demo3" > demo3/core.properties \
 && mv demo1 /var/solr/data/ \
 && mv demo2 /var/solr/data/ \
 && mv demo3 /var/solr/data/
