@@ -18,6 +18,7 @@ RUN mkdir lib
 ADD https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar /root/lib/
 
 RUN apt-get update && apt-get install -y lsof software-properties-common python-software-properties apache2 curl subversion \
+&& locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en \
 && solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
 && curl -o /root/solr-${currentDevelopmentVersion}.tgz -O $solrurl \
 && mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \

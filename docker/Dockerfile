@@ -1,5 +1,5 @@
 # Automatically generated Dockerfile 
-# - Build 2016-12-31 13:01
+# - Build 2017-01-02 07:18
 # - Lucene/Solr version 6.3.0
 # - Mtas release 20161230 
 #
@@ -18,6 +18,7 @@ RUN mkdir lib
 ADD https://github.com/meertensinstituut/mtas/releases/download/20161230/mtas-6.3.0.jar /root/lib/
 
 RUN apt-get update && apt-get install -y lsof software-properties-common python-software-properties apache2 curl subversion \
+&& locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en \
 && solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.3.0/solr-6.3.0.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
 && curl -o /root/solr-6.3.0.tgz -O $solrurl \
 && mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
@@ -54,7 +55,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
-&& printf "echo \"  Timestamp 2016-12-31 13:01\"\n" >> /start.sh \
+&& printf "echo \"  Timestamp 2017-01-02 07:18\"\n" >> /start.sh \
 && printf "echo \"  Lucene/Solr version 6.3.0\"\n" >> /start.sh \
 && printf "echo \"  Mtas release 20161230\"\n" >> /start.sh \
 && printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh \
