@@ -1075,6 +1075,7 @@ abstract public class MtasBasicParser extends MtasParser {
                   "variable " + decodedVariableName + " unknown");
             }
           } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
             // do nothing
           }
         } else {
@@ -1084,11 +1085,13 @@ abstract public class MtasBasicParser extends MtasParser {
         try {
           decoded = decoded + new String(dec.decode(split), "UTF-8");
         } catch (UnsupportedEncodingException e) {
+          e.printStackTrace();
           // do nothing
         } catch (IllegalArgumentException e) {
+          e.printStackTrace();
           // do nothing
           // System.out.println("Probleem "+split+" - "+e.getMessage());
-          e.printStackTrace();
+          //e.printStackTrace();
         }
       }
     }
@@ -1166,7 +1169,7 @@ abstract public class MtasBasicParser extends MtasParser {
         return true;
       } catch (MtasParserException e) {
         // do nothing
-        System.out.println(e.getMessage());
+        //System.out.println(e.getMessage());
       }
     }
     return false;

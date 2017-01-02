@@ -107,7 +107,7 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     if (!closed) {
       objectOutputStream.close();
       fileOutputStream.close();
-      closed = true;
+      closed = true;      
     }
   }
 

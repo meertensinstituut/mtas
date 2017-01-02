@@ -12,7 +12,7 @@ public final class MtasTokenIdFactory {
    * Instantiates a new mtas token id factory.
    */
   public MtasTokenIdFactory() {
-    tokenId = -1;
+    tokenId = 0;
   }
 
   /**

@@ -172,7 +172,6 @@ public class MtasUpdateRequestProcessorFactory
                     } catch (ClassNotFoundException | InstantiationException
                         | IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException | NoSuchMethodException e) {
-                      e.printStackTrace();
                       throw new IOException(e.getMessage());
                     }
                   } else {
@@ -216,8 +215,7 @@ public class MtasUpdateRequestProcessorFactory
                   } catch (ClassNotFoundException | InstantiationException
                       | IllegalAccessException | IllegalArgumentException
                       | InvocationTargetException | NoSuchMethodException e) {
-                    e.printStackTrace();
-                    throw new IOException(e.getMessage());
+                   throw new IOException(e.getMessage());
                   }
                 } else {
                   throw new IOException("no className");

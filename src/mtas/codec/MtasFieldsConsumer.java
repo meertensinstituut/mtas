@@ -1258,6 +1258,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     } catch (IOException e) {
       // ignore, can happen when merging segment already written by
       // delegateFieldsConsumer
+      e.printStackTrace();
     } finally {
       IOUtils.closeWhileHandlingException(closeables);
       try {
@@ -1416,6 +1417,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       }
       return mtasId;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IOException(e.getMessage());
     }
   }

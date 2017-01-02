@@ -173,7 +173,6 @@ public final class MtasTokenizer<T> extends Tokenizer {
       throw new IOException(
           e.getClass().getSimpleName() + ": " + e.getMessage());
     }
-
   }
 
   /**
