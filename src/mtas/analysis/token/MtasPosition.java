@@ -33,8 +33,7 @@ public class MtasPosition {
   /**
    * Instantiates a new mtas position.
    *
-   * @param position
-   *          the position
+   * @param position the position
    */
   public MtasPosition(int position) {
     mtasPositionType = POSITION_SINGLE;
@@ -44,10 +43,8 @@ public class MtasPosition {
   /**
    * Instantiates a new mtas position.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   public MtasPosition(int start, int end) {
     if (start == end) {
@@ -63,8 +60,7 @@ public class MtasPosition {
   /**
    * Instantiates a new mtas position.
    *
-   * @param positions
-   *          the positions
+   * @param positions the positions
    */
   public MtasPosition(int[] positions) {
     TreeSet<Integer> list = new TreeSet<Integer>();
@@ -91,8 +87,7 @@ public class MtasPosition {
   /**
    * Check type.
    *
-   * @param type
-   *          the type
+   * @param type the type
    * @return the boolean
    */
   public Boolean checkType(String type) {
@@ -160,8 +155,7 @@ public class MtasPosition {
   /**
    * Adds the.
    *
-   * @param positions
-   *          the positions
+   * @param positions the positions
    */
   public void add(int[] positions) {
     TreeSet<Integer> list = new TreeSet<Integer>();
@@ -197,8 +191,7 @@ public class MtasPosition {
   /**
    * Adds the.
    *
-   * @param position
-   *          the position
+   * @param position the position
    */
   public void add(int position) {
     if (mtasPositionType.equals(POSITION_SINGLE)) {

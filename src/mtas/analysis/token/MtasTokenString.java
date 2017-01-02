@@ -11,23 +11,22 @@ public class MtasTokenString extends MtasToken<String> {
   /**
    * Instantiates a new mtas token string.
    *
-   * @param value
-   *          the value
+   * @param tokenId the token id
+   * @param value the value
    */
-  public MtasTokenString(String value) {
-    super(value);
+  public MtasTokenString(Integer tokenId, String value) {
+    super(tokenId, value);
   }
 
   /**
    * Instantiates a new mtas token string.
    *
-   * @param value
-   *          the value
-   * @param position
-   *          the position
+   * @param tokenId the token id
+   * @param value the value
+   * @param position the position
    */
-  public MtasTokenString(String value, Integer position) {
-    super(value, position);
+  public MtasTokenString(Integer tokenId, String value, Integer position) {
+    super(tokenId, value, position);
   }
 
   /*

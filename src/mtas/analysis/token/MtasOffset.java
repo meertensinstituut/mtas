@@ -14,10 +14,8 @@ public class MtasOffset {
   /**
    * Instantiates a new mtas offset.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   public MtasOffset(int start, int end) {
     mtasOffsetStart = start;
@@ -27,10 +25,8 @@ public class MtasOffset {
   /**
    * Adds the.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   public void add(int start, int end) {
     mtasOffsetStart = Math.min(mtasOffsetStart, start);

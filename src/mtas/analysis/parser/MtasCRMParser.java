@@ -13,10 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mtas.analysis.parser.MtasBasicParser.MtasParserMapping;
-import mtas.analysis.parser.MtasParser.MtasParserObject;
-import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
+import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.util.MtasBufferedReader;
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
@@ -64,8 +62,7 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Instantiates a new mtas crm parser.
    *
-   * @param config
-   *          the config
+   * @param config the config
    */
   public MtasCRMParser(MtasConfiguration config) {
     super(config);
@@ -88,7 +85,8 @@ public class MtasCRMParser extends MtasBasicParser {
     super.initParser();
     if (config != null) {
       // always word, no mappings
-      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD, null, false);
+      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD,
+          null, false);
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
         if (current.name.equals("mappings")) {
@@ -109,8 +107,8 @@ public class MtasCRMParser extends MtasBasicParser {
                   if (wordAnnotationTypes.containsKey(nameMapping)) {
                     wordAnnotationTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(typeMapping,
-                        nameMapping, false);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
                     t.addItem(m);
                     wordAnnotationTypes.put(nameMapping, t);
                   }
@@ -120,8 +118,8 @@ public class MtasCRMParser extends MtasBasicParser {
                   if (crmSentenceTypes.containsKey(nameMapping)) {
                     crmSentenceTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_GROUP,
-                        nameMapping, true);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        MAPPING_TYPE_GROUP, nameMapping, true);
                     t.addItem(m);
                     crmSentenceTypes.put(nameMapping, t);
                   }
@@ -131,8 +129,8 @@ public class MtasCRMParser extends MtasBasicParser {
                   if (crmClauseTypes.containsKey(nameMapping)) {
                     crmClauseTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_GROUP,
-                        nameMapping, true);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        MAPPING_TYPE_GROUP, nameMapping, true);
                     t.addItem(m);
                     crmClauseTypes.put(nameMapping, t);
                   }
@@ -142,8 +140,8 @@ public class MtasCRMParser extends MtasBasicParser {
                   if (crmPairTypes.containsKey(nameMapping)) {
                     crmPairTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_RELATION,
-                        nameMapping, true);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        MAPPING_TYPE_RELATION, nameMapping, true);
                     t.addItem(m);
                     crmPairTypes.put(nameMapping, t);
                   }
@@ -234,10 +232,10 @@ public class MtasCRMParser extends MtasBasicParser {
     HashMap<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
 
     HashMap<String, HashMap<Integer, HashSet<String>>> updateList = createUpdateList();
-    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList(); 
+    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList();
 
     tokenCollection = new MtasTokenCollection();
-    MtasToken.resetId();
+    MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
     try (MtasBufferedReader br = new MtasBufferedReader(reader)) {
       String line;
       int currentOffset, previousOffset = br.getPosition();
@@ -259,17 +257,18 @@ public class MtasCRMParser extends MtasBasicParser {
           for (int i = 4; i < 8; i++) {
             ArrayList<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<MtasCRMParserFunctionOutput>();
             HashSet<MtasParserObject> tmpList = processCRMSentence(
-                String.valueOf(i), matcherRegular.group((i + 1)), currentOffset,
+                mtasTokenIdFactory, String.valueOf(i),
+                matcherRegular.group((i + 1)), currentOffset,
                 functionOutputList, unknownAncestors, currentList, updateList,
                 idPositions, idOffsets, previousSentence, previousClause);
             if (tmpList != null) {
               newPreviousSentence.addAll(tmpList);
             }
             for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {
-              tmpList = processCRMSentence(functionOutput.name,
-                  functionOutput.value, currentOffset, functionOutputList,
-                  unknownAncestors, currentList, updateList, idPositions,
-                  idOffsets, previousSentence, previousClause);
+              tmpList = processCRMSentence(mtasTokenIdFactory,
+                  functionOutput.name, functionOutput.value, currentOffset,
+                  functionOutputList, unknownAncestors, currentList, updateList,
+                  idPositions, idOffsets, previousSentence, previousClause);
               if (tmpList != null) {
                 newPreviousSentence.addAll(tmpList);
               }
@@ -283,17 +282,18 @@ public class MtasCRMParser extends MtasBasicParser {
           for (int i = 4; i < 8; i++) {
             ArrayList<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<MtasCRMParserFunctionOutput>();
             HashSet<MtasParserObject> tmpList = processCRMClause(
-                String.valueOf(i), matcherRegular.group((i + 1)), currentOffset,
+                mtasTokenIdFactory, String.valueOf(i),
+                matcherRegular.group((i + 1)), currentOffset,
                 functionOutputList, unknownAncestors, currentList, updateList,
                 idPositions, idOffsets, previousClause);
             if (tmpList != null) {
               newPreviousClause.addAll(tmpList);
             }
             for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {
-              tmpList = processCRMClause(functionOutput.name,
-                  functionOutput.value, currentOffset, functionOutputList,
-                  unknownAncestors, currentList, updateList, idPositions,
-                  idOffsets, previousClause);
+              tmpList = processCRMClause(mtasTokenIdFactory,
+                  functionOutput.name, functionOutput.value, currentOffset,
+                  functionOutputList, unknownAncestors, currentList, updateList,
+                  idPositions, idOffsets, previousClause);
               if (tmpList != null) {
                 newPreviousClause.addAll(tmpList);
               }
@@ -324,25 +324,27 @@ public class MtasCRMParser extends MtasBasicParser {
               // check for crmPair
               for (int i = 0; i < 8; i++) {
                 ArrayList<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<MtasCRMParserFunctionOutput>();
-                processCRMPair(p, String.valueOf(i),
+                processCRMPair(mtasTokenIdFactory, p, String.valueOf(i),
                     matcherRegular.group((i + 1)), currentOffset,
                     functionOutputList, unknownAncestors, currentList,
                     updateList, idPositions, idOffsets);
                 for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {
-                  processCRMPair(p, functionOutput.name, functionOutput.value,
-                      currentOffset, functionOutputList, unknownAncestors,
-                      currentList, updateList, idPositions, idOffsets);
+                  processCRMPair(mtasTokenIdFactory, p, functionOutput.name,
+                      functionOutput.value, currentOffset, functionOutputList,
+                      unknownAncestors, currentList, updateList, idPositions,
+                      idOffsets);
                 }
               }
               // compute word annotations
               for (int i = 0; i < 8; i++) {
                 ArrayList<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<MtasCRMParserFunctionOutput>();
-                functionOutputList.addAll(processWordAnnotation(
-                    String.valueOf(i), matcherRegular.group((i + 1)),
-                    previousOffset, currentOffset, unknownAncestors,
-                    currentList, updateList, idPositions, idOffsets));
+                functionOutputList
+                    .addAll(processWordAnnotation(mtasTokenIdFactory,
+                        String.valueOf(i), matcherRegular.group((i + 1)),
+                        previousOffset, currentOffset, unknownAncestors,
+                        currentList, updateList, idPositions, idOffsets));
                 for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {
-                  processWordAnnotation(functionOutput.name,
+                  processWordAnnotation(mtasTokenIdFactory, functionOutput.name,
                       functionOutput.value, previousOffset, currentOffset,
                       unknownAncestors, currentList, updateList, idPositions,
                       idOffsets);
@@ -372,7 +374,8 @@ public class MtasCRMParser extends MtasBasicParser {
               idOffsets.put(currentObject.getId(), currentObject.getOffset());
               currentObject.updateMappings(idPositions, idOffsets);
               unknownAncestors = currentObject.getUnknownAncestorNumber();
-              computeMappingsFromObject(currentObject, currentList, updateList);
+              computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                  currentList, updateList);
             }
 
           } else {
@@ -381,10 +384,10 @@ public class MtasCRMParser extends MtasBasicParser {
         }
         previousOffset = br.getPosition();
       }
-      closePrevious(previousSentence, previousOffset, unknownAncestors,
-          currentList, updateList, idPositions, idOffsets);
-      closePrevious(previousClause, previousOffset, unknownAncestors,
-          currentList, updateList, idPositions, idOffsets);
+      closePrevious(mtasTokenIdFactory, previousSentence, previousOffset,
+          unknownAncestors, currentList, updateList, idPositions, idOffsets);
+      closePrevious(mtasTokenIdFactory, previousClause, previousOffset,
+          unknownAncestors, currentList, updateList, idPositions, idOffsets);
     } catch (IOException e) {
       throw new MtasParserException(e.getMessage());
     }
@@ -397,33 +400,23 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Process word annotation.
    *
-   * @param name
-   *          the name
-   * @param text
-   *          the text
-   * @param previousOffset
-   *          the previous offset
-   * @param currentOffset
-   *          the current offset
-   * @param unknownAncestors
-   *          the unknown ancestors
-   * @param currentList
-   *          the current list
-   * @param updateList
-   *          the update list
-   * @param idPositions
-   *          the id positions
-   * @param idOffsets
-   *          the id offsets
+   * @param mtasTokenIdFactory the mtas token id factory
+   * @param name the name
+   * @param text the text
+   * @param previousOffset the previous offset
+   * @param currentOffset the current offset
+   * @param unknownAncestors the unknown ancestors
+   * @param currentList the current list
+   * @param updateList the update list
+   * @param idPositions the id positions
+   * @param idOffsets the id offsets
    * @return the array list
-   * @throws MtasParserException
-   *           the mtas parser exception
-   * @throws MtasConfigException
-   *           the mtas config exception
+   * @throws MtasParserException the mtas parser exception
+   * @throws MtasConfigException the mtas config exception
    */
   private ArrayList<MtasCRMParserFunctionOutput> processWordAnnotation(
-      String name, String text, Integer previousOffset, Integer currentOffset,
-      Integer unknownAncestors,
+      MtasTokenIdFactory mtasTokenIdFactory, String name, String text,
+      Integer previousOffset, Integer currentOffset, Integer unknownAncestors,
       HashMap<String, ArrayList<MtasParserObject>> currentList,
       HashMap<String, HashMap<Integer, HashSet<String>>> updateList,
       HashMap<String, TreeSet<Integer>> idPositions,
@@ -483,7 +476,8 @@ public class MtasCRMParser extends MtasBasicParser {
         }
         currentObject.updateMappings(idPositions, idOffsets);
         unknownAncestors = currentObject.getUnknownAncestorNumber();
-        computeMappingsFromObject(currentObject, currentList, updateList);
+        computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+            currentList, updateList);
       }
     }
     return functionOutputList;
@@ -492,35 +486,24 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Process crm sentence.
    *
-   * @param name
-   *          the name
-   * @param text
-   *          the text
-   * @param currentOffset
-   *          the current offset
-   * @param functionOutputList
-   *          the function output list
-   * @param unknownAncestors
-   *          the unknown ancestors
-   * @param currentList
-   *          the current list
-   * @param updateList
-   *          the update list
-   * @param idPositions
-   *          the id positions
-   * @param idOffsets
-   *          the id offsets
-   * @param previous
-   *          the previous
-   * @param previousClause
-   *          the previous clause
+   * @param mtasTokenIdFactory the mtas token id factory
+   * @param name the name
+   * @param text the text
+   * @param currentOffset the current offset
+   * @param functionOutputList the function output list
+   * @param unknownAncestors the unknown ancestors
+   * @param currentList the current list
+   * @param updateList the update list
+   * @param idPositions the id positions
+   * @param idOffsets the id offsets
+   * @param previous the previous
+   * @param previousClause the previous clause
    * @return the hash set
-   * @throws MtasParserException
-   *           the mtas parser exception
-   * @throws MtasConfigException
-   *           the mtas config exception
+   * @throws MtasParserException the mtas parser exception
+   * @throws MtasConfigException the mtas config exception
    */
-  private HashSet<MtasParserObject> processCRMSentence(String name, String text,
+  private HashSet<MtasParserObject> processCRMSentence(
+      MtasTokenIdFactory mtasTokenIdFactory, String name, String text,
       Integer currentOffset,
       ArrayList<MtasCRMParserFunctionOutput> functionOutputList,
       Integer unknownAncestors,
@@ -540,10 +523,10 @@ public class MtasCRMParser extends MtasBasicParser {
       if (!prevalidateObject(currentObject, currentList)) {
         return null;
       } else {
-        closePrevious(previousClause, currentOffset, unknownAncestors,
-            currentList, updateList, idPositions, idOffsets);
-        closePrevious(previous, currentOffset, unknownAncestors, currentList,
-            updateList, idPositions, idOffsets);
+        closePrevious(mtasTokenIdFactory, previousClause, currentOffset,
+            unknownAncestors, currentList, updateList, idPositions, idOffsets);
+        closePrevious(mtasTokenIdFactory, previous, currentOffset,
+            unknownAncestors, currentList, updateList, idPositions, idOffsets);
         previous.clear();
         currentList.get(MAPPING_TYPE_GROUP).add(currentObject);
         unknownAncestors = 0;
@@ -556,33 +539,23 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Process crm clause.
    *
-   * @param name
-   *          the name
-   * @param text
-   *          the text
-   * @param currentOffset
-   *          the current offset
-   * @param functionOutputList
-   *          the function output list
-   * @param unknownAncestors
-   *          the unknown ancestors
-   * @param currentList
-   *          the current list
-   * @param updateList
-   *          the update list
-   * @param idPositions
-   *          the id positions
-   * @param idOffsets
-   *          the id offsets
-   * @param previous
-   *          the previous
+   * @param mtasTokenIdFactory the mtas token id factory
+   * @param name the name
+   * @param text the text
+   * @param currentOffset the current offset
+   * @param functionOutputList the function output list
+   * @param unknownAncestors the unknown ancestors
+   * @param currentList the current list
+   * @param updateList the update list
+   * @param idPositions the id positions
+   * @param idOffsets the id offsets
+   * @param previous the previous
    * @return the hash set
-   * @throws MtasParserException
-   *           the mtas parser exception
-   * @throws MtasConfigException
-   *           the mtas config exception
+   * @throws MtasParserException the mtas parser exception
+   * @throws MtasConfigException the mtas config exception
    */
-  private HashSet<MtasParserObject> processCRMClause(String name, String text,
+  private HashSet<MtasParserObject> processCRMClause(
+      MtasTokenIdFactory mtasTokenIdFactory, String name, String text,
       Integer currentOffset,
       ArrayList<MtasCRMParserFunctionOutput> functionOutputList,
       Integer unknownAncestors,
@@ -601,8 +574,8 @@ public class MtasCRMParser extends MtasBasicParser {
       if (!prevalidateObject(currentObject, currentList)) {
         return null;
       } else {
-        closePrevious(previous, currentOffset, unknownAncestors, currentList,
-            updateList, idPositions, idOffsets);
+        closePrevious(mtasTokenIdFactory, previous, currentOffset,
+            unknownAncestors, currentList, updateList, idPositions, idOffsets);
         previous.clear();
         currentList.get(MAPPING_TYPE_GROUP).add(currentObject);
         unknownAncestors = 0;
@@ -615,27 +588,20 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Close previous.
    *
-   * @param previous
-   *          the previous
-   * @param currentOffset
-   *          the current offset
-   * @param unknownAncestors
-   *          the unknown ancestors
-   * @param currentList
-   *          the current list
-   * @param updateList
-   *          the update list
-   * @param idPositions
-   *          the id positions
-   * @param idOffsets
-   *          the id offsets
-   * @throws MtasParserException
-   *           the mtas parser exception
-   * @throws MtasConfigException
-   *           the mtas config exception
+   * @param mtasTokenIdFactory the mtas token id factory
+   * @param previous the previous
+   * @param currentOffset the current offset
+   * @param unknownAncestors the unknown ancestors
+   * @param currentList the current list
+   * @param updateList the update list
+   * @param idPositions the id positions
+   * @param idOffsets the id offsets
+   * @throws MtasParserException the mtas parser exception
+   * @throws MtasConfigException the mtas config exception
    */
-  private void closePrevious(HashSet<MtasParserObject> previous,
-      Integer currentOffset, Integer unknownAncestors,
+  private void closePrevious(MtasTokenIdFactory mtasTokenIdFactory,
+      HashSet<MtasParserObject> previous, Integer currentOffset,
+      Integer unknownAncestors,
       HashMap<String, ArrayList<MtasParserObject>> currentList,
       HashMap<String, HashMap<Integer, HashSet<String>>> updateList,
       HashMap<String, TreeSet<Integer>> idPositions,
@@ -647,7 +613,8 @@ public class MtasCRMParser extends MtasBasicParser {
       idOffsets.put(previousObject.getId(), previousObject.getOffset());
       previousObject.updateMappings(idPositions, idOffsets);
       unknownAncestors = previousObject.getUnknownAncestorNumber();
-      computeMappingsFromObject(previousObject, currentList, updateList);
+      computeMappingsFromObject(mtasTokenIdFactory, previousObject, currentList,
+          updateList);
       currentList.get(MAPPING_TYPE_GROUP).remove(previousObject);
     }
   }
@@ -655,33 +622,22 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Process crm pair.
    *
-   * @param position
-   *          the position
-   * @param name
-   *          the name
-   * @param text
-   *          the text
-   * @param currentOffset
-   *          the current offset
-   * @param functionOutputList
-   *          the function output list
-   * @param unknownAncestors
-   *          the unknown ancestors
-   * @param currentList
-   *          the current list
-   * @param updateList
-   *          the update list
-   * @param idPositions
-   *          the id positions
-   * @param idOffsets
-   *          the id offsets
-   * @throws MtasParserException
-   *           the mtas parser exception
-   * @throws MtasConfigException
-   *           the mtas config exception
+   * @param mtasTokenIdFactory the mtas token id factory
+   * @param position the position
+   * @param name the name
+   * @param text the text
+   * @param currentOffset the current offset
+   * @param functionOutputList the function output list
+   * @param unknownAncestors the unknown ancestors
+   * @param currentList the current list
+   * @param updateList the update list
+   * @param idPositions the id positions
+   * @param idOffsets the id offsets
+   * @throws MtasParserException the mtas parser exception
+   * @throws MtasConfigException the mtas config exception
    */
-  private void processCRMPair(int position, String name, String text,
-      Integer currentOffset,
+  private void processCRMPair(MtasTokenIdFactory mtasTokenIdFactory,
+      int position, String name, String text, Integer currentOffset,
       ArrayList<MtasCRMParserFunctionOutput> functionOutputList,
       Integer unknownAncestors,
       HashMap<String, ArrayList<MtasParserObject>> currentList,
@@ -720,7 +676,8 @@ public class MtasCRMParser extends MtasBasicParser {
             idOffsets.put(currentObject.getId(), currentObject.getOffset());
             currentObject.updateMappings(idPositions, idOffsets);
             unknownAncestors = currentObject.getUnknownAncestorNumber();
-            computeMappingsFromObject(currentObject, currentList, updateList);
+            computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                currentList, updateList);
           } else {
             currentObject = new MtasParserObject(tmpCurrentType);
             currentObject.setUnknownAncestorNumber(unknownAncestors);
@@ -759,14 +716,10 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Process functions.
    *
-   * @param name
-   *          the name
-   * @param text
-   *          the text
-   * @param type
-   *          the type
-   * @param functionOutputList
-   *          the function output list
+   * @param name the name
+   * @param text the text
+   * @param type the type
+   * @param functionOutputList the function output list
    */
   private void processFunctions(String name, String text, String type,
       ArrayList<MtasCRMParserFunctionOutput> functionOutputList) {
@@ -822,13 +775,14 @@ public class MtasCRMParser extends MtasBasicParser {
   /**
    * Prints the config types.
    *
-   * @param types
-   *          the types
+   * @param types the types
    * @return the string
    */
-  private String printConfigTypes(HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
+  private String printConfigTypes(
+      HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     String text = "";
-    for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types.entrySet()) {
+    for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types
+        .entrySet()) {
       text += "- " + entry.getKey() + ": " + entry.getValue().items.size()
           + " mapping(s)\n";
       for (int i = 0; i < entry.getValue().items.size(); i++) {
@@ -852,10 +806,8 @@ public class MtasCRMParser extends MtasBasicParser {
     /**
      * Instantiates a new mtas crm parser function.
      *
-     * @param type
-     *          the type
-     * @param split
-     *          the split
+     * @param type the type
+     * @param split the split
      */
     public MtasCRMParserFunction(String type, String split) {
       this.split = split;
@@ -878,10 +830,8 @@ public class MtasCRMParser extends MtasBasicParser {
     /**
      * Instantiates a new mtas crm parser function output.
      *
-     * @param name
-     *          the name
-     * @param value
-     *          the value
+     * @param name the name
+     * @param value the value
      */
     public MtasCRMParserFunctionOutput(String name, String value) {
       this.name = name;
@@ -891,8 +841,7 @@ public class MtasCRMParser extends MtasBasicParser {
     /**
      * Creates the.
      *
-     * @param originalValue
-     *          the original value
+     * @param originalValue the original value
      * @return the mtas crm parser function output
      */
     public MtasCRMParserFunctionOutput create(String originalValue) {

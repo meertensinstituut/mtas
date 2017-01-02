@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,11 +36,8 @@ public abstract class MtasToken<GenericType> {
   public static final Pattern patternPrePostFix = Pattern
       .compile(regexpPrePostFix);
 
-  /** The Constant MTAS_TOKEN_ID. */
-  static final AtomicInteger MTAS_TOKEN_ID = new AtomicInteger(0);
-
   /** The token id. */
-  private Integer tokenId = MTAS_TOKEN_ID.getAndIncrement();
+  private Integer tokenId;
 
   /** The token ref. */
   private Long tokenRef = null;
@@ -83,18 +79,13 @@ public abstract class MtasToken<GenericType> {
   private Boolean provideParentId = true;
 
   /**
-   * Reset id.
-   */
-  public static void resetId() {
-    MTAS_TOKEN_ID.set(0);
-  }
-
-  /**
    * Instantiates a new mtas token.
    *
+   * @param tokenId the token id
    * @param value the value
    */
-  protected MtasToken(String value) {
+  protected MtasToken(Integer tokenId, String value) {
+    this.tokenId = tokenId;
     setType();
     setValue(value);
   }
@@ -102,12 +93,12 @@ public abstract class MtasToken<GenericType> {
   /**
    * Instantiates a new mtas token.
    *
+   * @param tokenId the token id
    * @param value the value
    * @param position the position
    */
-  protected MtasToken(String value, Integer position) {
-    setType();
-    setValue(value);
+  protected MtasToken(Integer tokenId, String value, Integer position) {
+    this(tokenId, value);
     addPosition(position);
   }
 
@@ -513,13 +504,18 @@ public abstract class MtasToken<GenericType> {
    * @return the prefix from value
    */
   public static String getPrefixFromValue(String value) {
-    String prefix = null;
-    if (value.contains(DELIMITER)) {
-      prefix = value.split(DELIMITER)[0];
+    if (value == null) {
+      return null;
+    } else if (value.contains(DELIMITER)) {
+      String[] list = value.split(DELIMITER);
+      if (list != null && list.length > 0) {
+        return list[0].replaceAll("\u0000", "");
+      } else {
+        return null;
+      }
     } else {
-      prefix = value;
+      return value.replaceAll("\u0000", "");
     }
-    return prefix.replaceAll("\u0000", "");
   }
 
   /**
@@ -694,17 +690,17 @@ public abstract class MtasToken<GenericType> {
    * Creates the automata.
    *
    * @param prefix the prefix
+   * @param regexp the regexp
    * @param valueList the value list
    * @return the list
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static List<CompiledAutomaton> createAutomata(String prefix, String regexp,
-      List<String> valueList) throws IOException {
+  public static List<CompiledAutomaton> createAutomata(String prefix,
+      String regexp, List<String> valueList) throws IOException {
     List<CompiledAutomaton> list = new ArrayList<CompiledAutomaton>();
     Automaton automatonRegexp = null;
-    if(regexp!=null) {
-      RegExp re = new RegExp(
-          prefix + MtasToken.DELIMITER + regexp + "\u0000*");
+    if (regexp != null) {
+      RegExp re = new RegExp(prefix + MtasToken.DELIMITER + regexp + "\u0000*");
       automatonRegexp = re.toAutomaton();
     }
     int step = 500;
@@ -726,7 +722,7 @@ public abstract class MtasToken<GenericType> {
         }
         Automaton automatonList = Operations.union(listAutomaton);
         Automaton automaton;
-        if(automatonRegexp!=null) {
+        if (automatonRegexp != null) {
           automaton = Operations.intersection(automatonList, automatonRegexp);
         } else {
           automaton = automatonList;

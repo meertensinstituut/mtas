@@ -59,10 +59,8 @@ public class MtasUpdateRequestProcessorFactory
   /**
    * Inits the.
    *
-   * @param req
-   *          the req
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param req the req
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {

@@ -11,10 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mtas.analysis.parser.MtasBasicParser.MtasParserMapping;
-import mtas.analysis.parser.MtasParser.MtasParserObject;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
+import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.util.MtasBufferedReader;
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
@@ -43,8 +42,7 @@ final public class MtasSketchParser extends MtasBasicParser {
   /**
    * Instantiates a new mtas sketch parser.
    *
-   * @param config
-   *          the config
+   * @param config the config
    */
   public MtasSketchParser(MtasConfiguration config) {
     super(config);
@@ -67,7 +65,8 @@ final public class MtasSketchParser extends MtasBasicParser {
     if (config != null) {
 
       // always word, no mappings
-      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD, null, false);
+      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD,
+          null, false);
 
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
@@ -89,8 +88,8 @@ final public class MtasSketchParser extends MtasBasicParser {
                   if (wordAnnotationTypes.containsKey(nameMapping)) {
                     wordAnnotationTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(typeMapping,
-                        nameMapping, false);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
                     t.addItem(m);
                     wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
                   }
@@ -101,8 +100,8 @@ final public class MtasSketchParser extends MtasBasicParser {
                   if (groupTypes.containsKey(nameMapping)) {
                     groupTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(typeMapping,
-                        nameMapping, false);
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                        typeMapping, nameMapping, false);
                     t.addItem(m);
                     groupTypes.put(nameMapping, t);
                   }
@@ -133,10 +132,10 @@ final public class MtasSketchParser extends MtasBasicParser {
     HashMap<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
 
     HashMap<String, HashMap<Integer, HashSet<String>>> updateList = createUpdateList();
-    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList(); 
+    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList();
 
     tokenCollection = new MtasTokenCollection();
-    MtasToken.resetId();
+    MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
     try (MtasBufferedReader br = new MtasBufferedReader(reader)) {
       String line;
       int currentOffset, previousOffset = br.getPosition();
@@ -201,8 +200,8 @@ final public class MtasSketchParser extends MtasBasicParser {
                 idOffsets.put(currentObject.getId(), currentObject.getOffset());
                 currentObject.updateMappings(idPositions, idOffsets);
                 unknownAncestors = currentObject.getUnknownAncestorNumber();
-                computeMappingsFromObject(currentObject, currentList,
-                    updateList);
+                computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                    currentList, updateList);
               }
             }
           }
@@ -272,8 +271,8 @@ final public class MtasSketchParser extends MtasBasicParser {
                     }
                     currentObject.updateMappings(idPositions, idOffsets);
                     unknownAncestors = currentObject.getUnknownAncestorNumber();
-                    computeMappingsFromObject(currentObject, currentList,
-                        updateList);
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                        currentList, updateList);
                   }
                 }
               }
@@ -301,7 +300,8 @@ final public class MtasSketchParser extends MtasBasicParser {
               idOffsets.put(currentObject.getId(), currentObject.getOffset());
               currentObject.updateMappings(idPositions, idOffsets);
               unknownAncestors = currentObject.getUnknownAncestorNumber();
-              computeMappingsFromObject(currentObject, currentList, updateList);
+              computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                  currentList, updateList);
             }
           }
         }
@@ -352,13 +352,14 @@ final public class MtasSketchParser extends MtasBasicParser {
   /**
    * Prints the config types.
    *
-   * @param types
-   *          the types
+   * @param types the types
    * @return the string
    */
-  private String printConfigTypes(HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
+  private String printConfigTypes(
+      HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     String text = "";
-    for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types.entrySet()) {
+    for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types
+        .entrySet()) {
       text += "- " + entry.getKey() + ": " + entry.getValue().items.size()
           + " mapping(s)\n";
       for (int i = 0; i < entry.getValue().items.size(); i++) {
@@ -368,8 +369,15 @@ final public class MtasSketchParser extends MtasBasicParser {
     return text;
   }
 
+  /**
+   * The Class MtasSketchParserMappingWord.
+   */
   private class MtasSketchParserMappingWord
       extends MtasParserMapping<MtasSketchParserMappingWord> {
+    
+    /**
+     * Instantiates a new mtas sketch parser mapping word.
+     */
     public MtasSketchParserMappingWord() {
       super();
       this.position = SOURCE_OWN;
@@ -377,13 +385,15 @@ final public class MtasSketchParser extends MtasBasicParser {
       this.offset = SOURCE_OWN;
       this.type = MAPPING_TYPE_WORD;
     }
-    
+
+    /* (non-Javadoc)
+     * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
+     */
     @Override
     protected MtasSketchParserMappingWord self() {
       return this;
     }
   }
-
 
   /**
    * The Class MtasSketchParserMappingWordAnnotation.

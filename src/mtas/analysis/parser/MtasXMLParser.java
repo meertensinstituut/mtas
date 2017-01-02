@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
+import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasParserException;
 import mtas.analysis.util.MtasConfiguration;
@@ -354,9 +355,10 @@ abstract class MtasXMLParser extends MtasBasicParser {
     HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList();
     HashMap<String, HashMap<String, String>> variables = createVariables();
 
+    
     tokenCollection = new MtasTokenCollection();
-    MtasToken.resetId();
-    XMLInputFactory factory = XMLInputFactory.newInstance();
+    MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
+    XMLInputFactory factory = XMLInputFactory.newInstance();    
     try {
       XMLStreamReader streamReader = factory.createXMLStreamReader(reader);
       QName qname;
@@ -597,7 +599,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
                   // todo: necessary???
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   // this shouldn't happen
@@ -632,7 +634,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   }
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   // this shouldn't happen
@@ -664,7 +666,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                       currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   // this shouldn't happen
@@ -691,7 +693,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                       currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   // this shouldn't happen
@@ -717,7 +719,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                       currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   // this shouldn't happen
@@ -741,7 +743,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                       currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   // this shouldn't happen
@@ -765,7 +767,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                       currentObject.getOffset());
                   currentObject.updateMappings(idPositions, idOffsets);
                   unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(currentObject, currentList,
+                  computeMappingsFromObject(mtasTokenIdFactory, currentObject, currentList,
                       updateList);
                 } else {
                   unknownAncestors--;
@@ -818,6 +820,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     } catch (XMLStreamException e) {
       throw new MtasParserException("No valid XML: " + e.getMessage());
     }
+        
     // update tokens with variable
     for (Entry<Integer, HashSet<String>> updateItem : updateList
         .get(UPDATE_TYPE_VARIABLE).entrySet()) {
@@ -831,7 +834,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     for (Entry<Integer, HashSet<String>> updateItem : updateList
         .get(UPDATE_TYPE_OFFSET).entrySet()) {
       HashSet<String> refIdList = new HashSet<String>();
-      for (String refId : updateItem.getValue()) {
+      for (String refId : updateItem.getValue()) { 
         if (idPositions.containsKey(refId)) {
           refIdList.add(refId);
         }

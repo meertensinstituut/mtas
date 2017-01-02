@@ -8,6 +8,7 @@
     <configuration name="DDD" file="mtas/folia_ddd.xml" />
     <configuration name="EDBO" file="mtas/folia_edbo.xml" />
     <configuration name="SoNaR" file="mtas/folia_sonar.xml" />
+    <configuration name="isotei" file="mtas/iso_tei.xml" />    
   </configurations>
   <configurations type="mtas.analysis.util.MtasCharFilterFactory">
     <configuration name="test" type="file" />
@@ -17,5 +18,6 @@
     <configuration name="DDD" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="EDBO" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="SoNaR" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="isotei" type="file" prefix="/Users/matthijs/Software/Mtas/data/ISO_TEI/" postfix="" />    
   </configurations>
 </mtas>
