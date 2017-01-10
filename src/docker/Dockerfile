@@ -9,7 +9,7 @@ MAINTAINER Matthijs Brouwer, Meertens Institute
 
 EXPOSE 8983 80
   
-USER root 
+USER root
 
 WORKDIR "/root" 
 
