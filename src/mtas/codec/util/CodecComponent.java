@@ -753,6 +753,8 @@ public class CodecComponent {
     /** The base sort directions. */
     public String[] baseFields, baseFieldTypes, baseTypes, baseSortTypes,
         baseSortDirections;
+    
+    public Double[] baseRangeSizes, baseRangeBases;
 
     /** The base stats types. */
     public String[] baseCollectorTypes, baseDataTypes, baseStatsTypes;
@@ -830,7 +832,7 @@ public class CodecComponent {
      */
     @SuppressWarnings("unchecked")
     public ComponentFacet(MtasSpanQuery[] spanQueries, String field, String key,
-        String[] baseFields, String[] baseFieldTypes, String[] baseTypes,
+        String[] baseFields, String[] baseFieldTypes, String[] baseTypes, Double[] baseRangeSizes, Double[] baseRangeBases,
         String[] baseSortTypes, String[] baseSortDirections,
         Integer[] baseNumbers, Double[] baseMinimumDoubles,
         Double[] baseMaximumDoubles, String[][] baseFunctionKeys,
@@ -842,6 +844,8 @@ public class CodecComponent {
       this.baseFields = baseFields;
       this.baseFieldTypes = baseFieldTypes;
       this.baseTypes = baseTypes;
+      this.baseRangeSizes = baseRangeSizes;
+      this.baseRangeBases = baseRangeBases;
       this.baseSortTypes = baseSortTypes;
       this.baseSortDirections = baseSortDirections;
       this.baseNumbers = baseNumbers;

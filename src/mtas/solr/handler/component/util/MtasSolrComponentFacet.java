@@ -107,10 +107,15 @@ public class MtasSolrComponentFacet {
   /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE = "type";
 
+  public static final String SUBNAME_MTAS_FACET_BASE_RANGE = "range";
+  public static final String SUBNAME_MTAS_FACET_BASE_RANGE_SIZE = "size";
+  public static final String SUBNAME_MTAS_FACET_BASE_RANGE_BASE = "base";
+
   /**
    * Instantiates a new mtas solr component facet.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentFacet(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -119,9 +124,12 @@ public class MtasSolrComponentFacet {
   /**
    * Prepare.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -141,6 +149,8 @@ public class MtasSolrComponentFacet {
       String[][] baseFields = new String[ids.size()][];
       String[][] baseFieldTypes = new String[ids.size()][];
       String[][] baseTypes = new String[ids.size()][];
+      Double[][] baseRangeSizes = new Double[ids.size()][];
+      Double[][] baseRangeBases = new Double[ids.size()][];
       String[][] baseSortTypes = new String[ids.size()][];
       String[][] baseSortDirections = new String[ids.size()][];
       Integer[][] baseNumbers = new Integer[ids.size()][];
@@ -244,6 +254,8 @@ public class MtasSolrComponentFacet {
           baseFields[tmpCounter] = new String[bIds.size()];
           baseFieldTypes[tmpCounter] = new String[bIds.size()];
           baseTypes[tmpCounter] = new String[bIds.size()];
+          baseRangeSizes[tmpCounter] = new Double[bIds.size()];
+          baseRangeBases[tmpCounter] = new Double[bIds.size()];
           baseSortTypes[tmpCounter] = new String[bIds.size()];
           baseSortDirections[tmpCounter] = new String[bIds.size()];
           baseNumbers[tmpCounter] = new Integer[bIds.size()];
@@ -263,8 +275,19 @@ public class MtasSolrComponentFacet {
             baseTypes[tmpCounter][tmpBCounter] = rb.req.getParams()
                 .get(PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
                     + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_TYPE, null);
-            baseSortTypes[tmpCounter][tmpBCounter] = rb.req.getParams()
-                .get(
+            tmpValue = rb.req.getParams()
+                .get(PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
+                    + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
+                    + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE, null);
+            baseRangeSizes[tmpCounter][tmpBCounter] = tmpValue == null
+                ? null : Double.parseDouble(tmpValue);
+            tmpValue = rb.req.getParams()
+                .get(PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
+                    + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
+                    + SUBNAME_MTAS_FACET_BASE_RANGE_BASE, null);
+            baseRangeBases[tmpCounter][tmpBCounter] = tmpValue == null ? null : Double.parseDouble(tmpValue);
+            baseSortTypes[tmpCounter][tmpBCounter] = rb.req
+                .getParams().get(
                     PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
                         + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_SORT_TYPE,
                     null);
@@ -369,9 +392,10 @@ public class MtasSolrComponentFacet {
         try {
           mtasFields.list.get(fields[i]).facetList.add(new ComponentFacet(ql,
               fields[i], key, baseFields[i], baseFieldTypes[i], baseTypes[i],
-              baseSortTypes[i], baseSortDirections[i], baseNumbers[i],
-              baseMinima[i], baseMaxima[i], baseFunctionKeys[i],
-              baseFunctionExpressions[i], baseFunctionTypes[i]));
+              baseRangeSizes[i], baseRangeBases[i], baseSortTypes[i],
+              baseSortDirections[i], baseNumbers[i], baseMinima[i],
+              baseMaxima[i], baseFunctionKeys[i], baseFunctionExpressions[i],
+              baseFunctionTypes[i]));
         } catch (ParseException e) {
           throw new IOException(e.getMessage());
         }
@@ -382,9 +406,12 @@ public class MtasSolrComponentFacet {
   /**
    * Modify request.
    *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+   * @param rb
+   *          the rb
+   * @param who
+   *          the who
+   * @param sreq
+   *          the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -449,6 +476,14 @@ public class MtasSolrComponentFacet {
                       + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_TYPE);
               sreq.params.remove(
                   PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
+                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
+                      + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE);
+              sreq.params.remove(
+                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
+                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
+                      + SUBNAME_MTAS_FACET_BASE_RANGE_BASE);
+              sreq.params.remove(
+                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
                       + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_MAXIMUM);
               sreq.params.remove(
                   PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
@@ -491,10 +526,13 @@ public class MtasSolrComponentFacet {
   /**
    * Creates the.
    *
-   * @param facet the facet
-   * @param encode the encode
+   * @param facet
+   *          the facet
+   * @param encode
+   *          the encode
    * @return the simple ordered map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public SimpleOrderedMap<Object> create(ComponentFacet facet, Boolean encode)
       throws IOException {
@@ -538,7 +576,8 @@ public class MtasSolrComponentFacet {
   /**
    * Finish stage.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -570,9 +609,12 @@ public class MtasSolrComponentFacet {
   /**
    * Distributed process.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -600,8 +642,10 @@ public class MtasSolrComponentFacet {
   /**
    * Gets the field type.
    *
-   * @param schema the schema
-   * @param field the field
+   * @param schema
+   *          the schema
+   * @param field
+   *          the field
    * @return the field type
    */
   private String getFieldType(IndexSchema schema, String field) {
@@ -627,7 +671,8 @@ public class MtasSolrComponentFacet {
   /**
    * Gets the positive integer.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -641,7 +686,8 @@ public class MtasSolrComponentFacet {
   /**
    * Gets the double.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the double
    */
   private Double getDouble(String number) {
