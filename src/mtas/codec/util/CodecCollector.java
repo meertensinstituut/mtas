@@ -2028,13 +2028,13 @@ public class CodecCollector {
                 DataCollector.COLLECTOR_TYPE_DATA, document.dataType,
                 document.statsType, document.statsItems, null, null, null, null,
                 null, null);
-            document.stats.put(docId, stats);
-            if (document.list != null) {
+            document.statsData.put(docId, stats);
+            if (document.statsList != null) {
               MtasDataCollector<?, ?> list = DataCollector.getCollector(
                   DataCollector.COLLECTOR_TYPE_LIST, CodecUtil.DATA_TYPE_LONG,
                   listStatsType, listStatsItems, CodecUtil.STATS_TYPE_SUM,
                   CodecUtil.SORT_DESC, 0, document.number, null, null);
-              document.list.put(docId, list);
+              document.statsList.put(docId, list);
             }
           }
         }
@@ -2046,44 +2046,57 @@ public class CodecCollector {
         PostingsEnum postingsEnum = null;
         // loop over termvectors
         for (ComponentDocument document : documentList) {
-          termsEnum = t.intersect(document.compiledAutomaton, null);
-          // init
-          int initSize = Math.min((int) t.size(), 1000);
-          for (int docId : docList) {
-            document.stats.get(docId).initNewList(1);
-            if (document.list != null) {
-              document.list.get(docId).initNewList(initSize);
-            }
+
+          List<CompiledAutomaton> listAutomata;
+          if (document.list == null) {
+            listAutomata = new ArrayList<CompiledAutomaton>();
+            listAutomata.add(document.compiledAutomaton);
+          } else {
+            listAutomata = MtasToken.createAutomata(document.prefix,
+                document.regexp, new ArrayList<String>(document.list));
           }
-          // fill
-          while ((term = termsEnum.next()) != null) {
-            Iterator<Integer> docIterator = docList.iterator();
-            postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);
-            int termDocId = -1;
-            while (docIterator.hasNext()) {
-              int segmentDocId = docIterator.next() - lrc.docBase;
-              if (segmentDocId >= termDocId) {
-                if ((segmentDocId == termDocId) || ((termDocId = postingsEnum
-                    .advance(segmentDocId)) == segmentDocId)) {
-                  // register stats
-                  document.stats.get(segmentDocId + lrc.docBase)
-                      .add(new long[] { postingsEnum.freq() }, 1);
-                  // register list
-                  if (document.list != null) {
-                    document.list.get(segmentDocId + lrc.docBase).add(
-                        MtasToken.getPostfixFromValue(term),
-                        new long[] { postingsEnum.freq() }, 1);
+
+          for (CompiledAutomaton compiledAutomaton : listAutomata) {
+
+            termsEnum = t.intersect(compiledAutomaton, null);
+            // init
+            int initSize = Math.min((int) t.size(), 1000);
+            for (int docId : docList) {
+              document.statsData.get(docId).initNewList(1);
+              if (document.statsList != null) {
+                document.statsList.get(docId).initNewList(initSize);
+              }
+            }
+            // fill
+            while ((term = termsEnum.next()) != null) {
+              Iterator<Integer> docIterator = docList.iterator();
+              postingsEnum = termsEnum.postings(postingsEnum,
+                  PostingsEnum.FREQS);
+              int termDocId = -1;
+              while (docIterator.hasNext()) {
+                int segmentDocId = docIterator.next() - lrc.docBase;
+                if (segmentDocId >= termDocId) {
+                  if ((segmentDocId == termDocId) || ((termDocId = postingsEnum
+                      .advance(segmentDocId)) == segmentDocId)) {
+                    // register stats
+                    document.statsData.get(segmentDocId + lrc.docBase)
+                        .add(new long[] { postingsEnum.freq() }, 1);
+                    // register list
+                    if (document.statsList != null) {
+                      document.statsList.get(segmentDocId + lrc.docBase).add(
+                          MtasToken.getPostfixFromValue(term),
+                          new long[] { postingsEnum.freq() }, 1);
+                    }
                   }
                 }
               }
             }
-          }
-
-          // close
-          for (int docId : docList) {
-            document.stats.get(docId).closeNewList();
-            if (document.list != null) {
-              document.list.get(docId).closeNewList();
+            // close
+            for (int docId : docList) {
+              document.statsData.get(docId).closeNewList();
+              if (document.statsList != null) {
+                document.statsList.get(docId).closeNewList();
+              }
             }
           }
         }
@@ -2231,14 +2244,22 @@ public class CodecCollector {
   /**
    * Creates the facet base.
    *
-   * @param cf the cf
-   * @param level the level
-   * @param dataCollector the data collector
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param facetData the facet data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param cf
+   *          the cf
+   * @param level
+   *          the level
+   * @param dataCollector
+   *          the data collector
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param facetData
+   *          the facet data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createFacetBase(ComponentFacet cf, int level,
       MtasDataCollector<?, ?> dataCollector,
@@ -2287,22 +2308,24 @@ public class CodecCollector {
         // only if documents and facets
         if (docSet.length > 0 && list.size() > 0) {
           HashMap<String, Integer[]> docLists = new HashMap<String, Integer[]>();
-          HashMap<String, String> groupedKeys = new HashMap<String,String>();
+          HashMap<String, String> groupedKeys = new HashMap<String, String>();
           boolean documentsInFacets = false;
           // compute intersections
           for (String key : list.keySet()) {
-            //fill grouped keys
-            if(!groupedKeys.containsKey(key)) {
-              groupedKeys.put(key, groupedKeyName(key, cf.baseRangeSizes[level], cf.baseRangeBases[level]));
+            // fill grouped keys
+            if (!groupedKeys.containsKey(key)) {
+              groupedKeys.put(key, groupedKeyName(key, cf.baseRangeSizes[level],
+                  cf.baseRangeBases[level]));
             }
             // intersect docSet with docList
             Integer[] docList = intersectedDocList(list.get(key), docSet);
             if (docList.length > 0) {
               documentsInFacets = true;
             }
-            //update docLists
-            if(docLists.containsKey(groupedKeys.get(key))) {
-              docLists.put(groupedKeys.get(key),  mergeDocLists(docLists.get(groupedKeys.get(key)), docList));
+            // update docLists
+            if (docLists.containsKey(groupedKeys.get(key))) {
+              docLists.put(groupedKeys.get(key),
+                  mergeDocLists(docLists.get(groupedKeys.get(key)), docList));
             } else {
               docLists.put(groupedKeys.get(key), docList);
             }
@@ -2515,39 +2538,42 @@ public class CodecCollector {
           function.dataCollector.closeNewList();
         }
       }
-    }       
+    }
 
   }
-  
-  private static String groupedKeyName(String key, Double baseRangeSize, Double baseRangeBase) {
-    if(baseRangeSize==null || baseRangeSize<=0) {
+
+  private static String groupedKeyName(String key, Double baseRangeSize,
+      Double baseRangeBase) {
+    if (baseRangeSize == null || baseRangeSize <= 0) {
       return key;
-    } else {  
+    } else {
       Double doubleKey, doubleBase, doubleNumber, doubleStart, doubleEnd;
       try {
-        doubleKey = Double.parseDouble(key); 
-        doubleBase = baseRangeBase==null?0:baseRangeBase;
-        doubleNumber = Math.floor((doubleKey - doubleBase) / baseRangeSize);          
+        doubleKey = Double.parseDouble(key);
+        doubleBase = baseRangeBase == null ? 0 : baseRangeBase;
+        doubleNumber = Math.floor((doubleKey - doubleBase) / baseRangeSize);
         doubleStart = doubleBase + doubleNumber * baseRangeSize;
-        doubleEnd = doubleStart+baseRangeSize;
+        doubleEnd = doubleStart + baseRangeSize;
       } catch (NumberFormatException e) {
         return key;
       }
-      //integer
-      if(Math.floor(baseRangeSize) == baseRangeSize && Math.floor(doubleBase)==doubleBase) {
+      // integer
+      if (Math.floor(baseRangeSize) == baseRangeSize
+          && Math.floor(doubleBase) == doubleBase) {
         try {
-          if(baseRangeSize>1) {
-            return String.format("%.0f", doubleStart)+"-"+String.format("%.0f", doubleEnd-1);
+          if (baseRangeSize > 1) {
+            return String.format("%.0f", doubleStart) + "-"
+                + String.format("%.0f", doubleEnd - 1);
           } else {
             return String.format("%.0f", doubleStart);
           }
         } catch (NumberFormatException e) {
           return key;
-        } 
+        }
       } else {
-        return "["+doubleStart+","+doubleEnd+")";         
-      }  
-    }    
+        return "[" + doubleStart + "," + doubleEnd + ")";
+      }
+    }
   }
 
   private static Integer[] mergeDocLists(Integer[] a, Integer[] b) {

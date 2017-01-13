@@ -266,6 +266,9 @@ public class CodecComponent {
 
     /** The regexp. */
     public String key, prefix, regexp;
+    
+    /** The list. */
+    public HashSet<String> list;    
 
     /** The stats type. */
     public String dataType, statsType;
@@ -283,10 +286,10 @@ public class CodecComponent {
     public HashMap<Integer, String> uniqueKey;
 
     /** The stats. */
-    public HashMap<Integer, MtasDataCollector<?, ?>> stats;
+    public HashMap<Integer, MtasDataCollector<?, ?>> statsData;
 
     /** The list. */
-    public HashMap<Integer, MtasDataCollector<?, ?>> list;
+    public HashMap<Integer, MtasDataCollector<?, ?>> statsList;
 
     /**
      * Instantiates a new component document.
@@ -299,10 +302,15 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public ComponentDocument(String key, String prefix, String statsType,
-        String regexp, int number) throws IOException {
+        String regexp, String[] list, int number) throws IOException {
       this.key = key;
       this.prefix = prefix;
       this.regexp = regexp;
+      if (list != null && list.length > 0) {
+        this.list = new HashSet(Arrays.asList(list));
+      } else {
+        this.list = null;
+      }
       this.number = number;
       uniqueKey = new HashMap<Integer, String>();
       dataType = CodecUtil.DATA_TYPE_LONG;
@@ -316,11 +324,11 @@ public class CodecComponent {
             prefix + MtasToken.DELIMITER + regexp + "\u0000*");
         compiledAutomaton = new CompiledAutomaton(re.toAutomaton());
       }
-      this.stats = new HashMap<Integer, MtasDataCollector<?, ?>>();
+      this.statsData = new HashMap<Integer, MtasDataCollector<?, ?>>();
       if (this.number > 0) {
-        this.list = new HashMap<Integer, MtasDataCollector<?, ?>>();
+        this.statsList = new HashMap<Integer, MtasDataCollector<?, ?>>();
       } else {
-        this.list = null;
+        this.statsList = null;
       }
     }
   }
