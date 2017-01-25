@@ -1333,6 +1333,17 @@ public class CodecComponent {
       }
       return true;
     }
+    
+    public boolean functionBasic() {
+      if (functions != null) {
+        for (SubComponentFunction function : functions) {
+          if (!function.statsType.equals(CodecUtil.STATS_BASIC)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
 
     /**
      * Function need positions.

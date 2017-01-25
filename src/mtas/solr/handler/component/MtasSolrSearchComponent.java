@@ -244,6 +244,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
                 docListList, docSetList, mtasFields.list.get(field));
           } catch (IllegalAccessException | IllegalArgumentException
               | InvocationTargetException e) {
+            e.printStackTrace();
             throw new IOException(e.getMessage());
           }
         }

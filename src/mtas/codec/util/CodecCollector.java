@@ -1111,8 +1111,9 @@ public class CodecCollector {
           // try to call functionParser as little as possible
           if (span.statsType.equals(CodecUtil.STATS_BASIC)
               && (span.minimumLong == null) && (span.maximumLong == null)
-              && (span.functions == null || (span.functionSumRule()
-                  && !span.functionNeedPositions()))) {
+              && (span.functions == null
+                  || (span.functionBasic() && span.functionSumRule()
+                      && !span.functionNeedPositions()))) {
             // initialise
             int length = span.parser.needArgumentsNumber();
             long[] valueSum = new long[length];
@@ -2335,11 +2336,26 @@ public class CodecCollector {
             HashMap<Integer, long[]> args = computeArguments(spansNumberData,
                 cf.spanQueries, docSet);
             if (cf.baseDataTypes[level].equals(CodecUtil.DATA_TYPE_LONG)) {
-              // sumrule
+              // check functions
+              boolean applySumRule = false;
               if (cf.baseStatsTypes[level].equals(CodecUtil.STATS_BASIC)
                   && cf.baseParsers[level].sumRule()
                   && (cf.baseMinimumLongs[level] == null)
                   && (cf.baseMaximumLongs[level] == null)) {
+                applySumRule = true;
+                if (cf.baseFunctionList[level].get(dataCollector) != null) {
+                  for (SubComponentFunction function : cf.baseFunctionList[level]
+                      .get(dataCollector)) {
+                    if (!function.statsType.equals(CodecUtil.STATS_BASIC)
+                        || !function.parserFunction.sumRule()
+                        || function.parserFunction.needPositions()) {
+                      applySumRule = false;
+                      break;
+                    }
+                  }
+                }
+              }
+              if (applySumRule) {
                 for (String key : groupedKeys.values()) {
                   if (docLists.get(key).length > 0) {
                     // initialise
@@ -2695,127 +2711,142 @@ public class CodecCollector {
           }
 
           for (CompiledAutomaton compiledAutomaton : listAutomata) {
-            termsEnum = t.intersect(compiledAutomaton, null);
-            int initSize = Math.min((int) t.size(), 1000);
-            termVector.subComponentFunction.dataCollector.initNewList(initSize,
-                segmentName, segmentNumber, termVector.boundary);
-            boolean doBasic = termVector.subComponentFunction.dataCollector
-                .getStatsType().equals(CodecUtil.STATS_BASIC);
-            if (termVector.functions != null) {
-              for (SubComponentFunction function : termVector.functions) {
-                function.dataCollector.initNewList(initSize);
-                doBasic = doBasic ? (function.parserFunction.sumRule()
-                    && !function.parserFunction.needPositions()
-                    && function.dataCollector.getStatsType()
-                        .equals(CodecUtil.STATS_BASIC))
-                    : doBasic;
+            if (!compiledAutomaton.type
+                .equals(CompiledAutomaton.AUTOMATON_TYPE.NORMAL)) {
+              if (compiledAutomaton.type
+                  .equals(CompiledAutomaton.AUTOMATON_TYPE.NONE)) {
+                // do nothing
+              } else {
+                throw new IOException(
+                    "compiledAutomaton is " + compiledAutomaton.type);
               }
-            }
-            // only if documents
-            if (docSet.size() > 0) {
-              int termDocId;
-              // loop over terms
-              while ((term = termsEnum.next()) != null) {
-                termDocId = -1;
-                if (doBasic) {
-                  // compute numbers;
-                  TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                      docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                  // register
-                  if (numberBasic.docNumber > 0) {
-                    long valueLong = 0;
-                    try {
-                      valueLong = termVector.subComponentFunction.parserFunction
-                          .getValueLong(numberBasic.valueSum, 1);
-                    } catch (IOException e) {
-                      termVector.subComponentFunction.dataCollector.error(
-                          MtasToken.getPostfixFromValue(term), e.getMessage());
-                    }
-                    String key = MtasToken.getPostfixFromValue(term);
-                    termVector.subComponentFunction.dataCollector.add(key,
-                        valueLong, numberBasic.docNumber);
-                    if (termVector.functions != null) {
-                      for (SubComponentFunction function : termVector.functions) {
-                        if (function.dataType
-                            .equals(CodecUtil.DATA_TYPE_LONG)) {
-                          long valueFunction = function.parserFunction
-                              .getValueLong(numberBasic.valueSum, 0);
-                          function.dataCollector.add(key, valueFunction,
-                              numberBasic.docNumber);
-                        } else if (function.dataType
-                            .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
-                          double valueFunction = function.parserFunction
-                              .getValueDouble(numberBasic.valueSum, 0);
-                          function.dataCollector.add(key, valueFunction,
-                              numberBasic.docNumber);
-                        }
-                      }
-                    }
+            } else {
+              termsEnum = t.intersect(compiledAutomaton, null);
 
-                  }
-                } else {
-                  TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                      docSet, termDocId, termsEnum, r, lrc, postingsEnum,
-                      positionsData);
-                  if (numberFull.docNumber > 0) {
-                    long[] valuesLong = new long[numberFull.docNumber];
-                    String key = MtasToken.getPostfixFromValue(term);
-                    for (int i = 0; i < numberFull.docNumber; i++) {
-                      try {
-                        valuesLong[i] = termVector.subComponentFunction.parserFunction
-                            .getValueLong(new long[] { numberFull.args[i] },
-                                numberFull.positions[i]);
-                      } catch (IOException e) {
-                        termVector.subComponentFunction.dataCollector.error(key,
-                            e.getMessage());
-                      }
-                    }
-                    termVector.subComponentFunction.dataCollector.add(key,
-                        valuesLong, valuesLong.length);
-                    if (termVector.functions != null) {
-                      for (SubComponentFunction function : termVector.functions) {
-                        if (function.dataType
-                            .equals(CodecUtil.DATA_TYPE_LONG)) {
-                          valuesLong = new long[numberFull.docNumber];
-                          for (int i = 0; i < numberFull.docNumber; i++) {
-                            try {
-                              valuesLong[i] = function.parserFunction
-                                  .getValueLong(
-                                      new long[] { numberFull.args[i] },
-                                      numberFull.positions[i]);
-                            } catch (IOException e) {
-                              function.dataCollector.error(key, e.getMessage());
-                            }
-                          }
-                          function.dataCollector.add(key, valuesLong,
-                              valuesLong.length);
-                        } else if (function.dataType
-                            .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
-                          double[] valuesDouble = new double[numberFull.docNumber];
-                          for (int i = 0; i < numberFull.docNumber; i++) {
-                            try {
-                              valuesDouble[i] = function.parserFunction
-                                  .getValueDouble(
-                                      new long[] { numberFull.args[i] },
-                                      numberFull.positions[i]);
-                            } catch (IOException e) {
-                              function.dataCollector.error(key, e.getMessage());
-                            }
-                          }
-                          function.dataCollector.add(key, valuesDouble,
-                              valuesDouble.length);
-                        }
-                      }
-                    }
-                  }
-
+              int initSize = Math.min((int) t.size(), 1000);
+              termVector.subComponentFunction.dataCollector.initNewList(
+                  initSize, segmentName, segmentNumber, termVector.boundary);
+              boolean doBasic = termVector.subComponentFunction.dataCollector
+                  .getStatsType().equals(CodecUtil.STATS_BASIC);
+              if (termVector.functions != null) {
+                for (SubComponentFunction function : termVector.functions) {
+                  function.dataCollector.initNewList(initSize);
+                  doBasic = doBasic ? (function.parserFunction.sumRule()
+                      && !function.parserFunction.needPositions()
+                      && function.dataCollector.getStatsType()
+                          .equals(CodecUtil.STATS_BASIC))
+                      : doBasic;
                 }
               }
-            }
-            termVector.subComponentFunction.dataCollector.closeNewList();
-            if (termVector.functions != null) {
-              for (SubComponentFunction function : termVector.functions) {
-                function.dataCollector.closeNewList();
+              // only if documents
+              if (docSet.size() > 0) {
+                int termDocId;
+                // loop over terms
+                while ((term = termsEnum.next()) != null) {
+                  termDocId = -1;
+                  if (doBasic) {
+                    // compute numbers;
+                    TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                        docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                    // register
+                    if (numberBasic.docNumber > 0) {
+                      long valueLong = 0;
+                      try {
+                        valueLong = termVector.subComponentFunction.parserFunction
+                            .getValueLong(numberBasic.valueSum, 1);
+                      } catch (IOException e) {
+                        termVector.subComponentFunction.dataCollector.error(
+                            MtasToken.getPostfixFromValue(term),
+                            e.getMessage());
+                      }
+                      String key = MtasToken.getPostfixFromValue(term);
+                      termVector.subComponentFunction.dataCollector.add(key,
+                          valueLong, numberBasic.docNumber);
+                      if (termVector.functions != null) {
+                        for (SubComponentFunction function : termVector.functions) {
+                          if (function.dataType
+                              .equals(CodecUtil.DATA_TYPE_LONG)) {
+                            long valueFunction = function.parserFunction
+                                .getValueLong(numberBasic.valueSum, 0);
+                            function.dataCollector.add(key, valueFunction,
+                                numberBasic.docNumber);
+                          } else if (function.dataType
+                              .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+                            double valueFunction = function.parserFunction
+                                .getValueDouble(numberBasic.valueSum, 0);
+                            function.dataCollector.add(key, valueFunction,
+                                numberBasic.docNumber);
+                          }
+                        }
+                      }
+
+                    }
+                  } else {
+                    TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                        docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                        positionsData);
+                    if (numberFull.docNumber > 0) {
+                      long[] valuesLong = new long[numberFull.docNumber];
+                      String key = MtasToken.getPostfixFromValue(term);
+                      for (int i = 0; i < numberFull.docNumber; i++) {
+                        try {
+                          valuesLong[i] = termVector.subComponentFunction.parserFunction
+                              .getValueLong(new long[] { numberFull.args[i] },
+                                  numberFull.positions[i]);
+                        } catch (IOException e) {
+                          termVector.subComponentFunction.dataCollector
+                              .error(key, e.getMessage());
+                        }
+                      }
+                      termVector.subComponentFunction.dataCollector.add(key,
+                          valuesLong, valuesLong.length);
+                      if (termVector.functions != null) {
+                        for (SubComponentFunction function : termVector.functions) {
+                          if (function.dataType
+                              .equals(CodecUtil.DATA_TYPE_LONG)) {
+                            valuesLong = new long[numberFull.docNumber];
+                            for (int i = 0; i < numberFull.docNumber; i++) {
+                              try {
+                                valuesLong[i] = function.parserFunction
+                                    .getValueLong(
+                                        new long[] { numberFull.args[i] },
+                                        numberFull.positions[i]);
+                              } catch (IOException e) {
+                                function.dataCollector.error(key,
+                                    e.getMessage());
+                              }
+                            }
+                            function.dataCollector.add(key, valuesLong,
+                                valuesLong.length);
+                          } else if (function.dataType
+                              .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+                            double[] valuesDouble = new double[numberFull.docNumber];
+                            for (int i = 0; i < numberFull.docNumber; i++) {
+                              try {
+                                valuesDouble[i] = function.parserFunction
+                                    .getValueDouble(
+                                        new long[] { numberFull.args[i] },
+                                        numberFull.positions[i]);
+                              } catch (IOException e) {
+                                function.dataCollector.error(key,
+                                    e.getMessage());
+                              }
+                            }
+                            function.dataCollector.add(key, valuesDouble,
+                                valuesDouble.length);
+                          }
+                        }
+                      }
+                    }
+
+                  }
+                }
+              }
+              termVector.subComponentFunction.dataCollector.closeNewList();
+              if (termVector.functions != null) {
+                for (SubComponentFunction function : termVector.functions) {
+                  function.dataCollector.closeNewList();
+                }
               }
             }
           }

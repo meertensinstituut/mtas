@@ -1017,7 +1017,7 @@ public class MtasSolrComponentTermvector {
                     }
                     paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + "."
                         + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_FULL,
-                        "true");
+                        tv.full?"true":"false");
                     paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + "."
                         + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_LIST,
                         listValue);
