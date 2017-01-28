@@ -278,6 +278,8 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
 {
   MtasCQLParserSentenceCondition sc1 = null, sc2 = null;
   MtasSpanSequenceItem si1 = null, si2=null;
+  ArrayList < MtasSpanSequenceItem > itemList1 = new ArrayList < MtasSpanSequenceItem > ();
+  ArrayList < MtasSpanSequenceItem > itemList2 = new ArrayList < MtasSpanSequenceItem > ();
   MtasSpanQuery q1 = null, q2 = null;
   Token end = null;
   String operator = null;
@@ -292,7 +294,18 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
   (
     sc1 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
   | 
-    < BRACKET_START > si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength) < BRACKET_END >
+    < BRACKET_START >
+      si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+      {
+        itemList1.add(si1);
+      }
+      (
+        si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+        {
+          itemList1.add(si1);
+        }
+      )*
+    < BRACKET_END >
   )
   [
     (
@@ -323,20 +336,41 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
     )
     (
       sc2 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
-    | < BRACKET_START > si2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength) < BRACKET_END >
+    | < BRACKET_START >
+      si2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+      {
+        itemList2.add(si2);
+      }
+      (
+        si2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+        {
+          itemList2.add(si2);
+        }
+      )*
+    < BRACKET_END >
     )
   ]
   {
     if (sc1 != null)
     {
-      si1 = new MtasSpanSequenceItem(sc1.getQuery(),sc1.isOptional());
+      si1 = new MtasSpanSequenceItem(sc1.getQuery(),sc1.isOptional());      
+    } else if(itemList1.size()==1) {      
+      si1 = itemList1.get(0);
+    } else {
+      MtasSpanQuery q = new MtasSpanSequenceQuery(itemList1, ignore, maximumIgnoreLength);
+      si1 = new MtasSpanSequenceItem(q, false);
     }
     if (operator != null)
     {
       if (sc2 != null)
       {
         si2 = new MtasSpanSequenceItem(sc2.getQuery(),sc2.isOptional());
-      }
+      } else if(itemList2.size()==1) { 
+        si2 = itemList2.get(0);
+      } else {
+        MtasSpanQuery q = new MtasSpanSequenceQuery(itemList2, ignore, maximumIgnoreLength);
+        si2 = new MtasSpanSequenceItem(q, false);
+      }      
       if (operator.equals(OPERATOR_CONTAINING))
       {
         MtasSpanQuery q = new MtasSpanContainingQuery(si1.getQuery(), si2.getQuery());

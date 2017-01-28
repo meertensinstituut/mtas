@@ -1703,11 +1703,9 @@ public class CodecComponent {
       Collections.sort(data, new Comparator<MtasTreeHit<String>>() {
         @Override
         public int compare(MtasTreeHit<String> hit1, MtasTreeHit<String> hit2) {
-          int compare = (hit1.additionalId > hit2.additionalId) ? 1
-              : ((hit1.additionalId < hit2.additionalId) ? -1 : 0);
+          int compare = Integer.compare(hit1.additionalId, hit2.additionalId);            
           compare = (compare == 0)
-              ? ((hit1.additionalRef > hit2.additionalRef) ? 1
-                  : (hit2.additionalRef < hit2.additionalRef) ? -1 : 0)
+              ? Long.compare(hit1.additionalRef,hit2.additionalRef)
               : compare;
           return compare;
         }

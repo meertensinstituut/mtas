@@ -78,6 +78,7 @@ public class MtasCQLParserTestSentence {
     basicTest18();
     basicTest19();
     basicTest20();
+    basicTest21();
   }
   
   private void basicTest1() throws ParseException {
@@ -323,5 +324,12 @@ public class MtasCQLParserTestSentence {
     String cql10 = "[pos=\"N\"]([pos=\"ADJ\"])?([pos=\"N\"])?";
     testCQLEquivalent(field, null, cql9, cql10);
   }  
+  
+  private void basicTest21() {
+    String field = "testveld";
+    String cql1 = "(<s/>(<s/> containing [t_lc=\"rembrandt\"])</s>)";
+    String cql2 = "<s/>(<s/> containing [t_lc=\"rembrandt\"])</s>";
+    testCQLEquivalent(field, null, cql1, cql2);
+  }
   
 }
