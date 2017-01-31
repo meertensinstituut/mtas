@@ -137,7 +137,7 @@ public class MtasTokenCollection {
         } else {
           row[7] = null;
           row[8] = null;
-          row[9] = token.getPositions().toString();
+          row[9] = Arrays.toString(token.getPositions());
         }
       }
       if (token.getParentId() != null) {

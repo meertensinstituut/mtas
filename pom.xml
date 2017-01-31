@@ -4,13 +4,13 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<currentDevelopmentVersion>6.3.0</currentDevelopmentVersion>
+		<currentDevelopmentVersion>6.4.0</currentDevelopmentVersion>
 		<currentDevelopmentRelease>20170110</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>6.3.0</version>
+	<version>6.4.0</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -216,27 +216,27 @@
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
-				<version>6.3.0</version>
+				<version>6.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-analyzers-common</artifactId>
-				<version>6.3.0</version>
+				<version>6.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-queryparser</artifactId>
-				<version>6.3.0</version>
+				<version>6.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-codecs</artifactId>
-				<version>6.3.0</version>
+				<version>6.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-core</artifactId>
-				<version>6.3.0</version>
+				<version>6.4.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>

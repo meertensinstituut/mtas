@@ -516,10 +516,11 @@ public class MtasCRMParser extends MtasBasicParser {
     MtasParserType tmpCurrentType;
     MtasParserObject currentObject;
     if ((tmpCurrentType = crmSentenceTypes.get(name)) != null) {
+      String filteredText = text.replaceAll("[^0-9\\-]", "");
       currentObject = new MtasParserObject(tmpCurrentType);
       currentObject.setUnknownAncestorNumber(unknownAncestors);
-      currentObject.setRealOffsetStart(currentOffset);
-      currentObject.setText(text);
+      currentObject.setRealOffsetStart(currentOffset);      
+      currentObject.setText(filteredText);
       if (!prevalidateObject(currentObject, currentList)) {
         return null;
       } else {
@@ -567,10 +568,11 @@ public class MtasCRMParser extends MtasBasicParser {
     MtasParserType tmpCurrentType;
     MtasParserObject currentObject;
     if ((tmpCurrentType = crmClauseTypes.get(name)) != null) {
+      String filteredText = text.replaceAll("[^0-9\\-]", "");
       currentObject = new MtasParserObject(tmpCurrentType);
       currentObject.setUnknownAncestorNumber(unknownAncestors);
       currentObject.setRealOffsetStart(currentOffset);
-      currentObject.setText(text);
+      currentObject.setText(filteredText); 
       if (!prevalidateObject(currentObject, currentList)) {
         return null;
       } else {
