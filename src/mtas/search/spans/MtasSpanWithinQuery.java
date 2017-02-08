@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.SpanWithinQuery;
@@ -35,7 +34,9 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
-    return baseQuery.createWeight(searcher, needsScores);
+    SpanWeight sw = baseQuery.createWeight(searcher, needsScores);
+    return sw;
+    //return baseQuery.createWeight(searcher, needsScores);
   }
 
   @Override

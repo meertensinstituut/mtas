@@ -2,7 +2,9 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -45,6 +47,18 @@ public class MtasSolrComponentDocument {
 
   /** The Constant NAME_MTAS_DOCUMENT_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_LIST = "list";
+  
+  public static final String NAME_MTAS_DOCUMENT_LIST_REGEXP = "listRegexp";
+
+  public static final String NAME_MTAS_DOCUMENT_LIST_EXPAND = "listExpand";
+  
+  public static final String NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER = "listExpandNumber";
+  
+  public static final String NAME_MTAS_DOCUMENT_IGNORE_REGEXP = "ignoreRegexp";
+  
+  public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST = "ignoreList";
+  
+  public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP = "ignoreListRegexp";
 
   /** The Constant NAME_MTAS_DOCUMENT_NUMBER. */
   public static final String NAME_MTAS_DOCUMENT_NUMBER = "number";
@@ -77,7 +91,13 @@ public class MtasSolrComponentDocument {
       String[] types = new String[ids.size()];
       String[] regexps = new String[ids.size()];
       String[] lists = new String[ids.size()];
-      String[] numbers = new String[ids.size()];
+      Boolean[] listRegexps = new Boolean[ids.size()];
+      Boolean[] listExpands = new Boolean[ids.size()];
+      int[] listExpandNumbers = new int[ids.size()];
+      String[] ignoreRegexps = new String[ids.size()];
+      String[] ignoreLists = new String[ids.size()];
+      Boolean[] ignoreListRegexps = new Boolean[ids.size()];
+      String[] listNumbers = new String[ids.size()];
       for (String id : ids) {
         fields[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_FIELD,
@@ -98,7 +118,25 @@ public class MtasSolrComponentDocument {
         lists[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST,
             null);
-        numbers[tmpCounter] = rb.req.getParams().get(
+        listRegexps[tmpCounter] = rb.req.getParams().getBool(
+            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_REGEXP,
+            false);
+        listExpands[tmpCounter] = rb.req.getParams().getBool(
+            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_EXPAND,
+            false);
+        listExpandNumbers[tmpCounter] = rb.req.getParams().getInt(
+            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER,
+            10);
+        ignoreRegexps[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_REGEXP,
+            null);
+        ignoreLists[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_LIST,
+            null);
+        ignoreListRegexps[tmpCounter] = rb.req.getParams().getBool(
+            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP,
+            false);
+        listNumbers[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_NUMBER,
             null);
         tmpCounter++;
@@ -123,7 +161,11 @@ public class MtasSolrComponentDocument {
           NAME_MTAS_DOCUMENT_REGEXP, NAME_MTAS_DOCUMENT_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(lists, fields,
           NAME_MTAS_DOCUMENT_LIST, NAME_MTAS_DOCUMENT_FIELD, false);
-      MtasSolrResultUtil.compareAndCheck(numbers, fields,
+      MtasSolrResultUtil.compareAndCheck(ignoreRegexps, fields,
+          NAME_MTAS_DOCUMENT_IGNORE_REGEXP, NAME_MTAS_DOCUMENT_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(ignoreLists, fields,
+          NAME_MTAS_DOCUMENT_IGNORE_LIST, NAME_MTAS_DOCUMENT_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(listNumbers, fields,
           NAME_MTAS_DOCUMENT_NUMBER, NAME_MTAS_DOCUMENT_FIELD, false);
       for (int i = 0; i < fields.length; i++) {
         String key = (keys[i] == null) || (keys[i].isEmpty())
@@ -133,6 +175,9 @@ public class MtasSolrComponentDocument {
         String type = types[i];
         String regexp = regexps[i];
         String[] list = null;
+        Boolean listRegexp = listRegexps[i];
+        Boolean listExpand = listExpands[i];
+        int listExpandNumber = listExpandNumbers[i];
         if(lists[i]!=null) {
           ArrayList<String> tmpList = new ArrayList<String>();
           String[] subList = lists[i].split("(?<!\\\\),");
@@ -141,10 +186,21 @@ public class MtasSolrComponentDocument {
           }
           list = tmpList.toArray(new String[tmpList.size()]);
         }
-        int number = Math.max(0, (numbers[i] == null) || (numbers[i].isEmpty())
-            ? 0 : Integer.parseInt(numbers[i]));
+        int listNumber = Math.max(0, (listNumbers[i] == null) || (listNumbers[i].isEmpty())
+            ? 0 : Integer.parseInt(listNumbers[i]));
+        String ignoreRegexp = ignoreRegexps[i];
+        String[] ignoreList = null;
+        Boolean ignoreListRegexp = ignoreListRegexps[i];
+        if(ignoreLists[i]!=null) {
+          ArrayList<String> tmpList = new ArrayList<String>();
+          String[] subList = ignoreLists[i].split("(?<!\\\\),");
+          for(int j=0; j<subList.length; j++) {
+            tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
+          }
+          ignoreList = tmpList.toArray(new String[tmpList.size()]);
+        }
         mtasFields.list.get(fields[i]).documentList
-            .add(new ComponentDocument(key, prefix, type, regexp, list, number));
+            .add(new ComponentDocument(key, prefix, type, regexp, list, listNumber, listRegexp, listExpand, listExpandNumber, ignoreRegexp, ignoreList, ignoreListRegexp));
       }
     }
   }
@@ -165,6 +221,7 @@ public class MtasSolrComponentDocument {
       NamedList<Object> mtasDocumentItemResponse = new SimpleOrderedMap<>();
       MtasDataCollector<?, ?> stats = document.statsData.get(docId);
       MtasDataCollector<?, ?> list = null;
+      HashMap<String, MtasDataCollector<?, ?>> expandedList = null;
       if (document.statsList != null) {
         list = document.statsList.get(docId);
       }
@@ -172,9 +229,15 @@ public class MtasSolrComponentDocument {
           stats.getDataType(), stats.getStatsType(), stats.statsItems, null));
       mtasDocumentItemResponse.add("documentKey",
           document.uniqueKey.get(docId));
-      if (list != null) {
-        mtasDocumentItemResponse.add("list", new MtasSolrResult(list,
-            list.getDataType(), list.getStatsType(), list.statsItems, null));
+      if (list != null) {                
+        if(document.listExpand) {
+          mtasDocumentItemResponse.add("list", new MtasSolrResult(list,
+            new String[] { list.getDataType(), list.getDataType()}, new String[] {list.getStatsType(), list.getStatsType()}, new TreeSet[] {list.statsItems, list.statsItems}, new String[] {null, null}, new String[] {null, null}, new Integer[] { 0 , 0}, new Integer[] { 1 , 1}, null));
+        } else {
+          mtasDocumentItemResponse.add("list", new MtasSolrResult(list,
+              list.getDataType(), list.getStatsType(), list.statsItems, null));  
+        }
+                
       }
       // add
       mtasDocumentItemResponses.add(mtasDocumentItemResponse);

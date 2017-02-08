@@ -2,19 +2,23 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasExtendedSpanTermQuery.SpanTermWeight;
 
 import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
@@ -56,14 +60,17 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
-    return new SpanAllWeight(searcher, null);
+      throws IOException {    
+    //keep things simple
+    return new SpanAllWeight(searcher, null);        
   }
 
   /**
    * The Class SpanAllWeight.
    */
   public class SpanAllWeight extends SpanWeight {
+    
+    IndexSearcher searcher;
 
     /**
      * Instantiates a new span all weight.
@@ -78,6 +85,7 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     public SpanAllWeight(IndexSearcher searcher,
         Map<Term, TermContext> termContexts) throws IOException {
       super(MtasSpanMatchAllQuery.this, searcher, termContexts);
+      this.searcher = searcher;
     }
 
     /*
@@ -89,6 +97,15 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
+      Term term = new Term(field);
+      if(!contexts.containsKey(term)) {
+        IndexReaderContext topContext = searcher.getTopReaderContext();      
+        try {
+          contexts.put(term, TermContext.build(topContext, term));
+        } catch (IOException e) {
+          //fail
+        }
+      }  
     }
 
     /*
@@ -199,6 +216,6 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ field.hashCode();
     return h;
-  }
+  }  
 
 }

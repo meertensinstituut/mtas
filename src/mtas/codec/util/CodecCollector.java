@@ -55,17 +55,24 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.SingleTermsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.LegacyNumericUtils;
+import org.apache.lucene.util.automaton.Automaton;
+import org.apache.lucene.util.automaton.ByteRunAutomaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
+import org.apache.lucene.util.automaton.Operations;
+import org.apache.lucene.util.automaton.RegExp;
 
 /**
  * The Class CodecCollector.
@@ -2012,6 +2019,9 @@ public class CodecCollector {
       IndexSearcher searcher, Terms t, LeafReader r, LeafReaderContext lrc)
       throws IOException {
     if (documentList != null) {
+      TreeSet<String> listStatsItems = CodecUtil.createStatsItems("sum");
+      String listStatsType = CodecUtil.createStatsType(listStatsItems,
+          CodecUtil.STATS_TYPE_SUM, null);
       for (ComponentDocument document : documentList) {
         // initialize
         for (int docId : docList) {
@@ -2019,9 +2029,6 @@ public class CodecCollector {
           Document doc = searcher.doc(docId,
               new HashSet<String>(Arrays.asList(uniqueKeyField)));
           IndexableField indxfld = doc.getField(uniqueKeyField);
-          TreeSet<String> listStatsItems = CodecUtil.createStatsItems("sum");
-          String listStatsType = CodecUtil.createStatsType(listStatsItems,
-              CodecUtil.STATS_TYPE_SUM, null);
           // get other doc info
           if (indxfld != null) {
             document.uniqueKey.put(docId, indxfld.stringValue());
@@ -2031,10 +2038,30 @@ public class CodecCollector {
                 null, null);
             document.statsData.put(docId, stats);
             if (document.statsList != null) {
-              MtasDataCollector<?, ?> list = DataCollector.getCollector(
-                  DataCollector.COLLECTOR_TYPE_LIST, CodecUtil.DATA_TYPE_LONG,
-                  listStatsType, listStatsItems, CodecUtil.STATS_TYPE_SUM,
-                  CodecUtil.SORT_DESC, 0, document.number, null, null);
+              MtasDataCollector<?, ?> list;
+              if (document.listExpand) {
+                TreeSet<String>[] baseStatsItems = new TreeSet[] {
+                    listStatsItems };
+                list = DataCollector.getCollector(
+                    DataCollector.COLLECTOR_TYPE_LIST, CodecUtil.DATA_TYPE_LONG,
+                    listStatsType, listStatsItems, CodecUtil.STATS_TYPE_SUM,
+                    CodecUtil.SORT_DESC, 0, document.listNumber,
+                    new String[] { DataCollector.COLLECTOR_TYPE_LIST },
+                    new String[] { CodecUtil.DATA_TYPE_LONG },
+                    new String[] { listStatsType },
+                    Arrays.copyOfRange(baseStatsItems, 0,
+                        baseStatsItems.length),
+                    new String[] { CodecUtil.STATS_TYPE_SUM },
+                    new String[] { CodecUtil.SORT_DESC }, new Integer[] { 0 },
+                    new Integer[] { document.listExpandNumber }, null, null);
+              } else {
+                TreeSet<String>[] baseStatsItems = new TreeSet[] {
+                    listStatsItems };
+                list = DataCollector.getCollector(
+                    DataCollector.COLLECTOR_TYPE_LIST, CodecUtil.DATA_TYPE_LONG,
+                    listStatsType, listStatsItems, CodecUtil.STATS_TYPE_SUM,
+                    CodecUtil.SORT_DESC, 0, document.listNumber, null, null);
+              }
               document.statsList.put(docId, list);
             }
           }
@@ -2049,55 +2076,142 @@ public class CodecCollector {
         for (ComponentDocument document : documentList) {
 
           List<CompiledAutomaton> listAutomata;
+          HashMap<String, Automaton> automatonMap;
+          HashMap<String, ByteRunAutomaton> byteRunAutomatonMap;
           if (document.list == null) {
+            automatonMap = null;
+            byteRunAutomatonMap = null;
             listAutomata = new ArrayList<CompiledAutomaton>();
-            listAutomata.add(document.compiledAutomaton);
+            CompiledAutomaton compiledAutomaton;
+            Automaton automaton;
+            if ((document.regexp == null) || (document.regexp.isEmpty())) {
+              RegExp re = new RegExp(
+                  document.prefix + MtasToken.DELIMITER + ".*");
+              automaton = re.toAutomaton();
+            } else {
+              RegExp re = new RegExp(document.prefix + MtasToken.DELIMITER
+                  + document.regexp + "\u0000*");
+              automaton = re.toAutomaton();
+            }
+            compiledAutomaton = new CompiledAutomaton(automaton);
+            listAutomata.add(compiledAutomaton);
           } else {
+            automatonMap = MtasToken.createAutomatonMap(document.prefix,
+                new ArrayList<String>(document.list),
+                document.listRegexp ? false : true);
+            byteRunAutomatonMap = MtasToken.byteRunAutomatonMap(automatonMap);
             listAutomata = MtasToken.createAutomata(document.prefix,
-                document.regexp, new ArrayList<String>(document.list));
+                document.regexp, automatonMap);
+          }
+          List<ByteRunAutomaton> ignoreByteRunAutomatonList = null;
+          if ((document.ignoreRegexp != null)
+              && (!document.ignoreRegexp.isEmpty())) {
+            ignoreByteRunAutomatonList = new ArrayList<ByteRunAutomaton>();
+            RegExp re = new RegExp(document.prefix + MtasToken.DELIMITER
+                + document.ignoreRegexp + "\u0000*");
+            ignoreByteRunAutomatonList
+                .add(new ByteRunAutomaton(re.toAutomaton()));
+          }
+          if (document.ignoreList != null) {
+            if(ignoreByteRunAutomatonList==null) {
+              ignoreByteRunAutomatonList = new ArrayList<ByteRunAutomaton>();
+            }  
+            HashMap<String, Automaton> list = MtasToken.createAutomatonMap(
+                document.prefix, new ArrayList<String>(document.ignoreList),
+                document.ignoreListRegexp ? false : true);            
+            for (Automaton automaton : list.values()) {
+              ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));
+            }
           }
 
           for (CompiledAutomaton compiledAutomaton : listAutomata) {
-
-            termsEnum = t.intersect(compiledAutomaton, null);
-            // init
-            int initSize = Math.min((int) t.size(), 1000);
-            for (int docId : docList) {
-              document.statsData.get(docId).initNewList(1);
-              if (document.statsList != null) {
-                document.statsList.get(docId).initNewList(initSize);
+            if (!compiledAutomaton.type
+                .equals(CompiledAutomaton.AUTOMATON_TYPE.NONE)) {
+              termsEnum = t.intersect(compiledAutomaton, null);
+              // init
+              int initBaseSize = Math.min((int) t.size(), 1000);
+              int initListSize = document.statsList != null
+                  ? Math.min(document.statsList.size(), initBaseSize)
+                  : initBaseSize;
+              HashSet<MtasDataCollector<?, ?>> initialised = new HashSet<MtasDataCollector<?, ?>>();
+              for (int docId : docList) {
+                document.statsData.get(docId).initNewList(1);
+                initialised.add(document.statsData.get(docId));
+                if (document.statsList != null
+                    && document.statsList.size() > 0) {
+                  document.statsList.get(docId).initNewList(initListSize);
+                  initialised.add(document.statsList.get(docId));
+                }
               }
-            }
-            // fill
-            while ((term = termsEnum.next()) != null) {
-              Iterator<Integer> docIterator = docList.iterator();
-              postingsEnum = termsEnum.postings(postingsEnum,
-                  PostingsEnum.FREQS);
-              int termDocId = -1;
-              while (docIterator.hasNext()) {
-                int segmentDocId = docIterator.next() - lrc.docBase;
-                if (segmentDocId >= termDocId) {
-                  if ((segmentDocId == termDocId) || ((termDocId = postingsEnum
-                      .advance(segmentDocId)) == segmentDocId)) {
-                    // register stats
-                    document.statsData.get(segmentDocId + lrc.docBase)
-                        .add(new long[] { postingsEnum.freq() }, 1);
-                    // register list
-                    if (document.statsList != null) {
-                      document.statsList.get(segmentDocId + lrc.docBase).add(
-                          MtasToken.getPostfixFromValue(term),
-                          new long[] { postingsEnum.freq() }, 1);
+              // fill
+              int termDocId;
+              boolean acceptedTerm;
+              while ((term = termsEnum.next()) != null) {
+                Iterator<Integer> docIterator = docList.iterator();
+                postingsEnum = termsEnum.postings(postingsEnum,
+                    PostingsEnum.FREQS);
+                termDocId = -1;
+                acceptedTerm = true;
+                if(ignoreByteRunAutomatonList!=null) {
+                  for(ByteRunAutomaton ignoreByteRunAutomaton : ignoreByteRunAutomatonList) {
+                    if(ignoreByteRunAutomaton.run(term.bytes, term.offset, term.length)) {
+                      acceptedTerm = false;
+                      break;
+                    }
+                  }
+                }
+                if (acceptedTerm) {
+                  while (docIterator.hasNext()) {
+                    int segmentDocId = docIterator.next() - lrc.docBase;
+                    if (segmentDocId >= termDocId) {
+                      if ((segmentDocId == termDocId)
+                          || ((termDocId = postingsEnum
+                              .advance(segmentDocId)) == segmentDocId)) {
+                        // register stats
+                        document.statsData.get(segmentDocId + lrc.docBase)
+                            .add(new long[] { postingsEnum.freq() }, 1);
+                        // register list
+                        if (document.statsList != null) {
+                          if (automatonMap != null) {
+                            MtasDataCollector<?, ?> dataCollector,
+                                subSataCollector;
+                            for (String key : byteRunAutomatonMap.keySet()) {
+                              ByteRunAutomaton bra = byteRunAutomatonMap
+                                  .get(key);
+                              if (bra.run(term.bytes, term.offset,
+                                  term.length)) {
+                                dataCollector = document.statsList
+                                    .get(segmentDocId + lrc.docBase);
+                                subSataCollector = dataCollector.add(key,
+                                    new long[] { postingsEnum.freq() }, 1);
+                                if (document.listExpand
+                                    && subSataCollector != null) {
+                                  if (!initialised.contains(subSataCollector)) {
+                                    subSataCollector.initNewList(initBaseSize);
+                                    initialised.add(subSataCollector);
+                                  }
+                                  subSataCollector.add(
+                                      MtasToken.getPostfixFromValue(term),
+                                      new long[] { postingsEnum.freq() }, 1);
+                                }
+                              }
+                            }
+                          } else {
+                            document.statsList.get(segmentDocId + lrc.docBase)
+                                .add(MtasToken.getPostfixFromValue(term),
+                                    new long[] { postingsEnum.freq() }, 1);
+                          }
+                        }
+                      }
                     }
                   }
                 }
               }
-            }
-            // close
-            for (int docId : docList) {
-              document.statsData.get(docId).closeNewList();
-              if (document.statsList != null) {
-                document.statsList.get(docId).closeNewList();
+              // close
+              for (MtasDataCollector<?, ?> item : initialised) {
+                item.closeNewList();
               }
+              initialised.clear();
             }
           }
         }
@@ -2702,12 +2816,16 @@ public class CodecCollector {
           }
 
           List<CompiledAutomaton> listAutomata;
+          HashMap<String, Automaton> automatonMap;
           if (termVector.list == null) {
+            automatonMap = null;
             listAutomata = new ArrayList<CompiledAutomaton>();
             listAutomata.add(termVector.compiledAutomaton);
           } else {
+            automatonMap = MtasToken.createAutomatonMap(termVector.prefix,
+                new ArrayList<String>(termVector.list), true);
             listAutomata = MtasToken.createAutomata(termVector.prefix,
-                termVector.regexp, new ArrayList<String>(termVector.list));
+                termVector.regexp, automatonMap);
           }
 
           for (CompiledAutomaton compiledAutomaton : listAutomata) {
@@ -3055,9 +3173,12 @@ public class CodecCollector {
             HashSet<String> recomputeKeyList = termVector.subComponentFunction.dataCollector.segmentRecomputeKeyList
                 .get(segmentName);
             if (recomputeKeyList.size() > 0) {
+              HashMap<String, Automaton> automatonMap = MtasToken
+                  .createAutomatonMap(termVector.prefix,
+                      new ArrayList<String>(termVector.list), true);
               List<CompiledAutomaton> listCompiledAutomata = MtasToken
                   .createAutomata(termVector.prefix, termVector.regexp,
-                      new ArrayList<String>(recomputeKeyList));
+                      automatonMap);
               for (CompiledAutomaton compiledAutomaton : listCompiledAutomata) {
                 termsEnum = t.intersect(compiledAutomaton, null);
                 termVector.subComponentFunction.dataCollector.initNewList(

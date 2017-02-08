@@ -265,10 +265,14 @@ public class CodecComponent {
   public static class ComponentDocument {
 
     /** The regexp. */
-    public String key, prefix, regexp;
+    public String key, prefix, regexp, ignoreRegexp;
     
     /** The list. */
-    public HashSet<String> list;    
+    public HashSet<String> list, ignoreList;
+    
+    public boolean listRegexp, listExpand, ignoreListRegexp;
+    
+    public int listExpandNumber;
 
     /** The stats type. */
     public String dataType, statsType;
@@ -276,11 +280,8 @@ public class CodecComponent {
     /** The stats items. */
     public TreeSet<String> statsItems;
 
-    /** The compiled automaton. */
-    public CompiledAutomaton compiledAutomaton;
-
     /** The number. */
-    public int number;
+    public int listNumber;
 
     /** The unique key. */
     public HashMap<Integer, String> uniqueKey;
@@ -290,7 +291,7 @@ public class CodecComponent {
 
     /** The list. */
     public HashMap<Integer, MtasDataCollector<?, ?>> statsList;
-
+    
     /**
      * Instantiates a new component document.
      *
@@ -302,30 +303,40 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public ComponentDocument(String key, String prefix, String statsType,
-        String regexp, String[] list, int number) throws IOException {
+        String regexp, String[] list, int listNumber, Boolean listRegexp, Boolean listExpand, int listExpandNumber, String ignoreRegexp, String[] ignoreList, Boolean ignoreListRegexp) throws IOException {
       this.key = key;
       this.prefix = prefix;
       this.regexp = regexp;
       if (list != null && list.length > 0) {
         this.list = new HashSet(Arrays.asList(list));
+        this.listRegexp = listRegexp!=null?listRegexp:false;
+        this.listExpand = (listExpand!=null && listExpandNumber>0)?listExpand:false;
+        if(this.listExpand) {
+          this.listExpandNumber = listExpandNumber;
+        } else {
+          this.listExpandNumber = 0;
+        }
       } else {
         this.list = null;
+        this.listRegexp = false;
+        this.listExpand = false;
+        this.listExpandNumber = 0;
       }
-      this.number = number;
+      this.ignoreRegexp = ignoreRegexp;
+      if (ignoreList != null && ignoreList.length > 0) {
+        this.ignoreList = new HashSet(Arrays.asList(ignoreList));
+        this.ignoreListRegexp = ignoreListRegexp!=null?ignoreListRegexp:false;
+      } else {
+        this.ignoreList = null;
+        this.ignoreListRegexp = false;
+      }
+      this.listNumber = listNumber;
       uniqueKey = new HashMap<Integer, String>();
       dataType = CodecUtil.DATA_TYPE_LONG;
       statsItems = CodecUtil.createStatsItems(statsType);
-      this.statsType = CodecUtil.createStatsType(statsItems, null, null);
-      if ((regexp == null) || (regexp.isEmpty())) {
-        RegExp re = new RegExp(prefix + MtasToken.DELIMITER + ".*");
-        compiledAutomaton = new CompiledAutomaton(re.toAutomaton());
-      } else {
-        RegExp re = new RegExp(
-            prefix + MtasToken.DELIMITER + regexp + "\u0000*");
-        compiledAutomaton = new CompiledAutomaton(re.toAutomaton());
-      }
+      this.statsType = CodecUtil.createStatsType(statsItems, null, null);      
       this.statsData = new HashMap<Integer, MtasDataCollector<?, ?>>();
-      if (this.number > 0) {
+      if (this.listNumber > 0) {
         this.statsList = new HashMap<Integer, MtasDataCollector<?, ?>>();
       } else {
         this.statsList = null;

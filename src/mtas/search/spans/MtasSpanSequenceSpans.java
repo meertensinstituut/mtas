@@ -19,7 +19,7 @@ import org.apache.lucene.search.spans.Spans;
  * The Class MtasSpanSequenceSpans.
  */
 public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
-
+  
   /** The queue spans. */
   private List<QueueItem> queueSpans;
 
@@ -123,6 +123,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
+    for(QueueItem item : queueSpans) {
+      item.sequenceSpans.spans.collect(collector);      
+    }
   }
 
   /*
