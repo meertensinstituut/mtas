@@ -1,7 +1,7 @@
 # Automatically generated Dockerfile 
-# - Build 2017-02-11 09:25
+# - Build 2017-02-11 10:16
 # - Lucene/Solr version 6.4.1
-# - Mtas release 20170131 
+# - Mtas release 20170211 
 #
 
 FROM ubuntu:16.04
@@ -15,7 +15,7 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/20170131/mtas-6.4.1.jar /root/lib/
+ADD https://github.com/meertensinstituut/mtas/releases/download/20170211/mtas-6.4.1.jar /root/lib/
 
 RUN apt-get update && apt-get install -y lsof software-properties-common python-software-properties apache2 curl subversion \
 && locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en \
@@ -55,9 +55,9 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
-&& printf "echo \"  Timestamp 2017-02-11 09:25\"\n" >> /start.sh \
+&& printf "echo \"  Timestamp 2017-02-11 10:16\"\n" >> /start.sh \
 && printf "echo \"  Lucene/Solr version 6.4.1\"\n" >> /start.sh \
-&& printf "echo \"  Mtas release 20170131\"\n" >> /start.sh \
+&& printf "echo \"  Mtas release 20170211\"\n" >> /start.sh \
 && printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh \
 && printf "echo \"=======================================================================\"\n" >> /start.sh \
 && printf "echo\n" >> /start.sh \

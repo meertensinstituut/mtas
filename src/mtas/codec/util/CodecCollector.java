@@ -2471,7 +2471,6 @@ public class CodecCollector {
                   if (docLists.get(key).length > 0) {
                     // initialise
                     Integer[] subDocSet = docLists.get(key);
-                    System.out.println(key+": "+Arrays.toString(subDocSet));
                     int length = cf.baseParsers[level].needArgumentsNumber();
                     long[] valueSum = new long[length];
                     long valuePositions = 0;
@@ -2496,7 +2495,6 @@ public class CodecCollector {
                       try {
                         value = cf.baseParsers[level].getValueLong(valueSum,
                             valuePositions);
-                        System.out.println("Add "+key+" - "+value);
                         subDataCollector = dataCollector.add(key, value,
                             subDocSet.length);
                       } catch (IOException e) {
