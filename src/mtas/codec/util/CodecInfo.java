@@ -309,6 +309,7 @@ public class CodecInfo {
       HashMap<String, Integer> prefixIds = getPrefixesIds(field, prefixes);
       if (prefixIds != null && prefixIds.size() > 0) {
         ArrayList<MtasTreeHit<?>> filteredHitItems = new ArrayList<MtasTreeHit<?>>();
+        
         for (MtasTreeHit<?> hitItem : hitItems) {
           if (prefixIds.containsValue(hitItem.additionalId)) {
             filteredHitItems.add(hitItem);

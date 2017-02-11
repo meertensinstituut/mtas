@@ -108,8 +108,10 @@ public class MtasSolrResultUtil {
                 mdi.rewrite(showDebugInfo);
                 nnl.setVal(j, mdi);
               }
-            }
+            }            
+            //System.out.println("rewrite -- "+nnl);
             nl.setVal(i, rewriteToArray(nnl));
+            //System.out.println("rewrite! "+nl.getVal(i));
           } else {
             NamedList<Object> tmpResponse = new SimpleOrderedMap<>();
             tmpResponse.add(nl.getName(i) + "Total", o.dataCollector.getSize());

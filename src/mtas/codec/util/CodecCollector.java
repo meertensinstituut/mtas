@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeMap;
@@ -55,23 +56,19 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.PostingsEnum;
-import org.apache.lucene.index.SingleTermsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.search.AutomatonQuery;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.LegacyNumericUtils;
 import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.ByteRunAutomaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
-import org.apache.lucene.util.automaton.Operations;
 import org.apache.lucene.util.automaton.RegExp;
 
 /**
@@ -2469,11 +2466,12 @@ public class CodecCollector {
                   }
                 }
               }
-              if (applySumRule) {
-                for (String key : groupedKeys.values()) {
+              if (applySumRule) {  
+                for (String key : new LinkedHashSet<String>(groupedKeys.values())) {
                   if (docLists.get(key).length > 0) {
                     // initialise
                     Integer[] subDocSet = docLists.get(key);
+                    System.out.println(key+": "+Arrays.toString(subDocSet));
                     int length = cf.baseParsers[level].needArgumentsNumber();
                     long[] valueSum = new long[length];
                     long valuePositions = 0;
@@ -2498,6 +2496,7 @@ public class CodecCollector {
                       try {
                         value = cf.baseParsers[level].getValueLong(valueSum,
                             valuePositions);
+                        System.out.println("Add "+key+" - "+value);
                         subDataCollector = dataCollector.add(key, value,
                             subDocSet.length);
                       } catch (IOException e) {
@@ -2542,7 +2541,7 @@ public class CodecCollector {
                   }
                 }
               } else {
-                for (String key : groupedKeys.values()) {
+                for (String key : new LinkedHashSet<String>(groupedKeys.values())) {
                   if (docLists.get(key).length > 0) {
                     // initialise
                     Integer[] subDocSet = docLists.get(key);

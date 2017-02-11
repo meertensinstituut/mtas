@@ -94,7 +94,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       throws IOException {
     final TermContext context;
     final IndexReaderContext topContext = searcher.getTopReaderContext();
-    if (termContext == null || termContext.topReaderContext != topContext) {
+    if (termContext == null) {
       context = TermContext.build(topContext, term);
     } else {
       context = termContext;
@@ -159,11 +159,6 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     @Override
     public Spans getSpans(final LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-      assert termContext.topReaderContext == ReaderUtil.getTopLevelContext(
-          context) : "The top-reader used to create Weight ("
-              + termContext.topReaderContext
-              + ") is not the same as the current reader's top-reader ("
-              + ReaderUtil.getTopLevelContext(context);
       final TermState state = termContext.get(context.ord);
       if (state == null) { // term is not present in that reader
         assert context.reader().docFreq(
