@@ -32,7 +32,8 @@ public class MtasSpanEndSpans extends Spans implements MtasSpans {
    */
   @Override
   public int nextStartPosition() throws IOException {
-    return (spans == null) ? NO_MORE_POSITIONS : spans.nextStartPosition();
+    spans.nextStartPosition();
+    return startPosition();
   }
 
   /*

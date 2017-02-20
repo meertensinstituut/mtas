@@ -387,17 +387,18 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       if (slash == null)
       {
         startGroup = true;
+        endGroup = false;
       }
       else
       {
         startGroup = false;
+        endGroup = false;
       }
-      endGroup = false;
     } else if (jj_2_30(1000)) {
       jj_consume_token(SLASH);
       condition = groupCondition(field);
-      startGroup = true;
-      endGroup = false;
+      startGroup = false;
+      endGroup = true;
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -1465,13 +1466,22 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
+  private boolean jj_3_47() {
+    if (jj_scan_token(CURLY_BRACKET_START)) return true;
+    if (jj_scan_token(NUMBER)) return true;
+    if (jj_scan_token(CURLY_BRACKET_END)) return true;
+    return false;
+  }
+
   private boolean jj_3_26() {
     if (jj_3R_13()) return true;
     return false;
   }
 
-  private boolean jj_3_47() {
+  private boolean jj_3_46() {
     if (jj_scan_token(CURLY_BRACKET_START)) return true;
+    if (jj_scan_token(NUMBER)) return true;
+    if (jj_scan_token(KOMMA)) return true;
     if (jj_scan_token(NUMBER)) return true;
     if (jj_scan_token(CURLY_BRACKET_END)) return true;
     return false;
@@ -1486,15 +1496,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
       if (jj_3_11()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(BRACKET_END)) return true;
-    return false;
-  }
-
-  private boolean jj_3_46() {
-    if (jj_scan_token(CURLY_BRACKET_START)) return true;
-    if (jj_scan_token(NUMBER)) return true;
-    if (jj_scan_token(KOMMA)) return true;
-    if (jj_scan_token(NUMBER)) return true;
-    if (jj_scan_token(CURLY_BRACKET_END)) return true;
     return false;
   }
 
@@ -1526,18 +1527,13 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_10() {
-    if (jj_scan_token(NOT_INTERSECTING)) return true;
-    return false;
-  }
-
   private boolean jj_3_76() {
     if (jj_scan_token(TOKEN_EQUALS)) return true;
     return false;
   }
 
-  private boolean jj_3_24() {
-    if (jj_3R_14()) return true;
+  private boolean jj_3_10() {
+    if (jj_scan_token(NOT_INTERSECTING)) return true;
     return false;
   }
 
@@ -1546,19 +1542,24 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_9() {
-    if (jj_scan_token(INTERSECTING)) return true;
+  private boolean jj_3_24() {
+    if (jj_3R_14()) return true;
     return false;
   }
 
-  private boolean jj_3_23() {
-    if (jj_3R_13()) return true;
+  private boolean jj_3_9() {
+    if (jj_scan_token(INTERSECTING)) return true;
     return false;
   }
 
   private boolean jj_3_45() {
     if (jj_scan_token(WORD_START)) return true;
     if (jj_scan_token(WORD_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3_23() {
+    if (jj_3R_13()) return true;
     return false;
   }
 
@@ -1581,11 +1582,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3_8() {
-    if (jj_scan_token(NOT_WITHIN)) return true;
-    return false;
-  }
-
   private boolean jj_3_80() {
     if (jj_scan_token(UNQUOTED_VALUE)) return true;
     Token xsp;
@@ -1595,6 +1591,11 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     if (jj_3_76()) return true;
     }
     if (jj_scan_token(VARIABLE)) return true;
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_scan_token(NOT_WITHIN)) return true;
     return false;
   }
 
@@ -1864,6 +1865,11 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
+  private boolean jj_3_66() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
   private boolean jj_3R_12() {
     Token xsp;
     xsp = jj_scanpos;
@@ -1873,11 +1879,6 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     }
     xsp = jj_scanpos;
     if (jj_3_22()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3_66() {
-    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -1944,13 +1945,13 @@ public class MtasCQLParser implements MtasCQLParserConstants {
     return false;
   }
 
-  private boolean jj_3R_10() {
-    if (jj_3R_12()) return true;
+  private boolean jj_3_60() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
-  private boolean jj_3_60() {
-    if (jj_3R_17()) return true;
+  private boolean jj_3R_10() {
+    if (jj_3R_12()) return true;
     return false;
   }
 

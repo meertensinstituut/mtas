@@ -3172,7 +3172,7 @@ public class CodecCollector {
             if (recomputeKeyList.size() > 0) {
               HashMap<String, Automaton> automatonMap = MtasToken
                   .createAutomatonMap(termVector.prefix,
-                      new ArrayList<String>(termVector.list), true);
+                      new ArrayList<String>(recomputeKeyList), true);
               List<CompiledAutomaton> listCompiledAutomata = MtasToken
                   .createAutomata(termVector.prefix, termVector.regexp,
                       automatonMap);

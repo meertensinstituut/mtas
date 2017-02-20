@@ -563,17 +563,18 @@ private MtasCQLParserGroupFullCondition group(String field) throws ParseExceptio
       if (slash == null)
       {
         startGroup = true;
+        endGroup = false;
       }
       else
       {
         startGroup = false;
-      }
-      endGroup = false;
+        endGroup = false;
+      }      
     }
   | < SLASH > condition = groupCondition(field)
     {
-      startGroup = true;
-      endGroup = false;
+      startGroup = false;
+      endGroup = true;
     }
   )
   < GROUP_END >
