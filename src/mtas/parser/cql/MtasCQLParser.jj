@@ -32,7 +32,7 @@ import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashMap; 
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

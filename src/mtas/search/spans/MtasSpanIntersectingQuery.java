@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
@@ -19,7 +21,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 
   private String field;
 
-  private MtasSpanQuery q1, q2;
+  private SpanQuery q1, q2;
 
   public MtasSpanIntersectingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     if (q1 != null) {
@@ -102,15 +104,23 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 
   @Override
   public int hashCode() {
-    int h = this.getClass().getSimpleName().hashCode();
-    if (q1 != null) {
-      h = (h * 7) ^ q1.hashCode();
-    }
-    if (q2 != null) {
-      h = (h * 11) ^ q2.hashCode();
-    }
+    int h = Integer.rotateLeft(classHash(), 1);
+    h ^= q1.hashCode();
+    h = Integer.rotateLeft(h, 1);
+    h ^= q2.hashCode();
     return h;
   }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader); 
+    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader); 
+    if(newQ1!=q1 || newQ2!=q2) {
+      return new MtasSpanIntersectingQuery(newQ1, newQ2);      
+    } else {
+      return this;
+    }  
+}
 
   public class SpanIntersectingWeight extends SpanWeight {
     

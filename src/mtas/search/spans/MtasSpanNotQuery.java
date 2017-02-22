@@ -4,9 +4,7 @@ import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanNotQuery;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasSpanQuery;
@@ -15,7 +13,7 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
   /** The base query. */
   private SpanNotQuery baseQuery;
 
-  public MtasSpanNotQuery(SpanQuery q1, SpanQuery q2) {
+  public MtasSpanNotQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super();
     baseQuery = new SpanNotQuery(q1, q2);
   }
