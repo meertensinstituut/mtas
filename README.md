@@ -14,7 +14,7 @@ more information.
 
 ---
 
-One of the primary use cases for Mtas, the [Nederlab project](https://www.nederlab.nl/), currently<sup>[1](#footnote1)</sup> provides access, both in terms of metadata and 
+One of the primary use cases for Mtas, the [Nederlab project](http://www.nederlab.nl/), currently<sup>[1](#footnote1)</sup> provides access, both in terms of metadata and 
 annotated text, to over 15 million items for search and analysis as specified below. 
 
 |                 | Total          | Mean    | Min   | Max        |
