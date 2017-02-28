@@ -21,10 +21,13 @@ annotated text, to over 15 million items for search and analysis as specified be
 |-----------------|---------------:|--------:|------:|-----------:|
 | Solr index size | 1,146 G        | 49.8 G  | 268 k | 163 G      |
 | Solr documents  | 15,859,099     | 689,526 | 201   | 3,616,544  |
-| Words           | 9,584,448,067  | 654     | 1     | 3,537,883  |
-| Annotations     | 36,486,292,912 | 2,488   | 4     | 23,589,831 |
 
 Collections are added and updated regularly by adding new cores, replacing cores and/or merging new cores with existing ones. Currently, the data is divided over 23 separate cores. For 14,663,457 of these documents, annotated text varying in size from 1 to over 3.5 million words is included.
+
+|                 | Total          | Mean    | Min   | Max        |
+|-----------------|---------------:|--------:|------:|-----------:|
+| Words           | 9,584,448,067  | 654     | 1     | 3,537,883  |
+| Annotations     | 36,486,292,912 | 2,488   | 4     | 23,589,831 |
 
 ---
 <a name="footnote1">1</a> : <small>situation january 2017</small>
