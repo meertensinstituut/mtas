@@ -1,6 +1,6 @@
 # Multi Tier Annotation Search
 
-See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/).
+See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/) for more documentation and instructions.
 
 ---
 
