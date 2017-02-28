@@ -17,7 +17,7 @@ annotated text, to over 15 million items for search and analysis as specified be
 
 |                 | Total          | Mean    | Min   | Max        |
 |-----------------|---------------:|--------:|------:|-----------:|
-| Solr index size | 1,146 G        | 49.8 G  | 268 k | 163 G      |
+| Solr index size | 1,146 G        | 50 G    | 268 k | 163 G      |
 | Solr documents  | 15,859,099     | 689,526 | 201   | 3,616,544  |
 | Words           | 9,584,448,067  | 654     | 1     | 3,537,883  |
 | Annotations     | 36,486,292,912 | 2,488   | 4     | 23,589,831 |
