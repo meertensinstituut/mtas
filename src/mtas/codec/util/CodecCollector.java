@@ -110,7 +110,7 @@ public class CodecCollector {
       HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
-
+        
     HashMap<Integer, List<Integer>> docSets = new HashMap<Integer, List<Integer>>();
 
     ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
@@ -591,7 +591,6 @@ public class CodecCollector {
       createDocument(fieldInfo.documentList, docList, field, lrc.docBase,
           fieldInfo.uniqueKeyField, searcher, t, r, lrc);
     }
-
     if (fieldInfo.spanQueryList.size() > 0) {
       if (fieldInfo.statsSpanList.size() > 0) {
         // create stats

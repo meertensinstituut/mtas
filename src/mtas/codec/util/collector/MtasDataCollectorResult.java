@@ -241,5 +241,14 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
       throw new IOException("type " + collectorType + " not supported");
     }
   }
+  
+  @Override
+  public String toString() {
+    StringBuilder buffer = new StringBuilder();
+    buffer.append(this.getClass().getSimpleName() + "(");
+    buffer.append(collectorType+","+sortType+","+sortDirection);
+    buffer.append(")");
+    return buffer.toString();
+  }
 
 }

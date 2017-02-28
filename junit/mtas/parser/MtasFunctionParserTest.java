@@ -19,28 +19,10 @@ public class MtasFunctionParserTest {
 
   Random generator = new Random();
 
-  @org.junit.Test
-  public void test() {
-    basicTests();
-  }
-
   private void testFunction(MtasFunctionParserFunction pf, long[] args, int n,
       MtasFunctionParserFunctionResponse r) {
     assertEquals(pf + "\tn:" + n + "\targs:" + Arrays.toString(args),
         pf.getResponse(args, n), r);
-  }
-
-  private void basicTests() {
-    basicTest1();
-    basicTest2();
-    basicTest3();
-    basicTest4();
-    basicTest5();
-    basicTest6();
-    basicTest7();
-    basicTest8();
-    basicTest9();
-    basicTest10();
   }
 
   private long[] getArgs(int n, int min, int max) {
@@ -55,7 +37,8 @@ public class MtasFunctionParserTest {
     return min + generator.nextInt((1 + max - min));
   }
 
-  private void basicTest1() {
+  @org.junit.Test
+  public void basicTestFunction1() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -77,7 +60,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest2() {
+  @org.junit.Test
+  public void basicTestFunction2() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -98,7 +82,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest3() {
+  @org.junit.Test
+  public void basicTestFunction3() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -175,7 +160,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest4() {
+  @org.junit.Test
+  public void basicTestFunction4() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -196,7 +182,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest5() {
+  @org.junit.Test
+  public void basicTestFunction5() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -214,7 +201,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest6() {
+  @org.junit.Test
+  public void basicTestFunction6() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -237,7 +225,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest7() {
+  @org.junit.Test
+  public void basicTestFunction7() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -263,7 +252,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest8() {
+  @org.junit.Test
+  public void basicTestFunction8() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -293,7 +283,8 @@ public class MtasFunctionParserTest {
     }
   }
 
-  private void basicTest9() {
+  @org.junit.Test
+  public void basicTestFunction9() {
     String function = null;
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -314,7 +305,8 @@ public class MtasFunctionParserTest {
     }
   }
   
-  private void basicTest10() {
+  @org.junit.Test
+  public void basicTestFunction10() {
     String function = "(1+2)/3";
     MtasFunctionParser p;
     MtasFunctionParserFunction pf;
@@ -329,9 +321,11 @@ public class MtasFunctionParserTest {
           new BufferedReader(new StringReader(function)));
       pf = p.parse();
       args = getArgs(10 + generator.nextInt(20), 0, 2);
-      double answer = (double)(k1+k2) / (args[0]+1+k3-2);
-      testFunction(pf, args, n,
+      if((args[0]+1+k3-2)!=0) {
+        double answer = (double)(k1+k2) / (args[0]+1+k3-2);
+        testFunction(pf, args, n,
           new MtasFunctionParserFunctionResponseDouble(answer, true));
+      }  
     } catch (ParseException e) {
       e.printStackTrace();
     }  

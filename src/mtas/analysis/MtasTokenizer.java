@@ -228,7 +228,7 @@ public final class MtasTokenizer<T> extends Tokenizer {
   private void constructTokenCollection(Reader reader)
       throws MtasConfigException, MtasParserException {
     tokenCollection = null;
-    try {
+    try { 
       Constructor<?> c = Class.forName(parserName)
           .getDeclaredConstructor(MtasConfiguration.class);
       // try {

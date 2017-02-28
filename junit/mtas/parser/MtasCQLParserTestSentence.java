@@ -23,16 +23,6 @@ import mtas.search.spans.util.MtasSpanQuery;
 
 public class MtasCQLParserTestSentence {
 
-  @org.junit.Test
-  public void test() {
-    try {
-      basicTests();
-    } catch (ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-  
   private void testCQLParse(String field, String defaultPrefix, String cql, MtasSpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));   
     try {
@@ -57,31 +47,9 @@ public class MtasCQLParserTestSentence {
     }
   }
   
-  private void basicTests() throws ParseException {
-    basicTest1();
-    basicTest2();
-    basicTest3();
-    basicTest4();
-    basicTest5();
-    basicTest6();
-    basicTest7();
-    basicTest8();
-    basicTest9();
-    basicTest10();
-    basicTest11();
-    basicTest12();
-    basicTest13();
-    basicTest14();
-    basicTest15();
-    basicTest16();
-    basicTest17();
-    basicTest18();
-    basicTest19();
-    basicTest20();
-    basicTest21();
-  }
   
-  private void basicTest1() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL1() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"] [lemma=\"koe\"]";    
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
@@ -93,14 +61,16 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest2() {
+  @org.junit.Test
+  public void basicTestCQL2() {
     String field = "testveld";
     String cql1 = "[pos=\"LID\"] [] []? [] [lemma=\"koe\"]";
     String cql2 = "[pos=\"LID\"] []{2,3} [lemma=\"koe\"]";
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicTest3() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL3() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"] | [lemma=\"koe\"]";
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
@@ -109,7 +79,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);       
   }
   
-  private void basicTest4() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL4() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"] | ([lemma=\"de\"] [lemma=\"koe\"])";
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
@@ -123,28 +94,32 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);       
   }
   
-  private void basicTest5() {
+  @org.junit.Test
+  public void basicTestCQL5() {
     String field = "testveld";
     String cql1 = "([pos=\"LID\"]([pos=\"ADJ\"][lemma=\"koe\"]))";
     String cql2 = "[pos=\"LID\"][pos=\"ADJ\"][lemma=\"koe\"]";
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicTest6() {
+  @org.junit.Test
+  public void basicTestCQL6() {
     String field = "testveld";
     String cql1 = "([pos=\"LID\"]|[lemma=\"de\"][lemma=\"koe\"])|([pos=\"ADJ\"]|([lemma=\"het\"]([lemma=\"paard\"])))";
     String cql2 = "[pos=\"LID\"]|[lemma=\"de\"][lemma=\"koe\"]|[pos=\"ADJ\"]|[lemma=\"het\"][lemma=\"paard\"]";
     testCQLEquivalent(field, null, cql1, cql2);  
   }
   
-  private void basicTest7() {
+  @org.junit.Test
+  public void basicTestCQL7() {
     String field = "testveld";
     String cql1 = "[pos=\"LID\"] []{0,1} []{3,5} []{2,4}";
     String cql2 = "[pos=\"LID\"] []{5,10}";
     testCQLEquivalent(field, null, cql1, cql2);    
   }
   
-  private void basicTest8() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL8() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]([pos=\"N\"]|[pos=\"ADJ\"])";
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
@@ -158,7 +133,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);
   }
   
-  private void basicTest9() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL9() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]([pos=\"N\"]|[pos=\"ADJ\"]){2,3}[lemma=\"paard\"]";
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
@@ -174,7 +150,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);  
   }
   
-  private void basicTest10() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL10() throws ParseException {
     String field = "testveld";
     String cql = "[pos=\"LID\"]? [pos=\"ADJ\"]{1,3} [lemma=\"koe\"]";    
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
@@ -188,7 +165,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
 
-  private void basicTest11() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL11() throws ParseException {
     String field = "testveld";
     String cql = "<sentence/> containing [lemma=\"koe\"]"; 
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"sentence");
@@ -197,7 +175,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest12() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL12() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"] within <sentence/>"; 
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
@@ -206,7 +185,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest13() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL13() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]([t=\"de\"] within <sentence/>)"; 
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
@@ -220,7 +200,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest14() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL14() throws ParseException {
     String field = "testveld";
     String cql = "([t=\"de\"] within <sentence/>)[lemma=\"koe\"]"; 
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"t","de",null, null);
@@ -234,7 +215,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest15() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL15() throws ParseException {
     String field = "testveld";
     String cql = "[lemma=\"koe\"](<sentence/> containing [t=\"de\"]) within <sentence/>[lemma=\"paard\"]";
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
@@ -255,7 +237,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest16() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL16() throws ParseException {
     String field = "testveld";
     String cql = "(<entity=\"loc\"/> within (<s/> containing [t_lc=\"amsterdam\"])) !containing ([t_lc=\"amsterdam\"])"; 
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
@@ -267,7 +250,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest17() {
+  @org.junit.Test
+  public void basicTestCQL17() {
     String field = "testveld";
     String cql = "[]<entity=\"loc\"/>{1,2}[]"; 
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
@@ -280,7 +264,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest18() throws ParseException {
+  @org.junit.Test
+  public void basicTestCQL18() throws ParseException {
     String field = "testveld";
     String cql = "\"de\" [pos=\"N\"]"; 
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de",null, null);
@@ -292,7 +277,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, "t_lc", cql, q);    
   }
   
-  private void basicTest19() {
+  @org.junit.Test
+  public void basicTestCQL19() {
     String field = "testveld";
     String cql = "([]<entity=\"loc\"/>{1,2}[]){3,4}"; 
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
@@ -306,7 +292,8 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, q);    
   }
   
-  private void basicTest20() {
+  @org.junit.Test
+  public void basicTestCQL20() {
     String field = "testveld";
     String cql1 = "[pos=\"N\"]?[pos=\"ADJ\"]";
     String cql2 = "([pos=\"N\"])?[pos=\"ADJ\"]";
@@ -325,7 +312,8 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql9, cql10);
   }  
   
-  private void basicTest21() {
+  @org.junit.Test
+  public void basicTestCQL21() {
     String field = "testveld";
     String cql1 = "(<s/>(<s/> containing [t_lc=\"rembrandt\"])</s>)";
     String cql2 = "<s/>(<s/> containing [t_lc=\"rembrandt\"])</s>";

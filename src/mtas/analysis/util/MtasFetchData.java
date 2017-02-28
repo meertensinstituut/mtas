@@ -116,7 +116,7 @@ public class MtasFetchData {
       GZIPInputStream in;
       try {
         in = new GZIPInputStream(new FileInputStream(file));
-        return new InputStreamReader(in);
+        return new InputStreamReader(in);                                
       } catch (IOException e1) {
         try {
           String text = new String(Files.readAllBytes(Paths.get(file)));

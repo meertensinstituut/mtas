@@ -11,7 +11,6 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasSpanQuery;
-import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 /**
  * The Class MtasSpanOrQuery.

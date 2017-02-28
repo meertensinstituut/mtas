@@ -8,7 +8,6 @@ import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.SpanWeight;
 
 /**

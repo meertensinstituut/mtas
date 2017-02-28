@@ -5,7 +5,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>6.4.1</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20170220</currentDevelopmentRelease>
+		<currentDevelopmentRelease>20170228</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
@@ -57,6 +57,7 @@
 						<include>MtasCQLParserTestSentence.java</include>
 						<include>MtasCQLParserTestWord.java</include>
 						<include>MtasFunctionParserTest.java</include>
+						<include>MtasSearchTestConsistency.java</include>
 					</includes>
 				</configuration>
 			</plugin>			

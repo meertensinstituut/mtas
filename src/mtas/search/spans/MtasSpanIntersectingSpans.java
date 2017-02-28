@@ -7,16 +7,30 @@ import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.MtasSpanIntersectingQuery.MtasSpanIntersectingQuerySpans;
 import mtas.search.spans.util.MtasSpans;
 
+/**
+ * The Class MtasSpanIntersectingSpans.
+ */
 public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
 
+  /** The spans2. */
   private MtasSpanIntersectingQuerySpans spans1, spans2;
 
+  /** The no more positions. */
   private boolean calledNextStartPosition, noMorePositions;
 
+  /** The last spans2 end position. */
   private int lastSpans2StartPosition, lastSpans2EndPosition;
-  
+
+  /** The doc id. */
   private int docId;
 
+  /**
+   * Instantiates a new mtas span intersecting spans.
+   *
+   * @param mtasSpanIntersectingQuery the mtas span intersecting query
+   * @param spans1 the spans1
+   * @param spans2 the spans2
+   */
   public MtasSpanIntersectingSpans(
       MtasSpanIntersectingQuery mtasSpanIntersectingQuery,
       MtasSpanIntersectingQuerySpans spans1,
@@ -27,6 +41,9 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
     this.spans2 = spans2;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
   @Override
   public int nextStartPosition() throws IOException {
     // no document
@@ -52,6 +69,9 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
   @Override
   public int startPosition() {
     return calledNextStartPosition
@@ -59,6 +79,9 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
         : -1;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
   @Override
   public int endPosition() {
     return calledNextStartPosition
@@ -66,28 +89,43 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
         : -1;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
   @Override
   public int width() {
     return calledNextStartPosition ? (noMorePositions ? 0
         : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans1.spans.collect(collector);
     spans2.spans.collect(collector);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
   @Override
   public float positionsCost() {
     return 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
   @Override
   public int docID() {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
   @Override
   public int nextDoc() throws IOException {
     reset();
@@ -96,6 +134,9 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
   @Override
   public int advance(int target) throws IOException {
     reset();
@@ -125,10 +166,10 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
           return docId;
         }
       }
-      //check equal docId, otherwise next
+      // check equal docId, otherwise next
       if (spans1DocId == spans2DocId) {
         docId = spans1DocId;
-        //check match
+        // check match
         if (goToNextStartPosition()) {
           return docId;
         } else {
@@ -140,6 +181,12 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
     }
   }
 
+  /**
+   * Go to next doc.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
       return true;
@@ -157,56 +204,70 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
         }
       }
       if (docId != NO_MORE_DOCS) {
-        if(!goToNextStartPosition()) {
+        if (!goToNextStartPosition()) {
           reset();
           return false;
         }
-      } 
+      }
       return true;
     }
   }
-  
+
+  /**
+   * Go to next start position.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition, nextSpans1EndPosition;
     int nextSpans2StartPosition, nextSpans2EndPosition;
     while ((nextSpans1StartPosition = spans1.spans
         .nextStartPosition()) != NO_MORE_POSITIONS) {
-      nextSpans1EndPosition = spans1.spans
-          .endPosition();
-      if(nextSpans1StartPosition<=lastSpans2EndPosition && nextSpans1EndPosition>=lastSpans2StartPosition) {
+      nextSpans1EndPosition = spans1.spans.endPosition();
+      if (nextSpans1StartPosition <= lastSpans2EndPosition
+          && nextSpans1EndPosition >= lastSpans2StartPosition) {
         return true;
       } else {
-        while(lastSpans2StartPosition<=nextSpans1EndPosition) {
-          nextSpans2StartPosition = spans2.spans.nextStartPosition();          
-          if(nextSpans2StartPosition==NO_MORE_POSITIONS) {
+        while (lastSpans2StartPosition <= nextSpans1EndPosition) {
+          nextSpans2StartPosition = spans2.spans.nextStartPosition();
+          if (nextSpans2StartPosition == NO_MORE_POSITIONS) {
             noMorePositions = true;
             return false;
           } else {
             nextSpans2EndPosition = spans2.spans.endPosition();
-            if(nextSpans2StartPosition>lastSpans2StartPosition || nextSpans2EndPosition>lastSpans2EndPosition) {
-              if(nextSpans2EndPosition>lastSpans2EndPosition) {
+            if (nextSpans2StartPosition > lastSpans2StartPosition
+                || nextSpans2EndPosition > lastSpans2EndPosition) {
+              if (nextSpans2EndPosition > lastSpans2EndPosition) {
                 lastSpans2StartPosition = nextSpans2StartPosition;
                 lastSpans2EndPosition = nextSpans2EndPosition;
-                if(nextSpans1StartPosition<=lastSpans2EndPosition && nextSpans1EndPosition>=lastSpans2StartPosition) {
+                if (nextSpans1StartPosition <= lastSpans2EndPosition
+                    && nextSpans1EndPosition >= lastSpans2StartPosition) {
                   return true;
                 }
               }
-            }            
+            }
           }
         }
       }
-    }    
-    noMorePositions = true;    
+    }
+    noMorePositions = true;
     return false;
   }
 
+  /**
+   * Reset.
+   */
   private void reset() {
     calledNextStartPosition = false;
     noMorePositions = false;
     lastSpans2StartPosition = -1;
-    lastSpans2EndPosition = -1;        
+    lastSpans2EndPosition = -1;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
   @Override
   public long cost() {
     return 0;

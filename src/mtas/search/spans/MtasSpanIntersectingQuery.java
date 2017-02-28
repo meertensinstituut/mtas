@@ -17,16 +17,28 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
 
+/**
+ * The Class MtasSpanIntersectingQuery.
+ */
 public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 
+  /** The field. */
   private String field;
 
+  /** The q2. */
   private SpanQuery q1, q2;
 
+  /**
+   * Instantiates a new mtas span intersecting query.
+   *
+   * @param q1
+   *          the q1
+   * @param q2
+   *          the q2
+   */
   public MtasSpanIntersectingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
-    if (q1 != null) {
-      field = q1.getField();
-      if (q2 != null && !q2.getField().equals(field)) {
+    if (q1 != null && (field = q1.getField())!=null) {
+      if (q2 != null && ((field==null && q2.getField()!=null) || !q2.getField().equals(field))) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
     } else if (q2 != null) {
@@ -38,11 +50,23 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     this.q2 = q2;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() {
     return field;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -53,15 +77,23 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
           q1.createWeight(searcher, needsScores));
       MtasSpanIntersectingQueryWeight w2 = new MtasSpanIntersectingQueryWeight(
           q2.createWeight(searcher, needsScores));
-      //subWeights
-      List<MtasSpanIntersectingQueryWeight> subWeights = new ArrayList<MtasSpanIntersectingQueryWeight>();      
+      // subWeights
+      List<MtasSpanIntersectingQueryWeight> subWeights = new ArrayList<MtasSpanIntersectingQueryWeight>();
       subWeights.add(w1);
       subWeights.add(w2);
-      //return
-      return new SpanIntersectingWeight(w1, w2, searcher, needsScores ? getTermContexts(subWeights) : null);
+      // return
+      return new SpanIntersectingWeight(w1, w2, searcher,
+          needsScores ? getTermContexts(subWeights) : null);
     }
   }
-  
+
+  /**
+   * Gets the term contexts.
+   *
+   * @param items
+   *          the items
+   * @return the term contexts
+   */
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanIntersectingQueryWeight> items) {
     List<SpanWeight> weights = new ArrayList<SpanWeight>();
@@ -71,6 +103,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return getTermContexts(weights);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -90,6 +127,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -102,6 +144,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return q1.equals(other.q1) && q2.equals(other.q2);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = Integer.rotateLeft(classHash(), 1);
@@ -110,35 +157,75 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     h ^= q2.hashCode();
     return h;
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader); 
-    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader); 
-    if(newQ1!=q1 || newQ2!=q2) {
-      return new MtasSpanIntersectingQuery(newQ1, newQ2);      
+    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
+    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
+    if (newQ1 != q1 || newQ2 != q2) {
+      return new MtasSpanIntersectingQuery(newQ1, newQ2);
     } else {
       return this;
-    }  
-}
+    }
+  }
 
+  /**
+   * The Class SpanIntersectingWeight.
+   */
   public class SpanIntersectingWeight extends SpanWeight {
-    
-    MtasSpanIntersectingQueryWeight w1,w2;
 
-    public SpanIntersectingWeight(MtasSpanIntersectingQueryWeight w1, MtasSpanIntersectingQueryWeight w2, IndexSearcher searcher,
+    /** The w2. */
+    MtasSpanIntersectingQueryWeight w1, w2;
+
+    /**
+     * Instantiates a new span intersecting weight.
+     *
+     * @param w1
+     *          the w1
+     * @param w2
+     *          the w2
+     * @param searcher
+     *          the searcher
+     * @param terms
+     *          the terms
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     */
+    public SpanIntersectingWeight(MtasSpanIntersectingQueryWeight w1,
+        MtasSpanIntersectingQueryWeight w2, IndexSearcher searcher,
         Map<Term, TermContext> terms) throws IOException {
       super(MtasSpanIntersectingQuery.this, searcher, terms);
-      this.w1=w1;
-      this.w2=w2;
+      this.w1 = w1;
+      this.w2 = w2;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
+     */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       w1.spanWeight.extractTermContexts(contexts);
       w2.spanWeight.extractTermContexts(contexts);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
@@ -146,12 +233,19 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
       if (terms == null) {
         return null; // field does not exist
       }
-      MtasSpanIntersectingQuerySpans s1 = new MtasSpanIntersectingQuerySpans(w1.spanWeight.getSpans(context, requiredPostings));
-      MtasSpanIntersectingQuerySpans s2 = new MtasSpanIntersectingQuerySpans(w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanIntersectingSpans(MtasSpanIntersectingQuery.this,
-          s1, s2);
+      MtasSpanIntersectingQuerySpans s1 = new MtasSpanIntersectingQuerySpans(
+          w1.spanWeight.getSpans(context, requiredPostings));
+      MtasSpanIntersectingQuerySpans s2 = new MtasSpanIntersectingQuerySpans(
+          w2.spanWeight.getSpans(context, requiredPostings));
+      return new MtasSpanIntersectingSpans(MtasSpanIntersectingQuery.this, s1,
+          s2);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
     @Override
     public void extractTerms(Set<Term> terms) {
       w1.spanWeight.extractTerms(terms);
@@ -160,20 +254,40 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 
   }
 
+  /**
+   * The Class MtasSpanIntersectingQuerySpans.
+   */
   public class MtasSpanIntersectingQuerySpans {
+
+    /** The spans. */
     public Spans spans;
-    
+
+    /**
+     * Instantiates a new mtas span intersecting query spans.
+     *
+     * @param spans
+     *          the spans
+     */
     public MtasSpanIntersectingQuerySpans(Spans spans) {
       this.spans = spans;
     }
-    
+
   }
-  
+
+  /**
+   * The Class MtasSpanIntersectingQueryWeight.
+   */
   public class MtasSpanIntersectingQueryWeight {
 
     /** The span weight. */
     public SpanWeight spanWeight;
 
+    /**
+     * Instantiates a new mtas span intersecting query weight.
+     *
+     * @param spanWeight
+     *          the span weight
+     */
     public MtasSpanIntersectingQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;
     }
