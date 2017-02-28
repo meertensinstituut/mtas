@@ -1,8 +1,10 @@
 # Multi Tier Annotation Search
 
-See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/)
-or build and run a Docker image providing a Solr based demonstration 
-scenario with indexing and querying of some sample documents.
+See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/).
+
+---
+
+A Docker image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To build and run
 
 ```console
 docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/Dockerfile
