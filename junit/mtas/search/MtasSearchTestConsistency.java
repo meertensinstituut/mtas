@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -33,14 +34,17 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SegmentReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
+import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.collector.MtasDataItem;
@@ -48,13 +52,16 @@ import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentGroup;
 import mtas.codec.util.CodecComponent.ComponentPosition;
 import mtas.codec.util.CodecComponent.ComponentSpan;
+import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecComponent.GroupHit;
 import mtas.codec.util.CodecComponent.SubComponentFunction;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
+import mtas.search.spans.MtasSpanRegexpQuery;
 import mtas.search.spans.MtasSpanSequenceQuery;
+import mtas.search.spans.MtasSpanTermQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
 public class MtasSearchTestConsistency {
@@ -66,6 +73,7 @@ public class MtasSearchTestConsistency {
   private static Directory directory;
 
   private static HashMap<String, String> files;
+  private static ArrayList<Integer> docs;
 
   @org.junit.BeforeClass
   public static void initialize() {
@@ -79,6 +87,7 @@ public class MtasSearchTestConsistency {
       files.put("Een oude kennis", path + "resources/beets2.xml.gz");
       files.put("Varen en Rijden", path + "resources/beets3.xml.gz");
       createIndex(path + "conf/folia.xml", files);
+      docs = getLiveDocs(DirectoryReader.open(directory));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -164,9 +173,7 @@ public class MtasSearchTestConsistency {
         .round(queryResult.hits / queryResult.docs);
     // do position query
     try {
-      ArrayList<Integer> fullDocSet = new ArrayList<Integer>(
-          Arrays.asList(IntStream.rangeClosed(0, files.size() - 1).boxed()
-              .toArray(Integer[]::new)));
+      ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
       fieldStats.statsPositionList.add(
           new ComponentPosition(FIELD_CONTENT, "total", null, null, "all"));
@@ -200,9 +207,7 @@ public class MtasSearchTestConsistency {
 
   @org.junit.Test
   public void collectStatsPositions2() throws IOException {
-    ArrayList<Integer> fullDocSet = new ArrayList<Integer>(
-        Arrays.asList(IntStream.rangeClosed(0, files.size() - 1).boxed()
-            .toArray(Integer[]::new)));
+    ArrayList<Integer> fullDocSet = docs;
     try {
       // compute total
       ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
@@ -258,9 +263,7 @@ public class MtasSearchTestConsistency {
 
   @org.junit.Test
   public void collectStatsTokens() throws IOException {
-    ArrayList<Integer> fullDocSet = new ArrayList<Integer>(
-        Arrays.asList(IntStream.rangeClosed(0, files.size() - 1).boxed()
-            .toArray(Integer[]::new)));
+    ArrayList<Integer> fullDocSet = docs;
     try {
       // compute total
       ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
@@ -332,9 +335,7 @@ public class MtasSearchTestConsistency {
         .round(queryResult1.hits / queryResult1.docs);
     // do stats query for nouns
     try {
-      ArrayList<Integer> fullDocSet = new ArrayList<Integer>(
-          Arrays.asList(IntStream.rangeClosed(0, files.size() - 1).boxed()
-              .toArray(Integer[]::new)));
+      ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
       MtasSpanQuery q1 = createQuery(FIELD_CONTENT, cql1, null, null);
       MtasSpanQuery q2 = createQuery(FIELD_CONTENT, cql2, null, null);
@@ -416,39 +417,103 @@ public class MtasSearchTestConsistency {
   public void collectGroup() throws IOException {
     String cql = "[pos=\"LID\"]";
     try {
-      ArrayList<Integer> fullDocSet = new ArrayList<Integer>(
-          Arrays.asList(IntStream.rangeClosed(0, files.size() - 1).boxed()
-              .toArray(Integer[]::new)));
+      ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
       MtasSpanQuery q = createQuery(FIELD_CONTENT, cql, null, null);
       fieldStats.spanQueryList.add(q);
-      fieldStats.statsSpanList.add(new ComponentSpan(new MtasSpanQuery[]{q}, "total", null,
-          null, "sum", null, null, null));
+      fieldStats.statsSpanList.add(new ComponentSpan(new MtasSpanQuery[] { q },
+          "total", null, null, "sum", null, null, null));
       fieldStats.groupList.add(new ComponentGroup(q, FIELD_CONTENT, cql, "cql",
-          null, null, "articles", Integer.MAX_VALUE, "t_lc", null, null, null, null, null, null,
-          null, null, null, null, null, null));
+          null, null, "articles", Integer.MAX_VALUE, "t_lc", null, null, null,
+          null, null, null, null, null, null, null, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
-      ArrayList<HashMap<String,Object>> list = (ArrayList<HashMap<String, Object>>) response.get("group").get("articles");
+      ArrayList<HashMap<String, Object>> list = (ArrayList<HashMap<String, Object>>) response
+          .get("group").get("articles");
       DirectoryReader indexReader = DirectoryReader.open(directory);
       IndexSearcher searcher = new IndexSearcher(indexReader);
       int subTotal = 0;
-      for(HashMap<String, Object> listItem: list) {
-        HashMap<String, HashMap<Integer, HashMap<String, String>[]>> group = (HashMap<String, HashMap<Integer, HashMap<String, String>[]>>) listItem.get("group");
+      for (HashMap<String, Object> listItem : list) {
+        HashMap<String, HashMap<Integer, HashMap<String, String>[]>> group = (HashMap<String, HashMap<Integer, HashMap<String, String>[]>>) listItem
+            .get("group");
         HashMap<Integer, HashMap<String, String>[]> hitList = group.get("hit");
         HashMap<String, String> hitListItem = hitList.get(0)[0];
-        cql = "[pos=\"LID\" & "+hitListItem.get("prefix")+"=\""+hitListItem.get("value")+"\"]";
-        QueryResult queryResult = doQuery(indexReader, FIELD_CONTENT, cql, null, null, null);
-        assertEquals("number of hits for articles equals to "+hitListItem.get("value"),listItem.get("sum"), Long.valueOf(queryResult.hits));
-        subTotal+=queryResult.hits;
+        cql = "[pos=\"LID\" & " + hitListItem.get("prefix") + "=\""
+            + hitListItem.get("value") + "\"]";
+        QueryResult queryResult = doQuery(indexReader, FIELD_CONTENT, cql, null,
+            null, null);
+        assertEquals(
+            "number of hits for articles equals to " + hitListItem.get("value"),
+            listItem.get("sum"), Long.valueOf(queryResult.hits));
+        subTotal += queryResult.hits;
       }
       HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
           .get("statsSpans").get("total");
-      Long total = responseTotal != null
-          ? (Long) responseTotal.get("sum") : 0;
-      assertEquals("Total number of articles",total, Long.valueOf(subTotal));
+      Long total = responseTotal != null ? (Long) responseTotal.get("sum") : 0;
+      assertEquals("Total number of articles", total, Long.valueOf(subTotal));
       indexReader.close();
     } catch (ParseException | mtas.parser.function.ParseException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @org.junit.Test
+  public void collectTermvector() throws IOException {
+    String prefix = "t_lc";
+    Integer number = 100;
+    try {
+      ArrayList<Integer> fullDocSet = docs;
+      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
+      fieldStats.statsPositionList.add(
+          new ComponentPosition(FIELD_CONTENT, "total", null, null, "sum"));
+      fieldStats.termVectorList.add(new ComponentTermVector("toplist", prefix,
+          null, false, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
+          null, number, null, null, null, null, null));
+      fieldStats.termVectorList.add(new ComponentTermVector("fulllist", prefix,
+          null, true, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
+          null, Integer.MAX_VALUE, null, null, null, null, null));
+      HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
+          fullDocSet, fieldStats);
+      HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
+          .get("statsPositions").get("total");
+      Long total = responseTotal != null ? (Long) responseTotal.get("sum") : 0;
+      Map<String, Object> topList = (Map<String, Object>) response
+          .get("termvector").get("toplist");
+      Map<String, Object> fullList = (Map<String, Object>) response
+          .get("termvector").get("fulllist");
+      IndexReader indexReader = DirectoryReader.open(directory);
+      for (String key : topList.keySet()) {
+        HashMap<String, Object> responseTopTotal = (HashMap<String, Object>) topList
+            .get(key);
+        HashMap<String, Object> responseFullTotal = (HashMap<String, Object>) fullList
+            .get(key);
+        Long topTotal = responseTopTotal != null
+            ? (Long) responseTopTotal.get("sum") : 0;
+        Long subFullTotal = responseFullTotal != null
+            ? (Long) responseFullTotal.get("sum") : 0;
+        // recompute
+        String termBase = prefix + MtasToken.DELIMITER + key;
+        MtasSpanQuery q = new MtasSpanRegexpQuery(new Term(FIELD_CONTENT,
+            "\"" + termBase.replace("\"", "\"\\\"\"") + "\"\u0000*"), true);
+        QueryResult queryResult = doQuery(indexReader, FIELD_CONTENT, q, null);
+        assertEquals(
+            "Number of hits for topItem for " + termBase + " computed directly",
+            topTotal, Long.valueOf(queryResult.hits));
+        assertEquals("Number of hits for topItem for " + termBase
+            + " compared with fullItem", topTotal, subFullTotal);
+      }
+      Long fullTotal = Long.valueOf(0);
+      for (String key : fullList.keySet()) {
+        HashMap<String, Object> responseFullTotal = (HashMap<String, Object>) fullList
+            .get(key);
+        Long subFullTotal = responseFullTotal != null
+            ? (Long) responseFullTotal.get("sum") : 0;
+        fullTotal += subFullTotal;
+      }
+      assertEquals("Total number of hits for full list and positions", total,
+          fullTotal);
+      indexReader.close();
+    } catch (mtas.parser.function.ParseException e) {
       e.printStackTrace();
     }
   }
@@ -490,15 +555,26 @@ public class MtasSearchTestConsistency {
       for (ComponentGroup cg : fieldStats.groupList) {
         SortedMap<String, ?> list = cg.dataCollector.getResult().getList();
         ArrayList<HashMap<String, Object>> groupList = new ArrayList<HashMap<String, Object>>();
-        for(String key : list.keySet()) {
+        for (String key : list.keySet()) {
           HashMap<String, Object> subList = new HashMap<String, Object>();
-          StringBuilder newKey = new StringBuilder("");         
+          StringBuilder newKey = new StringBuilder("");
           subList.put("group", GroupHit.keyToObject(key, newKey));
-          subList.put("key", newKey.toString().trim());                    
-          subList.putAll(((MtasDataItem<?,?>) list.get(key)).rewrite(false));          
+          subList.put("key", newKey.toString().trim());
+          subList.putAll(((MtasDataItem<?, ?>) list.get(key)).rewrite(false));
           groupList.add(subList);
         }
-        response.get("group").put(cg.key, groupList);        
+        response.get("group").put(cg.key, groupList);
+      }
+      response.put("termvector", new HashMap<String, Object>());
+      for (ComponentTermVector ct : fieldStats.termVectorList) {
+        HashMap<String, Map<String, Object>> tvList = new HashMap<String, Map<String, Object>>();
+        Map<String, ?> tcList = ct.subComponentFunction.dataCollector
+            .getResult().getList();
+        for (String key : tcList.keySet()) {
+          tvList.put(key,
+              ((MtasDataItem<?, ?>) tcList.get(key)).rewrite(false));
+        }
+        response.get("termvector").put(ct.key, tvList);
       }
       indexReader.close();
     } catch (IOException | IllegalAccessException | IllegalArgumentException
@@ -534,21 +610,31 @@ public class MtasSearchTestConsistency {
     // add
     int counter = 0;
     for (String title : files.keySet()) {
-      addDoc(w, title, files.get(title));
-      if (counter > 0) {
+      addDoc(w, counter, title, files.get(title));      
+      if (counter == 0) {   
         w.commit();
+      } else {      
+        addDoc(w, counter, title, files.get(title));
+        addDoc(w, counter, "deletable", files.get(title));
+        w.commit();
+        w.deleteDocuments(
+            new Term(FIELD_ID, Integer.valueOf(counter).toString()));
+        w.deleteDocuments(
+            new Term(FIELD_TITLE, "deletable"));
+        addDoc(w, counter, title, files.get(title));
       }
       counter++;
     }
-    w.commit();
+    w.commit();   
     // finish
     w.close();
   }
 
-  private static void addDoc(IndexWriter w, String title, String file)
-      throws IOException {
+  private static void addDoc(IndexWriter w, Integer id, String title,
+      String file) throws IOException {
     try {
       Document doc = new Document();
+      doc.add(new StringField(FIELD_ID, id.toString(), Field.Store.YES));
       doc.add(new StringField(FIELD_TITLE, title, Field.Store.YES));
       doc.add(new TextField(FIELD_CONTENT, file, Field.Store.YES));
       w.addDocument(doc);
@@ -558,6 +644,23 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  private static ArrayList<Integer> getLiveDocs(IndexReader indexReader) {
+    ArrayList<Integer> list = new ArrayList<Integer>();
+    ListIterator<LeafReaderContext> iterator = indexReader.leaves()
+        .listIterator();
+    IndexSearcher searcher = new IndexSearcher(indexReader);
+    while (iterator.hasNext()) {
+      LeafReaderContext lrc = iterator.next();
+      SegmentReader r = (SegmentReader) lrc.reader();
+      for(int docId=0;docId<r.maxDoc();docId++) {
+        if (r.numDocs()==r.maxDoc() || r.getLiveDocs().get(docId)) { 
+          list.add(lrc.docBase+docId);
+        }
+      }
+    }
+    return list;
+  }
+  
   private MtasSpanQuery createQuery(String field, String cql,
       MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
     Reader reader = new BufferedReader(new StringReader(cql));
@@ -571,21 +674,32 @@ public class MtasSearchTestConsistency {
     QueryResult queryResult = new QueryResult();
     try {
       MtasSpanQuery q = createQuery(field, cql, ignore, maximumIgnoreLength);
-      queryResult.query = q.toString(field);
-      ListIterator<LeafReaderContext> iterator = indexReader.leaves()
-          .listIterator();
-      IndexSearcher searcher = new IndexSearcher(indexReader);
-      SpanWeight spanweight = ((MtasSpanQuery) q.rewrite(indexReader))
-          .createWeight(searcher, false);
+      queryResult = doQuery(indexReader, field, q, prefixes);
+    } catch (mtas.parser.cql.ParseException e) {
+      e.printStackTrace();
+    }
+    return queryResult;
+  }
 
-      while (iterator.hasNext()) {
-        LeafReaderContext lrc = iterator.next();
-        Spans spans = spanweight.getSpans(lrc, SpanWeight.Postings.POSITIONS);
-        SegmentReader r = (SegmentReader) lrc.reader();
-        Terms t = r.terms(field);
-        CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
-        if (spans != null) {
-          while (spans.nextDoc() != Spans.NO_MORE_DOCS) {
+  private QueryResult doQuery(IndexReader indexReader, String field,
+      MtasSpanQuery q, ArrayList<String> prefixes) throws IOException {
+    QueryResult queryResult = new QueryResult();
+    queryResult.query = q.toString(field);
+    ListIterator<LeafReaderContext> iterator = indexReader.leaves()
+        .listIterator();
+    IndexSearcher searcher = new IndexSearcher(indexReader);
+    SpanWeight spanweight = ((MtasSpanQuery) q.rewrite(indexReader))
+        .createWeight(searcher, false);
+
+    while (iterator.hasNext()) {
+      LeafReaderContext lrc = iterator.next();
+      Spans spans = spanweight.getSpans(lrc, SpanWeight.Postings.POSITIONS);
+      SegmentReader r = (SegmentReader) lrc.reader();
+      Terms t = r.terms(field);
+      CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
+      if (spans != null) {
+        while (spans.nextDoc() != Spans.NO_MORE_DOCS) {
+          if (r.numDocs()==r.maxDoc() || r.getLiveDocs().get(spans.docID())) { 
             queryResult.docs++;
             while (spans.nextStartPosition() != Spans.NO_MORE_POSITIONS) {
               queryResult.hits++;
@@ -602,12 +716,11 @@ public class MtasSearchTestConsistency {
                 }
               }
             }
-          }
+          } 
         }
       }
-    } catch (mtas.parser.cql.ParseException e) {
-      e.printStackTrace();
     }
+
     return queryResult;
   }
 

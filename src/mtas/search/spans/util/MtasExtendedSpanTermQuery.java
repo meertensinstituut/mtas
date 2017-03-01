@@ -68,7 +68,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
   public MtasExtendedSpanTermQuery(SpanTermQuery query,
       boolean singlePosition) {
     super(query.getTerm());
-    term = query.getTerm();
+    term = query.getTerm();    
     this.singlePosition = singlePosition;
     int i = term.text().indexOf(MtasToken.DELIMITER);
     if (i >= 0) {

@@ -92,7 +92,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
       term = new Term(field, termBase);
       query = new MtasSpanWildcardQuery(term, true);
     } else if (type.equals(MTAS_CQL_TERM_QUERY)) {
-      term = new Term(field, "\"" + termBase + "\"\u0000*");
+      term = new Term(field, "\"" + termBase.replace("\"", "\"\\\"\"") + "\"\u0000*");
       query = new MtasSpanRegexpQuery(term, true);
     } else if (type.equals(MTAS_CQL_VARIABLE_QUERY)) {
       if (value != null && variables != null && variables.containsKey(value)
