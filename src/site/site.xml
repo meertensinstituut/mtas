@@ -28,6 +28,7 @@
       </item>
       <item name="Indexing" href="indexing.html" collapse="true">
         <item name="Configuration" href="indexing_configuration.html"/>
+        <item name="Mapping" href="indexing_mapping.html"/>
         <item name="Formats" href="indexing_formats.html">
           <item name="FoLiA" href="indexing_formats_folia.html" collapse="true"/>
           <item name="TEI" href="indexing_formats_tei.html" collapse="true"/>
@@ -43,7 +44,9 @@
             <item name="Tokens" href="search_query_stats_tokens.html"/>
             <item name="Spans" href="search_query_stats_spans.html"/>
           </item>
-          <item name="Kwic/List" href="search_query_kwic_and_list.html"/>
+          <item name="Kwic" href="search_query_kwic.html"/>
+          <item name="List" href="search_query_list.html"/>
+          <item name="Document" href="search_query_document.html"/>
           <item name="Termvector" href="search_query_termvector.html"/>
           <item name="Facet" href="search_query_facet.html"/>
           <item name="Group" href="search_query_group.html"/>          
@@ -54,7 +57,7 @@
         <item name="CQL" href="search_cql.html"/>
         <item name="Sharding" href="search_sharding.html"/>                 
       </item>
-      <item name="Download" href="download.html"/>      
+      <item name="Download" href="download.html"/> 
     </menu>
     <menu ref="reports"/>
   </body>

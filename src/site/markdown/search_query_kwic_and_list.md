@@ -1,5 +1,0 @@
-#Query - kwic and lists
-
-
-
-

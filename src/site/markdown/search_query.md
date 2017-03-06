@@ -1,12 +1,21 @@
 # Query
 
-Mtas can be used in both regular and specific mtas queries.
+To perform specific Mtas queries in Solr requests, the following parameter should be used.
 
-## Regular queries
+| Parameter   |  Value | Obligatory  |
+|-------------|--------|-------------|
+| mtas        | true   | yes         |
 
-By [configuring](search_configuration.html) the mtas query parser in solrconfig.xml, [cql](search_cql.html) can be used in regular queries. 
+See [statistics](search_query_stats.html), 
+[kwic](search_query_kwic.html), [list](search_query_list.html), [document](search_query_document.html), [termvector](search_query_termvector.html), [facet](search_query_facet.html), [group](search_query_group.html) and [prefix](search_query_prefix.html) for more details and examples.
 
-**Example 1**
+---
+
+**Regular queries**
+
+Besides from specific Mtas queries in Solr requests, also [CQL](search_cql.html) can be used in regular queries by [configuring](search_configuration.html) the Mtas query parser in solrconfig.xml. 
+
+*Example 1*
 
 Search for documents containing the word "de" with a query.
 
@@ -17,11 +26,9 @@ Search for documents containing the word "de" with a query.
   }
 ```
 
-**Example 2**
+*Example 2*
 
 Search for documents containing the word "de" with a filter query.
-
-**Request and response**  
 
 `fq={!mtas_cql+field%3D"text"+query%3D"[t%3D\"de\"]"}&q=*%3A*&fl=*&start=0&rows=0&wt=json&indent=true`
 
@@ -30,14 +37,5 @@ Search for documents containing the word "de" with a filter query.
   }
 ```
 
-## Mtas queries
 
-To perform specific mtas queries, the following parameter should be used.
-
-| Parameter   |  Value | Obligatory  |
-|-------------|--------|-------------|
-| mtas        | true   | yes         |
-
-See [statistics](search_query_stats.html), 
-[kwic/list](search_query_kwic_and_list.html), [termvector](search_query_termvector.html), [facet](search_query_facet.html), [group](search_query_group.html) and [prefix](search_query_prefix.html) for more details and examples.
 

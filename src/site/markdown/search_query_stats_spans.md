@@ -1,4 +1,4 @@
-# Statistics - spans
+#Statistics - spans
 
 To get statistics on the occurrence of a span within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
@@ -77,8 +77,8 @@ Total and average number of occurrences of the word "de" and the number of docum
     "stats":{
       "spans":[{
           "key":"example - basic",
-          "mean":10.484745312881392,
-          "sum":21648986,
+          "mean":10.488239100197209,
+          "sum":21656200,
           "n":2064808}]}}
 ```
 
@@ -100,55 +100,55 @@ Full statistics on the number of occurrences of the word "de" for documents with
     "stats":{
       "spans":[{
           "key":"example - minimum",
-          "sumsq":8.697716821E9,
-          "populationvariance":419246.79216222034,
+          "sumsq":8.697655383E9,
+          "populationvariance":419224.862744871,
           "max":18192.0,
-          "sum":4531791.0,
-          "kurtosis":164.0070630212961,
-          "standarddeviation":647.5106543337658,
-          "n":18029,
-          "quadraticmean":694.5712655602209,
+          "sum":4531747.0,
+          "kurtosis":164.01633761739456,
+          "standarddeviation":647.4937185426337,
+          "n":18030,
+          "quadraticmean":694.5495506941058,
           "min":100.0,
           "median":136.0,
-          "variance":419270.04747574165,
-          "mean":251.36119585112766,
-          "geometricmean":160.51059457862394,
-          "sumoflogs":91557.75154264584,
-          "skewness":10.551742594336096},
+          "variance":419248.1155521673,
+          "mean":251.3448141985584,
+          "geometricmean":160.50112302303313,
+          "sumoflogs":91561.76594051626,
+          "skewness":10.552060273112971},
         {
           "key":"example - maximum",
-          "sumsq":7.37120919E8,
-          "populationvariance":271.7584436494812,
+          "sumsq":7.37391079E8,
+          "populationvariance":271.8217238864797,
           "max":200.0,
-          "sum":1.9094863E7,
-          "kurtosis":31.747278519903332,
-          "standarddeviation":16.485101621383148,
-          "n":2061622,
-          "quadraticmean":18.90883830898543,
+          "sum":1.9102393E7,
+          "kurtosis":31.734626574581217,
+          "standarddeviation":16.487020826545898,
+          "n":2061623,
+          "quadraticmean":18.91229851589547,
           "min":0.0,
           "median":4.0,
-          "variance":271.75857546732925,
-          "mean":9.26205822405864,
+          "variance":271.82185573495815,
+          "mean":9.265706193615522,
           "geometricmean":0.0,
           "sumoflogs":"-Infinity",
-          "skewness":4.742017950067824},
+          "skewness":4.741031505227169},
         {
           "key":"example - minimum and maximum",
-          "sumsq":2.73659206E8,
-          "populationvariance":684.261700791398,
+          "sumsq":2.73698488E8,
+          "populationvariance":684.3248008017308,
           "max":200.0,
-          "sum":1977668.0,
-          "kurtosis":-0.4734932618605048,
-          "standarddeviation":26.15927758668186,
-          "n":14843,
-          "quadraticmean":135.78262099542508,
+          "sum":1977940.0,
+          "kurtosis":-0.47377181206297303,
+          "standarddeviation":26.16048359466255,
+          "n":14845,
+          "quadraticmean":135.78321834689768,
           "min":100.0,
           "median":127.0,
-          "variance":684.3078038570759,
-          "mean":133.23910260728962,
-          "geometricmean":130.83058078303992,
-          "sumoflogs":72343.34534205312,
-          "skewness":0.7178184624731176}]}}
+          "variance":684.3709019066084,
+          "mean":133.23947457056252,
+          "geometricmean":130.83072059647412,
+          "sumoflogs":72353.10901272473,
+          "skewness":0.7177265003819447}]}}
 ```
 
 <a name="subset"></a>  
@@ -169,9 +169,9 @@ Total and average number of occurrences of the word "de" and the number of docum
     "stats":{
       "tokens":[{
           "key":"example - subset",
-          "mean":49644.49556868538,
-          "sum":134437294,
-          "n":2708}]}}
+          "mean":42901.60996309963,
+          "sum":116263363,
+          "n":2710}]}}
 ```
 
 <a name="multiple"></a>  
@@ -194,19 +194,19 @@ Total and average number of occurrences of the word "de" and "het", and the numb
     "stats":{
       "spans":[{
           "key":"multiple - combined cql",
-          "mean":15.173083405333571,
-          "sum":31329504,
+          "mean":15.178130848001365,
+          "sum":31339926,
           "n":2064808},
         {
           "key":"multiple - combined regexp",
-          "mean":15.173083405333571,
-          "sum":31329504,
+          "mean":15.178130848001365,
+          "sum":31339926,
           "n":2064808},
         {
           "key":"multiple - two queries",
-          "mean":15.173083405333571,
-          "sum":31329504,
-          "n":2064808}]}}}
+          "mean":15.178130848001365,
+          "sum":31339926,
+          "n":2064808}]}}
 ```
 
 <a name="prefix"></a>  
@@ -254,29 +254,29 @@ Total and average number of occurrences of an article followed by a noun, ignori
     "stats":{
       "spans":[{
           "key":"functions - de",
-          "mean":12.34790062804871,
-          "sum":25496044,
+          "mean":12.352043386116287,
+          "sum":25504598,
           "n":2064808,
           "functions":{
             "number of words":{
-              "sum":337230767,
+              "sum":504361094,
               "n":2064808},
             "relative frequency":{
               "distribution(start=0,end=0.1,number=10)":{
-                "[0.000,0.010)":950500,
-                "[0.010,0.020)":80369,
-                "[0.020,0.030)":115695,
-                "[0.030,0.040)":139752,
-                "[0.040,0.050)":162877,
-                "[0.050,0.060)":168598,
-                "[0.060,0.070)":145493,
-                "[0.070,0.080)":109117,
-                "[0.080,0.090)":77214,
-                "[0.090,0.100)":51243},
-              "mean":0.030196372045937097,
-              "errorList":{"division by zero":691633},
-              "standarddeviation":0.03428066513492476,
-              "errorNumber":691633}}}]}}
+                "[0.000,0.010)":390003,
+                "[0.010,0.020)":120903,
+                "[0.020,0.030)":173830,
+                "[0.030,0.040)":209994,
+                "[0.040,0.050)":245098,
+                "[0.050,0.060)":253528,
+                "[0.060,0.070)":218325,
+                "[0.070,0.080)":163982,
+                "[0.080,0.090)":115929,
+                "[0.090,0.100)":77207},
+              "mean":0.04538673326024501,
+              "errorList":{"division by zero":1039},
+              "standarddeviation":0.03284884758453086,
+              "errorNumber":1039}}}]}}
 ```
 
 <a name="ignore-and-maximumignorelength"></a>  
@@ -305,29 +305,29 @@ Statistics for the relative frequency of the word "de" and the total number of w
     "stats":{
       "spans":[{
           "key":"functions - de",
-          "mean":12.34790062804871,
-          "sum":25496044,
+          "mean":12.352043386116287,
+          "sum":25504598,
           "n":2064808,
           "functions":{
             "number of words":{
-              "sum":337230767,
+              "sum":504361094,
               "n":2064808},
             "relative frequency":{
               "distribution(start=0,end=0.1,number=10)":{
-                "[0.000,0.010)":950500,
-                "[0.010,0.020)":80369,
-                "[0.020,0.030)":115695,
-                "[0.030,0.040)":139752,
-                "[0.040,0.050)":162877,
-                "[0.050,0.060)":168598,
-                "[0.060,0.070)":145493,
-                "[0.070,0.080)":109117,
-                "[0.080,0.090)":77214,
-                "[0.090,0.100)":51243},
-              "mean":0.030196372045937097,
-              "errorList":{"division by zero":691633},
-              "standarddeviation":0.03428066513492476,
-              "errorNumber":691633}}}]}}
+                "[0.000,0.010)":390003,
+                "[0.010,0.020)":120903,
+                "[0.020,0.030)":173830,
+                "[0.030,0.040)":209994,
+                "[0.040,0.050)":245098,
+                "[0.050,0.060)":253528,
+                "[0.060,0.070)":218325,
+                "[0.070,0.080)":163982,
+                "[0.080,0.090)":115929,
+                "[0.090,0.100)":77207},
+              "mean":0.04538673326024501,
+              "errorList":{"division by zero":1039},
+              "standarddeviation":0.03284884758453086,
+              "errorNumber":1039}}}]}}
 ```
 
 <a name="multiple-and-functions"></a>  
@@ -361,58 +361,50 @@ Statistics for the absolute and relative frequency of the words "de", "het" and 
     "stats":{
       "spans":[{
           "key":"multiple and functions - de+het+een and LID",
-          "n":1889646,
+          "n":1890377,
           "functions":{
             "een - relative to LID":{
-              "mean":0.26176457027078637,
-              "errorList":{"division by zero":24165},
-              "n":1889646,
-              "errorNumber":24165},
+              "mean":0.26177400695591124,
+              "errorList":{"division by zero":24175},
+              "n":1890377,
+              "errorNumber":24175},
             "LID - absolute":{
-              "sum":44062088,
-              "n":1889646},
+              "sum":44077220,
+              "n":1890377},
             "de+het+een - relative to LID":{
-              "mean":1.0864042218694616,
-              "errorList":{"division by zero":24165},
-              "n":1889646,
-              "errorNumber":24165},
+              "mean":1.0864079360130154,
+              "errorList":{"division by zero":24175},
+              "n":1890377,
+              "errorNumber":24175},
             "het - relative to LID":{
-              "mean":0.27408299432800154,
-              "errorList":{"division by zero":24165},
-              "n":1889646,
-              "errorNumber":24165},
+              "mean":0.2740826070638114,
+              "errorList":{"division by zero":24175},
+              "n":1890377,
+              "errorNumber":24175},
             "een - relative to positions":{
-              "mean":0.014397108127121947,
-              "errorList":{"division by zero":631875},
-              "n":1889646,
-              "errorNumber":631875},
+              "mean":0.021631171906706374,
+              "n":1890377},
             "een - absolute":{
-              "sum":10616743,
-              "n":1889646},
+              "sum":10620744,
+              "n":1890377},
             "het - relative to positions":{
-              "mean":0.014874612933292992,
-              "errorList":{"division by zero":631875},
-              "n":1889646,
-              "errorNumber":631875},
+              "mean":0.02235754528581941,
+              "n":1890377},
             "de - absolute":{
-              "sum":25496044,
-              "n":1889646},
+              "sum":25504598,
+              "n":1890377},
             "het - absolute":{
-              "sum":11527080,
-              "n":1889646},
+              "sum":11530937,
+              "n":1890377},
             "LID - relative to positions":{
-              "mean":0.05786145893684233,
-              "errorList":{"division by zero":631875},
-              "n":1889646,
-              "errorNumber":631875},
+              "mean":0.08693980190126971,
+              "n":1890377},
             "de - relative to LID":{
-              "mean":0.5505566572707496,
-              "errorList":{"division by zero":24165},
-              "n":1889646,
-              "errorNumber":24165},
+              "mean":0.5505513219945993,
+              "errorList":{"division by zero":24175},
+              "n":1890377,
+              "errorNumber":24175},
             "de - relative to positions":{
-              "mean":0.03299544495178249,
-              "errorList":{"division by zero":631875},
-              "n":1889646,
-              "errorNumber":631875}}}]}}
+              "mean":0.049574709134571515,
+              "n":1890377}}}]}}
 ```

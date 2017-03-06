@@ -12,11 +12,11 @@ docker run -t -i -p 8080:80 --name mtas mtas
 ```
 
 This will provide a website on port 8080 on the ip of your docker host with 
-more information.
+more information. 
 
 ---
 
-One of the primary use cases for Mtas, the [Nederlab project](http://www.nederlab.nl/), currently<sup>[1](#footnote1)</sup> provides access, both in terms of metadata and 
+One of the primary use cases for Mtas, the [Nederlab project](http://www.nederlab.nl/), currently<sup>1</sup> provides access, both in terms of metadata and 
 annotated text, to over 15 million items for search and analysis as specified below. 
 
 |                 | Total          | Mean    | Min   | Max        |
@@ -32,4 +32,4 @@ Collections are added and updated regularly by adding new cores, replacing cores
 | Annotations     | 36,486,292,912 | 2,488   | 4     | 23,589,831 |
 
 ---
-<a name="footnote1">1</a> : <small>situation january 2017</small>
+<sup><a name="footnote">1</a></sup> : <small>situation january 2017</small>

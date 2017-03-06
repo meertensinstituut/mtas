@@ -41,12 +41,12 @@ The optional postfix associated with a token can also be queried within CQL by p
 
 | Syntax                                | Description                                     | Example |
 |---------------------------------------|-------------------------------------------------|---------|
-| **\(** [cql](#cql) **\) within \(** [cql](#cql) **\)**  | Matches cql expression within another cql expression   | `([t="de"]) within (<s/>)` |
-| **\(** [cql](#cql) **\) !within \(** [cql](#cql) **\)**  | Matches cql expression not within another cql expression   | `([t="de"]) !within (<s/>)` |
-| **\(** [cql](#cql) **\) containing \(** [cql](#cql) **\)**  | Matches cql expression containing another cql expression   | `(<s/>) containing ([t="de"])` |
-| **\(** [cql](#cql) **\) !containing \(** [cql](#cql) **\)**  | Matches cql expression not containing another cql expression   | `(<s/>) !containing ([t="de"])` |
-| **\(** [cql](#cql) **\) intersecting \(** [cql](#cql) **\)**  | Matches cql expression intersecting another cql expression   | `(<s/>) intersecting (<div/>)` |
-| **\(** [cql](#cql) **\) !intersecting \(** [cql](#cql) **\)**  | Matches cql expression not intersecting another cql expression   | `(<s/>) !intersecting (<div/>)` |
+| **\(** [cql](#cql) **\) within \(** [cql](#cql) **\)**  | Matches CQL expression within another CQL expression   | `([t="de"]) within (<s/>)` |
+| **\(** [cql](#cql) **\) !within \(** [cql](#cql) **\)**  | Matches CQL expression not within another CQL expression   | `([t="de"]) !within (<s/>)` |
+| **\(** [cql](#cql) **\) containing \(** [cql](#cql) **\)**  | Matches CQL expression containing another CQL expression   | `(<s/>) containing ([t="de"])` |
+| **\(** [cql](#cql) **\) !containing \(** [cql](#cql) **\)**  | Matches CQL expression not containing another CQL expression   | `(<s/>) !containing ([t="de"])` |
+| **\(** [cql](#cql) **\) intersecting \(** [cql](#cql) **\)**  | Matches CQL expression intersecting another CQL expression   | `(<s/>) intersecting (<div/>)` |
+| **\(** [cql](#cql) **\) !intersecting \(** [cql](#cql) **\)**  | Matches CQL expression not intersecting another CQL expression   | `(<s/>) !intersecting (<div/>)` |
 
 <a name="token"></a>
 

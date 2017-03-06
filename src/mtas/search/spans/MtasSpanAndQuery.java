@@ -1,12 +1,18 @@
 package mtas.search.spans;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanNearQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasExtendedSpanAndQuery;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
 
 /**
  * The Class MtasSpanAndQuery.
@@ -14,19 +20,31 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasSpanAndQuery extends MtasSpanQuery {
 
   /** The base query. */
-  SpanNearQuery baseQuery;
+  private SpanNearQuery baseQuery;
+  private List<MtasSpanQuery> clauses;
 
   /**
    * Instantiates a new mtas span and query.
    *
-   * @param clauses the clauses
+   * @param clauses
+   *          the clauses
+   * @throws IOException
    */
-  public MtasSpanAndQuery(MtasSpanQuery... clauses) {
+  public MtasSpanAndQuery(MtasSpanQuery... initialClauses) {
     super();
-    baseQuery = new MtasExtendedSpanAndQuery(clauses);
+    clauses = new ArrayList<MtasSpanQuery>();
+    for(MtasSpanQuery item : initialClauses) {
+      if(!clauses.contains(item)) {
+          clauses.add(item);
+      }
+    }  
+    baseQuery = new MtasExtendedSpanAndQuery(
+        clauses.toArray(new MtasSpanQuery[clauses.size()]));
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -34,13 +52,36 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
     return baseQuery.getField();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
-    return baseQuery.createWeight(searcher, needsScores);
+  public SpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
+    return baseQuery.createWeight(searcher, needsScores);    
+  }
+
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    if (clauses.size() > 1) {
+      MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];
+      boolean actuallyRewritten = false;
+      for (int i = 0; i < clauses.size(); i++) {
+        newClauses[i] = clauses.get(i).rewrite(reader);
+        actuallyRewritten |= clauses.get(i) != newClauses[i];
+      }
+      if (actuallyRewritten) {
+        return new MtasSpanAndQuery(newClauses);
+      } else {
+        return this;
+      }
+    } else {
+      return clauses.get(0).rewrite(reader);
+    }
   }
 
   /*

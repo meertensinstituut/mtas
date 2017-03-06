@@ -1,6 +1,6 @@
-# Prefix
+#Prefix
 
-Mtas can produce a list of available prefixes. To get this information, besides the parameter to enable [mtas queries](search_query.html), the following parameter should be provided.
+Mtas can produce a list of available prefixes. To get this information, besides the parameter to enable [Mtas queries](search_query.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -11,7 +11,7 @@ Information for multiple fields can be produced within the same request. To dist
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
 | mtas.stats.prefix.\<identifier\>.key         | \<string\>   | key used in response           | no          |
-| mtas.stats.prefix.\<identifier\>.field       | \<string\>   | mtas field                      | yes         |
+| mtas.stats.prefix.\<identifier\>.field       | \<string\>   | Mtas field                      | yes         |
 
 The *key* is added to the response and may be used to distinguish between multiple lists, and should therefore be unique. The response will contain three lists: prefixes strictly used for single position tokens, prefixes (also) used for multiple position tokens and prefixes used for multiple non adjacent positions. Notice that the last list will always be a subset of the second list.
 

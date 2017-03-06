@@ -54,6 +54,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery implements Cloneable {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
     }
+    //check ignore
     if (field != null && ignore != null) {
       if (ignore.getField() == null || field.equals(ignore.getField())) {
         this.ignoreClause = ignore;
@@ -65,7 +66,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery implements Cloneable {
     } else {
       this.ignoreClause = null;
       this.maximumIgnoreLength = null;
-    }
+    }    
   }
 
   /*

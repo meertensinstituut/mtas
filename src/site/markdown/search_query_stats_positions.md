@@ -1,4 +1,4 @@
-# Statistics - positions
+#Statistics - positions
 
 To get statistics on the number of positions within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
@@ -44,8 +44,8 @@ Total and average number of positions and the number of documents.
     "stats":{
       "positions":[{
           "key":"example - basic",
-          "mean":163.32306296759796,
-          "sum":337230767,
+          "mean":244.26537188929916,
+          "sum":504361094,
           "n":2064808}]}}
 ```
 
@@ -64,55 +64,55 @@ Full statistics on positions for documents with a minimum of 100 positions, for 
     "stats":{
       "positions":[{
           "key":"example - minimum",
-          "sumsq":3.217738942941E12,
-          "populationvariance":4429860.598303376,
+          "sumsq":4.407777345501E12,
+          "populationvariance":4021377.043206717,
           "max":419252.0,
-          "sum":3.03356085E8,
-          "kurtosis":7475.629984106579,
-          "standarddeviation":2104.724912671482,
-          "n":696551,
-          "quadraticmean":2149.309425767974,
+          "sum":4.53494907E8,
+          "kurtosis":7589.040501278469,
+          "standarddeviation":2005.3380969650148,
+          "n":1047253,
+          "quadraticmean":2051.5590305379797,
           "min":100.0,
           "median":232.0,
-          "variance":4429866.9580199765,
-          "mean":435.5116638982477,
-          "geometricmean":269.08829791186866,
-          "sumoflogs":3897230.408057158,
-          "skewness":69.96996634727896},
+          "variance":4021380.883139267,
+          "mean":433.0328077360544,
+          "geometricmean":269.1549624469481,
+          "sumoflogs":5859681.392265234,
+          "skewness":70.39565176567714},
         {
           "key":"example - maximum",
-          "sumsq":8.387258635E9,
-          "populationvariance":2952.9318413516844,
+          "sumsq":1.2589493055E10,
+          "populationvariance":2516.516960673755,
           "max":200.0,
-          "sum":7.6021711E7,
-          "kurtosis":0.06752103336188053,
-          "standarddeviation":54.34090186412456,
-          "n":1664511,
-          "quadraticmean":70.98501573316724,
+          "sum":1.14146849E8,
+          "kurtosis":-0.5513713934014715,
+          "standarddeviation":50.164914844725146,
+          "n":1462493,
+          "quadraticmean":92.78060994263417,
           "min":0.0,
-          "median":25.0,
-          "variance":2952.9336154064163,
-          "mean":45.672098892754136,
+          "median":68.0,
+          "variance":2516.5186813785253,
+          "mean":78.04950109162947,
           "geometricmean":0.0,
           "sumoflogs":"-Infinity",
-          "skewness":1.055453308387049},
+          "skewness":0.6202671670124106},
         {
           "key":"example - minimum and maximum",
-          "sumsq":6.242915333E9,
-          "populationvariance":833.0814348912809,
+          "sumsq":9.370630488E9,
+          "populationvariance":832.9926334704653,
           "max":200.0,
-          "sum":4.2147029E7,
-          "kurtosis":-1.089851452153094,
-          "standarddeviation":28.86319883436408,
-          "n":296254,
-          "quadraticmean":145.16489726459713,
+          "sum":6.3280662E7,
+          "kurtosis":-1.0893405044786282,
+          "standarddeviation":28.861644194831847,
+          "n":444938,
+          "quadraticmean":145.12246855142547,
           "min":100.0,
           "median":139.0,
-          "variance":833.084246952036,
-          "mean":142.2665314223605,
-          "geometricmean":139.38264759454245,
-          "sumoflogs":1462672.066002271,
-          "skewness":0.30992716799338843}]}}
+          "variance":832.9945056290709,
+          "mean":142.22355024745016,
+          "geometricmean":139.3394542837307,
+          "sumoflogs":2196620.2289446634,
+          "skewness":0.31081665704505534}]}}
 ```
 
 <a name="subset"></a>  
@@ -130,7 +130,7 @@ Total and average number of positions and the number of documents for a subset o
     "stats":{
       "positions":[{
           "key":"example - subset",
-          "mean":3578.5040620384048,
-          "sum":9690589,
-          "n":2708}]}}
+          "mean":5265.321033210332,
+          "sum":14269020,
+          "n":2710}]}}
 ```

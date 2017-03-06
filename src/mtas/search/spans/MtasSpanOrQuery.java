@@ -2,9 +2,11 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanOrQuery;
 import org.apache.lucene.search.spans.SpanQuery;
@@ -28,13 +30,15 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
    * @param clauses
    *          the clauses
    */
-  public MtasSpanOrQuery(MtasSpanQuery... clauses) {
+  public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
     super();
-    baseQuery = new SpanOrQuery(clauses);
-    this.clauses = new ArrayList<>(clauses.length);
-    for (MtasSpanQuery clause : clauses) {
-      this.clauses.add(clause);
-    }
+    clauses = new ArrayList<MtasSpanQuery>();
+    for(MtasSpanQuery item : initialClauses) {
+      if(!clauses.contains(item)) {
+          clauses.add(item);
+      }
+    }  
+    baseQuery = new SpanOrQuery(clauses.toArray(new MtasSpanQuery[clauses.size()]));      
   }
   
   @Override
@@ -46,6 +50,25 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores);
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    if(clauses.size()>1) {    
+      MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];
+      boolean actuallyRewritten = false;
+      for(int i=0; i<clauses.size(); i++) {
+        newClauses[i] = clauses.get(i).rewrite(reader);
+        actuallyRewritten |= clauses.get(i)!=newClauses[i];        
+      }
+      if(actuallyRewritten) {
+        return new MtasSpanOrQuery(newClauses);        
+      } else {
+        return this;
+      }
+    } else {
+      return clauses.get(0).rewrite(reader);      
+    }
   }
 
   /*

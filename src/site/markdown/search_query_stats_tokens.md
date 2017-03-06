@@ -1,4 +1,4 @@
-# Statistics - tokens
+#Statistics - tokens
 
 To get statistics on the number of tokens within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
@@ -44,8 +44,8 @@ Total and average number of tokens and the number of documents.
     "stats":{
       "tokens":[{
           "key":"example - basic",
-          "mean":2208.617131956095,
-          "sum":4560370323,
+          "mean":1949.101406523028,
+          "sum":4024520177,
           "n":2064808}]}}
 ```
 
@@ -64,55 +64,55 @@ Full statistics on tokens for documents with a minimum of 100 tokens, for docume
     "stats":{
       "tokens":[{
           "key":"example - minimum",
-          "sumsq":6.17630129413745E14,
-          "populationvariance":5.2902986678636354E8,
-          "max":5626223.0,
-          "sum":4.489695699E9,
-          "kurtosis":11397.708386174421,
-          "standarddeviation":23000.659411322642,
-          "n":1133873,
-          "quadraticmean":23338.98849418418,
+          "sumsq":2.91825668357275E14,
+          "populationvariance":2.022964435797023E8,
+          "max":3320612.0,
+          "sum":3.837278477E9,
+          "kurtosis":9580.99014557769,
+          "standarddeviation":14223.100544366072,
+          "n":1390207,
+          "quadraticmean":14488.452755067281,
           "min":500.0,
-          "median":1788.0,
-          "variance":5.290303333556648E8,
-          "mean":3959.610731536747,
-          "geometricmean":2073.1829663657477,
-          "sumoflogs":8659207.101050543,
-          "skewness":86.80974688421588},
+          "median":1359.0,
+          "variance":2.0229658909514648E8,
+          "mean":2760.2209433559033,
+          "geometricmean":1584.8982392362057,
+          "sumoflogs":1.0243428152831953E7,
+          "skewness":79.47215006871889},
         {
           "key":"example - maximum",
-          "sumsq":1.88841931218E11,
-          "populationvariance":100404.89269776225,
+          "sumsq":3.33432806009E11,
+          "populationvariance":65815.48228216589,
           "max":1000.0,
-          "sum":2.84511144E8,
-          "kurtosis":-0.5052359496974037,
-          "standarddeviation":316.8674407373186,
-          "n":1219963,
-          "quadraticmean":393.4376224488639,
+          "sum":5.49051031E8,
+          "kurtosis":-0.9495132030213522,
+          "standarddeviation":256.54539199058576,
+          "n":1178024,
+          "quadraticmean":532.0189410229931,
           "min":0.0,
-          "median":0.0,
-          "variance":100404.97499941812,
-          "mean":233.2129285891795,
+          "median":441.0,
+          "variance":65815.53815160331,
+          "mean":466.07796700236827,
           "geometricmean":0.0,
           "sumoflogs":"-Infinity",
-          "skewness":0.9900439471758536},
+          "skewness":0.2518109944817064},
         {
           "key":"example - minimum and maximum",
-          "sumsq":1.640713236E11,
-          "populationvariance":20292.151766107923,
+          "sumsq":2.70110872559E11,
+          "populationvariance":20021.06838039624,
           "max":1000.0,
-          "sum":2.1383652E8,
-          "kurtosis":-1.1536799879589004,
-          "standarddeviation":142.45077035455677,
-          "n":289028,
-          "quadraticmean":753.4360252467811,
+          "sum":3.61809331E8,
+          "kurtosis":-1.0824803795579663,
+          "standarddeviation":141.49596513804715,
+          "n":503423,
+          "quadraticmean":732.4947329880449,
           "min":500.0,
-          "median":734.0,
-          "variance":20292.221974606666,
-          "mean":739.8470736399236,
-          "geometricmean":725.9419502039267,
-          "sumoflogs":1903963.2945452952,
-          "skewness":0.08906106230519327}]}}
+          "median":704.0,
+          "variance":20021.108150347452,
+          "mean":718.6984523949043,
+          "geometricmean":704.889293672351,
+          "sumoflogs":3301468.553637138,
+          "skewness":0.2634725299866506}]}}
 ```
 
 <a name="subset"></a>  
@@ -130,7 +130,7 @@ Total and average number of tokens and the number of documents for a subset of d
     "stats":{
       "tokens":[{
           "key":"example - subset",
-          "mean":49644.49556868538,
-          "sum":134437294,
-          "n":2708}]}}
+          "mean":42901.60996309963,
+          "sum":116263363,
+          "n":2710}]}}
 ```

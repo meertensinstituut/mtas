@@ -1,26 +1,22 @@
-#set($h1 = '#')
-#set($h2 = '##')
-#set($h3 = '###')
-#set($h4 = '####')
-$h1 Mtas and Solr
+#Apache Solr
 
 Mtas can be used as plugin for Apache Solr
 
-$h3 Prerequisites
+**Prerequisites**
 
-- Installed [Apache Solr](http://lucene.apache.org/solr/)
+- Installed [Apache Solr](https://lucene.apache.org/solr/)
 - Currently supported and advised version is ${currentDevelopmentVersion}
 
 Start with a new Solr core.
 
-$h3 Libraries
+**Libraries**
 
 Add the `mtas-${currentDevelopmentVersion}.jar` to the `lib` directory of the new Solr core. 
 A prebuilt `mtas-${currentDevelopmentVersion}.jar` is available from the [download](download.html) page.
 
 Furthermore, add the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math/) to the `lib` directory of the new Solr core.
 
-$h3 Solrconfig.xml
+**Solrconfig.xml**
 
 Some changes have to be made within the `solrconfig.xml` file, elements have to be added to the `<config/>` or existing elements have te be adjusted:
 
@@ -78,7 +74,7 @@ managed-schema. So the configuration must contain:
 <schemaFactory class="ClassicIndexSchemaFactory"/>
 ```    
   
-$h3 Schema.xml
+**Schema.xml**
 
 We extend a (classic) schema with one (or multiple) fields that may contain 
 annotated text, e.g.
@@ -87,7 +83,7 @@ annotated text, e.g.
 <field name="text" type="mtas" required="false" multiValued="false" indexed="true" stored="true" />
 ```   
 
-We define the referred mtas fieldType by
+We define the referred Mtas fieldType by
 
 ```console
 <fieldType name="mtas" class="solr.TextField" postingsFormat="MtasCodec">
@@ -119,7 +115,7 @@ the definition of a tokenizer configuration.
 
 **Multiple tokenize configurations**
 
-If multiple tokenizer configurations are required, the mtas fieldType has to be 
+If multiple tokenizer configurations are required, the Mtas fieldType has to be 
 defined slightly different: 
 
 ```console
@@ -143,11 +139,11 @@ defined slightly different:
 
 An additional fieldType (here named mtas_config) is defined, containing 
 only an index analyzer. Both the charFilter and tokenizer within this analyzer have
-an attribute `config` referring to a mtas configuration file. Depending on the required 
+an attribute `config` referring to a Mtas configuration file. Depending on the required 
 tokenizer configuration, for the charFilter this file will define *type*, *prefix* and *postfix* and for the tokenizer this file 
-will define the *configFile*. An example of a mtas configuration file is added below.
+will define the *configFile*. An example of a Mtas configuration file is added below.
 
-The mtas fieldType is defined with class *mtas.solr.schema.MtasPreAnalyzedField*, 
+The Mtas fieldType is defined with class *mtas.solr.schema.MtasPreAnalyzedField*, 
 an obligatory attribute `followIndexAnalyzer` referring to the additional fieldType
 we defined before. The optional attribute `defaultConfiguration` contains the name 
 of the default configuration to be used, and the obligatory attribute 
@@ -156,7 +152,7 @@ configuration. The optional attributes `setNumberOfTokens`,
 `setNumberOfPositions`, `setSize` and `setError` define fields that may be filled
 with respectively number of tokens, number of positions, filesize and possible errors.
 
-**Example of a mtas configuration file**
+**Example of a Mtas configuration file**
 
 ```console
 <?xml version="1.0" encoding="UTF-8" ?>

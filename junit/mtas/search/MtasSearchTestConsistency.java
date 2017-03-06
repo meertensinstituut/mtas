@@ -468,10 +468,10 @@ public class MtasSearchTestConsistency {
           new ComponentPosition(FIELD_CONTENT, "total", null, null, "sum"));
       fieldStats.termVectorList.add(new ComponentTermVector("toplist", prefix,
           null, false, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
-          null, number, null, null, null, null, null));
+          null, number, null, null, null, null, null, number, null, prefix, null, null));
       fieldStats.termVectorList.add(new ComponentTermVector("fulllist", prefix,
           null, true, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
-          null, Integer.MAX_VALUE, null, null, null, null, null));
+          null, Integer.MAX_VALUE, null, null, null, null, null, number, null, prefix, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
