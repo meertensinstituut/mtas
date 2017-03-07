@@ -22,7 +22,7 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
   /** The base query. */
   private SpanNearQuery baseQuery;
   private List<MtasSpanQuery> clauses;
-
+  
   /**
    * Instantiates a new mtas span and query.
    *
@@ -34,10 +34,10 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
     super();
     clauses = new ArrayList<MtasSpanQuery>();
     for(MtasSpanQuery item : initialClauses) {
-      if(!clauses.contains(item)) {
-          clauses.add(item);
+     if(!clauses.contains(item)) {
+        clauses.add(item);
       }
-    }  
+    }      
     baseQuery = new MtasExtendedSpanAndQuery(
         clauses.toArray(new MtasSpanQuery[clauses.size()]));
   }
@@ -75,12 +75,14 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
         actuallyRewritten |= clauses.get(i) != newClauses[i];
       }
       if (actuallyRewritten) {
-        return new MtasSpanAndQuery(newClauses);
+        return new MtasSpanAndQuery(newClauses).rewrite(reader);
       } else {
-        return this;
+        return super.rewrite(reader);
       }
+    } else if(clauses.size()>0) {
+      return clauses.get(0).rewrite(reader);      
     } else {
-      return clauses.get(0).rewrite(reader);
+      return super.rewrite(reader);
     }
   }
 

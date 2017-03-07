@@ -62,12 +62,14 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
         actuallyRewritten |= clauses.get(i)!=newClauses[i];        
       }
       if(actuallyRewritten) {
-        return new MtasSpanOrQuery(newClauses);        
+        return new MtasSpanOrQuery(newClauses).rewrite(reader);        
       } else {
-        return this;
+        return super.rewrite(reader);
       }
-    } else {
+    } else if(clauses.size()>0) {
       return clauses.get(0).rewrite(reader);      
+    } else {
+      return super.rewrite(reader);
     }
   }
 
