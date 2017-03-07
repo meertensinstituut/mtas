@@ -16,7 +16,7 @@ For indexing [ISO-TEI](http://www.tei-c.org/) resources, the *mtas.analysis.pars
 <!-- END CONFIGURATION MTAS PARSER -->
 ```
 
-The syntax of the parser part in the [configuration file](indexing_configuration.html#configuration) is, besides from the *name* attribute, almost identical to the configuration of the [FoLiA-parser](indexing_formats_tei.html). An additional feature is the definition and use of *variables*, again illustrated and explained with examples.
+The syntax of the parser part in the [configuration file](indexing_configuration.html#configuration) is, besides from the *name* attribute, almost identical to the configuration of the [FoLiA-parser](indexing_formats_folia.html). An additional feature is the definition and use of *variables*, again illustrated and explained with examples.
 
 **Variables**
 

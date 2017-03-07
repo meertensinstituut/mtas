@@ -1,6 +1,6 @@
 #Statistics - spans
 
-To get statistics on the occurrence of a span within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the occurrence of a span within a set of documents in Solr requests, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -11,7 +11,7 @@ Multiple statistics on the occurrence of a span can be produced within the same 
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
 | mtas.stats.spans.\<identifier\>.key         | \<string\>   | key used in response           | no          |
-| mtas.stats.spans.\<identifier\>.field       | \<string\>   | mtas field                      | yes         |
+| mtas.stats.spans.\<identifier\>.field       | \<string\>   | Mtas field                      | yes         |
 | mtas.stats.spans.\<identifier\>.query.\<identifier query\>.type       | \<string\>   | query language: [cql](search_cql.html)  | yes         |
 | mtas.stats.spans.\<identifier\>.query.\<identifier query\>.value      | \<string\>   | query: [cql](search_cql.html)            | yes         |
 | mtas.stats.spans.\<identifier\>.query.\<identifier query\>.prefix     | \<string\>   | default prefix            | no         |
@@ -408,3 +408,9 @@ Statistics for the absolute and relative frequency of the words "de", "het" and 
               "mean":0.049574709134571515,
               "n":1890377}}}]}}
 ```
+
+---
+
+##Lucene
+
+To use statistics on the occurrence of a span [directly in Lucene](installation_lucene.html), *ComponentSpan* together with the provided *collect* method can be used. 

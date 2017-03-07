@@ -1,6 +1,6 @@
 #Statistics - positions
 
-To get statistics on the number of positions within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the number of positions within a set of documents in Solr requests, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -13,7 +13,7 @@ each of the required statistics.
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
 | mtas.stats.positions.\<identifier\>.key         | \<string\>   | key used in response           | no          |
-| mtas.stats.positions.\<identifier\>.field       | \<string\>   | mtas field                      | yes         |
+| mtas.stats.positions.\<identifier\>.field       | \<string\>   | Mtas field                      | yes         |
 | mtas.stats.positions.\<identifier\>.type        | \<string\>   | required [type of statistics](search_stats.html) | no          |
 | mtas.stats.positions.\<identifier\>.minimum     | \<double\>   | minimum number of positions  | no          |
 | mtas.stats.positions.\<identifier\>.maximum     | \<double\>   | maximum number of positions  | no          |
@@ -134,3 +134,9 @@ Total and average number of positions and the number of documents for a subset o
           "sum":14269020,
           "n":2710}]}}
 ```
+
+---
+
+##Lucene
+
+To use statistics on the number of positions [directly in Lucene](installation_lucene.html), *ComponentPosition* together with the provided *collect* method can be used. 

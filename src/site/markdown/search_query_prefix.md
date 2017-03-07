@@ -1,6 +1,6 @@
 #Prefix
 
-Mtas can produce a list of available prefixes. To get this information, besides the parameter to enable [Mtas queries](search_query.html), the following parameter should be provided.
+Mtas can produce a list of available prefixes. To get this information in Solr requests, besides the parameter to enable [Mtas queries](search_query.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -67,3 +67,7 @@ List of avilable prefixes.
           "s"],
         "setPosition":["entity"]}]}
 ```
+
+**Lucene**
+
+To get a list of prefixes [directly in Lucene](installation_lucene.html), *ComponentPrefix* together with the provided *collect* method can be used.

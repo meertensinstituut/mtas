@@ -1,6 +1,6 @@
 #Statistics - tokens
 
-To get statistics on the number of tokens within a set of documents, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the number of tokens within a set of documents in Solr requests, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -13,7 +13,7 @@ each of the required statistics.
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
 | mtas.stats.tokens.\<identifier\>.key         | \<string\>   | key used in response           | no          |
-| mtas.stats.tokens.\<identifier\>.field       | \<string\>   | mtas field                      | yes         |
+| mtas.stats.tokens.\<identifier\>.field       | \<string\>   | Mtas field                      | yes         |
 | mtas.stats.tokens.\<identifier\>.type        | \<string\>   | required [type of statistics](search_stats.html) | no          |
 | mtas.stats.tokens.\<identifier\>.minimum     | \<double\>   | minimum number of tokens  | no          |
 | mtas.stats.tokens.\<identifier\>.maximum     | \<double\>   | maximum number of tokens  | no          |
@@ -134,3 +134,9 @@ Total and average number of tokens and the number of documents for a subset of d
           "sum":116263363,
           "n":2710}]}}
 ```
+
+---
+
+##Lucene
+
+To use statistics on the number of tokens [directly in Lucene](installation_lucene.html), *ComponentToken* together with the provided *collect* method can be used. 

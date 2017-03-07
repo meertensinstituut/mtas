@@ -32,4 +32,4 @@ Collections are added and updated regularly by adding new cores, replacing cores
 | Annotations     | 36,486,292,912 | 2,488   | 4     | 23,589,831 |
 
 ---
-<sup><a name="footnote">1</a></sup> : <small>situation january 2017</small>
+<sup><a name="footnote">1</a></sup> <small>situation january 2017</small>
