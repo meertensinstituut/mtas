@@ -31,7 +31,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
 
   /** The current position. */
   private int docId, currentPosition;
-
+  
+  private long cost;
+  
   /** The current match. */
   Match currentMatch;
 
@@ -55,6 +57,14 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     }
     ignoreItem = new MtasIgnoreItem(ignoreSpans, maximumIgnoreLength);
     resetQueue();
+    computeCosts();
+  }
+  
+  private void computeCosts() {
+    cost = Long.MAX_VALUE;
+    for(QueueItem item : queueSpans) {
+      cost = Math.min(cost, item.sequenceSpans.spans.cost());
+    }    
   }
 
   /*
@@ -734,15 +744,6 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     currentMatch = null;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
-   */
-  @Override
-  public TwoPhaseIterator asTwoPhaseIterator() {
-    return null;
-  }
 
   /**
    * The Class QueueItem.
@@ -914,8 +915,8 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
-  public long cost() {
-    return 0;
+  public long cost() {    
+    return cost;
   }
 
   /*
@@ -925,7 +926,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
    */
   @Override
   public float positionsCost() {
-    return 0;
+    return 0;    
   }
 
 }

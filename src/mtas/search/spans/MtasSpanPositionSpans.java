@@ -184,7 +184,7 @@ public class MtasSpanPositionSpans extends Spans implements MtasSpans {
    */
   @Override
   public long cost() {
-    return 0;
+    return mtasCodecInfo.getNumberOfDocs(field);
   }
 
   /*

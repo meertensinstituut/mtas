@@ -54,6 +54,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    super.rewrite(reader);
     if(clauses.size()>1) {    
       MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];
       boolean actuallyRewritten = false;
@@ -66,7 +67,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
       } else {
         return super.rewrite(reader);
       }
-    } else if(clauses.size()>0) {
+    } else if(clauses.size()==1) {
       return clauses.get(0).rewrite(reader);      
     } else {
       return super.rewrite(reader);

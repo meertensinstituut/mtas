@@ -1480,7 +1480,7 @@ public class CodecCollector {
     if (mtasCodecInfo != null && groupList != null) {
       ArrayList<Match> matchList;
       HashMap<Integer, ArrayList<Match>> matchData;
-
+      long time = System.nanoTime();
       for (ComponentGroup group : groupList) {
         group.dataCollector.setWithTotal();
         if (group.prefixes.size() > 0) {
@@ -1556,8 +1556,8 @@ public class CodecCollector {
 
           } else {
             int maximumNumberOfDocuments = 0;
-            int minimumNumberOfDocuments = 1;
-            int boundaryNumberOfDocuments = 5;
+            int boundaryMinimumNumberOfDocuments = 1;
+            int boundaryMaximumNumberOfDocuments = 5;
             HashSet<GroupHit> administrationOccurrences = new HashSet<GroupHit>();
             for (int docCounter = 0; docCounter < docSet.size(); docCounter++) {
               occurencesInCurrentDocument.clear();
@@ -1602,19 +1602,17 @@ public class CodecCollector {
                     }
                   }
                 }
-
                 if (!intersectionGroupPrefixes) {
-
                   for (GroupHit groupHit : occurencesInCurrentDocument) {
                     int tmpNumber = occurencesN.get(groupHit);
                     maximumNumberOfDocuments = Math
                         .max(maximumNumberOfDocuments, tmpNumber);
-                    if (tmpNumber > minimumNumberOfDocuments) {
+                    if (tmpNumber > boundaryMinimumNumberOfDocuments) {
                       administrationOccurrences.add(groupHit);
                     }
                   }
                   // collect spans
-                  if (maximumNumberOfDocuments > boundaryNumberOfDocuments) {
+                  if (maximumNumberOfDocuments > boundaryMaximumNumberOfDocuments) {
                     if (administrationOccurrences.size() > 0) {
                       HashMap<GroupHit, Spans> list = collectSpansForOccurences(
                           administrationOccurrences, knownPrefixes, field,
@@ -1633,11 +1631,11 @@ public class CodecCollector {
                     }
                     administrationOccurrences.clear();
                     maximumNumberOfDocuments = 0;
-                    minimumNumberOfDocuments = (int) Math
-                        .ceil(minimumNumberOfDocuments * 1.2);
-                    boundaryNumberOfDocuments = (int) Math
-                        .ceil(boundaryNumberOfDocuments * 1.2);
-                  }
+                    boundaryMinimumNumberOfDocuments = (int) Math
+                        .ceil(boundaryMinimumNumberOfDocuments * 1.2);
+                    boundaryMaximumNumberOfDocuments = (int) Math
+                        .ceil(boundaryMaximumNumberOfDocuments * 1.2);
+                  }                  
                 }
               }
             }
@@ -1647,7 +1645,7 @@ public class CodecCollector {
             group.dataCollector.add(hit.toString(), occurencesSum.get(hit),
                 occurencesN.get(hit));
           }
-          group.dataCollector.closeNewList();
+          group.dataCollector.closeNewList();                                                  
         }
       }
     }

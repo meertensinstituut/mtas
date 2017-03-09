@@ -545,6 +545,15 @@ public class CodecInfo {
     return null;
   }
 
+  public int getNumberOfDocs(String field) {
+    if (fieldReferences.containsKey(field)) {
+      FieldReferences fr = fieldReferences.get(field);
+      return fr.numberOfDocs;
+    } else {
+      return 0;
+    }
+  }
+  
   /**
    * Gets the number of positions.
    *

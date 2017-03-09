@@ -43,7 +43,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery implements Cloneable {
    * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
-      MtasSpanQuery ignore, Integer maximumIgnoreLength) {
+      MtasSpanQuery ignore, Integer maximumIgnoreLength) {    
     this.items = items;
     // get field and do checks
     for (MtasSpanSequenceItem item : items) {

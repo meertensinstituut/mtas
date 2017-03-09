@@ -2,7 +2,6 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
@@ -12,7 +11,6 @@ import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasExtendedSpanAndQuery;
 import mtas.search.spans.util.MtasSpanQuery;
-import mtas.search.spans.util.MtasSpanWeight;
 
 /**
  * The Class MtasSpanAndQuery.
@@ -79,7 +77,7 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
       } else {
         return super.rewrite(reader);
       }
-    } else if(clauses.size()>0) {
+    } else if(clauses.size()==1) {
       return clauses.get(0).rewrite(reader);      
     } else {
       return super.rewrite(reader);

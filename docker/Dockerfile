@@ -1,6 +1,6 @@
 # Automatically generated Dockerfile 
-# - Build 2017-03-07 18:24
-# - Lucene/Solr version 6.4.1
+# - Build 2017-03-09 09:04
+# - Lucene/Solr version 6.4.2
 # - Mtas release 20170307 
 #
 
@@ -15,12 +15,12 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/20170307/mtas-6.4.1.jar /root/lib/
+ADD https://github.com/meertensinstituut/mtas/releases/download/20170307/mtas-6.4.2.jar /root/lib/
 
 RUN apt-get update && apt-get install -y lsof software-properties-common python-software-properties apache2 curl subversion \
 && locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en \
-&& solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.4.1/solr-6.4.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
-&& curl -o /root/solr-6.4.1.tgz -O $solrurl \
+&& solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.4.2/solr-6.4.2.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
+&& curl -o /root/solr-6.4.2.tgz -O $solrurl \
 && mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) \
 && curl -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl \
 && tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 \
@@ -31,8 +31,8 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections \
 && apt-get install -y oracle-java8-installer \
 && rm -rf /var/lib/apt/lists/* \
-&& tar xzf solr-6.4.1.tgz solr-6.4.1/bin/install_solr_service.sh --strip-components=2 \
-&& bash ./install_solr_service.sh solr-6.4.1.tgz && rm install_solr_service.sh && rm -rf solr-6.4.1.tgz \
+&& tar xzf solr-6.4.2.tgz solr-6.4.2/bin/install_solr_service.sh --strip-components=2 \
+&& bash ./install_solr_service.sh solr-6.4.2.tgz && rm install_solr_service.sh && rm -rf solr-6.4.2.tgz \
 && service apache2 stop \
 && echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf \
 && a2enmod proxy \
@@ -55,8 +55,8 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && chmod -R 755 /var/www/html \
 && printf "echo\n" >> /start.sh \
 && printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh \
-&& printf "echo \"  Timestamp 2017-03-07 18:24\"\n" >> /start.sh \
-&& printf "echo \"  Lucene/Solr version 6.4.1\"\n" >> /start.sh \
+&& printf "echo \"  Timestamp 2017-03-09 09:04\"\n" >> /start.sh \
+&& printf "echo \"  Lucene/Solr version 6.4.2\"\n" >> /start.sh \
 && printf "echo \"  Mtas release 20170307\"\n" >> /start.sh \
 && printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh \
 && printf "echo \"=======================================================================\"\n" >> /start.sh \
@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
 && mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf \
 && echo "name=demo1" > demo1/core.properties \
 && cp lib/commons-math3-3.6.1.jar demo1/lib/ \
-&& cp lib/mtas-6.4.1.jar demo1/lib/ \
+&& cp lib/mtas-6.4.2.jar demo1/lib/ \
 && cp data/solrconfig.xml demo1/conf/ \
 && cp data/schemaBasic.xml demo1/conf/schema.xml \
 && cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ \

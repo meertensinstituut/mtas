@@ -14,6 +14,7 @@ import mtas.codec.MtasCodecPostingsFormat;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.codec.util.CodecComponent.ComponentField;
+
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
@@ -236,7 +237,7 @@ public class CodecUtil {
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
     if (fieldStats != null) {
-      IndexReader reader = searcher.getIndexReader();
+      IndexReader reader = searcher.getIndexReader();      
       HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight = new HashMap<MtasSpanQuery, SpanWeight>();
       // only if spanQueryList is not empty
       if (fieldStats.spanQueryList.size() > 0) {
