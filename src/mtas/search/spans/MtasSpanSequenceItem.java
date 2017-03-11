@@ -1,5 +1,9 @@
 package mtas.search.spans;
 
+import java.io.IOException;
+
+import org.apache.lucene.index.IndexReader;
+
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -78,6 +82,15 @@ public class MtasSpanSequenceItem {
           && (optional == that.isOptional());
     } else {
       return false;
+    }
+  }
+  
+  public MtasSpanSequenceItem rewrite(IndexReader reader) throws IOException {
+    MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);
+    if(newSpanQuery!=spanQuery) {
+      return new MtasSpanSequenceItem(newSpanQuery, optional);
+    } else {
+      return this;
     }
   }
   

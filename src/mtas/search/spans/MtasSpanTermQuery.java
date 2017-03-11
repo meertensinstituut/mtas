@@ -4,6 +4,7 @@ import java.io.IOException;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.util.MtasExtendedSpanTermQuery;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanTermQuery;
@@ -43,7 +44,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    * @param singlePosition the single position
    */
   public MtasSpanTermQuery(SpanTermQuery query, boolean singlePosition) {
-    super();
+    super(singlePosition?1:null, singlePosition?1:null);
     baseQuery = new MtasExtendedSpanTermQuery(query, singlePosition);
   }
 
@@ -58,6 +59,11 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores);
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    return super.rewrite(reader);
   }
 
   /*

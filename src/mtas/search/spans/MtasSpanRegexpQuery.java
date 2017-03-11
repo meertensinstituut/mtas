@@ -59,7 +59,7 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
    *          the single position
    */
   public MtasSpanRegexpQuery(Term term, boolean singlePosition) {
-    super();
+    super(singlePosition?1:null, singlePosition?1:null);
     RegexpQuery req = new RegexpQuery(term);    
     query = new SpanMultiTermQueryWrapper<RegexpQuery>(req);
     this.term = term;
@@ -97,12 +97,12 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
       for (int i = 0; i < clauses.length; i++) {
         if (clauses[i] instanceof SpanTermQuery) {
           newClauses[i] = new MtasSpanTermQuery((SpanTermQuery) clauses[i],
-              singlePosition);
+              singlePosition).rewrite(reader);
         } else {
           throw new IOException("no SpanTermQuery after rewrite");
         }
       }
-      return new MtasSpanOrQuery(newClauses);
+      return new MtasSpanOrQuery(newClauses).rewrite(reader);
     } else {
       throw new IOException("no SpanOrQuery after rewrite");
     }

@@ -6,6 +6,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanWeight;
+
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIFactoryMethod;
+
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -15,7 +18,8 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanContainingQuery baseQuery;
-
+  private MtasSpanQuery bigQuery, smallQuery;
+  
   /**
    * Instantiates a new mtas span containing query.
    *
@@ -23,8 +27,15 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
    * @param q2 the q2
    */
   public MtasSpanContainingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
-    super();
-    baseQuery = new SpanContainingQuery(q1, q2);
+    super(q1!=null?q1.getMinimumWidth():null, q1!=null?q1.getMaximumWidth():null);
+    if(q2!=null && q2.getMinimumWidth()!=null) {
+      if(this.getMinimumWidth()==null || this.getMinimumWidth()<q2.getMinimumWidth()) {
+        this.setWidth(q2.getMinimumWidth(), this.getMaximumWidth());
+      }
+    }    
+    bigQuery=q1;
+    smallQuery=q2;
+    baseQuery = new SpanContainingQuery(bigQuery, smallQuery);    
   }
 
   /*
@@ -68,8 +79,16 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);
-    return this;
+    MtasSpanQuery newBigQuery = bigQuery.rewrite(reader);
+    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);    
+    if(newBigQuery!=bigQuery || newSmallQuery!=smallQuery) {
+      return new MtasSpanContainingQuery(newBigQuery, newSmallQuery).rewrite(reader);
+    } else if(newBigQuery!=null && newSmallQuery!=null && newBigQuery.equals(newSmallQuery)) {
+      return newBigQuery;
+    } else {    
+      baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);
+      return super.rewrite(reader);
+    }  
   }
 
   /*

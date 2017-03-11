@@ -42,14 +42,21 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
   /**
    * Instantiates a new mtas span recurrence query.
    *
-   * @param clause the clause
-   * @param minimumRecurrence the minimum recurrence
-   * @param maximumRecurrence the maximum recurrence
-   * @param ignore the ignore
-   * @param maximumIgnoreLength the maximum ignore length
+   * @param clause
+   *          the clause
+   * @param minimumRecurrence
+   *          the minimum recurrence
+   * @param maximumRecurrence
+   *          the maximum recurrence
+   * @param ignore
+   *          the ignore
+   * @param maximumIgnoreLength
+   *          the maximum ignore length
    */
   public MtasSpanRecurrenceQuery(MtasSpanQuery clause, int minimumRecurrence,
-      int maximumRecurrence, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
+      int maximumRecurrence, MtasSpanQuery ignore,
+      Integer maximumIgnoreLength) {
+    super(null, null);
     if (minimumRecurrence > maximumRecurrence) {
       throw new IllegalArgumentException(
           "minimumRecurrence > maximumRecurrence");
@@ -74,6 +81,23 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
       this.ignoreClause = null;
       this.maximumIgnoreLength = null;
     }
+    // set minimum/maximum
+    Integer minimum = null, maximum = null;
+    if (clause.getMinimumWidth() != null) {
+      minimum = minimumRecurrence * clause.getMinimumWidth();
+    }
+    if (clause.getMaximumWidth() != null) {
+      maximum = maximumRecurrence * clause.getMaximumWidth();
+      if (ignore != null && maximumIgnoreLength != null) {
+        if (ignore.getMaximumWidth() != null) {
+          maximum += (maximumRecurrence - 1) * maximumIgnoreLength
+              * ignore.getMaximumWidth();
+        } else {
+          maximum = null;
+        }
+      }
+    }
+    setWidth(minimum, maximum);
   }
 
   /**
@@ -95,14 +119,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
     return field;
   }
 
-  // @Override
-  // public MtasSpanRecurrenceQuery clone() {
-  // MtasSpanRecurrenceQuery soq = new
-  // MtasSpanRecurrenceQuery((SpanQuery)clause.clone(), minimumRecurrence,
-  // maximumRecurrence);
-  // return soq;
-  // }
-
   /*
    * (non-Javadoc)
    * 
@@ -111,16 +127,18 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    MtasSpanQuery query = clause.rewrite(reader);
-    MtasSpanQuery ignoreQuery = null;
-    if (ignoreClause != null) {
-      ignoreQuery = ignoreClause.rewrite(reader);
+    MtasSpanQuery newClause = clause.rewrite(reader);
+    MtasSpanQuery newIgnoreClause = (ignoreClause != null)
+        ? ignoreClause.rewrite(reader) : null;
+    if(newClause instanceof MtasSpanRecurrenceQuery) {
+      //for now too difficult, possibly merge later
     }
-    if (query != clause) { // clause rewrote: must clone
-      return new MtasSpanRecurrenceQuery(query, minimumRecurrence,
-          maximumRecurrence, ignoreQuery, maximumIgnoreLength);
+    if (newClause != clause
+        || (newIgnoreClause != null && newIgnoreClause != ignoreClause)) { 
+      return new MtasSpanRecurrenceQuery(newClause, minimumRecurrence,
+          maximumRecurrence, newIgnoreClause, maximumIgnoreLength).rewrite(reader);
     } else {
-      return this; // no rewrote
+      return super.rewrite(reader);
     }
   }
 
@@ -214,12 +232,18 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
     /**
      * Instantiates a new span recurrence weight.
      *
-     * @param subWeight the sub weight
-     * @param ignoreWeight the ignore weight
-     * @param maximumIgnoreLength the maximum ignore length
-     * @param searcher the searcher
-     * @param terms the terms
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param subWeight
+     *          the sub weight
+     * @param ignoreWeight
+     *          the ignore weight
+     * @param maximumIgnoreLength
+     *          the maximum ignore length
+     * @param searcher
+     *          the searcher
+     * @param terms
+     *          the terms
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public SpanRecurrenceWeight(SpanWeight subWeight, SpanWeight ignoreWeight,
         Integer maximumIgnoreLength, IndexSearcher searcher,

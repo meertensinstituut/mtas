@@ -9,6 +9,7 @@ import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
 
 import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -39,9 +40,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    *          the position
    */
   public MtasSpanPositionQuery(String field, int position) {
-    this.field = field;
-    this.start = position;
-    this.end = position;
+    this(field, position, position);
   }
 
   /**
@@ -55,6 +54,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    *          the end
    */
   public MtasSpanPositionQuery(String field, int start, int end) {
+    super(1,1);
     this.field = field;
     this.start = start;
     this.end = end;
@@ -81,6 +81,11 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     return new SpanAllWeight(searcher, null);
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    return super.rewrite(reader);
   }
 
   /**

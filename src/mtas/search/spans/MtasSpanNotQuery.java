@@ -5,22 +5,39 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanNotQuery;
+import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasSpanQuery;
 
 public class MtasSpanNotQuery extends MtasSpanQuery {
+  private String field;
+  
   /** The base query. */
   private SpanNotQuery baseQuery;
+  
+  private SpanQuery q1, q2;
 
   public MtasSpanNotQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
-    super();
+    super(q1!=null?q1.getMinimumWidth():null, q2!=null?q2.getMaximumWidth():null);
+    if (q1 != null && (field = q1.getField()) != null) {
+      if (q2 != null && ((field == null && q2.getField() != null)
+          || !q2.getField().equals(field))) {
+        throw new IllegalArgumentException("Clauses must have same field.");
+      }
+    } else if (q2 != null) {
+      field = q2.getField();
+    } else {
+      field = null;
+    }
+    this.q1 = q1;
+    this.q2 = q2;
     baseQuery = new SpanNotQuery(q1, q2);
   }
 
   @Override
   public String getField() {
-    return baseQuery.getField();
+    return field;
   }
 
   @Override
@@ -31,8 +48,13 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
 
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    baseQuery = (SpanNotQuery) baseQuery.rewrite(reader);
-    return this;
+    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
+    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
+    if (newQ1 != q1 || newQ2 != q2) {
+      return new MtasSpanNotQuery(newQ1, newQ2).rewrite(reader);
+    } else {
+      return super.rewrite(reader);
+    }    
   }
   
   @Override

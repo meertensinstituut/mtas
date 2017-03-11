@@ -78,5 +78,6 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
     h = (h * 7) ^ super.hashCode();
     return h;
   }
-
+  
+  
 }

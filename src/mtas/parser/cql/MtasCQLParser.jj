@@ -6,6 +6,7 @@ options
   DEBUG_PARSER = false;
   DEBUG_LOOKAHEAD = false;
   DEBUG_TOKEN_MANAGER = false;
+
   LOOKAHEAD= 1000;
 }
 
@@ -28,27 +29,31 @@ import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.MtasSpanContainingQuery;
 import mtas.search.spans.MtasSpanWithinQuery;
 import mtas.search.spans.MtasSpanIntersectingQuery;
+import mtas.search.spans.MtasSpanFullyAlignedWithQuery;
 import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import java.util.ArrayList;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MtasCQLParser
 {
-  public MtasSpanQuery parse(String field, String defaultPrefix, HashMap<String, String[] > variables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException
+  public MtasSpanQuery parse(String field, String defaultPrefix, HashMap < String, String [] > variables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException
   {
-    HashSet<String> usedVariables = new HashSet<String>();
+    HashSet < String > usedVariables = new HashSet < String > ();
     MtasSpanQuery query = cql(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength);
-    if(variables!=null && variables.size() > usedVariables.size()) {
-      for(String key : variables.keySet()) {
-        if(!usedVariables.contains(key)) {
-          throw new ParseException("variable $"+key+" not used");
+    if (variables != null && variables.size() > usedVariables.size())
+    {
+      for (String key : variables.keySet())
+      {
+        if (!usedVariables.contains(key))
+        {
+          throw new ParseException("variable $" + key + " not used");
         }
-      }    
+      }
       throw new ParseException("unused variables defined");
     }
     return query;
@@ -112,6 +117,16 @@ TOKEN :
 TOKEN :
 {
   < NOT_INTERSECTING : "!intersecting" >
+}
+
+TOKEN :
+{
+  < FULLYALIGNEDWITH : "fullyalignedwith" >
+}
+
+TOKEN :
+{
+  < NOT_FULLYALIGNEDWITH : "!fullyalignedwith" >
 }
 
 TOKEN :
@@ -245,7 +260,7 @@ TOKEN :
   >
 }
 
-private MtasSpanQuery cql(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
+private MtasSpanQuery cql(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasSpanSequenceItem si;
   ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
@@ -274,10 +289,10 @@ private MtasSpanQuery cql(String field, String defaultPrefix, HashMap<String, St
   }
 }
 
-private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore,Integer maximumIgnoreLength) throws ParseException :
+private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasCQLParserSentenceCondition sc1 = null, sc2 = null;
-  MtasSpanSequenceItem si1 = null, si2=null;
+  MtasSpanSequenceItem si1 = null, si2 = null;
   ArrayList < MtasSpanSequenceItem > itemList1 = new ArrayList < MtasSpanSequenceItem > ();
   ArrayList < MtasSpanSequenceItem > itemList2 = new ArrayList < MtasSpanSequenceItem > ();
   MtasSpanQuery q1 = null, q2 = null;
@@ -289,22 +304,24 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
   String OPERATOR_NOT_WITHIN = "not_within";
   String OPERATOR_INTERSECTING = "intersecting";
   String OPERATOR_NOT_INTERSECTING = "not_intersecting";
+  String OPERATOR_FULLYALIGNEDWITH = "fullyalignedwith";
+  String OPERATOR_NOT_FULLYALIGNEDWITH = "not_fullyalignedwith";
 }
 {
   (
     sc1 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
   | 
-    < BRACKET_START >
+    < BRACKET_START > 
+    si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+    {
+      itemList1.add(si1);
+    }
+    (
       si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
       {
         itemList1.add(si1);
       }
-      (
-        si1 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
-        {
-          itemList1.add(si1);
-        }
-      )*
+    )*
     < BRACKET_END >
   )
   [
@@ -325,7 +342,7 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
       {
         operator = OPERATOR_NOT_WITHIN;
       }
-      | < INTERSECTING >
+    | < INTERSECTING >
       {
         operator = OPERATOR_INTERSECTING;
       }
@@ -333,10 +350,18 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
       {
         operator = OPERATOR_NOT_INTERSECTING;
       }
+    | < FULLYALIGNEDWITH >
+      {
+        operator = OPERATOR_FULLYALIGNEDWITH;
+      }
+    | < NOT_FULLYALIGNEDWITH >
+      {
+        operator = OPERATOR_NOT_FULLYALIGNEDWITH;
+      }
     )
     (
       sc2 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
-    | < BRACKET_START >
+    | < BRACKET_START > 
       si2 = cqlBlock(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
       {
         itemList2.add(si2);
@@ -347,16 +372,20 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
           itemList2.add(si2);
         }
       )*
-    < BRACKET_END >
+      < BRACKET_END >
     )
   ]
   {
     if (sc1 != null)
     {
-      si1 = new MtasSpanSequenceItem(sc1.getQuery(),sc1.isOptional());      
-    } else if(itemList1.size()==1) {      
+      si1 = new MtasSpanSequenceItem(sc1.getQuery(), sc1.isOptional());
+    }
+    else if (itemList1.size() == 1)
+    {
       si1 = itemList1.get(0);
-    } else {
+    }
+    else
+    {
       MtasSpanQuery q = new MtasSpanSequenceQuery(itemList1, ignore, maximumIgnoreLength);
       si1 = new MtasSpanSequenceItem(q, false);
     }
@@ -364,13 +393,17 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
     {
       if (sc2 != null)
       {
-        si2 = new MtasSpanSequenceItem(sc2.getQuery(),sc2.isOptional());
-      } else if(itemList2.size()==1) { 
+        si2 = new MtasSpanSequenceItem(sc2.getQuery(), sc2.isOptional());
+      }
+      else if (itemList2.size() == 1)
+      {
         si2 = itemList2.get(0);
-      } else {
+      }
+      else
+      {
         MtasSpanQuery q = new MtasSpanSequenceQuery(itemList2, ignore, maximumIgnoreLength);
         si2 = new MtasSpanSequenceItem(q, false);
-      }      
+      }
       if (operator.equals(OPERATOR_CONTAINING))
       {
         MtasSpanQuery q = new MtasSpanContainingQuery(si1.getQuery(), si2.getQuery());
@@ -401,6 +434,16 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
         MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanIntersectingQuery(si1.getQuery(), si2.getQuery()));
         return new MtasSpanSequenceItem(q, si1.isOptional());
       }
+      else if (operator.equals(OPERATOR_FULLYALIGNEDWITH))
+      {
+        MtasSpanQuery q = new MtasSpanFullyAlignedWithQuery(si1.getQuery(), si2.getQuery());
+        return new MtasSpanSequenceItem(q, si1.isOptional());
+      }
+      else if (operator.equals(OPERATOR_NOT_FULLYALIGNEDWITH))
+      {
+        MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanFullyAlignedWithQuery(si1.getQuery(), si2.getQuery()));
+        return new MtasSpanSequenceItem(q, si1.isOptional());
+      }
       else
       {
         throw new ParseException("unexpected operator " + operator);
@@ -413,7 +456,7 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
   }
 }
 
-private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
+private MtasCQLParserSentenceCondition sentence(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasCQLParserSentenceCondition sentenceCondition;
   MtasCQLParserSentencePartCondition condition;
@@ -431,7 +474,7 @@ private MtasCQLParserSentenceCondition sentence(String field, String defaultPref
   }
 }
 
-private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
+private MtasCQLParserSentencePartCondition sentencePart(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   Token operator;
   MtasCQLParserSentencePartCondition condition, sentencePart;
@@ -509,13 +552,13 @@ private MtasCQLParserSentencePartCondition sentencePart(String field, String def
   }
 }
 
-private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
+private MtasCQLParserBasicSentenceCondition basicSentence(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasCQLParserWordFullCondition subWordCondition;
   MtasCQLParserGroupFullCondition subGroupCondition;
   MtasCQLParserBasicSentenceCondition condition = new MtasCQLParserBasicSentenceCondition(ignore, maximumIgnoreLength);
 }
-{ 
+{
   (
     subWordCondition = word(field, defaultPrefix, variables, usedVariables)
     {
@@ -569,7 +612,7 @@ private MtasCQLParserGroupFullCondition group(String field) throws ParseExceptio
       {
         startGroup = false;
         endGroup = false;
-      }      
+      }
     }
   | < SLASH > condition = groupCondition(field)
     {
@@ -652,7 +695,7 @@ private MtasCQLParserGroupCondition groupCondition(String field) throws ParseExc
   }
 }
 
-private MtasCQLParserWordFullCondition word(String field, String defaultPrefix, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasCQLParserWordFullCondition word(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables) throws ParseException :
 {
   Token questionMark = null;
   Token value;
@@ -749,7 +792,7 @@ private MtasCQLParserWordFullCondition word(String field, String defaultPrefix, 
   }
 }
 
-private MtasCQLParserWordCondition wordCondition(String field, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasCQLParserWordCondition wordCondition(String field, HashMap < String, String [ ] > variables, HashSet < String > usedVariables) throws ParseException :
 {
   Token negation = null;
   MtasCQLParserWordCondition condition, subCondition;
@@ -839,7 +882,7 @@ private MtasCQLParserWordCondition wordCondition(String field, HashMap<String, S
   }
 }
 
-private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap<String, String[] > variables, HashSet<String > usedVariables) throws ParseException :
+private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap < String, String [ ] > variables, HashSet < String > usedVariables) throws ParseException :
 {
   Token negation = null;
   Token nequals = null;

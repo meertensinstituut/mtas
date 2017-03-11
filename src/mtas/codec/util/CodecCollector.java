@@ -800,7 +800,8 @@ public class CodecCollector {
     for (GroupHit hit : occurences) {
       MtasSpanQuery queryHit = createQueryFromGroupHit(prefixes, field, hit);
       if (queryHit != null) {
-        SpanWeight weight = (SpanWeight) queryHit.rewrite(reader)
+        MtasSpanQuery queryHitRewritten = queryHit.rewrite(reader);
+        SpanWeight weight = (SpanWeight) queryHitRewritten
             .createWeight(searcher, false);
         Spans spans = weight.getSpans(lrc, SpanWeight.Postings.POSITIONS);
         if (spans != null) {
@@ -1480,7 +1481,6 @@ public class CodecCollector {
     if (mtasCodecInfo != null && groupList != null) {
       ArrayList<Match> matchList;
       HashMap<Integer, ArrayList<Match>> matchData;
-      long time = System.nanoTime();
       for (ComponentGroup group : groupList) {
         group.dataCollector.setWithTotal();
         if (group.prefixes.size() > 0) {
@@ -1635,7 +1635,7 @@ public class CodecCollector {
                         .ceil(boundaryMinimumNumberOfDocuments * 1.2);
                     boundaryMaximumNumberOfDocuments = (int) Math
                         .ceil(boundaryMaximumNumberOfDocuments * 1.2);
-                  }                  
+                  }
                 }
               }
             }
@@ -1645,7 +1645,7 @@ public class CodecCollector {
             group.dataCollector.add(hit.toString(), occurencesSum.get(hit),
                 occurencesN.get(hit));
           }
-          group.dataCollector.closeNewList();                                                  
+          group.dataCollector.closeNewList();
         }
       }
     }
@@ -1762,8 +1762,7 @@ public class CodecCollector {
       HashMap<GroupHit, Integer> occurencesN) throws IOException {
     int total = 0;
     if (docCounter + 1 < docSet.size()) {
-      // analyze matches for future documents with spans from
-      // previous
+      // initialize
       int nextDocCounter = docCounter + 1;
       long[] subSum = new long[list.size()];
       int[] subN = new int[list.size()];
@@ -1776,6 +1775,7 @@ public class CodecCollector {
       Spans[] spansList = new Spans[list.size()];
       boolean[] finishedSpansList = new boolean[list.size()];
       newNextDoc = true;
+      // advance spans, find nextDoc
       for (int i = 0; i < hitList.length; i++) {
         newNextDocs[i] = true;
         spansList[i] = list.get(hitList[i]);
@@ -1791,19 +1791,22 @@ public class CodecCollector {
             && docSet.get(nextDocCounter) < (nextDoc + docBase)) {
           nextDocCounter++;
         }
+        // finish, if no more docs in set
         if (nextDocCounter >= docSet.size()) {
           break;
         }
-        // matches found
+        // go to the matches
         if (docSet.get(nextDocCounter) == nextDoc + docBase) {
           matchList = matchData.get(nextDoc + docBase);
           if (matchList != null && matchList.size() > 0) {
+            // initialize
             int currentMatchPosition = 0;
             int lastMatchStartPosition = matchList
                 .get(matchList.size() - 1).startPosition;
             ArrayList<Match> newMatchList = new ArrayList<Match>(
                 matchList.size());
             int currentSpanPosition = Spans.NO_MORE_POSITIONS;
+            // check and initialize for each span
             for (int i = 0; i < spansList.length; i++) {
               if (spansList[i].docID() == nextDoc) {
                 int tmpStartPosition = spansList[i].nextStartPosition();
@@ -1812,6 +1815,7 @@ public class CodecCollector {
                 } else {
                   finishedSpansList[i] = true;
                 }
+                // compute position
                 currentSpanPosition = (currentSpanPosition == Spans.NO_MORE_POSITIONS)
                     ? tmpStartPosition
                     : Math.min(currentSpanPosition, tmpStartPosition);
@@ -1819,19 +1823,22 @@ public class CodecCollector {
                 finishedSpansList[i] = true;
               }
             }
+            // loop over matches
             while (currentMatchPosition < matchList.size()
                 && currentSpanPosition < Spans.NO_MORE_POSITIONS) {
+
               if (currentSpanPosition < matchList
                   .get(currentMatchPosition).startPosition) {
-                // do nothing
+                // do nothing, match not reached
               } else if (currentSpanPosition > lastMatchStartPosition) {
-                // finish
+                // finish, past last match
                 break;
               } else {
                 // advance matches
                 while (currentMatchPosition < matchList.size()
                     && currentSpanPosition > matchList
                         .get(currentMatchPosition).startPosition) {
+                  // store current match, not relevant
                   newMatchList.add(matchList.get(currentMatchPosition));
                   currentMatchPosition++;
                 }
@@ -1839,24 +1846,15 @@ public class CodecCollector {
                 while (currentMatchPosition < matchList.size()
                     && currentSpanPosition == matchList
                         .get(currentMatchPosition).startPosition) {
+                  // check for each span
                   for (int i = 0; i < spansList.length; i++) {
+                    // equal start and end, therefore match
                     if (!finishedSpansList[i] && spansList[i].docID() == nextDoc
                         && spansList[i].startPosition() == matchList
                             .get(currentMatchPosition).startPosition
                         && spansList[i].endPosition() == matchList
                             .get(currentMatchPosition).endPosition) {
-                      // StringBuilder newKey = new StringBuilder("");
-                      // GroupHit.keyToObject(hitList[i].toString(), newKey);
-                      // System.out
-                      // .println("FOUND " + newKey + " - doc "
-                      // + (nextDoc + docBase) + " ["
-                      // + spansList[i].startPosition() + ","
-                      // + spansList[i].endPosition() + "] == ["
-                      // + matchList
-                      // .get(currentMatchPosition).startPosition
-                      // + ","
-                      // + matchList.get(currentMatchPosition).endPosition
-                      // + "]");
+                      // administration
                       total++;
                       subSum[i]++;
                       if (newNextDocs[i]) {
@@ -1868,36 +1866,26 @@ public class CodecCollector {
                         && spansList[i].docID() == nextDoc
                         && spansList[i].startPosition() == matchList
                             .get(currentMatchPosition).startPosition) {
-                      // System.out
-                      // .println("NOT FOUND " + hitList[i] + " - doc "
-                      // + (nextDoc + docBase) + " ["
-                      // + spansList[i].startPosition() + ","
-                      // + spansList[i].endPosition() + "] ipv ["
-                      // + matchList
-                      // .get(currentMatchPosition).startPosition
-                      // + ","
-                      // + matchList.get(currentMatchPosition).endPosition
-                      // + "]");
+                      // no match, store
+                      newMatchList.add(matchList.get(currentMatchPosition));
                     }
                   }
                   currentMatchPosition++;
                 }
               }
+
               // advance spans
               if (currentMatchPosition < matchList.size()) {
                 currentSpanPosition = Spans.NO_MORE_POSITIONS;
                 for (int i = 0; i < spansList.length; i++) {
-                  if (spansList[i].docID() == nextDoc) {
-                    if (!finishedSpansList[i]
+                  if (!finishedSpansList[i]
+                      && (spansList[i].docID() == nextDoc)) {
+                    while (!finishedSpansList[i]
                         && spansList[i].startPosition() < matchList
                             .get(currentMatchPosition).startPosition) {
-                      while (!finishedSpansList[i]
-                          && spansList[i].startPosition() < matchList
-                              .get(currentMatchPosition).startPosition) {
-                        int tmpStartPosition = spansList[i].nextStartPosition();
-                        if (tmpStartPosition == Spans.NO_MORE_POSITIONS) {
-                          finishedSpansList[i] = true;
-                        }
+                      int tmpStartPosition = spansList[i].nextStartPosition();
+                      if (tmpStartPosition == Spans.NO_MORE_POSITIONS) {
+                        finishedSpansList[i] = true;
                       }
                     }
                     if (!finishedSpansList[i]) {
@@ -1913,14 +1901,16 @@ public class CodecCollector {
               }
             }
             if (!newNextDoc) {
+              // add other matches
               while (currentMatchPosition < matchList.size()) {
                 newMatchList.add(matchList.get(currentMatchPosition));
                 currentMatchPosition++;
               }
+              // update administration
               if (newMatchList.size() > 0) {
                 matchData.put(nextDoc + docBase, newMatchList);
               } else {
-                matchData.remove(nextDoc + docBase);
+                matchData.put(nextDoc + docBase, null);
               }
             }
           }
@@ -1934,6 +1924,7 @@ public class CodecCollector {
         // advance spans
         if (nextDocCounter < docSet.size()) {
           nextDoc = Spans.NO_MORE_DOCS;
+          // advance spans
           for (int i = 0; i < hitList.length; i++) {
             if (spansNextDoc[i] < (docSet.get(nextDocCounter) - docBase)) {
               spansNextDoc[i] = spansList[i]
@@ -1960,6 +1951,7 @@ public class CodecCollector {
     return total;
   }
 
+ 
   /**
    * Sort match list.
    *
@@ -2935,7 +2927,7 @@ public class CodecCollector {
                               double valueFunction = function.parserFunction
                                   .getValueDouble(numberBasic.valueSum, 0);
                               function.dataCollector.add(key, valueFunction,
-                                    numberBasic.docNumber);
+                                  numberBasic.docNumber);
                             }
                           }
                         }

@@ -7,6 +7,7 @@ import java.util.Set;
 import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -31,6 +32,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
    *          the field
    */
   public MtasSpanMatchNoneQuery(String field) {
+    super(null,null);
     this.field = field;
   }
 
@@ -55,6 +57,11 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     return new SpanNoneWeight(searcher, null);
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    return super.rewrite(reader);
   }
 
   /**

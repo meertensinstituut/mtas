@@ -1900,14 +1900,16 @@ public class CodecComponent {
     public GroupHit(ArrayList<MtasTreeHit<String>> list, int start, int end,
         int hitStart, int hitEnd, ComponentGroup group,
         HashSet<String> knownPrefixes) throws UnsupportedEncodingException {
+      //System.out.println("init: "+start+"-"+end+"\t"+hitStart+"-"+hitEnd);
       // compute dimensions
       int leftRangeStart = start;
       int leftRangeEnd = Math.min(end - 1, hitStart - 1);
       int leftRangeLength = Math.max(0, 1 + leftRangeEnd - leftRangeStart);
       int hitLength = 1 + hitEnd - hitStart;
       int rightRangeStart = Math.max(start, hitEnd + 1);
-      int rightRangeEnd = end - 1;
+      int rightRangeEnd = end;
       int rightRangeLength = Math.max(0, 1 + rightRangeEnd - rightRangeStart);
+      //System.out.println(leftRangeStart+"\t"+leftRangeEnd+"\t"+leftRangeLength+" - "+rightRangeStart+"\t"+rightRangeEnd+"\t"+rightRangeLength);
       // create initial arrays
       if (leftRangeLength > 0) {
         keyLeft = "";
@@ -1981,15 +1983,15 @@ public class CodecComponent {
         }
       }
       if (group.hitInsideRight != null) {
-        System.out.println(missingHit.length + " items in missingHit");
-        System.out.println(
-            group.hitInsideRight.length + " items in group.hitInsideRight");
+        //System.out.println(missingHit.length + " items in missingHit");
+        //System.out.println(
+        //    group.hitInsideRight.length + " items in group.hitInsideRight");
         for (int p = 0; p < group.hitInsideRight.length; p++) {
-          System.out.println(" - " + group.hitInsideRight[p]);
+          //System.out.println(" - " + group.hitInsideRight[p]);
         }
         for (int p = Math.max(hitStart,
             hitEnd - group.hitInsideRight.length + 1); p <= hitEnd; p++) {
-          System.out.println("Test voor p is " + (p - hitStart));
+          //System.out.println("Test voor p is " + (p - hitStart));
           if (group.hitInsideRight[hitEnd - p] != null) {
             missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);
           }

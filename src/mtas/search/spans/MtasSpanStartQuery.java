@@ -21,7 +21,7 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasSpanStartQuery extends MtasSpanQuery {
 
   /** The query. */
-  private MtasSpanQuery query;
+  private MtasSpanQuery clause;
 
   /**
    * Instantiates a new mtas span start query.
@@ -30,8 +30,8 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    *          the query
    */
   public MtasSpanStartQuery(MtasSpanQuery query) {
-    super();
-    this.query = query;
+    super(0, 0);
+    clause = query;
   }
 
   /*
@@ -42,8 +42,14 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    query = query.rewrite(reader);
-    return this;
+    MtasSpanQuery newClause = clause.rewrite(reader);
+    if (newClause != clause) {
+      return new MtasSpanStartQuery(newClause).rewrite(reader);
+    } else if(newClause.getMaximumWidth()!=null && newClause.getMaximumWidth()==0) {
+      return newClause;
+    } else {
+      return super.rewrite(reader);
+    }
   }
 
   /*
@@ -56,7 +62,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
     buffer.append(this.getClass().getSimpleName() + "([");
-    buffer.append(this.query.toString(field));
+    buffer.append(clause.toString(field));
     buffer.append("])");
     return buffer.toString();
   }
@@ -68,7 +74,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public String getField() {
-    return query.getField();
+    return clause.getField();
   }
 
   /*
@@ -81,7 +87,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
-    SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(query))
+    SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))
         .createWeight(searcher, needsScores);
     return new SpanTermWeight(spanWeight, searcher);
   }
@@ -162,7 +168,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     if (getClass() != obj.getClass())
       return false;
     final MtasSpanStartQuery that = (MtasSpanStartQuery) obj;
-    return query.equals(that.query);
+    return clause.equals(that.clause);
   }
 
   /*
@@ -173,7 +179,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
-    h = (h * 7) ^ query.hashCode();
+    h = (h * 7) ^ clause.hashCode();
     return h;
   }
 

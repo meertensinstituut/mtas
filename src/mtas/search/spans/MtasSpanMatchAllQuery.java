@@ -8,6 +8,7 @@ import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -34,6 +35,7 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    *          the field
    */
   public MtasSpanMatchAllQuery(String field) {
+    super(1,1);
     this.field = field;
   }
 
@@ -59,6 +61,11 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
       throws IOException {    
     //keep things simple
     return new SpanAllWeight(searcher, null);        
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    return super.rewrite(reader);
   }
 
   /**

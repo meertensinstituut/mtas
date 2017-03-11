@@ -47,6 +47,8 @@ The optional postfix associated with a token can also be queried within CQL by p
 | **\(** [cql](#cql) **\) !containing \(** [cql](#cql) **\)**  | Matches CQL expression not containing another CQL expression   | `(<s/>) !containing ([t="de"])` |
 | **\(** [cql](#cql) **\) intersecting \(** [cql](#cql) **\)**  | Matches CQL expression intersecting another CQL expression   | `(<s/>) intersecting (<div/>)` |
 | **\(** [cql](#cql) **\) !intersecting \(** [cql](#cql) **\)**  | Matches CQL expression not intersecting another CQL expression   | `(<s/>) !intersecting (<div/>)` |
+| **\(** [cql](#cql) **\) fullyalignedwith \(** [cql](#cql) **\)**  | Matches CQL expression fully aligned with another CQL expression   | `(<s/>) fullyalignedwith (<div/>)` |
+| **\(** [cql](#cql) **\) !fullyalignedwith \(** [cql](#cql) **\)**  | Matches CQL expression not fully aligned with another CQL expression   | `(<s/>) !fullyalignedwith (<div/>)` |
 
 <a name="token"></a>
 

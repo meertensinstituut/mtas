@@ -59,7 +59,7 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
    *          the single position
    */
   public MtasSpanWildcardQuery(Term term, boolean singlePosition) {
-    super();
+    super(singlePosition?1:null, singlePosition?1:null);
     WildcardQuery wcq = new WildcardQuery(term);
     query = new SpanMultiTermQueryWrapper<WildcardQuery>(wcq);
     this.term = term;
@@ -102,7 +102,7 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
           throw new IOException("no SpanTermQuery after rewrite");
         }
       }
-      return new MtasSpanOrQuery(newClauses);
+      return new MtasSpanOrQuery(newClauses).rewrite(reader);
     } else {
       throw new IOException("no SpanOrQuery after rewrite");
     }

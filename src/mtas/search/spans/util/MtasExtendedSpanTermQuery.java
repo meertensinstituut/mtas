@@ -263,7 +263,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     if (getClass() != obj.getClass())
       return false;
     MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;
-    return other.term.equals(term) && (other.singlePosition != singlePosition);
+    return other.term.equals(term) && (other.singlePosition == singlePosition);
   }
 
 }

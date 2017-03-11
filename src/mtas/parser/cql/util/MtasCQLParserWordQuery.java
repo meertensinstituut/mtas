@@ -50,6 +50,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
    */
   public MtasCQLParserWordQuery(String field, String prefix,
       HashMap<String, String[]> variables) {
+    super(1,1);
     term = new Term(field, prefix + MtasToken.DELIMITER);
     query = new MtasSpanPrefixQuery(term, true);
   }
@@ -84,6 +85,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
   public MtasCQLParserWordQuery(String field, String prefix, String value,
       String type, HashMap<String, String[]> variables,
       HashSet<String> usedVariables) throws ParseException {
+    super(1,1);
     String termBase = prefix + MtasToken.DELIMITER + value;
     if (type.equals(MTAS_CQL_REGEXP_QUERY)) {
       term = new Term(field, termBase + "\u0000*");

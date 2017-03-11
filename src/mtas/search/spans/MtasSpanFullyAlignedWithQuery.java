@@ -18,25 +18,23 @@ import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
- * The Class MtasSpanIntersectingQuery.
+ * The Class MtasSpanFullyAlignedWithQuery.
  */
-public class MtasSpanIntersectingQuery extends MtasSpanQuery {
+public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
 
   /** The field. */
   private String field;
 
-  /** The q2. */
+  /** The q 2. */
   private SpanQuery q1, q2;
 
   /**
-   * Instantiates a new mtas span intersecting query.
+   * Instantiates a new mtas span fully aligned with query.
    *
-   * @param q1
-   *          the q1
-   * @param q2
-   *          the q2
+   * @param q1 the q 1
+   * @param q2 the q 2
    */
-  public MtasSpanIntersectingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
+  public MtasSpanFullyAlignedWithQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
     if (q1 != null && (field = q1.getField()) != null) {
@@ -76,16 +74,16 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     if (q1 == null || q2 == null) {
       return null;
     } else {
-      MtasSpanIntersectingQueryWeight w1 = new MtasSpanIntersectingQueryWeight(
+      MtasSpanFullyAlignedWithQueryWeight w1 = new MtasSpanFullyAlignedWithQueryWeight(
           q1.createWeight(searcher, needsScores));
-      MtasSpanIntersectingQueryWeight w2 = new MtasSpanIntersectingQueryWeight(
+      MtasSpanFullyAlignedWithQueryWeight w2 = new MtasSpanFullyAlignedWithQueryWeight(
           q2.createWeight(searcher, needsScores));
       // subWeights
-      List<MtasSpanIntersectingQueryWeight> subWeights = new ArrayList<MtasSpanIntersectingQueryWeight>();
+      List<MtasSpanFullyAlignedWithQueryWeight> subWeights = new ArrayList<MtasSpanFullyAlignedWithQueryWeight>();
       subWeights.add(w1);
       subWeights.add(w2);
       // return
-      return new SpanIntersectingWeight(w1, w2, searcher,
+      return new SpanFullyAlignedWithWeight(w1, w2, searcher,
           needsScores ? getTermContexts(subWeights) : null);
     }
   }
@@ -93,14 +91,13 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /**
    * Gets the term contexts.
    *
-   * @param items
-   *          the items
+   * @param items the items
    * @return the term contexts
    */
   protected Map<Term, TermContext> getTermContexts(
-      List<MtasSpanIntersectingQueryWeight> items) {
+      List<MtasSpanFullyAlignedWithQueryWeight> items) {
     List<SpanWeight> weights = new ArrayList<SpanWeight>();
-    for (MtasSpanIntersectingQueryWeight item : items) {
+    for (MtasSpanFullyAlignedWithQueryWeight item : items) {
       weights.add(item.spanWeight);
     }
     return getTermContexts(weights);
@@ -143,7 +140,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final MtasSpanIntersectingQuery other = (MtasSpanIntersectingQuery) obj;
+    final MtasSpanFullyAlignedWithQuery other = (MtasSpanFullyAlignedWithQuery) obj;
     return q1.equals(other.q1) && q2.equals(other.q2);
   }
 
@@ -172,7 +169,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
     MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
     if (newQ1 != q1 || newQ2 != q2) {
-      return new MtasSpanIntersectingQuery(newQ1, newQ2).rewrite(reader);
+      return new MtasSpanFullyAlignedWithQuery(newQ1, newQ2).rewrite(reader);
     } else if (newQ1 == null || newQ2 == null) {
       return new MtasSpanMatchNoneQuery(this.getField());
     } else if(newQ1.equals(newQ2)) {
@@ -183,7 +180,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     } else if (newQ2.getMaximumWidth() != null
         && newQ2.getMaximumWidth() == 0) {
       return new MtasSpanMatchNoneQuery(this.getField());
-    } else {
+    } else if(newQ1.getMinimumWidth()!=null && newQ2.getMaximumWidth()!=null && newQ1.getMinimumWidth()>newQ2.getMaximumWidth()) {
+      return new MtasSpanMatchNoneQuery(this.getField());
+    } else if(newQ2.getMinimumWidth()!=null && newQ1.getMaximumWidth()!=null && newQ2.getMinimumWidth()>newQ1.getMaximumWidth()) {
+      return new MtasSpanMatchNoneQuery(this.getField());
+    } else {  
       return super.rewrite(reader);
     }
   }
@@ -191,29 +192,24 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /**
    * The Class SpanIntersectingWeight.
    */
-  public class SpanIntersectingWeight extends SpanWeight {
+  public class SpanFullyAlignedWithWeight extends SpanWeight {
 
-    /** The w2. */
-    MtasSpanIntersectingQueryWeight w1, w2;
+    /** The w 2. */
+    MtasSpanFullyAlignedWithQueryWeight w1, w2;
 
     /**
      * Instantiates a new span intersecting weight.
      *
-     * @param w1
-     *          the w1
-     * @param w2
-     *          the w2
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param w1 the w 1
+     * @param w2 the w 2
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    public SpanIntersectingWeight(MtasSpanIntersectingQueryWeight w1,
-        MtasSpanIntersectingQueryWeight w2, IndexSearcher searcher,
+    public SpanFullyAlignedWithWeight(MtasSpanFullyAlignedWithQueryWeight w1,
+        MtasSpanFullyAlignedWithQueryWeight w2, IndexSearcher searcher,
         Map<Term, TermContext> terms) throws IOException {
-      super(MtasSpanIntersectingQuery.this, searcher, terms);
+      super(MtasSpanFullyAlignedWithQuery.this, searcher, terms);
       this.w1 = w1;
       this.w2 = w2;
     }
@@ -246,11 +242,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
       if (terms == null) {
         return null; // field does not exist
       }
-      MtasSpanIntersectingQuerySpans s1 = new MtasSpanIntersectingQuerySpans(
+      MtasSpanFullyAlignedWithQuerySpans s1 = new MtasSpanFullyAlignedWithQuerySpans(
           w1.spanWeight.getSpans(context, requiredPostings));
-      MtasSpanIntersectingQuerySpans s2 = new MtasSpanIntersectingQuerySpans(
+      MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanIntersectingSpans(MtasSpanIntersectingQuery.this, s1,
+      return new MtasSpanFullyAlignedWithSpans(MtasSpanFullyAlignedWithQuery.this, s1,
           s2);
     }
 
@@ -270,7 +266,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanIntersectingQuerySpans.
    */
-  public class MtasSpanIntersectingQuerySpans {
+  public class MtasSpanFullyAlignedWithQuerySpans {
 
     /** The spans. */
     public Spans spans;
@@ -278,10 +274,9 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query spans.
      *
-     * @param spans
-     *          the spans
+     * @param spans the spans
      */
-    public MtasSpanIntersectingQuerySpans(Spans spans) {
+    public MtasSpanFullyAlignedWithQuerySpans(Spans spans) {
       this.spans = spans;
     }
 
@@ -290,7 +285,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanIntersectingQueryWeight.
    */
-  public class MtasSpanIntersectingQueryWeight {
+  public class MtasSpanFullyAlignedWithQueryWeight {
 
     /** The span weight. */
     public SpanWeight spanWeight;
@@ -298,10 +293,9 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query weight.
      *
-     * @param spanWeight
-     *          the span weight
+     * @param spanWeight the span weight
      */
-    public MtasSpanIntersectingQueryWeight(SpanWeight spanWeight) {
+    public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;
     }
   }

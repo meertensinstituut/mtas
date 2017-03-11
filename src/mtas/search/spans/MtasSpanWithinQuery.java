@@ -17,6 +17,8 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanWithinQuery baseQuery;
+  private MtasSpanQuery bigQuery, smallQuery;
+  
 
   /**
    * Instantiates a new mtas span within query.
@@ -25,8 +27,15 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
    * @param q2 the q2
    */
   public MtasSpanWithinQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
-    super();
-    baseQuery = new SpanWithinQuery(q1, q2);
+    super(q1!=null?q1.getMinimumWidth():null, q1!=null?q1.getMaximumWidth():null);
+    if(q2!=null && q2.getMinimumWidth()!=null) {
+      if(this.getMinimumWidth()==null || this.getMinimumWidth()<q2.getMinimumWidth()) {
+        this.setWidth(q2.getMinimumWidth(), this.getMaximumWidth());
+      }
+    }    
+    smallQuery=q1;
+    bigQuery=q2;
+    baseQuery = new SpanWithinQuery(smallQuery, bigQuery);
   }
 
   /*
@@ -37,8 +46,16 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    baseQuery = (SpanWithinQuery) baseQuery.rewrite(reader);
-    return this;
+    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);    
+    MtasSpanQuery newBigQuery = bigQuery.rewrite(reader);
+    if(newSmallQuery!=smallQuery || newBigQuery!=bigQuery) {
+      return new MtasSpanWithinQuery(newSmallQuery, newBigQuery).rewrite(reader);
+    } else if(newSmallQuery!=null && newBigQuery!=null && newSmallQuery.equals(newBigQuery)) {
+      return newSmallQuery;
+    } else {
+      baseQuery = (SpanWithinQuery) baseQuery.rewrite(reader);
+      return super.rewrite(reader);
+    }
   }
 
   /*

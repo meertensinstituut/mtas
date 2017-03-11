@@ -6,6 +6,7 @@ import java.util.Set;
 
 import mtas.search.similarities.MtasSimScorer;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
@@ -33,6 +34,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    *          the clause
    */
   public MtasSpanUniquePositionQuery(MtasSpanQuery clause) {
+    super(clause.getMinimumWidth(), clause.getMaximumWidth());
     field = clause.getField();
     this.clause = clause;
   }
@@ -97,6 +99,16 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     buffer.append(clause.toString(field));
     buffer.append("])");
     return buffer.toString();
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    MtasSpanQuery newClause = clause.rewrite(reader);
+    if(newClause!=clause) {
+      return new MtasSpanUniquePositionQuery(newClause).rewrite(reader);
+    } else {
+      return super.rewrite(reader);
+    }
   }
 
   /*

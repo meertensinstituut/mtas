@@ -23,51 +23,55 @@ public interface MtasCQLParserConstants {
   /** RegularExpression Id. */
   int NOT_INTERSECTING = 10;
   /** RegularExpression Id. */
-  int GROUP_START = 11;
+  int FULLYALIGNEDWITH = 11;
   /** RegularExpression Id. */
-  int GROUP_END = 12;
+  int NOT_FULLYALIGNEDWITH = 12;
   /** RegularExpression Id. */
-  int WORD_START = 13;
+  int GROUP_START = 13;
   /** RegularExpression Id. */
-  int WORD_END = 14;
+  int GROUP_END = 14;
   /** RegularExpression Id. */
-  int BRACKET_START = 15;
+  int WORD_START = 15;
   /** RegularExpression Id. */
-  int BRACKET_END = 16;
+  int WORD_END = 16;
   /** RegularExpression Id. */
-  int CURLY_BRACKET_START = 17;
+  int BRACKET_START = 17;
   /** RegularExpression Id. */
-  int CURLY_BRACKET_END = 18;
+  int BRACKET_END = 18;
   /** RegularExpression Id. */
-  int SLASH = 19;
+  int CURLY_BRACKET_START = 19;
   /** RegularExpression Id. */
-  int QUESTION_MARK = 20;
+  int CURLY_BRACKET_END = 20;
   /** RegularExpression Id. */
-  int NEGATION = 21;
+  int SLASH = 21;
   /** RegularExpression Id. */
-  int AND = 22;
+  int QUESTION_MARK = 22;
   /** RegularExpression Id. */
-  int OR = 23;
+  int NEGATION = 23;
   /** RegularExpression Id. */
-  int KOMMA = 24;
+  int AND = 24;
   /** RegularExpression Id. */
-  int TOKEN_NOTEQUALS = 25;
+  int OR = 25;
   /** RegularExpression Id. */
-  int TOKEN_EQUALS = 26;
+  int KOMMA = 26;
   /** RegularExpression Id. */
-  int NUMBER = 27;
+  int TOKEN_NOTEQUALS = 27;
   /** RegularExpression Id. */
-  int VARIABLE = 28;
+  int TOKEN_EQUALS = 28;
   /** RegularExpression Id. */
-  int QUOTED_VALUE = 29;
+  int NUMBER = 29;
   /** RegularExpression Id. */
-  int UNQUOTED_VALUE = 30;
+  int VARIABLE = 30;
   /** RegularExpression Id. */
-  int OCTOTHORPE = 31;
+  int QUOTED_VALUE = 31;
   /** RegularExpression Id. */
-  int DIGIT = 32;
+  int UNQUOTED_VALUE = 32;
   /** RegularExpression Id. */
-  int ALLOWED_UNQUOTED_CHARACTER = 33;
+  int OCTOTHORPE = 33;
+  /** RegularExpression Id. */
+  int DIGIT = 34;
+  /** RegularExpression Id. */
+  int ALLOWED_UNQUOTED_CHARACTER = 35;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -85,6 +89,8 @@ public interface MtasCQLParserConstants {
     "\"!within\"",
     "\"intersecting\"",
     "\"!intersecting\"",
+    "\"fullyalignedwith\"",
+    "\"!fullyalignedwith\"",
     "\"<\"",
     "\">\"",
     "\"[\"",

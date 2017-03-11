@@ -2,7 +2,6 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
 
   /** The clauses. */
   private List<MtasSpanQuery> clauses;
-  
+
   private SpanQuery baseQuery;
 
   /**
@@ -31,16 +30,25 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
    *          the clauses
    */
   public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
-    super();
+    super(null, null);
+    Integer minimum = null, maximum = null;
     clauses = new ArrayList<MtasSpanQuery>();
-    for(MtasSpanQuery item : initialClauses) {
-      if(!clauses.contains(item)) {
-          clauses.add(item);
+    for (MtasSpanQuery item : initialClauses) {
+      if (!clauses.contains(item)) {
+        minimum = clauses.isEmpty() ? item.getMinimumWidth()
+            : (minimum != null && item.getMinimumWidth() != null)
+                ? Math.min(minimum, item.getMinimumWidth()) : null;
+        maximum = clauses.isEmpty() ? item.getMaximumWidth()
+            : (maximum != null && item.getMaximumWidth() != null)
+                ? Math.max(maximum, item.getMaximumWidth()) : null;
+        clauses.add(item);
       }
-    }  
-    baseQuery = new SpanOrQuery(clauses.toArray(new MtasSpanQuery[clauses.size()]));      
+    }
+    setWidth(minimum, maximum);
+    baseQuery = new SpanOrQuery(
+        clauses.toArray(new MtasSpanQuery[clauses.size()]));
   }
-  
+
   @Override
   public String getField() {
     return baseQuery.getField();
@@ -51,27 +59,69 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores);
   }
-  
+
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    super.rewrite(reader);
-    if(clauses.size()>1) {    
+    if (clauses.size() > 1) {
+      // rewrite, count MtasSpanMatchAllQuery and check for
+      // MtasSpanMatchNoneQuery
       MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];
+      int singlePositionQueries = 0;
+      int matchAllSinglePositionQueries = 0;
+      int matchNoneQueries = 0;
       boolean actuallyRewritten = false;
-      for(int i=0; i<clauses.size(); i++) {
+      for (int i = 0; i < clauses.size(); i++) {
         newClauses[i] = clauses.get(i).rewrite(reader);
-        actuallyRewritten |= clauses.get(i)!=newClauses[i];        
+        actuallyRewritten |= clauses.get(i) != newClauses[i];
+        if (newClauses[i] instanceof MtasSpanMatchNoneQuery) {
+          matchNoneQueries++;
+        } else if (newClauses[i].isSinglePositionQuery()) {
+          singlePositionQueries++;
+          if (newClauses[i] instanceof MtasSpanMatchAllQuery) {
+            matchAllSinglePositionQueries++;
+          }
+        }
       }
-      if(actuallyRewritten) {
-        return new MtasSpanOrQuery(newClauses).rewrite(reader);        
+      // filter clauses
+      if (matchNoneQueries > 0 || matchAllSinglePositionQueries > 0) {
+        // compute new number of clauses
+        int newNumber = newClauses.length - matchNoneQueries;
+        if (matchAllSinglePositionQueries > 0) {
+          newNumber -= singlePositionQueries - 1;
+        }
+        MtasSpanQuery[] newFilteredClauses = new MtasSpanQuery[newNumber];
+        int j = 0;
+        for (int i = 0; i < newClauses.length; i++) {
+          if (!(newClauses[i] instanceof MtasSpanMatchNoneQuery)) {
+            if (!newClauses[i].isSinglePositionQuery()) {
+              newFilteredClauses[j] = newClauses[i];
+              j++;
+            } else if (matchAllSinglePositionQueries == 0) {
+              newFilteredClauses[j] = newClauses[i];
+              j++;
+            } else if (singlePositionQueries > 0) {
+              newFilteredClauses[j] = newClauses[i];
+              j++;
+              singlePositionQueries = 0; // only match this condition once
+            }
+          }
+        }
+        newClauses = newFilteredClauses;
+      }
+      if (newClauses.length == 0) {
+        return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);
+      } else if (newClauses.length == 1) {
+        return newClauses[0].rewrite(reader);
+      } else if (actuallyRewritten || newClauses.length != clauses.size()) {
+        return new MtasSpanOrQuery(newClauses).rewrite(reader);
       } else {
         return super.rewrite(reader);
       }
-    } else if(clauses.size()==1) {
-      return clauses.get(0).rewrite(reader);      
+    } else if (clauses.size() == 1) {
+      return clauses.get(0).rewrite(reader);
     } else {
-      return super.rewrite(reader);
-    }
+      return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);
+    }    
   }
 
   /*
@@ -123,6 +173,6 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ baseQuery.hashCode();
     return h;
-  }  
+  }
 
 }

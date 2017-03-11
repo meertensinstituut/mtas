@@ -28,6 +28,7 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
    * @param position the position
    */
   public MtasCQLParserWordPositionQuery(String field, int position) {
+    super(1,1);
     term = new Term(field);
     query = new MtasSpanPositionQuery(field, position);
   }
@@ -40,6 +41,7 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
    * @param end the end
    */
   public MtasCQLParserWordPositionQuery(String field, int start, int end) {
+    super(1,1);
     term = new Term(field);
     query = new MtasSpanPositionQuery(field, start, end);
   }
