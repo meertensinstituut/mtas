@@ -91,7 +91,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q3, false));
     MtasSpanQuery q4 = new MtasSpanSequenceQuery(items, null, null);
     MtasSpanQuery q = new MtasSpanOrQuery(q1,q4);
-    testCQLParse(field, null, cql, q);       
+    testCQLParse(field, null, cql, q);        
   }
   
   @org.junit.Test

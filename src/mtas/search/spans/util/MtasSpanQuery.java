@@ -6,8 +6,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
-
-import mtas.search.spans.MtasSpanMatchAllQuery;
 import mtas.search.spans.MtasSpanMatchNoneQuery;
 
 public abstract class MtasSpanQuery extends SpanQuery {

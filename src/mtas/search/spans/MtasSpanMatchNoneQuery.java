@@ -180,7 +180,11 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
     if (getClass() != obj.getClass())
       return false;
     final MtasSpanMatchNoneQuery that = (MtasSpanMatchNoneQuery) obj;
-    return field.equals(that.field);
+    if(field==null) {
+      return that.field==null;
+    } else {
+      return field.equals(that.field);
+    }  
   }
 
   /*
@@ -191,7 +195,9 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
-    h = (h * 7) ^ field.hashCode();
+    if(field!=null) {
+      h = (h * 7) ^ field.hashCode();
+    }  
     return h;
   }
 

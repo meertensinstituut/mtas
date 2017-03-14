@@ -2,6 +2,7 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   private List<MtasSpanSequenceItem> items;
 
   /** The ignore clause. */
-  private MtasSpanQuery ignoreClause;
+  private MtasSpanQuery ignoreQuery;
 
   /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
@@ -40,13 +41,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    *
    * @param items
    *          the items
-   * @param ignore
+   * @param ignoreQuery
    *          the ignore
    * @param maximumIgnoreLength
    *          the maximum ignore length
    */
   public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
-      MtasSpanQuery ignore, Integer maximumIgnoreLength) {
+      MtasSpanQuery ignoreQuery, Integer maximumIgnoreLength) {
     super(null, null);
     Integer minimum = 0, maximum = 0;
     this.items = items;
@@ -68,24 +69,26 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       }
     }
     // check ignore
-    if (field != null && ignore != null) {
-      if (ignore.getField() == null || field.equals(ignore.getField())) {
-        this.ignoreClause = ignore;
-        this.maximumIgnoreLength = maximumIgnoreLength;
+    if (field != null && ignoreQuery != null) {
+      if (ignoreQuery.getField() == null
+          || field.equals(ignoreQuery.getField())) {
+        this.ignoreQuery = ignoreQuery;
+        this.maximumIgnoreLength = maximumIgnoreLength == null ? 1
+            : maximumIgnoreLength;
       } else {
         throw new IllegalArgumentException(
             "ignore must have same field as clauses");
       }
       if (maximum != null && items.size() > 1) {
-        if (ignore.getMaximumWidth() != null) {
-          maximum += (items.size() - 1) * maximumIgnoreLength
-              * ignoreClause.getMaximumWidth();
+        if (this.ignoreQuery.getMaximumWidth() != null) {
+          maximum += (items.size() - 1) * this.maximumIgnoreLength
+              * this.ignoreQuery.getMaximumWidth();
         } else {
           maximum = null;
         }
       }
     } else {
-      this.ignoreClause = null;
+      this.ignoreQuery = null;
       this.maximumIgnoreLength = null;
     }
     setWidth(minimum, maximum);
@@ -101,6 +104,18 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return field;
   }
 
+  public List<MtasSpanSequenceItem> getItems() {
+    return items;
+  }
+
+  public MtasSpanQuery getIgnoreQuery() {
+    return ignoreQuery;
+  }
+
+  public Integer getMaximumIgnoreLength() {
+    return maximumIgnoreLength;
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -112,24 +127,43 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     if (items.size() == 1) {
       return items.get(0).getQuery().rewrite(reader);
     } else {
-      MtasSpanSequenceItem newItem;
+      MtasSpanSequenceItem newItem, previousNewItem = null;
       ArrayList<MtasSpanSequenceItem> newItems = new ArrayList<MtasSpanSequenceItem>(
           items.size());
-      MtasSpanQuery newIgnoreClause = ignoreClause != null
-          ? ignoreClause.rewrite(reader) : null;
-      boolean actuallyRewritten = ignoreClause != null
-          ? newIgnoreClause != ignoreClause : false;
+      MtasSpanQuery newIgnoreClause = ignoreQuery != null
+          ? ignoreQuery.rewrite(reader) : null;
+      boolean actuallyRewritten = ignoreQuery != null
+          ? newIgnoreClause != ignoreQuery : false;
       for (int i = 0; i < items.size(); i++) {
         newItem = items.get(i).rewrite(reader);
-        actuallyRewritten |= items.get(i) != newItem;
-        // for now too difficult, possibly later merge with previous if possible
-        newItems.add(newItem);
+        if (newItem.getQuery() instanceof MtasSpanMatchNoneQuery) {
+          if (!newItem.isOptional()) {
+            return new MtasSpanMatchNoneQuery(field);
+          } else {
+            actuallyRewritten = true;
+          }
+        } else {
+          actuallyRewritten |= items.get(i) != newItem;
+          MtasSpanSequenceItem previousMergedItem = MtasSpanSequenceItem.merge(
+              previousNewItem, newItem, ignoreQuery, maximumIgnoreLength);
+          if (previousMergedItem != null) {
+            newItems.set((newItems.size() - 1), previousMergedItem);
+            actuallyRewritten = true;
+          } else {
+            newItems.add(newItem);
+          }
+          previousNewItem = newItem;
+        }
       }
       if (!actuallyRewritten) {
         return super.rewrite(reader);
       } else {
-        return new MtasSpanSequenceQuery(newItems, newIgnoreClause,
-            maximumIgnoreLength).rewrite(reader);
+        if (newItems.size() > 0) {
+          return new MtasSpanSequenceQuery(newItems, newIgnoreClause,
+              maximumIgnoreLength).rewrite(reader);
+        } else {
+          return new MtasSpanMatchNoneQuery(field);
+        }
       }
     }
   }
@@ -157,7 +191,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     }
     buffer.append("]");
     buffer.append(", ");
-    buffer.append(ignoreClause);
+    buffer.append(ignoreQuery);
     buffer.append(")");
     return buffer.toString();
   }
@@ -177,9 +211,9 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       return false;
     MtasSpanSequenceQuery other = (MtasSpanSequenceQuery) obj;
     return field.equals(other.field) && items.equals(other.items)
-        && ((ignoreClause == null && other.ignoreClause == null)
-            || ignoreClause != null && other.ignoreClause != null
-                && ignoreClause.equals(other.ignoreClause));
+        && ((ignoreQuery == null && other.ignoreQuery == null)
+            || ignoreQuery != null && other.ignoreQuery != null
+                && ignoreQuery.equals(other.ignoreQuery));
   }
 
   /*
@@ -192,6 +226,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 3) ^ field.hashCode();
     h = (h * 5) ^ items.hashCode();
+    if (ignoreQuery != null) {
+      h = (h * 7) ^ ignoreQuery.hashCode();
+      h = (h * 11) ^ maximumIgnoreLength.hashCode();
+    }
     return h;
   }
 
@@ -211,8 +249,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       subWeights.add(new MtasSpanSequenceQueryWeight(
           item.getQuery().createWeight(searcher, false), item.isOptional()));
     }
-    if (ignoreClause != null) {
-      ignoreWeight = ignoreClause.createWeight(searcher, false);
+    if (ignoreQuery != null) {
+      ignoreWeight = ignoreQuery.createWeight(searcher, false);
     }
     return new SpanSequenceWeight(subWeights, ignoreWeight, maximumIgnoreLength,
         searcher, needsScores ? getTermContexts(subWeights) : null);

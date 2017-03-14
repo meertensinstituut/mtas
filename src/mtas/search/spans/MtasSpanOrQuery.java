@@ -2,6 +2,7 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasSpanOrQuery extends MtasSpanQuery {
 
   /** The clauses. */
-  private List<MtasSpanQuery> clauses;
+  private HashSet<MtasSpanQuery> clauses;
 
   private SpanQuery baseQuery;
 
@@ -32,7 +33,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
     Integer minimum = null, maximum = null;
-    clauses = new ArrayList<MtasSpanQuery>();
+    clauses = new HashSet<MtasSpanQuery>();
     for (MtasSpanQuery item : initialClauses) {
       if (!clauses.contains(item)) {
         minimum = clauses.isEmpty() ? item.getMinimumWidth()
@@ -66,13 +67,15 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
       // rewrite, count MtasSpanMatchAllQuery and check for
       // MtasSpanMatchNoneQuery
       MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];
+      MtasSpanQuery[] oldClauses = clauses
+          .toArray(new MtasSpanQuery[clauses.size()]);
       int singlePositionQueries = 0;
       int matchAllSinglePositionQueries = 0;
       int matchNoneQueries = 0;
       boolean actuallyRewritten = false;
-      for (int i = 0; i < clauses.size(); i++) {
-        newClauses[i] = clauses.get(i).rewrite(reader);
-        actuallyRewritten |= clauses.get(i) != newClauses[i];
+      for (int i = 0; i < oldClauses.length; i++) {
+        newClauses[i] = oldClauses[i].rewrite(reader);
+        actuallyRewritten |= oldClauses[i] != newClauses[i];
         if (newClauses[i] instanceof MtasSpanMatchNoneQuery) {
           matchNoneQueries++;
         } else if (newClauses[i].isSinglePositionQuery()) {
@@ -118,10 +121,10 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
         return super.rewrite(reader);
       }
     } else if (clauses.size() == 1) {
-      return clauses.get(0).rewrite(reader);
+      return clauses.iterator().next().rewrite(reader);
     } else {
       return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);
-    }    
+    }
   }
 
   /*
@@ -171,7 +174,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
-    h = (h * 7) ^ baseQuery.hashCode();
+    h = (h * 7) ^ clauses.hashCode();
     return h;
   }
 

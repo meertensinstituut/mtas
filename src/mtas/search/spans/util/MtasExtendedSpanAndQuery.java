@@ -1,6 +1,7 @@
 package mtas.search.spans.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import org.apache.lucene.search.spans.SpanQuery;
 public class MtasExtendedSpanAndQuery extends SpanNearQuery {
 
   /** The clauses. */
-  private List<SpanQuery> clauses;
+  private HashSet<SpanQuery> clauses;
 
   /**
    * Instantiates a new mtas extended span and query.
@@ -22,7 +23,7 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
    */
   public MtasExtendedSpanAndQuery(SpanQuery... clauses) {
     super(clauses, -1 * (clauses.length - 1), false);
-    this.clauses = new ArrayList<>(clauses.length);
+    this.clauses = new HashSet<SpanQuery>();
     for (SpanQuery clause : clauses) {
       this.clauses.add(clause);
     }
@@ -63,7 +64,7 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final MtasExtendedSpanAndQuery that = (MtasExtendedSpanAndQuery) obj;
+    final MtasExtendedSpanAndQuery that = (MtasExtendedSpanAndQuery) obj;    
     return clauses.equals(that.clauses);
   }
 

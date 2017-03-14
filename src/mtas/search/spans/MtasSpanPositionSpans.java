@@ -98,7 +98,7 @@ public class MtasSpanPositionSpans extends Spans implements MtasSpans {
    */
   @Override
   public int width() {
-    return 0;
+    return 1;
   }
 
   /*
