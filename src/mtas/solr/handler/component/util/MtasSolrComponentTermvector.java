@@ -72,6 +72,8 @@ public class MtasSolrComponentTermvector {
   /** The Constant NAME_MTAS_TERMVECTOR_SORT_DIRECTION. */
   public static final String NAME_MTAS_TERMVECTOR_SORT_DIRECTION = "sort.direction";
 
+  public static final String NAME_MTAS_TERMVECTOR_START = "start";
+
   /** The Constant NAME_MTAS_TERMVECTOR_NUMBER. */
   public static final String NAME_MTAS_TERMVECTOR_NUMBER = "number";
 
@@ -95,13 +97,13 @@ public class MtasSolrComponentTermvector {
 
   /** The Constant NAME_MTAS_TERMVECTOR_LIST. */
   public static final String NAME_MTAS_TERMVECTOR_LIST = "list";
-  
+
   public static final String NAME_MTAS_TERMVECTOR_LIST_REGEXP = "listRegexp";
 
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_REGEXP = "ignoreRegexp";
-  
+
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_LIST = "ignoreList";
-  
+
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP = "ignoreListRegexp";
 
   /** The Constant SHARD_NUMBER_MULTIPLIER. */
@@ -155,7 +157,7 @@ public class MtasSolrComponentTermvector {
       Boolean[] listRegexps = new Boolean[ids.size()];
       String[] ignoreRegexps = new String[ids.size()];
       String[] ignoreLists = new String[ids.size()];
-      Boolean[] ignoreListRegexps = new Boolean[ids.size()];      
+      Boolean[] ignoreListRegexps = new Boolean[ids.size()];
       for (String id : ids) {
         fields[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_FIELD,
@@ -175,6 +177,9 @@ public class MtasSolrComponentTermvector {
         sortDirections[tmpCounter] = rb.req.getParams()
             .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
                 + NAME_MTAS_TERMVECTOR_SORT_DIRECTION, null);
+        startValues[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_START,
+            null);
         numbers[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + "."
             + id + "." + NAME_MTAS_TERMVECTOR_NUMBER, null);
         numberShards[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR
@@ -211,18 +216,16 @@ public class MtasSolrComponentTermvector {
             + "." + id + "." + NAME_MTAS_TERMVECTOR_BOUNDARY, null);
         lists[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_LIST);
-        listRegexps[tmpCounter] = rb.req.getParams().getBool(
-            PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_LIST_REGEXP,
-            false);
-        ignoreRegexps[tmpCounter] = rb.req.getParams().get(
-            PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP,
-            null);
-        ignoreLists[tmpCounter] = rb.req.getParams().get(
-            PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_IGNORE_LIST,
-            null);
-        ignoreListRegexps[tmpCounter] = rb.req.getParams().getBool(
-            PARAM_MTAS_TERMVECTOR + "." + id + "." + NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP,
-            false);
+        listRegexps[tmpCounter] = rb.req.getParams()
+            .getBool(PARAM_MTAS_TERMVECTOR + "." + id + "."
+                + NAME_MTAS_TERMVECTOR_LIST_REGEXP, false);
+        ignoreRegexps[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR
+            + "." + id + "." + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, null);
+        ignoreLists[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR
+            + "." + id + "." + NAME_MTAS_TERMVECTOR_IGNORE_LIST, null);
+        ignoreListRegexps[tmpCounter] = rb.req.getParams()
+            .getBool(PARAM_MTAS_TERMVECTOR + "." + id + "."
+                + NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP, false);
         tmpCounter++;
       }
       String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();
@@ -256,7 +259,8 @@ public class MtasSolrComponentTermvector {
       MtasSolrResultUtil.compareAndCheck(lists, fields,
           NAME_MTAS_TERMVECTOR_LIST, NAME_MTAS_TERMVECTOR_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(ignoreRegexps, fields,
-          NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, NAME_MTAS_TERMVECTOR_FIELD, false);
+          NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, NAME_MTAS_TERMVECTOR_FIELD,
+          false);
       MtasSolrResultUtil.compareAndCheck(ignoreLists, fields,
           NAME_MTAS_TERMVECTOR_IGNORE_LIST, NAME_MTAS_TERMVECTOR_FIELD, false);
       for (int i = 0; i < fields.length; i++) {
@@ -288,10 +292,10 @@ public class MtasSolrComponentTermvector {
         String boundary = boundaries[i];
         String[] list = null;
         Boolean listRegexp = listRegexps[i];
-        if(lists[i]!=null) {
+        if (lists[i] != null) {
           ArrayList<String> tmpList = new ArrayList<String>();
           String[] subList = lists[i].split("(?<!\\\\),");
-          for(int j=0; j<subList.length; j++) {
+          for (int j = 0; j < subList.length; j++) {
             tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
           }
           list = tmpList.toArray(new String[tmpList.size()]);
@@ -299,15 +303,15 @@ public class MtasSolrComponentTermvector {
         String ignoreRegexp = ignoreRegexps[i];
         String[] ignoreList = null;
         Boolean ignoreListRegexp = ignoreListRegexps[i];
-        if(ignoreLists[i]!=null) {
+        if (ignoreLists[i] != null) {
           ArrayList<String> tmpList = new ArrayList<String>();
           String[] subList = ignoreLists[i].split("(?<!\\\\),");
-          for(int j=0; j<subList.length; j++) {
+          for (int j = 0; j < subList.length; j++) {
             tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
           }
           ignoreList = tmpList.toArray(new String[tmpList.size()]);
         }
-        
+
         if (prefix == null || prefix.isEmpty()) {
           throw new IOException("no (valid) prefix in mtas termvector");
         } else {
@@ -316,7 +320,8 @@ public class MtasSolrComponentTermvector {
                 .add(new ComponentTermVector(key, prefix, regexp, full, type,
                     sortType, sortDirection, startValue, numberFinal,
                     functionKey, functionExpression, functionType, boundary,
-                    list, listNumber, listRegexp, ignoreRegexp, ignoreList, ignoreListRegexp));
+                    list, listNumber, listRegexp, ignoreRegexp, ignoreList,
+                    ignoreListRegexp));
           } catch (ParseException e) {
             throw new IOException(e.getMessage());
           }
@@ -350,7 +355,8 @@ public class MtasSolrComponentTermvector {
             int number;
             if (oldNumber != null) {
               int oldNumberValue = Integer.valueOf(oldNumber);
-              number = (oldNumberValue>=0) ? oldNumberValue * SHARD_NUMBER_MULTIPLIER : oldNumberValue;
+              number = (oldNumberValue >= 0)
+                  ? oldNumberValue * SHARD_NUMBER_MULTIPLIER : oldNumberValue;
             } else {
               number = DEFAULT_NUMBER * SHARD_NUMBER_MULTIPLIER;
             }
@@ -381,17 +387,17 @@ public class MtasSolrComponentTermvector {
             sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
                 + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS);
             Set<String> functionKeys = MtasSolrResultUtil
-                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR+ "." + key + "."
-                    + NAME_MTAS_TERMVECTOR_FUNCTION);
+                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR
+                    + "." + key + "." + NAME_MTAS_TERMVECTOR_FUNCTION);
             for (String functionKey : functionKeys) {
               sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
-                  + NAME_MTAS_TERMVECTOR_FUNCTION+ "." + functionKey + "."
+                  + NAME_MTAS_TERMVECTOR_FUNCTION + "." + functionKey + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION);
               sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
-                  + NAME_MTAS_TERMVECTOR_FUNCTION+ "." + functionKey + "."
+                  + NAME_MTAS_TERMVECTOR_FUNCTION + "." + functionKey + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION_KEY);
               sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
-                  + NAME_MTAS_TERMVECTOR_FUNCTION+ "." + functionKey + "."
+                  + NAME_MTAS_TERMVECTOR_FUNCTION + "." + functionKey + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE);
             }
             sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
@@ -428,7 +434,7 @@ public class MtasSolrComponentTermvector {
       Boolean encode) throws IOException {
     SimpleOrderedMap<Object> mtasTermVectorResponse = new SimpleOrderedMap<>();
     mtasTermVectorResponse.add("key", termVector.key);
-    
+
     termVector.subComponentFunction.dataCollector.close();
 
     HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>>();
@@ -546,7 +552,8 @@ public class MtasSolrComponentTermvector {
                         int number;
                         if (numbers[i] != null) {
                           int numberValue = Integer.parseInt(numbers[i]);
-                          number = numberValue>=0 ? numberValue : Integer.MAX_VALUE;                          
+                          number = numberValue >= 0 ? numberValue
+                              : Integer.MAX_VALUE;
                         } else {
                           number = DEFAULT_NUMBER;
                         }
@@ -653,7 +660,7 @@ public class MtasSolrComponentTermvector {
                 try {
                   key = (String) dataItem.get("key");
                   list = (MtasSolrResult) dataItem.get("list");
-                  if(list!=null) {
+                  if (list != null) {
                     comparatorLast = list.getResult().getLastSortValue();
                     comparatorList = list.getResult().getComparatorList();
                     if (key == null) {
@@ -711,7 +718,7 @@ public class MtasSolrComponentTermvector {
           TreeMap<String, NumberComparator> mergedComparatorList;
           if (mergedComparatorLists.containsKey(tv.key)) {
             mergedComparatorList = mergedComparatorLists.get(tv.key);
-            if (mergedComparatorList.size() < tv.number || tv.number<=0) {
+            if (mergedComparatorList.size() < tv.number || tv.number <= 0) {
               // do nothing
             } else {
               SortedSet<Map.Entry<String, NumberComparator>> sortedSet = new TreeSet<Map.Entry<String, NumberComparator>>(
@@ -741,12 +748,12 @@ public class MtasSolrComponentTermvector {
           }
         }
       }
-       //System.out.println("BOUNDARIES: " + comparatorBoundariesList);
-       //System.out.println("MERGED: " + mergedComparatorLists);
-       //System.out.println("MERGED boundary : " +
-       //mergedComparatorBoundaryList);
-       //System.out.println("SUMMED boundary : " +
-       //summedComparatorBoundaryList);
+      // System.out.println("BOUNDARIES: " + comparatorBoundariesList);
+      // System.out.println("MERGED: " + mergedComparatorLists);
+      // System.out.println("MERGED boundary : " +
+      // mergedComparatorBoundaryList);
+      // System.out.println("SUMMED boundary : " +
+      // summedComparatorBoundaryList);
       // compute which termvectors to recompute
       HashMap<String, HashMap<String, NumberComparator>> recomputeList = new HashMap<String, HashMap<String, NumberComparator>>();
       for (ComponentTermVector tv : tvList) {
@@ -1072,18 +1079,20 @@ public class MtasSolrComponentTermvector {
                         + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_REGEXP,
                         tv.regexp);
                   }
-                  if(list.size()>0) {
+                  if (list.size() > 0) {
                     String listValue = "";
                     String[] listList = list.toArray(new String[list.size()]);
-                    for (int i=0; i<listList.length; i++) {
-                      if(i>0) {
-                        listValue+=",";                        
+                    for (int i = 0; i < listList.length; i++) {
+                      if (i > 0) {
+                        listValue += ",";
                       }
-                      listValue+=listList[i].replace("\\","\\\\").replace(",", "\\\\");                      
+                      listValue += listList[i].replace("\\", "\\\\")
+                          .replace(",", "\\\\");
                     }
-                    paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + "."
-                        + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_FULL,
-                        tv.full?"true":"false");
+                    paramsNewRequest.add(
+                        PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                            + NAME_MTAS_TERMVECTOR_FULL,
+                        tv.full ? "true" : "false");
                     paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + "."
                         + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_LIST,
                         listValue);
@@ -1108,7 +1117,7 @@ public class MtasSolrComponentTermvector {
             nsreq.params.add(PARAM_MTAS_TERMVECTOR,
                 rb.req.getOriginalParams().getParams(PARAM_MTAS_TERMVECTOR));
             nsreq.params.add(paramsNewRequest);
-            rb.addRequest(searchComponent, nsreq);            
+            rb.addRequest(searchComponent, nsreq);
           }
         }
       }

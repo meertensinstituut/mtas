@@ -1951,7 +1951,6 @@ public class CodecCollector {
     return total;
   }
 
- 
   /**
    * Sort match list.
    *
@@ -2803,7 +2802,6 @@ public class CodecCollector {
           if (termVector.full) {
             termVector.subComponentFunction.dataCollector.setWithTotal();
           }
-
           List<CompiledAutomaton> listAutomata;
           HashMap<String, Automaton> automatonMap;
           if (termVector.list == null) {
@@ -2884,112 +2882,116 @@ public class CodecCollector {
                 String key;
                 // loop over terms
                 while ((term = termsEnum.next()) != null) {
-                  termDocId = -1;
-                  acceptedTerm = true;
-                  if (ignoreByteRunAutomatonList != null) {
-                    for (ByteRunAutomaton ignoreByteRunAutomaton : ignoreByteRunAutomatonList) {
-                      if (ignoreByteRunAutomaton.run(term.bytes, term.offset,
-                          term.length)) {
-                        acceptedTerm = false;
-                        break;
+                  if (validateTermWithStartValue(term,
+                      termVector)) {
+                    termDocId = -1;
+                    acceptedTerm = true;
+                    if (ignoreByteRunAutomatonList != null) {
+                      for (ByteRunAutomaton ignoreByteRunAutomaton : ignoreByteRunAutomatonList) {
+                        if (ignoreByteRunAutomaton.run(term.bytes, term.offset,
+                            term.length)) {
+                          acceptedTerm = false;
+                          break;
+                        }
                       }
                     }
-                  }
-                  if (acceptedTerm) {
-                    if (doBasic) {
-                      // compute numbers;
-                      TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                          docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                      // register
-                      if (numberBasic.docNumber > 0) {
-                        long valueLong = 0;
-                        key = MtasToken.getPostfixFromValue(term);
-                        try {
-                          valueLong = termVector.subComponentFunction.parserFunction
-                              .getValueLong(numberBasic.valueSum, 1);
-                        } catch (IOException e) {
-                          termVector.subComponentFunction.dataCollector.error(
-                              MtasToken.getPostfixFromValue(term),
-                              e.getMessage());
-                        }
-                        termVector.subComponentFunction.dataCollector.add(key,
-                            valueLong, numberBasic.docNumber);
-                        if (termVector.functions != null) {
-                          for (SubComponentFunction function : termVector.functions) {
-                            if (function.dataType
-                                .equals(CodecUtil.DATA_TYPE_LONG)) {
-                              long valueFunction = function.parserFunction
-                                  .getValueLong(numberBasic.valueSum, 0);
-                              function.dataCollector.add(key, valueFunction,
-                                  numberBasic.docNumber);
-                            } else if (function.dataType
-                                .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
-                              double valueFunction = function.parserFunction
-                                  .getValueDouble(numberBasic.valueSum, 0);
-                              function.dataCollector.add(key, valueFunction,
-                                  numberBasic.docNumber);
-                            }
-                          }
-                        }
-                      }
-                    } else {
-                      TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                          docSet, termDocId, termsEnum, r, lrc, postingsEnum,
-                          positionsData);
-                      if (numberFull.docNumber > 0) {
-                        long[] valuesLong = new long[numberFull.docNumber];
-                        key = MtasToken.getPostfixFromValue(term);
-                        for (int i = 0; i < numberFull.docNumber; i++) {
+                    if (acceptedTerm) {
+                      if (doBasic) {
+                        // compute numbers;
+                        TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                            docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                        // register
+                        if (numberBasic.docNumber > 0) {
+                          long valueLong = 0;
+                          key = MtasToken.getPostfixFromValue(term);
                           try {
-                            valuesLong[i] = termVector.subComponentFunction.parserFunction
-                                .getValueLong(new long[] { numberFull.args[i] },
-                                    numberFull.positions[i]);
+                            valueLong = termVector.subComponentFunction.parserFunction
+                                .getValueLong(numberBasic.valueSum, 1);
                           } catch (IOException e) {
-                            termVector.subComponentFunction.dataCollector
-                                .error(key, e.getMessage());
+                            termVector.subComponentFunction.dataCollector.error(
+                                MtasToken.getPostfixFromValue(term),
+                                e.getMessage());
                           }
-                        }
-                        termVector.subComponentFunction.dataCollector.add(key,
-                            valuesLong, valuesLong.length);
-                        if (termVector.functions != null) {
-                          for (SubComponentFunction function : termVector.functions) {
-                            if (function.dataType
-                                .equals(CodecUtil.DATA_TYPE_LONG)) {
-                              valuesLong = new long[numberFull.docNumber];
-                              for (int i = 0; i < numberFull.docNumber; i++) {
-                                try {
-                                  valuesLong[i] = function.parserFunction
-                                      .getValueLong(
-                                          new long[] { numberFull.args[i] },
-                                          numberFull.positions[i]);
-                                } catch (IOException e) {
-                                  function.dataCollector.error(key,
-                                      e.getMessage());
-                                }
+                          termVector.subComponentFunction.dataCollector.add(key,
+                              valueLong, numberBasic.docNumber);
+                          if (termVector.functions != null) {
+                            for (SubComponentFunction function : termVector.functions) {
+                              if (function.dataType
+                                  .equals(CodecUtil.DATA_TYPE_LONG)) {
+                                long valueFunction = function.parserFunction
+                                    .getValueLong(numberBasic.valueSum, 0);
+                                function.dataCollector.add(key, valueFunction,
+                                    numberBasic.docNumber);
+                              } else if (function.dataType
+                                  .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+                                double valueFunction = function.parserFunction
+                                    .getValueDouble(numberBasic.valueSum, 0);
+                                function.dataCollector.add(key, valueFunction,
+                                    numberBasic.docNumber);
                               }
-                              function.dataCollector.add(key, valuesLong,
-                                  valuesLong.length);
-                            } else if (function.dataType
-                                .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
-                              double[] valuesDouble = new double[numberFull.docNumber];
-                              for (int i = 0; i < numberFull.docNumber; i++) {
-                                try {
-                                  valuesDouble[i] = function.parserFunction
-                                      .getValueDouble(
-                                          new long[] { numberFull.args[i] },
-                                          numberFull.positions[i]);
-                                } catch (IOException e) {
-                                  function.dataCollector.error(key,
-                                      e.getMessage());
-                                }
-                              }
-                              function.dataCollector.add(key, valuesDouble,
-                                  valuesDouble.length);
                             }
                           }
                         }
-                      }
+                      } else {
+                        TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                            docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                            positionsData);
+                        if (numberFull.docNumber > 0) {
+                          long[] valuesLong = new long[numberFull.docNumber];
+                          key = MtasToken.getPostfixFromValue(term);
+                          for (int i = 0; i < numberFull.docNumber; i++) {
+                            try {
+                              valuesLong[i] = termVector.subComponentFunction.parserFunction
+                                  .getValueLong(
+                                      new long[] { numberFull.args[i] },
+                                      numberFull.positions[i]);
+                            } catch (IOException e) {
+                              termVector.subComponentFunction.dataCollector
+                                  .error(key, e.getMessage());
+                            }
+                          }
+                          termVector.subComponentFunction.dataCollector.add(key,
+                              valuesLong, valuesLong.length);
+                          if (termVector.functions != null) {
+                            for (SubComponentFunction function : termVector.functions) {
+                              if (function.dataType
+                                  .equals(CodecUtil.DATA_TYPE_LONG)) {
+                                valuesLong = new long[numberFull.docNumber];
+                                for (int i = 0; i < numberFull.docNumber; i++) {
+                                  try {
+                                    valuesLong[i] = function.parserFunction
+                                        .getValueLong(
+                                            new long[] { numberFull.args[i] },
+                                            numberFull.positions[i]);
+                                  } catch (IOException e) {
+                                    function.dataCollector.error(key,
+                                        e.getMessage());
+                                  }
+                                }
+                                function.dataCollector.add(key, valuesLong,
+                                    valuesLong.length);
+                              } else if (function.dataType
+                                  .equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+                                double[] valuesDouble = new double[numberFull.docNumber];
+                                for (int i = 0; i < numberFull.docNumber; i++) {
+                                  try {
+                                    valuesDouble[i] = function.parserFunction
+                                        .getValueDouble(
+                                            new long[] { numberFull.args[i] },
+                                            numberFull.positions[i]);
+                                  } catch (IOException e) {
+                                    function.dataCollector.error(key,
+                                        e.getMessage());
+                                  }
+                                }
+                                function.dataCollector.add(key, valuesDouble,
+                                    valuesDouble.length);
+                              }
+                            }
+                          }
+                        }
 
+                      }
                     }
                   }
                 }
@@ -3041,7 +3043,7 @@ public class CodecCollector {
       int segmentNumber = lrc.parent.leaves().size();
       // loop over termvectors
       for (ComponentTermVector termVector : termVectorList) {
-        CompiledAutomaton compiledAutomaton;
+        CompiledAutomaton compiledAutomaton;        
         if ((termVector.regexp == null) || (termVector.regexp.isEmpty())) {
           RegExp re = new RegExp(
               termVector.prefix + MtasToken.DELIMITER + ".*");
@@ -3070,7 +3072,7 @@ public class CodecCollector {
           for (Automaton automaton : list.values()) {
             ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));
           }
-        }
+        }        
         if (!termVector.full && termVector.list == null) {
           termsEnum = t.intersect(compiledAutomaton, null);
           int initSize = Math.min((int) t.size(), 1000);
@@ -3103,56 +3105,59 @@ public class CodecCollector {
               // loop over terms
               boolean acceptedTerm;
               while ((term = termsEnum.next()) != null) {
-                termDocId = -1;
-                acceptedTerm = true;
-                if (ignoreByteRunAutomatonList != null) {
-                  for (ByteRunAutomaton ignoreByteRunAutomaton : ignoreByteRunAutomatonList) {
-                    if (ignoreByteRunAutomaton.run(term.bytes, term.offset,
-                        term.length)) {
-                      acceptedTerm = false;
+                if (validateTermWithStartValue(term,
+                    termVector)) {
+                  termDocId = -1;
+                  acceptedTerm = true;
+                  if (ignoreByteRunAutomatonList != null) {
+                    for (ByteRunAutomaton ignoreByteRunAutomaton : ignoreByteRunAutomatonList) {
+                      if (ignoreByteRunAutomaton.run(term.bytes, term.offset,
+                          term.length)) {
+                        acceptedTerm = false;
+                        break;
+                      }
+                    }
+                  }
+                  if (acceptedTerm) {
+                    continueAfterPreliminaryCheck = true;
+                    mutableKey[0] = null;
+                    if (preliminaryCheck) {
+                      try {
+                        TermvectorNumberBasic preliminaryNumberBasic = computeTermvectorNumberBasic(
+                            termsEnum, r);
+                        if (preliminaryNumberBasic.docNumber > 0) {
+                          continueAfterPreliminaryCheck = preliminaryRegisterValue(
+                              term, termVector, preliminaryNumberBasic,
+                              termNumberMaximum, segmentNumber, mutableKey);
+                        } else {
+                          continueAfterPreliminaryCheck = false;
+                        }
+                      } catch (IOException e) {
+                        continueAfterPreliminaryCheck = true;
+                      }
+                    }
+                    if (continueAfterPreliminaryCheck) {
+                      // compute numbers;
+                      TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                          docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                      // register
+                      if (numberBasic.docNumber > 0) {
+                        termCounter++;
+                        registerStatus = registerValue(term, termVector,
+                            numberBasic, termNumberMaximum, segmentNumber,
+                            false, mutableKey);
+                        if (registerStatus != null) {
+                          computeFullList.put(BytesRef.deepCopyOf(term),
+                              registerStatus);
+                        }
+                      }
+                    }
+                    // stop after termCounterMaximum
+                    if (termVector.subComponentFunction.sortType
+                        .equals(CodecUtil.SORT_TERM)
+                        && termCounter >= termNumberMaximum) {
                       break;
                     }
-                  }
-                }
-                if (acceptedTerm) {
-                  continueAfterPreliminaryCheck = true;
-                  mutableKey[0] = null;
-                  if (preliminaryCheck) {
-                    try {
-                      TermvectorNumberBasic preliminaryNumberBasic = computeTermvectorNumberBasic(
-                          termsEnum, r);
-                      if (preliminaryNumberBasic.docNumber > 0) {
-                        continueAfterPreliminaryCheck = preliminaryRegisterValue(
-                            term, termVector, preliminaryNumberBasic,
-                            termNumberMaximum, segmentNumber, mutableKey);
-                      } else {
-                        continueAfterPreliminaryCheck = false;
-                      }
-                    } catch (IOException e) {
-                      continueAfterPreliminaryCheck = true;
-                    }
-                  }
-                  if (continueAfterPreliminaryCheck) {
-                    // compute numbers;
-                    TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                        docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                    // register
-                    if (numberBasic.docNumber > 0) {
-                      termCounter++;
-                      registerStatus = registerValue(term, termVector,
-                          numberBasic, termNumberMaximum, segmentNumber, false,
-                          mutableKey);
-                      if (registerStatus != null) {
-                        computeFullList.put(BytesRef.deepCopyOf(term),
-                            registerStatus);
-                      }
-                    }
-                  }
-                  // stop after termCounterMaximum
-                  if (termVector.subComponentFunction.sortType
-                      .equals(CodecUtil.SORT_TERM)
-                      && termCounter >= termNumberMaximum) {
-                    break;
                   }
                 }
               }
@@ -3160,25 +3165,29 @@ public class CodecCollector {
               if (computeFullList.size() > 0) {
                 termsEnum = t.intersect(compiledAutomaton, null);
                 while ((term = termsEnum.next()) != null) {
-                  termDocId = -1;
-                  mutableKey[0] = null;
-                  // only if (probably) needed
-                  if (computeFullList.containsKey(term)) {
-                    registerStatus = computeFullList.get(term);
-                    if (termVector.subComponentFunction.sortType
-                        .equals(CodecUtil.SORT_TERM) || termVector.list != null
-                        || termVector.boundaryRegistration
-                        || registerStatus.force
-                        || termVector.subComponentFunction.dataCollector
-                            .validateSegmentBoundary(
-                                registerStatus.sortValue)) {
-                      TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                          docSet, termDocId, termsEnum, r, lrc, postingsEnum,
-                          positionsData);
-                      if (numberFull.docNumber > 0) {
-                        termCounter++;
-                        registerValue(term, termVector, numberFull,
-                            termNumberMaximum, segmentNumber, mutableKey);
+                  if (validateTermWithStartValue(term,
+                      termVector)) {
+                    termDocId = -1;
+                    mutableKey[0] = null;
+                    // only if (probably) needed
+                    if (computeFullList.containsKey(term)) {
+                      registerStatus = computeFullList.get(term);
+                      if (termVector.subComponentFunction.sortType
+                          .equals(CodecUtil.SORT_TERM)
+                          || termVector.list != null
+                          || termVector.boundaryRegistration
+                          || registerStatus.force
+                          || termVector.subComponentFunction.dataCollector
+                              .validateSegmentBoundary(
+                                  registerStatus.sortValue)) {
+                        TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                            docSet, termDocId, termsEnum, r, lrc, postingsEnum,
+                            positionsData);
+                        if (numberFull.docNumber > 0) {
+                          termCounter++;
+                          registerValue(term, termVector, numberFull,
+                              termNumberMaximum, segmentNumber, mutableKey);
+                        }
                       }
                     }
                   }
@@ -3273,21 +3282,24 @@ public class CodecCollector {
                 if (docSet.size() > 0) {
                   int termDocId;
                   while ((term = termsEnum.next()) != null) {
-                    termDocId = -1;
-                    mutableKey[0] = null;
-                    // compute numbers;
-                    TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                        docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                    if (numberBasic.docNumber > 0) {
-                      registerStatus = registerValue(term, termVector,
-                          numberBasic, 0, segmentNumber, true, mutableKey);
-                      if (registerStatus != null) {
-                        TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                            docSet, termDocId, termsEnum, r, lrc, postingsEnum,
-                            positionsData);
-                        if (numberFull.docNumber > 0) {
-                          registerValue(term, termVector, numberFull, 0,
-                              segmentNumber, mutableKey);
+                    if (validateTermWithStartValue(term,
+                        termVector)) {
+                      termDocId = -1;
+                      mutableKey[0] = null;
+                      // compute numbers;
+                      TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                          docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                      if (numberBasic.docNumber > 0) {
+                        registerStatus = registerValue(term, termVector,
+                            numberBasic, 0, segmentNumber, true, mutableKey);
+                        if (registerStatus != null) {
+                          TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                              docSet, termDocId, termsEnum, r, lrc,
+                              postingsEnum, positionsData);
+                          if (numberFull.docNumber > 0) {
+                            registerValue(term, termVector, numberFull, 0,
+                                segmentNumber, mutableKey);
+                          }
                         }
                       }
                     }
@@ -3305,6 +3317,33 @@ public class CodecCollector {
         }
       }
     }
+  }
+
+  private static boolean validateTermWithStartValue(BytesRef term,
+      ComponentTermVector termVector) {    
+    if (termVector.startValue == null) {
+      return true;
+    } else if (termVector.subComponentFunction.sortType
+        .equals(CodecUtil.SORT_TERM)) {
+      if(term.length>termVector.startValue.length) {
+        byte[] zeroBytes = (new BytesRef("\u0000")).bytes;
+        int n = (new Double(Math.ceil((term.length-termVector.startValue.length)/zeroBytes.length))).intValue();
+        byte[] newBytes = new byte[termVector.startValue.length+n*zeroBytes.length];
+        System.arraycopy(termVector.startValue.bytes, 0, newBytes, 0, termVector.startValue.length);        
+        for(int i=0; i<n; i++) {
+          System.arraycopy(zeroBytes, 0, newBytes, termVector.startValue.length+i*zeroBytes.length, zeroBytes.length);        
+        }
+        termVector.startValue = new BytesRef(newBytes);
+      }
+      if (termVector.subComponentFunction.sortDirection.equals(
+          CodecUtil.SORT_ASC) && (termVector.startValue.compareTo(term) < 0)) {
+        return true;
+      } else if (termVector.subComponentFunction.sortDirection
+          .equals(CodecUtil.SORT_DESC) && (termVector.startValue.compareTo(term) > 0)) {
+        return true;
+      }
+    }    
+    return false;
   }
 
   /**

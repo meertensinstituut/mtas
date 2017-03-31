@@ -1,8 +1,14 @@
 package mtas.search.spans;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
+import org.apache.lucene.search.ConjunctionDISI;
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
@@ -27,7 +33,8 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
 
   /** The doc id. */
   private int docId;
-
+  
+ 
   /**
    * Instantiates a new mtas span intersecting spans.
    *
@@ -46,6 +53,7 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
     docId = -1;
     this.spans1 = spans1;
     this.spans2 = spans2;
+    List<Spans> ls = new ArrayList<Spans>(Arrays.asList(new Spans[]{spans1.spans, spans2.spans}));
     previousSpans2EndPositions = new HashSet<Integer>();
   }
 
@@ -282,7 +290,7 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
             lastSpans2StartPosition = nextSpans2StartPosition;
             lastSpans2EndPosition = nextSpans2EndPosition;
             if (nextSpans1StartPosition == nextSpans2StartPosition
-                && nextSpans1StartPosition == nextSpans2StartPosition) {
+                && nextSpans1EndPosition == nextSpans2EndPosition) {
               return true;
             }
           }
@@ -315,5 +323,5 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
   public long cost() {
     return 0;
   }
-
+  
 }

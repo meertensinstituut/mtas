@@ -204,7 +204,6 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
               || newRightBoundaryMaximum > 0) {
             newBigQuery = (new MtasSpanSequenceQuery(newItems, null, null))
                 .rewrite(reader);
-            System.out.println(newBigQuery.getField() + "\t" + newBigQuery);
             // System.out.println("REPLACE WITH " + newBigQuery + " (["
             // + leftBoundaryMinimum + "," + leftBoundaryMaximum + "],["
             // + rightBoundaryMinimum + "," + rightBoundaryMaximum + "])");
@@ -217,8 +216,6 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     }
 
     if (newBigQuery != bigQuery || newSmallQuery != smallQuery) {
-      System.out.println(newBigQuery.getField() + "\t" + newBigQuery);
-      System.out.println(newSmallQuery.getField() + "\t" + newSmallQuery);
       return (new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
           leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
           rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);

@@ -28,6 +28,7 @@ import mtas.parser.function.util.MtasFunctionParserFunctionDefault;
 import mtas.search.spans.util.MtasSpanQuery;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RegExp;
 
@@ -1158,7 +1159,7 @@ public class CodecComponent {
     public int number;
 
     /** The start value. */
-    public String startValue;
+    public BytesRef startValue;
 
     /** The sub component function. */
     public SubComponentFunction subComponentFunction;
@@ -1222,7 +1223,6 @@ public class CodecComponent {
         this.listRegexp = listRegexp != null ? listRegexp : false;
         this.boundary = null;
         this.number = Integer.MAX_VALUE;
-        this.startValue = null;
         if (!this.full) {
           sortType = CodecUtil.SORT_TERM;
           sortDirection = CodecUtil.SORT_ASC;
@@ -1230,7 +1230,8 @@ public class CodecComponent {
       } else {
         this.list = null;
         this.listRegexp = false;
-        this.startValue = startValue;
+        this.startValue = (startValue!=null)?new BytesRef(prefix + MtasToken.DELIMITER
+            + startValue):null;
         if (boundary == null) {
           this.boundary = null;
           if (number < -1) {
@@ -1279,6 +1280,12 @@ public class CodecComponent {
             || sortType.equals(CodecUtil.STATS_TYPE_N))) {
           throw new IOException("sortType '" + sortType
               + "' only supported with full termVector");
+        }
+      }
+      if(!sortType.equals(CodecUtil.SORT_TERM)) {
+        if(startValue!=null) {
+          throw new IOException("startValue '" + startValue
+              + "' only supported with termVector sorted on "+CodecUtil.SORT_TERM);
         }
       }
       if (!sortDirection.equals(CodecUtil.SORT_ASC)
@@ -1800,6 +1807,8 @@ public class CodecComponent {
       endPosition = match.endPosition - 1;
       this.tokens = tokens;
     }
+    
+    
   }
 
   /**

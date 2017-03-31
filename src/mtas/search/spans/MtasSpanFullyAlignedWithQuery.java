@@ -31,8 +31,10 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span fully aligned with query.
    *
-   * @param q1 the q 1
-   * @param q2 the q 2
+   * @param q1
+   *          the q 1
+   * @param q2
+   *          the q 2
    */
   public MtasSpanFullyAlignedWithQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
@@ -91,7 +93,8 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   /**
    * Gets the term contexts.
    *
-   * @param items the items
+   * @param items
+   *          the items
    * @return the term contexts
    */
   protected Map<Term, TermContext> getTermContexts(
@@ -168,11 +171,13 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
     MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
-    if (newQ1 != q1 || newQ2 != q2) {
+    if(newQ1==null || newQ1 instanceof MtasSpanMatchNoneQuery || newQ2==null || newQ2 instanceof MtasSpanMatchNoneQuery) {
+      return new MtasSpanMatchNoneQuery(field);      
+    } else if (newQ1 != q1 || newQ2 != q2) {
       return new MtasSpanFullyAlignedWithQuery(newQ1, newQ2).rewrite(reader);
     } else if (newQ1 == null || newQ2 == null) {
       return new MtasSpanMatchNoneQuery(this.getField());
-    } else if(newQ1.equals(newQ2)) {
+    } else if (newQ1.equals(newQ2)) {
       return newQ1;
     } else if (newQ1.getMaximumWidth() != null
         && newQ1.getMaximumWidth() == 0) {
@@ -180,11 +185,15 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     } else if (newQ2.getMaximumWidth() != null
         && newQ2.getMaximumWidth() == 0) {
       return new MtasSpanMatchNoneQuery(this.getField());
-    } else if(newQ1.getMinimumWidth()!=null && newQ2.getMaximumWidth()!=null && newQ1.getMinimumWidth()>newQ2.getMaximumWidth()) {
+    } else if (newQ1.getMinimumWidth() != null
+        && newQ2.getMaximumWidth() != null
+        && newQ1.getMinimumWidth() > newQ2.getMaximumWidth()) {
       return new MtasSpanMatchNoneQuery(this.getField());
-    } else if(newQ2.getMinimumWidth()!=null && newQ1.getMaximumWidth()!=null && newQ2.getMinimumWidth()>newQ1.getMaximumWidth()) {
+    } else if (newQ2.getMinimumWidth() != null
+        && newQ1.getMaximumWidth() != null
+        && newQ2.getMinimumWidth() > newQ1.getMaximumWidth()) {
       return new MtasSpanMatchNoneQuery(this.getField());
-    } else {  
+    } else {
       return super.rewrite(reader);
     }
   }
@@ -200,11 +209,16 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span intersecting weight.
      *
-     * @param w1 the w 1
-     * @param w2 the w 2
-     * @param searcher the searcher
-     * @param terms the terms
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param w1
+     *          the w 1
+     * @param w2
+     *          the w 2
+     * @param searcher
+     *          the searcher
+     * @param terms
+     *          the terms
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public SpanFullyAlignedWithWeight(MtasSpanFullyAlignedWithQueryWeight w1,
         MtasSpanFullyAlignedWithQueryWeight w2, IndexSearcher searcher,
@@ -246,8 +260,8 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanFullyAlignedWithSpans(MtasSpanFullyAlignedWithQuery.this, s1,
-          s2);
+      return new MtasSpanFullyAlignedWithSpans(
+          MtasSpanFullyAlignedWithQuery.this, s1, s2);
     }
 
     /*
@@ -274,7 +288,8 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query spans.
      *
-     * @param spans the spans
+     * @param spans
+     *          the spans
      */
     public MtasSpanFullyAlignedWithQuerySpans(Spans spans) {
       this.spans = spans;
@@ -293,7 +308,8 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query weight.
      *
-     * @param spanWeight the span weight
+     * @param spanWeight
+     *          the span weight
      */
     public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;

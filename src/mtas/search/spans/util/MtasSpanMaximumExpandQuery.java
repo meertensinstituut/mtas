@@ -13,6 +13,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
@@ -239,8 +240,15 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     }
 
     @Override
+    public final TwoPhaseIterator asTwoPhaseIterator() {
+      // return subSpans.asTwoPhaseIterator();
+      return null;
+    }
+    
+    @Override
     public float positionsCost() {
-      return subSpans.positionsCost();
+      //return subSpans.positionsCost();
+      return 0;
     }
 
     @Override
@@ -292,7 +300,7 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
 
     @Override
     public long cost() {
-      return subSpans.cost();
+      return subSpans!=null?subSpans.cost():0;
     }
   }
 
