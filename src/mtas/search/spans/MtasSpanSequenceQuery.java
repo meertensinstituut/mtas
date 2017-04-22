@@ -16,6 +16,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasIgnoreItem;
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -72,7 +73,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       if (ignoreQuery.getField() == null
           || field.equals(ignoreQuery.getField())) {
         this.ignoreQuery = ignoreQuery;
-        this.maximumIgnoreLength = maximumIgnoreLength == null ? 1
+        this.maximumIgnoreLength = maximumIgnoreLength == null ? MtasIgnoreItem.DEFAULT_MAXIMUM_IGNORE_LENGTH
             : maximumIgnoreLength;
       } else {
         throw new IllegalArgumentException(

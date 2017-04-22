@@ -12,7 +12,7 @@ import org.apache.lucene.search.spans.Spans;
 public class MtasIgnoreItem {
   
   /** The Constant DEFAULT_MAXIMUM_IGNORE_LENGTH. */
-  static final int DEFAULT_MAXIMUM_IGNORE_LENGTH = 10;
+  public static final int DEFAULT_MAXIMUM_IGNORE_LENGTH = 10;
 
   /** The ignore spans. */
   Spans ignoreSpans;
