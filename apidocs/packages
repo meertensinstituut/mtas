@@ -7,9 +7,7 @@ mtas.codec.payload
 mtas.codec.tree
 mtas.codec.util
 mtas.codec.util.collector
-mtas.parser.cql
 mtas.parser.cql.util
-mtas.parser.function
 mtas.parser.function.util
 mtas.queries
 mtas.search
@@ -22,3 +20,5 @@ mtas.solr.handler
 mtas.solr.schema
 mtas.solr.search
 mtas.solr.update.processor
+mtas.parser.cql
+mtas.parser.function
