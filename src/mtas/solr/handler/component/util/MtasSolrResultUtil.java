@@ -25,6 +25,7 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
 import mtas.codec.util.DataCollector;
+import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.codec.util.CodecComponent.GroupHit;
 import mtas.codec.util.collector.MtasDataItem;
 import mtas.parser.cql.MtasCQLParser;
@@ -95,8 +96,8 @@ public class MtasSolrResultUtil {
       } else if (nl.getVal(i) instanceof MtasDataItem) {
         MtasDataItem dataItem = (MtasDataItem) nl.getVal(i);
         nl.setVal(i, dataItem.rewrite(showDebugInfo));
-      } else if (nl.getVal(i) instanceof MtasSolrResult) {
-        MtasSolrResult o = (MtasSolrResult) nl.getVal(i);
+      } else if (nl.getVal(i) instanceof MtasSolrMtasResult) {
+        MtasSolrMtasResult o = (MtasSolrMtasResult) nl.getVal(i);
         if (o.dataCollector.getCollectorType()
             .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
           if (!o.dataCollector.withTotal()) {

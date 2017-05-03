@@ -14,6 +14,7 @@ import mtas.codec.MtasCodecPostingsFormat;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.codec.util.CodecComponent.ComponentField;
+import mtas.codec.util.CodecComponent.ComponentJoin;
 
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
@@ -231,24 +232,31 @@ public class CodecUtil {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public static void collect(String field, IndexSearcher searcher,
+  public static void collectField(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList<Integer> fullDocList,
       ArrayList<Integer> fullDocSet, ComponentField fieldStats)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
     if (fieldStats != null) {
-      IndexReader reader = searcher.getIndexReader();      
-      HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight = new HashMap<MtasSpanQuery, SpanWeight>();
+      IndexReader reader = searcher.getIndexReader();
+      HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight = new HashMap<>();
       // only if spanQueryList is not empty
       if (fieldStats.spanQueryList.size() > 0) {
         for (MtasSpanQuery sq : fieldStats.spanQueryList) {
-          spansQueryWeight.put(sq,
-              ((MtasSpanQuery) sq.rewrite(reader)).createWeight(searcher, false));
+          spansQueryWeight.put(sq, ((MtasSpanQuery) sq.rewrite(reader))
+              .createWeight(searcher, false));
         }
       }
       // collect
-      CodecCollector.collect(field, searcher, reader, rawReader, fullDocList,
-          fullDocSet, fieldStats, spansQueryWeight);
+      CodecCollector.collectField(field, searcher, reader, rawReader,
+          fullDocList, fullDocSet, fieldStats, spansQueryWeight);
+    }
+  }
+
+  public static void collectJoin(IndexReader reader,
+      ArrayList<Integer> fullDocSet, ComponentJoin joinInfo) throws IOException {
+    if(joinInfo!=null) {
+      CodecCollector.collectJoin(reader, fullDocSet, joinInfo);
     }
   }
 

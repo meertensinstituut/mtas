@@ -21,7 +21,9 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
     locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en
             
 RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
-    curl -f -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl && \
+    if [[ $mathurl = *[!\ ]* ]]; then \
+      curl -f -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl; \
+    fi && \
     if [ ! -f /root/lib/commons-math3-3.6.1-bin.tar.gz ]; then \
       echo "Commons-math3 not found in mirror, falling back to apache archive"; \ 
       mathurl="http://archive.apache.org/dist/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz"; \
@@ -39,7 +41,9 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     rm -rf /var/lib/apt/lists/*
 
 RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
-    curl -f -o /root/solr-${currentDevelopmentVersion}.tgz -O $solrurl && \
+    if [[ $solrurl = *[!\ ]* ]]; then \
+      curl -f -o /root/solr-${currentDevelopmentVersion}.tgz -O $solrurl; \
+    fi && \
     if [ ! -f /root/solr-${currentDevelopmentVersion}.tgz ]; then \
       echo "Solr ${currentDevelopmentVersion} not found in mirror, falling back to apache archive"; \ 
       solrurl="http://archive.apache.org/dist/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz"; \

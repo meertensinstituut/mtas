@@ -399,8 +399,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                 variableObject = new MtasParserObject(tmpVariableType);
                 collectAttributes(variableObject, streamReader);
                 computeVariablesFromObject(variableObject, currentList,
-                    variables);
-               
+                    variables);               
               }
               if (parsingContent) {
                 // check for relation : not within word, not within

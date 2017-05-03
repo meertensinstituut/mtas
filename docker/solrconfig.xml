@@ -1245,7 +1245,12 @@
   </searchComponent>
 
   <!-- MTAS: searchComponent -->
-  <searchComponent name="mtas" class="mtas.solr.handler.component.MtasSolrSearchComponent"/>
+  <searchComponent name="mtas" class="mtas.solr.handler.component.MtasSolrSearchComponent">
+    <!-- <str name="joinCacheDirectory">${solr.core.instanceDir}/cache/join</str>
+    <long name="joinLifetime">86400</long>
+    <int name="joinMaximumNumber">1000</int>
+    <int name="joinMaximumOverflow">10</int> -->
+  </searchComponent>
 
 
   <!-- Update Processors
@@ -1472,7 +1477,8 @@
      <queryParser name="myparser" class="com.mycompany.MyQParserPlugin"/>
     -->
   <queryParser name="mtas_cql" class="mtas.solr.search.MtasSolrCQLQParserPlugin"/>
-
+  <queryParser name="mtas_join" class="mtas.solr.search.MtasSolrJoinQParserPlugin"/>
+  
   <!-- Function Parsers
 
        http://wiki.apache.org/solr/FunctionQuery

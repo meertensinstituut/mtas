@@ -323,7 +323,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
               // tokenizerFactory
               result = new MtasUpdateRequestProcessorResultWriter(storedValue);
-              MtasTokenizer<?> tokenizer = tokenizerFactory
+              MtasTokenizer tokenizer = tokenizerFactory
                   .create(configuration);
               tokenizer.setReader(sizeReader);
               tokenizer.reset();

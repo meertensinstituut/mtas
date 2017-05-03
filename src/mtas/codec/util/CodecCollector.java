@@ -23,6 +23,7 @@ import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentGroup;
+import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.codec.util.CodecComponent.ComponentKwic;
 import mtas.codec.util.CodecComponent.ComponentList;
 import mtas.codec.util.CodecComponent.ComponentPosition;
@@ -104,14 +105,14 @@ public class CodecCollector {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public static void collect(String field, IndexSearcher searcher,
+  public static void collectField(String field, IndexSearcher searcher,
       IndexReader reader, IndexReader rawReader, ArrayList<Integer> fullDocList,
       ArrayList<Integer> fullDocSet, ComponentField fieldInfo,
       HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
 
-    HashMap<Integer, List<Integer>> docSets = new HashMap<Integer, List<Integer>>();
+    HashMap<Integer, List<Integer>> docSets = new HashMap<>();
 
     ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
     while (iterator.hasNext()) {
@@ -195,7 +196,40 @@ public class CodecCollector {
         }
       }
     }
+  }
 
+  public static void collectJoin(IndexReader reader, ArrayList<Integer> docSet,
+      ComponentJoin joinInfo) throws IOException {
+    BytesRef term = null;
+    PostingsEnum postingsEnum = null;
+    Integer docId;
+    Integer termDocId = -1;
+    Terms terms;
+    LeafReaderContext lrc;
+    LeafReader r;
+    ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
+    while (iterator.hasNext()) {
+      lrc = iterator.next();
+      r = lrc.reader();
+      for (String field : joinInfo.fields()) {
+        if ((terms = r.fields().terms(field)) != null) {
+          TermsEnum termsEnum = terms.iterator();
+          termDocId = -1;
+          while ((term = termsEnum.next()) != null) {
+            Iterator<Integer> docIterator = docSet.iterator();
+            postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.NONE);
+            while (docIterator.hasNext()) {
+              docId = docIterator.next() - lrc.docBase;
+              if ((docId >= termDocId)&& ((docId.equals(termDocId))
+                    || ((termDocId = postingsEnum.advance(docId)).equals(docId)))) {
+                  joinInfo.add(term.utf8ToString());
+                  break;                
+              }
+            }
+          } 
+        }
+      }
+    }
   }
 
   /**
@@ -2882,8 +2916,7 @@ public class CodecCollector {
                 String key;
                 // loop over terms
                 while ((term = termsEnum.next()) != null) {
-                  if (validateTermWithStartValue(term,
-                      termVector)) {
+                  if (validateTermWithStartValue(term, termVector)) {
                     termDocId = -1;
                     acceptedTerm = true;
                     if (ignoreByteRunAutomatonList != null) {
@@ -3043,7 +3076,7 @@ public class CodecCollector {
       int segmentNumber = lrc.parent.leaves().size();
       // loop over termvectors
       for (ComponentTermVector termVector : termVectorList) {
-        CompiledAutomaton compiledAutomaton;        
+        CompiledAutomaton compiledAutomaton;
         if ((termVector.regexp == null) || (termVector.regexp.isEmpty())) {
           RegExp re = new RegExp(
               termVector.prefix + MtasToken.DELIMITER + ".*");
@@ -3072,7 +3105,7 @@ public class CodecCollector {
           for (Automaton automaton : list.values()) {
             ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));
           }
-        }        
+        }
         if (!termVector.full && termVector.list == null) {
           termsEnum = t.intersect(compiledAutomaton, null);
           int initSize = Math.min((int) t.size(), 1000);
@@ -3105,8 +3138,7 @@ public class CodecCollector {
               // loop over terms
               boolean acceptedTerm;
               while ((term = termsEnum.next()) != null) {
-                if (validateTermWithStartValue(term,
-                    termVector)) {
+                if (validateTermWithStartValue(term, termVector)) {
                   termDocId = -1;
                   acceptedTerm = true;
                   if (ignoreByteRunAutomatonList != null) {
@@ -3165,8 +3197,7 @@ public class CodecCollector {
               if (computeFullList.size() > 0) {
                 termsEnum = t.intersect(compiledAutomaton, null);
                 while ((term = termsEnum.next()) != null) {
-                  if (validateTermWithStartValue(term,
-                      termVector)) {
+                  if (validateTermWithStartValue(term, termVector)) {
                     termDocId = -1;
                     mutableKey[0] = null;
                     // only if (probably) needed
@@ -3282,8 +3313,7 @@ public class CodecCollector {
                 if (docSet.size() > 0) {
                   int termDocId;
                   while ((term = termsEnum.next()) != null) {
-                    if (validateTermWithStartValue(term,
-                        termVector)) {
+                    if (validateTermWithStartValue(term, termVector)) {
                       termDocId = -1;
                       mutableKey[0] = null;
                       // compute numbers;
@@ -3320,29 +3350,35 @@ public class CodecCollector {
   }
 
   private static boolean validateTermWithStartValue(BytesRef term,
-      ComponentTermVector termVector) {    
+      ComponentTermVector termVector) {
     if (termVector.startValue == null) {
       return true;
     } else if (termVector.subComponentFunction.sortType
         .equals(CodecUtil.SORT_TERM)) {
-      if(term.length>termVector.startValue.length) {
+      if (term.length > termVector.startValue.length) {
         byte[] zeroBytes = (new BytesRef("\u0000")).bytes;
-        int n = (new Double(Math.ceil((term.length-termVector.startValue.length)/zeroBytes.length))).intValue();
-        byte[] newBytes = new byte[termVector.startValue.length+n*zeroBytes.length];
-        System.arraycopy(termVector.startValue.bytes, 0, newBytes, 0, termVector.startValue.length);        
-        for(int i=0; i<n; i++) {
-          System.arraycopy(zeroBytes, 0, newBytes, termVector.startValue.length+i*zeroBytes.length, zeroBytes.length);        
+        int n = (new Double(Math.ceil(
+            (term.length - termVector.startValue.length) / zeroBytes.length)))
+                .intValue();
+        byte[] newBytes = new byte[termVector.startValue.length
+            + n * zeroBytes.length];
+        System.arraycopy(termVector.startValue.bytes, 0, newBytes, 0,
+            termVector.startValue.length);
+        for (int i = 0; i < n; i++) {
+          System.arraycopy(zeroBytes, 0, newBytes,
+              termVector.startValue.length + i * zeroBytes.length,
+              zeroBytes.length);
         }
         termVector.startValue = new BytesRef(newBytes);
       }
       if (termVector.subComponentFunction.sortDirection.equals(
           CodecUtil.SORT_ASC) && (termVector.startValue.compareTo(term) < 0)) {
         return true;
-      } else if (termVector.subComponentFunction.sortDirection
-          .equals(CodecUtil.SORT_DESC) && (termVector.startValue.compareTo(term) > 0)) {
+      } else if (termVector.subComponentFunction.sortDirection.equals(
+          CodecUtil.SORT_DESC) && (termVector.startValue.compareTo(term) > 0)) {
         return true;
       }
-    }    
+    }
     return false;
   }
 

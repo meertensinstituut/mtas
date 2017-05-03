@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import mtas.analysis.MtasTokenizer;
 import mtas.analysis.parser.MtasBasicParser.MtasParserType;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
@@ -15,6 +19,8 @@ import mtas.analysis.util.MtasParserException;
  * The Class MtasParser.
  */
 abstract public class MtasParser {
+
+  protected static Log log = LogFactory.getLog(MtasParser.class);
 
   /** The token collection. */
   protected MtasTokenCollection tokenCollection;
@@ -27,6 +33,10 @@ abstract public class MtasParser {
 
   /** The makeunique. */
   protected Boolean makeunique = false;
+
+  protected final static String TOKEN_OFFSET = "offset";
+  protected final static String TOKEN_REALOFFSET = "realoffset";
+  protected final static String TOKEN_PARENT = "parent";
 
   /**
    * Inits the parser.

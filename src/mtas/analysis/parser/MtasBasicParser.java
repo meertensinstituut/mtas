@@ -186,6 +186,21 @@ abstract public class MtasBasicParser extends MtasParser {
   /** The Constant UPDATE_TYPE_LOCAL_REF_POSITION_END. */
   protected final static String UPDATE_TYPE_LOCAL_REF_POSITION_END = "localRefPositionEndUpdate";
 
+  protected final static String MAPPING_VALUE_VALUE = "value";
+
+  protected final static String MAPPING_VALUE_TYPE = "type";
+  protected final static String MAPPING_VALUE_NAME = "name";
+  protected final static String MAPPING_VALUE_PREFIX = "prefix";
+  protected final static String MAPPING_VALUE_FILTER = "filter";
+  protected final static String MAPPING_VALUE_DISTANCE = "distance";
+  protected final static String MAPPING_VALUE_SOURCE = "source";
+  protected final static String MAPPING_VALUE_ANCESTOR = "ancestor";
+  protected final static String MAPPING_VALUE_SPLIT = "split";
+  protected final static String MAPPING_VALUE_NUMBER = "number";
+  protected final static String MAPPING_VALUE_CONDITION = "condition";
+  protected final static String MAPPING_VALUE_TEXT = "text";
+  protected final static String MAPPING_VALUE_NOT = "not";
+
   /** The enc. */
   private Base64.Encoder enc = Base64.getEncoder();
 
@@ -201,7 +216,8 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Instantiates a new mtas basic parser.
    *
-   * @param config the config
+   * @param config
+   *          the config
    */
   public MtasBasicParser(MtasConfiguration config) {
     this.config = config;
@@ -213,7 +229,7 @@ abstract public class MtasBasicParser extends MtasParser {
    * @return the hash map
    */
   protected HashMap<String, ArrayList<MtasParserObject>> createCurrentList() {
-    HashMap<String, ArrayList<MtasParserObject>> currentList = new HashMap<String, ArrayList<MtasParserObject>>();
+    HashMap<String, ArrayList<MtasParserObject>> currentList = new HashMap<>();
     currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_RELATION_ANNOTATION,
         new ArrayList<MtasParserObject>());
@@ -233,7 +249,7 @@ abstract public class MtasBasicParser extends MtasParser {
    * @return the hash map
    */
   protected HashMap<String, HashMap<Integer, HashSet<String>>> createUpdateList() {
-    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = new HashMap<String, HashMap<Integer, HashSet<String>>>();
+    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = new HashMap<>();
     updateList.put(UPDATE_TYPE_OFFSET, new HashMap<Integer, HashSet<String>>());
     updateList.put(UPDATE_TYPE_POSITION,
         new HashMap<Integer, HashSet<String>>());
@@ -256,18 +272,24 @@ abstract public class MtasBasicParser extends MtasParser {
    * @return the hash map
    */
   protected HashMap<String, HashMap<String, String>> createVariables() {
-    return new HashMap<String, HashMap<String, String>>();
+    return new HashMap<>();
   }
 
   /**
    * Compute mappings from object.
    *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param object the object
-   * @param currentList the current list
-   * @param updateList the update list
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
+   * @param mtasTokenIdFactory
+   *          the mtas token id factory
+   * @param object
+   *          the object
+   * @param currentList
+   *          the current list
+   * @param updateList
+   *          the update list
+   * @throws MtasParserException
+   *           the mtas parser exception
+   * @throws MtasConfigException
+   *           the mtas config exception
    */
   protected void computeMappingsFromObject(
       MtasTokenIdFactory mtasTokenIdFactory, MtasParserObject object,
@@ -276,25 +298,25 @@ abstract public class MtasBasicParser extends MtasParser {
       throws MtasParserException, MtasConfigException {
     MtasParserType objectType = object.getType();
     ArrayList<MtasParserMapping<?>> mappings = objectType.getItems();
-    if (object.updateableMappingsWithPosition.size() > 0) {
+    if (!object.updateableMappingsWithPosition.isEmpty()) {
       for (int tokenId : object.updateableMappingsWithPosition) {
         updateList.get(UPDATE_TYPE_POSITION).put(tokenId, object.getRefIds());
       }
     }
-    if (object.updateableMappingsWithOffset.size() > 0) {
+    if (!object.updateableMappingsWithOffset.isEmpty()) {
       for (int tokenId : object.updateableMappingsWithOffset) {
         updateList.get(UPDATE_TYPE_OFFSET).put(tokenId, object.getRefIds());
       }
     }
     for (MtasParserMapping<?> mapping : mappings) {
       try {
-        if (mapping.getTokens().size() == 0) {
+        if (mapping.getTokens().isEmpty()) {
           // empty exception
         } else {
           for (int i = 0; i < mapping.getTokens().size(); i++) {
             MtasParserMappingToken mappingToken = mapping.getTokens().get(i);
             // empty exception
-            if (mappingToken.preValues.size() == 0) {
+            if (mappingToken.preValues.isEmpty()) {
               // continue, but no token
             } else {
               // check conditions
@@ -369,7 +391,7 @@ abstract public class MtasBasicParser extends MtasParser {
                   updateList.get(UPDATE_TYPE_VARIABLE).put(token.getId(), null);
                 }
                 // register id for update when parent is created
-                if (currentList.get(checkType).size() > 0) {
+                if (!currentList.get(checkType).isEmpty()) {
                   if (currentList.get(checkType).contains(object)) {
                     int listPosition = currentList.get(checkType)
                         .indexOf(object);
@@ -384,11 +406,11 @@ abstract public class MtasBasicParser extends MtasParser {
                   }
                   // if no real ancestor, register id update when group
                   // ancestor is created
-                } else if (currentList.get(MAPPING_TYPE_GROUP).size() > 0) {
+                } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
                   currentList.get(MAPPING_TYPE_GROUP)
                       .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
                       .registerUpdateableMappingAtParent(token.getId());
-                } else if (currentList.get(MAPPING_TYPE_RELATION).size() > 0) {
+                } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
                   currentList.get(MAPPING_TYPE_RELATION)
                       .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
                       .registerUpdateableMappingAtParent(token.getId());
@@ -406,21 +428,21 @@ abstract public class MtasBasicParser extends MtasParser {
                   // use position from ancestorGroup
                 } else if (mapping.position
                     .equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)
-                    && (currentList.get(MAPPING_TYPE_GROUP).size() > 0)) {
+                    && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())) {
                   currentList.get(MAPPING_TYPE_GROUP)
                       .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
                       .addUpdateableMappingWithPosition(token.getId());
                   // use position from ancestorWord
                 } else if (mapping.position
                     .equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)
-                    && (currentList.get(MAPPING_TYPE_WORD).size() > 0)) {
+                    && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
                   currentList.get(MAPPING_TYPE_WORD)
                       .get(currentList.get(MAPPING_TYPE_WORD).size() - 1)
                       .addUpdateableMappingWithPosition(token.getId());
                   // use position from ancestorRelation
                 } else if (mapping.position
                     .equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)
-                    && (currentList.get(MAPPING_TYPE_RELATION).size() > 0)) {
+                    && (!currentList.get(MAPPING_TYPE_RELATION).isEmpty())) {
                   currentList.get(MAPPING_TYPE_RELATION)
                       .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
                       .addUpdateableMappingWithPosition(token.getId());
@@ -467,21 +489,21 @@ abstract public class MtasBasicParser extends MtasParser {
                   // use offset from ancestorGroup
                 } else if (mapping.offset
                     .equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)
-                    && (currentList.get(MAPPING_TYPE_GROUP).size() > 0)) {
+                    && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())) {
                   currentList.get(MAPPING_TYPE_GROUP)
                       .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
                       .addUpdateableMappingWithOffset(token.getId());
                   // use offset from ancestorWord
                 } else if (mapping.offset
                     .equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)
-                    && (currentList.get(MAPPING_TYPE_WORD).size() > 0)) {
+                    && !currentList.get(MAPPING_TYPE_WORD).isEmpty()) {
                   currentList.get(MAPPING_TYPE_WORD)
                       .get(currentList.get(MAPPING_TYPE_WORD).size() - 1)
                       .addUpdateableMappingWithOffset(token.getId());
                   // use offset from ancestorRelation
                 } else if (mapping.offset
                     .equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)
-                    && (currentList.get(MAPPING_TYPE_RELATION).size() > 0)) {
+                    && !currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
                   currentList.get(MAPPING_TYPE_RELATION)
                       .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
                       .addUpdateableMappingWithOffset(token.getId());
@@ -504,7 +526,8 @@ abstract public class MtasBasicParser extends MtasParser {
         }
         // register start and end
         if (mapping.start != null && mapping.end != null) {
-          String startAttribute = null, endAttribute = null;
+          String startAttribute = null;
+          String endAttribute = null;
           if (mapping.start.equals("#")) {
             startAttribute = object.getId();
           } else {
@@ -522,7 +545,7 @@ abstract public class MtasBasicParser extends MtasParser {
             }
           }
           if (startAttribute != null && endAttribute != null
-              && object.getPositions().size() > 0) {
+              && !object.getPositions().isEmpty()) {
             object.setReferredStartPosition(startAttribute,
                 object.getPositions().first());
             object.setReferredEndPosition(endAttribute,
@@ -533,13 +556,12 @@ abstract public class MtasBasicParser extends MtasParser {
           }
         }
       } catch (MtasParserException e) {
-        // System.out.println("Rejected mapping " + object.getType().getName()
-        // + ": " + e.getMessage());
+        log.debug("Rejected mapping " + object.getType().getName(), e);
         // ignore, no new token is created
       }
     }
     // copy remaining updateableMappings to new parent
-    if (currentList.get(objectType.getType()).size() > 0) {
+    if (!currentList.get(objectType.getType()).isEmpty()) {
       if (currentList.get(objectType.getType()).contains(object)) {
         int listPosition = currentList.get(objectType.getType())
             .indexOf(object);
@@ -554,12 +576,12 @@ abstract public class MtasBasicParser extends MtasParser {
             .registerUpdateableMappingsAtParent(
                 object.getUpdateableMappingsAsParent());
       }
-    } else if (currentList.get(MAPPING_TYPE_GROUP).size() > 0) {
+    } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
       currentList.get(MAPPING_TYPE_GROUP)
           .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
           .registerUpdateableMappingsAtParent(
               object.getUpdateableMappingsAsParent());
-    } else if (currentList.get(MAPPING_TYPE_RELATION).size() > 0) {
+    } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
       currentList.get(MAPPING_TYPE_RELATION)
           .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
           .registerUpdateableMappingsAtParent(
@@ -571,9 +593,12 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute variables from object.
    *
-   * @param object the object
-   * @param currentList the current list
-   * @param variables the variables
+   * @param object
+   *          the object
+   * @param currentList
+   *          the current list
+   * @param variables
+   *          the variables
    */
   protected void computeVariablesFromObject(MtasParserObject object,
       HashMap<String, ArrayList<MtasParserObject>> currentList,
@@ -585,16 +610,16 @@ abstract public class MtasBasicParser extends MtasParser {
         if (!variables.containsKey(variable.variable)) {
           variables.put(variable.variable, new HashMap<String, String>());
         }
-        String value = "";
+        StringBuilder builder = new StringBuilder();
         for (MtasParserVariableValue variableValue : variable.values) {
           if (variableValue.type.equals("attribute")) {
             String subValue = object.getAttribute(variableValue.name);
             if (subValue != null) {
-              value += subValue;
+              builder.append(subValue);
             }
           }
         }
-        variables.get(variable.variable).put(id, value);
+        variables.get(variable.variable).put(id, builder.toString());
       }
     }
   }
@@ -602,18 +627,18 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Check for variables.
    *
-   * @param values the values
+   * @param values
+   *          the values
    * @return true, if successful
    */
   private boolean checkForVariables(ArrayList<HashMap<String, String>> values) {
-    if (values == null || values.size() == 0) {
+    if (values == null || values.isEmpty()) {
       return false;
     } else {
       for (HashMap<String, String> list : values) {
-        if (list.containsKey("type")) {
-          if (list.get("type").equals(MtasParserMapping.PARSER_TYPE_VARIABLE)) {
-            return true;
-          }
+        if (list.containsKey("type") && list.get("type")
+            .equals(MtasParserMapping.PARSER_TYPE_VARIABLE)) {
+          return true;
         }
       }
     }
@@ -623,9 +648,12 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Update mappings with local references.
    *
-   * @param currentObject the current object
-   * @param currentList the current list
-   * @param updateList the update list
+   * @param currentObject
+   *          the current object
+   * @param currentList
+   *          the current list
+   * @param updateList
+   *          the update list
    */
   private void updateMappingsWithLocalReferences(MtasParserObject currentObject,
       HashMap<String, ArrayList<MtasParserObject>> currentList,
@@ -648,8 +676,10 @@ abstract public class MtasBasicParser extends MtasParser {
               .get(UPDATE_TYPE_LOCAL_REF_OFFSET_START).get(tokenId).iterator();
           Iterator<String> endOffsetIt = updateList
               .get(UPDATE_TYPE_LOCAL_REF_OFFSET_END).get(tokenId).iterator();
-          Integer startPosition = null, endPosition = null, startOffset = null,
-              endOffset = null;
+          Integer startPosition = null;
+          Integer endPosition = null;
+          Integer startOffset = null;
+          Integer endOffset = null;
           Integer newValue = null;
           while (startPositionIt.hasNext()) {
             String localKey = startPositionIt.next();
@@ -693,7 +723,7 @@ abstract public class MtasBasicParser extends MtasParser {
       }
 
     }
-    if (currentList.get(MAPPING_TYPE_GROUP).size() > 0) {
+    if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
       MtasParserObject parentGroup = currentList.get(MAPPING_TYPE_GROUP)
           .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1);
       parentGroup.referredStartPosition
@@ -711,9 +741,11 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute type from mapping source.
    *
-   * @param source the source
+   * @param source
+   *          the source
    * @return the string
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private String computeTypeFromMappingSource(String source)
       throws MtasParserException {
@@ -742,11 +774,15 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute object from mapping value.
    *
-   * @param object the object
-   * @param mappingValue the mapping value
-   * @param currentList the current list
+   * @param object
+   *          the object
+   * @param mappingValue
+   *          the mapping value
+   * @param currentList
+   *          the current list
    * @return the mtas parser object[]
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private MtasParserObject[] computeObjectFromMappingValue(
       MtasParserObject object, HashMap<String, String> mappingValue,
@@ -757,22 +793,22 @@ abstract public class MtasBasicParser extends MtasParser {
     Integer ancestorNumber = null;
     String ancestorType = null;
     // try to get relevant object
-    if (mappingValue.get("source").equals(MtasParserMapping.SOURCE_OWN)) {
+    if (mappingValue.get(MAPPING_VALUE_SOURCE)
+        .equals(MtasParserMapping.SOURCE_OWN)) {
       checkObjects = new MtasParserObject[] { object };
     } else {
-      ancestorNumber = mappingValue.get("ancestor") != null
-          ? Integer.parseInt(mappingValue.get("ancestor")) : null;
-      ancestorType = computeTypeFromMappingSource(mappingValue.get("source"));
+      ancestorNumber = mappingValue.get(MAPPING_VALUE_ANCESTOR) != null
+          ? Integer.parseInt(mappingValue.get(MAPPING_VALUE_ANCESTOR)) : null;
+      ancestorType = computeTypeFromMappingSource(
+          mappingValue.get(MAPPING_VALUE_SOURCE));
       // get ancestor object
       if (ancestorType != null) {
         int s = currentList.get(ancestorType).size();
         // check existence ancestor for conditions
         if (ancestorNumber != null) {
-          if ((s > 0) && (ancestorNumber < s)) {
-            if ((checkObject = currentList.get(ancestorType)
-                .get((s - ancestorNumber - 1))) != null) {
-              checkObjects = new MtasParserObject[] { checkObject };
-            }
+          if ((s > 0) && (ancestorNumber < s) && (checkObject = currentList
+              .get(ancestorType).get((s - ancestorNumber - 1))) != null) {
+            checkObjects = new MtasParserObject[] { checkObject };
           }
         } else {
           checkObjects = new MtasParserObject[s];
@@ -788,13 +824,19 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute value from mapping values.
    *
-   * @param object the object
-   * @param mappingValues the mapping values
-   * @param currentList the current list
-   * @param containsVariables the contains variables
+   * @param object
+   *          the object
+   * @param mappingValues
+   *          the mapping values
+   * @param currentList
+   *          the current list
+   * @param containsVariables
+   *          the contains variables
    * @return the string[]
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
+   * @throws MtasParserException
+   *           the mtas parser exception
+   * @throws MtasConfigException
+   *           the mtas config exception
    */
   private String[] computeValueFromMappingValues(MtasParserObject object,
       ArrayList<HashMap<String, String>> mappingValues,
@@ -804,11 +846,13 @@ abstract public class MtasBasicParser extends MtasParser {
     String[] value = { "" };
     for (HashMap<String, String> mappingValue : mappingValues) {
       // directly
-      if (mappingValue.get("source").equals(MtasParserMapping.SOURCE_STRING)) {
+      if (mappingValue.get(MAPPING_VALUE_SOURCE)
+          .equals(MtasParserMapping.SOURCE_STRING)) {
         if (mappingValue.get("type")
             .equals(MtasParserMapping.PARSER_TYPE_STRING)) {
           String subvalue = computeFilteredPrefixedValue(
-              mappingValue.get("type"), mappingValue.get("text"), null, null);
+              mappingValue.get(MAPPING_VALUE_TYPE),
+              mappingValue.get(MAPPING_VALUE_TEXT), null, null);
           if (subvalue != null) {
             for (int i = 0; i < value.length; i++) {
               value[i] = addAndEncodeValue(value[i], subvalue,
@@ -824,12 +868,14 @@ abstract public class MtasBasicParser extends MtasParser {
         if (checkObjects != null && checkObjects.length > 0) {
           MtasParserType checkType = checkObjects[0].getType();
           // add name to value
-          if (mappingValue.get("type")
+          if (mappingValue.get(MAPPING_VALUE_TYPE)
               .equals(MtasParserMapping.PARSER_TYPE_NAME)) {
             String subvalue = computeFilteredPrefixedValue(
-                mappingValue.get("type"), checkType.getName(),
-                mappingValue.get("filter"),
-                value.equals("") ? null : mappingValue.get("prefix"));
+                mappingValue.get(MAPPING_VALUE_TYPE), checkType.getName(),
+                mappingValue.get(MAPPING_VALUE_FILTER),
+                mappingValue.get(MAPPING_VALUE_PREFIX) == null
+                || mappingValue.get(MAPPING_VALUE_PREFIX).isEmpty() ? null
+                    : mappingValue.get(MAPPING_VALUE_PREFIX));
             if (subvalue != null) {
               for (int i = 0; i < value.length; i++) {
                 value[i] = addAndEncodeValue(value[i], subvalue,
@@ -837,17 +883,21 @@ abstract public class MtasBasicParser extends MtasParser {
               }
             }
             // add attribute to value
-          } else if (mappingValue.get("type")
+          } else if (mappingValue.get(MAPPING_VALUE_TYPE)
               .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
             String tmpValue = null;
-            if (mappingValue.get("name").equals("#")) {
+            if (mappingValue.get(MAPPING_VALUE_NAME).equals("#")) {
               tmpValue = checkObjects[0].getId();
             } else {
-              tmpValue = checkObjects[0].getAttribute(mappingValue.get("name"));
+              tmpValue = checkObjects[0]
+                  .getAttribute(mappingValue.get(MAPPING_VALUE_NAME));
             }
             String subvalue = computeFilteredPrefixedValue(
-                mappingValue.get("type"), tmpValue, mappingValue.get("filter"),
-                value.equals("") ? null : mappingValue.get("prefix"));
+                mappingValue.get(MAPPING_VALUE_TYPE), tmpValue,
+                mappingValue.get(MAPPING_VALUE_FILTER),
+                mappingValue.get(MAPPING_VALUE_PREFIX) == null
+                    || mappingValue.get(MAPPING_VALUE_PREFIX).isEmpty() ? null
+                        : mappingValue.get(MAPPING_VALUE_PREFIX));
             if (subvalue != null) {
               for (int i = 0; i < value.length; i++) {
                 value[i] = addAndEncodeValue(value[i], subvalue,
@@ -858,9 +908,11 @@ abstract public class MtasBasicParser extends MtasParser {
           } else if (mappingValue.get("type")
               .equals(MtasParserMapping.PARSER_TYPE_TEXT)) {
             String subvalue = computeFilteredPrefixedValue(
-                mappingValue.get("type"), checkObjects[0].getText(),
-                mappingValue.get("filter"),
-                value.equals("") ? null : mappingValue.get("prefix"));
+                mappingValue.get(MAPPING_VALUE_TYPE), checkObjects[0].getText(),
+                mappingValue.get(MAPPING_VALUE_FILTER),
+                mappingValue.get(MAPPING_VALUE_PREFIX) == null
+                || mappingValue.get(MAPPING_VALUE_PREFIX).isEmpty() ? null
+                    : mappingValue.get(MAPPING_VALUE_PREFIX));
             if (subvalue != null) {
               for (int i = 0; i < value.length; i++) {
                 value[i] = addAndEncodeValue(value[i], subvalue,
@@ -870,18 +922,20 @@ abstract public class MtasBasicParser extends MtasParser {
           } else if (mappingValue.get("type")
               .equals(MtasParserMapping.PARSER_TYPE_TEXT_SPLIT)) {
             String[] textValues = checkObjects[0].getText()
-                .split(Pattern.quote(mappingValue.get("split")));
+                .split(Pattern.quote(mappingValue.get(MAPPING_VALUE_SPLIT)));
             textValues = computeFilteredSplitValues(textValues,
-                mappingValue.get("filter"));
+                mappingValue.get(MAPPING_VALUE_FILTER));
             if (textValues != null && textValues.length > 0) {
               String[] nextValue = new String[value.length * textValues.length];
               boolean nullValue = false;
               int number = 0;
               for (int k = 0; k < textValues.length; k++) {
                 String subvalue = computeFilteredPrefixedValue(
-                    mappingValue.get("type"), textValues[k],
-                    mappingValue.get("filter"),
-                    value.equals("") ? null : mappingValue.get("prefix"));
+                    mappingValue.get(MAPPING_VALUE_TYPE), textValues[k],
+                    mappingValue.get(MAPPING_VALUE_FILTER),
+                    mappingValue.get(MAPPING_VALUE_PREFIX) == null
+                    || mappingValue.get(MAPPING_VALUE_PREFIX).isEmpty() ? null
+                        : mappingValue.get(MAPPING_VALUE_PREFIX));
                 if (subvalue != null) {
                   for (int i = 0; i < value.length; i++) {
                     nextValue[number] = addAndEncodeValue(value[i], subvalue,
@@ -902,25 +956,24 @@ abstract public class MtasBasicParser extends MtasParser {
           } else if (mappingValue.get("type")
               .equals(MtasParserMapping.PARSER_TYPE_VARIABLE)) {
             if (containsVariables) {
-              String variableName = mappingValue.get("name");
-              String variableValue = mappingValue.get("value");
-              String prefix = mappingValue.get("prefix");
-              if (variableName != null && variableValue != null) {
-                if (mappingValue.get("source")
-                    .equals(MtasParserMapping.SOURCE_OWN)) {
-                  String subvalue = object.getAttribute(variableValue);
-                  if (subvalue != null && subvalue.startsWith("#")) {
-                    subvalue = subvalue.substring(1);
-                  }
-                  if (subvalue != null) {
-                    for (int i = 0; i < value.length; i++) {
-                      if (prefix != null && !prefix.isEmpty()) {
-                        value[i] = addAndEncodeValue(value[i], prefix,
-                            containsVariables);
-                      }
-                      value[i] = addAndEncodeVariable(value[i], variableName,
-                          subvalue, containsVariables);
+              String variableName = mappingValue.get(MAPPING_VALUE_NAME);
+              String variableValue = mappingValue.get(MAPPING_VALUE_VALUE);
+              String prefix = mappingValue.get(MAPPING_VALUE_PREFIX);
+              if (variableName != null && variableValue != null
+                  && mappingValue.get(MAPPING_VALUE_SOURCE)
+                      .equals(MtasParserMapping.SOURCE_OWN)) {
+                String subvalue = object.getAttribute(variableValue);
+                if (subvalue != null && subvalue.startsWith("#")) {
+                  subvalue = subvalue.substring(1);
+                }
+                if (subvalue != null) {
+                  for (int i = 0; i < value.length; i++) {
+                    if (prefix != null && !prefix.isEmpty()) {
+                      value[i] = addAndEncodeValue(value[i], prefix,
+                          containsVariables);
                     }
+                    value[i] = addAndEncodeVariable(value[i], variableName,
+                        subvalue, containsVariables);
                   }
                 }
               }
@@ -934,7 +987,7 @@ abstract public class MtasBasicParser extends MtasParser {
         }
       }
     }
-    if (value.length == 1 && value[0].equals("")) {
+    if (value.length == 1 && value[0].isEmpty()) {
       return null;
     } else {
       return value;
@@ -944,10 +997,14 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Adds the and encode variable.
    *
-   * @param originalValue the original value
-   * @param newVariable the new variable
-   * @param newVariableName the new variable name
-   * @param encode the encode
+   * @param originalValue
+   *          the original value
+   * @param newVariable
+   *          the new variable
+   * @param newVariableName
+   *          the new variable name
+   * @param encode
+   *          the encode
    * @return the string
    */
   private String addAndEncodeVariable(String originalValue, String newVariable,
@@ -958,9 +1015,12 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Adds the and encode value.
    *
-   * @param originalValue the original value
-   * @param newValue the new value
-   * @param encode the encode
+   * @param originalValue
+   *          the original value
+   * @param newValue
+   *          the new value
+   * @param encode
+   *          the encode
    * @return the string
    */
   private String addAndEncodeValue(String originalValue, String newValue,
@@ -971,10 +1031,14 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Adds the and encode.
    *
-   * @param originalValue the original value
-   * @param newType the new type
-   * @param newValue the new value
-   * @param encode the encode
+   * @param originalValue
+   *          the original value
+   * @param newType
+   *          the new type
+   * @param newValue
+   *          the new value
+   * @param encode
+   *          the encode
    * @return the string
    */
   private String addAndEncode(String originalValue, String newType,
@@ -994,6 +1058,7 @@ abstract public class MtasBasicParser extends MtasParser {
                 + new String(enc.encode(newValue.getBytes("UTF-8")), "UTF-8");
           }
         } catch (UnsupportedEncodingException e) {
+          log.debug(e);
           finalNewValue = "";
         }
       } else {
@@ -1010,9 +1075,12 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Decode and update with variables.
    *
-   * @param encodedPrefix the encoded prefix
-   * @param encodedPostfix the encoded postfix
-   * @param variables the variables
+   * @param encodedPrefix
+   *          the encoded prefix
+   * @param encodedPostfix
+   *          the encoded postfix
+   * @param variables
+   *          the variables
    * @return the string
    */
   protected String decodeAndUpdateWithVariables(String encodedPrefix,
@@ -1020,7 +1088,8 @@ abstract public class MtasBasicParser extends MtasParser {
       HashMap<String, HashMap<String, String>> variables) {
     // System.out.println("TEST "+encodedPrefix+" - "+encodedPostfix+"
     // "+variables);
-    String[] prefixSplit, postfixSplit;
+    String[] prefixSplit;
+    String[] postfixSplit;
     if (encodedPrefix != null && !encodedPrefix.isEmpty()) {
       prefixSplit = encodedPrefix.split(" ");
     } else {
@@ -1036,6 +1105,7 @@ abstract public class MtasBasicParser extends MtasParser {
       String postfix = decodeAndUpdateWithVariables(postfixSplit, variables);
       return prefix + MtasToken.DELIMITER + postfix;
     } catch (MtasParserException e) {
+      log.debug(e);
       return null;
     }
   }
@@ -1043,15 +1113,18 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Decode and update with variables.
    *
-   * @param splitList the split list
-   * @param variables the variables
+   * @param splitList
+   *          the split list
+   * @param variables
+   *          the variables
    * @return the string
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private String decodeAndUpdateWithVariables(String[] splitList,
       HashMap<String, HashMap<String, String>> variables)
       throws MtasParserException {
-    String decoded = "";
+    StringBuilder builder = new StringBuilder();
     for (String split : splitList) {
       if (split.contains(":")) {
         String[] subSplit = split.split(":");
@@ -1064,8 +1137,8 @@ abstract public class MtasBasicParser extends MtasParser {
             if (variables.containsKey(decodedVariableName)) {
               if (variables.get(decodedVariableName)
                   .containsKey(decodedVariableValue)) {
-                decoded = decoded + variables.get(decodedVariableName)
-                    .get(decodedVariableValue);
+                builder.append(variables.get(decodedVariableName)
+                    .get(decodedVariableValue));
               } else {
                 throw new MtasParserException("id " + decodedVariableValue
                     + " not found in " + decodedVariableName);
@@ -1075,37 +1148,32 @@ abstract public class MtasBasicParser extends MtasParser {
                   "variable " + decodedVariableName + " unknown");
             }
           } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            // do nothing
+            log.info(e);
           }
-        } else {
-          // do nothing
         }
       } else {
         try {
-          decoded = decoded + new String(dec.decode(split), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
-          // do nothing
-        } catch (IllegalArgumentException e) {
-          e.printStackTrace();
-          // do nothing
-          // System.out.println("Probleem "+split+" - "+e.getMessage());
-          //e.printStackTrace();
+          builder.append(new String(dec.decode(split), "UTF-8"));
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+          log.info(e);
         }
       }
     }
-    return decoded;
+    return builder.toString();
   }
 
   /**
    * Compute payload from mapping payload.
    *
-   * @param object the object
-   * @param mappingPayloads the mapping payloads
-   * @param currentList the current list
+   * @param object
+   *          the object
+   * @param mappingPayloads
+   *          the mapping payloads
+   * @param currentList
+   *          the current list
    * @return the bytes ref
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private BytesRef computePayloadFromMappingPayload(MtasParserObject object,
       ArrayList<HashMap<String, String>> mappingPayloads,
@@ -1113,15 +1181,14 @@ abstract public class MtasBasicParser extends MtasParser {
       throws MtasParserException {
     BytesRef payload = null;
     for (HashMap<String, String> mappingPayload : mappingPayloads) {
-      if (mappingPayload.get("source")
+      if (mappingPayload.get(MAPPING_VALUE_SOURCE)
           .equals(MtasParserMapping.SOURCE_STRING)) {
-        if (mappingPayload.get("type")
-            .equals(MtasParserMapping.PARSER_TYPE_STRING)) {
-          if (mappingPayload.get("text") != null) {
-            BytesRef subpayload = computeMaximumFilteredPayload(
-                mappingPayload.get("text"), payload, null);
-            payload = (subpayload != null) ? subpayload : payload;
-          }
+        if (mappingPayload.get(MAPPING_VALUE_TYPE)
+            .equals(MtasParserMapping.PARSER_TYPE_STRING)
+            && mappingPayload.get(MAPPING_VALUE_TEXT) != null) {
+          BytesRef subpayload = computeMaximumFilteredPayload(
+              mappingPayload.get(MAPPING_VALUE_TEXT), payload, null);
+          payload = (subpayload != null) ? subpayload : payload;
         }
         // from objects
       } else {
@@ -1134,13 +1201,14 @@ abstract public class MtasBasicParser extends MtasParser {
               .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
             BytesRef subpayload = computeMaximumFilteredPayload(
                 checkObjects[0].getAttribute(mappingPayload.get("name")),
-                payload, mappingPayload.get("filter"));
+                payload, mappingPayload.get(MAPPING_VALUE_FILTER));
             payload = (subpayload != null) ? subpayload : payload;
             // payload from text
           } else if (mappingPayload.get("type")
               .equals(MtasParserMapping.PARSER_TYPE_TEXT)) {
             BytesRef subpayload = computeMaximumFilteredPayload(
-                object.getText(), payload, mappingPayload.get("filter"));
+                object.getText(), payload,
+                mappingPayload.get(MAPPING_VALUE_FILTER));
             payload = (subpayload != null) ? subpayload : payload;
           }
         }
@@ -1152,15 +1220,17 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Prevalidate object.
    *
-   * @param object the object
-   * @param currentList the current list
+   * @param object
+   *          the object
+   * @param currentList
+   *          the current list
    * @return the boolean
    */
   Boolean prevalidateObject(MtasParserObject object,
       HashMap<String, ArrayList<MtasParserObject>> currentList) {
     MtasParserType objectType = object.getType();
     ArrayList<MtasParserMapping<?>> mappings = objectType.getItems();
-    if (mappings.size() == 0) {
+    if (mappings.isEmpty()) {
       return true;
     }
     for (MtasParserMapping<?> mapping : mappings) {
@@ -1168,8 +1238,7 @@ abstract public class MtasBasicParser extends MtasParser {
         precheckMappingConditions(object, mapping.getConditions(), currentList);
         return true;
       } catch (MtasParserException e) {
-        // do nothing
-        //System.out.println(e.getMessage());
+        log.debug(e);
       }
     }
     return false;
@@ -1178,10 +1247,14 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Precheck mapping conditions.
    *
-   * @param object the object
-   * @param mappingConditions the mapping conditions
-   * @param currentList the current list
-   * @throws MtasParserException the mtas parser exception
+   * @param object
+   *          the object
+   * @param mappingConditions
+   *          the mapping conditions
+   * @param currentList
+   *          the current list
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   void precheckMappingConditions(MtasParserObject object,
       ArrayList<HashMap<String, String>> mappingConditions,
@@ -1195,10 +1268,10 @@ abstract public class MtasBasicParser extends MtasParser {
         try {
           number = Integer.parseInt(mappingCondition.get("number"));
         } catch (Exception e) {
-          // ignore
+          log.debug(e);
         }
         String type = computeTypeFromMappingSource(
-            mappingCondition.get("source"));
+            mappingCondition.get(MAPPING_VALUE_SOURCE));
         if (number != currentList.get(type).size()) {
           throw new MtasParserException(
               "condition mapping is " + number + " ancestors of " + type
@@ -1211,7 +1284,7 @@ abstract public class MtasBasicParser extends MtasParser {
         try {
           number = Integer.parseInt(mappingCondition.get("number"));
         } catch (Exception e) {
-          // ignore
+          log.debug(e);
         }
         if (number != object.getUnknownAncestorNumber()) {
           throw new MtasParserException(
@@ -1232,24 +1305,25 @@ abstract public class MtasBasicParser extends MtasParser {
             // condition on name
             if (mappingCondition.get("type")
                 .equals(MtasParserMapping.PARSER_TYPE_NAME)) {
-              if (notCondition && mappingCondition.get("condition")
+              if (notCondition && mappingCondition.get(MAPPING_VALUE_CONDITION)
                   .equals(checkType.getName())) {
                 throw new MtasParserException("condition NOT "
-                    + mappingCondition.get("condition")
+                    + mappingCondition.get(MAPPING_VALUE_CONDITION)
                     + " on name not matched (is " + checkType.getName() + ")");
-              } else if (!notCondition && mappingCondition.get("condition")
-                  .equals(checkType.getName())) {
+              } else if (!notCondition && mappingCondition
+                  .get(MAPPING_VALUE_CONDITION).equals(checkType.getName())) {
                 break checkObjectLoop;
-              } else if (!notCondition && !mappingCondition.get("condition")
-                  .equals(checkType.getName())) {
+              } else if (!notCondition && !mappingCondition
+                  .get(MAPPING_VALUE_CONDITION).equals(checkType.getName())) {
                 throw new MtasParserException("condition "
-                    + mappingCondition.get("condition")
+                    + mappingCondition.get(MAPPING_VALUE_CONDITION)
                     + " on name not matched (is " + checkType.getName() + ")");
               }
               // condition on attribute
             } else if (mappingCondition.get("type")
                 .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
-              String attributeCondition = mappingCondition.get("condition");
+              String attributeCondition = mappingCondition
+                  .get(MAPPING_VALUE_CONDITION);
               String attributeValue = checkObject
                   .getAttribute(mappingCondition.get("name"));
               if ((attributeCondition == null) && (attributeValue == null)) {
@@ -1285,30 +1359,28 @@ abstract public class MtasBasicParser extends MtasParser {
               }
               // condition on text
             } else if (mappingCondition.get("type")
-                .equals(MtasParserMapping.PARSER_TYPE_TEXT)) {
-              // can't pre-check this type of condition, only for group
-              if (object.getType().precheckText()) {
-                String textCondition = mappingCondition.get("condition");
-                String textValue = object.getText();
-                if ((textCondition == null)
-                    && ((textValue == null) || textValue.equals(""))) {
-                  if (!notCondition) {
-                    throw new MtasParserException("no text available");
-                  }
-                } else if ((textCondition != null) && (textValue == null)) {
-                  if (!notCondition) {
-                    throw new MtasParserException("condition " + textCondition
-                        + " on text not matched (is null)");
-                  }
-                } else if (textCondition != null) {
-                  if (!notCondition && !textCondition.equals(textValue)) {
-                    throw new MtasParserException("condition " + textCondition
-                        + " on text not matched (is " + textValue + ")");
-                  } else if (notCondition && textCondition.equals(textValue)) {
-                    throw new MtasParserException(
-                        "condition NOT " + textCondition
-                            + " on text not matched (is " + textValue + ")");
-                  }
+                .equals(MtasParserMapping.PARSER_TYPE_TEXT)
+                && object.getType().precheckText()) {
+              String textCondition = mappingCondition
+                  .get(MAPPING_VALUE_CONDITION);
+              String textValue = object.getText();
+              if ((textCondition == null)
+                  && ((textValue == null) || textValue.equals(""))) {
+                if (!notCondition) {
+                  throw new MtasParserException("no text available");
+                }
+              } else if ((textCondition != null) && (textValue == null)) {
+                if (!notCondition) {
+                  throw new MtasParserException("condition " + textCondition
+                      + " on text not matched (is null)");
+                }
+              } else if (textCondition != null) {
+                if (!notCondition && !textCondition.equals(textValue)) {
+                  throw new MtasParserException("condition " + textCondition
+                      + " on text not matched (is " + textValue + ")");
+                } else if (notCondition && textCondition.equals(textValue)) {
+                  throw new MtasParserException("condition NOT " + textCondition
+                      + " on text not matched (is " + textValue + ")");
                 }
               }
             }
@@ -1324,10 +1396,14 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Postcheck mapping conditions.
    *
-   * @param object the object
-   * @param mappingConditions the mapping conditions
-   * @param currentList the current list
-   * @throws MtasParserException the mtas parser exception
+   * @param object
+   *          the object
+   * @param mappingConditions
+   *          the mapping conditions
+   * @param currentList
+   *          the current list
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private void postcheckMappingConditions(MtasParserObject object,
       ArrayList<HashMap<String, String>> mappingConditions,
@@ -1341,14 +1417,14 @@ abstract public class MtasBasicParser extends MtasParser {
         MtasParserObject[] checkObjects = computeObjectFromMappingValue(object,
             mappingCondition, currentList);
         if (checkObjects != null) {
-          String textCondition = mappingCondition.get("condition");
+          String textCondition = mappingCondition.get(MAPPING_VALUE_CONDITION);
           String textValue = object.getText();
           Boolean notCondition = false;
           if (mappingCondition.get("not") != null) {
             notCondition = true;
           }
           if ((textCondition == null)
-              && ((textValue == null) || textValue.equals(""))) {
+              && ((textValue == null) || textValue.isEmpty())) {
             if (!notCondition) {
               throw new MtasParserException("no text available");
             }
@@ -1374,10 +1450,13 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute filtered split values.
    *
-   * @param values the values
-   * @param filter the filter
+   * @param values
+   *          the values
+   * @param filter
+   *          the filter
    * @return the string[]
-   * @throws MtasConfigException the mtas config exception
+   * @throws MtasConfigException
+   *           the mtas config exception
    */
   private String[] computeFilteredSplitValues(String[] values, String filter)
       throws MtasConfigException {
@@ -1438,12 +1517,17 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute filtered prefixed value.
    *
-   * @param type the type
-   * @param value the value
-   * @param filter the filter
-   * @param prefix the prefix
+   * @param type
+   *          the type
+   * @param value
+   *          the value
+   * @param filter
+   *          the filter
+   * @param prefix
+   *          the prefix
    * @return the string
-   * @throws MtasConfigException the mtas config exception
+   * @throws MtasConfigException
+   *           the mtas config exception
    */
   private String computeFilteredPrefixedValue(String type, String value,
       String filter, String prefix) throws MtasConfigException {
@@ -1452,13 +1536,9 @@ abstract public class MtasBasicParser extends MtasParser {
       String[] filters = filter.split(",");
       for (String item : filters) {
         if (item.trim().equals(MAPPING_FILTER_UPPERCASE)) {
-          if (value != null) {
-            value = value.toUpperCase();
-          }
+          value = value == null ? null : value.toUpperCase();
         } else if (item.trim().equals(MAPPING_FILTER_LOWERCASE)) {
-          if (value != null) {
-            value = value.toLowerCase();
-          }
+          value = value == null ? null : value.toLowerCase();
         } else if (item.trim().equals(MAPPING_FILTER_ASCII)) {
           if (value != null) {
             char[] old = value.toCharArray();
@@ -1478,10 +1558,8 @@ abstract public class MtasBasicParser extends MtasParser {
         }
       }
     }
-    if (value != null) {
-      if (prefix != null) {
-        value = prefix + value;
-      }
+    if (value != null && prefix != null) {
+      value = prefix + value;
     }
     return value;
   }
@@ -1489,9 +1567,12 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * Compute maximum filtered payload.
    *
-   * @param value the value
-   * @param payload the payload
-   * @param filter the filter
+   * @param value
+   *          the value
+   * @param payload
+   *          the payload
+   * @param filter
+   *          the filter
    * @return the bytes ref
    */
   private BytesRef computeMaximumFilteredPayload(String value, BytesRef payload,
@@ -1515,7 +1596,8 @@ abstract public class MtasBasicParser extends MtasParser {
   /**
    * The Class MtasParserType.
    *
-   * @param <T> the generic type
+   * @param <T>
+   *          the generic type
    */
   protected class MtasParserType<T> {
 
@@ -1532,14 +1614,17 @@ abstract public class MtasBasicParser extends MtasParser {
     private String refAttributeName;
 
     /** The items. */
-    protected ArrayList<T> items = new ArrayList<T>();
+    protected ArrayList<T> items = new ArrayList<>();
 
     /**
      * Instantiates a new mtas parser type.
      *
-     * @param type the type
-     * @param name the name
-     * @param precheckText the precheck text
+     * @param type
+     *          the type
+     * @param name
+     *          the name
+     * @param precheckText
+     *          the precheck text
      */
     MtasParserType(String type, String name, boolean precheckText) {
       this.type = type;
@@ -1550,10 +1635,14 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Instantiates a new mtas parser type.
      *
-     * @param type the type
-     * @param name the name
-     * @param precheckText the precheck text
-     * @param refAttributeName the ref attribute name
+     * @param type
+     *          the type
+     * @param name
+     *          the name
+     * @param precheckText
+     *          the precheck text
+     * @param refAttributeName
+     *          the ref attribute name
      */
     MtasParserType(String type, String name, boolean precheckText,
         String refAttributeName) {
@@ -1600,7 +1689,8 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Adds the item.
      *
-     * @param item the item
+     * @param item
+     *          the item
      */
     public void addItem(T item) {
       items.add(item);
@@ -1631,8 +1721,10 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Instantiates a new mtas parser variable value.
      *
-     * @param type the type
-     * @param name the name
+     * @param type
+     *          the type
+     * @param name
+     *          the name
      */
     public MtasParserVariableValue(String type, String name) {
       this.type = type;
@@ -1650,7 +1742,9 @@ abstract public class MtasBasicParser extends MtasParser {
     public String type;
 
     /** The parent. */
-    public Boolean offset, realoffset, parent;
+    public Boolean offset;
+    public Boolean realoffset;
+    public Boolean parent;
 
     /** The pre values. */
     public ArrayList<HashMap<String, String>> preValues;
@@ -1664,22 +1758,24 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Instantiates a new mtas parser mapping token.
      *
-     * @param tokenType the token type
+     * @param tokenType
+     *          the token type
      */
     public MtasParserMappingToken(String tokenType) {
       type = tokenType;
       offset = true;
       realoffset = true;
       parent = true;
-      preValues = new ArrayList<HashMap<String, String>>();
-      postValues = new ArrayList<HashMap<String, String>>();
-      payload = new ArrayList<HashMap<String, String>>();
+      preValues = new ArrayList<>();
+      postValues = new ArrayList<>();
+      payload = new ArrayList<>();
     }
 
     /**
      * Sets the offset.
      *
-     * @param tokenOffset the new offset
+     * @param tokenOffset
+     *          the new offset
      */
     public void setOffset(Boolean tokenOffset) {
       offset = tokenOffset;
@@ -1688,7 +1784,8 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Sets the real offset.
      *
-     * @param tokenRealOffset the new real offset
+     * @param tokenRealOffset
+     *          the new real offset
      */
     public void setRealOffset(Boolean tokenRealOffset) {
       realoffset = tokenRealOffset;
@@ -1697,7 +1794,8 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Sets the parent.
      *
-     * @param tokenParent the new parent
+     * @param tokenParent
+     *          the new parent
      */
     public void setParent(Boolean tokenParent) {
       parent = tokenParent;
@@ -1722,20 +1820,24 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Instantiates a new mtas parser variable.
      *
-     * @param name the name
-     * @param value the value
+     * @param name
+     *          the name
+     * @param value
+     *          the value
      */
     public MtasParserVariable(String name, String value) {
       this.name = name;
       this.variable = value;
-      values = new ArrayList<MtasParserVariableValue>();
+      values = new ArrayList<>();
     }
 
     /**
      * Process config.
      *
-     * @param config the config
-     * @throws MtasConfigException the mtas config exception
+     * @param config
+     *          the config
+     * @throws MtasConfigException
+     *           the mtas config exception
      */
     public void processConfig(MtasConfiguration config)
         throws MtasConfigException {
@@ -1745,7 +1847,6 @@ abstract public class MtasBasicParser extends MtasParser {
           for (int m = 0; m < config.children.get(k).children.size(); m++) {
             if (config.children.get(k).children.get(m).name
                 .equals(VARIABLE_SUBTYPE_VALUE_ITEM)) {
-              MtasConfiguration items = config.children.get(k).children.get(m);
               String valueType = config.children.get(k).children
                   .get(m).attributes.get("type");
               String nameType = config.children.get(k).children
@@ -1773,20 +1874,21 @@ abstract public class MtasBasicParser extends MtasParser {
      */
     @Override
     public String toString() {
-      String text = "variable " + variable + " from " + name;
+      StringBuilder builder = new StringBuilder();
+      builder.append("variable " + variable + " from " + name);
       for (int i = 0; i < values.size(); i++) {
-        text += "\n\tvalue " + i;
-        text += " - " + values.get(i).type;
+        builder.append("\n\tvalue " + i);
+        builder.append(" - " + values.get(i).type);
       }
-
-      return text;
+      return builder.toString();
     }
   }
 
   /**
    * The Class MtasParserMapping.
    *
-   * @param <T> the generic type
+   * @param <T>
+   *          the generic type
    */
   protected abstract class MtasParserMapping<T extends MtasParserMapping<T>> {
 
@@ -1880,8 +1982,8 @@ abstract public class MtasBasicParser extends MtasParser {
       offset = null;
       realOffset = null;
       position = null;
-      tokens = new ArrayList<MtasParserMappingToken>();
-      conditions = new ArrayList<HashMap<String, String>>();
+      tokens = new ArrayList<>();
+      conditions = new ArrayList<>();
       start = null;
       end = null;
     }
@@ -1889,8 +1991,10 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Process config.
      *
-     * @param config the config
-     * @throws MtasConfigException the mtas config exception
+     * @param config
+     *          the config
+     * @throws MtasConfigException
+     *           the mtas config exception
      */
     public void processConfig(MtasConfiguration config)
         throws MtasConfigException {
@@ -1907,21 +2011,21 @@ abstract public class MtasBasicParser extends MtasParser {
                 .keySet()) {
               String attributeValue = config.children.get(k).attributes
                   .get(tokenAttributeName);
-              if (tokenAttributeName.equals("offset")) {
+              if (tokenAttributeName.equals(TOKEN_OFFSET)) {
                 if (!attributeValue.equals("true")
                     && !attributeValue.equals("1")) {
                   mappingToken.setOffset(false);
                 } else {
                   mappingToken.setOffset(true);
                 }
-              } else if (tokenAttributeName.equals("realoffset")) {
+              } else if (tokenAttributeName.equals(TOKEN_REALOFFSET)) {
                 if (!attributeValue.equals("true")
                     && !attributeValue.equals("1")) {
                   mappingToken.setRealOffset(false);
                 } else {
                   mappingToken.setRealOffset(true);
                 }
-              } else if (tokenAttributeName.equals("parent")) {
+              } else if (tokenAttributeName.equals(TOKEN_PARENT)) {
                 if (!attributeValue.equals("true")
                     && !attributeValue.equals("1")) {
                   mappingToken.setParent(false);
@@ -1940,17 +2044,17 @@ abstract public class MtasBasicParser extends MtasParser {
                 for (int l = 0; l < items.children.size(); l++) {
                   if (items.children.get(l).name.equals("item")) {
                     String itemType = items.children.get(l).attributes
-                        .get("type");
+                        .get(MAPPING_VALUE_TYPE);
                     String nameAttribute = items.children.get(l).attributes
-                        .get("name");
+                        .get(MAPPING_VALUE_NAME);
                     String prefixAttribute = items.children.get(l).attributes
-                        .get("prefix");
+                        .get(MAPPING_VALUE_PREFIX);
                     String filterAttribute = items.children.get(l).attributes
-                        .get("filter");
+                        .get(MAPPING_VALUE_FILTER);
                     String distanceAttribute = items.children.get(l).attributes
-                        .get("distance");
+                        .get(MAPPING_VALUE_DISTANCE);
                     String valueAttribute = items.children.get(l).attributes
-                        .get("value");
+                        .get(MAPPING_VALUE_VALUE);
                     if (itemType.equals(ITEM_TYPE_STRING)) {
                       addString(mappingToken, items.name, valueAttribute);
                     } else if (itemType.equals(ITEM_TYPE_NAME)) {
@@ -2045,9 +2149,9 @@ abstract public class MtasBasicParser extends MtasParser {
                       addVariableFromAttribute(mappingToken, items.name,
                           nameAttribute, prefixAttribute, valueAttribute);
                     } else {
-                      throw new MtasConfigException(
-                          "unknown itemType " + itemType + " for " + items.name
-                              + " in mapping " + config.attributes.get("name"));
+                      throw new MtasConfigException(String.format(
+                          "unknown itemType %s for %s in mapping %s", itemType,
+                          items.name, config.attributes.get("name")));
                     }
                   }
                 }
@@ -2060,13 +2164,13 @@ abstract public class MtasBasicParser extends MtasParser {
                     String itemType = items.children.get(l).attributes
                         .get("type");
                     String valueAttribute = items.children.get(l).attributes
-                        .get("value");
+                        .get(MAPPING_VALUE_VALUE);
                     String nameAttribute = items.children.get(l).attributes
-                        .get("name");
+                        .get(MAPPING_VALUE_NAME);
                     String filterAttribute = items.children.get(l).attributes
-                        .get("filter");
+                        .get(MAPPING_VALUE_FILTER);
                     String distanceAttribute = items.children.get(l).attributes
-                        .get("distance");
+                        .get(MAPPING_VALUE_DISTANCE);
                     if (itemType.equals(ITEM_TYPE_STRING)) {
                       payloadString(mappingToken, valueAttribute);
                     } else if (itemType.equals(ITEM_TYPE_TEXT)) {
@@ -2116,9 +2220,9 @@ abstract public class MtasBasicParser extends MtasParser {
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
                     } else {
-                      throw new MtasConfigException(
-                          "unknown itemType " + itemType + " for " + items.name
-                              + " in mapping " + config.attributes.get("name"));
+                      throw new MtasConfigException(String.format(
+                          "unknown itemType %s for %s in mapping %s", itemType,
+                          items.name, config.attributes.get("name")));
                     }
                   }
                 }
@@ -2132,15 +2236,15 @@ abstract public class MtasBasicParser extends MtasParser {
             if (items.children.get(l).name.equals("item")) {
               String itemType = items.children.get(l).attributes.get("type");
               String nameAttribute = items.children.get(l).attributes
-                  .get("name");
+                  .get(MAPPING_VALUE_NAME);
               String conditionAttribute = items.children.get(l).attributes
-                  .get("condition");
+                  .get(MAPPING_VALUE_CONDITION);
               String filterAttribute = items.children.get(l).attributes
-                  .get("filter");
+                  .get(MAPPING_VALUE_FILTER);
               String numberAttribute = items.children.get(l).attributes
-                  .get("number");
+                  .get(MAPPING_VALUE_NUMBER);
               String distanceAttribute = items.children.get(l).attributes
-                  .get("distance");
+                  .get(MAPPING_VALUE_DISTANCE);
               String notAttribute = items.children.get(l).attributes.get("not");
               if ((notAttribute != null) && !notAttribute.equals("true")
                   && !notAttribute.equals("1")) {
@@ -2242,16 +2346,17 @@ abstract public class MtasBasicParser extends MtasParser {
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
               } else {
-                throw new MtasConfigException("unknown itemType " + itemType
-                    + " for " + config.children.get(k).name + " in mapping "
-                    + config.attributes.get("name"));
+                throw new MtasConfigException(
+                    String.format("unknown itemType %s for %s in mapping %s",
+                        itemType, config.children.get(k).name,
+                        config.attributes.get("name")));
               }
             }
           }
         } else {
           throw new MtasConfigException(
-              "unknown mapping subtype " + config.children.get(k).name
-                  + " in mapping " + config.attributes.get("name"));
+              String.format("unknown mapping subType %s in mapping %s",
+                  config.children.get(k).name, config.attributes.get("name")));
         }
       }
     }
@@ -2259,8 +2364,10 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Sets the start end.
      *
-     * @param start the start
-     * @param end the end
+     * @param start
+     *          the start
+     * @param end
+     *          the end
      */
     protected void setStartEnd(String start, String end) {
       if (start != null && !start.isEmpty() && end != null && !end.isEmpty()) {
@@ -2272,10 +2379,11 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Condition unknown ancestor.
      *
-     * @param number the number
+     * @param number
+     *          the number
      */
     private void conditionUnknownAncestor(String number) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
       mapConstructionItem.put("type", PARSER_TYPE_UNKNOWN_ANCESTOR);
       mapConstructionItem.put("number", number);
       conditions.add(mapConstructionItem);
@@ -2284,16 +2392,19 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Adds the string.
      *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param text the text
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param text
+     *          the text
      */
     private void addString(MtasParserMappingToken mappingToken, String type,
         String text) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_STRING);
-      mapConstructionItem.put("type", PARSER_TYPE_STRING);
-      mapConstructionItem.put("text", text);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_STRING);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_STRING);
+      mapConstructionItem.put(MAPPING_VALUE_TEXT, text);
       if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
         mappingToken.preValues.add(mapConstructionItem);
       } else if (type.equals(MAPPING_SUBTYPE_TOKEN_POST)) {
@@ -2304,33 +2415,39 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Payload string.
      *
-     * @param mappingToken the mapping token
-     * @param text the text
+     * @param mappingToken
+     *          the mapping token
+     * @param text
+     *          the text
      */
     private void payloadString(MtasParserMappingToken mappingToken,
         String text) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_STRING);
-      mapConstructionItem.put("type", PARSER_TYPE_STRING);
-      mapConstructionItem.put("text", text);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_STRING);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_STRING);
+      mapConstructionItem.put(MAPPING_VALUE_TEXT, text);
       mappingToken.payload.add(mapConstructionItem);
     }
 
     /**
      * Adds the name.
      *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param prefix the prefix
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param prefix
+     *          the prefix
+     * @param filter
+     *          the filter
      */
     private void addName(MtasParserMappingToken mappingToken, String type,
         String prefix, String filter) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_NAME);
-      mapConstructionItem.put("prefix", prefix);
-      mapConstructionItem.put("filter", filter);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_NAME);
+      mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
         mappingToken.preValues.add(mapConstructionItem);
       } else if (type.equals(MAPPING_SUBTYPE_TOKEN_POST)) {
@@ -2341,33 +2458,39 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Condition name.
      *
-     * @param condition the condition
-     * @param not the not
+     * @param condition
+     *          the condition
+     * @param not
+     *          the not
      */
     private void conditionName(String condition, String not) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_NAME);
-      mapConstructionItem.put("condition", condition);
-      mapConstructionItem.put("not", not);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_NAME);
+      mapConstructionItem.put(MAPPING_VALUE_CONDITION, condition);
+      mapConstructionItem.put(MAPPING_VALUE_NOT, not);
       conditions.add(mapConstructionItem);
     }
 
     /**
      * Adds the text.
      *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param prefix the prefix
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param prefix
+     *          the prefix
+     * @param filter
+     *          the filter
      */
     private void addText(MtasParserMappingToken mappingToken, String type,
         String prefix, String filter) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_TEXT);
-      mapConstructionItem.put("prefix", prefix);
-      mapConstructionItem.put("filter", filter);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_TEXT);
+      mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
         mappingToken.preValues.add(mapConstructionItem);
       } else if (type.equals(MAPPING_SUBTYPE_TOKEN_POST)) {
@@ -2378,20 +2501,25 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Adds the text split.
      *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param split the split
-     * @param prefix the prefix
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param split
+     *          the split
+     * @param prefix
+     *          the prefix
+     * @param filter
+     *          the filter
      */
     private void addTextSplit(MtasParserMappingToken mappingToken, String type,
         String split, String prefix, String filter) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_TEXT_SPLIT);
-      mapConstructionItem.put("split", split);
-      mapConstructionItem.put("prefix", prefix);
-      mapConstructionItem.put("filter", filter);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_TEXT_SPLIT);
+      mapConstructionItem.put(MAPPING_VALUE_SPLIT, split);
+      mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
         mappingToken.preValues.add(mapConstructionItem);
       } else if (type.equals(MAPPING_SUBTYPE_TOKEN_POST)) {
@@ -2402,52 +2530,62 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Condition text.
      *
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
+     * @param condition
+     *          the condition
+     * @param filter
+     *          the filter
+     * @param not
+     *          the not
      */
     private void conditionText(String condition, String filter, String not) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_TEXT);
-      mapConstructionItem.put("condition", condition);
-      mapConstructionItem.put("filter", filter);
-      mapConstructionItem.put("not", not);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_TEXT);
+      mapConstructionItem.put(MAPPING_VALUE_CONDITION, condition);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
+      mapConstructionItem.put(MAPPING_VALUE_NOT, not);
       conditions.add(mapConstructionItem);
     }
 
     /**
      * Payload text.
      *
-     * @param mappingToken the mapping token
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param filter
+     *          the filter
      */
     private void payloadText(MtasParserMappingToken mappingToken,
         String filter) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_TEXT);
-      mapConstructionItem.put("filter", filter);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_TEXT);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       mappingToken.payload.add(mapConstructionItem);
     }
 
     /**
      * Adds the attribute.
      *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param name the name
-     * @param prefix the prefix
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param name
+     *          the name
+     * @param prefix
+     *          the prefix
+     * @param filter
+     *          the filter
      */
     private void addAttribute(MtasParserMappingToken mappingToken, String type,
         String name, String prefix, String filter) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_ATTRIBUTE);
-      mapConstructionItem.put("name", name);
-      mapConstructionItem.put("prefix", prefix);
-      mapConstructionItem.put("filter", filter);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
+      mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+      mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       if (name != null) {
         if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
           mappingToken.preValues.add(mapConstructionItem);
@@ -2460,20 +2598,25 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Adds the variable from attribute.
      *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param name the name
-     * @param prefix the prefix
-     * @param value the value
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param name
+     *          the name
+     * @param prefix
+     *          the prefix
+     * @param value
+     *          the value
      */
     private void addVariableFromAttribute(MtasParserMappingToken mappingToken,
         String type, String name, String prefix, String value) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_VARIABLE);
-      mapConstructionItem.put("name", name);
-      mapConstructionItem.put("prefix", prefix);
-      mapConstructionItem.put("value", value);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_VARIABLE);
+      mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+      mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+      mapConstructionItem.put(MAPPING_VALUE_VALUE, value);
       if (name != null && value != null) {
         if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
           mappingToken.preValues.add(mapConstructionItem);
@@ -2486,20 +2629,24 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Condition attribute.
      *
-     * @param name the name
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
+     * @param name
+     *          the name
+     * @param condition
+     *          the condition
+     * @param filter
+     *          the filter
+     * @param not
+     *          the not
      */
     private void conditionAttribute(String name, String condition,
         String filter, String not) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_ATTRIBUTE);
-      mapConstructionItem.put("name", name);
-      mapConstructionItem.put("condition", condition);
-      mapConstructionItem.put("filter", filter);
-      mapConstructionItem.put("not", not);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
+      mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+      mapConstructionItem.put(MAPPING_VALUE_CONDITION, condition);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
+      mapConstructionItem.put(MAPPING_VALUE_NOT, not);
       if (name != null) {
         conditions.add(mapConstructionItem);
       }
@@ -2508,25 +2655,30 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Payload attribute.
      *
-     * @param mappingToken the mapping token
-     * @param name the name
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param name
+     *          the name
+     * @param filter
+     *          the filter
      */
     private void payloadAttribute(MtasParserMappingToken mappingToken,
         String name, String filter) {
-      HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-      mapConstructionItem.put("source", SOURCE_OWN);
-      mapConstructionItem.put("type", PARSER_TYPE_ATTRIBUTE);
-      mapConstructionItem.put("name", name);
-      mapConstructionItem.put("filter", filter);
+      HashMap<String, String> mapConstructionItem = new HashMap<>();
+      mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
+      mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
+      mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+      mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       mappingToken.payload.add(mapConstructionItem);
     }
 
     /**
      * Condition ancestor.
      *
-     * @param ancestorType the ancestor type
-     * @param number the number
+     * @param ancestorType
+     *          the ancestor type
+     * @param number
+     *          the number
      */
     public void conditionAncestor(String ancestorType, String number) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
@@ -2535,10 +2687,10 @@ abstract public class MtasBasicParser extends MtasParser {
           || ancestorType.equals(SOURCE_ANCESTOR_WORD_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-        HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-        mapConstructionItem.put("source", ancestorType);
-        mapConstructionItem.put("number", number);
-        mapConstructionItem.put("type", PARSER_TYPE_EXISTENCE);
+        HashMap<String, String> mapConstructionItem = new HashMap<>();
+        mapConstructionItem.put(MAPPING_VALUE_SOURCE, ancestorType);
+        mapConstructionItem.put(MAPPING_VALUE_NUMBER, number);
+        mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_EXISTENCE);
         conditions.add(mapConstructionItem);
       }
     }
@@ -2546,12 +2698,18 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Adds the ancestor name.
      *
-     * @param ancestorType the ancestor type
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param distance the distance
-     * @param prefix the prefix
-     * @param filter the filter
+     * @param ancestorType
+     *          the ancestor type
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param distance
+     *          the distance
+     * @param prefix
+     *          the prefix
+     * @param filter
+     *          the filter
      */
     private void addAncestorName(String ancestorType,
         MtasParserMappingToken mappingToken, String type, String distance,
@@ -2562,12 +2720,12 @@ abstract public class MtasBasicParser extends MtasParser {
           || ancestorType.equals(SOURCE_ANCESTOR_WORD_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-        HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-        mapConstructionItem.put("source", ancestorType);
-        mapConstructionItem.put("ancestor", distance);
-        mapConstructionItem.put("type", PARSER_TYPE_NAME);
-        mapConstructionItem.put("prefix", prefix);
-        mapConstructionItem.put("filter", filter);
+        HashMap<String, String> mapConstructionItem = new HashMap<>();
+        mapConstructionItem.put(MAPPING_VALUE_SOURCE, ancestorType);
+        mapConstructionItem.put(MAPPING_VALUE_ANCESTOR, distance);
+        mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_NAME);
+        mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+        mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
         if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
           mappingToken.preValues.add(mapConstructionItem);
         } else if (type.equals(MAPPING_SUBTYPE_TOKEN_POST)) {
@@ -2579,11 +2737,16 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Condition ancestor name.
      *
-     * @param ancestorType the ancestor type
-     * @param distance the distance
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
+     * @param ancestorType
+     *          the ancestor type
+     * @param distance
+     *          the distance
+     * @param condition
+     *          the condition
+     * @param filter
+     *          the filter
+     * @param not
+     *          the not
      */
     public void conditionAncestorName(String ancestorType, String distance,
         String condition, String filter, String not) {
@@ -2593,13 +2756,13 @@ abstract public class MtasBasicParser extends MtasParser {
           || ancestorType.equals(SOURCE_ANCESTOR_WORD_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-        HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-        mapConstructionItem.put("source", ancestorType);
-        mapConstructionItem.put("ancestor", distance);
-        mapConstructionItem.put("type", PARSER_TYPE_NAME);
-        mapConstructionItem.put("condition", condition);
-        mapConstructionItem.put("filter", filter);
-        mapConstructionItem.put("not", not);
+        HashMap<String, String> mapConstructionItem = new HashMap<>();
+        mapConstructionItem.put(MAPPING_VALUE_SOURCE, ancestorType);
+        mapConstructionItem.put(MAPPING_VALUE_ANCESTOR, distance);
+        mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_NAME);
+        mapConstructionItem.put(MAPPING_VALUE_CONDITION, condition);
+        mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
+        mapConstructionItem.put(MAPPING_VALUE_NOT, not);
         conditions.add(mapConstructionItem);
       }
     }
@@ -2607,13 +2770,20 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Adds the ancestor attribute.
      *
-     * @param ancestorType the ancestor type
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param distance the distance
-     * @param name the name
-     * @param prefix the prefix
-     * @param filter the filter
+     * @param ancestorType
+     *          the ancestor type
+     * @param mappingToken
+     *          the mapping token
+     * @param type
+     *          the type
+     * @param distance
+     *          the distance
+     * @param name
+     *          the name
+     * @param prefix
+     *          the prefix
+     * @param filter
+     *          the filter
      */
     public void addAncestorAttribute(String ancestorType,
         MtasParserMappingToken mappingToken, String type, String distance,
@@ -2624,13 +2794,13 @@ abstract public class MtasBasicParser extends MtasParser {
           || ancestorType.equals(SOURCE_ANCESTOR_WORD_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-        HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-        mapConstructionItem.put("source", ancestorType);
-        mapConstructionItem.put("ancestor", distance);
-        mapConstructionItem.put("type", PARSER_TYPE_ATTRIBUTE);
-        mapConstructionItem.put("name", name);
-        mapConstructionItem.put("prefix", prefix);
-        mapConstructionItem.put("filter", filter);
+        HashMap<String, String> mapConstructionItem = new HashMap<>();
+        mapConstructionItem.put(MAPPING_VALUE_SOURCE, ancestorType);
+        mapConstructionItem.put(MAPPING_VALUE_ANCESTOR, distance);
+        mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
+        mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+        mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
+        mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
         if (name != null) {
           if (type.equals(MAPPING_SUBTYPE_TOKEN_PRE)) {
             mappingToken.preValues.add(mapConstructionItem);
@@ -2644,12 +2814,18 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Condition ancestor attribute.
      *
-     * @param ancestorType the ancestor type
-     * @param distance the distance
-     * @param name the name
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
+     * @param ancestorType
+     *          the ancestor type
+     * @param distance
+     *          the distance
+     * @param name
+     *          the name
+     * @param condition
+     *          the condition
+     * @param filter
+     *          the filter
+     * @param not
+     *          the not
      */
     public void conditionAncestorAttribute(String ancestorType, String distance,
         String name, String condition, String filter, String not) {
@@ -2659,14 +2835,14 @@ abstract public class MtasBasicParser extends MtasParser {
           || ancestorType.equals(SOURCE_ANCESTOR_WORD_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-        HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-        mapConstructionItem.put("source", ancestorType);
-        mapConstructionItem.put("ancestor", distance);
-        mapConstructionItem.put("type", PARSER_TYPE_ATTRIBUTE);
-        mapConstructionItem.put("name", name);
-        mapConstructionItem.put("condition", condition);
-        mapConstructionItem.put("filter", filter);
-        mapConstructionItem.put("not", not);
+        HashMap<String, String> mapConstructionItem = new HashMap<>();
+        mapConstructionItem.put(MAPPING_VALUE_SOURCE, ancestorType);
+        mapConstructionItem.put(MAPPING_VALUE_ANCESTOR, distance);
+        mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
+        mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+        mapConstructionItem.put(MAPPING_VALUE_CONDITION, condition);
+        mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
+        mapConstructionItem.put(MAPPING_VALUE_NOT, not);
         if (name != null) {
           conditions.add(mapConstructionItem);
         }
@@ -2676,11 +2852,16 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Payload ancestor attribute.
      *
-     * @param mappingToken the mapping token
-     * @param ancestorType the ancestor type
-     * @param distance the distance
-     * @param name the name
-     * @param filter the filter
+     * @param mappingToken
+     *          the mapping token
+     * @param ancestorType
+     *          the ancestor type
+     * @param distance
+     *          the distance
+     * @param name
+     *          the name
+     * @param filter
+     *          the filter
      */
     private void payloadAncestorAttribute(MtasParserMappingToken mappingToken,
         String ancestorType, String distance, String name, String filter) {
@@ -2690,12 +2871,12 @@ abstract public class MtasBasicParser extends MtasParser {
           || ancestorType.equals(SOURCE_ANCESTOR_WORD_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION)
           || ancestorType.equals(SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-        HashMap<String, String> mapConstructionItem = new HashMap<String, String>();
-        mapConstructionItem.put("source", ancestorType);
-        mapConstructionItem.put("ancestor", distance);
-        mapConstructionItem.put("type", PARSER_TYPE_ATTRIBUTE);
-        mapConstructionItem.put("name", name);
-        mapConstructionItem.put("filter", filter);
+        HashMap<String, String> mapConstructionItem = new HashMap<>();
+        mapConstructionItem.put(MAPPING_VALUE_SOURCE, ancestorType);
+        mapConstructionItem.put(MAPPING_VALUE_ANCESTOR, distance);
+        mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
+        mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+        mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
         if (name != null) {
           mappingToken.payload.add(mapConstructionItem);
         }
@@ -2705,9 +2886,11 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Compute ancestor source type.
      *
-     * @param type the type
+     * @param type
+     *          the type
      * @return the string
-     * @throws MtasConfigException the mtas config exception
+     * @throws MtasConfigException
+     *           the mtas config exception
      */
     private String computeAncestorSourceType(String type)
         throws MtasConfigException {
@@ -2731,7 +2914,8 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Compute distance.
      *
-     * @param distance the distance
+     * @param distance
+     *          the distance
      * @return the string
      */
     private String computeDistance(String distance) {
@@ -2750,7 +2934,8 @@ abstract public class MtasBasicParser extends MtasParser {
     /**
      * Compute number.
      *
-     * @param number the number
+     * @param number
+     *          the number
      * @return the string
      */
     private String computeNumber(String number) {
@@ -2782,43 +2967,44 @@ abstract public class MtasBasicParser extends MtasParser {
      */
     @Override
     public String toString() {
-      String text = "mapping - type:" + type + ", offset:" + offset
-          + ", realOffset:" + realOffset + ", position:" + position;
+      StringBuilder builder = new StringBuilder();
+      builder.append("mapping - type:" + type + ", offset:" + offset
+          + ", realOffset:" + realOffset + ", position:" + position);
       for (int i = 0; i < conditions.size(); i++) {
-        text += "\n\tcondition " + i + ": ";
+        builder.append("\n\tcondition " + i + ": ");
         for (Entry<String, String> entry : conditions.get(i).entrySet()) {
-          text += entry.getKey() + ":" + entry.getValue() + ",";
+          builder.append(entry.getKey() + ":" + entry.getValue() + ",");
         }
       }
       for (int i = 0; i < tokens.size(); i++) {
-        text += "\n\ttoken " + i;
-        text += " - " + tokens.get(i).type;
-        text += " [offset:" + tokens.get(i).offset;
-        text += ",realoffset:" + tokens.get(i).realoffset;
-        text += ",parent:" + tokens.get(i).parent + "]";
+        builder.append("\n\ttoken " + i);
+        builder.append(" - " + tokens.get(i).type);
+        builder.append(" [offset:" + tokens.get(i).offset);
+        builder.append(",realoffset:" + tokens.get(i).realoffset);
+        builder.append(",parent:" + tokens.get(i).parent + "]");
         for (int j = 0; j < tokens.get(i).preValues.size(); j++) {
-          text += "\n\t- pre " + j + ": ";
+          builder.append("\n\t- pre " + j + ": ");
           for (Entry<String, String> entry : tokens.get(i).preValues.get(j)
               .entrySet()) {
-            text += entry.getKey() + ":" + entry.getValue() + ",";
+            builder.append(entry.getKey() + ":" + entry.getValue() + ",");
           }
         }
         for (int j = 0; j < tokens.get(i).postValues.size(); j++) {
-          text += "\n\t- post " + j + ": ";
+          builder.append("\n\t- post " + j + ": ");
           for (Entry<String, String> entry : tokens.get(i).postValues.get(j)
               .entrySet()) {
-            text += entry.getKey() + ":" + entry.getValue() + ",";
+            builder.append(entry.getKey() + ":" + entry.getValue() + ",");
           }
         }
         for (int j = 0; j < tokens.get(i).payload.size(); j++) {
-          text += "\n\t- payload " + j + ": ";
+          builder.append("\n\t- payload " + j + ": ");
           for (Entry<String, String> entry : tokens.get(i).payload.get(j)
               .entrySet()) {
-            text += entry.getKey() + ":" + entry.getValue() + ",";
+            builder.append(entry.getKey() + ":" + entry.getValue() + ",");
           }
         }
       }
-      return text;
+      return builder.toString();
     }
 
   }

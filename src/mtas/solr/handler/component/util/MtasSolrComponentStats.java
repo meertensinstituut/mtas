@@ -838,7 +838,7 @@ public class MtasSolrComponentStats {
     // + position.statsType + " " + position.statsItems + " --- " + encode);
     SimpleOrderedMap<Object> mtasPositionResponse = new SimpleOrderedMap<>();
     mtasPositionResponse.add("key", position.key);
-    MtasSolrResult data = new MtasSolrResult(position.dataCollector,
+    MtasSolrMtasResult data = new MtasSolrMtasResult(position.dataCollector,
         position.dataType, position.statsType, position.statsItems, null);
     if (encode) {
       mtasPositionResponse.add("_encoded_data",
@@ -864,7 +864,7 @@ public class MtasSolrComponentStats {
     // + position.statsType + " " + position.statsItems + " --- " + encode);
     SimpleOrderedMap<Object> mtasTokenResponse = new SimpleOrderedMap<>();
     mtasTokenResponse.add("key", token.key);
-    MtasSolrResult data = new MtasSolrResult(token.dataCollector,
+    MtasSolrMtasResult data = new MtasSolrMtasResult(token.dataCollector,
         token.dataType, token.statsType, token.statsItems, null);
     if (encode) {
       mtasTokenResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));
@@ -890,14 +890,14 @@ public class MtasSolrComponentStats {
     // + span.statsType + " " + span.statsItems + " --- " + encode);
     SimpleOrderedMap<Object> mtasSpanResponse = new SimpleOrderedMap<>();
     mtasSpanResponse.add("key", span.key);
-    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>>();
-    HashMap<String, MtasSolrResult> functionDataItem = new HashMap<String, MtasSolrResult>();
+    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
+    HashMap<String, MtasSolrMtasResult> functionDataItem = new HashMap<String, MtasSolrMtasResult>();
     functionData.put(span.dataCollector, functionDataItem);
     if (span.functions != null) {
       for (SubComponentFunction function : span.functions) {
         function.dataCollector.close();
         functionDataItem.put(function.key,
-            new MtasSolrResult(function.dataCollector,
+            new MtasSolrMtasResult(function.dataCollector,
                 new String[] { function.dataType },
                 new String[] { function.statsType },
                 new TreeSet[] { function.statsItems }, new String[] { null },
@@ -905,7 +905,7 @@ public class MtasSolrComponentStats {
                 new Integer[] { Integer.MAX_VALUE }, null));
       }
     }
-    MtasSolrResult data = new MtasSolrResult(span.dataCollector, span.dataType,
+    MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector, span.dataType,
         span.statsType, span.statsItems, functionData);
     if (encode) {
       mtasSpanResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));

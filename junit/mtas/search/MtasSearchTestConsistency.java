@@ -526,7 +526,7 @@ public class MtasSearchTestConsistency {
       indexReader = DirectoryReader.open(directory);
       IndexSearcher searcher = new IndexSearcher(indexReader);
       ArrayList<Integer> fullDocList = new ArrayList<Integer>();
-      CodecUtil.collect(FIELD_CONTENT, searcher, indexReader, fullDocList,
+      CodecUtil.collectField(FIELD_CONTENT, searcher, indexReader, fullDocList,
           fullDocSet, fieldStats);
       // add stats - position
       response.put("statsPositions", new HashMap<String, Object>());

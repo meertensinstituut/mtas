@@ -437,8 +437,8 @@ public class MtasSolrComponentTermvector {
 
     termVector.subComponentFunction.dataCollector.close();
 
-    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>>();
-    HashMap<String, MtasSolrResult> functionDataItem = new HashMap<String, MtasSolrResult>();
+    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
+    HashMap<String, MtasSolrMtasResult> functionDataItem = new HashMap<String, MtasSolrMtasResult>();
     functionData.put(termVector.subComponentFunction.dataCollector,
         functionDataItem);
     if (termVector.functions != null) {
@@ -447,7 +447,7 @@ public class MtasSolrComponentTermvector {
             termVector.subComponentFunction.dataCollector.getKeyList());
         function.dataCollector.close();
         functionDataItem.put(function.key,
-            new MtasSolrResult(function.dataCollector,
+            new MtasSolrMtasResult(function.dataCollector,
                 new String[] { function.dataType },
                 new String[] { function.statsType },
                 new TreeSet[] { function.statsItems }, new String[] { null },
@@ -455,7 +455,7 @@ public class MtasSolrComponentTermvector {
                 new Integer[] { Integer.MAX_VALUE }, null));
       }
     }
-    MtasSolrResult data = new MtasSolrResult(
+    MtasSolrMtasResult data = new MtasSolrMtasResult(
         termVector.subComponentFunction.dataCollector,
         new String[] { termVector.subComponentFunction.dataType },
         new String[] { termVector.subComponentFunction.statsType },
@@ -648,7 +648,7 @@ public class MtasSolrComponentTermvector {
           NamedList<Object> response = shardResponse.getSolrResponse()
               .getResponse();
           String key;
-          MtasSolrResult list;
+          MtasSolrMtasResult list;
           NumberComparator comparatorLast;
           LinkedHashMap<String, NumberComparator> comparatorList;
           try {
@@ -659,7 +659,7 @@ public class MtasSolrComponentTermvector {
                 NamedList<Object> dataItem = data.get(i);
                 try {
                   key = (String) dataItem.get("key");
-                  list = (MtasSolrResult) dataItem.get("list");
+                  list = (MtasSolrMtasResult) dataItem.get("list");
                   if (list != null) {
                     comparatorLast = list.getResult().getLastSortValue();
                     comparatorList = list.getResult().getComparatorList();
@@ -1156,7 +1156,7 @@ public class MtasSolrComponentTermvector {
                 NamedList<Object> dataItem = data.get(i);
                 try {
                   String termvectorKey = (String) dataItem.get("key");
-                  MtasSolrResult list = (MtasSolrResult) dataItem.get("list");
+                  MtasSolrMtasResult list = (MtasSolrMtasResult) dataItem.get("list");
                   if (termvectorKey != null && list != null) {
                     Set<String> keyList = list.getKeyList();
                     HashMap<String, HashSet<String>> itemsPerShardSet;

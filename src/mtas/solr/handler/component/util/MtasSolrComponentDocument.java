@@ -225,16 +225,16 @@ public class MtasSolrComponentDocument {
       if (document.statsList != null) {
         list = document.statsList.get(docId);
       }
-      mtasDocumentItemResponse.add("stats", new MtasSolrResult(stats,
+      mtasDocumentItemResponse.add("stats", new MtasSolrMtasResult(stats,
           stats.getDataType(), stats.getStatsType(), stats.statsItems, null));
       mtasDocumentItemResponse.add("documentKey",
           document.uniqueKey.get(docId));
       if (list != null) {                
         if(document.listExpand) {
-          mtasDocumentItemResponse.add("list", new MtasSolrResult(list,
+          mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
             new String[] { list.getDataType(), list.getDataType()}, new String[] {list.getStatsType(), list.getStatsType()}, new TreeSet[] {list.statsItems, list.statsItems}, new String[] {null, null}, new String[] {null, null}, new Integer[] { 0 , 0}, new Integer[] { 1 , 1}, null));
         } else {
-          mtasDocumentItemResponse.add("list", new MtasSolrResult(list,
+          mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
               list.getDataType(), list.getStatsType(), list.statsItems, null));  
         }
                 

@@ -70,6 +70,18 @@
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLTitle_yearOfPublicationLabel" type="nederlab_text"
 		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_witnessYearMin" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_witnessYearMax" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_witnessYearApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_textYearMin" type="nederlab_int" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_textYearMax" type="nederlab_int" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="NLTitle_textYearApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLTitle_edition" type="nederlab_string" required="false"
 		multiValued="false" indexed="true" stored="true" />
 	<field name="NLTitle_inNederlabAs" type="nederlab_uuid" required="false"
@@ -114,13 +126,26 @@
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLTitle_seriesTitleID_root" type="nederlab_uuid"
 		required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLTitle_NLLocalization_localizationPlace" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLTitle_NLLocalization_localizationProvince" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLTitle_NLLocalization_localizationCountry" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLTitle_NLLocalization_localizationRegion" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLTitle_NLLocalization_localizationKloekecode" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  
 
 	<!-- component NLDependentTitle -->
 	<field name="NLDependentTitle_title" type="nederlab_text"
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLDependentTitle_subtitle" type="nederlab_text"
 		required="false" multiValued="false" indexed="true" stored="true" />
-	<field name="NLDependentTitle_primaryLanguage" type="nederlab_string"
+	<field name="NLDependentTitle_genre" type="nederlab_string" required="false"
+    multiValued="true" indexed="true" stored="true" />
+  <field name="NLDependentTitle_primaryLanguage" type="nederlab_string"
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLDependentTitle_parentTitleID" type="nederlab_uuid"
 		required="false" multiValued="false" indexed="true" stored="true" />
@@ -137,6 +162,31 @@
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLDependentTitle_endPage" type="nederlab_int"
 		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_witnessYearMin" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_witnessYearMax" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_witnessYearApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_textYearMin" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_textYearMax" type="nederlab_int"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_textYearApprox" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLDependentTitle_processingMethod" type="nederlab_text"
+		required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDependentTitle_NLLocalization_localizationPlace" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDependentTitle_NLLocalization_localizationProvince" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDependentTitle_NLLocalization_localizationCountry" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDependentTitle_NLLocalization_localizationRegion" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDependentTitle_NLLocalization_localizationKloekecode" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+
 
 	<!-- component NLPerson -->
 	<field name="NLPerson_NLPersonName_nameId" type="nederlab_uuid"
@@ -216,7 +266,11 @@
 	<!-- component NLSeriesTitle -->
 	<field name="NLSeriesTitle_title" type="nederlab_text" required="false"
 		multiValued="false" indexed="true" stored="true" />
-	<field name="NLSeriesTitle_years" type="nederlab_text" required="false"
+	<field name="NLSeriesTitle_subtitle" type="nederlab_text" required="false"
+    multiValued="false" indexed="true" stored="true" />
+  <field name="NLSeriesTitle_genre" type="nederlab_string" required="false"
+    multiValued="true" indexed="true" stored="true" />
+  <field name="NLSeriesTitle_years" type="nederlab_text" required="false"
 		multiValued="false" indexed="true" stored="true" />
 	<field name="NLSeriesTitle_description" type="nederlab_text"
 		required="false" multiValued="false" indexed="true" stored="true" />
@@ -228,13 +282,24 @@
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLSeriesTitle_seriesTitleID_root" type="nederlab_uuid"
 		required="false" multiValued="false" indexed="true" stored="true" />
-
+	<field name="NLSeriesTitle_primaryLanguage" type="nederlab_string"
+		required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLSeriesTitle_processingMethod" type="nederlab_text"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLSeriesTitle_NLPersonRef_personID" type="nederlab_uuid"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLSeriesTitle_NLPersonRef_role" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <dynamicField name="NLSeriesTitle_NLPersonRef_personID_role_*"
+    type="nederlab_uuid" required="false" multiValued="true" indexed="true"
+    stored="true" />
+  
 	<!-- component NLCollectionSpecific -->
 	<dynamicField name="NLCollectionSpecific_*" type="nederlab_string"
 		required="false" multiValued="true" indexed="true" stored="true" />
 
 	<!-- component NLContent old -->
-	
+
 	<field name="NLContent_text_available" type="nederlab_boolean"
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLContent_text" type="nederlab_content" required="false"
@@ -249,14 +314,14 @@
 	<field name="NLContent_ticcl_lowercase" type="nederlab_content_lowercase"
 		required="false" multiValued="false" indexed="true" stored="true"
 		termVectors="true" termPositions="true" termOffsets="true" />
-		
+
 	<!-- component NLContent -->
-  
-  <field name="NLContent_folia_available" type="nederlab_boolean"
-    required="false" multiValued="false" indexed="true" stored="true" />
-  <field name="NLContent_mtas" type="mtas_text" indexed="true"
-    stored="true" />
-  <field name="NLContent_mtas_error" type="nederlab_string"
+
+	<field name="NLContent_folia_available" type="nederlab_boolean"
+		required="false" multiValued="false" indexed="true" stored="true" />
+	<field name="NLContent_mtas" type="mtas_text" indexed="true"
+		stored="true" />
+	<field name="NLContent_mtas_error" type="nederlab_string"
 		indexed="true" stored="true" />
 	<field name="NLContent_mtas_numberOfTokens" type="nederlab_int"
 		indexed="true" stored="true" />
@@ -264,17 +329,17 @@
 		indexed="true" stored="true" />
 	<field name="NLContent_mtas_size" type="nederlab_int" indexed="true"
 		stored="true" />
-	<field name="NLContent_mtasSource" type="mtasSource_text" indexed="true"
-    stored="true" />
-  <field name="NLContent_mtasSource_error" type="nederlab_string"
-    indexed="true" stored="true" />
-  <field name="NLContent_mtasSource_numberOfTokens" type="nederlab_int"
-    indexed="true" stored="true" />
-  <field name="NLContent_mtasSource_numberOfPositions" type="nederlab_int"
-    indexed="true" stored="true" />
-  <field name="NLContent_mtasSource_size" type="nederlab_int" indexed="true"
-    stored="true" />  
-  <!-- Combined Field Metadata -->
+	<field name="NLContent_mtasSource" type="mtasSource_text"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtasSource_error" type="nederlab_string"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtasSource_numberOfTokens" type="nederlab_int"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtasSource_numberOfPositions" type="nederlab_int"
+		indexed="true" stored="true" />
+	<field name="NLContent_mtasSource_size" type="nederlab_int"
+		indexed="true" stored="true" />
+	<!-- Combined Field Metadata -->
 	<field name="NLMetadata" type="nederlab_text" required="false"
 		multiValued="true" indexed="true" stored="false" />
 	<copyField source="NLCore_NLIdentification_nederlabID" dest="NLMetadata" />
@@ -298,7 +363,11 @@
 	<copyField source="NLTitle_yearOfPublicationMin" dest="NLMetadata" />
 	<copyField source="NLTitle_yearOfPublicationMax" dest="NLMetadata" />
 	<copyField source="NLTitle_yearOfPublicationLabel" dest="NLMetadata" />
-	<copyField source="NLTitle_edition" dest="NLMetadata" />
+	<copyField source="NLTitle_witnessYearMin" dest="NLMetadata" />
+  <copyField source="NLTitle_witnessYearMax" dest="NLMetadata" />
+  <copyField source="NLTitle_textYearMin" dest="NLMetadata" />
+  <copyField source="NLTitle_textYearMax" dest="NLMetadata" />
+  <copyField source="NLTitle_edition" dest="NLMetadata" />
 	<copyField source="NLTitle_NLPublicationPlace_placeOfPublication"
 		dest="NLMetadata" />
 	<copyField source="NLTitle_NLPublicationPlace_placeID" dest="NLMetadata" />
@@ -310,11 +379,27 @@
 	<copyField source="NLTitle_textQuality" dest="NLMetadata" />
 	<copyField source="NLTitle_processingMethod" dest="NLMetadata" />
 	<copyField source="NLTitle_NLPersonRef_role" dest="NLMetadata" />
-	<copyField source="NLDependentTitle_title" dest="NLMetadata" />
+	<copyField source="NLTitle_NLLocalization_localizationPlace" dest="NLMetadata" />
+  <copyField source="NLTitle_NLLocalization_localizationProvince" dest="NLMetadata" />
+  <copyField source="NLTitle_NLLocalization_localizationCountry" dest="NLMetadata" />
+  <copyField source="NLTitle_NLLocalization_localizationRegion" dest="NLMetadata" />
+  <copyField source="NLTitle_NLLocalization_localizationKloekecode" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_title" dest="NLMetadata" />
 	<copyField source="NLDependentTitle_subtitle" dest="NLMetadata" />
-	<copyField source="NLDependentTitle_primaryLanguage" dest="NLMetadata" />
-	<copyField source="NLDependentTitle_NLPersonRef_role" dest="NLMetadata" />
-	<copyField source="NLPerson_NLPersonName_lastName" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_genre" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_witnessYearMin" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_witnessYearMax" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_textYearMin" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_textYearMax" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_primaryLanguage" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_processingMethod" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_NLPersonRef_role" dest="NLMetadata" />
+	<copyField source="NLDependentTitle_NLLocalization_localizationPlace" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_NLLocalization_localizationProvince" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_NLLocalization_localizationCountry" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_NLLocalization_localizationRegion" dest="NLMetadata" />
+  <copyField source="NLDependentTitle_NLLocalization_localizationKloekecode" dest="NLMetadata" />
+  <copyField source="NLPerson_NLPersonName_lastName" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_firstName" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_infixes" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_firstNameFull" dest="NLMetadata" />
@@ -335,9 +420,14 @@
 	<copyField source="NLPerson_profession" dest="NLMetadata" />
 	<copyField source="NLPerson_education" dest="NLMetadata" />
 	<copyField source="NLSeriesTitle_title" dest="NLMetadata" />
-	<copyField source="NLSeriesTitle_years" dest="NLMetadata" />
+	<copyField source="NLSeriesTitle_subtitle" dest="NLMetadata" />
+  <copyField source="NLSeriesTitle_genre" dest="NLMetadata" />
+  <copyField source="NLSeriesTitle_years" dest="NLMetadata" />
 	<copyField source="NLSeriesTitle_description" dest="NLMetadata" />
-	<copyField source="NLCollectionSpecific_*" dest="NLMetadata" />
+	<copyField source="NLSeriesTitle_primaryLanguage" dest="NLMetadata" />
+  <copyField source="NLSeriesTitle_processingMethod" dest="NLMetadata" />
+  <copyField source="NLSeriesTitle_NLPersonRef_role" dest="NLMetadata" />
+  <copyField source="NLCollectionSpecific_*" dest="NLMetadata" />
 
 	<uniqueKey>NLCore_NLIdentification_versionID</uniqueKey>
 
@@ -398,16 +488,16 @@
 				configFile="mtas/folia_test.xml" />
 		</analyzer>
 	</fieldType>
-	
+
 	<fieldType name="mtas_text_example_local" class="solr.TextField"
-    postingsFormat="MtasCodec">
-    <analyzer type="index">
-      <charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-        type="file" prefix="/local/data/" />
-      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-        configFile="mtas/folia_test.xml" />
-    </analyzer>
-  </fieldType>
+		postingsFormat="MtasCodec">
+		<analyzer type="index">
+			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+				type="file" prefix="/local/data/" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+				configFile="mtas/folia_test.xml" />
+		</analyzer>
+	</fieldType>
 
 	<fieldType name="mtas_text_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
@@ -421,7 +511,8 @@
 
 	<fieldType name="mtas_text" class="mtas.solr.schema.MtasPreAnalyzedField"
 		followIndexAnalyzer="mtas_text_example_config" defaultConfiguration="default"
-		configurationFromField="NLCore_NLAdministrative_sourceCollection" setNumberOfTokens="NLContent_mtas_numberOfTokens"
+		configurationFromField="NLCore_NLAdministrative_sourceCollection"
+		setNumberOfTokens="NLContent_mtas_numberOfTokens"
 		setNumberOfPositions="NLContent_mtas_numberOfPositions" setSize="NLContent_mtas_size"
 		setError="NLContent_mtas_error" postingsFormat="MtasCodec">
 		<analyzer type="query">
@@ -430,27 +521,28 @@
 				prefix="t" />
 		</analyzer>
 	</fieldType>
-	
+
 	<fieldType name="mtasSource_text_example_config" class="solr.TextField"
-    postingsFormat="MtasCodec">
-    <analyzer type="index">
-      <charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-        config="mtasSource.xml" />
-      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-        config="mtasSource.xml" />
-    </analyzer>
-  </fieldType>
-	
+		postingsFormat="MtasCodec">
+		<analyzer type="index">
+			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+				config="mtasSource.xml" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+				config="mtasSource.xml" />
+		</analyzer>
+	</fieldType>
+
 	<fieldType name="mtasSource_text" class="mtas.solr.schema.MtasPreAnalyzedField"
-    followIndexAnalyzer="mtasSource_text_example_config"
-    configurationFromField="NLCore_NLAdministrative_sourceCollection" setNumberOfTokens="NLContent_mtasSource_numberOfTokens"
-    setNumberOfPositions="NLContent_mtasSource_numberOfPositions" setSize="NLContent_mtasSource_size"
-    setError="NLContent_mtasSource_error" postingsFormat="MtasCodec">
-    <analyzer type="query">
-      <tokenizer class="solr.WhitespaceTokenizerFactory" />
-      <filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory"
-        prefix="t" />
-    </analyzer>
-  </fieldType>
+		followIndexAnalyzer="mtasSource_text_example_config"
+		configurationFromField="NLCore_NLAdministrative_sourceCollection"
+		setNumberOfTokens="NLContent_mtasSource_numberOfTokens"
+		setNumberOfPositions="NLContent_mtasSource_numberOfPositions" setSize="NLContent_mtasSource_size"
+		setError="NLContent_mtasSource_error" postingsFormat="MtasCodec">
+		<analyzer type="query">
+			<tokenizer class="solr.WhitespaceTokenizerFactory" />
+			<filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory"
+				prefix="t" />
+		</analyzer>
+	</fieldType>
 
 </schema>

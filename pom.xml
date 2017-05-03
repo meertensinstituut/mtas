@@ -4,13 +4,13 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<currentDevelopmentVersion>6.5.0</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20170331</currentDevelopmentRelease>
+		<currentDevelopmentVersion>6.5.1</currentDevelopmentVersion>
+		<currentDevelopmentRelease>20170503</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>6.5.0</version>
+	<version>6.5.1</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -60,7 +60,42 @@
 						<include>MtasSearchTestConsistency.java</include>
 					</includes>
 				</configuration>
-			</plugin>			
+			</plugin>
+			<plugin>
+				<groupId>com.helger.maven</groupId>
+				<artifactId>ph-javacc-maven-plugin</artifactId>
+				<version>2.8.2</version>
+				<executions>
+					<execution>
+						<id>javacc1</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>javacc</goal>
+						</goals>
+						<configuration>
+							<jdkVersion>1.5</jdkVersion>
+							<javadocFriendlyComments>true</javadocFriendlyComments>
+							<packageName>mtas.parser.cql</packageName>
+							<sourceDirectory>${basedir}/src/mtas/parser/cql</sourceDirectory>
+							<outputDirectory>${basedir}/generated-sources</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>javacc2</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>javacc</goal>
+						</goals>
+						<configuration>
+							<jdkVersion>1.5</jdkVersion>
+							<javadocFriendlyComments>true</javadocFriendlyComments>
+							<packageName>mtas.parser.function</packageName>
+							<sourceDirectory>${basedir}/src/mtas/parser/function/</sourceDirectory>
+							<outputDirectory>${basedir}/generated-sources</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>3.0.0</version>
@@ -68,6 +103,16 @@
 					<filesets>
 						<fileset>
 							<directory>gh-pages</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<excludes>
+								<exclude>**/.git/</exclude>
+							</excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>generated-sources</directory>
 							<includes>
 								<include>**/*</include>
 							</includes>
@@ -168,10 +213,10 @@
 				</reportSets>
 			</plugin>
 			<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.19.1</version>
-      </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.19.1</version>
+			</plugin>
 		</plugins>
 	</reporting>
 	<repositories>
@@ -217,27 +262,27 @@
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
-				<version>6.5.0</version>
+				<version>6.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-analyzers-common</artifactId>
-				<version>6.5.0</version>
+				<version>6.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-queryparser</artifactId>
-				<version>6.5.0</version>
+				<version>6.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-codecs</artifactId>
-				<version>6.5.0</version>
+				<version>6.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-core</artifactId>
-				<version>6.5.0</version>
+				<version>6.5.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.handler.RequestHandlerBase;
+import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
 import org.noggit.JSONParser;
@@ -20,6 +21,7 @@ import org.noggit.ObjectBuilder;
 import mtas.analysis.MtasTokenizer;
 import mtas.analysis.util.MtasFetchData;
 import mtas.analysis.util.MtasParserException;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
  * The Class MtasRequestHandler.
@@ -63,7 +65,8 @@ public class MtasRequestHandler extends RequestHandlerBase {
   @Override
   public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp)
       throws IOException {
-
+    
+    
     String configDir = req.getCore().getResourceLoader().getConfigDir();
     // generate list of files
     if (req.getParams().get(PARAM_ACTION, "false")
@@ -103,7 +106,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
       }
       if (configuration != null && documentUrl != null) {
         try {
-          MtasTokenizer<String> tokenizer = new MtasTokenizer<String>(
+          MtasTokenizer tokenizer = new MtasTokenizer(
               IOUtils.toInputStream(configuration, "UTF-8"));
           MtasFetchData fetchData = new MtasFetchData(
               new StringReader(documentUrl));
@@ -114,12 +117,12 @@ public class MtasRequestHandler extends RequestHandlerBase {
         }
       } else if (configuration != null && document != null) {
         try {
-          MtasTokenizer<String> tokenizer = new MtasTokenizer<String>(
+          MtasTokenizer tokenizer = new MtasTokenizer(
               IOUtils.toInputStream(configuration, "UTF-8"));
           rsp.add(ACTION_MAPPING,
               tokenizer.getList(new StringReader(document)));
           tokenizer.close();
-        } catch (IOException | MtasParserException e) {
+        } catch (IOException e) {
           rsp.add(ERROR, e.getMessage());
         }
       }

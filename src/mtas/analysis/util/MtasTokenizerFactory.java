@@ -92,8 +92,8 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * util.AttributeFactory)
    */
   @Override
-  public MtasTokenizer<?> create(AttributeFactory factory) {
-    MtasTokenizer<?> tokenizer = null;
+  public MtasTokenizer create(AttributeFactory factory) {
+    MtasTokenizer tokenizer = null;
     try {
       tokenizer = create(factory, null);
     } catch (IOException e) {
@@ -111,7 +111,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer<?> create(String configuration) throws IOException {
+  public MtasTokenizer create(String configuration) throws IOException {
     return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
   }
 
@@ -126,14 +126,14 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer<?> create(AttributeFactory factory, String configuration)
+  public MtasTokenizer create(AttributeFactory factory, String configuration)
       throws IOException {
     if (configs != null && configs.size() > 0) {
       if (configuration == null && defaultArgument == null) {
         throw new IOException("no (default)configuration");
       } else if (configuration == null) {
         if (configs.get(defaultArgument) != null) {
-          return new MtasTokenizer<String>(factory,
+          return new MtasTokenizer(factory,
               configs.get(defaultArgument));
         } else {
           throw new IOException(
@@ -144,7 +144,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
         if (config == null) {
           if (defaultArgument != null) {
             if (configs.get(defaultArgument) != null) {
-              return new MtasTokenizer<String>(factory,
+              return new MtasTokenizer(factory,
                   configs.get(defaultArgument));
             } else {
               throw new IOException("configuration " + configuration
@@ -156,11 +156,11 @@ public class MtasTokenizerFactory extends TokenizerFactory
                 + " not available and no default configuration");
           }
         } else {
-          return new MtasTokenizer<String>(factory, config);
+          return new MtasTokenizer(factory, config);
         }
       }
     } else if (config != null) {
-      return new MtasTokenizer<String>(factory, config);
+      return new MtasTokenizer(factory, config);
     } else {
       throw new IOException("no configuration");
     }

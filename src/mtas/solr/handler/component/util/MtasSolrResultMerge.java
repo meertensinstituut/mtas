@@ -11,6 +11,9 @@ import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
+
+import mtas.codec.util.CodecComponent.ComponentFields;
+import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
@@ -21,7 +24,8 @@ public class MtasSolrResultMerge {
   /**
    * Merge.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    */
   @SuppressWarnings("unchecked")
   public void merge(ResponseBuilder rb) {
@@ -37,6 +41,7 @@ public class MtasSolrResultMerge {
         mtasResponse = new SimpleOrderedMap<>();
         rb.rsp.add("mtas", mtasResponse);
       }
+
       for (ShardRequest sreq : rb.finished) {
         if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {
           // merge stats
@@ -53,6 +58,14 @@ public class MtasSolrResultMerge {
           if (rb.req.getParams()
               .getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
             mergeArrayList(sreq, mtasResponse, "facet", null, false);
+          }
+          // merge join
+          if (rb.req.getParams().getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN,
+              false)) {
+            ComponentFields componentFields = (ComponentFields) rb.req.getContext().get(ComponentFields.class);
+            mtasResponse.add("join", new MtasSolrJoinResult(componentFields.join));            
+            mergeJoinResult(sreq, mtasResponse, "join", null);
+
           }
           // merge prefix
           if (rb.req.getParams()
@@ -74,8 +87,8 @@ public class MtasSolrResultMerge {
           }
         } else if (rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {
           // merge document
-          if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,
-              false)) {
+          if (rb.req.getParams()
+              .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
             mergeArrayList(sreq, mtasResponse, "document",
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
@@ -90,13 +103,59 @@ public class MtasSolrResultMerge {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  private void mergeJoinResult(ShardRequest sreq,
+      NamedList<Object> mtasResponse, String key, Integer preferredPurpose) {
+    Object o = mtasResponse.get(key);
+    MtasSolrJoinResult mtasJoinResponse;
+    if (o instanceof MtasSolrJoinResult) {
+      mtasJoinResponse = (MtasSolrJoinResult) o;
+    } else {
+      mtasJoinResponse = null;
+    }
+    // collect responses for each shard
+    HashMap<String, NamedList<Object>> mtasListShardResponses = new HashMap<String, NamedList<Object>>();
+    for (ShardResponse response : sreq.responses) {
+      // only continue if new shard or preferred purpose
+      if (mtasListShardResponses.containsKey(response.getShard())
+          && ((preferredPurpose == null)
+              || (sreq.purpose != preferredPurpose))) {
+        break;
+      }
+      // update
+      try {
+        NamedList<Object> result = response.getSolrResponse().getResponse();
+        String data = (String) result.findRecursive("mtas", key);
+        if (data != null) {
+          MtasSolrJoinResult decodedData = (MtasSolrJoinResult) MtasSolrResultUtil
+              .decode(data);
+          if (mtasJoinResponse == null) {
+            mtasJoinResponse = decodedData;
+          } else {
+            mtasJoinResponse.merge(decodedData);
+          }
+        }
+      } catch (ClassCastException e) {
+        
+      }
+    }
+    if (mtasJoinResponse != null) {
+      mtasResponse.removeAll(key);
+      mtasResponse.add(key, mtasJoinResponse);
+    }
+  }
+
   /**
    * Merge named list.
    *
-   * @param sreq the sreq
-   * @param mtasResponse the mtas response
-   * @param key the key
-   * @param preferredPurpose the preferred purpose
+   * @param sreq
+   *          the sreq
+   * @param mtasResponse
+   *          the mtas response
+   * @param key
+   *          the key
+   * @param preferredPurpose
+   *          the preferred purpose
    */
   @SuppressWarnings("unchecked")
   private void mergeNamedList(ShardRequest sreq, NamedList<Object> mtasResponse,
@@ -146,11 +205,16 @@ public class MtasSolrResultMerge {
   /**
    * Merge array list.
    *
-   * @param sreq the sreq
-   * @param mtasResponse the mtas response
-   * @param key the key
-   * @param preferredPurpose the preferred purpose
-   * @param mergeAllShardResponses the merge all shard responses
+   * @param sreq
+   *          the sreq
+   * @param mtasResponse
+   *          the mtas response
+   * @param key
+   *          the key
+   * @param preferredPurpose
+   *          the preferred purpose
+   * @param mergeAllShardResponses
+   *          the merge all shard responses
    */
   @SuppressWarnings("unchecked")
   private void mergeArrayList(ShardRequest sreq, NamedList<Object> mtasResponse,
@@ -210,8 +274,10 @@ public class MtasSolrResultMerge {
   /**
    * Merge responses tree set.
    *
-   * @param originalList the original list
-   * @param shardList the shard list
+   * @param originalList
+   *          the original list
+   * @param shardList
+   *          the shard list
    */
   private void mergeResponsesTreeSet(TreeSet<Object> originalList,
       TreeSet<Object> shardList) {
@@ -223,9 +289,12 @@ public class MtasSolrResultMerge {
   /**
    * Merge responses array list.
    *
-   * @param originalList the original list
-   * @param shardList the shard list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param originalList
+   *          the original list
+   * @param shardList
+   *          the shard list
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private void mergeResponsesArrayList(ArrayList<Object> originalList,
@@ -272,9 +341,12 @@ public class MtasSolrResultMerge {
   /**
    * Merge responses named list.
    *
-   * @param mainResponse the main response
-   * @param shardResponse the shard response
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param mainResponse
+   *          the main response
+   * @param shardResponse
+   *          the shard response
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private void mergeResponsesNamedList(NamedList<Object> mainResponse,
@@ -306,9 +378,12 @@ public class MtasSolrResultMerge {
           } else if (original instanceof TreeSet<?>) {
             mergeResponsesTreeSet((TreeSet<Object>) original,
                 (TreeSet<Object>) shardValue);
-          } else if (original instanceof MtasSolrResult) {
-            MtasSolrResult originalComponentResult = (MtasSolrResult) original;
-            originalComponentResult.merge((MtasSolrResult) shardValue);
+          } else if (original instanceof MtasSolrMtasResult) {
+            MtasSolrMtasResult originalComponentResult = (MtasSolrMtasResult) original;
+            originalComponentResult.merge((MtasSolrMtasResult) shardValue);
+          } else if (original instanceof MtasSolrJoinResult) {
+            MtasSolrJoinResult originalComponentResult = (MtasSolrJoinResult) original;
+            originalComponentResult.merge((MtasSolrJoinResult) shardValue);
           } else if (original instanceof String) {
             // ignore?
           } else if (original instanceof Integer) {
@@ -329,7 +404,8 @@ public class MtasSolrResultMerge {
   /**
    * Adjustable parts cloned.
    *
-   * @param original the original
+   * @param original
+   *          the original
    * @return the object
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })

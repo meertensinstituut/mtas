@@ -538,7 +538,7 @@ public class MtasSolrComponentFacet {
       throws IOException {
     SimpleOrderedMap<Object> mtasFacetResponse = new SimpleOrderedMap<>();
     mtasFacetResponse.add("key", facet.key);
-    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrResult>>();
+    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
     for (int i = 0; i < facet.baseFields.length; i++) {
       if (facet.baseFunctionList[i] != null) {
         for (MtasDataCollector<?, ?> functionDataCollector : facet.baseFunctionList[i]
@@ -546,10 +546,10 @@ public class MtasSolrComponentFacet {
           SubComponentFunction[] tmpSubComponentFunctionList = facet.baseFunctionList[i]
               .get(functionDataCollector);
           if (tmpSubComponentFunctionList != null) {
-            HashMap<String, MtasSolrResult> tmpList = new HashMap<String, MtasSolrResult>();
+            HashMap<String, MtasSolrMtasResult> tmpList = new HashMap<String, MtasSolrMtasResult>();
             for (SubComponentFunction tmpSubComponentFunction : tmpSubComponentFunctionList) {
               tmpList.put(tmpSubComponentFunction.key,
-                  new MtasSolrResult(tmpSubComponentFunction.dataCollector,
+                  new MtasSolrMtasResult(tmpSubComponentFunction.dataCollector,
                       tmpSubComponentFunction.dataType,
                       tmpSubComponentFunction.statsType,
                       tmpSubComponentFunction.statsItems, null));
@@ -559,7 +559,7 @@ public class MtasSolrComponentFacet {
         }
       }
     }
-    MtasSolrResult data = new MtasSolrResult(facet.dataCollector,
+    MtasSolrMtasResult data = new MtasSolrMtasResult(facet.dataCollector,
         facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,
         facet.baseSortTypes, facet.baseSortDirections, null, facet.baseNumbers,
         functionData);

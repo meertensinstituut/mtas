@@ -7,10 +7,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The Class MtasUpdateRequestProcessorResultReader.
  */
 public class MtasUpdateRequestProcessorResultReader implements Closeable {
+
+  private static Log log = LogFactory
+      .getLog(MtasUpdateRequestProcessorResultReader.class);
 
   /** The stored string value. */
   private String storedStringValue;
@@ -33,8 +39,10 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
   /**
    * Instantiates a new mtas update request processor result reader.
    *
-   * @param fileName the file name
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param fileName
+   *          the file name
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasUpdateRequestProcessorResultReader(String fileName)
       throws IOException {
@@ -64,11 +72,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
                 return true;
               } else {
                 next = getNext();
-                if (next != null) {
-                  return true;
-                } else {
-                  return false;
-                }
+                return next != null;
               }
             } else {
               return false;
@@ -109,6 +113,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
                   return null;
                 }
               } catch (ClassNotFoundException | IOException e) {
+                log.debug(e.getClass().getSimpleName()+" while retrieving data from "+fileName, e);
                 forceClose();
                 return null;
               }
@@ -118,9 +123,11 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
           }
         };
       } catch (IOException e) {
+        log.error(e.getClass().getSimpleName()+" while processing "+fileName+" ("+e.getMessage()+")", e);
         forceClose();
         throw new IOException(e.getMessage());
       } catch (ClassNotFoundException e) {
+        log.error(e.getClass().getSimpleName()+" while processing "+fileName+" ("+e.getMessage()+")", e);
         forceClose();
         throw new IOException("invalid tokenStream");
       }
@@ -178,7 +185,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
     try {
       objectInputStream.close();
     } catch (IOException e) {
-      // do nothing
+      log.debug(e);
     }
     closed = true;
   }

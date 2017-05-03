@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentDocument;
@@ -18,15 +19,16 @@ import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecUtil;
 import mtas.solr.handler.component.util.MtasSolrResultMerge;
+import mtas.solr.search.MtasSolrJoinCache;
 import mtas.solr.handler.component.util.MtasSolrComponentDocument;
 import mtas.solr.handler.component.util.MtasSolrComponentFacet;
 import mtas.solr.handler.component.util.MtasSolrComponentGroup;
+import mtas.solr.handler.component.util.MtasSolrComponentJoin;
 import mtas.solr.handler.component.util.MtasSolrComponentKwic;
 import mtas.solr.handler.component.util.MtasSolrComponentList;
 import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
 import mtas.solr.handler.component.util.MtasSolrComponentStats;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
-
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -43,6 +45,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
+
+  public static final String CONFIG_JOIN_CACHE_DIRECTORY = "joinCacheDirectory";
+  public static final String CONFIG_JOIN_LIFETIME = "joinLifetime";
+  public static final String CONFIG_JOIN_MAXIMUM_NUMBER = "joinMaximumNumber";
+  public static final String CONFIG_JOIN_MAXIMUM_OVERFLOW = "joinMaximumOverflow";
 
   /** The Constant PARAM_MTAS. */
   public static final String PARAM_MTAS = "mtas";
@@ -77,7 +84,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The Constant STAGE_GROUP. */
   public static final int STAGE_GROUP = ResponseBuilder.STAGE_EXECUTE_QUERY
       + 60;
-  
+
+  /** The Constant STAGE_JOIN. */
+  public static final int STAGE_JOIN = ResponseBuilder.STAGE_EXECUTE_QUERY + 70;
+
   /** The Constant STAGE_DOCUMENT. */
   public static final int STAGE_DOCUMENT = ResponseBuilder.STAGE_GET_FIELDS
       + 10;
@@ -105,9 +115,50 @@ public class MtasSolrSearchComponent extends SearchComponent {
 
   /** The search kwic. */
   private MtasSolrComponentKwic searchKwic;
-  
+
   /** The search document. */
   private MtasSolrComponentDocument searchDocument;
+
+  private MtasSolrComponentJoin searchJoin;
+
+  private MtasSolrJoinCache joinCache = null;
+
+  @Override
+  public void init(NamedList args) {
+    super.init(args);
+    // init components
+    searchDocument = new MtasSolrComponentDocument(this);
+    searchKwic = new MtasSolrComponentKwic(this);
+    searchList = new MtasSolrComponentList(this);
+    searchGroup = new MtasSolrComponentGroup(this);
+    searchTermvector = new MtasSolrComponentTermvector(this);
+    searchPrefix = new MtasSolrComponentPrefix(this);
+    searchStats = new MtasSolrComponentStats(this);
+    searchFacet = new MtasSolrComponentFacet(this);
+    searchJoin = new MtasSolrComponentJoin(this);
+    // init join
+    String joinCacheDirectory = null;
+    Long joinLifetime = null;
+    Integer joinMaximumNumber = null;
+    Integer joinMaximumOverflow = null;
+    if (args.get(CONFIG_JOIN_CACHE_DIRECTORY) != null
+        && args.get(CONFIG_JOIN_CACHE_DIRECTORY) instanceof String) {
+      joinCacheDirectory = (String) args.get(CONFIG_JOIN_CACHE_DIRECTORY);
+    }
+    if (args.get(CONFIG_JOIN_LIFETIME) != null
+        && args.get(CONFIG_JOIN_LIFETIME) instanceof Long) {
+      joinLifetime = (Long) args.get(CONFIG_JOIN_LIFETIME);
+    }
+    if (args.get(CONFIG_JOIN_MAXIMUM_NUMBER) != null
+        && args.get(CONFIG_JOIN_MAXIMUM_NUMBER) instanceof Integer) {
+      joinMaximumNumber = (Integer) args.get(CONFIG_JOIN_MAXIMUM_NUMBER);      
+    }
+    if (args.get(CONFIG_JOIN_MAXIMUM_OVERFLOW) != null
+        && args.get(CONFIG_JOIN_MAXIMUM_OVERFLOW) instanceof Integer) {
+      joinMaximumNumber = (Integer) args.get(CONFIG_JOIN_MAXIMUM_OVERFLOW);
+    }
+    joinCache = new MtasSolrJoinCache(joinCacheDirectory, joinLifetime, joinMaximumNumber, joinMaximumOverflow);    
+  }
 
   /*
    * (non-Javadoc)
@@ -141,59 +192,54 @@ public class MtasSolrSearchComponent extends SearchComponent {
     // System.out.println(System.nanoTime()+" - "+Thread.currentThread().getId()
     // + " - "
     // + rb.req.getParams().getBool("isShard", false) + " PREPARE " + rb.stage
-    // + " " + rb.req.getParamString());
+    // + " " + rb.req.getParamString());    
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-
       mtasSolrResultMerge = new MtasSolrResultMerge();
-
       ComponentFields mtasFields = new ComponentFields();
       // get settings document
-      if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,
-          false)) {
-        searchDocument = new MtasSolrComponentDocument(this);
+      if (rb.req.getParams()
+          .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
         searchDocument.prepare(rb, mtasFields);
       }
       // get settings kwic
       if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
           false)) {
-        searchKwic = new MtasSolrComponentKwic(this);
         searchKwic.prepare(rb, mtasFields);
       }
       // get settings list
       if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,
           false)) {
-        searchList = new MtasSolrComponentList(this);
         searchList.prepare(rb, mtasFields);
       }
       // get settings group
       if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,
           false)) {
-        searchGroup = new MtasSolrComponentGroup(this);
         searchGroup.prepare(rb, mtasFields);
       }
       // get settings termvector
       if (rb.req.getParams()
           .getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-        searchTermvector = new MtasSolrComponentTermvector(this);
         searchTermvector.prepare(rb, mtasFields);
       }
       // get settings prefix
       if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,
           false)) {
-        searchPrefix = new MtasSolrComponentPrefix(this);
         searchPrefix.prepare(rb, mtasFields);
       }
       // get settings stats
       if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,
           false)) {
-        searchStats = new MtasSolrComponentStats(this);
         searchStats.prepare(rb, mtasFields);
       }
       // get settings facet
       if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,
           false)) {
-        searchFacet = new MtasSolrComponentFacet(this);
         searchFacet.prepare(rb, mtasFields);
+      }
+      // get settings join
+      if (rb.req.getParams().getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN,
+          false)) {
+        searchJoin.prepare(rb, mtasFields);
       }
       rb.req.getContext().put(ComponentFields.class, mtasFields);
     }
@@ -216,14 +262,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
     if (mtasFields != null) {
       DocSet docSet = rb.getResults().docSet;
       DocList docList = rb.getResults().docList;
-      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic || mtasFields.doList
-          || mtasFields.doGroup || mtasFields.doFacet || mtasFields.doTermVector
+      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic
+          || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
+          || mtasFields.doJoin || mtasFields.doTermVector
           || mtasFields.doPrefix) {
         SolrIndexSearcher searcher = rb.req.getSearcher();
         ArrayList<Integer> docSetList = null;
         ArrayList<Integer> docListList = null;
         if (docSet != null) {
-          docSetList = new ArrayList<Integer>();
+          docSetList = new ArrayList<>();
           Iterator<Integer> docSetIterator = docSet.iterator();
           while (docSetIterator.hasNext()) {
             docSetList.add(docSetIterator.next());
@@ -231,7 +278,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           Collections.sort(docSetList);
         }
         if (docList != null) {
-          docListList = new ArrayList<Integer>();
+          docListList = new ArrayList<>();
           Iterator<Integer> docListIterator = docList.iterator();
           while (docListIterator.hasNext()) {
             docListList.add(docListIterator.next());
@@ -240,7 +287,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
         }
         for (String field : mtasFields.list.keySet()) {
           try {
-            CodecUtil.collect(field, searcher, searcher.getRawReader(),
+            CodecUtil.collectField(field, searcher, searcher.getRawReader(),
                 docListList, docSetList, mtasFields.list.get(field));
           } catch (IllegalAccessException | IllegalArgumentException
               | InvocationTargetException e) {
@@ -248,11 +295,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
             throw new IOException(e.getMessage());
           }
         }
+        CodecUtil.collectJoin(searcher.getRawReader(), docSetList,
+            mtasFields.join);
         NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
         if (mtasFields.doDocument) {
-          ArrayList<NamedList<?>> mtasDocumentResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasDocumentResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
-            for (ComponentDocument document : mtasFields.list.get(field).documentList) {
+            for (ComponentDocument document : mtasFields.list
+                .get(field).documentList) {
               mtasDocumentResponses.add(searchDocument.create(document));
             }
           }
@@ -260,7 +310,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           mtasResponse.add("document", mtasDocumentResponses);
         }
         if (mtasFields.doKwic) {
-          ArrayList<NamedList<?>> mtasKwicResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasKwicResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentKwic kwic : mtasFields.list.get(field).kwicList) {
               mtasKwicResponses.add(searchKwic.create(kwic));
@@ -270,7 +320,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           mtasResponse.add("kwic", mtasKwicResponses);
         }
         if (mtasFields.doFacet) {
-          ArrayList<NamedList<?>> mtasFacetResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasFacetResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentFacet facet : mtasFields.list.get(field).facetList) {
               if (rb.req.getParams().getBool("isShard", false)) {
@@ -283,8 +333,16 @@ public class MtasSolrSearchComponent extends SearchComponent {
           // add to response
           mtasResponse.add("facet", mtasFacetResponses);
         }
+        if (mtasFields.doJoin) {
+          // add to response
+          if (rb.req.getParams().getBool("isShard", false)) {
+            mtasResponse.add("join", searchJoin.create(mtasFields.join, true));
+          } else {
+            mtasResponse.add("join", searchJoin.create(mtasFields.join, false));
+          }
+        }
         if (mtasFields.doList) {
-          ArrayList<NamedList<?>> mtasListResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasListResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentList list : mtasFields.list.get(field).listList) {
               mtasListResponses.add(searchList.create(list));
@@ -294,7 +352,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           mtasResponse.add("list", mtasListResponses);
         }
         if (mtasFields.doGroup) {
-          ArrayList<NamedList<?>> mtasGroupResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasGroupResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentGroup group : mtasFields.list.get(field).groupList) {
               if (rb.req.getParams().getBool("isShard", false)) {
@@ -308,7 +366,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           mtasResponse.add("group", mtasGroupResponses);
         }
         if (mtasFields.doTermVector) {
-          ArrayList<NamedList<?>> mtasTermVectorResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasTermVectorResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentTermVector termVector : mtasFields.list
                 .get(field).termVectorList) {
@@ -325,7 +383,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           mtasResponse.add("termvector", mtasTermVectorResponses);
         }
         if (mtasFields.doPrefix) {
-          ArrayList<NamedList<?>> mtasPrefixResponses = new ArrayList<NamedList<?>>();
+          ArrayList<NamedList<?>> mtasPrefixResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             if (mtasFields.list.get(field).prefix != null) {
               if (rb.req.getParams().getBool("isShard", false)) {
@@ -344,7 +402,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           if (mtasFields.doStatsPositions || mtasFields.doStatsTokens
               || mtasFields.doStatsSpans) {
             if (mtasFields.doStatsTokens) {
-              ArrayList<Object> mtasStatsTokensResponses = new ArrayList<Object>();
+              ArrayList<Object> mtasStatsTokensResponses = new ArrayList<>();
               for (String field : mtasFields.list.keySet()) {
                 for (ComponentToken token : mtasFields.list
                     .get(field).statsTokenList) {
@@ -360,7 +418,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
               mtasStatsResponse.add("tokens", mtasStatsTokensResponses);
             }
             if (mtasFields.doStatsPositions) {
-              ArrayList<Object> mtasStatsPositionsResponses = new ArrayList<Object>();
+              ArrayList<Object> mtasStatsPositionsResponses = new ArrayList<>();
               for (String field : mtasFields.list.keySet()) {
                 for (ComponentPosition position : mtasFields.list
                     .get(field).statsPositionList) {
@@ -376,7 +434,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
               mtasStatsResponse.add("positions", mtasStatsPositionsResponses);
             }
             if (mtasFields.doStatsSpans) {
-              ArrayList<Object> mtasStatsSpansResponses = new ArrayList<Object>();
+              ArrayList<Object> mtasStatsSpansResponses = new ArrayList<>();
               for (String field : mtasFields.list.keySet()) {
                 for (ComponentSpan span : mtasFields.list
                     .get(field).statsSpanList) {
@@ -431,13 +489,17 @@ public class MtasSolrSearchComponent extends SearchComponent {
       if (sreq.params.getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
         searchFacet.modifyRequest(rb, who, sreq);
       }
+      if (sreq.params.getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN, false)) {
+        searchJoin.modifyRequest(rb, who, sreq);
+      }
       if (sreq.params.getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
         searchGroup.modifyRequest(rb, who, sreq);
       }
       if (sreq.params.getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
         searchList.modifyRequest(rb, who, sreq);
       }
-      if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+      if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,
+          false)) {
         searchDocument.modifyRequest(rb, who, sreq);
       }
       if (sreq.params.getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {
@@ -491,6 +553,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
           false)) {
         searchFacet.finishStage(rb);
       }
+      if (rb.req.getParams().getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN,
+          false)) {
+        searchJoin.finishStage(rb);
+      }
       if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,
           false)) {
         searchGroup.finishStage(rb);
@@ -499,8 +565,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
           false)) {
         searchList.finishStage(rb);
       }
-      if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,
-          false)) {
+      if (rb.req.getParams()
+          .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
         searchDocument.finishStage(rb);
       }
       if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
@@ -546,6 +612,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
       } else if (rb.stage == STAGE_FACET) {
         ComponentFields mtasFields = getMtasFields(rb);
         searchFacet.distributedProcess(rb, mtasFields);
+      } else if (rb.stage == STAGE_JOIN) {
+        ComponentFields mtasFields = getMtasFields(rb);
+        searchJoin.distributedProcess(rb, mtasFields);
       } else if (rb.stage == STAGE_GROUP) {
         ComponentFields mtasFields = getMtasFields(rb);
         searchGroup.distributedProcess(rb, mtasFields);
@@ -583,7 +652,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
         } else if (rb.stage < STAGE_GROUP && rb.req.getParams()
             .getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
           return STAGE_GROUP;
-        } 
+        } else if (rb.stage < STAGE_JOIN && rb.req.getParams()
+            .getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN, false)) {
+          return STAGE_JOIN;
+        }
       } else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS
           && rb.stage < ResponseBuilder.STAGE_DONE) {
         if (rb.stage < STAGE_DOCUMENT && rb.req.getParams()
@@ -598,13 +670,13 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the mtas fields.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    * @return the mtas fields
    */
 
   private ComponentFields getMtasFields(ResponseBuilder rb) {
     return (ComponentFields) rb.req.getContext().get(ComponentFields.class);
   }
-
 
 }

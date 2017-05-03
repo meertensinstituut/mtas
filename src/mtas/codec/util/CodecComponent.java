@@ -2,6 +2,7 @@ package mtas.codec.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +46,8 @@ public class CodecComponent {
 
     /** The list. */
     public Map<String, ComponentField> list;
+    
+    public ComponentJoin join;
 
     /** The do document. */
     public boolean doDocument;
@@ -78,11 +82,14 @@ public class CodecComponent {
     /** The do facet. */
     public boolean doFacet;
 
+    public boolean doJoin;
+
     /**
      * Instantiates a new component fields.
      */
     public ComponentFields() {
       list = new HashMap<String, ComponentField>();
+      join = null;
       doDocument = false;
       doKwic = false;
       doList = false;
@@ -94,6 +101,7 @@ public class CodecComponent {
       doStatsTokens = false;
       doPrefix = false;
       doFacet = false;
+      doJoin = false;
     }
   }
 
@@ -1208,8 +1216,9 @@ public class CodecComponent {
         Boolean full, String type, String sortType, String sortDirection,
         String startValue, int number, String[] functionKey,
         String[] functionExpression, String[] functionType, String boundary,
-        String[] list, int listNumber, Boolean listRegexp, String ignoreRegexp, String[] ignoreList,
-        Boolean ignoreListRegexp) throws IOException, ParseException {
+        String[] list, int listNumber, Boolean listRegexp, String ignoreRegexp,
+        String[] ignoreList, Boolean ignoreListRegexp)
+        throws IOException, ParseException {
       this.key = key;
       this.prefix = prefix;
       this.regexp = regexp;
@@ -1217,7 +1226,7 @@ public class CodecComponent {
       sortType = sortType == null ? CodecUtil.SORT_TERM : sortType;
       sortDirection = sortDirection == null ? (sortType == CodecUtil.SORT_TERM)
           ? CodecUtil.SORT_ASC : CodecUtil.SORT_DESC : sortDirection;
-            
+
       if (list != null && list.length > 0) {
         this.list = new HashSet(Arrays.asList(list));
         this.listRegexp = listRegexp != null ? listRegexp : false;
@@ -1230,8 +1239,8 @@ public class CodecComponent {
       } else {
         this.list = null;
         this.listRegexp = false;
-        this.startValue = (startValue!=null)?new BytesRef(prefix + MtasToken.DELIMITER
-            + startValue):null;
+        this.startValue = (startValue != null)
+            ? new BytesRef(prefix + MtasToken.DELIMITER + startValue) : null;
         if (boundary == null) {
           this.boundary = null;
           if (number < -1) {
@@ -1282,10 +1291,11 @@ public class CodecComponent {
               + "' only supported with full termVector");
         }
       }
-      if(!sortType.equals(CodecUtil.SORT_TERM)) {
-        if(startValue!=null) {
+      if (!sortType.equals(CodecUtil.SORT_TERM)) {
+        if (startValue != null) {
           throw new IOException("startValue '" + startValue
-              + "' only supported with termVector sorted on "+CodecUtil.SORT_TERM);
+              + "' only supported with termVector sorted on "
+              + CodecUtil.SORT_TERM);
         }
       }
       if (!sortDirection.equals(CodecUtil.SORT_ASC)
@@ -1663,6 +1673,40 @@ public class CodecComponent {
           this.statsItems, null, null, null, null, null, null);
     }
   }
+  
+  public static class ComponentJoin {
+    
+    private Set<String> fields;
+    private Set<String> values;
+    private String key;
+    
+    public ComponentJoin(Set<String> fields, String key) {
+      this.fields = fields;
+      this.key = key;
+      this.values = new HashSet<>();
+    }
+    
+    public void add(String value) {
+      values.add(value);
+    }
+    
+    public void add(Set<String> values) {
+      this.values.addAll(values);
+    }
+    
+    public Set<String> values() {
+      return values;
+    }
+    
+    public String key() {
+      return key;
+    }
+    
+    public Set<String> fields() {
+      return fields;
+    }
+    
+  }
 
   /**
    * The Class SubComponentFunction.
@@ -1807,8 +1851,7 @@ public class CodecComponent {
       endPosition = match.endPosition - 1;
       this.tokens = tokens;
     }
-    
-    
+
   }
 
   /**
@@ -1909,7 +1952,7 @@ public class CodecComponent {
     public GroupHit(ArrayList<MtasTreeHit<String>> list, int start, int end,
         int hitStart, int hitEnd, ComponentGroup group,
         HashSet<String> knownPrefixes) throws UnsupportedEncodingException {
-      //System.out.println("init: "+start+"-"+end+"\t"+hitStart+"-"+hitEnd);
+      // System.out.println("init: "+start+"-"+end+"\t"+hitStart+"-"+hitEnd);
       // compute dimensions
       int leftRangeStart = start;
       int leftRangeEnd = Math.min(end - 1, hitStart - 1);
@@ -1918,7 +1961,8 @@ public class CodecComponent {
       int rightRangeStart = Math.max(start, hitEnd + 1);
       int rightRangeEnd = end;
       int rightRangeLength = Math.max(0, 1 + rightRangeEnd - rightRangeStart);
-      //System.out.println(leftRangeStart+"\t"+leftRangeEnd+"\t"+leftRangeLength+" - "+rightRangeStart+"\t"+rightRangeEnd+"\t"+rightRangeLength);
+      // System.out.println(leftRangeStart+"\t"+leftRangeEnd+"\t"+leftRangeLength+"
+      // - "+rightRangeStart+"\t"+rightRangeEnd+"\t"+rightRangeLength);
       // create initial arrays
       if (leftRangeLength > 0) {
         keyLeft = "";
@@ -1992,15 +2036,15 @@ public class CodecComponent {
         }
       }
       if (group.hitInsideRight != null) {
-        //System.out.println(missingHit.length + " items in missingHit");
-        //System.out.println(
-        //    group.hitInsideRight.length + " items in group.hitInsideRight");
+        // System.out.println(missingHit.length + " items in missingHit");
+        // System.out.println(
+        // group.hitInsideRight.length + " items in group.hitInsideRight");
         for (int p = 0; p < group.hitInsideRight.length; p++) {
-          //System.out.println(" - " + group.hitInsideRight[p]);
+          // System.out.println(" - " + group.hitInsideRight[p]);
         }
         for (int p = Math.max(hitStart,
             hitEnd - group.hitInsideRight.length + 1); p <= hitEnd; p++) {
-          //System.out.println("Test voor p is " + (p - hitStart));
+          // System.out.println("Test voor p is " + (p - hitStart));
           if (group.hitInsideRight[hitEnd - p] != null) {
             missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);
           }

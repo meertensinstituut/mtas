@@ -463,7 +463,7 @@ public class MtasSolrComponentGroup {
       throws IOException {
     SimpleOrderedMap<Object> mtasGroupResponse = new SimpleOrderedMap<>();
     mtasGroupResponse.add("key", group.key);
-    MtasSolrResult data = new MtasSolrResult(group.dataCollector,
+    MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,
         new String[] { group.dataType }, new String[] { group.statsType },
         new TreeSet[] { group.statsItems }, new String[] { group.sortType },
         new String[] { group.sortDirection }, new Integer[] { group.start },
