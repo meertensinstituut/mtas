@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,15 +79,14 @@ public class MtasSearchTestConsistency {
   @org.junit.BeforeClass
   public static void initialize() {
     try {
-      String path = new File("junit/data").getCanonicalPath() + File.separator;
+      Path path = Paths.get("junit").resolve("data");
       // directory = FSDirectory.open(Paths.get("testindexMtas"));
       directory = new RAMDirectory();
       files = new HashMap<String, String>();
-      files.put("Een onaangenaam mens in de Haarlemmerhout",
-          path + "resources/beets1.xml.gz");
-      files.put("Een oude kennis", path + "resources/beets2.xml.gz");
-      files.put("Varen en Rijden", path + "resources/beets3.xml.gz");
-      createIndex(path + "conf/folia.xml", files);
+      files.put("Een onaangenaam mens in de Haarlemmerhout", path.resolve("resources").resolve("beets1.xml.gz").toAbsolutePath().toString());
+      files.put("Een oude kennis", path.resolve("resources").resolve("beets2.xml.gz").toAbsolutePath().toString());
+      files.put("Varen en Rijden", path.resolve("resources").resolve("beets3.xml.gz").toAbsolutePath().toString());
+      createIndex(path.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(), files);
       docs = getLiveDocs(DirectoryReader.open(directory));
     } catch (IOException e) {
       e.printStackTrace();
@@ -158,6 +158,75 @@ public class MtasSearchTestConsistency {
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, ignore,
         ignoreNumber, null);
     assertEquals("Article followed by Noun ignoring Adjectives",
+        queryResult1.hits, queryResult2.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchFollowedBy1() throws IOException, ParseException {
+    String cql1 = "[pos=\"LID\"] followedby []?[pos=\"ADJ\"]";
+    String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
+    String cql3 = "[pos=\"LID\"][pos=\"ADJ\"][pos=\"ADJ\"]";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    assertEquals("Article followed by Adjective",
+        queryResult1.hits, queryResult2.hits - queryResult3.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchFollowedBy2() throws IOException, ParseException {
+    String cql1 = "[pos=\"LID\"] followedby []?[pos=\"ADJ\"]";
+    String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
+    String cql3 = "[pos=\"LID\"][pos=\"ADJ\"][pos=\"ADJ\"]";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    assertEquals("Article followed by Adjective",
+        queryResult1.hits, queryResult2.hits - queryResult3.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchPrecededBy1() throws IOException, ParseException {
+    String cql1 = "[pos=\"ADJ\"] precededby [pos=\"LID\"][]?";
+    String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
+    String cql3 = "[pos=\"LID\"][pos=\"LID\"][pos=\"ADJ\"]";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    assertEquals("Adjective preceded by Article",
+        queryResult1.hits, queryResult2.hits - queryResult3.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchPrecededBy2() throws IOException, ParseException {
+    String cql1 = "[]?[pos=\"ADJ\"] precededby [pos=\"LID\"]";
+    String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    assertEquals("Adjective preceded by Article",
         queryResult1.hits, queryResult2.hits);
     indexReader.close();
   }

@@ -12,14 +12,20 @@ import mtas.parser.cql.ParseException;
 import mtas.parser.cql.util.MtasCQLParserGroupQuery;
 import mtas.parser.cql.util.MtasCQLParserWordQuery;
 import mtas.search.spans.MtasSpanContainingQuery;
+import mtas.search.spans.MtasSpanFollowedByQuery;
+import mtas.search.spans.MtasSpanFullyAlignedWithQuery;
+import mtas.search.spans.MtasSpanIntersectingQuery;
 import mtas.search.spans.MtasSpanMatchAllQuery;
 import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanOrQuery;
+import mtas.search.spans.MtasSpanPrecededByQuery;
 import mtas.search.spans.MtasSpanRecurrenceQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.MtasSpanWithinQuery;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanUniquePosition;
+import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 public class MtasCQLParserTestSentence {
 
@@ -58,7 +64,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q2, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -76,7 +82,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
     MtasSpanQuery q = new MtasSpanOrQuery(q1,q2);
-    testCQLParse(field, null, cql, q);       
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));       
   }
   
   @org.junit.Test
@@ -91,7 +97,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q3, false));
     MtasSpanQuery q4 = new MtasSpanSequenceQuery(items, null, null);
     MtasSpanQuery q = new MtasSpanOrQuery(q1,q4);
-    testCQLParse(field, null, cql, q);        
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));        
   }
   
   @org.junit.Test
@@ -130,7 +136,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
   
   @org.junit.Test
@@ -147,7 +153,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q5, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);  
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));  
   }
   
   @org.junit.Test
@@ -162,7 +168,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q2,1,3,null, null), false));
     items.add(new MtasSpanSequenceItem(q3, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
 
   @org.junit.Test
@@ -172,7 +178,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"sentence");
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     MtasSpanQuery q = new MtasSpanContainingQuery(q1, q2);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -182,7 +188,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     MtasSpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
     MtasSpanQuery q = new MtasSpanWithinQuery(q2, q1);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -197,7 +203,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -212,7 +218,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q3, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -234,7 +240,7 @@ public class MtasCQLParserTestSentence {
     items2.add(new MtasSpanSequenceItem(q1, false));
     items2.add(new MtasSpanSequenceItem(q8, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items2, null, null);    
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -247,7 +253,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q4 = new MtasSpanContainingQuery(q2, q3);
     MtasSpanQuery q5 = new MtasSpanWithinQuery(q4, q1);
     MtasSpanQuery q = new MtasSpanNotQuery(q5,new MtasSpanContainingQuery(q5, q3));
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -261,7 +267,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q2, false));
     items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -274,7 +280,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q2, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
-    testCQLParse(field, "t_lc", cql, q);    
+    testCQLParse(field, "t_lc", cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -289,7 +295,7 @@ public class MtasCQLParserTestSentence {
     items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
     MtasSpanQuery q3 = new MtasSpanSequenceQuery(items, null, null);
     MtasSpanQuery q = new MtasSpanRecurrenceQuery(q3,3,4,null, null); 
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -318,6 +324,58 @@ public class MtasCQLParserTestSentence {
     String cql1 = "(<s/>(<s/> containing [t_lc=\"rembrandt\"])</s>)";
     String cql2 = "<s/>(<s/> containing [t_lc=\"rembrandt\"])</s>";
     testCQLEquivalent(field, null, cql1, cql2);
+  }
+  
+  @org.junit.Test
+  public void basicTestCQL22() throws ParseException {
+    String field = "testveld";
+    String cql = "([lemma=\"koe\"] within <sentence/>) | [t=\"paard\"]"; 
+    MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    MtasSpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
+    MtasSpanQuery q3 = new MtasSpanWithinQuery(q2, q1);
+    MtasSpanQuery q4 = new MtasCQLParserWordQuery(field,"t","paard",null, null);
+    MtasSpanQuery q = new MtasSpanOrQuery(q3,q4);
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
+  }
+  
+  @org.junit.Test
+  public void basicTestCQL23() throws ParseException {
+    String field = "testveld";
+    String cql = "[lemma=\"koe\"] intersecting <sentence/>"; 
+    MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    MtasSpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
+    MtasSpanQuery q = new MtasSpanIntersectingQuery(q1, q2);
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
+  }
+  
+  @org.junit.Test
+  public void basicTestCQL24() throws ParseException {
+    String field = "testveld";
+    String cql = "[lemma=\"koe\"] fullyalignedwith [pos=\"N\"]"; 
+    MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
+    MtasSpanQuery q = new MtasSpanFullyAlignedWithQuery(q1, q2);
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
+  }
+  
+  @org.junit.Test
+  public void basicTestCQL25() throws ParseException {
+    String field = "testveld";
+    String cql = "[lemma=\"koe\"] followedby [pos=\"N\"]"; 
+    MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
+    MtasSpanQuery q = new MtasSpanFollowedByQuery(q1, q2);
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
+  }
+  
+  @org.junit.Test
+  public void basicTestCQL26() throws ParseException {
+    String field = "testveld";
+    String cql = "[lemma=\"koe\"] precededby [pos=\"N\"]"; 
+    MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
+    MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
+    MtasSpanQuery q = new MtasSpanPrecededByQuery(q1, q2);
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
 }

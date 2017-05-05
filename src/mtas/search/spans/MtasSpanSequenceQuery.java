@@ -414,7 +414,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      *          the optional
      */
     public MtasSpanSequenceQuerySpans(Spans spans, boolean optional) {
-      this.spans = spans;
+      this.spans = spans!=null?spans:new MtasSpanMatchNoneSpans(field);
       this.optional = optional;
     }
   }

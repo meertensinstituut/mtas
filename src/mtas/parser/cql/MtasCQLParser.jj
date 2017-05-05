@@ -26,13 +26,17 @@ import mtas.parser.cql.util.MtasCQLParserWordQuery;
 import mtas.parser.cql.util.MtasCQLParserDefaultPrefixCondition;
 import org.apache.lucene.index.Term;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 import mtas.search.spans.MtasSpanContainingQuery;
 import mtas.search.spans.MtasSpanWithinQuery;
 import mtas.search.spans.MtasSpanIntersectingQuery;
 import mtas.search.spans.MtasSpanFullyAlignedWithQuery;
+import mtas.search.spans.MtasSpanFollowedByQuery;
+import mtas.search.spans.MtasSpanPrecededByQuery;
 import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
+import mtas.search.spans.MtasSpanOrQuery;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +60,7 @@ public class MtasCQLParser
       }
       throw new ParseException("unused variables defined");
     }
-    return query;
+    return new MtasSpanUniquePositionQuery(query);
   }
 
   private String unquoteString(String unfiltered)
@@ -127,6 +131,26 @@ TOKEN :
 TOKEN :
 {
   < NOT_FULLYALIGNEDWITH : "!fullyalignedwith" >
+}
+
+TOKEN :
+{
+  < FOLLOWEDBY : "followedby" >
+}
+
+TOKEN :
+{
+  < NOT_FOLLOWEDBY : "!followedby" >
+}
+
+TOKEN :
+{
+  < PRECEDEDBY : "precededby" >
+}
+
+TOKEN :
+{
+  < NOT_PRECEDEDBY : "!precededby" >
 }
 
 TOKEN :
@@ -263,6 +287,8 @@ TOKEN :
 private MtasSpanQuery cql(String field, String defaultPrefix, HashMap < String, String [ ] > variables, HashSet < String > usedVariables, MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException :
 {
   MtasSpanSequenceItem si;
+  MtasSpanQuery mainCQL = null;
+  MtasSpanQuery orCQL = null;
   ArrayList < MtasSpanSequenceItem > itemList = new ArrayList < MtasSpanSequenceItem > ();
 }
 {
@@ -276,15 +302,28 @@ private MtasSpanQuery cql(String field, String defaultPrefix, HashMap < String, 
       itemList.add(si);
     }
   )*
-  < EOF >
+  (
+    < OR > 
+    orCQL = cql(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
+  | 
+    < EOF >
+  )
   {
     if (itemList.size() > 1)
     {
-      return new MtasSpanSequenceQuery(itemList, ignore, maximumIgnoreLength);
+      mainCQL = new MtasSpanSequenceQuery(itemList, ignore, maximumIgnoreLength);
     }
     else
     {
-      return itemList.get(0).getQuery();
+      mainCQL = itemList.get(0).getQuery();
+    }
+    if (orCQL != null)
+    {
+      return new MtasSpanOrQuery(mainCQL,orCQL);
+    }
+    else
+    {
+      return mainCQL;
     }
   }
 }
@@ -306,6 +345,10 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
   String OPERATOR_NOT_INTERSECTING = "not_intersecting";
   String OPERATOR_FULLYALIGNEDWITH = "fullyalignedwith";
   String OPERATOR_NOT_FULLYALIGNEDWITH = "not_fullyalignedwith";
+  String OPERATOR_FOLLOWEDBY = "followedby";
+  String OPERATOR_NOT_FOLLOWEDBY = "not_followedby";
+  String OPERATOR_PRECEDEDBY = "precededby";
+  String OPERATOR_NOT_PRECEDEDBY = "not_precededby";
 }
 {
   (
@@ -358,6 +401,22 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
       {
         operator = OPERATOR_NOT_FULLYALIGNEDWITH;
       }
+    | < FOLLOWEDBY >
+      {
+        operator = OPERATOR_FOLLOWEDBY;
+      }
+    | < NOT_FOLLOWEDBY >
+      {
+        operator = OPERATOR_NOT_FOLLOWEDBY;
+      }
+    | < PRECEDEDBY >
+      {
+        operator = OPERATOR_PRECEDEDBY;
+      }
+    | < NOT_PRECEDEDBY >
+      {
+        operator = OPERATOR_NOT_PRECEDEDBY;
+      }    
     )
     (
       sc2 = sentence(field, defaultPrefix, variables, usedVariables, ignore, maximumIgnoreLength)
@@ -442,6 +501,26 @@ private MtasSpanSequenceItem cqlBlock(String field, String defaultPrefix, HashMa
       else if (operator.equals(OPERATOR_NOT_FULLYALIGNEDWITH))
       {
         MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanFullyAlignedWithQuery(si1.getQuery(), si2.getQuery()));
+        return new MtasSpanSequenceItem(q, si1.isOptional());
+      }
+      else if (operator.equals(OPERATOR_FOLLOWEDBY))
+      {
+        MtasSpanQuery q = new MtasSpanFollowedByQuery(si1.getQuery(), si2.getQuery());
+        return new MtasSpanSequenceItem(q, si1.isOptional());
+      }
+      else if (operator.equals(OPERATOR_NOT_FOLLOWEDBY))
+      {
+        MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanFollowedByQuery(si1.getQuery(), si2.getQuery()));
+        return new MtasSpanSequenceItem(q, si1.isOptional());
+      }
+      else if (operator.equals(OPERATOR_PRECEDEDBY))
+      {
+        MtasSpanQuery q = new MtasSpanPrecededByQuery(si1.getQuery(), si2.getQuery());
+        return new MtasSpanSequenceItem(q, si1.isOptional());
+      }
+      else if (operator.equals(OPERATOR_NOT_PRECEDEDBY))
+      {
+        MtasSpanQuery q = new MtasSpanNotQuery(si1.getQuery(), new MtasSpanPrecededByQuery(si1.getQuery(), si2.getQuery()));
         return new MtasSpanSequenceItem(q, si1.isOptional());
       }
       else

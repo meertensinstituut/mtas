@@ -282,7 +282,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
      *          the spans
      */
     public MtasSpanIntersectingQuerySpans(Spans spans) {
-      this.spans = spans;
+      this.spans = spans!=null?spans:new MtasSpanMatchNoneSpans(field);
     }
 
   }

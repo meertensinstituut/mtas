@@ -13,6 +13,7 @@ import mtas.search.spans.MtasSpanAndQuery;
 import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanOrQuery;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 public class MtasCQLParserTestWord {
 
@@ -48,7 +49,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de",null, null);
     MtasSpanQuery q = new MtasSpanNotQuery(q1,q2);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -68,7 +69,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","een",null, null);
     MtasSpanQuery q4 = new MtasSpanOrQuery(new MtasSpanQuery[]{q2,q3});
     MtasSpanQuery q = new MtasSpanNotQuery(q1,q4);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -92,7 +93,7 @@ public class MtasCQLParserTestWord {
     String field = "testveld";
     String cql = "[lemma=\"koe\"]";
     MtasSpanQuery q = new MtasCQLParserWordQuery(field, "lemma", "koe",null, null);
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -102,7 +103,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     MtasSpanQuery q = new MtasSpanAndQuery(new MtasSpanQuery[]{q1,q2});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -112,7 +113,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     MtasSpanQuery q = new MtasSpanOrQuery(new MtasSpanQuery[]{q1,q2});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -132,7 +133,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q3 = new MtasSpanOrQuery(new MtasSpanQuery[]{q1,q2});
     MtasSpanQuery q4 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     MtasSpanQuery q = new MtasSpanAndQuery(new MtasSpanQuery[]{q3,q4});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -144,7 +145,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     MtasSpanQuery q4 = new MtasSpanOrQuery(new MtasSpanQuery[]{q2,q3});
     MtasSpanQuery q = new MtasSpanAndQuery(new MtasSpanQuery[]{q1,q4});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -156,7 +157,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
     MtasSpanQuery q4 = new MtasSpanAndQuery(new MtasSpanQuery[]{q2,q3});
     MtasSpanQuery q = new MtasSpanOrQuery(new MtasSpanQuery[]{q1,q4});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -170,7 +171,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q5 = new MtasSpanAndQuery(new MtasSpanQuery[]{q1,q2});
     MtasSpanQuery q6 = new MtasSpanAndQuery(new MtasSpanQuery[]{q3,q4});
     MtasSpanQuery q = new MtasSpanOrQuery(new MtasSpanQuery[]{q5,q6});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -186,7 +187,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q7 = new MtasSpanAndQuery(new MtasSpanQuery[]{q6,q3});
     MtasSpanQuery q8 = new MtasSpanAndQuery(new MtasSpanQuery[]{q4,q5});
     MtasSpanQuery q = new MtasSpanOrQuery(new MtasSpanQuery[]{q7,q8});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -204,7 +205,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q9 = new MtasSpanOrQuery(new MtasSpanQuery[]{q4,q5});    
     MtasSpanQuery q10 = new MtasSpanAndQuery(new MtasSpanQuery[]{q9,q6});
     MtasSpanQuery q = new MtasSpanOrQuery(new MtasSpanQuery[]{q8,q10});
-    testCQLParse(field, null, cql, q);    
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));    
   }
   
   @org.junit.Test
@@ -212,15 +213,15 @@ public class MtasCQLParserTestWord {
     String field = "testveld";
     String cql1 = "[#300]";
     MtasSpanQuery q1 = new MtasCQLParserWordPositionQuery(field, 300);
-    testCQLParse(field, null, cql1, q1); 
+    testCQLParse(field, null, cql1, new MtasSpanUniquePositionQuery(q1)); 
     String cql2 = "[#100-110]";
     MtasSpanQuery q2 = new MtasCQLParserWordPositionQuery(field, 100, 110);
-    testCQLParse(field, null, cql2, q2);
+    testCQLParse(field, null, cql2, new MtasSpanUniquePositionQuery(q2));
     String cql3 = "[#100-105 | #110]";
     MtasSpanQuery q3a = new MtasCQLParserWordPositionQuery(field, 100, 105);
     MtasSpanQuery q3b = new MtasCQLParserWordPositionQuery(field, 110);
     MtasSpanQuery q3 = new MtasSpanOrQuery(q3a, q3b);
-    testCQLParse(field, null, cql3, q3);
+    testCQLParse(field, null, cql3, new MtasSpanUniquePositionQuery(q3));
   }  
   
   @org.junit.Test
@@ -231,7 +232,7 @@ public class MtasCQLParserTestWord {
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"t_lc","het",null, null);
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"t_lc","paard",null, null);
     MtasSpanQuery q = new MtasSpanOrQuery(new MtasSpanQuery[]{q1,q2,q3});
-    testCQLParse(field, null, cql, q);   
+    testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));   
   }
   
   @org.junit.Test
@@ -239,6 +240,6 @@ public class MtasCQLParserTestWord {
     String field = "testveld";
     String cql = "\"de\"";
     MtasSpanQuery q = new MtasCQLParserWordQuery(field,"t_lc","de",null, null);
-    testCQLParse(field, "t_lc", cql, q);   
+    testCQLParse(field, "t_lc", cql, new MtasSpanUniquePositionQuery(q));   
   }
 }

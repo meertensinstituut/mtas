@@ -150,7 +150,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
         IndexSearcher searcher, Map<Term, TermContext> terms)
         throws IOException {
       super(MtasSpanUniquePositionQuery.this, searcher, terms);
-      this.subWeight = subWeight;
+      this.subWeight = subWeight;      
     }
 
     /*
@@ -176,11 +176,6 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
-      Terms terms = context.reader().terms(field);
-      if (terms == null) {
-        return null; // field does not exist
-      }
-
       Spans subSpan = subWeight.getSpans(context, requiredPostings);
       if (subSpan == null) {
         return null;

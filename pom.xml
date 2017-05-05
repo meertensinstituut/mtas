@@ -58,6 +58,7 @@
 						<include>MtasCQLParserTestWord.java</include>
 						<include>MtasFunctionParserTest.java</include>
 						<include>MtasSearchTestConsistency.java</include>
+						<include>MtasSolrTestConsistency.java</include>
 					</includes>
 				</configuration>
 			</plugin>

@@ -49,6 +49,10 @@ The optional postfix associated with a token can also be queried within CQL by p
 | **\(** [cql](#cql) **\) !intersecting \(** [cql](#cql) **\)**  | Matches CQL expression not intersecting another CQL expression   | `(<s/>) !intersecting (<div/>)` |
 | **\(** [cql](#cql) **\) fullyalignedwith \(** [cql](#cql) **\)**  | Matches CQL expression fully aligned with another CQL expression   | `(<s/>) fullyalignedwith (<div/>)` |
 | **\(** [cql](#cql) **\) !fullyalignedwith \(** [cql](#cql) **\)**  | Matches CQL expression not fully aligned with another CQL expression   | `(<s/>) !fullyalignedwith (<div/>)` |
+| **\(** [cql](#cql) **\) followedby \(** [cql](#cql) **\)**  | Matches CQL expression followed by another CQL expression   | `([t="de"]) followedby ([pos="ADJ"])` |
+| **\(** [cql](#cql) **\) !followedby \(** [cql](#cql) **\)**  | Matches CQL expression not followed by another CQL expression   | `([t="de"]) !followedby ([pos="ADJ"])` |
+| **\(** [cql](#cql) **\) precededby \(** [cql](#cql) **\)**  | Matches CQL expression preceded by another CQL expression   | `([pos="ADJ"]) precededby ([t="de"])` |
+| **\(** [cql](#cql) **\) !precededby \(** [cql](#cql) **\)**  | Matches CQL expression not preceded by another CQL expression   | `([pos="ADJ"]) !precededby ([t="de"])` |
 
 <a name="token"></a>
 

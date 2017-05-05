@@ -21,20 +21,22 @@ import mtas.search.spans.util.MtasSpans;
 public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
 
   /** The spans2. */
-  private MtasSpanFullyAlignedWithQuerySpans spans1, spans2;
+  private MtasSpanFullyAlignedWithQuerySpans spans1;
+  private MtasSpanFullyAlignedWithQuerySpans spans2;
 
   /** The last spans2 end position. */
-  private int lastSpans2StartPosition, lastSpans2EndPosition,
-      previousSpans2StartPosition;
+  private int lastSpans2StartPosition;
+  private int lastSpans2EndPosition;
+  private int previousSpans2StartPosition;
   private HashSet<Integer> previousSpans2EndPositions;
 
   /** The no more positions. */
-  private boolean calledNextStartPosition, noMorePositions;
+  private boolean calledNextStartPosition;
+  private boolean noMorePositions;
 
   /** The doc id. */
   private int docId;
-  
- 
+
   /**
    * Instantiates a new mtas span intersecting spans.
    *
@@ -53,7 +55,6 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
     docId = -1;
     this.spans1 = spans1;
     this.spans2 = spans2;
-    List<Spans> ls = new ArrayList<Spans>(Arrays.asList(new Spans[]{spans1.spans, spans2.spans}));
     previousSpans2EndPositions = new HashSet<Integer>();
   }
 
@@ -323,5 +324,5 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
   public long cost() {
     return 0;
   }
-  
+
 }
