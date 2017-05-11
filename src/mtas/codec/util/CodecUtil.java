@@ -87,11 +87,11 @@ public class CodecUtil {
   public static final String SORT_DESC = "desc";
 
   /** The Constant STATS_FUNCTIONS. */
-  public static final List<String> STATS_FUNCTIONS = Arrays
+  private static final List<String> STATS_FUNCTIONS = Arrays
       .asList(STATS_FUNCTION_DISTRIBUTION);
 
   /** The Constant STATS_TYPES. */
-  public static final List<String> STATS_TYPES = Arrays.asList(
+  private final static List<String> STATS_TYPES = Arrays.asList(
       STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_KURTOSIS, STATS_TYPE_MAX,
       STATS_TYPE_MEAN, STATS_TYPE_MIN, STATS_TYPE_N, STATS_TYPE_MEDIAN,
       STATS_TYPE_POPULATIONVARIANCE, STATS_TYPE_QUADRATICMEAN,
@@ -99,18 +99,18 @@ public class CodecUtil {
       STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS, STATS_TYPE_VARIANCE);
 
   /** The Constant STATS_BASIC_TYPES. */
-  public static final List<String> STATS_BASIC_TYPES = Arrays
+  private final static List<String> STATS_BASIC_TYPES = Arrays
       .asList(STATS_TYPE_N, STATS_TYPE_SUM, STATS_TYPE_MEAN);
 
   /** The Constant STATS_ADVANCED_TYPES. */
-  public static final List<String> STATS_ADVANCED_TYPES = Arrays.asList(
+  private static final List<String> STATS_ADVANCED_TYPES = Arrays.asList(
       STATS_TYPE_MAX, STATS_TYPE_MIN, STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS,
       STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_STANDARDDEVIATION,
       STATS_TYPE_VARIANCE, STATS_TYPE_POPULATIONVARIANCE,
       STATS_TYPE_QUADRATICMEAN);
 
   /** The Constant STATS_FULL_TYPES. */
-  public static final List<String> STATS_FULL_TYPES = Arrays
+  private static final List<String> STATS_FULL_TYPES = Arrays
       .asList(STATS_TYPE_KURTOSIS, STATS_TYPE_MEDIAN, STATS_TYPE_SKEWNESS);
 
   /** The Constant STATS_BASIC. */
@@ -194,7 +194,7 @@ public class CodecUtil {
     if (i >= 0) {
       prefix = term.substring(0, i);
     }
-    return (prefix == null) ? null : prefix.replace("\u0000", "");
+    return prefix.replace("\u0000", "");
   }
 
   /**
@@ -254,8 +254,9 @@ public class CodecUtil {
   }
 
   public static void collectJoin(IndexReader reader,
-      ArrayList<Integer> fullDocSet, ComponentJoin joinInfo) throws IOException {
-    if(joinInfo!=null) {
+      ArrayList<Integer> fullDocSet, ComponentJoin joinInfo)
+      throws IOException {
+    if (joinInfo != null) {
       CodecCollector.collectJoin(reader, fullDocSet, joinInfo);
     }
   }
@@ -344,11 +345,13 @@ public class CodecUtil {
       } else if (STATS_ADVANCED_TYPES.contains(sortType)) {
         statsType = (statsType == null || statsType != STATS_FULL)
             ? STATS_ADVANCED : statsType;
-      } else if (STATS_BASIC_TYPES.contains(sortType)) {
-        statsType = (statsType == null) ? STATS_BASIC : statsType;
-      }
+      } 
     }
     return statsType;
+  }
+  
+  public static boolean isStatsType(String type) {
+    return STATS_TYPES.contains(type);
   }
 
 }

@@ -40,14 +40,4 @@ public class IntervalRBTreeNode<T>
     this.n = n;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.tree.MtasTreeNode#self()
-   */
-  @Override
-  protected IntervalRBTreeNode<T> self() {
-    return self();
-  }
-
 }

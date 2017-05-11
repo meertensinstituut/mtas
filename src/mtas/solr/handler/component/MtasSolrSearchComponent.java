@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentDocument;
@@ -127,7 +126,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   public void init(NamedList args) {
     super.init(args);
     // init components
-    searchDocument = new MtasSolrComponentDocument(this);
+    searchDocument = new MtasSolrComponentDocument();
     searchKwic = new MtasSolrComponentKwic(this);
     searchList = new MtasSolrComponentList(this);
     searchGroup = new MtasSolrComponentGroup(this);
@@ -303,7 +302,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           for (String field : mtasFields.list.keySet()) {
             for (ComponentDocument document : mtasFields.list
                 .get(field).documentList) {
-              mtasDocumentResponses.add(searchDocument.create(document));
+              mtasDocumentResponses.add(searchDocument.create(document, false));
             }
           }
           // add to response
@@ -313,7 +312,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           ArrayList<NamedList<?>> mtasKwicResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentKwic kwic : mtasFields.list.get(field).kwicList) {
-              mtasKwicResponses.add(searchKwic.create(kwic));
+              mtasKwicResponses.add(searchKwic.create(kwic, false));
             }
           }
           // add to response
@@ -345,7 +344,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           ArrayList<NamedList<?>> mtasListResponses = new ArrayList<>();
           for (String field : mtasFields.list.keySet()) {
             for (ComponentList list : mtasFields.list.get(field).listList) {
-              mtasListResponses.add(searchList.create(list));
+              mtasListResponses.add(searchList.create(list, false));
             }
           }
           // add to response
@@ -408,10 +407,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
                     .get(field).statsTokenList) {
                   if (rb.req.getParams().getBool("isShard", false)) {
                     mtasStatsTokensResponses
-                        .add(searchStats.createToken(token, true));
+                        .add(searchStats.create(token, true));
                   } else {
                     mtasStatsTokensResponses
-                        .add(searchStats.createToken(token, false));
+                        .add(searchStats.create(token, false));
                   }
                 }
               }
@@ -424,10 +423,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
                     .get(field).statsPositionList) {
                   if (rb.req.getParams().getBool("isShard", false)) {
                     mtasStatsPositionsResponses
-                        .add(searchStats.createPosition(position, true));
+                        .add(searchStats.create(position, true));
                   } else {
                     mtasStatsPositionsResponses
-                        .add(searchStats.createPosition(position, false));
+                        .add(searchStats.create(position, false));
                   }
                 }
               }
@@ -440,10 +439,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
                     .get(field).statsSpanList) {
                   if (rb.req.getParams().getBool("isShard", false)) {
                     mtasStatsSpansResponses
-                        .add(searchStats.createSpan(span, true));
+                        .add(searchStats.create(span, true));
                   } else {
                     mtasStatsSpansResponses
-                        .add(searchStats.createSpan(span, false));
+                        .add(searchStats.create(span, false));
                   }
                 }
               }
@@ -591,15 +590,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
     // + rb.stage + " " + rb.req.getParamString());
     // distributed processes
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-      if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP) {
+      if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP || rb.stage == STAGE_TERMVECTOR_MISSING_KEY || rb.stage == STAGE_TERMVECTOR_FINISH) {
         ComponentFields mtasFields = getMtasFields(rb);
-        searchTermvector.distributedProcessMissingTop(rb, mtasFields);
-      } else if (rb.stage == STAGE_TERMVECTOR_MISSING_KEY) {
-        ComponentFields mtasFields = getMtasFields(rb);
-        searchTermvector.distributedProcessMissingKey(rb, mtasFields);
-      } else if (rb.stage == STAGE_TERMVECTOR_FINISH) {
-        ComponentFields mtasFields = getMtasFields(rb);
-        searchTermvector.distributedProcessFinish(rb, mtasFields);
+        searchTermvector.distributedProcess(rb, mtasFields);
       } else if (rb.stage == STAGE_LIST) {
         ComponentFields mtasFields = getMtasFields(rb);
         searchList.distributedProcess(rb, mtasFields);

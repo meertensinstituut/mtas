@@ -20,13 +20,13 @@ public class MtasTokenizerFactory extends TokenizerFactory
     implements ResourceLoaderAware {
 
   /** The argument configfile. */
-  public static String ARGUMENT_CONFIGFILE = "configFile";
+  public final static String ARGUMENT_CONFIGFILE = "configFile";
 
   /** The argument config. */
-  public static String ARGUMENT_CONFIG = "config";
+  public final static String ARGUMENT_CONFIG = "config";
 
   /** The argument default. */
-  public static String ARGUMENT_DEFAULT = "default";
+  public final static String ARGUMENT_DEFAULT = "default";
 
   /** The config argument. */
   private String configArgument;

@@ -1,10 +1,8 @@
 package mtas.solr.handler.component.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.solr.common.util.NamedList;
@@ -14,7 +12,6 @@ import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 
-import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
@@ -23,7 +20,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  * The Class MtasSolrComponentFacet.
  */
 @SuppressWarnings("deprecation")
-public class MtasSolrComponentJoin {
+public class MtasSolrComponentJoin  {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;

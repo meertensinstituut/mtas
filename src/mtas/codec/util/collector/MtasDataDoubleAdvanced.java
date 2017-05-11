@@ -346,13 +346,7 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
   @Override
   protected Double stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException {
-    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {
-      if (segmentNumber == null) {
-        return Double.valueOf(boundary);
-      } else {
-        return Double.valueOf(boundary) / segmentNumber;
-      }
-    } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
+    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)||segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
       if (segmentNumber == null) {
         return Double.valueOf(boundary);
       } else {

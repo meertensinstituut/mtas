@@ -298,23 +298,23 @@ public class MtasCQLParserBasicSentenceCondition {
    */
   @Override
   public String toString() {
-    String text = "BASIC SENTENCE";
+    StringBuilder text = new StringBuilder("BASIC SENTENCE");
     if (optional) {
-      text += " OPTIONAL";
+      text.append(" OPTIONAL");
     }
-    text += "\n";
+    text.append("\n");
     if (simplified) {
       try {
-        text += "- Query: " + getQuery().toString(getQuery().getField());
+        text.append("- Query: " + getQuery().toString(getQuery().getField()));
       } catch (ParseException e) {
-        text += "- Query: " + e.getMessage();
+        text.append("- Query: " + e.getMessage());
       }
     } else {
       for (MtasCQLParserBasicSentencePartCondition word : partList) {
-        text += word.toString("  - ", "   ");
+        text.append(word.toString("  - ", "   "));
       }
     }
-    return text;
+    return text.toString();
   }
 
 }

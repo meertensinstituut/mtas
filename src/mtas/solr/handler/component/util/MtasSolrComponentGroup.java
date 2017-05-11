@@ -24,7 +24,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentGroup.
  */
-public class MtasSolrComponentGroup {
+public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup> {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -280,7 +280,7 @@ public class MtasSolrComponentGroup {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas group");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_GROUP_KEY,
@@ -308,7 +308,7 @@ public class MtasSolrComponentGroup {
         int number = (numbers[i] == null) || (numbers[i].isEmpty())
             ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
         mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
-            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i], queryIgnores[i], key,
+            key,
             number, groupingHitInsidePrefixes[i],
             groupingHitInsideLeftPosition[i], groupingHitInsideLeftPrefixes[i],
             groupingHitInsideRightPosition[i],

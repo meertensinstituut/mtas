@@ -61,17 +61,6 @@ public class MtasSpanSequenceItem {
   /*
    * (non-Javadoc)
    * 
-   * @see java.lang.Object#clone()
-   */
-  @Override
-  public MtasSpanSequenceItem clone() {
-    MtasSpanSequenceItem item = new MtasSpanSequenceItem(spanQuery, optional);
-    return item;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -81,21 +70,21 @@ public class MtasSpanSequenceItem {
       return spanQuery.equals(that.getQuery())
           && (optional == that.isOptional());
     } else {
-      return false; 
+      return false;
     }
   }
-  
+
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 3) ^ spanQuery.hashCode();
     h += (optional ? 1 : 0);
     return h;
-  }  
+  }
 
   public MtasSpanSequenceItem rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);
-    if (newSpanQuery != spanQuery) {
+    if (!newSpanQuery.equals(spanQuery)) {
       return new MtasSpanSequenceItem(newSpanQuery, optional);
     } else {
       return this;
@@ -126,14 +115,17 @@ public class MtasSpanSequenceItem {
           // equal query
           if (rq1.getQuery().equals(rq2.getQuery())) {
             // equal ignoreQuery settings
-            if ((ignoreQuery == null && rq1.getIgnoreQuery() == null
-                && rq2.getIgnoreQuery() == null)
-                || (ignoreQuery != null && rq1.getIgnoreQuery() != null
-                    && ignoreQuery.equals(rq1.getIgnoreQuery())
-                    && maximumIgnoreLength == rq1.getMaximumIgnoreLength()
-                    && rq2.getIgnoreQuery() != null
-                    && ignoreQuery.equals(rq2.getIgnoreQuery())
-                    && maximumIgnoreLength == rq2.getMaximumIgnoreLength())) {
+            boolean checkCondition;
+            checkCondition = ignoreQuery != null;
+            checkCondition &= rq1.getIgnoreQuery() != null;
+            checkCondition &= ignoreQuery.equals(rq1.getIgnoreQuery());
+            checkCondition &= maximumIgnoreLength
+                .equals(rq1.getMaximumIgnoreLength());
+            checkCondition &= rq2.getIgnoreQuery() != null;
+            checkCondition &= ignoreQuery.equals(rq2.getIgnoreQuery());
+            checkCondition &= maximumIgnoreLength
+                .equals(rq2.getMaximumIgnoreLength());
+            if (checkCondition) {
               // at least one optional
               if (item1.optional || item2.optional) {
                 int minimum = Math.min(rq1.getMinimumRecurrence(),
@@ -171,12 +163,14 @@ public class MtasSpanSequenceItem {
           }
         } else {
           if (rq1.getQuery().equals(q2)) {
-            if ((ignoreQuery == null && rq1.getIgnoreQuery() == null)
-                || (ignoreQuery != null && rq1.getIgnoreQuery() != null
-                    && ignoreQuery.equals(rq1.getIgnoreQuery())
-                    && rq1.getMaximumIgnoreLength() != null
-                    && maximumIgnoreLength
-                        .equals(rq1.getMaximumIgnoreLength()))) {
+            boolean checkCondition;
+            checkCondition = ignoreQuery != null;
+            checkCondition &= rq1.getIgnoreQuery() != null;
+            checkCondition &= ignoreQuery.equals(rq1.getIgnoreQuery());
+            checkCondition &= rq1.getMaximumIgnoreLength() != null;
+            checkCondition &= maximumIgnoreLength
+                .equals(rq1.getMaximumIgnoreLength());
+            if (checkCondition) {
               if (!optional) {
                 if (item1.optional) {
                   if (rq1.getMinimumRecurrence() == 1) {
@@ -209,9 +203,13 @@ public class MtasSpanSequenceItem {
       } else if (q2 instanceof MtasSpanRecurrenceQuery) {
         MtasSpanRecurrenceQuery rq2 = (MtasSpanRecurrenceQuery) q2;
         if (rq2.getQuery().equals(q1)) {
-          if ((ignoreQuery == null && rq2.getIgnoreQuery() == null)
-              || (ignoreQuery != null && rq2.getIgnoreQuery()!=null && ignoreQuery.equals(rq2.getIgnoreQuery())
-                  && maximumIgnoreLength == rq2.getMaximumIgnoreLength())) {
+          boolean checkCondition;
+          checkCondition = ignoreQuery != null;
+          checkCondition &= rq2.getIgnoreQuery() != null;
+          checkCondition &= ignoreQuery.equals(rq2.getIgnoreQuery());
+          checkCondition &= maximumIgnoreLength
+              .equals(rq2.getMaximumIgnoreLength());
+          if (checkCondition) {
             if (!optional) {
               if (item1.optional) {
                 return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,

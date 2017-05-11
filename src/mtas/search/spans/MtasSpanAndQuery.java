@@ -1,10 +1,7 @@
 package mtas.search.spans;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanNearQuery;
@@ -31,20 +28,25 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
    */
   public MtasSpanAndQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
-    Integer minimum = null, maximum = null;
-    clauses = new HashSet<MtasSpanQuery>();
+    Integer minimum = null;
+    Integer maximum = null;
+    clauses = new HashSet<>();
     for (MtasSpanQuery item : initialClauses) {
       if (!clauses.contains(item)) {
         clauses.add(item);
         if (item.getMinimumWidth() != null) {
-          minimum = (minimum != null)
-              ? Math.max(minimum, item.getMinimumWidth())
-              : item.getMinimumWidth();
+          if(minimum != null) {
+            minimum = Math.max(minimum, item.getMinimumWidth());
+          } else {
+            minimum = item.getMinimumWidth();
+          }
         }
-        if (item.getMaximumWidth() != null) {
-          maximum = (maximum != null)
-              ? Math.min(maximum, item.getMaximumWidth())
-              : item.getMaximumWidth();
+        if (item.getMaximumWidth() != null) {          
+          if(maximum != null) {
+            maximum = Math.max(maximum, item.getMaximumWidth());
+          } else {
+            maximum = item.getMaximumWidth();
+          }
         }
       }
     }
@@ -79,15 +81,17 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     if (clauses.size() > 1) {
-      // rewrite, count MtasSpanMatchAllQuery and check for MtasSpanMatchNoneQuery
+      // rewrite, count MtasSpanMatchAllQuery and check for
+      // MtasSpanMatchNoneQuery
       MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];
-      MtasSpanQuery[] oldClauses = clauses.toArray(new MtasSpanQuery[clauses.size()]);
+      MtasSpanQuery[] oldClauses = clauses
+          .toArray(new MtasSpanQuery[clauses.size()]);
       int singlePositionQueries = 0;
       int matchAllSinglePositionQueries = 0;
       boolean actuallyRewritten = false;
       for (int i = 0; i < oldClauses.length; i++) {
         newClauses[i] = oldClauses[i].rewrite(reader);
-        actuallyRewritten |= oldClauses[i] != newClauses[i];
+        actuallyRewritten |= !oldClauses[i].equals(newClauses[i]);
         if (newClauses[i] instanceof MtasSpanMatchNoneQuery) {
           return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);
         } else {
@@ -123,13 +127,13 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
       }
       if (newClauses.length == 0) {
         return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);
-      } else if(newClauses.length==1) {
+      } else if (newClauses.length == 1) {
         return newClauses[0].rewrite(reader);
-      } else if(actuallyRewritten || newClauses.length!=clauses.size()) {
+      } else if (actuallyRewritten || newClauses.length != clauses.size()) {
         return new MtasSpanAndQuery(newClauses).rewrite(reader);
       } else {
         return super.rewrite(reader);
-      }      
+      }
     } else if (clauses.size() == 1) {
       return clauses.iterator().next().rewrite(reader);
     } else {

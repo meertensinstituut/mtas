@@ -1,6 +1,7 @@
 package mtas.search.spans;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
@@ -31,11 +32,10 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span match all query.
    *
-   * @param field
-   *          the field
+   * @param field the field
    */
   public MtasSpanMatchAllQuery(String field) {
-    super(1,1);
+    super(1, 1);
     this.field = field;
   }
 
@@ -58,11 +58,14 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {    
-    //keep things simple
-    return new SpanAllWeight(searcher, null);        
+      throws IOException {
+    // keep things simple
+    return new SpanAllWeight(searcher, null);
   }
-  
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return super.rewrite(reader);
@@ -71,19 +74,17 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
   /**
    * The Class SpanAllWeight.
    */
-  public class SpanAllWeight extends SpanWeight {
-    
+  protected class SpanAllWeight extends SpanWeight {
+
+    /** The searcher. */
     IndexSearcher searcher;
 
     /**
      * Instantiates a new span all weight.
      *
-     * @param searcher
-     *          the searcher
-     * @param termContexts
-     *          the term contexts
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param searcher the searcher
+     * @param termContexts the term contexts
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanAllWeight(IndexSearcher searcher,
         Map<Term, TermContext> termContexts) throws IOException {
@@ -101,14 +102,14 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       Term term = new Term(field);
-      if(!contexts.containsKey(term)) {
-        IndexReaderContext topContext = searcher.getTopReaderContext();      
+      if (!contexts.containsKey(term)) {
+        IndexReaderContext topContext = searcher.getTopReaderContext();
         try {
           contexts.put(term, TermContext.build(topContext, term));
         } catch (IOException e) {
-          //fail
+          // fail
         }
-      }  
+      }
     }
 
     /*
@@ -150,8 +151,9 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
           return new MtasSpanMatchAllSpans(mtasCodecInfo, field);
         }
-      } catch (Exception e) {
-        throw new IOException("Can't get reader");
+      } catch (InvocationTargetException | IllegalAccessException
+          | NoSuchMethodException e) {
+        throw new IOException("Can't get reader", e);
       }
 
     }
@@ -219,6 +221,6 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ field.hashCode();
     return h;
-  }  
+  }
 
 }

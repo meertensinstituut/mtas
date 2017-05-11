@@ -227,11 +227,11 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
    * 
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
    */
-  public final NumberComparator<Long> getCompareValue0() {
+  public final MtasDataItemNumberComparator<Long> getCompareValue0() {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
-      return new NumberComparator<Long>(stats.getN());
+      return new MtasDataItemNumberComparator<Long>(stats.getN(), sortDirection);
     default:
       return null;
     }

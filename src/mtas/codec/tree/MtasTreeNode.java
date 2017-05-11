@@ -10,13 +10,6 @@ import java.util.HashMap;
  */
 abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
 
-  /**
-   * Self.
-   *
-   * @return the n
-   */
-  protected abstract N self();
-
   /** The left. */
   public int left;
 

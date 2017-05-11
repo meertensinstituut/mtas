@@ -20,6 +20,7 @@ public class MtasSolrCQLQParserPlugin extends QParserPlugin {
   @SuppressWarnings("rawtypes")
   @Override
   public void init(NamedList args) {
+    //do nothing for now
   }
 
   /*

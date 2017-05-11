@@ -37,11 +37,13 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas cql parser group query.
    *
-   * @param field the field
-   * @param prefix the prefix
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
    */
   public MtasCQLParserGroupQuery(String field, String prefix) {
-    super(null,null);
+    super(null, null);
     term = new Term(field, prefix + MtasToken.DELIMITER);
     query = new MtasSpanPrefixQuery(term, false);
   }
@@ -49,9 +51,12 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas cql parser group query.
    *
-   * @param field the field
-   * @param prefix the prefix
-   * @param value the value
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param value
+   *          the value
    */
   public MtasCQLParserGroupQuery(String field, String prefix, String value) {
     this(field, prefix, value, MTAS_CQL_REGEXP_QUERY);
@@ -60,34 +65,40 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas cql parser group query.
    *
-   * @param field the field
-   * @param prefix the prefix
-   * @param value the value
-   * @param type the type
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param value
+   *          the value
+   * @param type
+   *          the type
    */
   public MtasCQLParserGroupQuery(String field, String prefix, String value,
       String type) {
-    super(null,null);
+    super(null, null);
     if (value == null || value.trim().equals("")) {
       term = new Term(field, prefix + MtasToken.DELIMITER);
       query = new MtasSpanPrefixQuery(term, false);
+    } else if (type == null) {
+      term = new Term(field, prefix + MtasToken.DELIMITER + value);
+      query = new MtasSpanTermQuery(term, false);
     } else {
-      if (type == null) {
-        term = new Term(field, prefix + MtasToken.DELIMITER + value);
-        query = new MtasSpanTermQuery(term, false);
-      } else if (type.equals(MTAS_CQL_REGEXP_QUERY)) {
+      switch (type) {
+      case MTAS_CQL_REGEXP_QUERY:
         term = new Term(field,
             prefix + MtasToken.DELIMITER + value + "\u0000*");
         query = new MtasSpanRegexpQuery(term, false);
-      } else if (type.equals(MTAS_CQL_WILDCARD_QUERY)) {
+        break;
+      case MTAS_CQL_WILDCARD_QUERY:
         term = new Term(field, prefix + MtasToken.DELIMITER + value);
         query = new MtasSpanWildcardQuery(term, false);
-      } else if (type.equals(MTAS_CQL_TERM_QUERY)) {
+        break;
+      case MTAS_CQL_TERM_QUERY:
+      default:
         term = new Term(field, prefix + MtasToken.DELIMITER + value);
         query = new MtasSpanTermQuery(term, false);
-      } else {
-        term = new Term(field, prefix + MtasToken.DELIMITER + value);
-        query = new MtasSpanTermQuery(term, false);
+        break;
       }
     }
   }
@@ -161,6 +172,7 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 5) ^ term.hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
   }

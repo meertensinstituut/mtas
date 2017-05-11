@@ -15,10 +15,10 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasCQLParserWordCondition {
 
   /** The type and. */
-  public static String TYPE_AND = "and";
+  public final static String TYPE_AND = "and";
 
   /** The type or. */
-  public static String TYPE_OR = "or";
+  public final static String TYPE_OR = "or";
 
   /** The negative query list. */
   private List<MtasSpanQuery> positiveQueryList, negativeQueryList;
@@ -382,32 +382,32 @@ public class MtasCQLParserWordCondition {
    * @return the string
    */
   public String toString(String firstIndent, String indent) {
-    String text = "";
+    StringBuilder text = new StringBuilder();
     if (isEmpty()) {
-      text += firstIndent + "Type: any word";
-      text += (not ? " (not)\n" : "\n");
+      text.append(firstIndent + "Type: any word");
+      text.append(not ? " (not)\n" : "\n");
     } else {
-      text += firstIndent + "Type: " + type;
-      text += (not ? " (not)\n" : "\n");
+      text.append(firstIndent + "Type: " + type);
+      text.append(not ? " (not)\n" : "\n");
       if (positiveQueryList.size() > 0) {
         for (MtasSpanQuery q : positiveQueryList) {
-          text += indent + "List Positive Subqueries: " + q.toString(field)
-              + "\n";
+          text.append(indent + "List Positive Subqueries: " + q.toString(field)
+              + "\n");
         }
       }
       if (negativeQueryList.size() > 0) {
         for (MtasSpanQuery q : negativeQueryList) {
-          text += indent + "List Negative Queries: " + q.toString(field) + "\n";
+          text.append(indent + "List Negative Queries: " + q.toString(field) + "\n");
         }
       }
       if (conditionList.size() > 0) {
-        text += indent + "List Conditions\n";
+        text.append(indent + "List Conditions\n");
         for (MtasCQLParserWordCondition c : conditionList) {
-          text += c.toString(indent + "- ", indent + "  ") + "\n";
+          text.append(c.toString(indent + "- ", indent + "  ") + "\n");
         }
       }
     }
-    return text;
+    return text.toString();
   }
 
   /*
@@ -467,4 +467,18 @@ public class MtasCQLParserWordCondition {
       return false;
     }
   }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 3) ^ field.hashCode();
+    h = (h * 5) ^ type.hashCode();
+    h += (h * 7) ^ (not ? 3 : 5);
+    h += (h * 11) ^ (simplified ? 7 : 13);
+    h = (h * 17) ^ conditionList.hashCode();
+    h = (h * 19) ^ positiveQueryList.hashCode();
+    h = (h * 23) ^ negativeQueryList.hashCode();
+    return h;
+  }
+  
 }

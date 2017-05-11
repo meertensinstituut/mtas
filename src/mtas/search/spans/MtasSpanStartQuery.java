@@ -95,7 +95,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   /**
    * The Class SpanTermWeight.
    */
-  public class SpanTermWeight extends SpanWeight {
+  protected class SpanTermWeight extends SpanWeight {
 
     /** The span weight. */
     SpanWeight spanWeight;

@@ -1,14 +1,7 @@
 package mtas.search.spans;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-
-import org.apache.lucene.search.ConjunctionDISI;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 

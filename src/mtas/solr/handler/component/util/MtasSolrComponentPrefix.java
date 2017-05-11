@@ -20,7 +20,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentPrefix.
  */
-public class MtasSolrComponentPrefix {
+public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefix> {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -75,7 +75,7 @@ public class MtasSolrComponentPrefix {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas prefix");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_PREFIX_KEY,

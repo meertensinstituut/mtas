@@ -19,8 +19,7 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
   /**
    * Instantiates a new mtas prefix token filter factory.
    *
-   * @param args
-   *          the args
+   * @param args the args
    */
   public MtasPrefixTokenFilterFactory(Map<String, String> args) {
     super(args);
@@ -42,7 +41,7 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
   /**
    * The Class MtasPrefixTokenFilter.
    */
-  public class MtasPrefixTokenFilter extends TokenFilter {
+  private static class MtasPrefixTokenFilter extends TokenFilter {
 
     /** The prefix. */
     private String prefix;
@@ -54,10 +53,8 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
     /**
      * Instantiates a new mtas prefix token filter.
      *
-     * @param input
-     *          the input
-     * @param prefix
-     *          the prefix
+     * @param input the input
+     * @param prefix the prefix
      */
     protected MtasPrefixTokenFilter(TokenStream input, String prefix) {
       super(input);
@@ -86,6 +83,31 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
       } else {
         return false;
       }
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.lucene.util.AttributeSource#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      final MtasPrefixTokenFilter that = (MtasPrefixTokenFilter) obj;
+      return prefix.equals(that.prefix) && super.equals(that);
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.lucene.util.AttributeSource#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      int h = this.getClass().getSimpleName().hashCode();
+      h = (h * 7) ^ prefix.hashCode();
+      return h;
     }
 
   }

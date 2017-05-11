@@ -145,11 +145,11 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
    * long, long)
    */
   @Override
-  public MtasDataCollector<?, ?> add(String key, long valueSum,
-      long valueN) throws IOException {
-    if (key != null ) {
+  public MtasDataCollector<?, ?> add(String key, long valueSum, long valueN)
+      throws IOException {
+    if (key != null) {
       MtasDataCollector<?, ?> subCollector = add(key, false);
-      setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);      
+      setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);
       return subCollector;
     } else {
       return null;
@@ -169,7 +169,7 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
     if (key != null) {
       MtasDataCollector<?, ?> subCollector = add(key, false);
       setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
-            newCurrentExisting);      
+          newCurrentExisting);
       return subCollector;
     } else {
       return null;
@@ -184,12 +184,12 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
    * double, long)
    */
   @Override
-  public MtasDataCollector<?, ?> add(String key, double valueSum,
-      long valueN) throws IOException {
+  public MtasDataCollector<?, ?> add(String key, double valueSum, long valueN)
+      throws IOException {
     if (key != null) {
-      MtasDataCollector<?, ?> subCollector= add(key, false);
-        setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(),
-            valueN, newCurrentExisting);      
+      MtasDataCollector<?, ?> subCollector = add(key, false);
+      setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(), valueN,
+          newCurrentExisting);
       return subCollector;
     } else {
       return null;
@@ -204,14 +204,14 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
    * double[], int)
    */
   @Override
-  public MtasDataCollector<?, ?> add(String key, double[] values,
-      int number) throws IOException {
+  public MtasDataCollector<?, ?> add(String key, double[] values, int number)
+      throws IOException {
     if (key != null) {
       Long[] newValues = new Long[number];
       for (int i = 0; i < values.length; i++)
         newValues[i] = Double.valueOf(values[i]).longValue();
       MtasDataCollector<?, ?> subCollector = add(key, false);
-      setValue(newCurrentPosition, newValues, number, newCurrentExisting);      
+      setValue(newCurrentPosition, newValues, number, newCurrentExisting);
       return subCollector;
     } else {
       return null;
@@ -358,17 +358,12 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
   @Override
   protected Long stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException {
-    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {
+    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)
+        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
       if (segmentNumber == null) {
         return Long.valueOf(boundary);
       } else {
-        return Math.floorDiv(Long.valueOf(boundary), segmentNumber);
-      }
-    } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
-      if (segmentNumber == null) {
-        return Long.valueOf(boundary);
-      } else {
-        return Math.floorDiv(Long.valueOf(boundary), segmentNumber);
+        return Math.floorDiv(Long.parseLong(boundary), segmentNumber);
       }
     } else {
       throw new IOException(

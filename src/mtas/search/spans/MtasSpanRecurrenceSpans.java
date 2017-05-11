@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
@@ -15,11 +18,14 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
 
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSpanRecurrenceSpans.class);
+
   /** The spans. */
   private Spans spans;
 
   /** The ignore item. */
-  private MtasIgnoreItem ignoreItem;    
+  private MtasIgnoreItem ignoreItem;
 
   /** The minimum recurrence. */
   int minimumRecurrence;
@@ -48,27 +54,21 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span recurrence spans.
    *
-   * @param mtasSpanRecurrenceQuery
-   *          the mtas span recurrence query
-   * @param spans
-   *          the spans
-   * @param minimumRecurrence
-   *          the minimum recurrence
-   * @param maximumRecurrence
-   *          the maximum recurrence
-   * @param ignoreSpans
-   *          the ignore spans
+   * @param spans the spans
+   * @param minimumRecurrence the minimum recurrence
+   * @param maximumRecurrence the maximum recurrence
+   * @param ignoreSpans the ignore spans
+   * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasSpanRecurrenceSpans(
-      MtasSpanRecurrenceQuery mtasSpanRecurrenceQuery, Spans spans,
-      int minimumRecurrence, int maximumRecurrence, Spans ignoreSpans, Integer maximumIgnoreLength) {
+  public MtasSpanRecurrenceSpans(Spans spans, int minimumRecurrence,
+      int maximumRecurrence, Spans ignoreSpans, Integer maximumIgnoreLength) {
     assert minimumRecurrence <= maximumRecurrence : "minimumRecurrence > maximumRecurrence";
     assert minimumRecurrence > 0 : "minimumRecurrence < 1 not supported";
     this.spans = spans;
     this.minimumRecurrence = minimumRecurrence;
     this.maximumRecurrence = maximumRecurrence;
-    queueSpans = new ArrayList<Match>();
-    queueMatches = new ArrayList<Match>();
+    queueSpans = new ArrayList<>();
+    queueMatches = new ArrayList<>();
     ignoreItem = new MtasIgnoreItem(ignoreSpans, maximumIgnoreLength);
     resetQueue();
   }
@@ -99,8 +99,15 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
    */
   @Override
   public int startPosition() {
-    return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
-        : currentMatch.startPosition();
+    if (currentMatch == null) {
+      if (noMorePositions) {
+        return NO_MORE_POSITIONS;
+      } else {
+        return -1;
+      }
+    } else {
+      return currentMatch.startPosition();
+    }
   }
 
   /*
@@ -110,8 +117,15 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
    */
   @Override
   public int endPosition() {
-    return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
-        : currentMatch.endPosition();
+    if (currentMatch == null) {
+      if (noMorePositions) {
+        return NO_MORE_POSITIONS;
+      } else {
+        return -1;
+      }
+    } else {
+      return currentMatch.endPosition();
+    }
   }
 
   /*
@@ -185,8 +199,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
    * To match doc.
    *
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   int toMatchDoc() throws IOException {
     while (true) {
@@ -204,8 +217,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
    * Collect span.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
@@ -225,8 +237,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
    * Find matches.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
@@ -242,9 +253,9 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
         // try to get matches with first span in queue
         Match firstMatch = queueSpans.remove(0);
         // create a list of matches with same startPosition as firstMatch
-        List<Match> matches = new ArrayList<Match>();
+        List<Match> matches = new ArrayList<>();
         matches.add(firstMatch);
-        //matches.addAll(expandWithIgnoreItem(spans.docID(), firstMatch));
+        // matches.addAll(expandWithIgnoreItem(spans.docID(), firstMatch));
         // try to collect spans until lastStartPosition not equal to
         // startPosition of firstMatch
         while (!lastSpan && (lastStartPosition == firstMatch.startPosition())) {
@@ -265,37 +276,35 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
         }
         // check for something in queue of matches
         if (!queueMatches.isEmpty()) {
-          ignoreItem.removeBefore(spans.docID(), queueMatches.get(0).startPosition());
+          ignoreItem.removeBefore(spans.docID(),
+              queueMatches.get(0).startPosition());
           return true;
         }
       }
     }
   }
 
-  
-
   /**
    * Find matches.
    *
-   * @param match
-   *          the match
-   * @param n
-   *          the n
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param match the match
+   * @param n the n
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
       int largestMatchingEndPosition = match.endPosition();
-      HashSet<Integer> list = ignoreItem.getFullEndPositionList(spans.docID(), match.endPosition());
+      HashSet<Integer> list = ignoreItem.getFullEndPositionList(spans.docID(),
+          match.endPosition());
       // try to find matches with existing queue
       if (!queueSpans.isEmpty()) {
         Match span;
         for (int i = 0; i < queueSpans.size(); i++) {
           span = queueSpans.get(i);
-          if (match.endPosition() == span.startPosition() || (list!=null && list.contains(span.startPosition()))) {
-            findMatches(new Match(match.startPosition(),
-                span.endPosition()), (n - 1));
+          if (match.endPosition() == span.startPosition()
+              || (list != null && list.contains(span.startPosition()))) {
+            findMatches(new Match(match.startPosition(), span.endPosition()),
+                (n - 1));
             largestMatchingEndPosition = Math.max(largestMatchingEndPosition,
                 span.endPosition());
           }
@@ -310,7 +319,8 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
           queueSpans.add(span);
           lastStartPosition = spans.startPosition();
           // check if this provides new match
-          if (match.endPosition() == span.startPosition() || (list!=null && list.contains(span.startPosition()))) {
+          if (match.endPosition() == span.startPosition()
+              || (list != null && list.contains(span.startPosition()))) {
             findMatches(new Match(match.startPosition(), span.endPosition()),
                 (n - 1));
             largestMatchingEndPosition = Math.max(largestMatchingEndPosition,
@@ -325,9 +335,16 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
       }
     }
   }
-  
+
+  /**
+   * Expand with ignore item.
+   *
+   * @param docId the doc id
+   * @param match the match
+   * @return the list
+   */
   private List<Match> expandWithIgnoreItem(int docId, Match match) {
-    List<Match> list = new ArrayList<Match>();
+    List<Match> list = new ArrayList<>();
     try {
       HashSet<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
           match.endPosition);
@@ -337,7 +354,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
         }
       }
     } catch (IOException e) {
-      // do nothing
+      log.debug(e);
     }
     return list;
   }
@@ -345,7 +362,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   /**
    * The Class Match.
    */
-  private class Match {
+  private static class Match {
 
     /** The start position. */
     private int startPosition;
@@ -356,10 +373,8 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
     /**
      * Instantiates a new match.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
@@ -390,14 +405,29 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object object) {
-      if (this.getClass().equals(object.getClass())) {
-        if ((((Match) object).startPosition == startPosition)
-            && (((Match) object).endPosition == endPosition)) {
-          return true;
-        }
-      }
-      return false;
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      final Match that = (Match) obj;
+      return startPosition == that.startPosition
+          && endPosition == that.endPosition;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      int h = this.getClass().getSimpleName().hashCode();
+      h = (h * 5) ^ startPosition;
+      h = (h * 7) ^ endPosition;
+      return h;
     }
 
   }
@@ -421,7 +451,5 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   public float positionsCost() {
     return 0;
   }
-
-  
 
 }

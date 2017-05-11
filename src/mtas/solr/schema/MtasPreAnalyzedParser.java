@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -22,6 +24,9 @@ import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
  * The Class MtasPreAnalyzedParser.
  */
 public class MtasPreAnalyzedParser implements PreAnalyzedParser {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasPreAnalyzedParser.class);
 
   /*
    * (non-Javadoc)
@@ -42,15 +47,16 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
       sb.append(buf, 0, cnt);
     }
 
-    MtasUpdateRequestProcessorResultReader result;
     Iterator<MtasUpdateRequestProcessorResultItem> iterator;
 
     try {
-      result = new MtasUpdateRequestProcessorResultReader(sb.toString());
+      MtasUpdateRequestProcessorResultReader result = new MtasUpdateRequestProcessorResultReader(
+          sb.toString());
       iterator = result.getIterator();
       if (iterator != null && iterator.hasNext()) {
         res.str = result.getStoredStringValue();
         res.bin = result.getStoredBinValue();
+        result.close();
       } else {
         res.str = null;
         res.bin = null;
@@ -88,10 +94,8 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
         // reset for reuse
         parent.clearAttributes();
       }
-      result.close();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      log.error(e);
     }
     return res;
   }

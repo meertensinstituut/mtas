@@ -27,7 +27,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentList.
  */
-public class MtasSolrComponentList {
+public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -198,7 +198,7 @@ public class MtasSolrComponentList {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas list");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_LIST_KEY,
@@ -478,7 +478,7 @@ public class MtasSolrComponentList {
    * @param list the list
    * @return the simple ordered map
    */
-  public SimpleOrderedMap<Object> create(ComponentList list) {
+  public SimpleOrderedMap<Object> create(ComponentList list, Boolean encode) {
     SimpleOrderedMap<Object> mtasListResponse = new SimpleOrderedMap<>();
     mtasListResponse.add("key", list.key);
     if(list.number==0) {
@@ -557,7 +557,7 @@ public class MtasSolrComponentList {
           mtasListItemResponse.add("endPosition", tokenHit.endPosition);
 
           ArrayList<NamedList<Object>> mtasListItemResponseItemTokens = new ArrayList<NamedList<Object>>();
-          for (MtasToken<?> token : tokenHit.tokens) {
+          for (MtasToken token : tokenHit.tokens) {
             NamedList<Object> mtasListItemResponseItemToken = new SimpleOrderedMap<>();
             if (token.getId() != null) {
               mtasListItemResponseItemToken.add("mtasId", token.getId());

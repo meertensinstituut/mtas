@@ -45,8 +45,7 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
    */
   @Override
   final protected void addRangeEmpty(int left, int right) {
-    String key = ((Integer) left).toString() + "_"
-        + ((Integer) right).toString();
+    String key = left + "_" + right;
     if (index.containsKey(key)) {
       // do nothing (empty...)
     } else {
@@ -74,8 +73,7 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
   @Override
   final protected void addRange(int left, int right,
       ArrayList<MtasTreeHit<T>> list) {
-    String key = ((Integer) left).toString() + "_"
-        + ((Integer) right).toString();
+    String key = left + "_" + right;
     if (index.containsKey(key)) {
       index.get(key).addList(list);
     } else {

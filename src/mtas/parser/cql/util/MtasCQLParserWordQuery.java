@@ -198,6 +198,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 5) ^ term.hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
   }

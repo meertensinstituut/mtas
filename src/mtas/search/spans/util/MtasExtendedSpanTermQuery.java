@@ -38,7 +38,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
   private boolean singlePosition;
 
   /** The term. */
-  private Term term;
+  private Term localTerm;
 
   /**
    * Instantiates a new mtas extended span term query.
@@ -55,8 +55,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    * @param term the term
    * @param singlePosition the single position
    */
-  public MtasExtendedSpanTermQuery(Term term, boolean singlePosition) {
-    this(new SpanTermQuery(term), true);
+  private MtasExtendedSpanTermQuery(Term term, boolean singlePosition) {
+    this(new SpanTermQuery(term), singlePosition);
   }
 
   /**
@@ -68,15 +68,15 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
   public MtasExtendedSpanTermQuery(SpanTermQuery query,
       boolean singlePosition) {
     super(query.getTerm());
-    term = query.getTerm();    
+    localTerm = query.getTerm();    
     this.singlePosition = singlePosition;
-    int i = term.text().indexOf(MtasToken.DELIMITER);
+    int i = localTerm.text().indexOf(MtasToken.DELIMITER);
     if (i >= 0) {
-      prefix = term.text().substring(0, i);
-      value = term.text().substring((i + MtasToken.DELIMITER.length()));
+      prefix = localTerm.text().substring(0, i);
+      value = localTerm.text().substring((i + MtasToken.DELIMITER.length()));
       value = (value.length() > 0) ? value : null;
     } else {
-      prefix = term.text();
+      prefix = localTerm.text();
       value = null;
     }
   }
@@ -94,12 +94,12 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     final TermContext context;
     final IndexReaderContext topContext = searcher.getTopReaderContext();
     if (termContext == null) {
-      context = TermContext.build(topContext, term);
+      context = TermContext.build(topContext, localTerm);
     } else {
       context = termContext;
     }
     return new SpanTermWeight(context, searcher,
-        needsScores ? Collections.singletonMap(term, context) : null);
+        needsScores ? Collections.singletonMap(localTerm, context) : null);
   }
 
   /**
@@ -132,7 +132,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      */
     @Override
     public void extractTerms(Set<Term> terms) {
-      terms.add(term);
+      terms.add(localTerm);
     }
 
     /*
@@ -144,7 +144,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
-      contexts.put(term, termContext);
+      contexts.put(localTerm, termContext);
     }
 
     /*
@@ -161,21 +161,21 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       final TermState state = termContext.get(context.ord);
       if (state == null) { // term is not present in that reader
         assert context.reader().docFreq(
-            term) == 0 : "no termstate found but term exists in reader term="
-                + term;
+            localTerm) == 0 : "no termstate found but term exists in reader term="
+                + localTerm;
         return null;
       }
 
-      final Terms terms = context.reader().terms(term.field());
+      final Terms terms = context.reader().terms(localTerm.field());
       if (terms == null)
         return null;
-      if (terms.hasPositions() == false)
-        throw new IllegalStateException("field \"" + term.field()
+      if (!terms.hasPositions())
+        throw new IllegalStateException("field \"" + localTerm.field()
             + "\" was indexed without position data; cannot run SpanTermQuery (term="
-            + term.text() + ")");
+            + localTerm.text() + ")");
 
       final TermsEnum termsEnum = terms.iterator();
-      termsEnum.seekExact(term.bytes(), state);
+      termsEnum.seekExact(localTerm.bytes(), state);
 
       final PostingsEnum postings;
       Spans matchSpans;
@@ -203,28 +203,32 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
         if (CodecUtil.isSinglePositionPrefix(fieldInfo, prefix)) {
           postings = termsEnum.postings(null,
               requiredPostings.getRequiredPostings());
-          matchSpans = new MtasExtendedTermSpans(postings, term, true);
+          matchSpans = new MtasExtendedTermSpans(postings, localTerm, true);
         } else {
           postings = termsEnum.postings(null, requiredPostings
               .atLeast(Postings.PAYLOADS).getRequiredPostings());
-          matchSpans = new MtasExtendedTermSpans(postings, term, false);
+          matchSpans = new MtasExtendedTermSpans(postings, localTerm, false);
         }
-        return (matchSpans == null) ? null
-            : singlePosition ? new FilterSpans(matchSpans) {
-              @Override
-              protected AcceptStatus accept(Spans candidate)
-                  throws IOException {
-                assert candidate.startPosition() != candidate.endPosition();
-                AcceptStatus res = ((candidate.endPosition()
-                    - candidate.startPosition()) == 1) ? AcceptStatus.YES
-                        : AcceptStatus.NO;
-                return res;
-              }
-            } : matchSpans;
-
+        if(singlePosition) {
+          return new FilterSpans(matchSpans) {
+            @Override
+            protected AcceptStatus accept(Spans candidate)
+                throws IOException {
+              assert candidate.startPosition() != candidate.endPosition();
+              if((candidate.endPosition()
+                  - candidate.startPosition()) == 1) {
+                return AcceptStatus.YES;
+              } else {
+                return AcceptStatus.NO;
+              }                           
+            }
+          };
+        } else {
+          return matchSpans;
+        }        
       } catch (Exception e) {
         // e.printStackTrace();
-        throw new IOException("Can't get reader: " + e.getMessage());
+        throw new IOException("Can't get reader: " + e.getMessage(), e);
       }
 
     }
@@ -263,7 +267,17 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     if (getClass() != obj.getClass())
       return false;
     MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;
-    return other.term.equals(term) && (other.singlePosition == singlePosition);
+    return other.localTerm.equals(localTerm) && (other.singlePosition == singlePosition);
+  }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 5) ^ localTerm.hashCode();
+    if(singlePosition) {
+      h+=1;
+    }
+    return h;
   }
 
 }

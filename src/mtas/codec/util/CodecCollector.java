@@ -12,11 +12,13 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenString;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.tree.IntervalTreeNodeData;
 import mtas.codec.util.CodecComponent.ComponentDocument;
@@ -220,13 +222,14 @@ public class CodecCollector {
             postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.NONE);
             while (docIterator.hasNext()) {
               docId = docIterator.next() - lrc.docBase;
-              if ((docId >= termDocId)&& ((docId.equals(termDocId))
-                    || ((termDocId = postingsEnum.advance(docId)).equals(docId)))) {
-                  joinInfo.add(term.utf8ToString());
-                  break;                
+              if ((docId >= termDocId) && ((docId.equals(termDocId))
+                  || ((termDocId = postingsEnum.advance(docId))
+                      .equals(docId)))) {
+                joinInfo.add(term.utf8ToString());
+                break;
               }
             }
-          } 
+          }
         }
       }
     }
@@ -280,14 +283,14 @@ public class CodecCollector {
     HashMap<String, String> facetDataType = null;
 
     // collect position stats
-    if (fieldInfo.statsPositionList.size() > 0) {
+    if (!fieldInfo.statsPositionList.isEmpty()) {
       needPositions = true;
     }
     // collect token stats
-    if (fieldInfo.statsTokenList.size() > 0) {
+    if (!fieldInfo.statsTokenList.isEmpty()) {
       needTokens = true;
     }
-    if (fieldInfo.termVectorList.size() > 0) {
+    if (!fieldInfo.termVectorList.isEmpty()) {
       for (ComponentTermVector ctv : fieldInfo.termVectorList) {
         needPositions = !needPositions ? (ctv.functions == null
             ? ctv.subComponentFunction.parserFunction.needPositions()
@@ -296,14 +299,14 @@ public class CodecCollector {
     }
 
     // compute from spans for selected docs
-    if (fieldInfo.spanQueryList.size() > 0) {
+    if (!fieldInfo.spanQueryList.isEmpty()) {
       // check for statsSpans
-      spansNumberData = new HashMap<MtasSpanQuery, HashMap<Integer, Integer>>();
-      spansMatchData = new HashMap<MtasSpanQuery, HashMap<Integer, ArrayList<Match>>>();
-      facetData = new HashMap<String, TreeMap<String, int[]>>();
-      facetDataType = new HashMap<String, String>();
+      spansNumberData = new HashMap<>();
+      spansMatchData = new HashMap<>();
+      facetData = new HashMap<>();
+      facetDataType = new HashMap<>();
       // spans
-      if (fieldInfo.statsSpanList.size() > 0) {
+      if (!fieldInfo.statsSpanList.isEmpty()) {
         for (ComponentSpan cs : fieldInfo.statsSpanList) {
           needPositions = (!needPositions) ? cs.parser.needPositions()
               : needPositions;
@@ -324,7 +327,7 @@ public class CodecCollector {
         }
       }
       // kwic
-      if (fieldInfo.kwicList.size() > 0) {
+      if (!fieldInfo.kwicList.isEmpty()) {
         needSpans = true;
         for (ComponentKwic ck : fieldInfo.kwicList) {
           if (!spansMatchData.containsKey(ck.query)) {
@@ -334,7 +337,7 @@ public class CodecCollector {
         }
       }
       // list
-      if (fieldInfo.listList.size() > 0) {
+      if (!fieldInfo.listList.isEmpty()) {
         needSpans = true;
         for (ComponentList cl : fieldInfo.listList) {
           if (!spansMatchData.containsKey(cl.spanQuery)) {
@@ -355,7 +358,7 @@ public class CodecCollector {
         }
       }
       // group
-      if (fieldInfo.groupList.size() > 0) {
+      if (!fieldInfo.groupList.isEmpty()) {
         needSpans = true;
         for (ComponentGroup cg : fieldInfo.groupList) {
           if (!spansMatchData.containsKey(cg.spanQuery)) {
@@ -365,7 +368,7 @@ public class CodecCollector {
         }
       }
       // facet
-      if (fieldInfo.facetList.size() > 0) {
+      if (!fieldInfo.facetList.isEmpty()) {
         for (ComponentFacet cf : fieldInfo.facetList) {
           needPositions = !needPositions ? cf.baseParserNeedPositions()
               : needPositions;
@@ -420,16 +423,16 @@ public class CodecCollector {
       HashMap<Integer, ArrayList<Match>> matchData;
 
       // collect values for facetFields
-      for (String facetField : facetData.keySet()) {
-        Terms fft = r.terms(facetField);
+      for (Entry<String,TreeMap<String, int[]>> entry : facetData.entrySet()) {
+        Terms fft = r.terms(entry.getKey());
         if (fft != null) {
           TermsEnum termsEnum = fft.iterator();
           BytesRef term = null;
           PostingsEnum postingsEnum = null;
-          TreeMap<String, int[]> facetDataList = facetData.get(facetField);
+          TreeMap<String, int[]> facetDataList = entry.getValue();
           while ((term = termsEnum.next()) != null) {
-            // TODO: check for strange int/doubles etc : skip
-            int docId, termDocId = -1;
+            int docId;
+            int termDocId = -1;
             int[] facetDataSublist = new int[docSet.size()];
             int facetDataSublistCounter = 0;
             Iterator<Integer> docIterator = docSet.iterator();
@@ -447,7 +450,7 @@ public class CodecCollector {
             }
             if (facetDataSublistCounter > 0) {
               String termValue = null;
-              if (facetDataType.get(facetField)
+              if (facetDataType.get(entry.getKey())
                   .equals(ComponentFacet.TYPE_INTEGER)) {
                 // only values without shifting bits
                 if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_INT) {
@@ -456,7 +459,7 @@ public class CodecCollector {
                 } else {
                   continue;
                 }
-              } else if (facetDataType.get(facetField)
+              } else if (facetDataType.get(entry.getKey())
                   .equals(ComponentFacet.TYPE_LONG)) {
                 if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_LONG) {
                   termValue = Long
@@ -483,7 +486,7 @@ public class CodecCollector {
           }
         }
       }
-
+      
       for (MtasSpanQuery sq : fieldInfo.spanQueryList) {
         // what to collect
         if (spansNumberData.containsKey(sq)) {
@@ -554,7 +557,7 @@ public class CodecCollector {
         }
       }
     }
-
+    
     // collect position stats
     if (needPositions) {
       if (mtasCodecInfo != null) {
@@ -863,8 +866,8 @@ public class CodecCollector {
     if (prefixes == null || field == null || hit == null) {
       return null;
     } else {
-      MtasSpanQuery query = null, leftQuery = null, hitQuery = null,
-          rightQuery = null;
+      MtasSpanQuery query = null;
+      MtasSpanQuery hitQuery = null;
       // check for missing
       if (hit.missingLeft != null && hit.missingLeft.length > 0) {
         for (int i = 0; i < hit.missingLeft.length; i++) {
@@ -1343,9 +1346,7 @@ public class CodecCollector {
             for (int docId : docSet) {
               if (matchData != null
                   && (matchList = matchData.get(docId)) != null) {
-                if (list.number == 0) {
-                  list.position += matchList.size();
-                } else if (list.position < (list.start + list.number)) {
+                if (list.position < (list.start + list.number)) {
                   boolean getDoc = false;
                   Match m;
                   for (int i = 0; i < matchList.size(); i++) {
@@ -1404,9 +1405,7 @@ public class CodecCollector {
                 }
               } else if (numberData != null
                   && (matchNumber = numberData.get(docId)) != null) {
-                if (matchNumber != null) {
-                  list.position += matchNumber;
-                }
+                list.position += matchNumber;                
               }
             }
             list.total = list.position;
@@ -1414,9 +1413,7 @@ public class CodecCollector {
             for (int docId : docSet) {
               if (matchData != null
                   && (matchList = matchData.get(docId)) != null) {
-                if (list.number == 0) {
-                  list.position += matchList.size();
-                } else if (list.position < (list.start + list.number)) {
+                if (list.position < (list.start + list.number)) {
                   boolean getDoc = false;
                   Match m;
                   for (int i = 0; i < matchList.size(); i++) {
@@ -1426,7 +1423,7 @@ public class CodecCollector {
                       getDoc = true;
                       int startPosition = m.startPosition;
                       int endPosition = m.endPosition - 1;
-                      ArrayList<MtasToken<String>> tokens;
+                      ArrayList<MtasTokenString> tokens;
                       tokens = mtasCodecInfo
                           .getPrefixFilteredObjectsByPositions(field,
                               (docId - docBase), list.prefixes,
@@ -1458,9 +1455,7 @@ public class CodecCollector {
                 }
               } else if (numberData != null
                   && (matchNumber = numberData.get(docId)) != null) {
-                if (matchNumber != null) {
-                  list.position += matchNumber;
-                }
+                list.position += matchNumber;                
               }
             }
             list.total = list.position;
@@ -1527,8 +1522,8 @@ public class CodecCollector {
           boolean availablePrefixes = availablePrefixes(group, knownPrefixes);
           // sort match lists
           if (!intersectionGroupPrefixes) {
-            for (int docId : matchData.keySet()) {
-              sortMatchList(matchData.get(docId));
+            for (Entry<Integer,ArrayList<Match>> entry : matchData.entrySet()) {
+              sortMatchList(entry.getValue());
             }
           }
           // init
@@ -1652,15 +1647,8 @@ public class CodecCollector {
                           administrationOccurrences, knownPrefixes, field,
                           mtasCodecInfo, searcher, lrc);
                       if (list.size() > 0) {
-                        // System.out.println("== START == segment " + lrc.ord
-                        // + " - doc " + docId + " - list:" + list.size());
-                        int subTotalOfGroupCollectsUsingSpan = collectGroupUsingSpans(
-                            list, docSet, docBase, docCounter, matchData,
-                            occurencesSum, occurencesN);
-                        // System.out.println(" - collected "
-                        // + subTotalOfGroupCollectsUsingSpan + " hits");
-                        // System.out.println(
-                        // "== END == segment " + lrc.ord + " - doc " + docId);
+                        collectGroupUsingSpans(list, docSet, docBase,
+                            docCounter, matchData, occurencesSum, occurencesN);
                       }
                     }
                     administrationOccurrences.clear();
@@ -1675,9 +1663,9 @@ public class CodecCollector {
             }
           }
 
-          for (GroupHit hit : occurencesSum.keySet()) {
-            group.dataCollector.add(hit.toString(), occurencesSum.get(hit),
-                occurencesN.get(hit));
+          for (Entry<GroupHit,Long> entry : occurencesSum.entrySet()) {
+            group.dataCollector.add(entry.getKey().toString(), entry.getValue(),
+                occurencesN.get(entry.getKey()));
           }
           group.dataCollector.closeNewList();
         }
@@ -2074,8 +2062,6 @@ public class CodecCollector {
                     new String[] { CodecUtil.SORT_DESC }, new Integer[] { 0 },
                     new Integer[] { document.listExpandNumber }, null, null);
               } else {
-                TreeSet<String>[] baseStatsItems = new TreeSet[] {
-                    listStatsItems };
                 list = DataCollector.getCollector(
                     DataCollector.COLLECTOR_TYPE_LIST, CodecUtil.DATA_TYPE_LONG,
                     listStatsType, listStatsItems, CodecUtil.STATS_TYPE_SUM,
@@ -2195,14 +2181,13 @@ public class CodecCollector {
                           if (automatonMap != null) {
                             MtasDataCollector<?, ?> dataCollector,
                                 subSataCollector;
-                            for (String key : byteRunAutomatonMap.keySet()) {
-                              ByteRunAutomaton bra = byteRunAutomatonMap
-                                  .get(key);
+                            for (Entry<String, ByteRunAutomaton> entry : byteRunAutomatonMap.entrySet()) {
+                              ByteRunAutomaton bra = entry.getValue();
                               if (bra.run(term.bytes, term.offset,
                                   term.length)) {
                                 dataCollector = document.statsList
                                     .get(segmentDocId + lrc.docBase);
-                                subSataCollector = dataCollector.add(key,
+                                subSataCollector = dataCollector.add(entry.getKey(),
                                     new long[] { postingsEnum.freq() }, 1);
                                 if (document.listExpand
                                     && subSataCollector != null) {
@@ -2359,7 +2344,7 @@ public class CodecCollector {
                 if (number >= kwic.start) {
                   int startPosition = m.startPosition;
                   int endPosition = m.endPosition - 1;
-                  ArrayList<MtasToken<String>> tokens;
+                  ArrayList<MtasTokenString> tokens;
                   tokens = mtasCodecInfo.getPrefixFilteredObjectsByPositions(
                       field, (docId - docBase), kwic.prefixes,
                       Math.max(mDoc.minPosition, startPosition - kwic.left),
@@ -2446,23 +2431,23 @@ public class CodecCollector {
           HashMap<String, String> groupedKeys = new HashMap<String, String>();
           boolean documentsInFacets = false;
           // compute intersections
-          for (String key : list.keySet()) {
+          for (Entry<String, int[]> entry : list.entrySet()) {
             // fill grouped keys
-            if (!groupedKeys.containsKey(key)) {
-              groupedKeys.put(key, groupedKeyName(key, cf.baseRangeSizes[level],
+            if (!groupedKeys.containsKey(entry.getKey())) {
+              groupedKeys.put(entry.getKey(), groupedKeyName(entry.getKey(), cf.baseRangeSizes[level],
                   cf.baseRangeBases[level]));
             }
             // intersect docSet with docList
-            Integer[] docList = intersectedDocList(list.get(key), docSet);
+            Integer[] docList = intersectedDocList(entry.getValue(), docSet);
             if (docList.length > 0) {
               documentsInFacets = true;
             }
             // update docLists
-            if (docLists.containsKey(groupedKeys.get(key))) {
-              docLists.put(groupedKeys.get(key),
-                  mergeDocLists(docLists.get(groupedKeys.get(key)), docList));
+            if (docLists.containsKey(groupedKeys.get(entry.getKey()))) {
+              docLists.put(groupedKeys.get(entry.getKey()),
+                  mergeDocLists(docLists.get(groupedKeys.get(entry.getKey())), docList));
             } else {
-              docLists.put(groupedKeys.get(key), docList);
+              docLists.put(groupedKeys.get(entry.getKey()), docList);
             }
           }
           // compute stats for each key
@@ -2699,10 +2684,14 @@ public class CodecCollector {
     if (baseRangeSize == null || baseRangeSize <= 0) {
       return key;
     } else {
-      Double doubleKey, doubleBase, doubleNumber, doubleStart, doubleEnd;
+      Double doubleKey;
+      Double doubleBase;
+      Double doubleNumber;
+      Double doubleStart;
+      Double doubleEnd;
       try {
         doubleKey = Double.parseDouble(key);
-        doubleBase = baseRangeBase == null ? 0 : baseRangeBase;
+        doubleBase = baseRangeBase != null ? baseRangeBase : 0;
         doubleNumber = Math.floor((doubleKey - doubleBase) / baseRangeSize);
         doubleStart = doubleBase + doubleNumber * baseRangeSize;
         doubleEnd = doubleStart + baseRangeSize;
@@ -2730,25 +2719,27 @@ public class CodecCollector {
 
   private static Integer[] mergeDocLists(Integer[] a, Integer[] b) {
     Integer[] answer = new Integer[a.length + b.length];
-    int i = 0, j = 0, k = 0;
+    int i = 0;
+    int j = 0;
+    int k = 0;
     Integer tmp;
     while (i < a.length && j < b.length) {
       tmp = a[i] < b[j] ? a[i++] : b[j++];
-      for (; i < a.length && a[i] == tmp; i++)
+      for (; i < a.length && a[i].equals(tmp); i++)
         ;
-      for (; j < b.length && b[j] == tmp; j++)
+      for (; j < b.length && b[j].equals(tmp); j++)
         ;
       answer[k++] = tmp;
     }
     while (i < a.length) {
       tmp = a[i++];
-      for (; i < a.length && a[i] == tmp; i++)
+      for (; i < a.length && a[i].equals(tmp); i++)
         ;
       answer[k++] = tmp;
     }
     while (j < b.length) {
       tmp = b[j++];
-      for (; j < b.length && b[j] == tmp; j++)
+      for (; j < b.length && b[j].equals(tmp); j++)
         ;
       answer[k++] = tmp;
     }
@@ -3187,6 +3178,8 @@ public class CodecCollector {
                     // stop after termCounterMaximum
                     if (termVector.subComponentFunction.sortType
                         .equals(CodecUtil.SORT_TERM)
+                        && termVector.subComponentFunction.sortDirection
+                            .equals(CodecUtil.SORT_ASC)
                         && termCounter >= termNumberMaximum) {
                       break;
                     }
@@ -3357,9 +3350,9 @@ public class CodecCollector {
         .equals(CodecUtil.SORT_TERM)) {
       if (term.length > termVector.startValue.length) {
         byte[] zeroBytes = (new BytesRef("\u0000")).bytes;
-        int n = (new Double(Math.ceil(
-            (term.length - termVector.startValue.length) / zeroBytes.length)))
-                .intValue();
+        int n = (int) (Math
+            .ceil(((double) (term.length - termVector.startValue.length))
+                / zeroBytes.length));
         byte[] newBytes = new byte[termVector.startValue.length
             + n * zeroBytes.length];
         System.arraycopy(termVector.startValue.bytes, 0, newBytes, 0,
@@ -3832,7 +3825,6 @@ public class CodecCollector {
       LeafReaderContext lrc, PostingsEnum postingsEnum) throws IOException {
     TermvectorNumberBasic result = new TermvectorNumberBasic();
     boolean hasDeletedDocuments = (r.getLiveDocs() != null);
-    boolean subtractValue;
     if ((docSet.size() == r.numDocs()) && !hasDeletedDocuments) {
       try {
         return computeTermvectorNumberBasic(termsEnum, r);

@@ -343,17 +343,11 @@ public class MtasDataLongAdvanced extends MtasDataAdvanced<Long, Double> {
   @Override
   protected Long stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException {
-    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {
+    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC) || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
       if (segmentNumber == null) {
         return Long.valueOf(boundary);
       } else {
-        return Math.floorDiv(Long.valueOf(boundary), segmentNumber);
-      }
-    } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
-      if (segmentNumber == null) {
-        return Long.valueOf(boundary);
-      } else {
-        return Math.floorDiv(Long.valueOf(boundary), segmentNumber);
+        return Math.floorDiv(Long.parseLong(boundary), segmentNumber);
       }
     } else {
       throw new IOException(

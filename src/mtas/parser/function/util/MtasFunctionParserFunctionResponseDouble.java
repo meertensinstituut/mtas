@@ -2,11 +2,18 @@ package mtas.parser.function.util;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The Class MtasFunctionParserFunctionResponseDouble.
  */
 public class MtasFunctionParserFunctionResponseDouble
     extends MtasFunctionParserFunctionResponse {
+
+  /** The log. */
+  private static Log log = LogFactory
+      .getLog(MtasFunctionParserFunctionResponseDouble.class);
 
   /** The value. */
   private double value;
@@ -57,19 +64,21 @@ public class MtasFunctionParserFunctionResponseDouble
     MtasFunctionParserFunctionResponseDouble other = (MtasFunctionParserFunctionResponseDouble) obj;
     try {
       if (value == other.getValue()) {
-        if (defined)
-          return true;
-        else
-          return false;
-      } else {
+        return defined;
+      } else {        
         return false;
       }
     } catch (IOException e) {
-      if (!defined)
-        return true;
-      else
-        return false;
+      log.debug(e);
+      return !defined;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 7) ^ (int) value;
+    return h;
   }
 
   /*
@@ -79,7 +88,7 @@ public class MtasFunctionParserFunctionResponseDouble
    */
   @Override
   public String toString() {
-    return defined ? "double:" + String.valueOf(value) : "double:undefined";
+    return defined ? "double:" + value : "double:undefined";
   }
 
 }

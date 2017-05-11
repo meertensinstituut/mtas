@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
+  /** The log. */
   private static Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorResultReader.class);
 
@@ -39,10 +41,8 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
   /**
    * Instantiates a new mtas update request processor result reader.
    *
-   * @param fileName
-   *          the file name
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param fileName the file name
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasUpdateRequestProcessorResultReader(String fileName)
       throws IOException {
@@ -94,11 +94,11 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
                   next = null;
                   return result;
                 } else {
-                  return null;
+                  throw new NoSuchElementException();
                 }
               }
             } else {
-              return null;
+              throw new NoSuchElementException();
             }
           }
 
@@ -113,7 +113,8 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
                   return null;
                 }
               } catch (ClassNotFoundException | IOException e) {
-                log.debug(e.getClass().getSimpleName()+" while retrieving data from "+fileName, e);
+                log.debug(e.getClass().getSimpleName()
+                    + " while retrieving data from " + fileName, e);
                 forceClose();
                 return null;
               }
@@ -123,11 +124,13 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
           }
         };
       } catch (IOException e) {
-        log.error(e.getClass().getSimpleName()+" while processing "+fileName+" ("+e.getMessage()+")", e);
+        log.error(e.getClass().getSimpleName() + " while processing " + fileName
+            + " (" + e.getMessage() + ")", e);
         forceClose();
         throw new IOException(e.getMessage());
       } catch (ClassNotFoundException e) {
-        log.error(e.getClass().getSimpleName()+" while processing "+fileName+" ("+e.getMessage()+")", e);
+        log.error(e.getClass().getSimpleName() + " while processing " + fileName
+            + " (" + e.getMessage() + ")", e);
         forceClose();
         throw new IOException("invalid tokenStream");
       }
@@ -150,7 +153,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @return the stored bin value
    */
   public byte[] getStoredBinValue() {
-    return null;
+    return new byte[0];
   }
 
   /**
@@ -177,8 +180,8 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    */
   private void forceClose() {
     if (file != null) {
-      if (file.exists() && file.canWrite()) {
-        file.delete();
+      if (file.exists() && file.canWrite() && !file.delete()) {
+        log.debug("couldn't delete " + file.getName());
       }
       file = null;
     }

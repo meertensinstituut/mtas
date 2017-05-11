@@ -21,8 +21,7 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
   public MtasSpanNotQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1!=null?q1.getMinimumWidth():null, q2!=null?q2.getMaximumWidth():null);
     if (q1 != null && (field = q1.getField()) != null) {
-      if (q2 != null && q2.getField()!=null && ((field == null && q2.getField() != null)
-          || !q2.getField().equals(field))) {
+      if (q2 != null && q2.getField()!=null && !q2.getField().equals(field)) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
     } else if (q2 != null) {

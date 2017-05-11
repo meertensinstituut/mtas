@@ -41,12 +41,11 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    * @param spans
    *          the spans
    */
-  public MtasSpanUniquePosition(
-      MtasSpanUniquePositionQuery mtasSpanUniquePositionQuery, Spans spans) {
+  public MtasSpanUniquePosition(Spans spans) {
     super();
     this.spans = spans;
-    queueSpans = new ArrayList<Match>();
-    queueMatches = new ArrayList<Match>();
+    queueSpans = new ArrayList<>();
+    queueMatches = new ArrayList<>();
     resetQueue();
   }
 
@@ -76,8 +75,15 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    */
   @Override
   public int startPosition() {
-    return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
-        : currentMatch.startPosition();
+    if (currentMatch == null) {      
+      if(noMorePositions) {
+        return NO_MORE_POSITIONS;
+      } else {
+        return -1;
+      }
+    } else {  
+      return currentMatch.startPosition();
+    } 
   }
 
   /*
@@ -87,8 +93,15 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    */
   @Override
   public int endPosition() {
-    return (currentMatch == null) ? (noMorePositions ? NO_MORE_POSITIONS : -1)
-        : currentMatch.endPosition();
+    if (currentMatch == null) {      
+      if(noMorePositions) {
+        return NO_MORE_POSITIONS;
+      } else {
+        return -1;
+      }
+    } else {  
+      return currentMatch.endPosition();
+    }    
   }
 
   /*
@@ -220,7 +233,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
         Match firstMatch = queueSpans.get(0);
         queueSpans.remove(0);
         // create a list of matches with same startposition as firstMatch
-        List<Match> matches = new ArrayList<Match>();
+        List<Match> matches = new ArrayList<>();
         matches.add(firstMatch);
         // try to collect spans until lastStartPosition not equal to
         // startposition of firstMatch
@@ -295,14 +308,24 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object object) {
-      if (this.getClass().equals(object.getClass())) {
-        if ((((Match) object).startPosition == startPosition)
-            && (((Match) object).endPosition == endPosition)) {
-          return true;
-        }
-      }
-      return false;
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      final Match that = (Match) obj;
+      return startPosition == that.startPosition
+          && endPosition == that.endPosition;
+    }
+    
+    @Override
+    public int hashCode() {
+      int h = this.getClass().getSimpleName().hashCode();
+      h = (h * 5) ^ startPosition;
+      h = (h * 7) ^ endPosition;
+      return h;
     }
 
   }

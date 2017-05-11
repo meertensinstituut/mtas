@@ -15,23 +15,21 @@ import org.apache.lucene.search.spans.Spans;
 
 import mtas.search.spans.util.MtasSpanQuery;
 
-
 /**
  * The Class MtasSpanEndQuery.
  */
 public class MtasSpanEndQuery extends MtasSpanQuery {
 
-  /** The query. */
+  /** The clause. */
   private MtasSpanQuery clause;
 
   /**
    * Instantiates a new mtas span end query.
    *
-   * @param query
-   *          the query
+   * @param query the query
    */
   public MtasSpanEndQuery(MtasSpanQuery query) {
-    super(0,0);
+    super(0, 0);
     clause = query;
   }
 
@@ -44,9 +42,10 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newClause = clause.rewrite(reader);
-    if(newClause!=clause) {
+    if (!newClause.equals(clause)) {
       return new MtasSpanEndQuery(newClause).rewrite(reader);
-    } else if(newClause.getMaximumWidth()!=null && newClause.getMaximumWidth()==0) {
+    } else if (newClause.getMaximumWidth() != null
+        && newClause.getMaximumWidth() == 0) {
       return newClause;
     } else {
       return super.rewrite(reader);
@@ -92,7 +91,6 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
         .createWeight(searcher, needsScores);
     return new SpanTermWeight(spanWeight, searcher);
   }
-  
 
   /**
    * The Class SpanTermWeight.
@@ -105,12 +103,9 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span term weight.
      *
-     * @param spanWeight
-     *          the span weight
-     * @param searcher
-     *          the searcher
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param spanWeight the span weight
+     * @param searcher the searcher
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(SpanWeight spanWeight, IndexSearcher searcher)
         throws IOException {
@@ -141,7 +136,8 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
-      return new MtasSpanEndSpans(spanWeight.getSpans(context, requiredPostings));
+      return new MtasSpanEndSpans(
+          spanWeight.getSpans(context, requiredPostings));
     }
 
     /*

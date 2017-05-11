@@ -2,12 +2,18 @@ package mtas.parser.function.util;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The Class MtasFunctionParserFunctionResponseLong.
  */
 public class MtasFunctionParserFunctionResponseLong
     extends MtasFunctionParserFunctionResponse {
 
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasFunctionParserFunctionResponseLong.class);
+  
   /** The value. */
   private long value;
 
@@ -57,19 +63,21 @@ public class MtasFunctionParserFunctionResponseLong
     MtasFunctionParserFunctionResponseLong other = (MtasFunctionParserFunctionResponseLong) obj;
     try {
       if (value == other.getValue()) {
-        if (defined)
-          return true;
-        else
-          return false;
-      } else {
+        return defined;
+      } else {        
         return false;
       }
     } catch (IOException e) {
-      if (!defined)
-        return true;
-      else
-        return false;
+      log.debug(e);
+      return !defined;
     }
+  }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (int) ((h * 7) ^ value);
+    return h;
   }
 
   /*
@@ -79,7 +87,7 @@ public class MtasFunctionParserFunctionResponseLong
    */
   @Override
   public String toString() {
-    return defined ? "long:" + String.valueOf(value) : "long:undefined";
+    return defined ? "long:" + value : "long:undefined";
   }
 
 }

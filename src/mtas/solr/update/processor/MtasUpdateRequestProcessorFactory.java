@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -40,6 +44,10 @@ import mtas.solr.schema.MtasPreAnalyzedField;
 public class MtasUpdateRequestProcessorFactory
     extends UpdateRequestProcessorFactory {
 
+  /** The log. */
+  private static Log log = LogFactory
+      .getLog(MtasUpdateRequestProcessorFactory.class);
+
   /** The config. */
   private MtasUpdateRequestProcessorConfig config = null;
 
@@ -59,8 +67,10 @@ public class MtasUpdateRequestProcessorFactory
   /**
    * Inits the.
    *
-   * @param req the req
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param req
+   *          the req
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {
@@ -73,24 +83,25 @@ public class MtasUpdateRequestProcessorFactory
       SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()
           .getResourceLoader();
       // check fieldTypes
-      for (String name : fieldTypes.keySet()) {
+      // for (String name : fieldTypes.keySet()) {
+      for (Entry<String, FieldType> entry : fieldTypes.entrySet()) {
         // only for MtasPreAnalyzedField
-        if (fieldTypes.get(name) instanceof MtasPreAnalyzedField) {
-          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) fieldTypes
-              .get(name);
-          config.fieldTypeDefaultConfiguration.put(name,
+        if (entry.getValue() instanceof MtasPreAnalyzedField) {
+          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) entry.getValue();
+          config.fieldTypeDefaultConfiguration.put(entry.getKey(),
               mpaf.defaultConfiguration);
-          config.fieldTypeConfigurationFromField.put(name,
+          config.fieldTypeConfigurationFromField.put(entry.getKey(),
               mpaf.configurationFromField);
-          config.fieldTypeNumberOfTokensField.put(name, mpaf.setNumberOfTokens);
-          config.fieldTypeNumberOfPositionsField.put(name,
+          config.fieldTypeNumberOfTokensField.put(entry.getKey(),
+              mpaf.setNumberOfTokens);
+          config.fieldTypeNumberOfPositionsField.put(entry.getKey(),
               mpaf.setNumberOfPositions);
-          config.fieldTypeSizeField.put(name, mpaf.setSize);
-          config.fieldTypeErrorField.put(name, mpaf.setError);
+          config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);
+          config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);
           if (mpaf.followIndexAnalyzer == null
               || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {
             throw new IOException(
-                name + " can't follow " + mpaf.followIndexAnalyzer);
+                entry.getKey() + " can't follow " + mpaf.followIndexAnalyzer);
           } else {
             FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);
             SimpleOrderedMap<?> analyzer = null;
@@ -120,7 +131,8 @@ public class MtasUpdateRequestProcessorFactory
                     .findRecursive(FieldType.TOKENIZER);
               } catch (ClassCastException e) {
                 throw new IOException(
-                    "could not cast charFilters and/or tokenizer from analyzer");
+                    "could not cast charFilters and/or tokenizer from analyzer",
+                    e);
               }
               if (listCharFilters != null && !listCharFilters.isEmpty()) {
                 CharFilterFactory[] charFilterFactories = new CharFilterFactory[listCharFilters
@@ -128,7 +140,7 @@ public class MtasUpdateRequestProcessorFactory
                 int number = 0;
                 for (SimpleOrderedMap<Object> configCharFilter : listCharFilters) {
                   String className = null;
-                  Map<String, String> args = new HashMap<String, String>();
+                  Map<String, String> args = new HashMap<>();
                   Iterator<Map.Entry<String, Object>> it = configCharFilter
                       .iterator();
                   // get className and args
@@ -172,20 +184,20 @@ public class MtasUpdateRequestProcessorFactory
                     } catch (ClassNotFoundException | InstantiationException
                         | IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException | NoSuchMethodException e) {
-                      throw new IOException(e.getMessage());
+                      throw new IOException(e);
                     }
                   } else {
                     throw new IOException("no className");
                   }
                 }
-                config.fieldTypeCharFilterFactories.put(name,
+                config.fieldTypeCharFilterFactories.put(entry.getKey(),
                     charFilterFactories);
               } else {
-                config.fieldTypeCharFilterFactories.put(name, null);
+                config.fieldTypeCharFilterFactories.put(entry.getKey(), null);
               }
               if (configTokenizer != null) {
                 String className = null;
-                Map<String, String> args = new HashMap<String, String>();
+                Map<String, String> args = new HashMap<>();
                 Iterator<Map.Entry<String, Object>> it = configTokenizer
                     .iterator();
                 // get className and args
@@ -206,7 +218,7 @@ public class MtasUpdateRequestProcessorFactory
                     Constructor<?> cnstr = cls.getConstructor(types);
                     Object cff = cnstr.newInstance(args, resourceLoader);
                     if (cff instanceof MtasTokenizerFactory) {
-                      config.fieldTypeTokenizerFactory.put(name,
+                      config.fieldTypeTokenizerFactory.put(entry.getKey(),
                           (MtasTokenizerFactory) cff);
                     } else {
                       throw new IOException(
@@ -215,7 +227,7 @@ public class MtasUpdateRequestProcessorFactory
                   } catch (ClassNotFoundException | InstantiationException
                       | IllegalAccessException | IllegalArgumentException
                       | InvocationTargetException | NoSuchMethodException e) {
-                   throw new IOException(e.getMessage());
+                    throw new IOException(e);
                   }
                 } else {
                   throw new IOException("no className");
@@ -226,12 +238,12 @@ public class MtasUpdateRequestProcessorFactory
           }
         }
       }
-      for (String field : fields.keySet()) {
-        if (fields.get(field).getType() != null
+      for (Entry<String, SchemaField> entry : fields.entrySet()) {
+        if (entry.getValue().getType() != null
             && config.fieldTypeTokenizerFactory
-                .containsKey(fields.get(field).getType().getTypeName())) {
-          config.fieldMapping.put(field,
-              fields.get(field).getType().getTypeName());
+                .containsKey(entry.getValue().getType().getTypeName())) {
+          config.fieldMapping.put(entry.getKey(),
+              entry.getValue().getType().getTypeName());
         }
       }
     }
@@ -252,7 +264,7 @@ public class MtasUpdateRequestProcessorFactory
     try {
       init(req);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e);
     }
     return new MtasUpdateRequestProcessor(next, config);
   }
@@ -260,6 +272,9 @@ public class MtasUpdateRequestProcessorFactory
 }
 
 class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasUpdateRequestProcessor.class);
 
   private MtasUpdateRequestProcessorConfig config;
 
@@ -283,48 +298,48 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
         MtasTokenizerFactory tokenizerFactory = config.fieldTypeTokenizerFactory
             .get(config.fieldMapping.get(field));
         MtasUpdateRequestProcessorSizeReader sizeReader;
-        if (originalValue != null) {
-          // only string
-          if (originalValue.getValue() instanceof String) {
-            MtasUpdateRequestProcessorResultWriter result = null;
+        if (originalValue != null
+            && originalValue.getValue() instanceof String) {
+          MtasUpdateRequestProcessorResultWriter result = null;
+          try {
+            String storedValue = (String) originalValue.getValue();
+            // create reader
+            Reader reader = new StringReader(storedValue);
+            // configuration
+            String configuration = config.fieldTypeDefaultConfiguration
+                .get(fieldType);
+            if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {
+              Object obj = doc.getFieldValue(
+                  config.fieldTypeConfigurationFromField.get(fieldType));
+              if (obj != null) {
+                configuration = obj.toString();
+              }
+            }
+            // charFilterFactories
+            if (charFilterFactories != null) {
+              for (CharFilterFactory charFilterFactory : charFilterFactories) {
+                if (charFilterFactory instanceof MtasCharFilterFactory) {
+                  reader = ((MtasCharFilterFactory) charFilterFactory)
+                      .create(reader, configuration);
+                } else {
+                  reader = charFilterFactory.create(reader);
+                }
+                if (reader == null) {
+                  throw new IOException(
+                      "charFilter " + charFilterFactory.getClass().getName()
+                          + " returns null");
+                }
+              }
+            }
+
+            sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
+
+            // tokenizerFactory
+            result = new MtasUpdateRequestProcessorResultWriter(storedValue);
+            int numberOfPositions = 0;
+            int numberOfTokens = 0;            
             try {
-              String storedValue = (String) originalValue.getValue();
-              // create reader
-              Reader reader = new StringReader(storedValue);
-              // configuration
-              String configuration = config.fieldTypeDefaultConfiguration
-                  .get(fieldType);
-              if (config.fieldTypeConfigurationFromField
-                  .get(fieldType) != null) {
-                Object obj = doc.getFieldValue(
-                    config.fieldTypeConfigurationFromField.get(fieldType));
-                if (obj != null) {
-                  configuration = obj.toString();
-                }
-              }
-              // charFilterFactories
-              if (charFilterFactories != null) {
-                for (CharFilterFactory charFilterFactory : charFilterFactories) {
-                  if (charFilterFactory instanceof MtasCharFilterFactory) {
-                    reader = ((MtasCharFilterFactory) charFilterFactory)
-                        .create(reader, configuration);
-                  } else {
-                    reader = charFilterFactory.create(reader);
-                  }
-                  if (reader == null) {
-                    throw new IOException(
-                        "charFilter " + charFilterFactory.getClass().getName()
-                            + " returns null");
-                  }
-                }
-              }
-
-              sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
-
-              // tokenizerFactory
-              result = new MtasUpdateRequestProcessorResultWriter(storedValue);
-              MtasTokenizer tokenizer = tokenizerFactory
-                  .create(configuration);
+              MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
               tokenizer.setReader(sizeReader);
               tokenizer.reset();
               // attributes
@@ -339,13 +354,12 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               FlagsAttribute flagsAttribute = tokenizer
                   .getAttribute(FlagsAttribute.class);
 
-              int numberOfPositions = 0;
-              int numberOfTokens = 0;
-
               while (tokenizer.incrementToken()) {
                 String term = null;
-                Integer offsetStart = null, offsetEnd = null, posIncr = null,
-                    flags = null;
+                Integer offsetStart = null;
+                Integer offsetEnd = null;
+                Integer posIncr = null;
+                Integer flags = null;
                 BytesRef payload = null;
                 if (termAttribute != null) {
                   term = termAttribute.toString();
@@ -356,6 +370,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 }
                 if (positionIncrementAttribute != null) {
                   posIncr = positionIncrementAttribute.getPositionIncrement();
+                } else {
+                  posIncr = 0;
                 }
                 if (payloadAttribute != null) {
                   payload = payloadAttribute.getPayload();
@@ -375,33 +391,35 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               if (result.getTokenNumber() > 0) {
                 doc.addField(field, result.getFileName());
               }
+            } finally {
               result.close();
-              // update size
-              setFields(doc, config.fieldTypeSizeField.get(fieldType),
-                  sizeReader.getTotalReadSize());
-              // update numberOfPositions
-              setFields(doc,
-                  config.fieldTypeNumberOfPositionsField.get(fieldType),
-                  numberOfPositions);
-              // update numberOfTokens
-              setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
-                  numberOfTokens);
-            } catch (IOException e) {
-              // update error
-              doc.addField(config.fieldTypeErrorField.get(fieldType),
-                  e.getMessage());
-              // update size
-              setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);
-              // update numberOfPositions
-              setFields(doc,
-                  config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
-              // update numberOfTokens
-              setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
-                  0);
-              if (result != null) {
-                result.forceCloseAndDelete();
-                doc.remove(field);
-              }
+            }
+            // update size
+            setFields(doc, config.fieldTypeSizeField.get(fieldType),
+                sizeReader.getTotalReadSize());
+            // update numberOfPositions
+            setFields(doc,
+                config.fieldTypeNumberOfPositionsField.get(fieldType),
+                numberOfPositions);
+            // update numberOfTokens
+            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
+                numberOfTokens);
+          } catch (IOException e) {
+            log.info(e);
+            // update error
+            doc.addField(config.fieldTypeErrorField.get(fieldType),
+                e.getMessage());
+            // update size
+            setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);
+            // update numberOfPositions
+            setFields(doc,
+                config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
+            // update numberOfTokens
+            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
+                0);
+            if (result != null) {
+              result.forceCloseAndDelete();
+              doc.remove(field);
             }
           }
         }
@@ -417,7 +435,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
     if (fieldNames != null) {
       String[] tmpFields = fieldNames.split(",");
       for (int i = 0; i < tmpFields.length; i++) {
-        if (!tmpFields[i].trim().equals("")) {
+        if (!tmpFields[i].trim().isEmpty()) {
           doc.addField(tmpFields[i].trim(), value);
         }
       }
@@ -439,15 +457,15 @@ class MtasUpdateRequestProcessorConfig {
   HashMap<String, String> fieldTypeErrorField;
 
   MtasUpdateRequestProcessorConfig() {
-    fieldMapping = new HashMap<String, String>();
-    fieldTypeCharFilterFactories = new HashMap<String, CharFilterFactory[]>();
-    fieldTypeTokenizerFactory = new HashMap<String, MtasTokenizerFactory>();
-    fieldTypeDefaultConfiguration = new HashMap<String, String>();
-    fieldTypeConfigurationFromField = new HashMap<String, String>();
-    fieldTypeNumberOfTokensField = new HashMap<String, String>();
-    fieldTypeNumberOfPositionsField = new HashMap<String, String>();
-    fieldTypeSizeField = new HashMap<String, String>();
-    fieldTypeErrorField = new HashMap<String, String>();
+    fieldMapping = new HashMap<>();
+    fieldTypeCharFilterFactories = new HashMap<>();
+    fieldTypeTokenizerFactory = new HashMap<>();
+    fieldTypeDefaultConfiguration = new HashMap<>();
+    fieldTypeConfigurationFromField = new HashMap<>();
+    fieldTypeNumberOfTokensField = new HashMap<>();
+    fieldTypeNumberOfPositionsField = new HashMap<>();
+    fieldTypeSizeField = new HashMap<>();
+    fieldTypeErrorField = new HashMap<>();
   }
 
 }
@@ -462,7 +480,7 @@ class MtasUpdateRequestProcessorSizeReader extends Reader {
     totalReadSize = 0;
   }
 
-  public int read(char cbuf[], int off, int len) throws IOException {
+  public int read(char[] cbuf, int off, int len) throws IOException {
     int read = reader.read(cbuf, off, len);
     totalReadSize += read;
     return read;

@@ -1,6 +1,7 @@
 package mtas.codec.util;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,10 +10,14 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenString;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.tree.IntervalRBTree;
 import mtas.codec.tree.IntervalTreeNodeData;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.store.IndexInput;
 
@@ -21,6 +26,8 @@ import org.apache.lucene.store.IndexInput;
  */
 public class CodecInfo {
 
+  private static Log log = LogFactory.getLog(CodecInfo.class);
+  
   /** The index input list. */
   HashMap<String, IndexInput> indexInputList;
 
@@ -65,27 +72,28 @@ public class CodecInfo {
     try {
       HashMap<String, IndexInput> indexInputList = null;
       HashMap<String, Long> indexInputOffsetList = null;
-      Integer version = null;
+      Object version = null;
       Method[] methods = t.getClass().getMethods();
+      Object[] emptyArgs = null;
       for (Method m : methods) {
         if (m.getName().equals("getIndexInputList")) {
           indexInputList = (HashMap<String, IndexInput>) m.invoke(t,
-              (Object[]) null);
+              emptyArgs);
         } else if (m.getName().equals("getIndexInputOffsetList")) {
           indexInputOffsetList = (HashMap<String, Long>) m.invoke(t,
-              (Object[]) null);
+              emptyArgs);
         } else if (m.getName().equals("getVersion")) {
-          version = (int) m.invoke(t, (Object[]) null);
+          version = m.invoke(t, emptyArgs);
         }
       }
       if (indexInputList == null || indexInputOffsetList == null
           || version == null) {
         throw new IOException("Reader doesn't provide MtasFieldsProducer");
       } else {
-        return new CodecInfo(indexInputList, indexInputOffsetList, version);
+        return new CodecInfo(indexInputList, indexInputOffsetList, (int) version);
       }
-    } catch (Exception e) {
-      throw new IOException("Can't get codecInfo");
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new IOException("Can't get codecInfo", e);
     }
   }
 
@@ -100,7 +108,8 @@ public class CodecInfo {
     inField.seek(indexInputOffsetList.get("field"));
     // store field references in memory
     fieldReferences = new HashMap<String, FieldReferences>();
-    while (true) {
+    boolean doInit = true;
+    while (doInit) {
       try {
         String field = inField.readString();
         long refIndexDoc = inField.readVLong();
@@ -112,9 +121,10 @@ public class CodecInfo {
         int numberOfPrefixes = inField.readVInt();
         fieldReferences.put(field,
             new FieldReferences(refIndexDoc, refIndexDocId, numberOfDocs,
-                refTerm, numberOfTerms, refPrefix, numberOfPrefixes));
-      } catch (Exception ex) {
-        break;
+                refPrefix, numberOfPrefixes));
+      } catch (IOException e) {
+        log.debug(e); 
+        doInit = false;
       }
     }
     // prefixReferences
@@ -130,29 +140,30 @@ public class CodecInfo {
    * @return the object by id
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasToken<?> getObjectById(String field, int docId, int mtasId)
+  public MtasToken getObjectById(String field, int docId, int mtasId)
       throws IOException {
     try {
-      Long ref, objectRefApproxCorrection;
+      Long ref;
+      Long objectRefApproxCorrection;
       IndexDoc doc = getDoc(field, docId);
       IndexInput inObjectId = indexInputList.get("indexObjectId");
       IndexInput inObject = indexInputList.get("object");
       IndexInput inTerm = indexInputList.get("term");
       if (doc.storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {
-        inObjectId.seek((doc.fpIndexObjectId + (mtasId * 1)));
+        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 1L));
         objectRefApproxCorrection = Long.valueOf(inObjectId.readByte());
       } else if (doc.storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_SHORT) {
-        inObjectId.seek((doc.fpIndexObjectId + (mtasId * 2)));
+        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 2L));
         objectRefApproxCorrection = Long.valueOf(inObjectId.readShort());
       } else if (doc.storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER) {
-        inObjectId.seek((doc.fpIndexObjectId + (mtasId * 4)));
+        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 4L));
         objectRefApproxCorrection = Long.valueOf(inObjectId.readInt());
       } else {
-        inObjectId.seek((doc.fpIndexObjectId + (mtasId * 8)));
+        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 8L));
         objectRefApproxCorrection = Long.valueOf(inObjectId.readLong());
       }
       ref = objectRefApproxCorrection + doc.objectRefApproxOffset
-          + (mtasId * doc.objectRefApproxQuotient);
+          + (mtasId * (long) doc.objectRefApproxQuotient);
       return MtasCodecPostingsFormat.getToken(inObject, inTerm, ref);
     } catch (Exception e) {
       throw new IOException(e.getMessage());
@@ -168,7 +179,7 @@ public class CodecInfo {
    * @return the objects by parent id
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public List<MtasToken<String>> getObjectsByParentId(String field, int docId,
+  public List<MtasTokenString> getObjectsByParentId(String field, int docId,
       int position) throws IOException {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectParent = indexInputList.get("indexObjectParent");
@@ -187,7 +198,7 @@ public class CodecInfo {
    * @return the objects by position
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ArrayList<MtasToken<String>> getObjectsByPosition(String field,
+  public ArrayList<MtasTokenString> getObjectsByPosition(String field,
       int docId, int position) throws IOException {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectPosition = indexInputList
@@ -198,7 +209,7 @@ public class CodecInfo {
     return getObjects(hits);
   }
 
-  // public ArrayList<MtasToken<String>> getObjectsByPositions(String field,
+  // public ArrayList<MtasTokenString> getObjectsByPositions(String field,
   // int docId, int startPosition, int endPosition) throws IOException {
   // IndexDoc doc = getDoc(field, docId);
   // IndexInput inIndexObjectPosition = indexInputList
@@ -220,7 +231,7 @@ public class CodecInfo {
    * @return the prefix filtered objects by positions
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ArrayList<MtasToken<String>> getPrefixFilteredObjectsByPositions(
+  public ArrayList<MtasTokenString> getPrefixFilteredObjectsByPositions(
       String field, int docId, ArrayList<String> prefixes, int startPosition,
       int endPosition) throws IOException {
     IndexDoc doc = getDoc(field, docId);
@@ -232,7 +243,7 @@ public class CodecInfo {
           doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
       return getPrefixFilteredObjects(hits, prefixes);
     } else {
-      return new ArrayList<MtasToken<String>>();
+      return new ArrayList<MtasTokenString>();
     }
   }
 
@@ -244,14 +255,14 @@ public class CodecInfo {
    * @return the prefix filtered objects
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  private ArrayList<MtasToken<String>> getPrefixFilteredObjects(
+  private ArrayList<MtasTokenString> getPrefixFilteredObjects(
       List<MtasTreeHit<?>> hits, ArrayList<String> prefixes)
       throws IOException {
-    ArrayList<MtasToken<String>> tokens = new ArrayList<MtasToken<String>>();
+    ArrayList<MtasTokenString> tokens = new ArrayList<MtasTokenString>();
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
-      MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
+      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,
           inTerm, hit.ref);
       if (token != null) {
         if (prefixes.size() > 0) {
@@ -316,8 +327,8 @@ public class CodecInfo {
           }
         }
         if (filteredHitItems.size() > 0) {
-          ArrayList<MtasToken<String>> objects = getObjects(filteredHitItems);
-          for (MtasToken<String> token : objects) {
+          ArrayList<MtasTokenString> objects = getObjects(filteredHitItems);
+          for (MtasTokenString token : objects) {
             MtasTreeHit<String> hit = new MtasTreeHit<String>(
                 token.getPositionStart(), token.getPositionEnd(),
                 token.getTokenRef(), 0, 0, token.getValue());
@@ -347,7 +358,6 @@ public class CodecInfo {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectPosition = indexInputList
         .get("indexObjectPosition");
-    IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");
     // create tree interval hits
     IntervalRBTree<String> positionTree = new IntervalRBTree<String>(
@@ -391,13 +401,13 @@ public class CodecInfo {
    * @return the objects
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public ArrayList<MtasToken<String>> getObjects(List<MtasTreeHit<?>> hits)
+  public ArrayList<MtasTokenString> getObjects(List<MtasTreeHit<?>> hits)
       throws IOException {
-    ArrayList<MtasToken<String>> tokens = new ArrayList<MtasToken<String>>();
+    ArrayList<MtasTokenString> tokens = new ArrayList<>();
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
-      MtasToken<String> token = MtasCodecPostingsFormat.getToken(inObject,
+      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,
           inTerm, hit.ref);
       if (token != null) {
         tokens.add(token);
@@ -646,22 +656,25 @@ public class CodecInfo {
     public int docId;
 
     /** The fp index object parent. */
-    public long fpIndexObjectId, fpIndexObjectPosition, fpIndexObjectParent;
+    public long fpIndexObjectId;
+    public long fpIndexObjectPosition;
+    public long fpIndexObjectParent;
 
     /** The object ref approx offset. */
-    public long smallestObjectFilepointer, objectRefApproxOffset;
+    public long smallestObjectFilepointer;
+    public long objectRefApproxOffset;
 
     /** The object ref approx quotient. */
     public int objectRefApproxQuotient;
 
-    /** The offset. */
-    public long offset;
-
+    
     /** The storage flags. */
     public byte storageFlags;
 
     /** The max position. */
-    public int size, minPosition, maxPosition;
+    public int size;
+    public int minPosition;
+    public int maxPosition;
 
     /**
      * Instantiates a new index doc.
@@ -677,8 +690,7 @@ public class CodecInfo {
         }
         docId = inIndexDoc.readVInt(); // docId
         fpIndexObjectId = inIndexDoc.readVLong(); // ref indexObjectId
-        fpIndexObjectPosition = inIndexDoc.readVLong(); // ref
-                                                        // indexObjectPosition
+        fpIndexObjectPosition = inIndexDoc.readVLong(); // ref indexObjectPosition
         fpIndexObjectParent = inIndexDoc.readVLong(); // ref indexObjectParent
         smallestObjectFilepointer = inIndexDoc.readVLong(); // offset
         objectRefApproxQuotient = inIndexDoc.readVInt(); // slope
@@ -688,7 +700,7 @@ public class CodecInfo {
         minPosition = inIndexDoc.readVInt(); // minimum position
         maxPosition = inIndexDoc.readVInt(); // maximum position
       } catch (Exception e) {
-        throw new IOException(e.getMessage());
+        throw new IOException(e);
       }
     }
   }
@@ -696,13 +708,16 @@ public class CodecInfo {
   /**
    * The Class FieldReferences.
    */
-  public class FieldReferences {
+  private static class FieldReferences {
 
     /** The ref prefix. */
-    public long refIndexDoc, refIndexDocId, refTerm, refPrefix;
+    public long refIndexDoc;
+    public long refIndexDocId;
+    public long refPrefix;
 
     /** The number of prefixes. */
-    public int numberOfDocs, numberOfTerms, numberOfPrefixes;
+    public int numberOfDocs;
+    public int numberOfPrefixes;
 
     /**
      * Instantiates a new field references.
@@ -716,13 +731,11 @@ public class CodecInfo {
      * @param numberOfPrefixes the number of prefixes
      */
     public FieldReferences(long refIndexDoc, long refIndexDocId,
-        int numberOfDocs, long refTerm, int numberOfTerms, long refPrefix,
+        int numberOfDocs, long refPrefix,
         int numberOfPrefixes) {
       this.refIndexDoc = refIndexDoc;
       this.refIndexDocId = refIndexDocId;
       this.numberOfDocs = numberOfDocs;
-      this.refTerm = refTerm;
-      this.numberOfTerms = numberOfTerms;
       this.refPrefix = refPrefix;
       this.numberOfPrefixes = numberOfPrefixes;
     }

@@ -2,10 +2,13 @@ package mtas.analysis.token;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,7 +29,7 @@ import org.apache.lucene.util.automaton.TooComplexToDeterminizeException;
  * @param <GenericType>
  *          the generic type
  */
-public abstract class MtasToken<GenericType> {
+public abstract class MtasToken {
 
   /** The Constant DELIMITER. */
   public static final String DELIMITER = "\u0001";
@@ -302,7 +305,7 @@ public abstract class MtasToken<GenericType> {
    * @param list
    *          the list
    */
-  final public void addPositions(TreeSet<Integer> list) {
+  final public void addPositions(Set<Integer> list) {
     int[] positions = ArrayUtils
         .toPrimitive(list.toArray(new Integer[list.size()]));
     addPositions(positions);
@@ -316,7 +319,11 @@ public abstract class MtasToken<GenericType> {
    * @return the boolean
    */
   final public Boolean checkPositionType(String type) {
-    return tokenPosition == null ? false : tokenPosition.checkType(type);
+    if(tokenPosition==null) {
+      return false;
+    } else {
+      return tokenPosition.checkType(type);
+    }    
   }
 
   /**
@@ -640,12 +647,7 @@ public abstract class MtasToken<GenericType> {
         return "";
       }
     }
-    try {
-      return new String(Arrays.copyOfRange(postfix, start, i), "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      return "";
-    }
-
+    return new String(Arrays.copyOfRange(postfix, start, i), StandardCharsets.UTF_8);    
   }
 
   /**
@@ -739,8 +741,8 @@ public abstract class MtasToken<GenericType> {
   public static HashMap<String, ByteRunAutomaton> byteRunAutomatonMap(HashMap<String, Automaton> automatonMap) {
     HashMap<String, ByteRunAutomaton> byteRunAutomatonMap = new HashMap<String, ByteRunAutomaton>();
     if(automatonMap!=null) {
-      for(String key : automatonMap.keySet()) {
-        byteRunAutomatonMap.put(key, new ByteRunAutomaton(automatonMap.get(key)));
+      for(Entry<String,Automaton> entry : automatonMap.entrySet()) {
+        byteRunAutomatonMap.put(entry.getKey(), new ByteRunAutomaton(entry.getValue()));
       }
     }
     return byteRunAutomatonMap;
@@ -767,7 +769,7 @@ public abstract class MtasToken<GenericType> {
       automatonRegexp = re.toAutomaton();
     }
     int step = 500;
-    List<String> keyList = new ArrayList<String>(automatonMap.keySet());
+    List<String> keyList = new ArrayList<>(automatonMap.keySet());
     for (int i = 0; i < keyList.size(); i += step) {
       int localStep = step;
       boolean success = false;
@@ -775,7 +777,7 @@ public abstract class MtasToken<GenericType> {
       while (!success) {
         success = true;
         int next = Math.min(keyList.size(), i + localStep);
-        List<Automaton> listAutomaton = new ArrayList<Automaton>();
+        List<Automaton> listAutomaton = new ArrayList<>();
         for (int j = i; j < next; j++) {
           listAutomaton.add(automatonMap.get(keyList.get(j)));
         }

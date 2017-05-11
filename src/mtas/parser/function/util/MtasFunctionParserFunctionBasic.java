@@ -19,16 +19,16 @@ public class MtasFunctionParserFunctionBasic
   private int firstId;
 
   /** The tmp parser longs. */
-  private ArrayList<MtasFunctionParserFunction> tmpParserLongs = new ArrayList<MtasFunctionParserFunction>();
+  private ArrayList<MtasFunctionParserFunction> tmpParserLongs = new ArrayList<>();
 
   /** The tmp parser doubles. */
-  private ArrayList<MtasFunctionParserFunction> tmpParserDoubles = new ArrayList<MtasFunctionParserFunction>();
+  private ArrayList<MtasFunctionParserFunction> tmpParserDoubles = new ArrayList<>();
 
   /** The tmp constant longs. */
-  private ArrayList<Long> tmpConstantLongs = new ArrayList<Long>();
+  private ArrayList<Long> tmpConstantLongs = new ArrayList<>();
 
   /** The tmp constant doubles. */
-  private ArrayList<Double> tmpConstantDoubles = new ArrayList<Double>();
+  private ArrayList<Double> tmpConstantDoubles = new ArrayList<>();
 
   /** The number. */
   private int number;
@@ -43,13 +43,13 @@ public class MtasFunctionParserFunctionBasic
   private int[] idList;
 
   /** The tmp operator list. */
-  private ArrayList<String> tmpOperatorList = new ArrayList<String>();
+  private ArrayList<String> tmpOperatorList = new ArrayList<>();
 
   /** The tmp type list. */
-  private ArrayList<String> tmpTypeList = new ArrayList<String>();
+  private ArrayList<String> tmpTypeList = new ArrayList<>();
 
   /** The tmp id list. */
-  private ArrayList<Integer> tmpIdList = new ArrayList<Integer>();
+  private ArrayList<Integer> tmpIdList = new ArrayList<>();
 
   /** The Constant BASIC_OPERATOR_ADD. */
   public final static String BASIC_OPERATOR_ADD = "add";
@@ -145,21 +145,21 @@ public class MtasFunctionParserFunctionBasic
   public void close() throws ParseException {
     if (!defined()) {
       super.close();
-      if (tmpParserLongs.size() > 0) {
+      if (!tmpParserLongs.isEmpty()) {
         parserLongs = new MtasFunctionParserFunction[tmpParserLongs.size()];
         parserLongs = tmpParserLongs.toArray(parserLongs);
       }
-      if (tmpParserDoubles.size() > 0) {
+      if (!tmpParserDoubles.isEmpty()) {
         parserDoubles = new MtasFunctionParserFunction[tmpParserDoubles.size()];
         parserDoubles = tmpParserDoubles.toArray(parserDoubles);
       }
-      if (tmpConstantLongs.size() > 0) {
+      if (!tmpConstantLongs.isEmpty()) {
         constantLongs = new long[tmpConstantLongs.size()];
         for (int i = 0; i < tmpConstantLongs.size(); i++) {
           constantLongs[i] = tmpConstantLongs.get(i);
         }
       }
-      if (tmpConstantDoubles.size() > 0) {
+      if (!tmpConstantDoubles.isEmpty()) {
         constantDoubles = new Double[tmpConstantDoubles.size()];
         for (int i = 0; i < tmpConstantDoubles.size(); i++) {
           constantDoubles[i] = tmpConstantDoubles.get(i);
@@ -168,7 +168,7 @@ public class MtasFunctionParserFunctionBasic
       if (firstType == null) {
         throw new ParseException("incorrect definition: no firstType");
       }
-      if (tmpOperatorList.size() > 0) {
+      if (!tmpOperatorList.isEmpty()) {
         number = tmpOperatorList.size();
         if ((tmpTypeList.size() != number) || (tmpIdList.size() != number)) {
           throw new ParseException("incorrect definition additional items");
@@ -284,11 +284,9 @@ public class MtasFunctionParserFunctionBasic
             } else if (degree > 0) {
               sumRule = false;
             }
-          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
-            if (degree != 0) {
-              sumRule = false;
-              degree = null;
-            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
+            sumRule = false;
+            degree = null;
           }
         }
         break;
@@ -334,11 +332,9 @@ public class MtasFunctionParserFunctionBasic
             } else if (degree > 0) {
               sumRule = false;
             }
-          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
-            if (degree != 0) {
-              sumRule = false;
-              degree = null;
-            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
+            sumRule = false;
+            degree = null;
           }
         }
         break;
@@ -356,11 +352,9 @@ public class MtasFunctionParserFunctionBasic
             } else if (degree > 0) {
               sumRule = false;
             }
-          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
-            if (degree != 0) {
-              sumRule = false;
-              degree = null;
-            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
+            sumRule = false;
+            degree = null;            
           }
         }
         break;
@@ -376,7 +370,7 @@ public class MtasFunctionParserFunctionBasic
         if (sumRule && degree != null) {
           if (operator.equals(BASIC_OPERATOR_ADD)
               || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-            if (parser.degree != degree) {
+            if (!parser.degree.equals(degree)) {
               sumRule = false;
               if (degree < 0) {
                 degree = null;
@@ -389,11 +383,9 @@ public class MtasFunctionParserFunctionBasic
               sumRule = false;
             }
             degree += parser.degree;
-          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
-            if (degree != 0) {
-              sumRule = false;
-              degree = null;
-            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
+            sumRule = false;
+            degree = null;            
           }
         }
         break;
@@ -410,7 +402,7 @@ public class MtasFunctionParserFunctionBasic
         if (sumRule && degree != null) {
           if (operator.equals(BASIC_OPERATOR_ADD)
               || operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-            if (parser.degree != degree) {
+            if (!parser.degree.equals(degree)) {
               sumRule = false;
               if (degree < 0) {
                 degree = null;
@@ -423,11 +415,9 @@ public class MtasFunctionParserFunctionBasic
               sumRule = false;
             }
             degree += parser.degree;
-          } else if (operator.equals(BASIC_OPERATOR_POWER)) {
-            if (degree != 0) {
-              sumRule = false;
-              degree = null;
-            }
+          } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
+            sumRule = false;
+            degree = null;            
           }
         }
         break;
@@ -784,28 +774,29 @@ public class MtasFunctionParserFunctionBasic
    */
   @Override
   public String toString() {
-    String text = "?";
     if (firstType != null) {
-      text = toString(firstType, firstId);
+      StringBuilder text = new StringBuilder(toString(firstType, firstId));
       for (int i = 0; i < tmpOperatorList.size(); i++) {
         String operator = tmpOperatorList.get(i);
         if (operator.equals(BASIC_OPERATOR_ADD)) {
-          text += " + ";
+          text.append(" + ");
         } else if (operator.equals(BASIC_OPERATOR_SUBTRACT)) {
-          text += " - ";
+          text.append(" - ");
         } else if (operator.equals(BASIC_OPERATOR_MULTIPLY)) {
-          text += " * ";
+          text.append(" * ");
         } else if (operator.equals(BASIC_OPERATOR_DIVIDE)) {
-          text += " / ";
+          text.append(" / ");
         } else if (operator.equals(BASIC_OPERATOR_POWER)) {
-          text += " ^ ";
+          text.append(" ^ ");
         } else {
-          text += " ? ";
+          text.append(" ? ");
         }
-        text += toString(tmpTypeList.get(i), tmpIdList.get(i));
+        text.append(toString(tmpTypeList.get(i), tmpIdList.get(i)));
       }
+      return text.toString();
+    } else {
+      return "?";
     }
-    return text;
   }
 
   /**

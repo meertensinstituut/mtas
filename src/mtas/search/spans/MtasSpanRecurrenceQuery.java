@@ -18,8 +18,7 @@ import mtas.search.spans.util.MtasSpanQuery;
 /**
  * The Class MtasSpanRecurrenceQuery.
  */
-public class MtasSpanRecurrenceQuery extends MtasSpanQuery
-    implements Cloneable {
+public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
 
   /** The clause. */
   private MtasSpanQuery query;
@@ -63,7 +62,11 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
       if (ignoreQuery.getField() == null
           || field.equals(ignoreQuery.getField())) {
         this.ignoreQuery = ignoreQuery;
-        this.maximumIgnoreLength = maximumIgnoreLength==null?1:maximumIgnoreLength;
+        if (maximumIgnoreLength == null) {
+          this.maximumIgnoreLength = 1;
+        } else {
+          this.maximumIgnoreLength = maximumIgnoreLength;
+        }
       } else {
         throw new IllegalArgumentException(
             "ignore must have same field as clauses");
@@ -112,7 +115,8 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
     this.minimumRecurrence = minimumRecurrence;
     this.maximumRecurrence = maximumRecurrence;
     // set minimum/maximum
-    Integer minimum = null, maximum = null;
+    Integer minimum = null;
+    Integer maximum = null;
     if (query.getMinimumWidth() != null) {
       minimum = minimumRecurrence * query.getMinimumWidth();
     }
@@ -155,10 +159,10 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
       MtasSpanQuery newIgnoreQuery = (ignoreQuery != null)
           ? ignoreQuery.rewrite(reader) : null;
       if (newQuery instanceof MtasSpanRecurrenceQuery) {
-        // TODO: for now too difficult, possibly merge later
+        // for now too difficult, possibly merge later
       }
-      if (newQuery != query
-          || (newIgnoreQuery != null && newIgnoreQuery != ignoreQuery)) {
+      if (!newQuery.equals(query)
+          || (newIgnoreQuery != null && !newIgnoreQuery.equals(ignoreQuery))) {
         return new MtasSpanRecurrenceQuery(newQuery, minimumRecurrence,
             maximumRecurrence, newIgnoreQuery, maximumIgnoreLength)
                 .rewrite(reader);
@@ -199,12 +203,19 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
     if (getClass() != obj.getClass())
       return false;
     final MtasSpanRecurrenceQuery other = (MtasSpanRecurrenceQuery) obj;
-    return query.equals(other.query)
-        && minimumRecurrence == other.minimumRecurrence
-        && maximumRecurrence == other.maximumRecurrence
-        && ((ignoreQuery == null && other.ignoreQuery == null)
-            || ignoreQuery != null && other.ignoreQuery != null
-                && ignoreQuery.equals(other.ignoreQuery));
+    boolean result;
+    result = query.equals(other.query);
+    result &= minimumRecurrence == other.minimumRecurrence;
+    result &= maximumRecurrence == other.maximumRecurrence;
+    if (result) {
+      boolean subResult;
+      subResult = ignoreQuery == null && other.ignoreQuery == null;
+      subResult |= ignoreQuery != null && other.ignoreQuery != null
+          && ignoreQuery.equals(other.ignoreQuery);
+      return subResult;
+    } else {
+      return false;
+    }
   }
 
   /*
@@ -244,7 +255,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
   /**
    * The Class SpanRecurrenceWeight.
    */
-  public class SpanRecurrenceWeight extends SpanWeight {
+  protected class SpanRecurrenceWeight extends SpanWeight {
 
     /** The sub weight. */
     final SpanWeight subWeight;
@@ -318,7 +329,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery
           if (ignoreWeight != null) {
             ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);
           }
-          return new MtasSpanRecurrenceSpans(MtasSpanRecurrenceQuery.this,
+          return new MtasSpanRecurrenceSpans(
               subSpans, minimumRecurrence, maximumRecurrence, ignoreSpans,
               maximumIgnoreLength);
         }

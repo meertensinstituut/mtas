@@ -20,6 +20,7 @@ import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentPosition;
 import mtas.codec.util.CodecComponent.ComponentSpan;
+import mtas.codec.util.CodecComponent.ComponentStats;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecComponent.SubComponentFunction;
 import mtas.codec.util.collector.MtasDataCollector;
@@ -30,7 +31,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentStats.
  */
-public class MtasSolrComponentStats {
+public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats> {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -178,7 +179,7 @@ public class MtasSolrComponentStats {
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
@@ -208,7 +209,7 @@ public class MtasSolrComponentStats {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas stats positions");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields,
@@ -233,7 +234,7 @@ public class MtasSolrComponentStats {
             : Double.parseDouble(maxima[i]);
         try {
           mtasFields.list.get(field).statsPositionList
-              .add(new ComponentPosition(field, key, minimum, maximum, type));
+              .add(new ComponentPosition(key, minimum, maximum, type));
         } catch (ParseException e) {
           throw new IOException(e.getMessage());
         }
@@ -252,7 +253,7 @@ public class MtasSolrComponentStats {
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_TOKENS);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
@@ -282,7 +283,7 @@ public class MtasSolrComponentStats {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas stats tokens");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields,
@@ -304,7 +305,7 @@ public class MtasSolrComponentStats {
             : Double.parseDouble(maxima[i]);
         try {
           mtasFields.list.get(field).statsTokenList
-              .add(new ComponentToken(field, key, minimum, maximum, type));
+              .add(new ComponentToken(key, minimum, maximum, type));
         } catch (ParseException e) {
           throw new IOException(e.getMessage());
         }
@@ -323,7 +324,7 @@ public class MtasSolrComponentStats {
       throws IOException {
     SortedSet<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
@@ -381,7 +382,7 @@ public class MtasSolrComponentStats {
         Set<String> qIds = MtasSolrResultUtil
             .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS
                 + "." + id + "." + NAME_MTAS_STATS_SPANS_QUERY);
-        if (qIds.size() > 0) {
+        if (!qIds.isEmpty()) {
           int tmpQCounter = 0;
           queryTypes[tmpCounter] = new String[qIds.size()];
           queryValues[tmpCounter] = new String[qIds.size()];
@@ -417,9 +418,9 @@ public class MtasSolrComponentStats {
                 PARAM_MTAS_STATS_SPANS + "." + id + "."
                     + NAME_MTAS_STATS_SPANS_QUERY + "." + qId + "."
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
-            queryVariables[tmpCounter][tmpQCounter] = new HashMap<String, String[]>();
-            if (vIds.size() > 0) {
-              HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+            queryVariables[tmpCounter][tmpQCounter] = new HashMap<>();
+            if (!vIds.isEmpty()) {
+              HashMap<String, ArrayList<String>> tmpVariables = new HashMap<>();
               for (String vId : vIds) {
                 String name = rb.req.getParams()
                     .get(PARAM_MTAS_STATS_SPANS + "." + id + "."
@@ -438,7 +439,7 @@ public class MtasSolrComponentStats {
                           + "." + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE,
                           null);
                   if (value != null) {
-                    ArrayList<String> list = new ArrayList<String>();
+                    ArrayList<String> list = new ArrayList<>();
                     String[] subList = value.split("(?<!\\\\),");
                     for (int i = 0; i < subList.length; i++) {
                       list.add(
@@ -476,7 +477,7 @@ public class MtasSolrComponentStats {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas stats spans");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields,
@@ -573,23 +574,23 @@ public class MtasSolrComponentStats {
    */
   private String generateKey(String key,
       HashMap<String, String[]>[] queryVariables) {
-    String newKey = key;
-    newKey += " -";
+    StringBuilder newKey = new StringBuilder(key);
+    newKey.append(" -");
     for (int q = 0; q < queryVariables.length; q++) {
       if (queryVariables[q] != null && queryVariables[q].size() > 0) {
         for (String name : queryVariables[q].keySet()) {
-          newKey += " q" + q + ":$" + name + "=";
+          newKey.append(" q" + q + ":$" + name + "=");
           if (queryVariables[q].get(name) != null
               && queryVariables[q].get(name).length == 1) {
-            newKey += "'" + queryVariables[q].get(name)[0].replace("\\", "\\\\")
-                .replace(",", "\\,") + "'";
+            newKey.append("'" + queryVariables[q].get(name)[0].replace("\\", "\\\\")
+                .replace(",", "\\,") + "'");
           } else {
-            newKey += "-";
+            newKey.append("-");
           }
         }
       }
     }
-    return newKey;
+    return newKey.toString();
   }
 
   /**
@@ -601,11 +602,10 @@ public class MtasSolrComponentStats {
   private HashMap<String, String[]>[][] expandedQueryVariables(
       HashMap<String, String[]>[] queryVariables) {
     HashMap<String, String[]>[][] subResult = new HashMap[queryVariables.length][];
-    int e = 0;
     for (int q = 0; q < queryVariables.length; q++) {
       subResult[q] = expandedQueryVariables(queryVariables[q]);
     }
-    ArrayList<HashMap<String, String[]>[]> result = new ArrayList<HashMap<String, String[]>[]>();
+    ArrayList<HashMap<String, String[]>[]> result = new ArrayList<>();
     generatePermutations(result, 0, subResult);
     return result.toArray(new HashMap[result.size()][]);
   }
@@ -628,7 +628,7 @@ public class MtasSolrComponentStats {
         result.add(resultItem);
       }
     } else {
-      ArrayList<HashMap<String, String[]>[]> newResult = new ArrayList<HashMap<String, String[]>[]>();
+      ArrayList<HashMap<String, String[]>[]> newResult = new ArrayList<>();
       for (int e = 0; e < result.size(); e++) {
         for (int i = 0; i < value.length; i++) {
           HashMap<String, String[]>[] resultItem = result.get(e);
@@ -653,7 +653,7 @@ public class MtasSolrComponentStats {
    */
   private HashMap<String, String[]>[] expandedQueryVariables(
       HashMap<String, String[]> queryVariables) {
-    ArrayList<HashMap<String, String[]>> result = new ArrayList<HashMap<String, String[]>>();
+    ArrayList<HashMap<String, String[]>> result = new ArrayList<>();
     Set<String> keys = queryVariables.keySet();
     generatePermutationsQueryVariables(result, keys, queryVariables);
     return result.toArray(new HashMap[result.size()]);
@@ -669,26 +669,26 @@ public class MtasSolrComponentStats {
   private void generatePermutationsQueryVariables(
       ArrayList<HashMap<String, String[]>> result, Set<String> keys,
       HashMap<String, String[]> queryVariables) {
-    if (keys != null && keys.size() > 0) {
-      Set<String> newKeys = new HashSet<String>();
+    if (keys != null && !keys.isEmpty()) {
+      Set<String> newKeys = new HashSet<>();
       Iterator<String> it = keys.iterator();
       String key = it.next();
       String[] value = queryVariables.get(key);
-      if (result.size() == 0) {
+      if (result.isEmpty()) {
         HashMap<String, String[]> newItem;
         if (value == null || value.length == 0) {
-          newItem = new HashMap<String, String[]>();
+          newItem = new HashMap<>();
           newItem.put(key, value);
           result.add(newItem);
         } else {
           for (int j = 0; j < value.length; j++) {
-            newItem = new HashMap<String, String[]>();
+            newItem = new HashMap<>();
             newItem.put(key, new String[] { value[j] });
             result.add(newItem);
           }
         }
       } else {
-        ArrayList<HashMap<String, String[]>> newResult = new ArrayList<HashMap<String, String[]>>();
+        ArrayList<HashMap<String, String[]>> newResult = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) {
           HashMap<String, String[]> newItem;
           if (value == null || value.length == 0) {
@@ -824,6 +824,20 @@ public class MtasSolrComponentStats {
     }
   }
 
+  @Override
+  public SimpleOrderedMap<Object> create(ComponentStats response,
+      Boolean encode) throws IOException {
+    if(response instanceof ComponentPosition) {
+      return createPosition((ComponentPosition) response, encode);
+    } else if(response instanceof ComponentToken) {
+      return createToken((ComponentToken) response, encode);
+    } else if(response instanceof ComponentSpan) {
+      return createSpan((ComponentSpan) response, encode);
+    } else {
+      throw new IOException("incorrect type "+response.getClass());
+    }
+  }
+  
   /**
    * Creates the position.
    *
@@ -832,7 +846,7 @@ public class MtasSolrComponentStats {
    * @return the simple ordered map
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public SimpleOrderedMap<Object> createPosition(ComponentPosition position,
+  private SimpleOrderedMap<Object> createPosition(ComponentPosition position,
       Boolean encode) throws IOException {
     // System.out.println("Create stats position " + position.dataType + " "
     // + position.statsType + " " + position.statsItems + " --- " + encode);
@@ -858,7 +872,7 @@ public class MtasSolrComponentStats {
    * @return the simple ordered map
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public SimpleOrderedMap<Object> createToken(ComponentToken token,
+  private SimpleOrderedMap<Object> createToken(ComponentToken token,
       Boolean encode) throws IOException {
     // System.out.println("Create stats position " + position.dataType + " "
     // + position.statsType + " " + position.statsItems + " --- " + encode);
@@ -884,14 +898,14 @@ public class MtasSolrComponentStats {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
-  public SimpleOrderedMap<Object> createSpan(ComponentSpan span, Boolean encode)
+  private SimpleOrderedMap<Object> createSpan(ComponentSpan span, Boolean encode)
       throws IOException {
     // System.out.println("Create stats span " + span.dataType + " "
     // + span.statsType + " " + span.statsItems + " --- " + encode);
     SimpleOrderedMap<Object> mtasSpanResponse = new SimpleOrderedMap<>();
     mtasSpanResponse.add("key", span.key);
-    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
-    HashMap<String, MtasSolrMtasResult> functionDataItem = new HashMap<String, MtasSolrMtasResult>();
+    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<>();
+    HashMap<String, MtasSolrMtasResult> functionDataItem = new HashMap<>();
     functionData.put(span.dataCollector, functionDataItem);
     if (span.functions != null) {
       for (SubComponentFunction function : span.functions) {
@@ -977,5 +991,7 @@ public class MtasSolrComponentStats {
       mtasResponse = null;
     }
   }
+
+  
 
 }

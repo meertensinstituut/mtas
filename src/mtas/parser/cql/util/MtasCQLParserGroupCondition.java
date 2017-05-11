@@ -51,21 +51,19 @@ public class MtasCQLParserGroupCondition {
    */
   @Override
   public boolean equals(Object object) {
-    if (object == null) {
-      return false;
-    } else if (object instanceof MtasCQLParserGroupCondition) {
-      MtasCQLParserGroupCondition condition = (MtasCQLParserGroupCondition) object;
-      // basic checks
-      if (!field.equals(condition.field)) {
-        return false;
-      } else {
-        if (!this.condition.equals(condition)) {
-          return false;
-        }
-        return true;
-      }
+    if (object != null && object instanceof MtasCQLParserGroupCondition) {
+      MtasCQLParserGroupCondition groupCondition = (MtasCQLParserGroupCondition) object;
+      return field.equals(groupCondition.field) && condition.equals(groupCondition.condition);      
     } else {
       return false;
     }
+  }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 5) ^ field.hashCode();
+    h = (h * 7) ^ condition.hashCode();
+    return h;
   }
 }

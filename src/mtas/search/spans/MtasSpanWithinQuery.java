@@ -3,19 +3,10 @@ package mtas.search.spans;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.SpanWithinQuery;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.util.MtasSpanMaximumExpandQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
@@ -63,9 +54,9 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     rightBoundaryMinimum = rightMinimum;
     rightBoundaryMaximum = rightMaximum;
     autoAdjustBigQuery = adjustBigQuery;
-    if (bigQuery.getField() != null) {
+    if (bigQuery!=null && bigQuery.getField() != null) {
       field = bigQuery.getField();
-    } else if (smallQuery.getField() != null) {
+    } else if (smallQuery!=null && smallQuery.getField() != null) {
       field = smallQuery.getField();
     } else {
       field = null;
@@ -190,7 +181,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
           leftBoundaryMinimum += newLeftBoundaryMinimum;
           rightBoundaryMaximum += newRightBoundaryMaximum;
           rightBoundaryMinimum += newRightBoundaryMinimum;
-          if (newItems.size() == 0) {
+          if (newItems.isEmpty()) {
             rightBoundaryMaximum = Math.max(0,
                 rightBoundaryMaximum + leftBoundaryMaximum - 1);
             rightBoundaryMinimum = Math.max(0,
@@ -215,12 +206,11 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
       }
     }
 
-    if (newBigQuery != bigQuery || newSmallQuery != smallQuery) {
+    if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {
       return (new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
           leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
           rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);
-    } else if (newBigQuery != null && newSmallQuery != null
-        && newBigQuery.equals(newSmallQuery)) {
+    } else if (newBigQuery.equals(newSmallQuery)) {
       return newBigQuery;
     } else {
       baseQuery = (SpanWithinQuery) baseQuery.rewrite(reader);

@@ -29,14 +29,4 @@ public class MtasAVLTreeNode extends MtasTreeNode<MtasAVLTreeNode> {
     this.parent = parent;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.tree.MtasTreeNode#self()
-   */
-  @Override
-  protected MtasAVLTreeNode self() {
-    return self();
-  }
-
 }

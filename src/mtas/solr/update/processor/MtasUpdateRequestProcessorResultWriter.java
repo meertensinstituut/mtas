@@ -5,12 +5,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.util.BytesRef;
 
 /**
  * The Class MtasUpdateRequestProcessorResultWriter.
  */
 public class MtasUpdateRequestProcessorResultWriter implements Closeable {
+
+  /** The log. */
+  private static Log log = LogFactory
+      .getLog(MtasUpdateRequestProcessorResultWriter.class);
 
   /** The object output stream. */
   private ObjectOutputStream objectOutputStream;
@@ -45,6 +52,7 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
       objectOutputStream.writeObject(value);
     } catch (IOException e) {
       forceCloseAndDelete();
+      log.debug(e);
     }
   }
 
@@ -70,6 +78,7 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
         objectOutputStream.flush();
       } catch (IOException e) {
         forceCloseAndDelete();
+        log.debug(e);
       }
     }
   }
@@ -107,7 +116,7 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     if (!closed) {
       objectOutputStream.close();
       fileOutputStream.close();
-      closed = true;      
+      closed = true;
     }
   }
 
@@ -125,13 +134,13 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
         fileOutputStream = null;
       }
     } catch (IOException e) {
-      // do nothing;
+      log.debug(e);
     }
     closed = true;
     tokenNumber = 0;
     if (file != null) {
-      if (file.exists() && file.canWrite()) {
-        file.delete();
+      if (file.exists() && file.canWrite() && !file.delete()) {
+        log.debug("couldn't delete " + file.getName());
       }
       file = null;
     }

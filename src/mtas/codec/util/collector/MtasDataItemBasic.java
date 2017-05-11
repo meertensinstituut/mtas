@@ -156,13 +156,14 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
    * 
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
    */
-  public final NumberComparator<Long> getCompareValue0() {
+  public final MtasDataItemNumberComparator<Long> getCompareValue0() {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
-      return new NumberComparator<Long>(valueN);
+      return new MtasDataItemNumberComparator<Long>(valueN, sortDirection);
     default:
       return null;
     }
   }
+  
 
 }

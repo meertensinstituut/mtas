@@ -38,14 +38,4 @@ public class MtasRBTreeNode extends MtasTreeNode<MtasRBTreeNode> {
     this.n = n;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.tree.MtasTreeNode#self()
-   */
-  @Override
-  protected MtasRBTreeNode self() {
-    return self();
-  }
-
 }

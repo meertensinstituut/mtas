@@ -23,16 +23,19 @@ public class MtasSolrMtasResult implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** The stats type. */
-  public String dataType, statsType;
+  public String dataType;
+  public String statsType;
 
   /** The stats items. */
   public TreeSet<String> statsItems;
 
   /** The sort direction. */
-  public String sortType, sortDirection;
+  public String sortType;
+  public String sortDirection;
 
   /** The number. */
-  public Integer start, number;
+  public Integer start;
+  public Integer number;
 
   /** The data collector. */
   public MtasDataCollector<?, ?> dataCollector = null;
@@ -41,16 +44,19 @@ public class MtasSolrMtasResult implements Serializable {
   public HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData;
 
   /** The sub stats type. */
-  private String[] subDataType, subStatsType;
+  private String[] subDataType;
+  private String[] subStatsType;
 
   /** The sub stats items. */
   private TreeSet<String>[] subStatsItems;
 
   /** The sub sort direction. */
-  private String[] subSortType, subSortDirection;
+  private String[] subSortType;
+  private String[] subSortDirection;
 
   /** The sub number. */
-  private Integer[] subStart, subNumber;
+  private Integer[] subStart;
+  private Integer[] subNumber;
 
   /**
    * Instantiates a new mtas solr result.
@@ -89,6 +95,8 @@ public class MtasSolrMtasResult implements Serializable {
     this.sortDirection = (sortDirection == null) ? null : sortDirection[0];
     this.start = (start == null) ? null : start[0];
     this.number = (number == null) ? null : number[0];
+    this.subStart = null;
+    this.subNumber = null;
     if ((dataType != null) && (dataType.length > 1)) {
       subDataType = new String[dataType.length - 1];
       subStatsType = new String[dataType.length - 1];
@@ -143,14 +151,14 @@ public class MtasSolrMtasResult implements Serializable {
    *           Signals that an I/O exception has occurred.
    */
   void merge(MtasSolrMtasResult newItem) throws IOException {
-    HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>>();
+    HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<>();
     if(newItem.dataCollector.withTotal()) {
       dataCollector.setWithTotal();
     }
     dataCollector.merge(newItem.dataCollector, map, true);
     if (newItem.functionData != null) {
       if (functionData == null) {
-        functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
+        functionData = new HashMap<>();
       }
       for (MtasDataCollector<?, ?> keyCollector : newItem.functionData
           .keySet()) {
@@ -196,17 +204,17 @@ public class MtasSolrMtasResult implements Serializable {
         .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
       NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
       // functions
-      Map<String, NamedList<Object>> functionList = new HashMap<String, NamedList<Object>>();
+      Map<String, NamedList<Object>> functionList = new HashMap<>();
       if (functionData != null && functionData.containsKey(dataCollector)) {
         HashMap<String, MtasSolrMtasResult> functionDataItem = functionData
             .get(dataCollector);
-        for (String functionKey : functionDataItem.keySet()) {
-          MtasSolrMtasResult functionResult = functionDataItem.get(functionKey);
+        for (Entry <String, MtasSolrMtasResult> entry : functionDataItem.entrySet()) {
+          MtasSolrMtasResult functionResult = entry.getValue();
           if (functionResult.dataCollector.getCollectorType()
               .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
             NamedList<Object> functionData = functionResult
                 .getData(showDebugInfo);
-            functionList.put(functionKey, functionData);
+            functionList.put(entry.getKey(), functionData);
           } else {
             throw new IOException("unexpected function collectorType "
                 + functionResult.dataCollector.getCollectorType());
@@ -220,21 +228,21 @@ public class MtasSolrMtasResult implements Serializable {
         if (functionList.size() > 0) {
           mtasResponse.add("functions", functionList);
         }
-      }
-      if ((subDataType != null) && (dataItem.getSub() != null)) {
-        MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(), subDataType,
-            subStatsType, subStatsItems, subSortType, subSortDirection,
-            subStart, subNumber, functionData);
-        if (dataItem.getSub().getCollectorType()
-            .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-          mtasResponse.add(dataItem.getSub().getCollectorType(),
-              css.getNamedList(showDebugInfo));
-        } else if (dataItem.getSub().getCollectorType()
-            .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
-          mtasResponse.add(dataItem.getSub().getCollectorType(),
-              css.getData(showDebugInfo));
+        if ((subDataType != null) && (dataItem.getSub() != null)) {
+          MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(), subDataType,
+              subStatsType, subStatsItems, subSortType, subSortDirection,
+              subStart, subNumber, functionData);
+          if (dataItem.getSub().getCollectorType()
+              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
+            mtasResponse.add(dataItem.getSub().getCollectorType(),
+                css.getNamedList(showDebugInfo));
+          } else if (dataItem.getSub().getCollectorType()
+              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
+            mtasResponse.add(dataItem.getSub().getCollectorType(),
+                css.getData(showDebugInfo));
+          }
         }
-      }
+      }      
       return mtasResponse;
     } else {
       throw new IOException(
@@ -290,12 +298,12 @@ public class MtasSolrMtasResult implements Serializable {
         .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
       SimpleOrderedMap<Object> mtasResponseList = new SimpleOrderedMap<>();
       // functions
-      Map<String, SimpleOrderedMap<Object>> functionList = new HashMap<String, SimpleOrderedMap<Object>>();
+      Map<String, SimpleOrderedMap<Object>> functionList = new HashMap<>();
       if (functionData != null && functionData.containsKey(dataCollector)) {
         HashMap<String, MtasSolrMtasResult> functionDataItem = functionData
             .get(dataCollector);
-        for (String functionKey : functionDataItem.keySet()) {
-          MtasSolrMtasResult functionResult = functionDataItem.get(functionKey);
+        for (Entry<String, MtasSolrMtasResult> entry : functionDataItem.entrySet()) {
+          MtasSolrMtasResult functionResult = entry.getValue();
           if (functionResult.dataCollector.getCollectorType()
               .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
             NamedList<Object> functionNamedList = functionResult
@@ -304,10 +312,10 @@ public class MtasSolrMtasResult implements Serializable {
               if (functionList.containsKey(functionNamedList.getName(i))) {
                 SimpleOrderedMap<Object> tmpMap = functionList
                     .get(functionNamedList.getName(i));
-                tmpMap.add(functionKey, functionNamedList.getVal(i));
+                tmpMap.add(entry.getKey(), functionNamedList.getVal(i));
               } else {
                 SimpleOrderedMap<Object> tmpMap = new SimpleOrderedMap<>();
-                tmpMap.add(functionKey, functionNamedList.getVal(i));
+                tmpMap.add(entry.getKey(), functionNamedList.getVal(i));
                 functionList.put(functionNamedList.getName(i), tmpMap);
               }
             }
@@ -382,7 +390,7 @@ public class MtasSolrMtasResult implements Serializable {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public MtasDataCollectorResult<?, ?> getResult() throws IOException {
+  public MtasDataCollectorResult getResult() throws IOException {
     return dataCollector.getResult();
   }
 

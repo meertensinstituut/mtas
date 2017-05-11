@@ -150,5 +150,12 @@ public class MtasCQLParserWordFullCondition
       return false;
     }
   }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 7) ^ wordCondition.hashCode();
+    return h;
+  }
 
 }

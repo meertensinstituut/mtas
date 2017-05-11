@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -20,28 +21,28 @@ import org.apache.lucene.analysis.util.ResourceLoader;
 public class MtasConfiguration {
 
   /** The configurations mtas. */
-  public static String CONFIGURATIONS_MTAS = "mtas";
+  public final static String CONFIGURATIONS_MTAS = "mtas";
 
   /** The configurations configurations. */
-  public static String CONFIGURATIONS_CONFIGURATIONS = "configurations";
+  public final static String CONFIGURATIONS_CONFIGURATIONS = "configurations";
 
   /** The configurations configuration. */
-  public static String CONFIGURATIONS_CONFIGURATION = "configuration";
+  public final static String CONFIGURATIONS_CONFIGURATION = "configuration";
 
   /** The configurations configuration name. */
-  public static String CONFIGURATIONS_CONFIGURATION_NAME = "name";
+  public final static String CONFIGURATIONS_CONFIGURATION_NAME = "name";
 
   /** The tokenizer configuration file. */
-  public static String TOKENIZER_CONFIGURATION_FILE = "file";
+  public final static String TOKENIZER_CONFIGURATION_FILE = "file";
 
   /** The charfilter configuration type. */
-  public static String CHARFILTER_CONFIGURATION_TYPE = "type";
+  public final static String CHARFILTER_CONFIGURATION_TYPE = "type";
 
   /** The charfilter configuration prefix. */
-  public static String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
+  public final static String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
 
   /** The charfilter configuration postfix. */
-  public static String CHARFILTER_CONFIGURATION_POSTFIX = "postfix";
+  public final static String CHARFILTER_CONFIGURATION_POSTFIX = "postfix";
 
   /** The name. */
   public String name;
@@ -207,8 +208,8 @@ public class MtasConfiguration {
       throw new IOException("no configurations");
     } else {
       HashMap<String, MtasConfiguration> result = new HashMap<String, MtasConfiguration>();
-      for (String name : configs.keySet()) {
-        HashMap<String, String> config = configs.get(name);
+      for (Entry<String, HashMap<String, String>> entry : configs.entrySet()) {
+        HashMap<String, String> config = entry.getValue();
         if (config.containsKey(CHARFILTER_CONFIGURATION_TYPE)) {
           MtasConfiguration item = new MtasConfiguration();
           item.attributes.put(CHARFILTER_CONFIGURATION_TYPE,
@@ -217,9 +218,9 @@ public class MtasConfiguration {
               config.get(CHARFILTER_CONFIGURATION_PREFIX));
           item.attributes.put(CHARFILTER_CONFIGURATION_POSTFIX,
               config.get(CHARFILTER_CONFIGURATION_POSTFIX));
-          result.put(name, item);
+          result.put(entry.getKey(), item);
         } else {
-          throw new IOException("configuration " + name + " has no "
+          throw new IOException("configuration " + entry.getKey() + " has no "
               + CHARFILTER_CONFIGURATION_TYPE);
         }
       }
@@ -246,13 +247,13 @@ public class MtasConfiguration {
       throw new IOException("no configurations");
     } else {
       HashMap<String, MtasConfiguration> result = new HashMap<String, MtasConfiguration>();
-      for (String name : configs.keySet()) {
-        HashMap<String, String> config = configs.get(name);
+      for (Entry<String, HashMap<String, String>> entry : configs.entrySet()) {
+        HashMap<String, String> config = entry.getValue();
         if (config.containsKey(TOKENIZER_CONFIGURATION_FILE)) {
-          result.put(name, readConfiguration(resourceLoader
+          result.put(entry.getKey(), readConfiguration(resourceLoader
               .openResource(config.get(TOKENIZER_CONFIGURATION_FILE))));
         } else {
-          throw new IOException("configuration " + name + " has no "
+          throw new IOException("configuration " + entry.getKey() + " has no "
               + TOKENIZER_CONFIGURATION_FILE);
         }
       }
@@ -287,7 +288,6 @@ public class MtasConfiguration {
             }
             break;
           case XMLStreamConstants.END_DOCUMENT:
-            break;
           case XMLStreamConstants.SPACE:
             break;
           case XMLStreamConstants.START_ELEMENT:

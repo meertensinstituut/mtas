@@ -72,10 +72,10 @@ public class MtasBitInputStream extends ByteArrayInputStream {
    */
   public int readEliasGammaCodingInteger() throws IOException {
     int value = readEliasGammaCodingPositiveInteger();
-    if ((value % 2) == 1) {
-      return (value - 1) / 2;
-    } else {
+    if ((value % 2) == 0) {
       return (-value) / 2;
+    } else {
+      return (value - 1) / 2;      
     }
   }
 

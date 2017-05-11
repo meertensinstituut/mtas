@@ -17,25 +17,25 @@ public class MtasCharFilterFactory extends CharFilterFactory
     implements ResourceLoaderAware {
 
   /** The argument type. */
-  public static String ARGUMENT_TYPE = "type";
+  public final static String ARGUMENT_TYPE = "type";
 
   /** The argument prefix. */
-  public static String ARGUMENT_PREFIX = "prefix";
+  public final static String ARGUMENT_PREFIX = "prefix";
 
   /** The argument postfix. */
-  public static String ARGUMENT_POSTFIX = "postfix";
+  public final static String ARGUMENT_POSTFIX = "postfix";
 
   /** The argument config. */
-  public static String ARGUMENT_CONFIG = "config";
+  public final static String ARGUMENT_CONFIG = "config";
 
   /** The argument default. */
-  public static String ARGUMENT_DEFAULT = "default";
+  public final static String ARGUMENT_DEFAULT = "default";
 
   /** The value type url. */
-  public static String VALUE_TYPE_URL = "url";
+  public final static String VALUE_TYPE_URL = "url";
 
   /** The value type file. */
-  public static String VALUE_TYPE_FILE = "file";
+  public final static String VALUE_TYPE_FILE = "file";
 
   /** The config argument. */
   String configArgument;

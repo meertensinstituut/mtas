@@ -66,7 +66,7 @@ ComponentField fieldStats = new ComponentField(CreateIndex.FIELD_CONTENT, Create
 ArrayList<Integer> fullDocSet = new ArrayList<Integer>(Arrays.asList(new Integer[]{0,1,2}));
 ArrayList<Integer> fullDocList = new ArrayList<Integer>();
 try {
-  fieldStats.termVectorList.add(new ComponentTermVector("wordList", "t", null, false, "n,sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC, null, 10, null, null, null, null, null, 0, null, null, null, null));
+  fieldStats.termVectorList.add(new ComponentTermVector("wordList", "t", null, false, "n,sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC, null, 10, null, null, null, null, null, null, null, null, null));
   CodecUtil.collect(CreateIndex.FIELD_CONTENT, searcher, indexReader, fullDocList,
       fullDocSet, fieldStats);
   for (ComponentTermVector ct : fieldStats.termVectorList) {

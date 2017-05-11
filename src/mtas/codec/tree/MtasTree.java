@@ -72,7 +72,7 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  final public <T> void addParentFromToken(MtasToken<T> token)
+  final public void addParentFromToken(MtasToken token)
       throws IOException {
     if (!closed && (token != null)) {
       if (token.checkParentId()) {
@@ -92,7 +92,7 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  final public <T> void addPositionAndObjectFromToken(MtasToken<T> token)
+  final public void addPositionAndObjectFromToken(MtasToken token)
       throws IOException {
     addPositionFromToken(token, token.getTokenRef());
   }
@@ -113,7 +113,7 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  final private <T> void addPositionFromToken(MtasToken<T> token, Long ref)
+  final private void addPositionFromToken(MtasToken token, Long ref)
       throws IOException {
     int prefixId = storePrefixAndTermRef ? token.getPrefixId() : 0;
     if (!closed && (token != null)) {

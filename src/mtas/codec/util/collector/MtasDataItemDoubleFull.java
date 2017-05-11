@@ -184,8 +184,8 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
     int compare = 0;
     if (o instanceof MtasDataItemDoubleFull) {
       MtasDataItemDoubleFull to = (MtasDataItemDoubleFull) o;
-      NumberComparator c1 = getComparableValue();
-      NumberComparator c2 = to.getComparableValue();
+      MtasDataItemNumberComparator c1 = getComparableValue();
+      MtasDataItemNumberComparator c2 = to.getComparableValue();
       compare = (c1 != null && c2 != null) ? c1.compareTo(c2.getValue()) : 0;
     }
     return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;
@@ -197,17 +197,17 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValue1()
    */
   @Override
-  public NumberComparator<Double> getCompareValue1() {
+  public MtasDataItemNumberComparator<Double> getCompareValue1() {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUM:
-      return new NumberComparator<Double>(stats.getSum());
+      return new MtasDataItemNumberComparator<Double>(stats.getSum(), sortDirection);
     case CodecUtil.STATS_TYPE_MAX:
-      return new NumberComparator<Double>(stats.getMax());
+      return new MtasDataItemNumberComparator<Double>(stats.getMax(), sortDirection);
     case CodecUtil.STATS_TYPE_MIN:
-      return new NumberComparator<Double>(stats.getMin());
+      return new MtasDataItemNumberComparator<Double>(stats.getMin(), sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
-      return new NumberComparator<Double>(stats.getSumsq());
+      return new MtasDataItemNumberComparator<Double>(stats.getSumsq(), sortDirection);
     default:
       return null;
     }
@@ -219,30 +219,30 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
    */
   @Override
-  public NumberComparator<Double> getCompareValue2() {
+  public MtasDataItemNumberComparator<Double> getCompareValue2() {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUMOFLOGS:
-      return new NumberComparator<Double>(
-          stats.getN() * Math.log(stats.getGeometricMean()));
+      return new MtasDataItemNumberComparator<Double>(
+          stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);
     case CodecUtil.STATS_TYPE_MEAN:
-      return new NumberComparator<Double>(stats.getMean());
+      return new MtasDataItemNumberComparator<Double>(stats.getMean(), sortDirection);
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-      return new NumberComparator<Double>(stats.getGeometricMean());
+      return new MtasDataItemNumberComparator<Double>(stats.getGeometricMean(), sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-      return new NumberComparator<Double>(stats.getStandardDeviation());
+      return new MtasDataItemNumberComparator<Double>(stats.getStandardDeviation(), sortDirection);
     case CodecUtil.STATS_TYPE_VARIANCE:
-      return new NumberComparator<Double>(stats.getVariance());
+      return new MtasDataItemNumberComparator<Double>(stats.getVariance(), sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-      return new NumberComparator<Double>(stats.getPopulationVariance());
+      return new MtasDataItemNumberComparator<Double>(stats.getPopulationVariance(), sortDirection);
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-      return new NumberComparator<Double>(stats.getQuadraticMean());
+      return new MtasDataItemNumberComparator<Double>(stats.getQuadraticMean(), sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
-      return new NumberComparator<Double>(stats.getKurtosis());
+      return new MtasDataItemNumberComparator<Double>(stats.getKurtosis(), sortDirection);
     case CodecUtil.STATS_TYPE_MEDIAN:
-      return new NumberComparator<Double>(stats.getPercentile(50));
+      return new MtasDataItemNumberComparator<Double>(stats.getPercentile(50), sortDirection);
     case CodecUtil.STATS_TYPE_SKEWNESS:
-      return new NumberComparator<Double>(stats.getSkewness());
+      return new MtasDataItemNumberComparator<Double>(stats.getSkewness(), sortDirection);
     default:
       return null;
     }
@@ -255,6 +255,27 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
    */
   public String toString() {
     return this.getClass().getSimpleName() + "[" + fullValues.length + "]";
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    MtasDataItemDoubleFull that = (MtasDataItemDoubleFull) obj;
+    MtasDataItemNumberComparator<?> c1 = getComparableValue();
+    MtasDataItemNumberComparator<?> c2 = that.getComparableValue();
+    return (c1!=null&&c2!=null&&c1.equals(c2));    
+  }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 7) ^ getComparableValue().hashCode();
+    return h;
   }
 
 }

@@ -29,6 +29,12 @@ The `mtas.solr.search.MtasSolrCQLQParserPlugin` has to be included to enable the
 <queryParser name="mtas_cql" class="mtas.solr.search.MtasSolrCQLQParserPlugin"/>
 ``` 
 
+And the `mtas.solr.search.MtasSolrJoinQParserPlugin` has to be included to enable the use of join queries:
+
+```console
+<queryParser name="mtas_join" class="mtas.solr.search.MtasSolrJoinQParserPlugin"/>
+``` 
+
 This enables the use of expressions like `{!mtas_cql field="mtas" query="[pos=\"N\"]"}` within Solr (filter) queries.
 
 **Mtas requestHandler**

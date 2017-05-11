@@ -3,12 +3,13 @@ package mtas.analysis.parser;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import mtas.analysis.MtasTokenizer;
 import mtas.analysis.parser.MtasBasicParser.MtasParserType;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
@@ -20,7 +21,7 @@ import mtas.analysis.util.MtasParserException;
  */
 abstract public class MtasParser {
 
-  protected static Log log = LogFactory.getLog(MtasParser.class);
+  protected final static Log log = LogFactory.getLog(MtasParser.class);
 
   /** The token collection. */
   protected MtasTokenCollection tokenCollection;
@@ -224,8 +225,8 @@ abstract public class MtasParser {
      * @param idOffsets
      *          the id offsets
      */
-    public void updateMappings(HashMap<String, TreeSet<Integer>> idPositions,
-        HashMap<String, Integer[]> idOffsets) {
+    public void updateMappings(Map<String, Set<Integer>> idPositions,
+        Map<String, Integer[]> idOffsets) {
       for (Integer mappingId : updateableMappingsWithPosition) {
         tokenCollection.get(mappingId).addPositions(objectPositions);
       }
@@ -445,7 +446,7 @@ abstract public class MtasParser {
      * @return the offset
      */
     public Integer[] getOffset() {
-      if (objectOffsetStart != null && objectOffsetStart != null) {
+      if (objectOffsetStart != null) {
         Integer[] list = new Integer[] { objectOffsetStart, objectOffsetEnd };
         return list;
       } else {

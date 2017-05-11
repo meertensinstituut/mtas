@@ -2,10 +2,11 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -21,10 +22,9 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentDocument.
  */
-public class MtasSolrComponentDocument {
+public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDocument> {
 
-  /** The search component. */
-  MtasSolrSearchComponent searchComponent;
+  private static Log log = LogFactory.getLog(MtasSolrComponentDocument.class);
 
   /** The Constant PARAM_MTAS_DOCUMENT. */
   public static final String PARAM_MTAS_DOCUMENT = MtasSolrSearchComponent.PARAM_MTAS
@@ -45,19 +45,25 @@ public class MtasSolrComponentDocument {
   /** The Constant NAME_MTAS_DOCUMENT_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_REGEXP = "regexp";
 
-  /** The Constant NAME_MTAS_DOCUMENT_REGEXP. */
+  /** The Constant NAME_MTAS_DOCUMENT_LIST. */
   public static final String NAME_MTAS_DOCUMENT_LIST = "list";
-  
+
+  /** The Constant NAME_MTAS_DOCUMENT_LIST_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_LIST_REGEXP = "listRegexp";
 
+  /** The Constant NAME_MTAS_DOCUMENT_LIST_EXPAND. */
   public static final String NAME_MTAS_DOCUMENT_LIST_EXPAND = "listExpand";
-  
+
+  /** The Constant NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER. */
   public static final String NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER = "listExpandNumber";
-  
+
+  /** The Constant NAME_MTAS_DOCUMENT_IGNORE_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_IGNORE_REGEXP = "ignoreRegexp";
-  
+
+  /** The Constant NAME_MTAS_DOCUMENT_IGNORE_LIST. */
   public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST = "ignoreList";
-  
+
+  /** The Constant NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP = "ignoreListRegexp";
 
   /** The Constant NAME_MTAS_DOCUMENT_NUMBER. */
@@ -65,25 +71,26 @@ public class MtasSolrComponentDocument {
 
   /**
    * Instantiates a new mtas solr component document.
-   *
-   * @param searchComponent the search component
    */
-  public MtasSolrComponentDocument(MtasSolrSearchComponent searchComponent) {
-    this.searchComponent = searchComponent;
+  public MtasSolrComponentDocument() {
+    // do nothing for now
   }
 
   /**
    * Prepare.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_DOCUMENT);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
@@ -118,24 +125,20 @@ public class MtasSolrComponentDocument {
         lists[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST,
             null);
-        listRegexps[tmpCounter] = rb.req.getParams().getBool(
-            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_REGEXP,
-            false);
-        listExpands[tmpCounter] = rb.req.getParams().getBool(
-            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_EXPAND,
-            false);
-        listExpandNumbers[tmpCounter] = rb.req.getParams().getInt(
-            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER,
-            10);
-        ignoreRegexps[tmpCounter] = rb.req.getParams().get(
-            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_REGEXP,
-            null);
-        ignoreLists[tmpCounter] = rb.req.getParams().get(
-            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_LIST,
-            null);
-        ignoreListRegexps[tmpCounter] = rb.req.getParams().getBool(
-            PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP,
-            false);
+        listRegexps[tmpCounter] = rb.req.getParams().getBool(PARAM_MTAS_DOCUMENT
+            + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_REGEXP, false);
+        listExpands[tmpCounter] = rb.req.getParams().getBool(PARAM_MTAS_DOCUMENT
+            + "." + id + "." + NAME_MTAS_DOCUMENT_LIST_EXPAND, false);
+        listExpandNumbers[tmpCounter] = rb.req.getParams()
+            .getInt(PARAM_MTAS_DOCUMENT + "." + id + "."
+                + NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER, 10);
+        ignoreRegexps[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_DOCUMENT
+            + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_REGEXP, null);
+        ignoreLists[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_DOCUMENT
+            + "." + id + "." + NAME_MTAS_DOCUMENT_IGNORE_LIST, null);
+        ignoreListRegexps[tmpCounter] = rb.req.getParams()
+            .getBool(PARAM_MTAS_DOCUMENT + "." + id + "."
+                + NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP, false);
         listNumbers[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_DOCUMENT + "." + id + "." + NAME_MTAS_DOCUMENT_NUMBER,
             null);
@@ -146,9 +149,9 @@ public class MtasSolrComponentDocument {
       rb.setNeedDocList(true);
       for (String field : fields) {
         if (field == null || field.isEmpty()) {
-          throw new IOException("no (valid) field in mtas kwic");
+          throw new IOException("no (valid) field in mtas document");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_DOCUMENT_KEY,
@@ -159,8 +162,8 @@ public class MtasSolrComponentDocument {
           NAME_MTAS_DOCUMENT_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(regexps, fields,
           NAME_MTAS_DOCUMENT_REGEXP, NAME_MTAS_DOCUMENT_FIELD, false);
-      MtasSolrResultUtil.compareAndCheck(lists, fields,
-          NAME_MTAS_DOCUMENT_LIST, NAME_MTAS_DOCUMENT_FIELD, false);
+      MtasSolrResultUtil.compareAndCheck(lists, fields, NAME_MTAS_DOCUMENT_LIST,
+          NAME_MTAS_DOCUMENT_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(ignoreRegexps, fields,
           NAME_MTAS_DOCUMENT_IGNORE_REGEXP, NAME_MTAS_DOCUMENT_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(ignoreLists, fields,
@@ -172,35 +175,40 @@ public class MtasSolrComponentDocument {
             ? String.valueOf(i) + ":" + fields[i] + ":" + prefixes[i]
             : keys[i].trim();
         String prefix = prefixes[i];
+        if (prefix == null || prefix.isEmpty()) {
+          throw new IOException("no (valid) prefix in mtas document");
+        }
         String type = types[i];
         String regexp = regexps[i];
         String[] list = null;
         Boolean listRegexp = listRegexps[i];
         Boolean listExpand = listExpands[i];
         int listExpandNumber = listExpandNumbers[i];
-        if(lists[i]!=null) {
-          ArrayList<String> tmpList = new ArrayList<String>();
+        if (lists[i] != null) {
+          ArrayList<String> tmpList = new ArrayList<>();
           String[] subList = lists[i].split("(?<!\\\\),");
-          for(int j=0; j<subList.length; j++) {
+          for (int j = 0; j < subList.length; j++) {
             tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
           }
           list = tmpList.toArray(new String[tmpList.size()]);
         }
-        int listNumber = Math.max(0, (listNumbers[i] == null) || (listNumbers[i].isEmpty())
-            ? 0 : Integer.parseInt(listNumbers[i]));
+        int listNumber = Math.max(0,
+            (listNumbers[i] == null) || (listNumbers[i].isEmpty()) ? 0
+                : Integer.parseInt(listNumbers[i]));
         String ignoreRegexp = ignoreRegexps[i];
         String[] ignoreList = null;
         Boolean ignoreListRegexp = ignoreListRegexps[i];
-        if(ignoreLists[i]!=null) {
-          ArrayList<String> tmpList = new ArrayList<String>();
+        if (ignoreLists[i] != null) {
+          ArrayList<String> tmpList = new ArrayList<>();
           String[] subList = ignoreLists[i].split("(?<!\\\\),");
-          for(int j=0; j<subList.length; j++) {
+          for (int j = 0; j < subList.length; j++) {
             tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
           }
           ignoreList = tmpList.toArray(new String[tmpList.size()]);
         }
-        mtasFields.list.get(fields[i]).documentList
-            .add(new ComponentDocument(key, prefix, type, regexp, list, listNumber, listRegexp, listExpand, listExpandNumber, ignoreRegexp, ignoreList, ignoreListRegexp));
+        mtasFields.list.get(fields[i]).documentList.add(new ComponentDocument(
+            key, prefix, type, regexp, list, listNumber, listRegexp, listExpand,
+            listExpandNumber, ignoreRegexp, ignoreList, ignoreListRegexp));
       }
     }
   }
@@ -208,20 +216,21 @@ public class MtasSolrComponentDocument {
   /**
    * Creates the.
    *
-   * @param document the document
+   * @param document
+   *          the document
    * @return the simple ordered map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
-  public SimpleOrderedMap<Object> create(ComponentDocument document)
+  public SimpleOrderedMap<Object> create(ComponentDocument document, Boolean encode)
       throws IOException {
     SimpleOrderedMap<Object> mtasDocumentResponse = new SimpleOrderedMap<>();
     mtasDocumentResponse.add("key", document.key);
-    ArrayList<NamedList<Object>> mtasDocumentItemResponses = new ArrayList<NamedList<Object>>();
+    ArrayList<NamedList<Object>> mtasDocumentItemResponses = new ArrayList<>();
     for (int docId : document.statsData.keySet()) {
       NamedList<Object> mtasDocumentItemResponse = new SimpleOrderedMap<>();
       MtasDataCollector<?, ?> stats = document.statsData.get(docId);
       MtasDataCollector<?, ?> list = null;
-      HashMap<String, MtasDataCollector<?, ?>> expandedList = null;
       if (document.statsList != null) {
         list = document.statsList.get(docId);
       }
@@ -229,15 +238,20 @@ public class MtasSolrComponentDocument {
           stats.getDataType(), stats.getStatsType(), stats.statsItems, null));
       mtasDocumentItemResponse.add("documentKey",
           document.uniqueKey.get(docId));
-      if (list != null) {                
-        if(document.listExpand) {
-          mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
-            new String[] { list.getDataType(), list.getDataType()}, new String[] {list.getStatsType(), list.getStatsType()}, new TreeSet[] {list.statsItems, list.statsItems}, new String[] {null, null}, new String[] {null, null}, new Integer[] { 0 , 0}, new Integer[] { 1 , 1}, null));
+      if (list != null) {
+        if (document.listExpand) {
+          mtasDocumentItemResponse.add("list",
+              new MtasSolrMtasResult(list,
+                  new String[] { list.getDataType(), list.getDataType() },
+                  new String[] { list.getStatsType(), list.getStatsType() },
+                  new TreeSet[] { list.statsItems, list.statsItems },
+                  new String[] { null, null }, new String[] { null, null },
+                  new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
         } else {
           mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
-              list.getDataType(), list.getStatsType(), list.statsItems, null));  
+              list.getDataType(), list.getStatsType(), list.statsItems, null));
         }
-                
+
       }
       // add
       mtasDocumentItemResponses.add(mtasDocumentItemResponse);
@@ -250,47 +264,50 @@ public class MtasSolrComponentDocument {
   /**
    * Modify request.
    *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+   * @param rb
+   *          the rb
+   * @param who
+   *          the who
+   * @param sreq
+   *          the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (sreq.params.getBool(PARAM_MTAS_DOCUMENT, false)) {
-        if ((sreq.purpose & ShardRequest.PURPOSE_GET_FIELDS) != 0) {
-          // do nothing
-        } else {
-          Set<String> keys = MtasSolrResultUtil
-              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_DOCUMENT);
-          sreq.params.remove(PARAM_MTAS_DOCUMENT);
-          for (String key : keys) {
-            sreq.params.remove(PARAM_MTAS_DOCUMENT + "." + key + "."
-                + NAME_MTAS_DOCUMENT_FIELD);
-            sreq.params.remove(
-                PARAM_MTAS_DOCUMENT + "." + key + "." + NAME_MTAS_DOCUMENT_KEY);
-            sreq.params.remove(PARAM_MTAS_DOCUMENT + "." + key + "."
-                + NAME_MTAS_DOCUMENT_PREFIX);
-          }
+    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && sreq.params.getBool(PARAM_MTAS_DOCUMENT, false)) {
+      if ((sreq.purpose & ShardRequest.PURPOSE_GET_FIELDS) != 0) {
+        // do nothing
+      } else {
+        Set<String> keys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_DOCUMENT);
+        sreq.params.remove(PARAM_MTAS_DOCUMENT);
+        for (String key : keys) {
+          sreq.params.remove(
+              PARAM_MTAS_DOCUMENT + "." + key + "." + NAME_MTAS_DOCUMENT_FIELD);
+          sreq.params.remove(
+              PARAM_MTAS_DOCUMENT + "." + key + "." + NAME_MTAS_DOCUMENT_KEY);
+          sreq.params.remove(PARAM_MTAS_DOCUMENT + "." + key + "."
+              + NAME_MTAS_DOCUMENT_PREFIX);
         }
       }
     }
+
   }
 
   /**
    * Finish stage.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    */
   public void finishStage(ResponseBuilder rb) {
-    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
-          && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-        for (ShardRequest sreq : rb.finished) {
-          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
-              && sreq.params.getBool(PARAM_MTAS_DOCUMENT, false)) {
-            // nothing to do
-          }
+    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
+        && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_DOCUMENT, false)) {
+          // nothing to do
         }
       }
     }
@@ -299,9 +316,12 @@ public class MtasSolrComponentDocument {
   /**
    * Distributed process.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -309,21 +329,23 @@ public class MtasSolrComponentDocument {
     NamedList<Object> mtasResponse = null;
     try {
       mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
-      if (mtasResponse != null) {
-        ArrayList<Object> mtasResponseDocument;
-        try {
-          mtasResponseDocument = (ArrayList<Object>) mtasResponse
-              .get("document");
-          if (mtasResponseDocument != null) {
-            MtasSolrResultUtil.rewrite(mtasResponseDocument);
-          }
-        } catch (ClassCastException e) {
-          mtasResponseDocument = null;
-        }
-      }
     } catch (ClassCastException e) {
+      log.debug(e);
       mtasResponse = null;
     }
+
+    if (mtasResponse != null) {
+      ArrayList<Object> mtasResponseDocument;
+      try {
+        mtasResponseDocument = (ArrayList<Object>) mtasResponse.get("document");
+        if (mtasResponseDocument != null) {
+          MtasSolrResultUtil.rewrite(mtasResponseDocument);
+        }
+      } catch (ClassCastException e) {
+        log.debug(e);
+      }
+    }
+
   }
 
 }

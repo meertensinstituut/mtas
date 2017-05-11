@@ -3,7 +3,6 @@ package mtas.search;
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -17,9 +16,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.custom.CustomAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -38,11 +34,9 @@ import org.apache.lucene.index.SegmentReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
 import mtas.analysis.token.MtasToken;
@@ -61,15 +55,13 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanRegexpQuery;
-import mtas.search.spans.MtasSpanSequenceQuery;
-import mtas.search.spans.MtasSpanTermQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
 public class MtasSearchTestConsistency {
 
-  private static String FIELD_ID = "id";
-  private static String FIELD_TITLE = "title";
-  private static String FIELD_CONTENT = "content";
+  private final static String FIELD_ID = "id";
+  private final static String FIELD_TITLE = "title";
+  private final static String FIELD_CONTENT = "content";
 
   private static Directory directory;
 
@@ -243,13 +235,13 @@ public class MtasSearchTestConsistency {
     // do position query
     try {
       ArrayList<Integer> fullDocSet = docs;
-      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
+      ComponentField fieldStats = new ComponentField(FIELD_ID);
       fieldStats.statsPositionList.add(
-          new ComponentPosition(FIELD_CONTENT, "total", null, null, "all"));
-      fieldStats.statsPositionList.add(new ComponentPosition(FIELD_CONTENT,
+          new ComponentPosition("total", null, null, "all"));
+      fieldStats.statsPositionList.add(new ComponentPosition(
           "minimum", (double) (averageNumberOfPositions - 1), null,
           "n,sum,mean,min,max"));
-      fieldStats.statsPositionList.add(new ComponentPosition(FIELD_CONTENT,
+      fieldStats.statsPositionList.add(new ComponentPosition(
           "maximum", null, (double) averageNumberOfPositions, "sum"));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
@@ -279,8 +271,8 @@ public class MtasSearchTestConsistency {
     ArrayList<Integer> fullDocSet = docs;
     try {
       // compute total
-      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
-      fieldStats.statsPositionList.add(new ComponentPosition(FIELD_CONTENT,
+      ComponentField fieldStats = new ComponentField(FIELD_ID);
+      fieldStats.statsPositionList.add(new ComponentPosition(
           "total", null, null, "n,sum,min,max"));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
@@ -298,8 +290,8 @@ public class MtasSearchTestConsistency {
       ArrayList<Integer> subDocSet = new ArrayList<Integer>();
       for (Integer docId : fullDocSet) {
         subDocSet.add(docId);
-        fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
-        fieldStats.statsPositionList.add(new ComponentPosition(FIELD_CONTENT,
+        fieldStats = new ComponentField(FIELD_ID);
+        fieldStats.statsPositionList.add(new ComponentPosition(
             "total", null, null, "n,sum,min,max"));
         response = doAdvancedSearch(subDocSet, fieldStats);
         responseTotal = (HashMap<String, Object>) response.get("statsPositions")
@@ -335,8 +327,8 @@ public class MtasSearchTestConsistency {
     ArrayList<Integer> fullDocSet = docs;
     try {
       // compute total
-      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
-      fieldStats.statsTokenList.add(new ComponentToken(FIELD_CONTENT, "total",
+      ComponentField fieldStats = new ComponentField(FIELD_ID);
+      fieldStats.statsTokenList.add(new ComponentToken("total",
           null, null, "n,sum,min,max"));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
@@ -354,8 +346,8 @@ public class MtasSearchTestConsistency {
       ArrayList<Integer> subDocSet = new ArrayList<Integer>();
       for (Integer docId : fullDocSet) {
         subDocSet.add(docId);
-        fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
-        fieldStats.statsTokenList.add(new ComponentToken(FIELD_CONTENT, "total",
+        fieldStats = new ComponentField(FIELD_ID);
+        fieldStats.statsTokenList.add(new ComponentToken("total",
             null, null, "n,sum,min,max"));
         response = doAdvancedSearch(subDocSet, fieldStats);
         responseTotal = (HashMap<String, Object>) response.get("statsTokens")
@@ -405,7 +397,7 @@ public class MtasSearchTestConsistency {
     // do stats query for nouns
     try {
       ArrayList<Integer> fullDocSet = docs;
-      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
+      ComponentField fieldStats = new ComponentField(FIELD_ID);
       MtasSpanQuery q1 = createQuery(FIELD_CONTENT, cql1, null, null);
       MtasSpanQuery q2 = createQuery(FIELD_CONTENT, cql2, null, null);
       MtasSpanQuery q3 = createQuery(FIELD_CONTENT, cql3, null, null);
@@ -487,20 +479,18 @@ public class MtasSearchTestConsistency {
     String cql = "[pos=\"LID\"]";
     try {
       ArrayList<Integer> fullDocSet = docs;
-      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
+      ComponentField fieldStats = new ComponentField(FIELD_ID);
       MtasSpanQuery q = createQuery(FIELD_CONTENT, cql, null, null);
       fieldStats.spanQueryList.add(q);
       fieldStats.statsSpanList.add(new ComponentSpan(new MtasSpanQuery[] { q },
           "total", null, null, "sum", null, null, null));
-      fieldStats.groupList.add(new ComponentGroup(q, FIELD_CONTENT, cql, "cql",
-          null, null, "articles", Integer.MAX_VALUE, "t_lc", null, null, null,
+      fieldStats.groupList.add(new ComponentGroup(q, "articles", Integer.MAX_VALUE, "t_lc", null, null, null,
           null, null, null, null, null, null, null, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       ArrayList<HashMap<String, Object>> list = (ArrayList<HashMap<String, Object>>) response
           .get("group").get("articles");
       DirectoryReader indexReader = DirectoryReader.open(directory);
-      IndexSearcher searcher = new IndexSearcher(indexReader);
       int subTotal = 0;
       for (HashMap<String, Object> listItem : list) {
         HashMap<String, HashMap<Integer, HashMap<String, String>[]>> group = (HashMap<String, HashMap<Integer, HashMap<String, String>[]>>) listItem
@@ -532,15 +522,15 @@ public class MtasSearchTestConsistency {
     Integer number = 100;
     try {
       ArrayList<Integer> fullDocSet = docs;
-      ComponentField fieldStats = new ComponentField(FIELD_CONTENT, FIELD_ID);
+      ComponentField fieldStats = new ComponentField(FIELD_ID);
       fieldStats.statsPositionList.add(
-          new ComponentPosition(FIELD_CONTENT, "total", null, null, "sum"));
+          new ComponentPosition( "total", null, null, "sum"));
       fieldStats.termVectorList.add(new ComponentTermVector("toplist", prefix,
           null, false, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
-          null, number, null, null, null, null, null, number, null, prefix, null, null));
+          null, number, null, null, null, null, null, null, prefix, null, null));
       fieldStats.termVectorList.add(new ComponentTermVector("fulllist", prefix,
           null, true, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
-          null, Integer.MAX_VALUE, null, null, null, null, null, number, null, prefix, null, null));
+          null, Integer.MAX_VALUE, null, null, null, null, null, null, prefix, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
@@ -717,7 +707,6 @@ public class MtasSearchTestConsistency {
     ArrayList<Integer> list = new ArrayList<Integer>();
     ListIterator<LeafReaderContext> iterator = indexReader.leaves()
         .listIterator();
-    IndexSearcher searcher = new IndexSearcher(indexReader);
     while (iterator.hasNext()) {
       LeafReaderContext lrc = iterator.next();
       SegmentReader r = (SegmentReader) lrc.reader();

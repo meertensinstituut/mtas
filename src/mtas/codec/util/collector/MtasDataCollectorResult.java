@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
-import mtas.codec.util.collector.MtasDataItem.NumberComparator;
 
 /**
  * The Class MtasDataCollectorResult.
@@ -36,7 +36,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
 
   /** The last sort value. */
   @SuppressWarnings("rawtypes")
-  NumberComparator lastSortValue;
+  MtasDataItemNumberComparator lastSortValue;
 
   /** The end key. */
   String startKey, endKey;
@@ -71,7 +71,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
       } else {
         throw new IOException("unknown sort direction " + sortDirection);
       }
-    } else if (CodecUtil.STATS_TYPES.contains(sortType)) {
+    } else if (CodecUtil.isStatsType(sortType)) {
       // comperator
       Comparator<String> valueComparator = new Comparator<String>() {
         @Override
@@ -95,33 +95,33 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
       String boundaryEndKey = null;
       int counter = 0;
       MtasDataItem<T1, T2> previous = null;
-      for (String key : list.keySet()) {
+      for (Entry<String, MtasDataItem<T1, T2>> entry : list.entrySet()) {
         if (listStart == counter) {
-          startKey = key;
+          startKey = entry.getKey();
         } else if (listStart + number <= counter) {
-          if (sortType.equals(CodecUtil.SORT_TERM)) {
-            endKey = key;
-            boundaryEndKey = key;
+          if (sortType==null || sortType.equals(CodecUtil.SORT_TERM)) {
+            endKey = entry.getKey();
+            boundaryEndKey = entry.getKey();
             break;
           } else if (previous != null) {
-            if (previous.compareTo(list.get(key)) != 0) {
+            if (previous.compareTo(entry.getValue()) != 0) {
               break;
             } else {
-              boundaryEndKey = key;
+              boundaryEndKey = entry.getKey();
             }
           } else {
-            endKey = key;
-            boundaryEndKey = key;
-            previous = list.get(key);
+            endKey = entry.getKey();
+            boundaryEndKey = entry.getKey();
+            previous = entry.getValue();
           }
         } else {
-          endKey = key;
+          endKey = entry.getKey();
         }
         counter++;
       }
       list = list.subMap(startKey, boundaryEndKey);
     } else {
-      list = new TreeMap<String, MtasDataItem<T1, T2>>();
+      list = new TreeMap<>();
     }
     if (list.size() > 0 && sortType != null) {
       lastSortValue = list.get(list.lastKey()).getComparableValue();
@@ -204,12 +204,12 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
    *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("rawtypes")
-  public final LinkedHashMap<String, NumberComparator> getComparatorList()
+  public final LinkedHashMap<String, MtasDataItemNumberComparator> getComparatorList()
       throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-      LinkedHashMap<String, NumberComparator> comparatorList = new LinkedHashMap<String, NumberComparator>();
-      for (String key : list.keySet()) {
-        comparatorList.put(key, list.get(key).getComparableValue());
+      LinkedHashMap<String, MtasDataItemNumberComparator> comparatorList = new LinkedHashMap<String, MtasDataItemNumberComparator>();
+      for (Entry<String, MtasDataItem<T1,T2>> entry: list.entrySet()) {
+        comparatorList.put(entry.getKey(), entry.getValue().getComparableValue());
       }
       return comparatorList;
     } else {
@@ -223,7 +223,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
    * @return the last sort value
    */
   @SuppressWarnings("rawtypes")
-  public final NumberComparator getLastSortValue() {
+  public final MtasDataItemNumberComparator getLastSortValue() {
     return lastSortValue;
   }
 

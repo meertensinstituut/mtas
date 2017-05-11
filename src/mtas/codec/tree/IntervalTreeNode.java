@@ -14,13 +14,6 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
  */
 abstract public class IntervalTreeNode<T, N extends IntervalTreeNode<T, N>> {
 
-  /**
-   * Self.
-   *
-   * @return the n
-   */
-  protected abstract N self();
-
   /** The left. */
   public int left;
 

@@ -24,7 +24,6 @@ import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.MtasSpanWithinQuery;
 import mtas.search.spans.util.MtasSpanQuery;
-import mtas.search.spans.util.MtasSpanUniquePosition;
 import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 public class MtasCQLParserTestSentence {

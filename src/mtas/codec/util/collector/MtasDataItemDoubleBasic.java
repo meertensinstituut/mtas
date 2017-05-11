@@ -53,8 +53,8 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
     int compare = 0;
     if (o instanceof MtasDataItemDoubleBasic) {
       MtasDataItemDoubleBasic to = (MtasDataItemDoubleBasic) o;
-      NumberComparator c1 = getComparableValue();
-      NumberComparator c2 = to.getComparableValue();
+      MtasDataItemNumberComparator c1 = getComparableValue();
+      MtasDataItemNumberComparator c2 = to.getComparableValue();
       compare = (c1 != null && c2 != null) ? c1.compareTo(c2.getValue()) : 0;
     }
     return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;
@@ -66,10 +66,10 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValue()
    */
   @Override
-  public NumberComparator<Double> getCompareValue1() {
+  public MtasDataItemNumberComparator<Double> getCompareValue1() {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUM:
-      return new NumberComparator<Double>(valueSum);
+      return new MtasDataItemNumberComparator<Double>(valueSum, sortDirection);
     default:
       return null;
     }
@@ -80,10 +80,10 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
    * 
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
    */
-  public NumberComparator<Double> getCompareValue2() {
+  public MtasDataItemNumberComparator<Double> getCompareValue2() {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_MEAN:
-      return new NumberComparator<Double>(getValue(sortType));
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
     default:
       return null;
     }
@@ -97,6 +97,27 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
   public String toString() {
     return this.getClass().getSimpleName() + "[" + valueSum + "," + valueN
         + "]";
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    MtasDataItemDoubleBasic that = (MtasDataItemDoubleBasic) obj;
+    MtasDataItemNumberComparator<?> c1 = getComparableValue();
+    MtasDataItemNumberComparator<?> c2 = that.getComparableValue();
+    return (c1!=null&&c2!=null&&c1.equals(c2));    
+  }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 7) ^ getComparableValue().hashCode();
+    return h;
   }
 
 }

@@ -7,8 +7,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanContainingQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIFactoryMethod;
-
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -18,31 +16,35 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanContainingQuery baseQuery;
-  private MtasSpanQuery bigQuery, smallQuery;
+  
+  /** The big query. */
+  private MtasSpanQuery bigQuery;
+  
+  /** The small query. */
+  private MtasSpanQuery smallQuery;
+  
+  /** The field. */
   private String field;
 
   /**
    * Instantiates a new mtas span containing query.
    *
-   * @param q1
-   *          the q1
-   * @param q2
-   *          the q2
+   * @param q1 the q 1
+   * @param q2 the q 2
    */
   public MtasSpanContainingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
-    if (q2 != null && q2.getMinimumWidth() != null) {
-      if (this.getMinimumWidth() == null
-          || this.getMinimumWidth() < q2.getMinimumWidth()) {
-        this.setWidth(q2.getMinimumWidth(), this.getMaximumWidth());
-      }
+    if (q2 != null && q2.getMinimumWidth() != null
+        && (this.getMinimumWidth() == null
+            || this.getMinimumWidth() < q2.getMinimumWidth())) {
+      this.setWidth(q2.getMinimumWidth(), this.getMaximumWidth());
     }
     bigQuery = q1;
     smallQuery = q2;
-    if (bigQuery.getField() != null) {
+    if (bigQuery != null && bigQuery.getField() != null) {
       field = bigQuery.getField();
-    } else if (smallQuery.getField() != null) {
+    } else if (smallQuery != null && smallQuery.getField() != null) {
       field = smallQuery.getField();
     } else {
       field = null;
@@ -51,7 +53,7 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
       baseQuery = new SpanContainingQuery(bigQuery, smallQuery);
     } else {
       baseQuery = null;
-    }  
+    }
   }
 
   /*
@@ -103,11 +105,10 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
       return new MtasSpanMatchNoneQuery(field);
     }
 
-    if (newBigQuery != bigQuery || newSmallQuery != smallQuery) {
+    if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {
       return new MtasSpanContainingQuery(newBigQuery, newSmallQuery)
           .rewrite(reader);
-    } else if (newBigQuery != null && newSmallQuery != null
-        && newBigQuery.equals(newSmallQuery)) {
+    } else if (newBigQuery.equals(newSmallQuery)) {
       return newBigQuery;
     } else {
       baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);

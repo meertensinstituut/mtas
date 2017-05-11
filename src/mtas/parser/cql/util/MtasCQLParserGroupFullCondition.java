@@ -12,13 +12,13 @@ public class MtasCQLParserGroupFullCondition
     extends MtasCQLParserBasicSentencePartCondition {
 
   /** The group full. */
-  public static String GROUP_FULL = "full";
+  public final static String GROUP_FULL = "full";
 
   /** The group start. */
-  public static String GROUP_START = "start";
+  public final static String GROUP_START = "start";
 
   /** The group end. */
-  public static String GROUP_END = "end";
+  public final static String GROUP_END = "end";
 
   /** The group condition. */
   private MtasCQLParserGroupCondition groupCondition;
@@ -151,12 +151,20 @@ public class MtasCQLParserGroupFullCondition
       return false;
     if (object instanceof MtasCQLParserGroupFullCondition) {
       MtasCQLParserGroupFullCondition word = (MtasCQLParserGroupFullCondition) object;
-      if (!groupCondition.equals(word.groupCondition))
-        return false;
-      return true;
+      return groupCondition.equals(word.groupCondition) && type.equals(word.type);      
     } else {
       return false;
     }
   }
+  
+  @Override
+  public int hashCode() {
+    int h = this.getClass().getSimpleName().hashCode();
+    h = (h * 5) ^ groupCondition.hashCode();
+    h = (h * 7) ^ type.hashCode();
+    return h;
+  }
+  
+  
 
 }

@@ -29,7 +29,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  * The Class MtasSolrComponentFacet.
  */
 @SuppressWarnings("deprecation")
-public class MtasSolrComponentFacet {
+public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet> {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -364,7 +364,7 @@ public class MtasSolrComponentFacet {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas facet");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_FACET_KEY,

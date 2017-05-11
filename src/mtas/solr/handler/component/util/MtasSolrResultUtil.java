@@ -25,7 +25,6 @@ import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
 import mtas.codec.util.DataCollector;
-import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.codec.util.CodecComponent.GroupHit;
 import mtas.codec.util.collector.MtasDataItem;
 import mtas.parser.cql.MtasCQLParser;

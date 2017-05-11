@@ -19,7 +19,7 @@ import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
 
 public class MtasSpanFollowedByQuery extends MtasSpanQuery {
-  
+
   /** The field. */
   private String field;
 
@@ -31,8 +31,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
     if (q1 != null && (field = q1.getField()) != null) {
-      if (q2 != null && ((field == null && q2.getField() != null)
-          || !q2.getField().equals(field))) {
+      if (q2 != null && q2.getField()!=null && !q2.getField().equals(field)) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
     } else if (q2 != null) {
@@ -53,7 +52,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   public String getField() {
     return field;
   }
-  
+
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -65,7 +64,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
       MtasSpanFollowedByQueryWeight w2 = new MtasSpanFollowedByQueryWeight(
           q2.createWeight(searcher, needsScores));
       // subWeights
-      List<MtasSpanFollowedByQueryWeight> subWeights = new ArrayList<MtasSpanFollowedByQueryWeight>();
+      List<MtasSpanFollowedByQueryWeight> subWeights = new ArrayList<>();
       subWeights.add(w1);
       subWeights.add(w2);
       // return
@@ -73,16 +72,16 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
           needsScores ? getTermContexts(subWeights) : null);
     }
   }
-  
+
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanFollowedByQueryWeight> items) {
-    List<SpanWeight> weights = new ArrayList<SpanWeight>();
+    List<SpanWeight> weights = new ArrayList<>();
     for (MtasSpanFollowedByQueryWeight item : items) {
       weights.add(item.spanWeight);
     }
     return getTermContexts(weights);
   }
-  
+
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -122,26 +121,26 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     h ^= q2.hashCode();
     return h;
   }
-  
+
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
     MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
-    if(newQ1==null || newQ1 instanceof MtasSpanMatchNoneQuery || newQ2==null || newQ2 instanceof MtasSpanMatchNoneQuery) {
-      return new MtasSpanMatchNoneQuery(field);      
-    } else if (newQ1 != q1 || newQ2 != q2) {
+    if (newQ1 == null || newQ1 instanceof MtasSpanMatchNoneQuery
+        || newQ2 == null || newQ2 instanceof MtasSpanMatchNoneQuery) {
+      return new MtasSpanMatchNoneQuery(field);
+    } else if (!newQ1.equals(q1) || !newQ2.equals(q2)) {
       return new MtasSpanFollowedByQuery(newQ1, newQ2).rewrite(reader);
-    } else if (newQ1 == null || newQ2 == null) {
-      return new MtasSpanMatchNoneQuery(this.getField());
     } else {
       return super.rewrite(reader);
     }
   }
-  
-  public class SpanFollowedByWeight extends SpanWeight {
+
+  protected class SpanFollowedByWeight extends SpanWeight {
 
     /** The w 2. */
-    MtasSpanFollowedByQueryWeight w1, w2;
+    MtasSpanFollowedByQueryWeight w1;
+    MtasSpanFollowedByQueryWeight w2;
 
     /**
      * Instantiates a new span intersecting weight.
@@ -197,8 +196,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanFollowedByQuerySpans s2 = new MtasSpanFollowedByQuerySpans(
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanFollowedBySpans(
-          MtasSpanFollowedByQuery.this, s1, s2);
+      return new MtasSpanFollowedBySpans(MtasSpanFollowedByQuery.this, s1, s2);
     }
 
     /*
@@ -217,7 +215,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanIntersectingQuerySpans.
    */
-  public class MtasSpanFollowedByQuerySpans {
+  protected class MtasSpanFollowedByQuerySpans {
 
     /** The spans. */
     public Spans spans;
@@ -229,7 +227,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
      *          the spans
      */
     public MtasSpanFollowedByQuerySpans(Spans spans) {
-      this.spans = spans!=null?spans:new MtasSpanMatchNoneSpans(field);
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
     }
 
   }
@@ -237,7 +235,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanIntersectingQueryWeight.
    */
-  public class MtasSpanFollowedByQueryWeight {
+  private static class MtasSpanFollowedByQueryWeight {
 
     /** The span weight. */
     public SpanWeight spanWeight;
@@ -254,5 +252,3 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   }
 
 }
-
-

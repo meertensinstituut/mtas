@@ -19,7 +19,7 @@ import org.apache.lucene.util.BytesRef;
 public class MtasPayloadEncoder {
 
   /** The mtas token. */
-  private MtasToken<?> mtasToken;
+  private MtasToken mtasToken;
 
   /** The byte stream. */
   private MtasBitOutputStream byteStream;
@@ -28,23 +28,23 @@ public class MtasPayloadEncoder {
   private int encodingFlags;
 
   /** The encode payload. */
-  public static int ENCODE_PAYLOAD = 1;
+  public final static int ENCODE_PAYLOAD = 1;
 
   /** The encode offset. */
-  public static int ENCODE_OFFSET = 2;
+  public final static int ENCODE_OFFSET = 2;
 
   /** The encode realoffset. */
-  public static int ENCODE_REALOFFSET = 4;
+  public final static int ENCODE_REALOFFSET = 4;
 
   /** The encode parent. */
-  public static int ENCODE_PARENT = 8;
+  public final static int ENCODE_PARENT = 8;
 
   /** The encode default. */
-  public static int ENCODE_DEFAULT = ENCODE_PAYLOAD | ENCODE_OFFSET
+  public final static int ENCODE_DEFAULT = ENCODE_PAYLOAD | ENCODE_OFFSET
       | ENCODE_PARENT;
 
   /** The encode all. */
-  public static int ENCODE_ALL = ENCODE_PAYLOAD | ENCODE_OFFSET
+  public final static int ENCODE_ALL = ENCODE_PAYLOAD | ENCODE_OFFSET
       | ENCODE_REALOFFSET | ENCODE_PARENT;
 
   /**
@@ -55,7 +55,7 @@ public class MtasPayloadEncoder {
    * @param flags
    *          the flags
    */
-  public MtasPayloadEncoder(MtasToken<?> token, int flags) {
+  public MtasPayloadEncoder(MtasToken token, int flags) {
     mtasToken = token;
     byteStream = new MtasBitOutputStream();
     encodingFlags = flags;
@@ -67,7 +67,7 @@ public class MtasPayloadEncoder {
    * @param token
    *          the token
    */
-  public MtasPayloadEncoder(MtasToken<?> token) {
+  public MtasPayloadEncoder(MtasToken token) {
     this(token, ENCODE_DEFAULT);
   }
 

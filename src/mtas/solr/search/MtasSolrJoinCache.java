@@ -3,11 +3,15 @@ package mtas.solr.search;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,15 +20,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.Base64;
@@ -32,17 +32,13 @@ import org.apache.solr.common.util.Base64;
 public class MtasSolrJoinCache {
 
   private static Log log = LogFactory.getLog(MtasSolrJoinCache.class);
-
   private static final long DEFAULT_LIFETIME = 86400;
   private static final int DEFAULT_MAXIMUM_NUMBER = 1000;
   private static final int DEFAULT_MAXIMUM_OVERFLOW = 10;
-
   private HashMap<MtasSolrJoinCacheItem, String> administration;
   private HashMap<String, MtasSolrJoinCacheItem> index;
   private HashMap<String, Long> expiration;
-
   private Path joinCachePath;
-
   private long lifeTime;
   private int maximumNumber;
   private int maximumOverflow;
@@ -59,11 +55,14 @@ public class MtasSolrJoinCache {
     if (cacheDirectory != null) {
       try {
         joinCachePath = Files.createDirectories(Paths.get(cacheDirectory));
-        for (File file : joinCachePath.toFile().listFiles()) {
-          if (file.isFile() && !file.delete()) {
-            log.error("couldn't delete " + file);
-          } else if(file.isDirectory()) {
-            log.info("unexpected directory "+file.getName());
+        File[] fileList = joinCachePath.toFile().listFiles();
+        if (fileList != null) {
+          for (File file : fileList) {
+            if (file.isFile() && !file.delete()) {
+              log.error("couldn't delete " + file);
+            } else if (file.isDirectory()) {
+              log.info("unexpected directory " + file.getName());
+            }
           }
         }
       } catch (IOException e) {
@@ -98,13 +97,13 @@ public class MtasSolrJoinCache {
     // store data
     if (joinCachePath != null) {
       File file = joinCachePath.resolve(key).toFile();
-      try {
-        FileWriter writer = new FileWriter(file, false);
-        writer.write(encode(data));
-        writer.close();
+      try (OutputStream outputStream = new FileOutputStream(file);
+          Writer outputStreamWriter = new OutputStreamWriter(outputStream,
+              StandardCharsets.UTF_8);) {
+        outputStreamWriter.write(encode(data));
         return key;
       } catch (IOException e) {
-        administration.remove(key);
+        administration.remove(item);
         expiration.remove(key);
         log.error("couldn't create " + key, e);
         return null;
@@ -139,13 +138,14 @@ public class MtasSolrJoinCache {
       expiration.put(key, date.getTime() + lifeTime);
       try {
         Path path = joinCachePath.resolve(key);
-        String data = new String(Files.readAllBytes(path));
+        String data = new String(Files.readAllBytes(path),
+            StandardCharsets.UTF_8);
         return decode(data);
       } catch (IOException e) {
         if (!joinCachePath.resolve(key).toFile().delete()) {
           log.debug("couldn't delete " + key);
         }
-        administration.remove(key);
+        administration.remove(item);
         expiration.remove(key);
         log.error("couldn't get " + key, e);
       }
@@ -188,17 +188,13 @@ public class MtasSolrJoinCache {
     // check size
     if (expiration.size() > maximumNumber + maximumOverflow) {
       Set<Entry<String, Long>> mapEntries = expiration.entrySet();
-      List<Entry<String, Long>> aList = new LinkedList<Entry<String, Long>>(
-          mapEntries);
-      Collections.sort(aList, new Comparator<Entry<String, Long>>() {
-        @Override
-        public int compare(Entry<String, Long> ele1, Entry<String, Long> ele2) {
-          return ele2.getValue().compareTo(ele1.getValue());
-        }
-      });
+      List<Entry<String, Long>> aList = new LinkedList<>(mapEntries);
+      Collections.sort(aList,
+          (Entry<String, Long> ele1, Entry<String, Long> ele2) -> ele2
+              .getValue().compareTo(ele1.getValue()));
       aList.subList(maximumNumber, aList.size()).clear();
-      for(Entry<String,MtasSolrJoinCacheItem> entry : index.entrySet()) {
-        if(!aList.contains(entry.getKey())) {
+      for (Entry<String, MtasSolrJoinCacheItem> entry : index.entrySet()) {
+        if (!expiration.containsKey(entry.getKey())) {
           toBeRemoved.add(entry.getValue());
         }
       }

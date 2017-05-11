@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
@@ -60,7 +61,8 @@ public class MtasFetchData {
    * @throws MtasParserException
    *           the mtas parser exception
    */
-  public Reader getUrl(String prefix, String postfix) throws MtasParserException {
+  public Reader getUrl(String prefix, String postfix)
+      throws MtasParserException {
     String url = getString();
     if ((url != null) && !url.equals("")) {
       if (prefix != null) {
@@ -78,10 +80,10 @@ public class MtasFetchData {
           if (connection.getHeaderField("Content-Encoding") != null
               && connection.getHeaderField("Content-Encoding").equals("gzip")) {
             in = new BufferedReader(new InputStreamReader(
-                new GZIPInputStream(connection.getInputStream())));
+                new GZIPInputStream(connection.getInputStream()), StandardCharsets.UTF_8));
           } else {
             in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));
+                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
           }
           return in;
         } catch (IOException ex) {
@@ -104,7 +106,8 @@ public class MtasFetchData {
    * @throws MtasParserException
    *           the mtas parser exception
    */
-  public Reader getFile(String prefix, String postfix) throws MtasParserException {
+  public Reader getFile(String prefix, String postfix)
+      throws MtasParserException {
     String file = getString();
     if ((file != null) && !file.equals("")) {
       if (prefix != null) {
@@ -116,10 +119,11 @@ public class MtasFetchData {
       GZIPInputStream in;
       try {
         in = new GZIPInputStream(new FileInputStream(file));
-        return new InputStreamReader(in);                                
+        return new InputStreamReader(in, StandardCharsets.UTF_8);
       } catch (IOException e1) {
         try {
-          String text = new String(Files.readAllBytes(Paths.get(file)));
+          String text = new String(Files.readAllBytes(Paths.get(file)),
+              StandardCharsets.UTF_8);
           return new StringReader(text);
         } catch (IOException e2) {
           throw new MtasParserException(e2.getMessage());

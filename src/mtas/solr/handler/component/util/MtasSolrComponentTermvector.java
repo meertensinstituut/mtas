@@ -18,6 +18,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -26,20 +28,24 @@ import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 
+import mtas.analysis.MtasTokenizer;
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.SubComponentFunction;
 import mtas.codec.util.collector.MtasDataCollector;
-import mtas.codec.util.collector.MtasDataItem.NumberComparator;
+import mtas.codec.util.collector.MtasDataItemNumberComparator;
 import mtas.parser.function.ParseException;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
  * The Class MtasSolrComponentTermvector.
  */
-public class MtasSolrComponentTermvector {
+public class MtasSolrComponentTermvector implements MtasSolrComponent<ComponentTermVector>{
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSolrComponentTermvector.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -72,6 +78,7 @@ public class MtasSolrComponentTermvector {
   /** The Constant NAME_MTAS_TERMVECTOR_SORT_DIRECTION. */
   public static final String NAME_MTAS_TERMVECTOR_SORT_DIRECTION = "sort.direction";
 
+  /** The Constant NAME_MTAS_TERMVECTOR_START. */
   public static final String NAME_MTAS_TERMVECTOR_START = "start";
 
   /** The Constant NAME_MTAS_TERMVECTOR_NUMBER. */
@@ -98,12 +105,16 @@ public class MtasSolrComponentTermvector {
   /** The Constant NAME_MTAS_TERMVECTOR_LIST. */
   public static final String NAME_MTAS_TERMVECTOR_LIST = "list";
 
+  /** The Constant NAME_MTAS_TERMVECTOR_LIST_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_LIST_REGEXP = "listRegexp";
 
+  /** The Constant NAME_MTAS_TERMVECTOR_IGNORE_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_REGEXP = "ignoreRegexp";
 
+  /** The Constant NAME_MTAS_TERMVECTOR_IGNORE_LIST. */
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_LIST = "ignoreList";
 
+  /** The Constant NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP = "ignoreListRegexp";
 
   /** The Constant SHARD_NUMBER_MULTIPLIER. */
@@ -115,8 +126,7 @@ public class MtasSolrComponentTermvector {
   /**
    * Instantiates a new mtas solr component termvector.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentTermvector(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -125,18 +135,15 @@ public class MtasSolrComponentTermvector {
   /**
    * Prepare.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
@@ -236,7 +243,7 @@ public class MtasSolrComponentTermvector {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas termvector");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_TERMVECTOR_KEY,
@@ -264,6 +271,10 @@ public class MtasSolrComponentTermvector {
       MtasSolrResultUtil.compareAndCheck(ignoreLists, fields,
           NAME_MTAS_TERMVECTOR_IGNORE_LIST, NAME_MTAS_TERMVECTOR_FIELD, false);
       for (int i = 0; i < fields.length; i++) {
+        if (!rb.req.getParams().getBool("isShard", false)) {
+          numberShards[i] = null;
+          boundaries[i] = null;
+        }
         String field = fields[i];
         String prefix = (prefixes[i] == null) || (prefixes[i].isEmpty()) ? null
             : prefixes[i].trim();
@@ -293,7 +304,7 @@ public class MtasSolrComponentTermvector {
         String[] list = null;
         Boolean listRegexp = listRegexps[i];
         if (lists[i] != null) {
-          ArrayList<String> tmpList = new ArrayList<String>();
+          ArrayList<String> tmpList = new ArrayList<>();
           String[] subList = lists[i].split("(?<!\\\\),");
           for (int j = 0; j < subList.length; j++) {
             tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
@@ -304,7 +315,7 @@ public class MtasSolrComponentTermvector {
         String[] ignoreList = null;
         Boolean ignoreListRegexp = ignoreListRegexps[i];
         if (ignoreLists[i] != null) {
-          ArrayList<String> tmpList = new ArrayList<String>();
+          ArrayList<String> tmpList = new ArrayList<>();
           String[] subList = ignoreLists[i].split("(?<!\\\\),");
           for (int j = 0; j < subList.length; j++) {
             tmpList.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
@@ -320,10 +331,10 @@ public class MtasSolrComponentTermvector {
                 .add(new ComponentTermVector(key, prefix, regexp, full, type,
                     sortType, sortDirection, startValue, numberFinal,
                     functionKey, functionExpression, functionType, boundary,
-                    list, listNumber, listRegexp, ignoreRegexp, ignoreList,
+                    list, listRegexp, ignoreRegexp, ignoreList,
                     ignoreListRegexp));
           } catch (ParseException e) {
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
           }
         }
       }
@@ -334,12 +345,9 @@ public class MtasSolrComponentTermvector {
   /**
    * Modify request.
    *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -354,7 +362,7 @@ public class MtasSolrComponentTermvector {
                 + "." + NAME_MTAS_TERMVECTOR_NUMBER);
             int number;
             if (oldNumber != null) {
-              int oldNumberValue = Integer.valueOf(oldNumber);
+              int oldNumberValue = Integer.parseInt(oldNumber);
               number = (oldNumberValue >= 0)
                   ? oldNumberValue * SHARD_NUMBER_MULTIPLIER : oldNumberValue;
             } else {
@@ -421,13 +429,10 @@ public class MtasSolrComponentTermvector {
   /**
    * Creates the.
    *
-   * @param termVector
-   *          the term vector
-   * @param encode
-   *          the encode
+   * @param termVector the term vector
+   * @param encode the encode
    * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public SimpleOrderedMap<Object> create(ComponentTermVector termVector,
@@ -437,8 +442,8 @@ public class MtasSolrComponentTermvector {
 
     termVector.subComponentFunction.dataCollector.close();
 
-    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
-    HashMap<String, MtasSolrMtasResult> functionDataItem = new HashMap<String, MtasSolrMtasResult>();
+    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<>();
+    HashMap<String, MtasSolrMtasResult> functionDataItem = new HashMap<>();
     functionData.put(termVector.subComponentFunction.dataCollector,
         functionDataItem);
     if (termVector.functions != null) {
@@ -476,8 +481,7 @@ public class MtasSolrComponentTermvector {
   /**
    * Finish stage.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -497,6 +501,7 @@ public class MtasSolrComponentTermvector {
                   MtasSolrResultUtil.decode(data);
                 }
               } catch (ClassCastException e) {
+                log.debug(e);
                 // shouldnt happen
               }
             }
@@ -508,7 +513,7 @@ public class MtasSolrComponentTermvector {
               && rb.req.getParams().getBool(PARAM_MTAS_TERMVECTOR, false)) {
             Set<String> ids = MtasSolrResultUtil.getIdsFromParameters(
                 rb.req.getParams(), PARAM_MTAS_TERMVECTOR);
-            if (ids.size() > 0) {
+            if (!ids.isEmpty()) {
               int tmpCounter = 0;
               String[] keys = new String[ids.size()];
               String[] numbers = new String[ids.size()];
@@ -530,6 +535,7 @@ public class MtasSolrComponentTermvector {
                 mtasResponse = (NamedList<Object>) rb.rsp.getValues()
                     .get("mtas");
               } catch (ClassCastException e) {
+                log.debug(e);
                 mtasResponse = null;
               }
               if (mtasResponse == null) {
@@ -570,70 +576,67 @@ public class MtasSolrComponentTermvector {
         }
       }
     }
-
   }
 
+  @Override
+  public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
+      throws IOException {
+    if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_MISSING_TOP) {
+      distributedProcessMissingTop(rb, mtasFields);
+    } else if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_MISSING_KEY) {
+      distributedProcessMissingKey(rb, mtasFields);
+    } else if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_FINISH) {
+      distributedProcessFinish(rb, mtasFields);
+    }
+  }
+  
   /**
    * Distributed process finish.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  @SuppressWarnings("unchecked")
-  public void distributedProcessFinish(ResponseBuilder rb,
+  private void distributedProcessFinish(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
     // rewrite
-    NamedList<Object> mtasResponse = null;
-    try {
-      mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
-      if (mtasResponse != null) {
-        ArrayList<Object> mtasResponseTermvector;
-        try {
-          mtasResponseTermvector = (ArrayList<Object>) mtasResponse
-              .get("termvector");
-          if (mtasResponseTermvector != null) {
-            MtasSolrResultUtil.rewrite(mtasResponseTermvector);
-          }
-        } catch (ClassCastException e) {
-          mtasResponseTermvector = null;
-        }
+
+    Object mtasResponseRaw;
+    if ((mtasResponseRaw = rb.rsp.getValues().get("mtas")) != null
+        && mtasResponseRaw instanceof NamedList) {
+      NamedList<Object> mtasResponse = (NamedList<Object>) mtasResponseRaw;
+      Object mtasResponseTermvectorRaw;
+      if ((mtasResponseTermvectorRaw = mtasResponse.get("termvector")) != null
+          && mtasResponseTermvectorRaw instanceof ArrayList) {
+        MtasSolrResultUtil
+            .rewrite((ArrayList<Object>) mtasResponseTermvectorRaw);
       }
-    } catch (ClassCastException e) {
-      mtasResponse = null;
     }
   }
 
   /**
    * Distributed process missing top.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public void distributedProcessMissingTop(ResponseBuilder rb,
+  private void distributedProcessMissingTop(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
     // initialise
-    HashMap<String, TreeMap<String, NumberComparator>> mergedComparatorLists = new HashMap<String, TreeMap<String, NumberComparator>>();
-    HashMap<String, NumberComparator> mergedComparatorBoundaryList = new HashMap<String, NumberComparator>();
-    HashMap<String, NumberComparator> summedComparatorBoundaryList = new HashMap<String, NumberComparator>();
-    HashMap<String, HashMap<String, NumberComparator>> comparatorBoundariesList = new HashMap<String, HashMap<String, NumberComparator>>();
+    HashMap<String, TreeMap<String, MtasDataItemNumberComparator>> mergedComparatorLists = new HashMap<>();
+    HashMap<String, MtasDataItemNumberComparator> mergedComparatorBoundaryList = new HashMap<>();
+    HashMap<String, MtasDataItemNumberComparator> summedComparatorBoundaryList = new HashMap<>();
+    HashMap<String, HashMap<String, MtasDataItemNumberComparator>> comparatorBoundariesList = new HashMap<>();
     // check all termvectors, and initialize
     for (String field : mtasFields.list.keySet()) {
       List<ComponentTermVector> tvList = mtasFields.list
           .get(field).termVectorList;
       if (tvList != null) {
         for (ComponentTermVector tv : tvList) {
-          if (tv.subComponentFunction.sortType != CodecUtil.SORT_TERM) {
+          if (!tv.subComponentFunction.sortType.equals(CodecUtil.SORT_TERM)) {
             mergedComparatorLists.put(tv.key,
-                new TreeMap<String, NumberComparator>());
+                new TreeMap<String, MtasDataItemNumberComparator>());
           }
         }
       }
@@ -644,13 +647,13 @@ public class MtasSolrComponentTermvector {
       if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
           && sreq.params.getBool(PARAM_MTAS_TERMVECTOR, false)) {
         for (ShardResponse shardResponse : sreq.responses) {
-          TreeMap<String, NumberComparator> mergedComparatorList;
+          TreeMap<String, MtasDataItemNumberComparator> mergedComparatorList;
           NamedList<Object> response = shardResponse.getSolrResponse()
               .getResponse();
           String key;
           MtasSolrMtasResult list;
-          NumberComparator comparatorLast;
-          LinkedHashMap<String, NumberComparator> comparatorList;
+          MtasDataItemNumberComparator comparatorLast;
+          LinkedHashMap<String, MtasDataItemNumberComparator> comparatorList;
           try {
             ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
                 .findRecursive("mtas", "termvector");
@@ -670,18 +673,19 @@ public class MtasSolrComponentTermvector {
                       // do nothing
                     } else {
                       mergedComparatorList = mergedComparatorLists.get(key);
-                      for (String value : comparatorList.keySet()) {
-                        if (mergedComparatorList.containsKey(value)) {
-                          mergedComparatorList.get(value)
-                              .add(comparatorList.get(value).getValue());
+                      for (Entry<String, MtasDataItemNumberComparator> entry : comparatorList
+                          .entrySet()) {
+                        if (mergedComparatorList.containsKey(entry.getKey())) {
+                          mergedComparatorList.get(entry.getKey())
+                              .add(entry.getValue().getValue());
                         } else {
-                          mergedComparatorList.put(value,
-                              comparatorList.get(value).clone());
+                          mergedComparatorList.put(entry.getKey(),
+                              entry.getValue().clone());
                         }
                       }
                       if (!comparatorBoundariesList.containsKey(key)) {
                         comparatorBoundariesList.put(key,
-                            new HashMap<String, NumberComparator>());
+                            new HashMap<String, MtasDataItemNumberComparator>());
                       }
                       comparatorBoundariesList.get(key)
                           .put(shardResponse.getShardAddress(), comparatorLast);
@@ -697,11 +701,13 @@ public class MtasSolrComponentTermvector {
                     throw new IOException("no data returned");
                   }
                 } catch (ClassCastException e) {
+                  log.debug(e);
                   dataItem.clear();
                 }
               }
             }
           } catch (ClassCastException e) {
+            log.debug(e);
             // shouldnt happen
           }
           shardResponse.getSolrResponse().setResponse(response);
@@ -709,37 +715,31 @@ public class MtasSolrComponentTermvector {
       }
     }
     // compute for each relevant termvector the mergedComparatorBoundary
-    HashMap<String, HashMap<String, HashMap<String, NumberComparator>>> recomputeFieldList = new HashMap<String, HashMap<String, HashMap<String, NumberComparator>>>();
+    HashMap<String, HashMap<String, HashMap<String, MtasDataItemNumberComparator>>> recomputeFieldList = new HashMap<>();
     for (String field : mtasFields.list.keySet()) {
       List<ComponentTermVector> tvList = mtasFields.list
           .get(field).termVectorList;
       if (tvList != null) {
         for (ComponentTermVector tv : tvList) {
-          TreeMap<String, NumberComparator> mergedComparatorList;
+          TreeMap<String, MtasDataItemNumberComparator> mergedComparatorList;
           if (mergedComparatorLists.containsKey(tv.key)) {
             mergedComparatorList = mergedComparatorLists.get(tv.key);
             if (mergedComparatorList.size() < tv.number || tv.number <= 0) {
               // do nothing
             } else {
-              SortedSet<Map.Entry<String, NumberComparator>> sortedSet = new TreeSet<Map.Entry<String, NumberComparator>>(
-                  new Comparator<Map.Entry<String, NumberComparator>>() {
-                    @Override
-                    public int compare(Map.Entry<String, NumberComparator> e1,
-                        Map.Entry<String, NumberComparator> e2) {
-                      int compare = e1.getValue()
-                          .compareTo(e2.getValue().getValue());
-                      if (compare == 0) {
-                        compare = e1.getKey().compareTo(e2.getKey());
-                      } else if (tv.subComponentFunction.sortDirection
-                          .equals(CodecUtil.SORT_DESC)) {
-                        compare *= -1;
-                      }
-                      return compare;
-                    }
-                  });
+              final int sortDirection = tv.subComponentFunction.sortDirection
+                  .equals(CodecUtil.SORT_DESC) ? -1 : 1;
+              SortedSet<Map.Entry<String, MtasDataItemNumberComparator>> sortedSet = new TreeSet<>(
+                  (Map.Entry<String, MtasDataItemNumberComparator> e1,
+                      Map.Entry<String, MtasDataItemNumberComparator> e2) -> (e1
+                          .getValue().compareTo(e2.getValue().getValue()) == 0)
+                              ? e1.getKey().compareTo(e2.getKey())
+                              : e1.getValue().compareTo(
+                                  e2.getValue().getValue()) * sortDirection);
+
               sortedSet.addAll(mergedComparatorLists.get(tv.key).entrySet());
-              Optional<Map.Entry<String, NumberComparator>> optionalItem = sortedSet
-                  .stream().skip(tv.number - 1).findFirst();
+              Optional<Map.Entry<String, MtasDataItemNumberComparator>> optionalItem = sortedSet
+                  .stream().skip(tv.number - 1L).findFirst();
               if (optionalItem.isPresent()) {
                 mergedComparatorBoundaryList.put(tv.key,
                     optionalItem.get().getValue());
@@ -748,102 +748,97 @@ public class MtasSolrComponentTermvector {
           }
         }
       }
-      // System.out.println("BOUNDARIES: " + comparatorBoundariesList);
-      // System.out.println("MERGED: " + mergedComparatorLists);
-      // System.out.println("MERGED boundary : " +
-      // mergedComparatorBoundaryList);
-      // System.out.println("SUMMED boundary : " +
-      // summedComparatorBoundaryList);
-      // compute which termvectors to recompute
-      HashMap<String, HashMap<String, NumberComparator>> recomputeList = new HashMap<String, HashMap<String, NumberComparator>>();
-      for (ComponentTermVector tv : tvList) {
-        String key = tv.key;
-        if (mergedComparatorBoundaryList.containsKey(key)
-            && summedComparatorBoundaryList.containsKey(key)) {
-          // set termvector to recompute
-          recomputeList.put(key, new HashMap<String, NumberComparator>());
-          // sort
-          List<Entry<String, NumberComparator>> list = new LinkedList<Entry<String, NumberComparator>>(
-              comparatorBoundariesList.get(key).entrySet());
-          Collections.sort(list,
-              new Comparator<Entry<String, NumberComparator>>() {
+      HashMap<String, HashMap<String, MtasDataItemNumberComparator>> recomputeList = new HashMap<>();
+      if (tvList != null) {
+        for (ComponentTermVector tv : tvList) {
+          String key = tv.key;
+          if (mergedComparatorBoundaryList.containsKey(key)
+              && summedComparatorBoundaryList.containsKey(key)) {
+            // set termvector to recompute
+            recomputeList.put(key,
+                new HashMap<String, MtasDataItemNumberComparator>());
+            // sort
+            List<Entry<String, MtasDataItemNumberComparator>> list = new LinkedList<>(
+                comparatorBoundariesList.get(key).entrySet());
+            Collections.sort(list,
+                (Entry<String, MtasDataItemNumberComparator> e1,
+                    Entry<String, MtasDataItemNumberComparator> e2) -> e1
+                        .getValue().compareTo(e2.getValue().getValue()));
 
-                public int compare(Entry<String, NumberComparator> e1,
-                    Entry<String, NumberComparator> e2) {
-                  return e1.getValue().compareTo(e2.getValue().getValue());
-                }
-              });
-
-          HashMap<String, NumberComparator> sortedHashMap = new LinkedHashMap<String, NumberComparator>();
-          for (Iterator<Map.Entry<String, NumberComparator>> it = list
-              .iterator(); it.hasNext();) {
-            Map.Entry<String, NumberComparator> entry = it.next();
-            sortedHashMap.put(entry.getKey(), entry.getValue());
-          }
-
-          NumberComparator mainNewBoundary = mergedComparatorBoundaryList
-              .get(key).recomputeBoundary(sortedHashMap.size());
-          // System.out.println(
-          // "MAIN NEW BOUNDARY for '" + key + "' : " + mainNewBoundary);
-
-          NumberComparator sum = null;
-          int number = 0;
-          for (String shardAddress : sortedHashMap.keySet()) {
-            NumberComparator newBoundary = mainNewBoundary.clone();
-            NumberComparator currentBoundary = sortedHashMap.get(shardAddress);
-            int compare = currentBoundary.compareTo(newBoundary.getValue());
-            if (tv.subComponentFunction.sortDirection
-                .equals(CodecUtil.SORT_DESC)) {
-              compare *= -1;
+            HashMap<String, MtasDataItemNumberComparator> sortedHashMap = new LinkedHashMap<>();
+            for (Iterator<Map.Entry<String, MtasDataItemNumberComparator>> it = list
+                .iterator(); it.hasNext();) {
+              Map.Entry<String, MtasDataItemNumberComparator> entry = it.next();
+              sortedHashMap.put(entry.getKey(), entry.getValue());
             }
-            if (compare < 0) {
-              HashMap<String, NumberComparator> recomputeSubList = new HashMap<String, NumberComparator>();
-              if (number > 0 && tv.subComponentFunction.sortDirection
+
+            MtasDataItemNumberComparator mainNewBoundary = mergedComparatorBoundaryList
+                .get(key).recomputeBoundary(sortedHashMap.size());
+            // System.out.println(
+            // "MAIN NEW BOUNDARY for '" + key + "' : " + mainNewBoundary);
+
+            MtasDataItemNumberComparator sum = null;
+            int number = 0;
+            for (Entry<String, MtasDataItemNumberComparator> entry : sortedHashMap
+                .entrySet()) {
+              MtasDataItemNumberComparator newBoundary = mainNewBoundary
+                  .clone();
+              MtasDataItemNumberComparator currentBoundary = entry.getValue();
+              int compare = currentBoundary.compareTo(newBoundary.getValue());
+              if (tv.subComponentFunction.sortDirection
                   .equals(CodecUtil.SORT_DESC)) {
-                NumberComparator tmpSumBoundary = mergedComparatorBoundaryList
-                    .get(key);
-                tmpSumBoundary.subtract(sum.getValue());
-                NumberComparator alternativeNewBoundary = tmpSumBoundary
-                    .recomputeBoundary(sortedHashMap.size() - number);
-                compare = newBoundary
-                    .compareTo(alternativeNewBoundary.getValue());
-                if (compare < 0) {
-                  newBoundary = alternativeNewBoundary;
-                  compare = currentBoundary.compareTo(newBoundary.getValue());
-                  if (tv.subComponentFunction.sortDirection
-                      .equals(CodecUtil.SORT_DESC)) {
-                    compare *= -1;
-                  }
+                compare *= -1;
+              }
+              if (compare < 0) {
+                HashMap<String, MtasDataItemNumberComparator> recomputeSubList = new HashMap<>();
+                // sum not null if number>0, but do check
+                if (number > 0 && sum != null
+                    && tv.subComponentFunction.sortDirection
+                        .equals(CodecUtil.SORT_DESC)) {
+                  MtasDataItemNumberComparator tmpSumBoundary = mergedComparatorBoundaryList
+                      .get(key);
+                  tmpSumBoundary.subtract(sum.getValue());
+                  MtasDataItemNumberComparator alternativeNewBoundary = tmpSumBoundary
+                      .recomputeBoundary(sortedHashMap.size() - number);
+                  compare = newBoundary
+                      .compareTo(alternativeNewBoundary.getValue());
                   if (compare < 0) {
-                    recomputeSubList.put(shardAddress, newBoundary);
+                    newBoundary = alternativeNewBoundary;
+                    compare = currentBoundary.compareTo(newBoundary.getValue());
+                    if (tv.subComponentFunction.sortDirection
+                        .equals(CodecUtil.SORT_DESC)) {
+                      compare *= -1;
+                    }
+                    if (compare < 0) {
+                      recomputeSubList.put(entry.getKey(), newBoundary);
+                    }
+                  } else {
+                    recomputeSubList.put(entry.getKey(), newBoundary);
                   }
                 } else {
-                  recomputeSubList.put(shardAddress, newBoundary);
+                  recomputeSubList.put(entry.getKey(), newBoundary);
+                }
+                if (!recomputeSubList.isEmpty()) {
+                  if (!recomputeList.containsKey(key)) {
+                    recomputeList.put(key, recomputeSubList);
+                  } else {
+                    recomputeList.get(key).putAll(recomputeSubList);
+                  }
                 }
               } else {
-                recomputeSubList.put(shardAddress, newBoundary);
+                newBoundary = currentBoundary.clone();
               }
-              if (recomputeSubList.size() > 0) {
-                if (!recomputeList.containsKey(key)) {
-                  recomputeList.put(key, recomputeSubList);
-                } else {
-                  recomputeList.get(key).putAll(recomputeSubList);
-                }
+              if (sum == null) {
+                sum = newBoundary.clone();
+              } else {
+                sum.add(newBoundary.getValue());
               }
-            } else {
-              newBoundary = currentBoundary.clone();
+              number++;
             }
-            if (sum == null) {
-              sum = newBoundary.clone();
-            } else {
-              sum.add(newBoundary.getValue());
-            }
-            number++;
           }
-
         }
       }
-      if (recomputeList.size() > 0) {
+      if (!recomputeList.isEmpty()) {
         recomputeFieldList.put(field, recomputeList);
       }
     }
@@ -852,14 +847,15 @@ public class MtasSolrComponentTermvector {
     if (recomputeFieldList.size() > 0) {
 
       // remove output for termvectors in recompute list and get list of shards
-      HashSet<String> shards = new HashSet<String>();
+      HashSet<String> shards = new HashSet<>();
       for (ShardRequest sreq : rb.finished) {
         if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
             && sreq.params.getBool(PARAM_MTAS_TERMVECTOR, false)) {
           for (ShardResponse shardResponse : sreq.responses) {
             NamedList<Object> response = shardResponse.getSolrResponse()
                 .getResponse();
-            String key, field;
+            String key;
+            String field;
             String shardAddress = shardResponse.getShardAddress();
             try {
               ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
@@ -871,20 +867,25 @@ public class MtasSolrComponentTermvector {
                   try {
                     key = (String) dataItem.get("key");
                     field = (String) dataItem.get("field");
-                    if (field != null && key != null
-                        && recomputeFieldList.containsKey(field)
-                        && recomputeFieldList.get(field).containsKey(key)
-                        && recomputeFieldList.get(field).get(key)
-                            .containsKey(shardAddress)) {
+                    boolean doClear;
+                    doClear = field != null;
+                    doClear &= key != null;
+                    doClear &= recomputeFieldList.containsKey(field);
+                    doClear &= recomputeFieldList.get(field).containsKey(key);
+                    doClear &= recomputeFieldList.get(field).get(key)
+                        .containsKey(shardAddress);
+                    if (doClear) {
                       dataItem.clear();
                       dataItem.add("key", key);
                     }
                   } catch (ClassCastException e) {
+                    log.debug(e);
                     dataItem.clear();
                   }
                 }
               }
             } catch (ClassCastException e) {
+              log.debug(e);
               // shouldnt happen
             }
             shardResponse.getSolrResponse().setResponse(response);
@@ -893,7 +894,7 @@ public class MtasSolrComponentTermvector {
       }
 
       // parameter
-      HashMap<String, ModifiableSolrParams> requestParamList = new HashMap<String, ModifiableSolrParams>();
+      HashMap<String, ModifiableSolrParams> requestParamList = new HashMap<>();
       for (String shardAddress : shards) {
         ModifiableSolrParams paramsNewRequest = new ModifiableSolrParams();
         int termvectorCounter = 0;
@@ -901,7 +902,7 @@ public class MtasSolrComponentTermvector {
           List<ComponentTermVector> tvList = mtasFields.list
               .get(field).termVectorList;
           if (recomputeFieldList.containsKey(field)) {
-            HashMap<String, HashMap<String, NumberComparator>> recomputeList = recomputeFieldList
+            HashMap<String, HashMap<String, MtasDataItemNumberComparator>> recomputeList = recomputeFieldList
                 .get(field);
             if (tvList != null) {
               for (ComponentTermVector tv : tvList) {
@@ -980,17 +981,18 @@ public class MtasSolrComponentTermvector {
             }
           }
         }
-        if (paramsNewRequest.getParameterNames().size() > 0) {
+        if (!paramsNewRequest.getParameterNames().isEmpty()) {
           requestParamList.put(shardAddress, paramsNewRequest);
         }
       }
 
       // new requests
-      for (String shardAddress : requestParamList.keySet()) {
+      for (Entry<String, ModifiableSolrParams> entry : requestParamList
+          .entrySet()) {
         ShardRequest sreq = new ShardRequest();
-        sreq.shards = new String[] { shardAddress };
+        sreq.shards = new String[] { entry.getKey() };
         sreq.purpose = ShardRequest.PURPOSE_PRIVATE;
-        sreq.params = requestParamList.get(shardAddress);
+        sreq.params = entry.getValue();
         sreq.params.add("fq", rb.req.getParams().getParams("fq"));
         sreq.params.add("q", rb.req.getParams().getParams("q"));
         sreq.params.add("cache", rb.req.getParams().getParams("cache"));
@@ -1008,20 +1010,18 @@ public class MtasSolrComponentTermvector {
   /**
    * Distributed process missing key.
    *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  public void distributedProcessMissingKey(ResponseBuilder rb,
+  private void distributedProcessMissingKey(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
     HashMap<String, HashMap<String, HashSet<String>>> missingTermvectorKeys = computeMissingTermvectorItemsPerShard(
         rb.finished, "mtas", "termvector");
-    for (String shardName : missingTermvectorKeys.keySet()) {
-      HashMap<String, HashSet<String>> missingTermvectorKeysShard = missingTermvectorKeys
-          .get(shardName);
+    for (Entry<String, HashMap<String, HashSet<String>>> entry : missingTermvectorKeys
+        .entrySet()) {
+      HashMap<String, HashSet<String>> missingTermvectorKeysShard = entry
+          .getValue();
       ModifiableSolrParams paramsNewRequest = new ModifiableSolrParams();
       int termvectorCounter = 0;
       for (String field : mtasFields.list.keySet()) {
@@ -1032,7 +1032,7 @@ public class MtasSolrComponentTermvector {
             if (!tv.full) {
               if (missingTermvectorKeysShard.containsKey(tv.key)) {
                 HashSet<String> list = missingTermvectorKeysShard.get(tv.key);
-                if (list.size() > 0) {
+                if (!list.isEmpty()) {
                   paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + "."
                       + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_FIELD,
                       field);
@@ -1079,23 +1079,24 @@ public class MtasSolrComponentTermvector {
                         + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_REGEXP,
                         tv.regexp);
                   }
-                  if (list.size() > 0) {
-                    String listValue = "";
+                  if (!list.isEmpty()) {
+                    StringBuilder listValue = new StringBuilder();
                     String[] listList = list.toArray(new String[list.size()]);
                     for (int i = 0; i < listList.length; i++) {
                       if (i > 0) {
-                        listValue += ",";
+                        listValue.append(",");
                       }
-                      listValue += listList[i].replace("\\", "\\\\")
-                          .replace(",", "\\\\");
+                      listValue.append(listList[i].replace("\\", "\\\\")
+                          .replace(",", "\\\\"));
                     }
-                    paramsNewRequest.add(
-                        PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
-                            + NAME_MTAS_TERMVECTOR_FULL,
-                        tv.full ? "true" : "false");
                     paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + "."
-                        + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_LIST,
-                        listValue);
+                        + termvectorCounter + "." + NAME_MTAS_TERMVECTOR_FULL,
+                        "false");
+                    paramsNewRequest
+                        .add(
+                            PARAM_MTAS_TERMVECTOR + "." + termvectorCounter
+                                + "." + NAME_MTAS_TERMVECTOR_LIST,
+                            listValue.toString());
                   }
                   termvectorCounter++;
                 }
@@ -1104,7 +1105,7 @@ public class MtasSolrComponentTermvector {
           }
           if (termvectorCounter > 0) {
             ShardRequest nsreq = new ShardRequest();
-            nsreq.shards = new String[] { shardName };
+            nsreq.shards = new String[] { entry.getKey() };
             nsreq.purpose = ShardRequest.PURPOSE_PRIVATE;
             nsreq.params = new ModifiableSolrParams();
             nsreq.params.add("fq", rb.req.getParams().getParams("fq"));
@@ -1127,20 +1128,17 @@ public class MtasSolrComponentTermvector {
   /**
    * Compute missing termvector items per shard.
    *
-   * @param requests
-   *          the requests
-   * @param args
-   *          the args
+   * @param requests the requests
+   * @param args the args
    * @return the hash map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private HashMap<String, HashMap<String, HashSet<String>>> computeMissingTermvectorItemsPerShard(
       List<ShardRequest> requests, String... args) throws IOException {
-    HashMap<String, HashMap<String, HashSet<String>>> result = new HashMap<String, HashMap<String, HashSet<String>>>();
-    HashMap<String, HashMap<String, HashSet<String>>> itemsPerShardSets = new HashMap<String, HashMap<String, HashSet<String>>>();
-    HashMap<String, HashSet<String>> itemSets = new HashMap<String, HashSet<String>>();
+    HashMap<String, HashMap<String, HashSet<String>>> result = new HashMap<>();
+    HashMap<String, HashMap<String, HashSet<String>>> itemsPerShardSets = new HashMap<>();
+    HashMap<String, HashSet<String>> itemSets = new HashMap<>();
     // loop over responses different shards
     for (ShardRequest sreq : requests) {
       if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
@@ -1156,17 +1154,19 @@ public class MtasSolrComponentTermvector {
                 NamedList<Object> dataItem = data.get(i);
                 try {
                   String termvectorKey = (String) dataItem.get("key");
-                  MtasSolrMtasResult list = (MtasSolrMtasResult) dataItem.get("list");
+                  MtasSolrMtasResult list = (MtasSolrMtasResult) dataItem
+                      .get("list");
                   if (termvectorKey != null && list != null) {
                     Set<String> keyList = list.getKeyList();
                     HashMap<String, HashSet<String>> itemsPerShardSet;
-                    HashSet<String> itemSet, tmpItemSet = new HashSet<String>();
+                    HashSet<String> itemSet;
+                    HashSet<String> tmpItemSet = new HashSet<>();
                     if (itemsPerShardSets.containsKey(termvectorKey)) {
                       itemsPerShardSet = itemsPerShardSets.get(termvectorKey);
                       itemSet = itemSets.get(termvectorKey);
                     } else {
-                      itemsPerShardSet = new HashMap<String, HashSet<String>>();
-                      itemSet = new HashSet<String>();
+                      itemsPerShardSet = new HashMap<>();
+                      itemSet = new HashSet<>();
                       itemsPerShardSets.put(termvectorKey, itemsPerShardSet);
                       itemSets.put(termvectorKey, itemSet);
                     }
@@ -1176,34 +1176,35 @@ public class MtasSolrComponentTermvector {
                     itemSet.addAll(keyList);
                   }
                 } catch (ClassCastException e) {
-
+                  log.debug(e);
                 }
               }
-
             }
           } catch (ClassCastException e) {
+            log.debug(e);
           }
         }
       }
     }
 
     // construct result
-    for (String key : itemSets.keySet()) {
-      if (itemsPerShardSets.containsKey(key)) {
+    for (Entry<String, HashSet<String>> entry : itemSets.entrySet()) {
+      if (itemsPerShardSets.containsKey(entry.getKey())) {
         HashMap<String, HashSet<String>> itemsPerShardSet = itemsPerShardSets
-            .get(key);
-        for (String shardAddress : itemsPerShardSet.keySet()) {
+            .get(entry.getKey());
+        for (Entry<String, HashSet<String>> subEntry : itemsPerShardSet
+            .entrySet()) {
           HashMap<String, HashSet<String>> tmpShardKeySet;
-          if (result.containsKey(shardAddress)) {
-            tmpShardKeySet = result.get(shardAddress);
+          if (result.containsKey(subEntry.getKey())) {
+            tmpShardKeySet = result.get(subEntry.getKey());
           } else {
-            tmpShardKeySet = new HashMap<String, HashSet<String>>();
-            result.put(shardAddress, tmpShardKeySet);
+            tmpShardKeySet = new HashMap<>();
+            result.put(subEntry.getKey(), tmpShardKeySet);
           }
-          HashSet<String> tmpResult = new HashSet<String>();
-          tmpShardKeySet.put(key, tmpResult);
-          HashSet<String> itemsSet = itemsPerShardSet.get(shardAddress);
-          for (String item : itemSets.get(key)) {
+          HashSet<String> tmpResult = new HashSet<>();
+          tmpShardKeySet.put(entry.getKey(), tmpResult);
+          HashSet<String> itemsSet = subEntry.getValue();
+          for (String item : entry.getValue()) {
             if (!itemsSet.contains(item)) {
               tmpResult.add(item);
             }
@@ -1213,5 +1214,7 @@ public class MtasSolrComponentTermvector {
     }
     return result;
   }
+
+  
 
 }

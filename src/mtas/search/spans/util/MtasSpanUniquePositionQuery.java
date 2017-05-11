@@ -10,7 +10,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
-import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
 import org.apache.lucene.search.spans.SpanWeight;
@@ -100,11 +99,11 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     buffer.append("])");
     return buffer.toString();
   }
-  
+
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newClause = clause.rewrite(reader);
-    if(newClause!=clause) {
+    if (!newClause.equals(clause)) {
       return new MtasSpanUniquePositionQuery(newClause).rewrite(reader);
     } else {
       return super.rewrite(reader);
@@ -150,7 +149,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
         IndexSearcher searcher, Map<Term, TermContext> terms)
         throws IOException {
       super(MtasSpanUniquePositionQuery.this, searcher, terms);
-      this.subWeight = subWeight;      
+      this.subWeight = subWeight;
     }
 
     /*
@@ -180,12 +179,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
       if (subSpan == null) {
         return null;
       } else {
-        SimScorer scorer = getSimScorer(context);
-        if (scorer == null) {
-          scorer = new MtasSimScorer();
-        }
-        return new MtasSpanUniquePosition(MtasSpanUniquePositionQuery.this,
-            subSpan);
+        return new MtasSpanUniquePosition(subSpan);
       }
     }
 

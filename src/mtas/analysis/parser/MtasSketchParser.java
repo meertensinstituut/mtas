@@ -5,8 +5,11 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,8 +88,8 @@ final public class MtasSketchParser extends MtasBasicParser {
                     && (nameMapping != null)) {
                   MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
                   m.processConfig(mapping);
-                  if (wordAnnotationTypes.containsKey(nameMapping)) {
-                    wordAnnotationTypes.get(nameMapping).addItem(m);
+                  if (wordAnnotationTypes.containsKey(Integer.parseInt(nameMapping))) {
+                    wordAnnotationTypes.get(Integer.parseInt(nameMapping)).addItem(m);
                   } else {
                     MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
                         typeMapping, nameMapping, false);
@@ -128,11 +131,11 @@ final public class MtasSketchParser extends MtasBasicParser {
     AtomicInteger position = new AtomicInteger(0);
     Integer unknownAncestors = 0;
 
-    HashMap<String, TreeSet<Integer>> idPositions = new HashMap<String, TreeSet<Integer>>();
-    HashMap<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
+    Map<String, Set<Integer>> idPositions = new HashMap<>();
+    Map<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
 
-    HashMap<String, HashMap<Integer, HashSet<String>>> updateList = createUpdateList();
-    HashMap<String, ArrayList<MtasParserObject>> currentList = createCurrentList();
+    Map<String, Map<Integer, Set<String>>> updateList = createUpdateList();
+    Map<String, List<MtasParserObject>> currentList = createCurrentList();
 
     tokenCollection = new MtasTokenCollection();
     MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
@@ -311,7 +314,7 @@ final public class MtasSketchParser extends MtasBasicParser {
       throw new MtasParserException(e.getMessage());
     }
     // update tokens with offset
-    for (Entry<Integer, HashSet<String>> updateItem : updateList
+    for (Entry<Integer, Set<String>> updateItem : updateList
         .get(UPDATE_TYPE_OFFSET).entrySet()) {
       for (String refId : updateItem.getValue()) {
         Integer[] refOffset = idOffsets.get(refId);
@@ -322,10 +325,10 @@ final public class MtasSketchParser extends MtasBasicParser {
       }
     }
     // update tokens with position
-    for (Entry<Integer, HashSet<String>> updateItem : updateList
+    for (Entry<Integer, Set<String>> updateItem : updateList
         .get(UPDATE_TYPE_POSITION).entrySet()) {
       for (String refId : updateItem.getValue()) {
-        MtasToken<?> token = tokenCollection.get(updateItem.getKey());
+        MtasToken token = tokenCollection.get(updateItem.getKey());
         token.addPositions(idPositions.get(refId));
       }
     }
@@ -341,12 +344,12 @@ final public class MtasSketchParser extends MtasBasicParser {
    */
   @Override
   public String printConfig() {
-    String text = "";
-    text += "=== CONFIGURATION ===\n";
-    text += "type: " + wordAnnotationTypes.size() + " x wordAnnotation";
-    text += printConfigTypes(wordAnnotationTypes);
-    text += "=== CONFIGURATION ===\n";
-    return text;
+    StringBuilder text = new StringBuilder();
+    text.append("=== CONFIGURATION ===\n");
+    text.append("type: " + wordAnnotationTypes.size() + " x wordAnnotation");
+    text.append(printConfigTypes(wordAnnotationTypes));
+    text.append("=== CONFIGURATION ===\n");
+    return text.toString();
   }
 
   /**
@@ -357,16 +360,16 @@ final public class MtasSketchParser extends MtasBasicParser {
    */
   private String printConfigTypes(
       HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
-    String text = "";
+    StringBuilder text = new StringBuilder();
     for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types
         .entrySet()) {
-      text += "- " + entry.getKey() + ": " + entry.getValue().items.size()
-          + " mapping(s)\n";
+      text.append("- " + entry.getKey() + ": " + entry.getValue().items.size()
+          + " mapping(s)\n");
       for (int i = 0; i < entry.getValue().items.size(); i++) {
-        text += "\t" + entry.getValue().items.get(i) + "\n";
+        text.append("\t" + entry.getValue().items.get(i) + "\n");
       }
     }
-    return text;
+    return text.toString();
   }
 
   /**

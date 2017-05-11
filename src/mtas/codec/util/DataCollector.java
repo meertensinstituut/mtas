@@ -17,10 +17,10 @@ import mtas.codec.util.collector.MtasDataLongFull;
 public class DataCollector {
 
   /** The collector type list. */
-  public static String COLLECTOR_TYPE_LIST = "list";
+  public final static String COLLECTOR_TYPE_LIST = "list";
 
   /** The collector type data. */
-  public static String COLLECTOR_TYPE_DATA = "data";
+  public final static String COLLECTOR_TYPE_DATA = "data";
 
   /**
    * Gets the collector.

@@ -2,9 +2,9 @@ package mtas.codec.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -21,23 +21,26 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenString;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.parser.function.MtasFunctionParser;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.parser.function.util.MtasFunctionParserFunctionDefault;
+import mtas.search.spans.MtasSpanContainingQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.automaton.CompiledAutomaton;
-import org.apache.lucene.util.automaton.RegExp;
 
 /**
  * The Class CodecComponent.
  */
 public class CodecComponent {
+
+  private CodecComponent() {
+  }
 
   /**
    * The Class ComponentFields.
@@ -46,7 +49,7 @@ public class CodecComponent {
 
     /** The list. */
     public Map<String, ComponentField> list;
-    
+
     public ComponentJoin join;
 
     /** The do document. */
@@ -105,13 +108,13 @@ public class CodecComponent {
     }
   }
 
+  public abstract static interface BasicComponent {
+  }
+
   /**
    * The Class ComponentField.
    */
-  public static class ComponentField {
-
-    /** The field. */
-    public String field;
+  public static class ComponentField implements BasicComponent {
 
     /** The unique key field. */
     public String uniqueKeyField;
@@ -157,19 +160,19 @@ public class CodecComponent {
      * @param uniqueKeyField
      *          the unique key field
      */
-    public ComponentField(String field, String uniqueKeyField) {
-      this.field = field;
+    public ComponentField(String uniqueKeyField) {
       this.uniqueKeyField = uniqueKeyField;
-      documentList = new ArrayList<ComponentDocument>();
-      kwicList = new ArrayList<ComponentKwic>();
-      listList = new ArrayList<ComponentList>();
-      groupList = new ArrayList<ComponentGroup>();
-      facetList = new ArrayList<ComponentFacet>();
-      termVectorList = new ArrayList<ComponentTermVector>();
-      statsPositionList = new ArrayList<ComponentPosition>();
-      statsTokenList = new ArrayList<ComponentToken>();
-      statsSpanList = new ArrayList<ComponentSpan>();
-      spanQueryList = new ArrayList<MtasSpanQuery>();
+      // initialise
+      documentList = new ArrayList<>();
+      kwicList = new ArrayList<>();
+      listList = new ArrayList<>();
+      groupList = new ArrayList<>();
+      facetList = new ArrayList<>();
+      termVectorList = new ArrayList<>();
+      statsPositionList = new ArrayList<>();
+      statsTokenList = new ArrayList<>();
+      statsSpanList = new ArrayList<>();
+      spanQueryList = new ArrayList<>();
       prefix = null;
     }
   }
@@ -177,7 +180,7 @@ public class CodecComponent {
   /**
    * The Class ComponentPrefix.
    */
-  public static class ComponentPrefix {
+  public static class ComponentPrefix implements BasicComponent {
 
     /** The key. */
     public String key;
@@ -202,10 +205,10 @@ public class CodecComponent {
      */
     public ComponentPrefix(String key) {
       this.key = key;
-      singlePositionList = new TreeSet<String>();
-      multiplePositionList = new TreeSet<String>();
-      setPositionList = new TreeSet<String>();
-      intersectingList = new TreeSet<String>();
+      singlePositionList = new TreeSet<>();
+      multiplePositionList = new TreeSet<>();
+      setPositionList = new TreeSet<>();
+      intersectingList = new TreeSet<>();
     }
 
     /**
@@ -215,11 +218,9 @@ public class CodecComponent {
      *          the prefix
      */
     public void addSinglePosition(String prefix) {
-      if (!prefix.trim().equals("")) {
-        if (!singlePositionList.contains(prefix)
-            && !multiplePositionList.contains(prefix)) {
-          singlePositionList.add(prefix);
-        }
+      if (!prefix.trim().isEmpty() && !singlePositionList.contains(prefix)
+          && !multiplePositionList.contains(prefix)) {
+        singlePositionList.add(prefix);
       }
     }
 
@@ -278,7 +279,7 @@ public class CodecComponent {
   /**
    * The Class ComponentDocument.
    */
-  public static class ComponentDocument {
+  public static class ComponentDocument implements BasicComponent {
 
     /** The regexp. */
     public String key, prefix, regexp, ignoreRegexp;
@@ -373,7 +374,7 @@ public class CodecComponent {
   /**
    * The Class ComponentKwic.
    */
-  public static class ComponentKwic {
+  public static class ComponentKwic implements BasicComponent {
 
     /** The query. */
     public MtasSpanQuery query;
@@ -449,13 +450,13 @@ public class CodecComponent {
       this.start = (start > 0) ? start : 0;
       this.number = (number != null && number >= 0) ? number : null;
       this.output = output;
-      tokens = new HashMap<Integer, ArrayList<KwicToken>>();
-      hits = new HashMap<Integer, ArrayList<KwicHit>>();
-      uniqueKey = new HashMap<Integer, String>();
-      subTotal = new HashMap<Integer, Integer>();
-      minPosition = new HashMap<Integer, Integer>();
-      maxPosition = new HashMap<Integer, Integer>();
-      this.prefixes = new ArrayList<String>();
+      tokens = new HashMap<>();
+      hits = new HashMap<>();
+      uniqueKey = new HashMap<>();
+      subTotal = new HashMap<>();
+      minPosition = new HashMap<>();
+      maxPosition = new HashMap<>();
+      this.prefixes = new ArrayList<>();
       if ((prefixes != null) && (prefixes.trim().length() > 0)) {
         List<String> l = Arrays.asList(prefixes.split(Pattern.quote(",")));
         for (String ls : l) {
@@ -465,7 +466,7 @@ public class CodecComponent {
         }
       }
       if (this.output == null) {
-        if (this.prefixes.size() > 0) {
+        if (!this.prefixes.isEmpty()) {
           this.output = ComponentKwic.KWIC_OUTPUT_HIT;
         } else {
           this.output = ComponentKwic.KWIC_OUTPUT_TOKEN;
@@ -480,7 +481,7 @@ public class CodecComponent {
   /**
    * The Class ComponentList.
    */
-  public static class ComponentList {
+  public static class ComponentList implements BasicComponent {
 
     /** The span query. */
     public MtasSpanQuery spanQuery;
@@ -591,7 +592,7 @@ public class CodecComponent {
       subTotal = new HashMap<Integer, Integer>();
       minPosition = new HashMap<Integer, Integer>();
       maxPosition = new HashMap<Integer, Integer>();
-      this.prefixes = new ArrayList<String>();
+      this.prefixes = new ArrayList<>();
       if ((prefix != null) && (prefix.trim().length() > 0)) {
         List<String> l = Arrays.asList(prefix.split(Pattern.quote(",")));
         for (String ls : l) {
@@ -602,7 +603,7 @@ public class CodecComponent {
       }
       // check output
       if (this.output == null) {
-        if (this.prefixes.size() > 0) {
+        if (!this.prefixes.isEmpty()) {
           this.output = ComponentList.LIST_OUTPUT_HIT;
         } else {
           this.output = ComponentList.LIST_OUTPUT_TOKEN;
@@ -617,7 +618,7 @@ public class CodecComponent {
   /**
    * The Class ComponentGroup.
    */
-  public static class ComponentGroup {
+  public static class ComponentGroup implements BasicComponent {
 
     /** The span query. */
     public MtasSpanQuery spanQuery;
@@ -632,7 +633,7 @@ public class CodecComponent {
     public Integer start, number;
 
     /** The key. */
-    public String field, queryValue, queryType, queryPrefix, queryIgnore, key;
+    public String key;
 
     /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
@@ -695,9 +696,7 @@ public class CodecComponent {
      * @throws IOException
      *           Signals that an I/O exception has occurred.
      */
-    public ComponentGroup(MtasSpanQuery spanQuery, String field,
-        String queryValue, String queryType, String queryPrefix,
-        String queryIgnore, String key, int number,
+    public ComponentGroup(MtasSpanQuery spanQuery, String key, int number,
         String groupingHitInsidePrefixes,
         String[] groupingHitInsideLeftPosition,
         String[] groupingHitInsideLeftPrefixes,
@@ -709,27 +708,22 @@ public class CodecComponent {
         String[] groupingRightPosition, String[] groupingRightPrefixes)
         throws IOException {
       this.spanQuery = spanQuery;
-      this.field = field;
-      this.queryValue = queryValue;
-      this.queryType = queryType;
-      this.queryPrefix = queryPrefix;
-      this.queryIgnore = queryIgnore;
       this.key = key;
       this.dataType = CodecUtil.DATA_TYPE_LONG;
+      this.sortType = CodecUtil.STATS_TYPE_SUM;
+      this.sortDirection = CodecUtil.SORT_DESC;
       this.statsItems = CodecUtil.createStatsItems("n,sum,mean");
       this.statsType = CodecUtil.createStatsType(this.statsItems, this.sortType,
           null);
-      this.sortType = CodecUtil.STATS_TYPE_SUM;
-      this.sortDirection = CodecUtil.SORT_DESC;
       this.start = 0;
       this.number = number;
-      HashSet<String> tmpPrefixes = new HashSet<String>();
+      HashSet<String> tmpPrefixes = new HashSet<>();
       // analyze grouping condition
       if (groupingHitInsidePrefixes != null) {
-        hitInside = new HashSet<String>();
+        hitInside = new HashSet<>();
         String[] tmpList = groupingHitInsidePrefixes.split(",");
         for (String tmpItem : tmpList) {
-          if (!tmpItem.trim().equals("")) {
+          if (!tmpItem.trim().isEmpty()) {
             hitInside.add(tmpItem.trim());
           }
         }
@@ -749,7 +743,7 @@ public class CodecComponent {
           groupingLeftPrefixes);
       right = createPositionedPrefixes(tmpPrefixes, groupingRightPosition,
           groupingRightPrefixes);
-      prefixes = new ArrayList<String>(tmpPrefixes);
+      prefixes = new ArrayList<>(tmpPrefixes);
       // datacollector
       dataCollector = DataCollector.getCollector(
           DataCollector.COLLECTOR_TYPE_LIST, this.dataType, this.statsType,
@@ -818,18 +812,18 @@ public class CodecComponent {
       String[] tmpList;
       for (int i = 0; i < tmpPosition.length; i++) {
         tmpList = prefixes[i].split(",");
-        tmpPrefixList = new ArrayList<String>();
+        tmpPrefixList = new ArrayList<>();
         for (String tmpItem : tmpList) {
           if (!tmpItem.trim().equals("")) {
             tmpPrefixList.add(tmpItem.trim());
           }
         }
-        if (tmpPrefixList.size() == 0) {
+        if (tmpPrefixList.isEmpty()) {
           throw new IOException("incorrect prefixes " + prefixes[i]);
         }
         for (int t = 0; t < tmpPosition[i].length; t++) {
           if (result[tmpPosition[i][t]] == null) {
-            result[tmpPosition[i][t]] = new HashSet<String>();
+            result[tmpPosition[i][t]] = new HashSet<>();
           }
           result[tmpPosition[i][t]].addAll(tmpPrefixList);
         }
@@ -842,25 +836,31 @@ public class CodecComponent {
   /**
    * The Class ComponentFacet.
    */
-  public static class ComponentFacet {
+  public static class ComponentFacet implements BasicComponent {
 
     /** The span queries. */
     public MtasSpanQuery[] spanQueries;
 
     /** The base sort directions. */
-    public String[] baseFields, baseFieldTypes, baseTypes, baseSortTypes,
-        baseSortDirections;
+    public String[] baseFields;
+    public String[] baseFieldTypes;
+    public String[] baseTypes;
+    public String[] baseSortTypes;
+    public String[] baseSortDirections;
 
-    public Double[] baseRangeSizes, baseRangeBases;
+    public Double[] baseRangeSizes;
+    public Double[] baseRangeBases;
 
     /** The base stats types. */
-    public String[] baseCollectorTypes, baseDataTypes, baseStatsTypes;
+    public String[] baseCollectorTypes;
+    public String[] baseDataTypes;
+    public String[] baseStatsTypes;
 
     /** The base stats items. */
     public TreeSet<String>[] baseStatsItems;
 
     /** The field. */
-    public String key, field;
+    public String key;
 
     /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
@@ -872,10 +872,8 @@ public class CodecComponent {
     public Integer[] baseNumbers;
 
     /** The base maximum longs. */
-    public Long[] baseMinimumLongs, baseMaximumLongs;
-
-    /** The base maximum doubles. */
-    public Double[] baseMinimumDoubles, baseMaximumDoubles;
+    public Long[] baseMinimumLongs;
+    public Long[] baseMaximumLongs;
 
     /** The base parsers. */
     public MtasFunctionParserFunction[] baseParsers;
@@ -952,19 +950,16 @@ public class CodecComponent {
         Double[] baseMaximumDoubles, String[][] baseFunctionKeys,
         String[][] baseFunctionExpressions, String[][] baseFunctionTypes)
         throws IOException, ParseException {
-      this.spanQueries = spanQueries;
-      this.field = field;
+      this.spanQueries = (MtasSpanQuery[]) spanQueries.clone();
       this.key = key;
-      this.baseFields = baseFields;
-      this.baseFieldTypes = baseFieldTypes;
-      this.baseTypes = baseTypes;
-      this.baseRangeSizes = baseRangeSizes;
-      this.baseRangeBases = baseRangeBases;
-      this.baseSortTypes = baseSortTypes;
-      this.baseSortDirections = baseSortDirections;
-      this.baseNumbers = baseNumbers;
-      this.baseMinimumDoubles = baseMinimumDoubles;
-      this.baseMaximumDoubles = baseMaximumDoubles;
+      this.baseFields = (String[]) baseFields.clone();
+      this.baseFieldTypes = (String[]) baseFieldTypes.clone();
+      this.baseTypes = (String[]) baseTypes.clone();
+      this.baseRangeSizes = (Double[]) baseRangeSizes.clone();
+      this.baseRangeBases = (Double[]) baseRangeBases.clone();
+      this.baseSortTypes = (String[]) baseSortTypes.clone();
+      this.baseSortDirections = (String[]) baseSortDirections.clone();
+      this.baseNumbers = (Integer[]) baseNumbers.clone();
       // compute types
       this.baseMinimumLongs = new Long[baseFields.length];
       this.baseMaximumLongs = new Long[baseFields.length];
@@ -1001,45 +996,45 @@ public class CodecComponent {
         if (this.baseSortTypes[i] == null) {
           this.baseSortTypes[i] = CodecUtil.SORT_TERM;
         } else if (!this.baseSortTypes[i].equals(CodecUtil.SORT_TERM)
-            && !CodecUtil.STATS_TYPES.contains(this.baseSortTypes[i])) {
+            && !CodecUtil.isStatsType(this.baseSortTypes[i])) {
           throw new IOException(
               "unrecognized sortType " + this.baseSortTypes[i]);
         }
         this.baseCollectorTypes[i] = DataCollector.COLLECTOR_TYPE_LIST;
-        this.baseStatsItems[i] = CodecUtil.createStatsItems(baseTypes[i]);
+        this.baseStatsItems[i] = CodecUtil.createStatsItems(this.baseTypes[i]);
         this.baseStatsTypes[i] = CodecUtil.createStatsType(baseStatsItems[i],
             this.baseSortTypes[i], new MtasFunctionParserFunctionDefault(1));
       }
-      if (baseFunctionKeys != null && baseFunctionExpressions != null
-          && baseFunctionTypes != null) {
-        if (baseFunctionKeys.length == baseFields.length
-            && baseFunctionExpressions.length == baseFields.length
-            && baseFunctionTypes.length == baseFields.length) {
-          this.baseFunctionKeys = new String[baseFields.length][];
-          this.baseFunctionExpressions = new String[baseFields.length][];
-          this.baseFunctionTypes = new String[baseFields.length][];
-          for (int i = 0; i < baseFields.length; i++) {
-            if (baseFunctionKeys[i].length == baseFunctionExpressions[i].length
-                && baseFunctionKeys[i].length == baseFunctionTypes[i].length) {
-              this.baseFunctionKeys[i] = new String[baseFunctionKeys[i].length];
-              this.baseFunctionExpressions[i] = new String[baseFunctionExpressions[i].length];
-              this.baseFunctionTypes[i] = new String[baseFunctionTypes[i].length];
-              baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[baseFunctionExpressions[i].length];
-              for (int j = 0; j < baseFunctionKeys[i].length; j++) {
-                this.baseFunctionKeys[i][j] = baseFunctionKeys[i][j];
-                this.baseFunctionExpressions[i][j] = baseFunctionExpressions[i][j];
-                this.baseFunctionTypes[i][j] = baseFunctionTypes[i][j];
-                baseFunctionParserFunctions[i][j] = new MtasFunctionParser(
-                    new BufferedReader(
-                        new StringReader(baseFunctionExpressions[i][j])))
-                            .parse();
-              }
-            } else {
-              this.baseFunctionKeys[i] = new String[0];
-              this.baseFunctionExpressions[i] = new String[0];
-              this.baseFunctionTypes[i] = new String[0];
-              baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[0];
+      boolean doFunctions;
+      doFunctions = baseFunctionKeys != null;
+      doFunctions &= baseFunctionExpressions != null;
+      doFunctions &= baseFunctionTypes != null;
+      doFunctions &= baseFunctionKeys.length == baseFields.length;
+      doFunctions &= baseFunctionTypes.length == baseFields.length;
+      if (doFunctions) {
+        this.baseFunctionKeys = new String[baseFields.length][];
+        this.baseFunctionExpressions = new String[baseFields.length][];
+        this.baseFunctionTypes = new String[baseFields.length][];
+        for (int i = 0; i < baseFields.length; i++) {
+          if (baseFunctionKeys[i].length == baseFunctionExpressions[i].length
+              && baseFunctionKeys[i].length == baseFunctionTypes[i].length) {
+            this.baseFunctionKeys[i] = new String[baseFunctionKeys[i].length];
+            this.baseFunctionExpressions[i] = new String[baseFunctionExpressions[i].length];
+            this.baseFunctionTypes[i] = new String[baseFunctionTypes[i].length];
+            baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[baseFunctionExpressions[i].length];
+            for (int j = 0; j < baseFunctionKeys[i].length; j++) {
+              this.baseFunctionKeys[i][j] = baseFunctionKeys[i][j];
+              this.baseFunctionExpressions[i][j] = baseFunctionExpressions[i][j];
+              this.baseFunctionTypes[i][j] = baseFunctionTypes[i][j];
+              baseFunctionParserFunctions[i][j] = new MtasFunctionParser(
+                  new BufferedReader(
+                      new StringReader(baseFunctionExpressions[i][j]))).parse();
             }
+          } else {
+            this.baseFunctionKeys[i] = new String[0];
+            this.baseFunctionExpressions[i] = new String[0];
+            this.baseFunctionTypes[i] = new String[0];
+            baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[0];
           }
         }
       }
@@ -1147,7 +1142,7 @@ public class CodecComponent {
   /**
    * The Class ComponentTermVector.
    */
-  public static class ComponentTermVector {
+  public static class ComponentTermVector implements BasicComponent {
 
     /** The boundary. */
     public String key, prefix, regexp, ignoreRegexp, boundary;
@@ -1174,6 +1169,9 @@ public class CodecComponent {
 
     /** The boundary registration. */
     public boolean boundaryRegistration;
+
+    public String sortType;
+    public String sortDirection;
 
     /**
      * Instantiates a new component term vector.
@@ -1216,25 +1214,35 @@ public class CodecComponent {
         Boolean full, String type, String sortType, String sortDirection,
         String startValue, int number, String[] functionKey,
         String[] functionExpression, String[] functionType, String boundary,
-        String[] list, int listNumber, Boolean listRegexp, String ignoreRegexp,
+        String[] list, Boolean listRegexp, String ignoreRegexp,
         String[] ignoreList, Boolean ignoreListRegexp)
         throws IOException, ParseException {
       this.key = key;
       this.prefix = prefix;
       this.regexp = regexp;
       this.full = (full != null && full) ? true : false;
-      sortType = sortType == null ? CodecUtil.SORT_TERM : sortType;
-      sortDirection = sortDirection == null ? (sortType == CodecUtil.SORT_TERM)
-          ? CodecUtil.SORT_ASC : CodecUtil.SORT_DESC : sortDirection;
-
+      if (sortType == null) {
+        this.sortType = CodecUtil.SORT_TERM;
+      } else {
+        this.sortType = sortType;
+      }
+      if (sortDirection == null) {
+        if (this.sortType.equals(CodecUtil.SORT_TERM)) {
+          this.sortDirection = CodecUtil.SORT_ASC;
+        } else {
+          this.sortDirection = CodecUtil.SORT_DESC;
+        }
+      } else {
+        this.sortDirection = sortDirection;
+      }
       if (list != null && list.length > 0) {
         this.list = new HashSet(Arrays.asList(list));
         this.listRegexp = listRegexp != null ? listRegexp : false;
         this.boundary = null;
         this.number = Integer.MAX_VALUE;
         if (!this.full) {
-          sortType = CodecUtil.SORT_TERM;
-          sortDirection = CodecUtil.SORT_ASC;
+          this.sortType = CodecUtil.SORT_TERM;
+          this.sortDirection = CodecUtil.SORT_ASC;
         }
       } else {
         this.list = null;
@@ -1281,27 +1289,27 @@ public class CodecComponent {
           }
         }
       }
-      if (!sortType.equals(CodecUtil.SORT_TERM)
-          && !CodecUtil.STATS_TYPES.contains(sortType)) {
-        throw new IOException("unknown sortType '" + sortType + "'");
-      } else if (!full && !sortType.equals(CodecUtil.SORT_TERM)) {
-        if (!(sortType.equals(CodecUtil.STATS_TYPE_SUM)
-            || sortType.equals(CodecUtil.STATS_TYPE_N))) {
-          throw new IOException("sortType '" + sortType
+      if (!this.sortType.equals(CodecUtil.SORT_TERM)
+          && !CodecUtil.isStatsType(this.sortType)) {
+        throw new IOException("unknown sortType '" + this.sortType + "'");
+      } else if (!full && !this.sortType.equals(CodecUtil.SORT_TERM)) {
+        if (!(this.sortType.equals(CodecUtil.STATS_TYPE_SUM)
+            || this.sortType.equals(CodecUtil.STATS_TYPE_N))) {
+          throw new IOException("sortType '" + this.sortType
               + "' only supported with full termVector");
         }
       }
-      if (!sortType.equals(CodecUtil.SORT_TERM)) {
+      if (!this.sortType.equals(CodecUtil.SORT_TERM)) {
         if (startValue != null) {
           throw new IOException("startValue '" + startValue
               + "' only supported with termVector sorted on "
               + CodecUtil.SORT_TERM);
         }
       }
-      if (!sortDirection.equals(CodecUtil.SORT_ASC)
-          && !sortDirection.equals(CodecUtil.SORT_DESC)) {
+      if (!this.sortDirection.equals(CodecUtil.SORT_ASC)
+          && !this.sortDirection.equals(CodecUtil.SORT_DESC)) {
         throw new IOException(
-            "unrecognized sortDirection '" + sortDirection + "'");
+            "unrecognized sortDirection '" + this.sortDirection + "'");
       }
       boundaryRegistration = this.boundary != null;
       String segmentRegistration = null;
@@ -1309,23 +1317,23 @@ public class CodecComponent {
         this.boundary = null;
         segmentRegistration = null;
       } else if (this.boundary != null) {
-        if (sortDirection.equals(CodecUtil.SORT_ASC)) {
+        if (this.sortDirection.equals(CodecUtil.SORT_ASC)) {
           segmentRegistration = MtasDataCollector.SEGMENT_BOUNDARY_ASC;
-        } else if (sortDirection.equals(CodecUtil.SORT_DESC)) {
+        } else if (this.sortDirection.equals(CodecUtil.SORT_DESC)) {
           segmentRegistration = MtasDataCollector.SEGMENT_BOUNDARY_DESC;
         }
-      } else if (!sortType.equals(CodecUtil.SORT_TERM)) {
-        if (sortDirection.equals(CodecUtil.SORT_ASC)) {
+      } else if (!this.sortType.equals(CodecUtil.SORT_TERM)) {
+        if (this.sortDirection.equals(CodecUtil.SORT_ASC)) {
           segmentRegistration = MtasDataCollector.SEGMENT_SORT_ASC;
-        } else if (sortDirection.equals(CodecUtil.SORT_DESC)) {
+        } else if (this.sortDirection.equals(CodecUtil.SORT_DESC)) {
           segmentRegistration = MtasDataCollector.SEGMENT_SORT_DESC;
         }
       }
       // create main subComponentFunction
       this.subComponentFunction = new SubComponentFunction(
           DataCollector.COLLECTOR_TYPE_LIST, key, type,
-          new MtasFunctionParserFunctionDefault(1), sortType, sortDirection, 0,
-          this.number, segmentRegistration, boundary);
+          new MtasFunctionParserFunctionDefault(1), this.sortType,
+          this.sortDirection, 0, this.number, segmentRegistration, boundary);
     }
 
     /**
@@ -1362,10 +1370,13 @@ public class CodecComponent {
 
   }
 
+  public abstract static class ComponentStats implements BasicComponent {
+  }
+
   /**
    * The Class ComponentSpan.
    */
-  public static class ComponentSpan {
+  public static class ComponentSpan extends ComponentStats {
 
     /** The queries. */
     public MtasSpanQuery[] queries;
@@ -1381,9 +1392,6 @@ public class CodecComponent {
 
     /** The stats items. */
     public TreeSet<String> statsItems;
-
-    /** The maximum double. */
-    public Double minimumDouble, maximumDouble;
 
     /** The maximum long. */
     public Long minimumLong, maximumLong;
@@ -1425,7 +1433,7 @@ public class CodecComponent {
         Double minimumDouble, Double maximumDouble, String type,
         String[] functionKey, String[] functionExpression,
         String[] functionType) throws IOException, ParseException {
-      this.queries = queries;
+      this.queries = (MtasSpanQuery[]) queries.clone();
       this.key = key;
       functions = new ArrayList<SubComponentFunction>();
       if (functionKey != null && functionExpression != null
@@ -1444,17 +1452,13 @@ public class CodecComponent {
       statsItems = CodecUtil.createStatsItems(type);
       statsType = CodecUtil.createStatsType(this.statsItems, null, parser);
       if (minimumDouble != null) {
-        this.minimumDouble = minimumDouble;
         this.minimumLong = minimumDouble.longValue();
       } else {
-        this.minimumDouble = null;
         this.minimumLong = null;
       }
       if (maximumDouble != null) {
-        this.maximumDouble = maximumDouble;
         this.maximumLong = maximumDouble.longValue();
       } else {
-        this.maximumDouble = null;
         this.maximumLong = null;
       }
       dataCollector = DataCollector.getCollector(
@@ -1525,10 +1529,7 @@ public class CodecComponent {
   /**
    * The Class ComponentPosition.
    */
-  public static class ComponentPosition {
-
-    /** The field. */
-    public String field;
+  public static class ComponentPosition extends ComponentStats{
 
     /** The key. */
     public String key;
@@ -1539,17 +1540,11 @@ public class CodecComponent {
     /** The stats items. */
     public TreeSet<String> statsItems;
 
-    /** The maximum double. */
-    public Double minimumDouble, maximumDouble;
-
     /** The maximum long. */
     public Long minimumLong, maximumLong;
 
     /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
-
-    /** The function parser. */
-    public MtasFunctionParserFunction functionParser;
 
     /**
      * Instantiates a new component position.
@@ -1569,27 +1564,21 @@ public class CodecComponent {
      * @throws ParseException
      *           the parse exception
      */
-    public ComponentPosition(String field, String key, Double minimumDouble,
+    public ComponentPosition(String key, Double minimumDouble,
         Double maximumDouble, String statsType)
         throws IOException, ParseException {
-      this.field = field;
       this.key = key;
       dataType = CodecUtil.DATA_TYPE_LONG;
       this.statsItems = CodecUtil.createStatsItems(statsType);
-      this.statsType = CodecUtil.createStatsType(this.statsItems, null,
-          functionParser);
+      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);
       if (minimumDouble != null) {
-        this.minimumDouble = minimumDouble;
         this.minimumLong = minimumDouble.longValue();
       } else {
-        this.minimumDouble = null;
         this.minimumLong = null;
       }
       if (maximumDouble != null) {
-        this.maximumDouble = maximumDouble;
         this.maximumLong = maximumDouble.longValue();
       } else {
-        this.maximumDouble = null;
         this.maximumLong = null;
       }
       dataCollector = DataCollector.getCollector(
@@ -1601,31 +1590,24 @@ public class CodecComponent {
   /**
    * The Class ComponentToken.
    */
-  public static class ComponentToken {
-
-    /** The field. */
-    public String field;
+  public static class ComponentToken extends ComponentStats {
 
     /** The key. */
     public String key;
 
     /** The stats type. */
-    public String dataType, statsType;
+    public String dataType;
+    public String statsType;
 
     /** The stats items. */
     public TreeSet<String> statsItems;
 
-    /** The maximum double. */
-    public Double minimumDouble, maximumDouble;
-
     /** The maximum long. */
-    public Long minimumLong, maximumLong;
+    public Long minimumLong;
+    public Long maximumLong;
 
     /** The data collector. */
     public MtasDataCollector<?, ?> dataCollector;
-
-    /** The function parser. */
-    public MtasFunctionParserFunction functionParser;
 
     /**
      * Instantiates a new component token.
@@ -1645,27 +1627,21 @@ public class CodecComponent {
      * @throws ParseException
      *           the parse exception
      */
-    public ComponentToken(String field, String key, Double minimumDouble,
+    public ComponentToken(String key, Double minimumDouble,
         Double maximumDouble, String statsType)
         throws IOException, ParseException {
-      this.field = field;
       this.key = key;
       dataType = CodecUtil.DATA_TYPE_LONG;
       this.statsItems = CodecUtil.createStatsItems(statsType);
-      this.statsType = CodecUtil.createStatsType(this.statsItems, null,
-          functionParser);
+      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);
       if (minimumDouble != null) {
-        this.minimumDouble = minimumDouble;
         this.minimumLong = minimumDouble.longValue();
       } else {
-        this.minimumDouble = null;
         this.minimumLong = null;
       }
       if (maximumDouble != null) {
-        this.maximumDouble = maximumDouble;
         this.maximumLong = maximumDouble.longValue();
       } else {
-        this.maximumDouble = null;
         this.maximumLong = null;
       }
       dataCollector = DataCollector.getCollector(
@@ -1673,39 +1649,39 @@ public class CodecComponent {
           this.statsItems, null, null, null, null, null, null);
     }
   }
-  
-  public static class ComponentJoin {
-    
+
+  public static class ComponentJoin implements BasicComponent {
+
     private Set<String> fields;
     private Set<String> values;
     private String key;
-    
+
     public ComponentJoin(Set<String> fields, String key) {
       this.fields = fields;
       this.key = key;
       this.values = new HashSet<>();
     }
-    
+
     public void add(String value) {
       values.add(value);
     }
-    
+
     public void add(Set<String> values) {
       this.values.addAll(values);
     }
-    
+
     public Set<String> values() {
       return values;
     }
-    
+
     public String key() {
       return key;
     }
-    
+
     public Set<String> fields() {
       return fields;
     }
-    
+
   }
 
   /**
@@ -1836,7 +1812,7 @@ public class CodecComponent {
     public int endPosition;
 
     /** The tokens. */
-    public ArrayList<MtasToken<String>> tokens;
+    public ArrayList<MtasTokenString> tokens;
 
     /**
      * Instantiates a new kwic token.
@@ -1846,7 +1822,7 @@ public class CodecComponent {
      * @param tokens
      *          the tokens
      */
-    public KwicToken(Match match, ArrayList<MtasToken<String>> tokens) {
+    public KwicToken(Match match, ArrayList<MtasTokenString> tokens) {
       startPosition = match.startPosition;
       endPosition = match.endPosition - 1;
       this.tokens = tokens;
@@ -1889,22 +1865,34 @@ public class CodecComponent {
   public static class GroupHit {
 
     /** The hash right. */
-    private int hash, hashLeft, hashHit, hashRight;
+    private int hash;
+    private int hashLeft;
+    private int hashHit;
+    private int hashRight;
 
     /** The key right. */
-    private String key, keyLeft, keyHit, keyRight;
+    private String key;
+    private String keyLeft;
+    private String keyHit;
+    private String keyRight;
 
     /** The data right. */
-    public ArrayList<String>[] dataHit, dataLeft, dataRight;
+    public ArrayList<String>[] dataHit;
+    public ArrayList<String>[] dataLeft;
+    public ArrayList<String>[] dataRight;
 
     /** The missing right. */
-    public HashSet<String>[] missingHit, missingLeft, missingRight;
+    public HashSet<String>[] missingHit;
+    public HashSet<String>[] missingLeft;
+    public HashSet<String>[] missingRight;
 
     /** The unknown right. */
-    public HashSet<String>[] unknownHit, unknownLeft, unknownRight;
+    public HashSet<String>[] unknownHit;
+    public HashSet<String>[] unknownLeft;
+    public HashSet<String>[] unknownRight;
 
     /** The key start. */
-    public static String KEY_START = MtasToken.DELIMITER + "grouphit"
+    public final static String KEY_START = MtasToken.DELIMITER + "grouphit"
         + MtasToken.DELIMITER;
 
     /**
@@ -1970,9 +1958,9 @@ public class CodecComponent {
         missingLeft = (HashSet<String>[]) new HashSet[leftRangeLength];
         unknownLeft = (HashSet<String>[]) new HashSet[leftRangeLength];
         for (int p = 0; p < leftRangeLength; p++) {
-          dataLeft[p] = new ArrayList<String>();
-          missingLeft[p] = new HashSet<String>();
-          unknownLeft[p] = new HashSet<String>();
+          dataLeft[p] = new ArrayList<>();
+          missingLeft[p] = new HashSet<>();
+          unknownLeft[p] = new HashSet<>();
         }
       } else {
         keyLeft = null;
@@ -1986,9 +1974,9 @@ public class CodecComponent {
         missingHit = (HashSet<String>[]) new HashSet[hitLength];
         unknownHit = (HashSet<String>[]) new HashSet[hitLength];
         for (int p = 0; p < hitLength; p++) {
-          dataHit[p] = new ArrayList<String>();
-          missingHit[p] = new HashSet<String>();
-          unknownHit[p] = new HashSet<String>();
+          dataHit[p] = new ArrayList<>();
+          missingHit[p] = new HashSet<>();
+          unknownHit[p] = new HashSet<>();
         }
       } else {
         keyHit = null;
@@ -2002,9 +1990,9 @@ public class CodecComponent {
         missingRight = (HashSet<String>[]) new HashSet[rightRangeLength];
         unknownRight = (HashSet<String>[]) new HashSet[rightRangeLength];
         for (int p = 0; p < rightRangeLength; p++) {
-          dataRight[p] = new ArrayList<String>();
-          missingRight[p] = new HashSet<String>();
-          unknownRight[p] = new HashSet<String>();
+          dataRight[p] = new ArrayList<>();
+          missingRight[p] = new HashSet<>();
+          unknownRight[p] = new HashSet<>();
         }
       } else {
         keyRight = null;
@@ -2350,39 +2338,45 @@ public class CodecComponent {
      */
     private String dataToString(ArrayList<String>[] data,
         HashSet<String>[] missing) throws UnsupportedEncodingException {
-      String text = "";
+      StringBuilder text = null;
       Encoder encoder = Base64.getEncoder();
-      String prefix, postfix;
+      String prefix;
+      String postfix;
       if (data != null && missing != null && data.length == missing.length) {
         for (int i = 0; i < data.length; i++) {
           if (i > 0) {
-            text += ",";
+            text.append(",");
+          } else {
+            text = new StringBuilder();
           }
           for (int j = 0; j < data[i].size(); j++) {
             if (j > 0) {
-              text += "&";
+              text.append("&");
             }
             prefix = MtasToken.getPrefixFromValue(data[i].get(j));
             postfix = MtasToken.getPostfixFromValue(data[i].get(j));
-            text += encoder.encodeToString(prefix.getBytes("utf-8"));
-            if (postfix != "") {
-              text += ".";
-              text += encoder.encodeToString(postfix.getBytes("utf-8"));
+            text.append(encoder
+                .encodeToString(prefix.getBytes(StandardCharsets.UTF_8)));
+            if (!postfix.isEmpty()) {
+              text.append(".");
+              text.append(encoder
+                  .encodeToString(postfix.getBytes(StandardCharsets.UTF_8)));
             }
           }
           if (missing[i] != null) {
             String[] tmpMissing = missing[i]
                 .toArray(new String[missing[i].size()]);
             for (int j = 0; j < tmpMissing.length; j++) {
-              if (j > 0 || data[i].size() > 0) {
-                text += "&";
+              if (j > 0 || !data[i].isEmpty()) {
+                text.append("&");
               }
-              text += encoder.encodeToString(("!" + tmpMissing[j]).getBytes());
+              text.append(encoder.encodeToString(
+                  ("!" + tmpMissing[j]).getBytes(StandardCharsets.UTF_8)));
             }
           }
         }
       }
-      return text;
+      return text != null ? text.toString() : null;
     }
 
     /*
@@ -2402,38 +2396,49 @@ public class CodecComponent {
      * @param newKey
      *          the new key
      * @return the hash map[]
+     * @throws UnsupportedEncodingException
      */
-    private static HashMap<String, String>[] keyToSubSubObject(String key,
+    private static Map<String, String>[] keyToSubSubObject(String key,
         StringBuilder newKey) {
-      if (key != "") {
+      if (!key.isEmpty()) {
         newKey.append(" [");
-        String prefix, postfix, parts[] = key.split(Pattern.quote("&"));
-        HashMap<String, String>[] result = new HashMap[parts.length];
+        String prefix;
+        String postfix;
+        String parts[] = key.split(Pattern.quote("&"));
+        Map<String, String>[] result = new HashMap[parts.length];
         Pattern pattern = Pattern.compile("^([^\\.]*)\\.([^\\.]*)$");
         Decoder decoder = Base64.getDecoder();
         Matcher matcher;
-        String tmpNewKey = null;
+        StringBuilder tmpNewKey = null;
         for (int i = 0; i < parts.length; i++) {
-          if (parts[i].equals("")) {
+          if (parts[i].isEmpty()) {
             result[i] = null;
           } else {
-            HashMap<String, String> subResult = new HashMap<String, String>();
+            HashMap<String, String> subResult = new HashMap<>();
             matcher = pattern.matcher(parts[i]);
-            if (tmpNewKey == null) {
-              tmpNewKey = "";
+            if (tmpNewKey != null) {
+              tmpNewKey.append(" & ");
             } else {
-              tmpNewKey += " & ";
+              tmpNewKey = new StringBuilder();
             }
             if (matcher.matches()) {
-              prefix = new String(decoder.decode(matcher.group(1)));
-              postfix = new String(decoder.decode(matcher.group(2)));
-              tmpNewKey += prefix.replace("=", "\\=");
-              tmpNewKey += "=\"" + postfix.replace("\"", "\\\"") + "\"";
+              prefix = new String(
+                  decoder.decode(
+                      matcher.group(1).getBytes(StandardCharsets.UTF_8)),
+                  StandardCharsets.UTF_8);
+              postfix = new String(
+                  decoder.decode(
+                      matcher.group(2).getBytes(StandardCharsets.UTF_8)),
+                  StandardCharsets.UTF_8);
+              tmpNewKey.append(prefix.replace("=", "\\="));
+              tmpNewKey.append("=\"" + postfix.replace("\"", "\\\"") + "\"");
               subResult.put("prefix", prefix);
               subResult.put("value", postfix);
             } else {
-              prefix = new String(decoder.decode(parts[i]));
-              tmpNewKey += prefix.replace("=", "\\=");
+              prefix = new String(
+                  decoder.decode(parts[i].getBytes(StandardCharsets.UTF_8)),
+                  StandardCharsets.UTF_8);
+              tmpNewKey.append(prefix.replace("=", "\\="));
               if (prefix.startsWith("!")) {
                 subResult.put("missing", prefix.substring(1));
               } else {
@@ -2463,9 +2468,9 @@ public class CodecComponent {
      *          the new key
      * @return the hash map
      */
-    private static HashMap<Integer, HashMap<String, String>[]> keyToSubObject(
+    private static Map<Integer, Map<String, String>[]> keyToSubObject(
         String key, StringBuilder newKey) {
-      HashMap<Integer, HashMap<String, String>[]> result = new HashMap();
+      Map<Integer, Map<String, String>[]> result = new HashMap();
       if (key == null || key.trim().equals("")) {
         return null;
       } else {
@@ -2490,22 +2495,22 @@ public class CodecComponent {
      *          the new key
      * @return the hash map
      */
-    public static HashMap<String, HashMap<Integer, HashMap<String, String>[]>> keyToObject(
+    public static Map<String, Map<Integer, Map<String, String>[]>> keyToObject(
         String key, StringBuilder newKey) {
       if (key.startsWith(KEY_START)) {
         String content = key.substring(KEY_START.length());
-        StringBuilder keyLeft = new StringBuilder(""),
-            keyHit = new StringBuilder(""), keyRight = new StringBuilder("");
-        HashMap<String, HashMap<Integer, HashMap<String, String>[]>> result = new HashMap<String, HashMap<Integer, HashMap<String, String>[]>>();
-        HashMap<Integer, HashMap<String, String>[]> resultLeft = null,
-            resultHit = null, resultRight = null;
+        StringBuilder keyLeft = new StringBuilder("");
+        StringBuilder keyHit = new StringBuilder("");
+        StringBuilder keyRight = new StringBuilder("");
+        Map<String, Map<Integer, Map<String, String>[]>> result = new HashMap<>();
+        Map<Integer, Map<String, String>[]> resultLeft = null;
+        Map<Integer, Map<String, String>[]> resultHit = null;
+        Map<Integer, Map<String, String>[]> resultRight = null;
         String[] parts = content.split(Pattern.quote("|"), -1);
         if (parts.length == 3) {
           resultLeft = keyToSubObject(parts[0].trim(), keyLeft);
           resultHit = keyToSubObject(parts[1].trim(), keyHit);
-          if (parts.length > 2) {
-            resultRight = keyToSubObject(parts[2].trim(), keyRight);
-          }
+          resultRight = keyToSubObject(parts[2].trim(), keyRight);
         } else if (parts.length == 1) {
           resultHit = keyToSubObject(parts[0].trim(), keyHit);
         }
@@ -2541,7 +2546,7 @@ public class CodecComponent {
     public int startPosition, endPosition;
 
     /** The tokens. */
-    public ArrayList<MtasToken<String>> tokens;
+    public ArrayList<MtasTokenString> tokens;
 
     /**
      * Instantiates a new list token.
@@ -2556,7 +2561,7 @@ public class CodecComponent {
      *          the tokens
      */
     public ListToken(Integer docId, Integer docPosition, Match match,
-        ArrayList<MtasToken<String>> tokens) {
+        ArrayList<MtasTokenString> tokens) {
       this.docId = docId;
       this.docPosition = docPosition;
       startPosition = match.startPosition;
@@ -2631,15 +2636,26 @@ public class CodecComponent {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object object) {
-      if (this.getClass().equals(object.getClass())) {
-        if ((((Match) object).startPosition == startPosition)
-            && (((Match) object).endPosition == endPosition)) {
-          return true;
-        }
-      }
-      return false;
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      final Match that = (Match) obj;
+      return startPosition == that.startPosition
+          && endPosition == that.endPosition;
     }
+
+    @Override
+    public int hashCode() {
+      int h = this.getClass().getSimpleName().hashCode();
+      h = (h * 5) ^ startPosition;
+      h = (h * 7) ^ endPosition;
+      return h;
+    }
+
   }
 
 }

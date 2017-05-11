@@ -35,10 +35,11 @@ Add this component to the select requestHandler by inserting the following withi
 </arr>
 ```   
 
-Define a new **mtas_cql queryParser**:
+Define a new **mtas_cql queryParser** and **mtas_join queryParser**:
 
 ```console
 <queryParser name="mtas_cql" class="mtas.solr.search.MtasSolrCQLQParserPlugin"/>
+<queryParser name="mtas_join" class="mtas.solr.search.MtasSolrJoinQParserPlugin"/>
 ``` 
 
 Define a new **mtas requestHandler**:

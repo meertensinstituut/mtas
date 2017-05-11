@@ -1,10 +1,7 @@
 package mtas.codec;
 
 import java.io.IOException;
-import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenString;
-import mtas.codec.payload.MtasPayloadDecoder;
-
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.FieldsProducer;
@@ -112,9 +109,6 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   /** The Constant MTAS_INDEX_TERM_PREFIX_POSITION_EXTENSION. */
   public static final String MTAS_INDEX_TERM_PREFIX_POSITION_EXTENSION = "mtas.index.term.prefix.position";
 
-  /** The payload decoder. */
-  MtasPayloadDecoder payloadDecoder;
-
   /** The delegate codec name. */
   private String delegateCodecName = null;
 
@@ -218,9 +212,9 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
    * @return the token
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static MtasToken<String> getToken(IndexInput inObject,
+  public static MtasTokenString getToken(IndexInput inObject,
       IndexInput inTerm, Long ref) throws IOException {
-    MtasToken<String> token = null;
+    MtasTokenString token = null;
     try {
       inObject.seek(ref);
       token = new MtasTokenString(null, "");

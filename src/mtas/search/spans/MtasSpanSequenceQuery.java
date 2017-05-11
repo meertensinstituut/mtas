@@ -27,7 +27,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /** The items. */
   private List<MtasSpanSequenceItem> items;
 
-  /** The ignore clause. */
+  /** The ignore query. */
   private MtasSpanQuery ignoreQuery;
 
   /** The maximum ignore length. */
@@ -39,17 +39,15 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span sequence query.
    *
-   * @param items
-   *          the items
-   * @param ignoreQuery
-   *          the ignore
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
+   * @param items the items
+   * @param ignoreQuery the ignore query
+   * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
       MtasSpanQuery ignoreQuery, Integer maximumIgnoreLength) {
     super(null, null);
-    Integer minimum = 0, maximum = 0;
+    Integer minimum = 0;
+    Integer maximum = 0;
     this.items = items;
     // get field and do checks
     for (MtasSpanSequenceItem item : items) {
@@ -73,8 +71,11 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       if (ignoreQuery.getField() == null
           || field.equals(ignoreQuery.getField())) {
         this.ignoreQuery = ignoreQuery;
-        this.maximumIgnoreLength = maximumIgnoreLength == null ? MtasIgnoreItem.DEFAULT_MAXIMUM_IGNORE_LENGTH
-            : maximumIgnoreLength;
+        if (maximumIgnoreLength == null) {
+          this.maximumIgnoreLength = MtasIgnoreItem.DEFAULT_MAXIMUM_IGNORE_LENGTH;
+        } else {
+          this.maximumIgnoreLength = maximumIgnoreLength;
+        }
       } else {
         throw new IllegalArgumentException(
             "ignore must have same field as clauses");
@@ -104,14 +105,29 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return field;
   }
 
+  /**
+   * Gets the items.
+   *
+   * @return the items
+   */
   public List<MtasSpanSequenceItem> getItems() {
     return items;
   }
 
+  /**
+   * Gets the ignore query.
+   *
+   * @return the ignore query
+   */
   public MtasSpanQuery getIgnoreQuery() {
     return ignoreQuery;
   }
 
+  /**
+   * Gets the maximum ignore length.
+   *
+   * @return the maximum ignore length
+   */
   public Integer getMaximumIgnoreLength() {
     return maximumIgnoreLength;
   }
@@ -127,13 +143,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     if (items.size() == 1) {
       return items.get(0).getQuery().rewrite(reader);
     } else {
-      MtasSpanSequenceItem newItem, previousNewItem = null;
-      ArrayList<MtasSpanSequenceItem> newItems = new ArrayList<MtasSpanSequenceItem>(
-          items.size());
+      MtasSpanSequenceItem newItem;
+      MtasSpanSequenceItem previousNewItem = null;
+      ArrayList<MtasSpanSequenceItem> newItems = new ArrayList<>(items.size());
       MtasSpanQuery newIgnoreClause = ignoreQuery != null
           ? ignoreQuery.rewrite(reader) : null;
       boolean actuallyRewritten = ignoreQuery != null
-          ? newIgnoreClause != ignoreQuery : false;
+          ? !newIgnoreClause.equals(ignoreQuery) : false;
       for (int i = 0; i < items.size(); i++) {
         newItem = items.get(i).rewrite(reader);
         if (newItem.getQuery() instanceof MtasSpanMatchNoneQuery) {
@@ -143,7 +159,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
             actuallyRewritten = true;
           }
         } else {
-          actuallyRewritten |= items.get(i) != newItem;
+          actuallyRewritten |= !items.get(i).equals(newItem);
           MtasSpanSequenceItem previousMergedItem = MtasSpanSequenceItem.merge(
               previousNewItem, newItem, ignoreQuery, maximumIgnoreLength);
           if (previousMergedItem != null) {
@@ -158,7 +174,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       if (!actuallyRewritten) {
         return super.rewrite(reader);
       } else {
-        if (newItems.size() > 0) {
+        if (!newItems.isEmpty()) {
           return new MtasSpanSequenceQuery(newItems, newIgnoreClause,
               maximumIgnoreLength).rewrite(reader);
         } else {
@@ -243,7 +259,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
-    List<MtasSpanSequenceQueryWeight> subWeights = new ArrayList<MtasSpanSequenceQueryWeight>();
+    List<MtasSpanSequenceQueryWeight> subWeights = new ArrayList<>();
     SpanWeight ignoreWeight = null;
     for (MtasSpanSequenceItem item : items) {
       subWeights.add(new MtasSpanSequenceQueryWeight(
@@ -259,13 +275,12 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /**
    * Gets the term contexts.
    *
-   * @param items
-   *          the items
+   * @param items the items
    * @return the term contexts
    */
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanSequenceQueryWeight> items) {
-    List<SpanWeight> weights = new ArrayList<SpanWeight>();
+    List<SpanWeight> weights = new ArrayList<>();
     for (MtasSpanSequenceQueryWeight item : items) {
       weights.add(item.spanWeight);
     }
@@ -275,7 +290,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /**
    * The Class SpanSequenceWeight.
    */
-  public class SpanSequenceWeight extends SpanWeight {
+  protected class SpanSequenceWeight extends SpanWeight {
 
     /** The sub weights. */
     final List<MtasSpanSequenceQueryWeight> subWeights;
@@ -289,18 +304,12 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span sequence weight.
      *
-     * @param subWeights
-     *          the sub weights
-     * @param ignoreWeight
-     *          the ignore weight
-     * @param maximumIgnoreLength
-     *          the maximum ignore length
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param subWeights the sub weights
+     * @param ignoreWeight the ignore weight
+     * @param maximumIgnoreLength the maximum ignore length
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanSequenceWeight(List<MtasSpanSequenceQueryWeight> subWeights,
         SpanWeight ignoreWeight, Integer maximumIgnoreLength,
@@ -372,8 +381,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
         } else if (ignoreWeight != null) {
           ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);
         }
-        return new MtasSpanSequenceSpans(MtasSpanSequenceQuery.this,
-            setSequenceSpans, ignoreSpans, maximumIgnoreLength);
+        return new MtasSpanSequenceSpans(setSequenceSpans, ignoreSpans,
+            maximumIgnoreLength);
       }
     }
 
@@ -397,7 +406,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanSequenceQuerySpans.
    */
-  public class MtasSpanSequenceQuerySpans {
+  protected class MtasSpanSequenceQuerySpans {
 
     /** The spans. */
     public Spans spans;
@@ -408,13 +417,11 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span sequence query spans.
      *
-     * @param spans
-     *          the spans
-     * @param optional
-     *          the optional
+     * @param spans the spans
+     * @param optional the optional
      */
     public MtasSpanSequenceQuerySpans(Spans spans, boolean optional) {
-      this.spans = spans!=null?spans:new MtasSpanMatchNoneSpans(field);
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
       this.optional = optional;
     }
   }
@@ -422,7 +429,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanSequenceQueryWeight.
    */
-  public class MtasSpanSequenceQueryWeight {
+  private static class MtasSpanSequenceQueryWeight {
 
     /** The span weight. */
     public SpanWeight spanWeight;
@@ -433,10 +440,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span sequence query weight.
      *
-     * @param spanWeight
-     *          the span weight
-     * @param optional
-     *          the optional
+     * @param spanWeight the span weight
+     * @param optional the optional
      */
     public MtasSpanSequenceQueryWeight(SpanWeight spanWeight,
         boolean optional) {

@@ -1,6 +1,7 @@
 package mtas.search.spans;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
   /**
    * The Class SpanAllWeight.
    */
-  public class SpanAllWeight extends SpanWeight {
+  protected class SpanAllWeight extends SpanWeight {
 
     /**
      * Instantiates a new span all weight.
@@ -158,8 +159,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
           return new MtasSpanPositionSpans(mtasCodecInfo, field, start, end);
         }
-      } catch (Exception e) {
-        throw new IOException("Can't get reader");
+      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+        throw new IOException("Can't get reader", e);
       }
 
     }

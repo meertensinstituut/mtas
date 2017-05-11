@@ -26,7 +26,8 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   private String field;
 
   /** The q 2. */
-  private SpanQuery q1, q2;
+  private SpanQuery q1;
+  private SpanQuery q2;
 
   /**
    * Instantiates a new mtas span fully aligned with query.
@@ -40,8 +41,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
     if (q1 != null && (field = q1.getField()) != null) {
-      if (q2 != null && ((field == null && q2.getField() != null)
-          || !q2.getField().equals(field))) {
+      if (q2 != null && q2.getField()!=null && !q2.getField().equals(field)) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
     } else if (q2 != null) {
@@ -81,7 +81,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
       MtasSpanFullyAlignedWithQueryWeight w2 = new MtasSpanFullyAlignedWithQueryWeight(
           q2.createWeight(searcher, needsScores));
       // subWeights
-      List<MtasSpanFullyAlignedWithQueryWeight> subWeights = new ArrayList<MtasSpanFullyAlignedWithQueryWeight>();
+      List<MtasSpanFullyAlignedWithQueryWeight> subWeights = new ArrayList<>();
       subWeights.add(w1);
       subWeights.add(w2);
       // return
@@ -99,7 +99,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
    */
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanFullyAlignedWithQueryWeight> items) {
-    List<SpanWeight> weights = new ArrayList<SpanWeight>();
+    List<SpanWeight> weights = new ArrayList<>();
     for (MtasSpanFullyAlignedWithQueryWeight item : items) {
       weights.add(item.spanWeight);
     }
@@ -171,40 +171,44 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
     MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
-    if(newQ1==null || newQ1 instanceof MtasSpanMatchNoneQuery || newQ2==null || newQ2 instanceof MtasSpanMatchNoneQuery) {
-      return new MtasSpanMatchNoneQuery(field);      
-    } else if (newQ1 != q1 || newQ2 != q2) {
+    if (newQ1 == null || newQ1 instanceof MtasSpanMatchNoneQuery
+        || newQ2 == null || newQ2 instanceof MtasSpanMatchNoneQuery) {
+      return new MtasSpanMatchNoneQuery(field);
+    } else if (!newQ1.equals(q1) || !newQ2.equals(q2)) {
       return new MtasSpanFullyAlignedWithQuery(newQ1, newQ2).rewrite(reader);
-    } else if (newQ1 == null || newQ2 == null) {
-      return new MtasSpanMatchNoneQuery(this.getField());
     } else if (newQ1.equals(newQ2)) {
       return newQ1;
-    } else if (newQ1.getMaximumWidth() != null
-        && newQ1.getMaximumWidth() == 0) {
-      return new MtasSpanMatchNoneQuery(this.getField());
-    } else if (newQ2.getMaximumWidth() != null
-        && newQ2.getMaximumWidth() == 0) {
-      return new MtasSpanMatchNoneQuery(this.getField());
-    } else if (newQ1.getMinimumWidth() != null
-        && newQ2.getMaximumWidth() != null
-        && newQ1.getMinimumWidth() > newQ2.getMaximumWidth()) {
-      return new MtasSpanMatchNoneQuery(this.getField());
-    } else if (newQ2.getMinimumWidth() != null
-        && newQ1.getMaximumWidth() != null
-        && newQ2.getMinimumWidth() > newQ1.getMaximumWidth()) {
-      return new MtasSpanMatchNoneQuery(this.getField());
     } else {
-      return super.rewrite(reader);
+      boolean returnNone;
+      returnNone = newQ1.getMaximumWidth() != null
+          && newQ1.getMaximumWidth() == 0;
+      returnNone |= newQ2.getMaximumWidth() != null
+          && newQ2.getMaximumWidth() == 0;
+      returnNone |= newQ1.getMinimumWidth() != null
+          && newQ2.getMaximumWidth() != null
+          && newQ1.getMinimumWidth() > newQ2.getMaximumWidth();
+      returnNone |= newQ2.getMinimumWidth() != null
+          && newQ1.getMaximumWidth() != null
+          && newQ2.getMinimumWidth() > newQ1.getMaximumWidth();
+      returnNone |= newQ2.getMinimumWidth() != null
+          && newQ1.getMaximumWidth() != null
+          && newQ2.getMinimumWidth() > newQ1.getMaximumWidth();
+      if (returnNone) {
+        return new MtasSpanMatchNoneQuery(this.getField());
+      } else {
+        return super.rewrite(reader);
+      }
     }
   }
 
   /**
    * The Class SpanIntersectingWeight.
    */
-  public class SpanFullyAlignedWithWeight extends SpanWeight {
+  protected class SpanFullyAlignedWithWeight extends SpanWeight {
 
     /** The w 2. */
-    MtasSpanFullyAlignedWithQueryWeight w1, w2;
+    MtasSpanFullyAlignedWithQueryWeight w1;
+    MtasSpanFullyAlignedWithQueryWeight w2;
 
     /**
      * Instantiates a new span intersecting weight.
@@ -280,7 +284,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanIntersectingQuerySpans.
    */
-  public class MtasSpanFullyAlignedWithQuerySpans {
+  protected class MtasSpanFullyAlignedWithQuerySpans {
 
     /** The spans. */
     public Spans spans;
@@ -292,7 +296,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      *          the spans
      */
     public MtasSpanFullyAlignedWithQuerySpans(Spans spans) {
-      this.spans = spans!=null?spans:new MtasSpanMatchNoneSpans(field);
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
     }
 
   }
@@ -300,7 +304,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanIntersectingQueryWeight.
    */
-  public class MtasSpanFullyAlignedWithQueryWeight {
+  private static class MtasSpanFullyAlignedWithQueryWeight {
 
     /** The span weight. */
     public SpanWeight spanWeight;

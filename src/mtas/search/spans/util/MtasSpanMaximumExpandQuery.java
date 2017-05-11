@@ -25,7 +25,10 @@ import mtas.search.spans.MtasSpanMatchNoneSpans;
 public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
 
   MtasSpanQuery query;
-  int minimumLeft, maximumLeft, minimumRight, maximumRight;
+  int minimumLeft;
+  int maximumLeft;
+  int minimumRight;
+  int maximumRight;
 
   public MtasSpanMaximumExpandQuery(MtasSpanQuery query, int minimumLeft,
       int maximumLeft, int minimumRight, int maximumRight) {
@@ -83,9 +86,13 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     if (getClass() != obj.getClass())
       return false;
     final MtasSpanMaximumExpandQuery that = (MtasSpanMaximumExpandQuery) obj;
-    return query.equals(that.query) && minimumLeft == that.minimumLeft
-        && maximumLeft == that.maximumLeft && minimumRight == that.minimumRight
-        && maximumRight == that.maximumRight;
+    boolean isEqual;
+    isEqual = query.equals(that.query);
+    isEqual &= minimumLeft == that.minimumLeft;
+    isEqual &= maximumLeft == that.maximumLeft;
+    isEqual &= minimumRight == that.minimumRight;
+    isEqual &= maximumRight == that.maximumRight;
+    return isEqual;
   }
 
   @Override
@@ -104,10 +111,10 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
 
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    MtasSpanQuery newQuery = (MtasSpanQuery) query.rewrite(reader);
+    MtasSpanQuery newQuery = query.rewrite(reader);
     if (maximumLeft == 0 && maximumRight == 0) {
       return newQuery;
-    } else if (query != newQuery) {
+    } else if (!query.equals(newQuery)) {
       return new MtasSpanMaximumExpandQuery(newQuery, minimumLeft, maximumLeft,
           minimumRight, maximumRight);
     } else {
@@ -166,7 +173,7 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
                 spans);
           }
         } catch (Exception e) {
-          throw new IOException("Can't get reader");
+          throw new IOException("Can't get reader", e);
         }
 
       }
@@ -182,10 +189,12 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
   private class MtasMaximumExpandSpans extends Spans {
 
     Spans subSpans;
-    int minPosition, maxPosition;
+    int minPosition;
+    int maxPosition;
     String field;
     CodecInfo mtasCodecInfo;
-    int startPosition, endPosition;
+    int startPosition;
+    int endPosition;
 
     public MtasMaximumExpandSpans(CodecInfo mtasCodecInfo, String field,
         Spans subSpans) {
@@ -201,7 +210,8 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
 
     @Override
     public int nextStartPosition() throws IOException {
-      int basicStartPosition, basicEndPosition;
+      int basicStartPosition;
+      int basicEndPosition;
       while ((basicStartPosition = subSpans
           .nextStartPosition()) != NO_MORE_POSITIONS) {
         basicEndPosition = subSpans.endPosition();

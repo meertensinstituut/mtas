@@ -3,7 +3,7 @@ package mtas.analysis.token;
 /**
  * The Class MtasTokenString.
  */
-public class MtasTokenString extends MtasToken<String> {
+public class MtasTokenString extends MtasToken {
 
   /** The Constant TOKEN_TYPE. */
   public static final String TOKEN_TYPE = "string";

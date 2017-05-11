@@ -1,7 +1,6 @@
 package mtas.solr.handler.component.util;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Set;
 
 import org.apache.solr.common.util.NamedList;

@@ -13,7 +13,6 @@ import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 
 import mtas.codec.util.CodecComponent.ComponentFields;
-import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**

@@ -15,7 +15,6 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import mtas.codec.util.DataCollector;
-import mtas.codec.util.collector.MtasDataItem.NumberComparator;
 
 /**
  * The Class MtasDataCollector.
@@ -744,10 +743,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
       if (segmentRegistration != null) {
         HashMap<String, T1> keyValueList = segmentKeyValueList.get(segmentName);
         T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
-        for (String key : keyValueList.keySet()) {
+        for (Entry<String,T1> entry : keyValueList.entrySet()) {
           if (tmpSegmentValueBoundary == null || compareWithBoundary(
-              keyValueList.get(key), tmpSegmentValueBoundary)) {
-            segmentKeys.add(key);
+              entry.getValue(), tmpSegmentValueBoundary)) {
+            segmentKeys.add(entry.getKey());
           }
         }
       }
@@ -772,23 +771,22 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             || segmentRegistration.equals(SEGMENT_SORT_DESC)) {
           segmentKeys.clear();
           // recompute boundaries
-          for (String segmentName : segmentKeyValueList.keySet()) {
-            T1 tmpSegmentValueBoundary = boundaryForSegment(segmentName);
-            segmentValuesBoundary.put(segmentName, tmpSegmentValueBoundary);
+          for (Entry<String, HashMap<String,T1>> entry : segmentKeyValueList.entrySet()) {
+            T1 tmpSegmentValueBoundary = boundaryForSegment(entry.getKey());
+            segmentValuesBoundary.put(entry.getKey(), tmpSegmentValueBoundary);
           }
           // compute adjusted boundaries and compute keys
-          for (String segmentName : segmentKeyValueList.keySet()) {
-            this.segmentName = segmentName;
-            HashMap<String, T1> keyValueList = segmentKeyValueList
-                .get(segmentName);
+          for (Entry<String, HashMap<String,T1>> entry : segmentKeyValueList.entrySet()) {
+            this.segmentName = entry.getKey();
+            HashMap<String, T1> keyValueList = entry.getValue();
             T1 tmpSegmentValueBoundaryForComputing = boundaryForSegmentComputing(
-                segmentName);
-            for (String key : keyValueList.keySet()) {
+                entry.getKey());
+            for(Entry<String, T1> subEntry : keyValueList.entrySet()) {
               if (tmpSegmentValueBoundaryForComputing == null
-                  || compareWithBoundary(keyValueList.get(key),
+                  || compareWithBoundary(subEntry.getValue(),
                       tmpSegmentValueBoundaryForComputing)) {
-                if (!segmentKeys.contains(key)) {
-                  segmentKeys.add(key);
+                if (!segmentKeys.contains(subEntry.getKey())) {
+                  segmentKeys.add(subEntry.getKey());
                 }
               }
             }
@@ -799,14 +797,14 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
         HashSet<String> recomputeKeyList;
         segmentRecomputeKeyList = new LinkedHashMap<String, HashSet<String>>();
         for (String key : segmentKeys) {
-          for (String segmentName : segmentKeyValueList.keySet()) {
-            keyValueList = segmentKeyValueList.get(segmentName);
+          for (Entry<String, HashMap<String, T1>> entry : segmentKeyValueList.entrySet()) {
+            keyValueList = entry.getValue();
             if (!keyValueList.containsKey(key)) {
-              if (!segmentRecomputeKeyList.containsKey(segmentName)) {
-                recomputeKeyList = new HashSet<String>();
-                segmentRecomputeKeyList.put(segmentName, recomputeKeyList);
+              if (!segmentRecomputeKeyList.containsKey(entry.getKey())) {
+                recomputeKeyList = new HashSet<>();
+                segmentRecomputeKeyList.put(entry.getKey(), recomputeKeyList);
               } else {
-                recomputeKeyList = segmentRecomputeKeyList.get(segmentName);
+                recomputeKeyList = segmentRecomputeKeyList.get(entry.getKey());
               }
               recomputeKeyList.add(key);
             }
@@ -1384,36 +1382,36 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             reduceToKeys(result.getComparatorList().keySet());
           } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)
               || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
-            LinkedHashMap<String, NumberComparator> comparatorList = result
+            LinkedHashMap<String, MtasDataItemNumberComparator> comparatorList = result
                 .getComparatorList();
-            HashSet<String> filteredKeySet = new HashSet<String>();
+            HashSet<String> filteredKeySet = new HashSet<>();
             if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {
-              for (String key : comparatorList.keySet()) {
-                if (comparatorList.get(key)
+              for(Entry<String, MtasDataItemNumberComparator> entry : comparatorList.entrySet()) {
+                if (entry.getValue()
                     .compareTo(segmentValueBoundary) < 0) {
-                  filteredKeySet.add(key);
+                  filteredKeySet.add(entry.getKey());
                 }
               }
-            } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
-              for (String key : comparatorList.keySet()) {
-                if (comparatorList.get(key)
+            } else {
+              for (Entry<String, MtasDataItemNumberComparator> entry : comparatorList.entrySet()) {
+                if (entry.getValue()
                     .compareTo(segmentValueBoundary) > 0) {
-                  filteredKeySet.add(key);
+                  filteredKeySet.add(entry.getKey());
                 }
               }
             }
             reduceToKeys(filteredKeySet);
             basicList.keySet().retainAll(filteredKeySet);
-            result = new MtasDataCollectorResult<T1, T2>(collectorType,
+            result = new MtasDataCollectorResult<>(collectorType,
                 sortType, sortDirection, basicList, start, number);
           }
         }
       } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
         if (getSize() > 0) {
-          result = new MtasDataCollectorResult<T1, T2>(collectorType,
+          result = new MtasDataCollectorResult<>(collectorType,
               getItem(0));
         } else {
-          result = new MtasDataCollectorResult<T1, T2>(collectorType, sortType,
+          result = new MtasDataCollectorResult<>(collectorType, sortType,
               sortDirection);
         }
       } else {

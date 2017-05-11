@@ -33,8 +33,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   @Override
   final protected void addRangeEmpty(int left, int right, int additionalId,
       long additionalRef) {
-    String key = ((Integer) left).toString() + "_"
-        + ((Integer) right).toString();
+    String key = left + "_" + right;
     if (index.containsKey(key)) {
       // do nothing (empty...)
     } else {
@@ -65,8 +64,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   @Override
   final protected void addRange(int left, int right, int additionalId,
       long additionalRef, Integer id, Long ref) {
-    String key = ((Integer) left).toString() + "_"
-        + ((Integer) right).toString();
+    String key = left + "_" + right;
     if (index.containsKey(key)) {
       index.get(key).addIdAndRef(id, ref, additionalId, additionalRef);
     } else {

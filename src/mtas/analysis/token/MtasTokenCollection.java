@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.lucene.analysis.payloads.PayloadHelper;
 import org.apache.lucene.util.BytesRef;
 
@@ -18,7 +20,7 @@ import mtas.analysis.util.MtasParserException;
 public class MtasTokenCollection {
 
   /** The token collection. */
-  private HashMap<Integer, MtasToken<?>> tokenCollection = new HashMap<Integer, MtasToken<?>>();
+  private HashMap<Integer, MtasToken> tokenCollection = new HashMap<Integer, MtasToken>();
 
   /** The token collection index. */
   private ArrayList<Integer> tokenCollectionIndex = new ArrayList<Integer>();
@@ -33,10 +35,11 @@ public class MtasTokenCollection {
   /**
    * Adds the.
    *
-   * @param token the token
+   * @param token
+   *          the token
    * @return the integer
    */
-  public Integer add(MtasToken<?> token) {
+  public Integer add(MtasToken token) {
     Integer id = token.getId();
     tokenCollection.put(id, token);
     return id;
@@ -45,10 +48,11 @@ public class MtasTokenCollection {
   /**
    * Gets the.
    *
-   * @param id the id
+   * @param id
+   *          the id
    * @return the mtas token
    */
-  public MtasToken<?> get(Integer id) {
+  public MtasToken get(Integer id) {
     return tokenCollection.get(id);
   }
 
@@ -56,11 +60,12 @@ public class MtasTokenCollection {
    * Iterator.
    *
    * @return the iterator
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
-  public Iterator<MtasToken<?>> iterator() throws MtasParserException {
+  public Iterator<MtasToken> iterator() throws MtasParserException {
     checkTokenCollectionIndex();
-    Iterator<MtasToken<?>> it = new Iterator<MtasToken<?>>() {
+    Iterator<MtasToken> it = new Iterator<MtasToken>() {
 
       private Iterator<Integer> indexIterator = tokenCollectionIndex.iterator();
 
@@ -70,7 +75,7 @@ public class MtasTokenCollection {
       }
 
       @Override
-      public MtasToken<?> next() {
+      public MtasToken next() {
         return tokenCollection.get(indexIterator.next());
       }
 
@@ -85,12 +90,13 @@ public class MtasTokenCollection {
   /**
    * Prints the.
    *
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public void print() throws MtasParserException {
-    Iterator<MtasToken<?>> it = this.iterator();
+    Iterator<MtasToken> it = this.iterator();
     while (it.hasNext()) {
-      MtasToken<?> token = it.next();
+      MtasToken token = it.next();
       System.out.println(token);
     }
   }
@@ -99,7 +105,8 @@ public class MtasTokenCollection {
    * Gets the list.
    *
    * @return the list
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public String[][] getList() throws MtasParserException {
     String[][] result = new String[(tokenCollection.size() + 1)][];
@@ -108,9 +115,9 @@ public class MtasTokenCollection {
         "start position", "end position", "multiple positions", "parent",
         "provide parent", "payload", "prefix", "postfix" };
     int number = 1;
-    Iterator<MtasToken<?>> it = this.iterator();
+    Iterator<MtasToken> it = this.iterator();
     while (it.hasNext()) {
-      MtasToken<?> token = it.next();
+      MtasToken token = it.next();
       String[] row = new String[15];
       row[0] = token.getId().toString();
       if (token.getRealOffsetStart() != null) {
@@ -160,9 +167,12 @@ public class MtasTokenCollection {
   /**
    * Check.
    *
-   * @param autoRepair the auto repair
-   * @param makeUnique the make unique
-   * @throws MtasParserException the mtas parser exception
+   * @param autoRepair
+   *          the auto repair
+   * @param makeUnique
+   *          the make unique
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   public void check(Boolean autoRepair, Boolean makeUnique)
       throws MtasParserException {
@@ -189,12 +199,12 @@ public class MtasTokenCollection {
    * Make unique.
    */
   private void makeUnique() {
-    HashMap<String, ArrayList<MtasToken<?>>> currentPositionTokens = new HashMap<String, ArrayList<MtasToken<?>>>();
-    ArrayList<MtasToken<?>> currentValueTokens;
+    HashMap<String, ArrayList<MtasToken>> currentPositionTokens = new HashMap<String, ArrayList<MtasToken>>();
+    ArrayList<MtasToken> currentValueTokens;
     int currentStartPosition = -1;
-    MtasToken<?> currentToken = null;
-    for (Integer i : tokenCollection.keySet()) {
-      currentToken = tokenCollection.get(i);
+    MtasToken currentToken = null;
+    for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
+      currentToken = entry.getValue();
       if (currentToken.getPositionStart() > currentStartPosition) {
         currentPositionTokens.clear();
         currentStartPosition = currentToken.getPositionStart();
@@ -204,7 +214,7 @@ public class MtasTokenCollection {
               .get(currentToken.getValue());
 
         } else {
-          currentValueTokens = new ArrayList<MtasToken<?>>();
+          currentValueTokens = new ArrayList<>();
           currentPositionTokens.put(currentToken.getValue(),
               currentValueTokens);
         }
@@ -219,32 +229,30 @@ public class MtasTokenCollection {
   private void autoRepair() {
     ArrayList<Integer> trash = new ArrayList<Integer>();
     HashMap<Integer, Integer> translation = new HashMap<Integer, Integer>();
-    HashMap<Integer, MtasToken<?>> newTokenCollection = new HashMap<Integer, MtasToken<?>>();
+    HashMap<Integer, MtasToken> newTokenCollection = new HashMap<Integer, MtasToken>();
     Integer parentId, maxId = null, minId = null;
-    MtasToken<?> token;
+    MtasToken token;
     // check id, position and value
-    for (Integer i : tokenCollection.keySet()) {
-      token = tokenCollection.get(i);
+    for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
+      token = entry.getValue();
       if (token.getId() == null) {
-        trash.add(i);
+        trash.add(entry.getKey());
       } else if ((token.getPositionStart() == null)
           || (token.getPositionEnd() == null)) {
-        trash.add(i);
-      } else if (token.getValue() == null || (token.getValue().equals(""))) {
-        trash.add(i);
-      } else if (token.getPrefix() == null || (token.getPrefix().equals(""))) {
-        trash.add(i);
+        trash.add(entry.getKey());
+      } else if (token.getValue() == null || (token.getValue().isEmpty())) {
+        trash.add(entry.getKey());
+      } else if (token.getPrefix() == null || (token.getPrefix().isEmpty())) {
+        trash.add(entry.getKey());
       }
     }
     // check parentId
-    for (Integer i : tokenCollection.keySet()) {
-      token = tokenCollection.get(i);
+    for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
+      token = entry.getValue();
       parentId = token.getParentId();
-      if (parentId != null) {
-        if (!tokenCollection.containsKey(parentId)
-            || trash.contains(parentId)) {
-          token.setParentId(null);
-        }
+      if (parentId != null && (!tokenCollection.containsKey(parentId)
+          || trash.contains(parentId))) {
+        token.setParentId(null);
       }
     }
     // empty bin
@@ -268,19 +276,19 @@ public class MtasTokenCollection {
           newId++;
         }
         // translate objects
-        for (Integer i : tokenCollection.keySet()) {
-          token = tokenCollection.get(i);
+        for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
+          token = entry.getValue();
           parentId = token.getParentId();
-          token.setId(translation.get(i));
+          token.setId(translation.get(entry.getKey()));
           if (parentId != null) {
             token.setParentId(translation.get(parentId));
           }
         }
         // new tokenCollection
-        Iterator<Map.Entry<Integer, MtasToken<?>>> iter = tokenCollection
+        Iterator<Map.Entry<Integer, MtasToken>> iter = tokenCollection
             .entrySet().iterator();
         while (iter.hasNext()) {
-          Map.Entry<Integer, MtasToken<?>> entry = iter.next();
+          Map.Entry<Integer, MtasToken> entry = iter.next();
           newTokenCollection.put(translation.get(entry.getKey()),
               entry.getValue());
           iter.remove();
@@ -293,17 +301,20 @@ public class MtasTokenCollection {
   /**
    * Check token collection index.
    *
-   * @throws MtasParserException the mtas parser exception
+   * @throws MtasParserException
+   *           the mtas parser exception
    */
   private void checkTokenCollectionIndex() throws MtasParserException {
     if (tokenCollectionIndex.size() != tokenCollection.size()) {
-      MtasToken<?> token;
+      MtasToken token;
       Integer maxId = null, minId = null;
       tokenCollectionIndex.clear();
-      for (Integer i : tokenCollection.keySet()) {
-        token = tokenCollection.get(i);
-        maxId = ((maxId == null) ? i : Math.max(maxId, i));
-        minId = ((minId == null) ? i : Math.min(minId, i));
+      for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
+        token = entry.getValue();
+        maxId = ((maxId == null) ? entry.getKey()
+            : Math.max(maxId, entry.getKey()));
+        minId = ((minId == null) ? entry.getKey()
+            : Math.min(minId, entry.getKey()));
         if (token.getId() == null) {
           throw new MtasParserException(
               "no id for token (" + token.getValue() + ")");
@@ -327,7 +338,7 @@ public class MtasTokenCollection {
           throw new MtasParserException("missing offset for token with id "
               + token.getId() + " (" + token.getValue() + ")");
         }
-        tokenCollectionIndex.add(i);
+        tokenCollectionIndex.add(entry.getKey());
       }
       if ((tokenCollection.size() > 0)
           && ((minId > 0) || ((1 + maxId - minId) != tokenCollection.size()))) {

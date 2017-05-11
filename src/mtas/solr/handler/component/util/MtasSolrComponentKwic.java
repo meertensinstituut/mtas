@@ -25,7 +25,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentKwic.
  */
-public class MtasSolrComponentKwic {
+public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -211,7 +211,7 @@ public class MtasSolrComponentKwic {
         if (field == null || field.isEmpty()) {
           throw new IOException("no (valid) field in mtas kwic");
         } else if (!mtasFields.list.containsKey(field)) {
-          mtasFields.list.put(field, new ComponentField(field, uniqueKeyField));
+          mtasFields.list.put(field, new ComponentField(uniqueKeyField));
         }
       }
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_KWIC_KEY,
@@ -274,7 +274,7 @@ public class MtasSolrComponentKwic {
    * @param kwic the kwic
    * @return the simple ordered map
    */
-  public SimpleOrderedMap<Object> create(ComponentKwic kwic) {
+  public SimpleOrderedMap<Object> create(ComponentKwic kwic, Boolean encode) {
     SimpleOrderedMap<Object> mtasKwicResponse = new SimpleOrderedMap<>();
     mtasKwicResponse.add("key", kwic.key);
     ArrayList<NamedList<Object>> mtasKwicItemResponses = new ArrayList<NamedList<Object>>();
@@ -342,7 +342,7 @@ public class MtasSolrComponentKwic {
           mtasKwicItemResponseItem.add("startPosition", k.startPosition);
           mtasKwicItemResponseItem.add("endPosition", k.endPosition);
           ArrayList<NamedList<Object>> mtasKwicItemResponseItemTokens = new ArrayList<NamedList<Object>>();
-          for (MtasToken<?> token : k.tokens) {
+          for (MtasToken token : k.tokens) {
             NamedList<Object> mtasKwicItemResponseItemToken = new SimpleOrderedMap<>();
             if (token.getId() != null) {
               mtasKwicItemResponseItemToken.add("mtasId", token.getId());
@@ -463,6 +463,11 @@ public class MtasSolrComponentKwic {
         }
       }
     }
+  }
+  
+  public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
+      throws IOException {
+    //nothing to do
   }
 
 }

@@ -1,6 +1,7 @@
 package mtas.search.spans;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
   /**
    * The Class SpanNoneWeight.
    */
-  public class SpanNoneWeight extends SpanWeight {
+  protected class SpanNoneWeight extends SpanWeight {
 
     /**
      * Instantiates a new span none weight.
@@ -124,8 +125,8 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
         }
         // get MtasFieldsProducer using terms
         return new MtasSpanMatchNoneSpans(field);        
-      } catch (Exception e) {
-        throw new IOException("Can't get reader");
+      } catch (InvocationTargetException | IllegalAccessException e) {
+        throw new IOException("Can't get reader", e);
       }
 
     }

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsProducer;
@@ -135,8 +136,8 @@ public class MtasFieldsProducer extends FieldsProducer {
   @Override
   public void close() throws IOException {
     delegateFieldsProducer.close();
-    for (String name : indexInputList.keySet()) {
-      indexInputList.get(name).close();
+    for(Entry<String,IndexInput> entry : indexInputList.entrySet()) {
+      entry.getValue().close();
     }
   }
 

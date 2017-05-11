@@ -8,12 +8,6 @@ abstract public class MtasFunctionParserFunctionResponse {
   /** The defined. */
   boolean defined;
 
-  /** The value double. */
-  double valueDouble;
-
-  /** The value int. */
-  int valueInt;
-
   /**
    * Instantiates a new mtas function parser function response.
    *
