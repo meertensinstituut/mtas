@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasPayloadDecoder.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.payload</a> &gt; <span class="el_source">MtasPayloadDecoder.java</span></div><h1>MtasPayloadDecoder.java</h1><pre class="source lang-java linenums">package mtas.codec.payload;
+
+import java.io.IOException;
+import java.util.TreeSet;
+
+import mtas.analysis.token.MtasOffset;
+import mtas.analysis.token.MtasPosition;
+
+/**
+ * The Class MtasPayloadDecoder.
+ */
+<span class="fc" id="L12">public class MtasPayloadDecoder {</span>
+
+  /** The byte stream. */
+  private MtasBitInputStream byteStream;
+
+  /** The mtas position. */
+  private MtasPosition mtasPosition;
+
+  /** The mtas start position. */
+  private int mtasStartPosition;
+
+  /** The mtas positions. */
+  private TreeSet&lt;Integer&gt; mtasPositions;
+
+  /** The mtas id. */
+<span class="fc" id="L27">  private Integer mtasId = null;</span>
+
+  /** The mtas payload value. */
+<span class="fc" id="L30">  private byte[] mtasPayloadValue = null;</span>
+
+  /** The mtas parent id. */
+<span class="fc" id="L33">  private Integer mtasParentId = null;</span>
+
+  /** The mtas payload. */
+<span class="fc" id="L36">  private Boolean mtasPayload = null;</span>
+
+  /** The mtas parent. */
+<span class="fc" id="L39">  private Boolean mtasParent = null;</span>
+
+  /** The mtas position type. */
+<span class="fc" id="L42">  private String mtasPositionType = null;</span>
+
+  /** The mtas offset. */
+  private MtasOffset mtasOffset;
+
+  /** The mtas real offset. */
+  private MtasOffset mtasRealOffset;
+
+  
+
+  /**
+   * Inits the.
+   *
+   * @param startPosition
+   *          the start position
+   * @param payload
+   *          the payload
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public void init(int startPosition, byte[] payload) throws IOException {
+<span class="fc" id="L63">    byteStream = new MtasBitInputStream(payload);</span>
+<span class="fc" id="L64">    mtasStartPosition = startPosition;</span>
+    // analyse initial bits - position
+    Boolean getOffset;
+    Boolean getRealOffset;
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (byteStream.readBit() == 1) {</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">      if (byteStream.readBit() == 1) {</span>
+<span class="nc" id="L70">        mtasPositionType = null;</span>
+      } else {
+<span class="fc" id="L72">        mtasPositionType = MtasPosition.POSITION_RANGE;</span>
+      }
+    } else {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">      if (byteStream.readBit() == 1) {</span>
+<span class="fc" id="L76">        mtasPositionType = MtasPosition.POSITION_SET;</span>
+      } else {
+<span class="fc" id="L78">        mtasPositionType = MtasPosition.POSITION_SINGLE;</span>
+      }
+    }
+    // analyze initial bits - offset
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    if (byteStream.readBit() == 1) {</span>
+<span class="nc" id="L83">      getOffset = true;</span>
+    } else {
+<span class="fc" id="L85">      getOffset = false;</span>
+    }
+    // analyze initial bits - realOffset
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">    if (byteStream.readBit() == 1) {</span>
+<span class="nc" id="L89">      getRealOffset = true;</span>
+    } else {
+<span class="fc" id="L91">      getRealOffset = false;</span>
+    }
+    // analyze initial bits - parent
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    if (byteStream.readBit() == 1) {</span>
+<span class="fc" id="L95">      mtasParent = true;</span>
+    } else {
+<span class="fc" id="L97">      mtasParent = false;</span>
+    }
+    // analyse initial bits - payload
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (byteStream.readBit() == 1) {</span>
+<span class="nc" id="L101">      mtasPayload = true;</span>
+    } else {
+<span class="fc" id="L103">      mtasPayload = false;</span>
+    }
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">    if (byteStream.readBit() == 0) {</span>
+      // string
+    } else {
+      // other
+    }
+    // get id
+<span class="fc" id="L111">    mtasId = byteStream.readEliasGammaCodingNonNegativeInteger();</span>
+    // get position info
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">    if (mtasPositionType!=null &amp;&amp; mtasPositionType.equals(MtasPosition.POSITION_SINGLE)) {</span>
+<span class="fc" id="L114">      mtasPosition = new MtasPosition(mtasStartPosition);</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">    } else if (mtasPositionType!=null &amp;&amp; mtasPositionType.equals(MtasPosition.POSITION_RANGE)) {</span>
+<span class="fc" id="L116">      mtasPosition = new MtasPosition(mtasStartPosition, (mtasStartPosition</span>
+<span class="fc" id="L117">          + byteStream.readEliasGammaCodingPositiveInteger() - 1));</span>
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">    } else if (mtasPositionType!=null &amp;&amp; mtasPositionType.equals(MtasPosition.POSITION_SET)) {</span>
+<span class="fc" id="L119">      mtasPositions = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L120">      mtasPositions.add(mtasStartPosition);</span>
+<span class="fc" id="L121">      int numberOfPoints = byteStream.readEliasGammaCodingPositiveInteger();</span>
+<span class="fc" id="L122">      int[] positionList = new int[numberOfPoints];</span>
+<span class="fc" id="L123">      positionList[0] = mtasStartPosition;</span>
+<span class="fc" id="L124">      int previousPosition = 0;</span>
+<span class="fc" id="L125">      int currentPosition = mtasStartPosition;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      for (int i = 1; i &lt; numberOfPoints; i++) {</span>
+<span class="fc" id="L127">        previousPosition = currentPosition;</span>
+<span class="fc" id="L128">        currentPosition = previousPosition</span>
+<span class="fc" id="L129">            + byteStream.readEliasGammaCodingPositiveInteger();</span>
+<span class="fc" id="L130">        positionList[i] = currentPosition;</span>
+      }
+<span class="fc" id="L132">      mtasPosition = new MtasPosition(positionList);</span>
+<span class="fc" id="L133">    } else {</span>
+<span class="nc" id="L134">      mtasPosition = null;</span>
+    }
+    // get offset and realOffset info
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    if (getOffset) {</span>
+<span class="nc" id="L138">      int offsetStart = byteStream.readEliasGammaCodingNonNegativeInteger();</span>
+<span class="nc" id="L139">      int offsetEnd = offsetStart</span>
+<span class="nc" id="L140">          + byteStream.readEliasGammaCodingPositiveInteger() - 1;</span>
+<span class="nc" id="L141">      mtasOffset = new MtasOffset(offsetStart, offsetEnd);</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">      if (getRealOffset) {</span>
+<span class="nc" id="L143">        int realOffsetStart = byteStream.readEliasGammaCodingInteger()</span>
+            + offsetStart;
+<span class="nc" id="L145">        int realOffsetEnd = realOffsetStart</span>
+<span class="nc" id="L146">            + byteStream.readEliasGammaCodingPositiveInteger() - 1;</span>
+<span class="nc" id="L147">        mtasRealOffset = new MtasOffset(realOffsetStart, realOffsetEnd);</span>
+      }
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    } else if (getRealOffset) {</span>
+<span class="nc" id="L150">      int realOffsetStart = byteStream.readEliasGammaCodingNonNegativeInteger();</span>
+<span class="nc" id="L151">      int realOffsetEnd = realOffsetStart</span>
+<span class="nc" id="L152">          + byteStream.readEliasGammaCodingPositiveInteger() - 1;</span>
+<span class="nc" id="L153">      mtasRealOffset = new MtasOffset(realOffsetStart, realOffsetEnd);</span>
+    }
+<span class="fc bfc" id="L155" title="All 2 branches covered.">    if (mtasParent) {</span>
+<span class="fc" id="L156">      mtasParentId = byteStream.readEliasGammaCodingInteger() + mtasId;</span>
+    }
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">    if (mtasPayload) {</span>
+<span class="nc" id="L159">      mtasPayloadValue = byteStream.readRemainingBytes();</span>
+    }
+<span class="fc" id="L161">  }</span>
+
+  /**
+   * Gets the mtas id.
+   *
+   * @return the mtas id
+   */
+  public Integer getMtasId() {
+<span class="fc" id="L169">    return mtasId;</span>
+  }
+
+  /**
+   * Gets the mtas parent id.
+   *
+   * @return the mtas parent id
+   */
+  public Integer getMtasParentId() {
+<span class="fc" id="L178">    return mtasParentId;</span>
+  }
+
+  /**
+   * Gets the mtas payload.
+   *
+   * @return the mtas payload
+   */
+  public byte[] getMtasPayload() {
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">    return mtasPayload ? mtasPayloadValue : null;</span>
+  }
+
+  /**
+   * Gets the mtas position.
+   *
+   * @return the mtas position
+   */
+  public MtasPosition getMtasPosition() {
+<span class="fc" id="L196">    return mtasPosition;</span>
+  }
+
+  /**
+   * Gets the mtas offset.
+   *
+   * @return the mtas offset
+   */
+  public MtasOffset getMtasOffset() {
+<span class="fc" id="L205">    return mtasOffset;</span>
+  }
+
+  /**
+   * Gets the mtas real offset.
+   *
+   * @return the mtas real offset
+   */
+  public MtasOffset getMtasRealOffset() {
+<span class="fc" id="L214">    return mtasRealOffset;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

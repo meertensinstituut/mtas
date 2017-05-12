@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasUpdateRequestProcessorResultWriter.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.update.processor</a> &gt; <span class="el_source">MtasUpdateRequestProcessorResultWriter.java</span></div><h1>MtasUpdateRequestProcessorResultWriter.java</h1><pre class="source lang-java linenums">package mtas.solr.update.processor;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.util.BytesRef;
+
+/**
+ * The Class MtasUpdateRequestProcessorResultWriter.
+ */
+public class MtasUpdateRequestProcessorResultWriter implements Closeable {
+
+  /** The log. */
+<span class="nc" id="L19">  private static Log log = LogFactory</span>
+<span class="nc" id="L20">      .getLog(MtasUpdateRequestProcessorResultWriter.class);</span>
+
+  /** The object output stream. */
+  private ObjectOutputStream objectOutputStream;
+
+  /** The file output stream. */
+  private FileOutputStream fileOutputStream;
+
+  /** The closed. */
+  private boolean closed;
+
+  /** The token number. */
+  private int tokenNumber;
+
+  /** The file. */
+  private File file;
+
+  /**
+   * Instantiates a new mtas update request processor result writer.
+   *
+   * @param value the value
+   */
+<span class="nc" id="L42">  public MtasUpdateRequestProcessorResultWriter(String value) {</span>
+<span class="nc" id="L43">    closed = false;</span>
+<span class="nc" id="L44">    tokenNumber = 0;</span>
+<span class="nc" id="L45">    file = null;</span>
+<span class="nc" id="L46">    fileOutputStream = null;</span>
+<span class="nc" id="L47">    objectOutputStream = null;</span>
+    try {
+<span class="nc" id="L49">      file = File.createTempFile(&quot;MtasUpdateRequestProcessorResult&quot;, &quot;.data&quot;);</span>
+<span class="nc" id="L50">      fileOutputStream = new FileOutputStream(file);</span>
+<span class="nc" id="L51">      objectOutputStream = new ObjectOutputStream(fileOutputStream);</span>
+<span class="nc" id="L52">      objectOutputStream.writeObject(value);</span>
+<span class="nc" id="L53">    } catch (IOException e) {</span>
+<span class="nc" id="L54">      forceCloseAndDelete();</span>
+<span class="nc" id="L55">      log.debug(e);</span>
+<span class="nc" id="L56">    }</span>
+<span class="nc" id="L57">  }</span>
+
+  /**
+   * Adds the item.
+   *
+   * @param term the term
+   * @param offsetStart the offset start
+   * @param offsetEnd the offset end
+   * @param posIncr the pos incr
+   * @param payload the payload
+   * @param flags the flags
+   */
+  public void addItem(String term, Integer offsetStart, Integer offsetEnd,
+      Integer posIncr, BytesRef payload, Integer flags) {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">    if (!closed) {</span>
+<span class="nc" id="L72">      tokenNumber++;</span>
+<span class="nc" id="L73">      MtasUpdateRequestProcessorResultItem item = new MtasUpdateRequestProcessorResultItem(</span>
+          term, offsetStart, offsetEnd, posIncr, payload, flags);
+      try {
+<span class="nc" id="L76">        objectOutputStream.writeObject(item);</span>
+<span class="nc" id="L77">        objectOutputStream.reset();</span>
+<span class="nc" id="L78">        objectOutputStream.flush();</span>
+<span class="nc" id="L79">      } catch (IOException e) {</span>
+<span class="nc" id="L80">        forceCloseAndDelete();</span>
+<span class="nc" id="L81">        log.debug(e);</span>
+<span class="nc" id="L82">      }</span>
+    }
+<span class="nc" id="L84">  }</span>
+
+  /**
+   * Gets the token number.
+   *
+   * @return the token number
+   */
+  public int getTokenNumber() {
+<span class="nc" id="L92">    return tokenNumber;</span>
+  }
+
+  /**
+   * Gets the file name.
+   *
+   * @return the file name
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String getFileName() throws IOException {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">    if (file != null) {</span>
+<span class="nc" id="L103">      return file.getAbsolutePath();</span>
+    } else {
+<span class="nc" id="L105">      throw new IOException(&quot;no file&quot;);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Closeable#close()
+   */
+  @Override
+  public void close() throws IOException {
+<span class="nc bnc" id="L116" title="All 2 branches missed.">    if (!closed) {</span>
+<span class="nc" id="L117">      objectOutputStream.close();</span>
+<span class="nc" id="L118">      fileOutputStream.close();</span>
+<span class="nc" id="L119">      closed = true;</span>
+    }
+<span class="nc" id="L121">  }</span>
+
+  /**
+   * Force close and delete.
+   */
+  public void forceCloseAndDelete() {
+    try {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">      if (objectOutputStream != null) {</span>
+<span class="nc" id="L129">        objectOutputStream.close();</span>
+<span class="nc" id="L130">        objectOutputStream = null;</span>
+      }
+<span class="nc bnc" id="L132" title="All 2 branches missed.">      if (fileOutputStream != null) {</span>
+<span class="nc" id="L133">        fileOutputStream.close();</span>
+<span class="nc" id="L134">        fileOutputStream = null;</span>
+      }
+<span class="nc" id="L136">    } catch (IOException e) {</span>
+<span class="nc" id="L137">      log.debug(e);</span>
+<span class="nc" id="L138">    }</span>
+<span class="nc" id="L139">    closed = true;</span>
+<span class="nc" id="L140">    tokenNumber = 0;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">    if (file != null) {</span>
+<span class="nc bnc" id="L142" title="All 6 branches missed.">      if (file.exists() &amp;&amp; file.canWrite() &amp;&amp; !file.delete()) {</span>
+<span class="nc" id="L143">        log.debug(&quot;couldn't delete &quot; + file.getName());</span>
+      }
+<span class="nc" id="L145">      file = null;</span>
+    }
+<span class="nc" id="L147">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

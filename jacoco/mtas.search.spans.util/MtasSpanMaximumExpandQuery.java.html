@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanMaximumExpandQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasSpanMaximumExpandQuery.java</span></div><h1>MtasSpanMaximumExpandQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.spans.SpanCollector;
+import org.apache.lucene.search.spans.SpanWeight;
+import org.apache.lucene.search.spans.Spans;
+
+import mtas.codec.util.CodecInfo;
+import mtas.codec.util.CodecInfo.IndexDoc;
+import mtas.search.spans.MtasSpanMatchNoneSpans;
+
+public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
+
+  MtasSpanQuery query;
+  int minimumLeft;
+  int maximumLeft;
+  int minimumRight;
+  int maximumRight;
+
+  public MtasSpanMaximumExpandQuery(MtasSpanQuery query, int minimumLeft,
+      int maximumLeft, int minimumRight, int maximumRight) {
+<span class="fc" id="L35">    super(null, null);</span>
+<span class="fc" id="L36">    this.query = query;</span>
+<span class="pc bpc" id="L37" title="4 of 8 branches missed.">    if (minimumLeft &gt; maximumLeft || minimumRight &gt; maximumRight</span>
+        || minimumLeft &lt; 0 || minimumRight &lt; 0) {
+<span class="nc" id="L39">      throw new IllegalArgumentException();</span>
+    }
+<span class="fc" id="L41">    this.minimumLeft = minimumLeft;</span>
+<span class="fc" id="L42">    this.maximumLeft = maximumLeft;</span>
+<span class="fc" id="L43">    this.minimumRight = minimumRight;</span>
+<span class="fc" id="L44">    this.maximumRight = maximumRight;</span>
+<span class="fc" id="L45">    Integer minimum = query.getMinimumWidth();</span>
+<span class="fc" id="L46">    Integer maximum = query.getMaximumWidth();</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    if (minimum != null) {</span>
+<span class="fc" id="L48">      minimum += minimumLeft + minimumRight;</span>
+    }
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">    if (maximum != null) {</span>
+<span class="nc" id="L51">      maximum += maximumLeft + maximumRight;</span>
+    }
+<span class="fc" id="L53">    setWidth(minimum, maximum);</span>
+<span class="fc" id="L54">  }</span>
+
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+<span class="nc" id="L59">    SpanWeight subWeight = query.createWeight(searcher, needsScores);</span>
+<span class="nc bnc" id="L60" title="All 4 branches missed.">    if (maximumLeft == 0 &amp;&amp; maximumRight == 0) {</span>
+<span class="nc" id="L61">      return subWeight;</span>
+    } else {
+<span class="nc" id="L63">      return new MtasMaximumExpandWeight(subWeight, searcher, needsScores);</span>
+    }
+  }
+
+  @Override
+  public String getField() {
+<span class="fc" id="L69">    return query.getField();</span>
+  }
+
+  @Override
+  public String toString(String field) {
+<span class="nc" id="L74">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L75">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc" id="L76">    buffer.append(query.toString(field) + &quot;][&quot;+minimumLeft+&quot;,&quot;+maximumLeft+&quot;][&quot;+minimumRight+&quot;,&quot;+maximumRight+&quot;])&quot;);</span>
+<span class="nc" id="L77">    return buffer.toString();</span>
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L83">      return true;</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L85">      return false;</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L87">      return false;</span>
+<span class="fc" id="L88">    final MtasSpanMaximumExpandQuery that = (MtasSpanMaximumExpandQuery) obj;</span>
+    boolean isEqual;
+<span class="fc" id="L90">    isEqual = query.equals(that.query);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">    isEqual &amp;= minimumLeft == that.minimumLeft;</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    isEqual &amp;= maximumLeft == that.maximumLeft;</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    isEqual &amp;= minimumRight == that.minimumRight;</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">    isEqual &amp;= maximumRight == that.maximumRight;</span>
+<span class="fc" id="L95">    return isEqual;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L100">    int h = Integer.rotateLeft(classHash(), 1);</span>
+<span class="nc" id="L101">    h ^= query.hashCode();</span>
+<span class="nc" id="L102">    h = Integer.rotateLeft(h, minimumLeft) + minimumLeft;</span>
+<span class="nc" id="L103">    h ^= 2;</span>
+<span class="nc" id="L104">    h = Integer.rotateLeft(h, maximumLeft) + maximumLeft;</span>
+<span class="nc" id="L105">    h ^= 3;</span>
+<span class="nc" id="L106">    h = Integer.rotateLeft(h, minimumRight) + minimumRight;</span>
+<span class="nc" id="L107">    h ^= 5;</span>
+<span class="nc" id="L108">    h = Integer.rotateLeft(h, maximumRight) + maximumRight;</span>
+<span class="nc" id="L109">    return h;</span>
+  }
+
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+<span class="fc" id="L114">    MtasSpanQuery newQuery = query.rewrite(reader);</span>
+<span class="pc bpc" id="L115" title="2 of 4 branches missed.">    if (maximumLeft == 0 &amp;&amp; maximumRight == 0) {</span>
+<span class="fc" id="L116">      return newQuery;</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">    } else if (!query.equals(newQuery)) {</span>
+<span class="nc" id="L118">      return new MtasSpanMaximumExpandQuery(newQuery, minimumLeft, maximumLeft,</span>
+          minimumRight, maximumRight);
+    } else {
+<span class="nc" id="L121">      return super.rewrite(reader);</span>
+    }
+  }
+
+  private class MtasMaximumExpandWeight extends SpanWeight {
+    SpanWeight subWeight;
+
+    public MtasMaximumExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
+<span class="nc" id="L129">        boolean needsScores) throws IOException {</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">      super(MtasSpanMaximumExpandQuery.this, searcher,</span>
+<span class="nc" id="L131">          needsScores ? getTermContexts(subWeight) : null);</span>
+<span class="nc" id="L132">      this.subWeight = subWeight;</span>
+<span class="nc" id="L133">    }</span>
+
+    @Override
+    public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
+<span class="nc" id="L137">      subWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L138">    }</span>
+
+    @Override
+    public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
+        throws IOException {
+<span class="nc" id="L143">      Spans spans = subWeight.getSpans(ctx, requiredPostings);</span>
+<span class="nc bnc" id="L144" title="All 4 branches missed.">      if (maximumLeft == 0 &amp;&amp; maximumRight == 0) {</span>
+<span class="nc" id="L145">        return spans;</span>
+      } else {
+        try {
+          // get leafreader
+<span class="nc" id="L149">          LeafReader r = ctx.reader();</span>
+          // get delegate
+<span class="nc" id="L151">          Boolean hasMethod = true;</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">          while (hasMethod) {</span>
+<span class="nc" id="L153">            hasMethod = false;</span>
+<span class="nc" id="L154">            Method[] methods = r.getClass().getMethods();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">            for (Method m : methods) {</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">              if (m.getName().equals(&quot;getDelegate&quot;)) {</span>
+<span class="nc" id="L157">                hasMethod = true;</span>
+<span class="nc" id="L158">                r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="nc" id="L159">                break;</span>
+              }
+            }
+<span class="nc" id="L162">          } // get fieldsproducer</span>
+<span class="nc" id="L163">          Method fpm = r.getClass().getMethod(&quot;getPostingsReader&quot;,</span>
+              (Class&lt;?&gt;[]) null);
+<span class="nc" id="L165">          FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
+          // get MtasFieldsProducer using terms
+<span class="nc" id="L167">          Terms t = fp.terms(field);</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">          if (t == null) {</span>
+<span class="nc" id="L169">            return new MtasSpanMatchNoneSpans(field);</span>
+          } else {
+<span class="nc" id="L171">            CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
+<span class="nc" id="L172">            return new MtasMaximumExpandSpans(mtasCodecInfo, query.getField(),</span>
+                spans);
+          }
+<span class="nc" id="L175">        } catch (Exception e) {</span>
+<span class="nc" id="L176">          throw new IOException(&quot;Can't get reader&quot;, e);</span>
+        }
+
+      }
+    }
+
+    @Override
+    public void extractTerms(Set&lt;Term&gt; terms) {
+<span class="nc" id="L184">      subWeight.extractTerms(terms);</span>
+<span class="nc" id="L185">    }</span>
+
+  }
+
+  private class MtasMaximumExpandSpans extends Spans {
+
+    Spans subSpans;
+    int minPosition;
+    int maxPosition;
+    String field;
+    CodecInfo mtasCodecInfo;
+    int startPosition;
+    int endPosition;
+
+    public MtasMaximumExpandSpans(CodecInfo mtasCodecInfo, String field,
+<span class="nc" id="L200">        Spans subSpans) {</span>
+<span class="nc" id="L201">      super();</span>
+<span class="nc" id="L202">      this.subSpans = subSpans;</span>
+<span class="nc" id="L203">      this.field = field;</span>
+<span class="nc" id="L204">      this.mtasCodecInfo = mtasCodecInfo;</span>
+<span class="nc" id="L205">      this.minPosition = 0;</span>
+<span class="nc" id="L206">      this.maxPosition = 0;</span>
+<span class="nc" id="L207">      this.startPosition = -1;</span>
+<span class="nc" id="L208">      this.endPosition = -1;</span>
+<span class="nc" id="L209">    }</span>
+
+    @Override
+    public int nextStartPosition() throws IOException {
+      int basicStartPosition;
+      int basicEndPosition;
+<span class="nc" id="L215">      while ((basicStartPosition = subSpans</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">          .nextStartPosition()) != NO_MORE_POSITIONS) {</span>
+<span class="nc" id="L217">        basicEndPosition = subSpans.endPosition();</span>
+<span class="nc" id="L218">        startPosition = Math.max(minPosition,</span>
+            (basicStartPosition - maximumLeft));
+<span class="nc" id="L220">        endPosition = Math.min(maxPosition + 1,</span>
+            (basicEndPosition + maximumRight));
+<span class="nc bnc" id="L222" title="All 4 branches missed.">        if (startPosition &lt;= (basicStartPosition - minimumLeft)</span>
+            &amp;&amp; endPosition &gt;= (basicEndPosition + minimumRight)) {
+<span class="nc" id="L224">          return this.startPosition;</span>
+        }
+      }
+<span class="nc" id="L227">      startPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L228">      endPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L229">      return NO_MORE_POSITIONS;</span>
+    }
+
+    @Override
+    public int startPosition() {
+<span class="nc" id="L234">      return startPosition;</span>
+    }
+
+    @Override
+    public int endPosition() {
+<span class="nc" id="L239">      return endPosition;</span>
+    }
+
+    @Override
+    public int width() {
+<span class="nc" id="L244">      return endPosition-startPosition;</span>
+    }
+
+    @Override
+    public void collect(SpanCollector collector) throws IOException {
+<span class="nc" id="L249">      subSpans.collect(collector);</span>
+<span class="nc" id="L250">    }</span>
+
+    @Override
+    public final TwoPhaseIterator asTwoPhaseIterator() {
+      // return subSpans.asTwoPhaseIterator();
+<span class="nc" id="L255">      return null;</span>
+    }
+    
+    @Override
+    public float positionsCost() {
+      //return subSpans.positionsCost();
+<span class="nc" id="L261">      return 0;</span>
+    }
+
+    @Override
+    public int docID() {
+<span class="nc" id="L266">      return subSpans.docID();</span>
+    }
+
+    @Override
+    public int nextDoc() throws IOException {
+<span class="nc" id="L271">      int docId = subSpans.nextDoc();</span>
+<span class="nc" id="L272">      startPosition = -1;</span>
+<span class="nc" id="L273">      endPosition = -1;</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">      if (docId != NO_MORE_DOCS) {</span>
+<span class="nc" id="L275">        IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        if (doc != null) {</span>
+<span class="nc" id="L277">          minPosition = doc.minPosition;</span>
+<span class="nc" id="L278">          maxPosition = doc.maxPosition;</span>
+        } else {
+<span class="nc" id="L280">          minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L281">          maxPosition = NO_MORE_POSITIONS;</span>
+        }
+<span class="nc" id="L283">      } else {</span>
+<span class="nc" id="L284">        minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L285">        maxPosition = NO_MORE_POSITIONS;</span>
+      }
+<span class="nc" id="L287">      return docId;</span>
+    }
+
+    @Override
+    public int advance(int target) throws IOException {
+<span class="nc" id="L292">      int docId = subSpans.advance(target);</span>
+<span class="nc" id="L293">      startPosition = -1;</span>
+<span class="nc" id="L294">      endPosition = -1;</span>
+<span class="nc bnc" id="L295" title="All 2 branches missed.">      if (docId != NO_MORE_DOCS) {</span>
+<span class="nc" id="L296">        IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">        if (doc != null) {</span>
+<span class="nc" id="L298">          minPosition = doc.minPosition;</span>
+<span class="nc" id="L299">          maxPosition = doc.maxPosition;</span>
+        } else {
+<span class="nc" id="L301">          minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L302">          maxPosition = NO_MORE_POSITIONS;</span>
+        }
+<span class="nc" id="L304">      } else {</span>
+<span class="nc" id="L305">        minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L306">        maxPosition = NO_MORE_POSITIONS;</span>
+      }
+<span class="nc" id="L308">      return docId;</span>
+    }
+
+    @Override
+    public long cost() {
+<span class="nc bnc" id="L313" title="All 2 branches missed.">      return subSpans!=null?subSpans.cost():0;</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

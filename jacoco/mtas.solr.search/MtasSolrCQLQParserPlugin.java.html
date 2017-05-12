@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrCQLQParserPlugin.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.search</a> &gt; <span class="el_source">MtasSolrCQLQParserPlugin.java</span></div><h1>MtasSolrCQLQParserPlugin.java</h1><pre class="source lang-java linenums">package mtas.solr.search;
+
+import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.common.util.NamedList;
+import org.apache.solr.request.SolrQueryRequest;
+import org.apache.solr.search.QParser;
+import org.apache.solr.search.QParserPlugin;
+
+/**
+ * The Class MtasSolrCQLQParserPlugin.
+ */
+<span class="fc" id="L12">public class MtasSolrCQLQParserPlugin extends QParserPlugin {</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.solr.search.QParserPlugin#init(org.apache.solr.common.util.
+   * NamedList)
+   */
+  @SuppressWarnings(&quot;rawtypes&quot;)
+  @Override
+  public void init(NamedList args) {
+    //do nothing for now
+<span class="fc" id="L24">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.solr.search.QParserPlugin#createParser(java.lang.String,
+   * org.apache.solr.common.params.SolrParams,
+   * org.apache.solr.common.params.SolrParams,
+   * org.apache.solr.request.SolrQueryRequest)
+   */
+  @Override
+  public QParser createParser(String qstr, SolrParams localParams,
+      SolrParams params, SolrQueryRequest req) {
+<span class="fc" id="L37">    return new MtasCQLQParser(qstr, localParams, params, req);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

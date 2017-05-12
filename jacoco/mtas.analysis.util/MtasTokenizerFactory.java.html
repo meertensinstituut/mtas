@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasTokenizerFactory.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasTokenizerFactory.java</span></div><h1>MtasTokenizerFactory.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
+
+import mtas.analysis.MtasTokenizer;
+
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.util.ResourceLoader;
+import org.apache.lucene.analysis.util.ResourceLoaderAware;
+import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.util.AttributeFactory;
+import org.apache.solr.core.SolrResourceLoader;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * A factory for creating MtasTokenizer objects.
+ */
+public class MtasTokenizerFactory extends TokenizerFactory
+    implements ResourceLoaderAware {
+
+  /** The argument configfile. */
+  public final static String ARGUMENT_CONFIGFILE = &quot;configFile&quot;;
+
+  /** The argument config. */
+  public final static String ARGUMENT_CONFIG = &quot;config&quot;;
+
+  /** The argument default. */
+  public final static String ARGUMENT_DEFAULT = &quot;default&quot;;
+
+  /** The config argument. */
+  private String configArgument;
+
+  /** The default argument. */
+  private String defaultArgument;
+
+  /** The config file argument. */
+  private String configFileArgument;
+
+  /** The configs. */
+<span class="fc" id="L41">  private HashMap&lt;String, MtasConfiguration&gt; configs = null;</span>
+
+  /** The config. */
+<span class="fc" id="L44">  private MtasConfiguration config = null;</span>
+
+  /**
+   * Instantiates a new mtas tokenizer factory.
+   *
+   * @param args
+   *          the args
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public MtasTokenizerFactory(Map&lt;String, String&gt; args) throws IOException {
+<span class="fc" id="L55">    this(args, null);</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Instantiates a new mtas tokenizer factory.
+   *
+   * @param args
+   *          the args
+   * @param resourceLoader
+   *          the resource loader
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public MtasTokenizerFactory(Map&lt;String, String&gt; args,
+      SolrResourceLoader resourceLoader) throws IOException {
+<span class="fc" id="L70">    super(args);</span>
+<span class="fc" id="L71">    configFileArgument = get(args, ARGUMENT_CONFIGFILE);</span>
+<span class="fc" id="L72">    configArgument = get(args, ARGUMENT_CONFIG);</span>
+<span class="fc" id="L73">    defaultArgument = get(args, ARGUMENT_DEFAULT);</span>
+<span class="pc bpc" id="L74" title="2 of 4 branches missed.">    if (configFileArgument != null &amp;&amp; configArgument != null) {</span>
+<span class="nc" id="L75">      throw new IOException(this.getClass().getName() + &quot; can't have both &quot;</span>
+          + ARGUMENT_CONFIGFILE + &quot; and &quot; + ARGUMENT_CONFIG);
+<span class="pc bpc" id="L77" title="2 of 4 branches missed.">    } else if (configArgument == null &amp;&amp; defaultArgument != null) {</span>
+<span class="nc" id="L78">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
+          + ARGUMENT_DEFAULT + &quot; without &quot; + ARGUMENT_CONFIG);
+<span class="pc bpc" id="L80" title="3 of 4 branches missed.">    } else if (configFileArgument == null &amp;&amp; configArgument == null) {</span>
+<span class="nc" id="L81">      throw new IOException(this.getClass().getName() + &quot; should have &quot;</span>
+          + ARGUMENT_CONFIGFILE + &quot; or &quot; + ARGUMENT_CONFIG);
+    }
+<span class="fc" id="L84">    init(resourceLoader);</span>
+<span class="fc" id="L85">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.analysis.util.TokenizerFactory#create(org.apache.lucene.
+   * util.AttributeFactory)
+   */
+  @Override
+  public MtasTokenizer create(AttributeFactory factory) {
+<span class="fc" id="L96">    MtasTokenizer tokenizer = null;</span>
+    try {
+<span class="fc" id="L98">      tokenizer = create(factory, null);</span>
+<span class="nc" id="L99">    } catch (IOException e) {</span>
+<span class="nc" id="L100">      e.printStackTrace();</span>
+<span class="fc" id="L101">    }</span>
+<span class="fc" id="L102">    return tokenizer;</span>
+  }
+
+  /**
+   * Creates the.
+   *
+   * @param configuration
+   *          the configuration
+   * @return the mtas tokenizer
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public MtasTokenizer create(String configuration) throws IOException {
+<span class="nc" id="L115">    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);</span>
+  }
+
+  /**
+   * Creates the.
+   *
+   * @param factory
+   *          the factory
+   * @param configuration
+   *          the configuration
+   * @return the mtas tokenizer
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public MtasTokenizer create(AttributeFactory factory, String configuration)
+      throws IOException {
+<span class="pc bpc" id="L131" title="3 of 4 branches missed.">    if (configs != null &amp;&amp; configs.size() &gt; 0) {</span>
+<span class="nc bnc" id="L132" title="All 4 branches missed.">      if (configuration == null &amp;&amp; defaultArgument == null) {</span>
+<span class="nc" id="L133">        throw new IOException(&quot;no (default)configuration&quot;);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">      } else if (configuration == null) {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (configs.get(defaultArgument) != null) {</span>
+<span class="nc" id="L136">          return new MtasTokenizer(factory,</span>
+<span class="nc" id="L137">              configs.get(defaultArgument));</span>
+        } else {
+<span class="nc" id="L139">          throw new IOException(</span>
+              &quot;default configuration &quot; + defaultArgument + &quot; not available&quot;);
+        }
+      } else {
+<span class="nc" id="L143">        MtasConfiguration config = configs.get(configuration);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if (config == null) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">          if (defaultArgument != null) {</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            if (configs.get(defaultArgument) != null) {</span>
+<span class="nc" id="L147">              return new MtasTokenizer(factory,</span>
+<span class="nc" id="L148">                  configs.get(defaultArgument));</span>
+            } else {
+<span class="nc" id="L150">              throw new IOException(&quot;configuration &quot; + configuration</span>
+                  + &quot; not found and default configuration &quot; + defaultArgument
+                  + &quot; not available&quot;);
+            }
+          } else {
+<span class="nc" id="L155">            throw new IOException(&quot;configuration &quot; + configuration</span>
+                + &quot; not available and no default configuration&quot;);
+          }
+        } else {
+<span class="nc" id="L159">          return new MtasTokenizer(factory, config);</span>
+        }
+      }
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">    } else if (config != null) {</span>
+<span class="fc" id="L163">      return new MtasTokenizer(factory, config);</span>
+    } else {
+<span class="nc" id="L165">      throw new IOException(&quot;no configuration&quot;);</span>
+    }
+  }
+
+  /**
+   * Inits the.
+   *
+   * @param resourceLoader
+   *          the resource loader
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void init(ResourceLoader resourceLoader) throws IOException {
+<span class="pc bpc" id="L178" title="2 of 4 branches missed.">    if (config == null &amp;&amp; configs == null) {</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">      if (resourceLoader == null) {</span>
+<span class="fc" id="L180">        return;</span>
+<span class="pc bpc" id="L181" title="3 of 4 branches missed.">      } else if (configFileArgument == null &amp;&amp; configArgument == null) {</span>
+<span class="nc" id="L182">        throw new IOException(&quot;no configuration&quot;);</span>
+      } else {
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">        if (configFileArgument != null) {</span>
+          try {
+<span class="fc" id="L186">            config = MtasConfiguration.readConfiguration(</span>
+<span class="fc" id="L187">                resourceLoader.openResource(configFileArgument));</span>
+<span class="nc" id="L188">          } catch (IOException e) {</span>
+<span class="nc" id="L189">            throw new IOException(&quot;Problem loading configuration from &quot;</span>
+<span class="nc" id="L190">                + configFileArgument + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L191">          }</span>
+        }
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if (configArgument != null) {</span>
+          try {
+<span class="nc" id="L195">            configs = MtasConfiguration.readMtasTokenizerConfigurations(</span>
+                resourceLoader, configArgument);
+<span class="nc" id="L197">          } catch (IOException e) {</span>
+<span class="nc" id="L198">            throw new IOException(&quot;Problem loading configurations from &quot;</span>
+<span class="nc" id="L199">                + configArgument + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L200">          }</span>
+        }
+      }
+    }
+<span class="fc" id="L204">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.analysis.util.ResourceLoaderAware#inform(org.apache.
+   * lucene.analysis.util.ResourceLoader)
+   */
+  @Override
+  public void inform(ResourceLoader loader) throws IOException {
+<span class="fc" id="L214">    init(loader);</span>
+<span class="fc" id="L215">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

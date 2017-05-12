@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>IntervalTree.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">IntervalTree.java</span></div><h1>IntervalTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
+
+import java.util.ArrayList;
+import mtas.codec.util.CodecSearchTree.MtasTreeHit;
+
+/**
+ * The Class IntervalTree.
+ *
+ * @param &lt;T&gt;
+ *          the generic type
+ * @param &lt;N&gt;
+ *          the number type
+ */
+abstract public class IntervalTree&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&gt; {
+
+  /** The current. */
+  protected N root, current;
+
+  /**
+   * Instantiates a new interval tree.
+   */
+<span class="fc" id="L22">  public IntervalTree() {</span>
+<span class="fc" id="L23">    root = null;</span>
+<span class="fc" id="L24">  }</span>
+
+  /**
+   * Close.
+   *
+   * @return the n
+   */
+  final public N close() {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">    if (root == null) {</span>
+<span class="nc" id="L33">      addRangeEmpty(0, 0);</span>
+    }
+<span class="fc" id="L35">    return root;</span>
+  }
+
+  /**
+   * Adds the single point.
+   *
+   * @param position
+   *          the position
+   * @param list
+   *          the list
+   */
+  abstract protected void addSinglePoint(int position,
+      ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list);
+
+  /**
+   * Adds the range.
+   *
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param list
+   *          the list
+   */
+  abstract protected void addRange(int left, int right,
+      ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list);
+
+  /**
+   * Adds the range empty.
+   *
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   */
+  abstract protected void addRangeEmpty(int left, int right);
+
+  /**
+   * Prints the balance.
+   */
+  final public void printBalance() {
+<span class="nc" id="L76">    printBalance(1, root);</span>
+<span class="nc" id="L77">  }</span>
+
+  /**
+   * Prints the balance.
+   *
+   * @param p
+   *          the p
+   * @param n
+   *          the n
+   */
+  final private void printBalance(Integer p, N n) {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">    if (n != null) {</span>
+<span class="nc" id="L89">      printBalance((p + 1), n.leftChild);</span>
+<span class="nc" id="L90">      System.out.print(String.format(&quot;%&quot; + (3 * p) + &quot;s&quot;, &quot;&quot;));</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">      if (n.left == n.right) {</span>
+<span class="nc" id="L92">        System.out.println(</span>
+<span class="nc" id="L93">            &quot;[&quot; + n.left + &quot;] (&quot; + n.max + &quot;) : &quot; + n.lists.size() + &quot; lists&quot;);</span>
+      } else {
+<span class="nc" id="L95">        System.out.println(&quot;[&quot; + n.left + &quot;-&quot; + n.right + &quot;] (&quot; + n.max + &quot;) : &quot;</span>
+<span class="nc" id="L96">            + n.lists.size() + &quot; lists&quot;);</span>
+      }
+<span class="nc" id="L98">      printBalance((p + 1), n.rightChild);</span>
+    }
+<span class="nc" id="L100">  }</span>
+
+  /**
+   * Gets the root.
+   *
+   * @return the root
+   */
+  final public N getRoot() {
+<span class="fc" id="L108">    return root;</span>
+  }
+
+  /**
+   * Gets the current.
+   *
+   * @return the current
+   */
+  final public N getCurrent() {
+<span class="nc" id="L117">    return current;</span>
+  }
+
+  /**
+   * Sets the current.
+   *
+   * @param node
+   *          the new current
+   */
+  final public void setCurrent(N node) {
+<span class="nc" id="L127">    current = node;</span>
+<span class="nc" id="L128">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CodecInfo.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">CodecInfo.java</span></div><h1>CodecInfo.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map.Entry;
+
+import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenString;
+import mtas.codec.MtasCodecPostingsFormat;
+import mtas.codec.tree.IntervalRBTree;
+import mtas.codec.tree.IntervalTreeNodeData;
+import mtas.codec.util.CodecSearchTree.MtasTreeHit;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.store.IndexInput;
+
+/**
+ * The Class CodecInfo.
+ */
+public class CodecInfo {
+
+<span class="fc" id="L29">  private static Log log = LogFactory.getLog(CodecInfo.class);</span>
+  
+  /** The index input list. */
+  HashMap&lt;String, IndexInput&gt; indexInputList;
+
+  /** The index input offset list. */
+  HashMap&lt;String, Long&gt; indexInputOffsetList;
+
+  /** The version. */
+  int version;
+
+  /** The field references. */
+  private HashMap&lt;String, FieldReferences&gt; fieldReferences;
+
+  /** The prefix references. */
+  private HashMap&lt;String, LinkedHashMap&lt;String, Long&gt;&gt; prefixReferences;
+
+  /**
+   * Instantiates a new codec info.
+   *
+   * @param indexInputList the index input list
+   * @param indexInputOffsetList the index input offset list
+   * @param version the version
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public CodecInfo(HashMap&lt;String, IndexInput&gt; indexInputList,
+      HashMap&lt;String, Long&gt; indexInputOffsetList, int version)
+<span class="fc" id="L56">      throws IOException {</span>
+<span class="fc" id="L57">    this.indexInputList = indexInputList;</span>
+<span class="fc" id="L58">    this.indexInputOffsetList = indexInputOffsetList;</span>
+<span class="fc" id="L59">    this.version = version;</span>
+<span class="fc" id="L60">    init();</span>
+<span class="fc" id="L61">  }</span>
+
+  /**
+   * Gets the codec info from terms.
+   *
+   * @param t the t
+   * @return the codec info from terms
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public static CodecInfo getCodecInfoFromTerms(Terms t) throws IOException {
+    try {
+<span class="fc" id="L73">      HashMap&lt;String, IndexInput&gt; indexInputList = null;</span>
+<span class="fc" id="L74">      HashMap&lt;String, Long&gt; indexInputOffsetList = null;</span>
+<span class="fc" id="L75">      Object version = null;</span>
+<span class="fc" id="L76">      Method[] methods = t.getClass().getMethods();</span>
+<span class="fc" id="L77">      Object[] emptyArgs = null;</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">      for (Method m : methods) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (m.getName().equals(&quot;getIndexInputList&quot;)) {</span>
+<span class="fc" id="L80">          indexInputList = (HashMap&lt;String, IndexInput&gt;) m.invoke(t,</span>
+              emptyArgs);
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        } else if (m.getName().equals(&quot;getIndexInputOffsetList&quot;)) {</span>
+<span class="fc" id="L83">          indexInputOffsetList = (HashMap&lt;String, Long&gt;) m.invoke(t,</span>
+              emptyArgs);
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        } else if (m.getName().equals(&quot;getVersion&quot;)) {</span>
+<span class="fc" id="L86">          version = m.invoke(t, emptyArgs);</span>
+        }
+      }
+<span class="pc bpc" id="L89" title="3 of 6 branches missed.">      if (indexInputList == null || indexInputOffsetList == null</span>
+          || version == null) {
+<span class="nc" id="L91">        throw new IOException(&quot;Reader doesn't provide MtasFieldsProducer&quot;);</span>
+      } else {
+<span class="fc" id="L93">        return new CodecInfo(indexInputList, indexInputOffsetList, (int) version);</span>
+      }
+<span class="nc" id="L95">    } catch (IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L96">      throw new IOException(&quot;Can't get codecInfo&quot;, e);</span>
+    }
+  }
+
+  /**
+   * Inits the.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private void init() throws IOException {
+    // move to begin
+<span class="fc" id="L107">    IndexInput inField = indexInputList.get(&quot;field&quot;);</span>
+<span class="fc" id="L108">    inField.seek(indexInputOffsetList.get(&quot;field&quot;));</span>
+    // store field references in memory
+<span class="fc" id="L110">    fieldReferences = new HashMap&lt;String, FieldReferences&gt;();</span>
+<span class="fc" id="L111">    boolean doInit = true;</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    while (doInit) {</span>
+      try {
+<span class="fc" id="L114">        String field = inField.readString();</span>
+<span class="fc" id="L115">        long refIndexDoc = inField.readVLong();</span>
+<span class="fc" id="L116">        long refIndexDocId = inField.readVLong();</span>
+<span class="fc" id="L117">        int numberOfDocs = inField.readVInt();</span>
+<span class="fc" id="L118">        long refTerm = inField.readVLong();</span>
+<span class="fc" id="L119">        int numberOfTerms = inField.readVInt();</span>
+<span class="fc" id="L120">        long refPrefix = inField.readVLong();</span>
+<span class="fc" id="L121">        int numberOfPrefixes = inField.readVInt();</span>
+<span class="fc" id="L122">        fieldReferences.put(field,</span>
+            new FieldReferences(refIndexDoc, refIndexDocId, numberOfDocs,
+                refPrefix, numberOfPrefixes));
+<span class="fc" id="L125">      } catch (IOException e) {</span>
+<span class="fc" id="L126">        log.debug(e); </span>
+<span class="fc" id="L127">        doInit = false;</span>
+<span class="fc" id="L128">      }</span>
+    }
+    // prefixReferences
+<span class="fc" id="L131">    prefixReferences = new HashMap&lt;String, LinkedHashMap&lt;String, Long&gt;&gt;();</span>
+<span class="fc" id="L132">  }</span>
+
+  /**
+   * Gets the object by id.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param mtasId the mtas id
+   * @return the object by id
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public MtasToken getObjectById(String field, int docId, int mtasId)
+      throws IOException {
+    try {
+      Long ref;
+      Long objectRefApproxCorrection;
+<span class="nc" id="L148">      IndexDoc doc = getDoc(field, docId);</span>
+<span class="nc" id="L149">      IndexInput inObjectId = indexInputList.get(&quot;indexObjectId&quot;);</span>
+<span class="nc" id="L150">      IndexInput inObject = indexInputList.get(&quot;object&quot;);</span>
+<span class="nc" id="L151">      IndexInput inTerm = indexInputList.get(&quot;term&quot;);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">      if (doc.storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {</span>
+<span class="nc" id="L153">        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 1L));</span>
+<span class="nc" id="L154">        objectRefApproxCorrection = Long.valueOf(inObjectId.readByte());</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">      } else if (doc.storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_SHORT) {</span>
+<span class="nc" id="L156">        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 2L));</span>
+<span class="nc" id="L157">        objectRefApproxCorrection = Long.valueOf(inObjectId.readShort());</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">      } else if (doc.storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER) {</span>
+<span class="nc" id="L159">        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 4L));</span>
+<span class="nc" id="L160">        objectRefApproxCorrection = Long.valueOf(inObjectId.readInt());</span>
+      } else {
+<span class="nc" id="L162">        inObjectId.seek(doc.fpIndexObjectId + (mtasId * 8L));</span>
+<span class="nc" id="L163">        objectRefApproxCorrection = Long.valueOf(inObjectId.readLong());</span>
+      }
+<span class="nc" id="L165">      ref = objectRefApproxCorrection + doc.objectRefApproxOffset</span>
+          + (mtasId * (long) doc.objectRefApproxQuotient);
+<span class="nc" id="L167">      return MtasCodecPostingsFormat.getToken(inObject, inTerm, ref);</span>
+<span class="nc" id="L168">    } catch (Exception e) {</span>
+<span class="nc" id="L169">      throw new IOException(e.getMessage());</span>
+    }
+  }
+
+  /**
+   * Gets the objects by parent id.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param position the position
+   * @return the objects by parent id
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public List&lt;MtasTokenString&gt; getObjectsByParentId(String field, int docId,
+      int position) throws IOException {
+<span class="nc" id="L184">    IndexDoc doc = getDoc(field, docId);</span>
+<span class="nc" id="L185">    IndexInput inIndexObjectParent = indexInputList.get(&quot;indexObjectParent&quot;);</span>
+<span class="nc" id="L186">    ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; hits = CodecSearchTree.searchMtasTree(position,</span>
+        inIndexObjectParent, doc.fpIndexObjectParent,
+        doc.smallestObjectFilepointer);
+<span class="nc" id="L189">    return getObjects(hits);</span>
+  }
+
+  /**
+   * Gets the objects by position.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param position the position
+   * @return the objects by position
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public ArrayList&lt;MtasTokenString&gt; getObjectsByPosition(String field,
+      int docId, int position) throws IOException {
+<span class="nc" id="L203">    IndexDoc doc = getDoc(field, docId);</span>
+<span class="nc" id="L204">    IndexInput inIndexObjectPosition = indexInputList</span>
+<span class="nc" id="L205">        .get(&quot;indexObjectPosition&quot;);</span>
+<span class="nc" id="L206">    ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; hits = CodecSearchTree.searchMtasTree(position,</span>
+        inIndexObjectPosition, doc.fpIndexObjectPosition,
+        doc.smallestObjectFilepointer);
+<span class="nc" id="L209">    return getObjects(hits);</span>
+  }
+
+  // public ArrayList&lt;MtasTokenString&gt; getObjectsByPositions(String field,
+  // int docId, int startPosition, int endPosition) throws IOException {
+  // IndexDoc doc = getDoc(field, docId);
+  // IndexInput inIndexObjectPosition = indexInputList
+  // .get(&quot;indexObjectPosition&quot;);
+  // ArrayList&lt;TreeHit&lt;?&gt;&gt; hits = CodecSearchTree.searchTree(startPosition,
+  // endPosition, inIndexObjectPosition, doc.fpIndexObjectPosition,
+  // doc.smallestObjectFilepointer);
+  // return getObjects(hits);
+  // }
+
+  /**
+   * Gets the prefix filtered objects by positions.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param startPosition the start position
+   * @param endPosition the end position
+   * @return the prefix filtered objects by positions
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public ArrayList&lt;MtasTokenString&gt; getPrefixFilteredObjectsByPositions(
+      String field, int docId, ArrayList&lt;String&gt; prefixes, int startPosition,
+      int endPosition) throws IOException {
+<span class="nc" id="L237">    IndexDoc doc = getDoc(field, docId);</span>
+<span class="nc" id="L238">    IndexInput inIndexObjectPosition = indexInputList</span>
+<span class="nc" id="L239">        .get(&quot;indexObjectPosition&quot;);</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    if (doc != null) {</span>
+<span class="nc" id="L241">      ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; hits = CodecSearchTree.searchMtasTree(</span>
+          startPosition, endPosition, inIndexObjectPosition,
+          doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
+<span class="nc" id="L244">      return getPrefixFilteredObjects(hits, prefixes);</span>
+    } else {
+<span class="nc" id="L246">      return new ArrayList&lt;MtasTokenString&gt;();</span>
+    }
+  }
+
+  /**
+   * Gets the prefix filtered objects.
+   *
+   * @param hits the hits
+   * @param prefixes the prefixes
+   * @return the prefix filtered objects
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private ArrayList&lt;MtasTokenString&gt; getPrefixFilteredObjects(
+      List&lt;MtasTreeHit&lt;?&gt;&gt; hits, ArrayList&lt;String&gt; prefixes)
+      throws IOException {
+<span class="nc" id="L261">    ArrayList&lt;MtasTokenString&gt; tokens = new ArrayList&lt;MtasTokenString&gt;();</span>
+<span class="nc" id="L262">    IndexInput inObject = indexInputList.get(&quot;object&quot;);</span>
+<span class="nc" id="L263">    IndexInput inTerm = indexInputList.get(&quot;term&quot;);</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">    for (MtasTreeHit&lt;?&gt; hit : hits) {</span>
+<span class="nc" id="L265">      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,</span>
+<span class="nc" id="L266">          inTerm, hit.ref);</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">      if (token != null) {</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        if (prefixes.size() &gt; 0) {</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">          if (prefixes.contains(token.getPrefix())) {</span>
+<span class="nc" id="L270">            tokens.add(token);</span>
+          }
+        } else {
+<span class="nc" id="L273">          tokens.add(token);</span>
+        }
+      }
+<span class="nc" id="L276">    }</span>
+<span class="nc" id="L277">    return tokens;</span>
+  }
+
+  /**
+   * Gets the positioned terms by prefixes and position.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param position the position
+   * @return the positioned terms by prefixes and position
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public ArrayList&lt;MtasTreeHit&lt;String&gt;&gt; getPositionedTermsByPrefixesAndPosition(
+      String field, int docId, ArrayList&lt;String&gt; prefixes, int position)
+      throws IOException {
+<span class="nc" id="L293">    return getPositionedTermsByPrefixesAndPositionRange(field, docId, prefixes,</span>
+        position, position);
+  }
+
+  /**
+   * Gets the positioned terms by prefixes and position range.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param startPosition the start position
+   * @param endPosition the end position
+   * @return the positioned terms by prefixes and position range
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public ArrayList&lt;MtasTreeHit&lt;String&gt;&gt; getPositionedTermsByPrefixesAndPositionRange(
+      String field, int docId, ArrayList&lt;String&gt; prefixes, int startPosition,
+      int endPosition) throws IOException {
+<span class="nc" id="L311">    IndexDoc doc = getDoc(field, docId);</span>
+<span class="nc" id="L312">    IndexInput inIndexObjectPosition = indexInputList</span>
+<span class="nc" id="L313">        .get(&quot;indexObjectPosition&quot;);</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">    if (doc != null) {</span>
+<span class="nc" id="L315">      ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; hitItems = CodecSearchTree.searchMtasTree(</span>
+          startPosition, endPosition, inIndexObjectPosition,
+          doc.fpIndexObjectPosition, doc.smallestObjectFilepointer);
+<span class="nc" id="L318">      ArrayList&lt;MtasTreeHit&lt;String&gt;&gt; hits = new ArrayList&lt;MtasTreeHit&lt;String&gt;&gt;();</span>
+
+<span class="nc" id="L320">      HashMap&lt;String, Integer&gt; prefixIds = getPrefixesIds(field, prefixes);</span>
+<span class="nc bnc" id="L321" title="All 4 branches missed.">      if (prefixIds != null &amp;&amp; prefixIds.size() &gt; 0) {</span>
+<span class="nc" id="L322">        ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; filteredHitItems = new ArrayList&lt;MtasTreeHit&lt;?&gt;&gt;();</span>
+        
+<span class="nc bnc" id="L324" title="All 2 branches missed.">        for (MtasTreeHit&lt;?&gt; hitItem : hitItems) {</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">          if (prefixIds.containsValue(hitItem.additionalId)) {</span>
+<span class="nc" id="L326">            filteredHitItems.add(hitItem);</span>
+          }
+<span class="nc" id="L328">        }</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">        if (filteredHitItems.size() &gt; 0) {</span>
+<span class="nc" id="L330">          ArrayList&lt;MtasTokenString&gt; objects = getObjects(filteredHitItems);</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">          for (MtasTokenString token : objects) {</span>
+<span class="nc" id="L332">            MtasTreeHit&lt;String&gt; hit = new MtasTreeHit&lt;String&gt;(</span>
+<span class="nc" id="L333">                token.getPositionStart(), token.getPositionEnd(),</span>
+<span class="nc" id="L334">                token.getTokenRef(), 0, 0, token.getValue());</span>
+<span class="nc" id="L335">            hits.add(hit);</span>
+<span class="nc" id="L336">          }</span>
+        }
+      }
+<span class="nc" id="L339">      return hits;</span>
+    } else {
+<span class="nc" id="L341">      return new ArrayList&lt;MtasTreeHit&lt;String&gt;&gt;();</span>
+    }
+  }
+
+  /**
+   * Collect terms by prefixes for list of hit positions.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @param prefixes the prefixes
+   * @param positionsHits the positions hits
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void collectTermsByPrefixesForListOfHitPositions(String field,
+      int docId, ArrayList&lt;String&gt; prefixes,
+      ArrayList&lt;IntervalTreeNodeData&lt;String&gt;&gt; positionsHits)
+      throws IOException {
+<span class="fc" id="L358">    IndexDoc doc = getDoc(field, docId);</span>
+<span class="fc" id="L359">    IndexInput inIndexObjectPosition = indexInputList</span>
+<span class="fc" id="L360">        .get(&quot;indexObjectPosition&quot;);</span>
+<span class="fc" id="L361">    IndexInput inTerm = indexInputList.get(&quot;term&quot;);</span>
+    // create tree interval hits
+<span class="fc" id="L363">    IntervalRBTree&lt;String&gt; positionTree = new IntervalRBTree&lt;String&gt;(</span>
+        positionsHits);
+
+    // find prefixIds
+<span class="fc" id="L367">    HashMap&lt;String, Integer&gt; prefixIds = getPrefixesIds(field, prefixes);</span>
+    // search matching tokens
+<span class="pc bpc" id="L369" title="1 of 2 branches missed.">    if (prefixIds != null) {</span>
+<span class="fc" id="L370">      CodecSearchTree.searchMtasTreeWithIntervalTree(prefixIds.values(),</span>
+          positionTree, inIndexObjectPosition, doc.fpIndexObjectPosition,
+          doc.smallestObjectFilepointer);
+
+      // reverse list
+<span class="fc" id="L375">      HashMap&lt;Integer, String&gt; idPrefixes = new HashMap&lt;Integer, String&gt;();</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">      for (Entry&lt;String, Integer&gt; entry : prefixIds.entrySet()) {</span>
+<span class="fc" id="L377">        idPrefixes.put(entry.getValue(), entry.getKey());</span>
+<span class="fc" id="L378">      }</span>
+      // term administration
+<span class="fc" id="L380">      HashMap&lt;Long, String&gt; refTerms = new HashMap&lt;Long, String&gt;();</span>
+
+<span class="fc bfc" id="L382" title="All 2 branches covered.">      for (IntervalTreeNodeData&lt;String&gt; positionHit : positionsHits) {</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">        for (MtasTreeHit&lt;String&gt; hit : positionHit.list) {</span>
+<span class="pc bpc" id="L384" title="1 of 2 branches missed.">          if (hit.idData == null) {</span>
+<span class="fc" id="L385">            hit.idData = idPrefixes.get(hit.additionalId);</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">            if (!refTerms.containsKey(hit.additionalRef)) {</span>
+<span class="fc" id="L387">              refTerms.put(hit.additionalRef,</span>
+<span class="fc" id="L388">                  MtasCodecPostingsFormat.getTerm(inTerm, hit.additionalRef));</span>
+            }
+<span class="fc" id="L390">            hit.refData = refTerms.get(hit.additionalRef);</span>
+          }
+<span class="fc" id="L392">        }</span>
+<span class="fc" id="L393">      }</span>
+    }
+<span class="fc" id="L395">  }</span>
+
+  /**
+   * Gets the objects.
+   *
+   * @param hits the hits
+   * @return the objects
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public ArrayList&lt;MtasTokenString&gt; getObjects(List&lt;MtasTreeHit&lt;?&gt;&gt; hits)
+      throws IOException {
+<span class="nc" id="L406">    ArrayList&lt;MtasTokenString&gt; tokens = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L407">    IndexInput inObject = indexInputList.get(&quot;object&quot;);</span>
+<span class="nc" id="L408">    IndexInput inTerm = indexInputList.get(&quot;term&quot;);</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">    for (MtasTreeHit&lt;?&gt; hit : hits) {</span>
+<span class="nc" id="L410">      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,</span>
+<span class="nc" id="L411">          inTerm, hit.ref);</span>
+<span class="nc bnc" id="L412" title="All 2 branches missed.">      if (token != null) {</span>
+<span class="nc" id="L413">        tokens.add(token);</span>
+      }
+<span class="nc" id="L415">    }</span>
+<span class="nc" id="L416">    return tokens;</span>
+  }
+
+  /**
+   * Gets the terms.
+   *
+   * @param refs the refs
+   * @return the terms
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public ArrayList&lt;MtasTreeHit&lt;String&gt;&gt; getTerms(ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; refs)
+      throws IOException {
+    try {
+<span class="nc" id="L429">      ArrayList&lt;MtasTreeHit&lt;String&gt;&gt; terms = new ArrayList&lt;MtasTreeHit&lt;String&gt;&gt;();</span>
+<span class="nc" id="L430">      IndexInput inTerm = indexInputList.get(&quot;term&quot;);</span>
+<span class="nc bnc" id="L431" title="All 2 branches missed.">      for (MtasTreeHit&lt;?&gt; hit : refs) {</span>
+<span class="nc" id="L432">        inTerm.seek(hit.ref);</span>
+<span class="nc" id="L433">        String term = inTerm.readString();</span>
+<span class="nc" id="L434">        MtasTreeHit&lt;String&gt; newHit = new MtasTreeHit&lt;String&gt;(hit.startPosition,</span>
+            hit.endPosition, hit.ref, hit.additionalId, hit.additionalRef,
+            term);
+<span class="nc" id="L437">        terms.add(newHit);</span>
+<span class="nc" id="L438">      }</span>
+<span class="nc" id="L439">      return terms;</span>
+<span class="nc" id="L440">    } catch (Exception e) {</span>
+<span class="nc" id="L441">      throw new IOException(e.getMessage());</span>
+    }
+  }
+
+  /**
+   * Gets the prefixes ids.
+   *
+   * @param field the field
+   * @param prefixes the prefixes
+   * @return the prefixes ids
+   */
+  HashMap&lt;String, Integer&gt; getPrefixesIds(String field,
+      ArrayList&lt;String&gt; prefixes) {
+<span class="fc" id="L454">    LinkedHashMap&lt;String, Long&gt; refs = getPrefixes(field);</span>
+<span class="pc bpc" id="L455" title="1 of 2 branches missed.">    if (refs != null) {</span>
+<span class="fc" id="L456">      ArrayList&lt;String&gt; list = new ArrayList&lt;String&gt;(refs.keySet());</span>
+<span class="fc" id="L457">      HashMap&lt;String, Integer&gt; result = new HashMap&lt;String, Integer&gt;();</span>
+<span class="fc bfc" id="L458" title="All 2 branches covered.">      for (String prefix : prefixes) {</span>
+<span class="fc" id="L459">        int id = list.indexOf(prefix);</span>
+<span class="pc bpc" id="L460" title="1 of 2 branches missed.">        if (id &gt;= 0) {</span>
+<span class="fc" id="L461">          result.put(prefix, id + 1);</span>
+        }
+<span class="fc" id="L463">      }</span>
+<span class="fc" id="L464">      return result;</span>
+    } else {
+<span class="nc" id="L466">      return null;</span>
+    }
+  }
+
+  /**
+   * Gets the prefixes.
+   *
+   * @param field the field
+   * @return the prefixes
+   */
+  private LinkedHashMap&lt;String, Long&gt; getPrefixes(String field) {
+<span class="pc bpc" id="L477" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L478">      FieldReferences fr = fieldReferences.get(field);</span>
+<span class="pc bpc" id="L479" title="1 of 2 branches missed.">      if (!prefixReferences.containsKey(field)) {</span>
+<span class="fc" id="L480">        LinkedHashMap&lt;String, Long&gt; refs = new LinkedHashMap&lt;String, Long&gt;();</span>
+        try {
+<span class="fc" id="L482">          IndexInput inPrefix = indexInputList.get(&quot;prefix&quot;);</span>
+<span class="fc" id="L483">          inPrefix.seek(fr.refPrefix);</span>
+<span class="fc bfc" id="L484" title="All 2 branches covered.">          for (int i = 0; i &lt; fr.numberOfPrefixes; i++) {</span>
+<span class="fc" id="L485">            Long ref = inPrefix.getFilePointer();</span>
+<span class="fc" id="L486">            String prefix = inPrefix.readString();</span>
+<span class="fc" id="L487">            refs.put(prefix, ref);</span>
+          }
+<span class="nc" id="L489">        } catch (Exception e) {</span>
+<span class="nc" id="L490">          e.printStackTrace();</span>
+<span class="nc" id="L491">          refs.clear();</span>
+<span class="fc" id="L492">        }</span>
+<span class="fc" id="L493">        prefixReferences.put(field, refs);</span>
+<span class="fc" id="L494">        return refs;</span>
+      } else {
+<span class="nc" id="L496">        return prefixReferences.get(field);</span>
+      }
+    } else {
+<span class="nc" id="L499">      return null;</span>
+    }
+  }
+
+  /**
+   * Gets the doc.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @return the doc
+   */
+  public IndexDoc getDoc(String field, int docId) {
+<span class="pc bpc" id="L511" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L512">      FieldReferences fr = fieldReferences.get(field);</span>
+      try {
+<span class="fc" id="L514">        IndexInput inIndexDocId = indexInputList.get(&quot;indexDocId&quot;);</span>
+<span class="fc" id="L515">        ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list = CodecSearchTree.searchMtasTree(docId,</span>
+            inIndexDocId, fr.refIndexDocId, fr.refIndexDoc);
+<span class="pc bpc" id="L517" title="1 of 2 branches missed.">        if (list.size() == 1) {</span>
+<span class="fc" id="L518">          return new IndexDoc(list.get(0).ref);</span>
+        }
+<span class="nc" id="L520">      } catch (IOException e) {</span>
+<span class="nc" id="L521">        return null;</span>
+<span class="nc" id="L522">      }</span>
+    }
+<span class="nc" id="L524">    return null;</span>
+  }
+
+  /**
+   * Gets the next doc.
+   *
+   * @param field the field
+   * @param previousDocId the previous doc id
+   * @return the next doc
+   */
+  public IndexDoc getNextDoc(String field, int previousDocId) {
+<span class="pc bpc" id="L535" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L536">      FieldReferences fr = fieldReferences.get(field);</span>
+      try {
+<span class="fc bfc" id="L538" title="All 2 branches covered.">        if (previousDocId &lt; 0) {</span>
+<span class="fc" id="L539">          return new IndexDoc(fr.refIndexDoc);</span>
+        } else {
+<span class="fc" id="L541">          int nextDocId = previousDocId + 1;</span>
+<span class="fc" id="L542">          IndexInput inIndexDocId = indexInputList.get(&quot;indexDocId&quot;);</span>
+<span class="fc" id="L543">          ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list = CodecSearchTree.advanceMtasTree(</span>
+              nextDocId, inIndexDocId, fr.refIndexDocId, fr.refIndexDoc);
+<span class="fc bfc" id="L545" title="All 2 branches covered.">          if (list.size() == 1) {</span>
+<span class="fc" id="L546">            IndexInput inDoc = indexInputList.get(&quot;doc&quot;);</span>
+<span class="fc" id="L547">            inDoc.seek(list.get(0).ref);</span>
+<span class="fc" id="L548">            return new IndexDoc(inDoc.getFilePointer());</span>
+          }
+        }
+<span class="nc" id="L551">      } catch (IOException e) {</span>
+<span class="nc" id="L552">        return null;</span>
+<span class="fc" id="L553">      }</span>
+    }
+<span class="fc" id="L555">    return null;</span>
+  }
+
+  public int getNumberOfDocs(String field) {
+<span class="nc bnc" id="L559" title="All 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="nc" id="L560">      FieldReferences fr = fieldReferences.get(field);</span>
+<span class="nc" id="L561">      return fr.numberOfDocs;</span>
+    } else {
+<span class="nc" id="L563">      return 0;</span>
+    }
+  }
+  
+  /**
+   * Gets the number of positions.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @return the number of positions
+   */
+  public Integer getNumberOfPositions(String field, int docId) {
+<span class="pc bpc" id="L575" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L576">      IndexDoc doc = getDoc(field, docId);</span>
+<span class="pc bpc" id="L577" title="1 of 2 branches missed.">      if (doc != null) {</span>
+<span class="fc" id="L578">        return 1 + doc.maxPosition - doc.minPosition;</span>
+      }
+    }
+<span class="nc" id="L581">    return null;</span>
+  }
+
+  /**
+   * Gets the all number of positions.
+   *
+   * @param field the field
+   * @param docBase the doc base
+   * @return the all number of positions
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public HashMap&lt;Integer, Integer&gt; getAllNumberOfPositions(String field,
+      int docBase) throws IOException {
+<span class="fc" id="L594">    HashMap&lt;Integer, Integer&gt; numbers = new HashMap&lt;Integer, Integer&gt;();</span>
+<span class="pc bpc" id="L595" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L596">      FieldReferences fr = fieldReferences.get(field);</span>
+<span class="fc" id="L597">      IndexInput inIndexDoc = indexInputList.get(&quot;doc&quot;);</span>
+<span class="fc" id="L598">      inIndexDoc.seek(fr.refIndexDoc);</span>
+      IndexDoc doc;
+<span class="fc bfc" id="L600" title="All 2 branches covered.">      for (int i = 0; i &lt; fr.numberOfDocs; i++) {</span>
+<span class="fc" id="L601">        doc = new IndexDoc(null);</span>
+<span class="fc" id="L602">        numbers.put((doc.docId + docBase),</span>
+<span class="fc" id="L603">            (1 + doc.maxPosition - doc.minPosition));</span>
+      }
+    }
+<span class="fc" id="L606">    return numbers;</span>
+  }
+
+  /**
+   * Gets the number of tokens.
+   *
+   * @param field the field
+   * @param docId the doc id
+   * @return the number of tokens
+   */
+  public Integer getNumberOfTokens(String field, int docId) {
+<span class="pc bpc" id="L617" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L618">      IndexDoc doc = getDoc(field, docId);</span>
+<span class="pc bpc" id="L619" title="1 of 2 branches missed.">      if (doc != null) {</span>
+<span class="fc" id="L620">        return doc.size;</span>
+      }
+    }
+<span class="nc" id="L623">    return null;</span>
+  }
+
+  /**
+   * Gets the all number of tokens.
+   *
+   * @param field the field
+   * @param docBase the doc base
+   * @return the all number of tokens
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public HashMap&lt;Integer, Integer&gt; getAllNumberOfTokens(String field,
+      int docBase) throws IOException {
+<span class="fc" id="L636">    HashMap&lt;Integer, Integer&gt; numbers = new HashMap&lt;Integer, Integer&gt;();</span>
+<span class="pc bpc" id="L637" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
+<span class="fc" id="L638">      FieldReferences fr = fieldReferences.get(field);</span>
+<span class="fc" id="L639">      IndexInput inIndexDoc = indexInputList.get(&quot;doc&quot;);</span>
+<span class="fc" id="L640">      inIndexDoc.seek(fr.refIndexDoc);</span>
+      IndexDoc doc;
+<span class="fc bfc" id="L642" title="All 2 branches covered.">      for (int i = 0; i &lt; fr.numberOfDocs; i++) {</span>
+<span class="fc" id="L643">        doc = new IndexDoc(null);</span>
+<span class="fc" id="L644">        numbers.put((doc.docId + docBase), doc.size);</span>
+      }
+    }
+<span class="fc" id="L647">    return numbers;</span>
+  }
+
+  /**
+   * The Class IndexDoc.
+   */
+  public class IndexDoc {
+
+    /** The doc id. */
+    public int docId;
+
+    /** The fp index object parent. */
+    public long fpIndexObjectId;
+    public long fpIndexObjectPosition;
+    public long fpIndexObjectParent;
+
+    /** The object ref approx offset. */
+    public long smallestObjectFilepointer;
+    public long objectRefApproxOffset;
+
+    /** The object ref approx quotient. */
+    public int objectRefApproxQuotient;
+
+    
+    /** The storage flags. */
+    public byte storageFlags;
+
+    /** The max position. */
+    public int size;
+    public int minPosition;
+    public int maxPosition;
+
+    /**
+     * Instantiates a new index doc.
+     *
+     * @param ref the ref
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+<span class="fc" id="L685">    public IndexDoc(Long ref) throws IOException {</span>
+      try {
+<span class="fc" id="L687">        IndexInput inIndexDoc = indexInputList.get(&quot;doc&quot;);</span>
+<span class="fc bfc" id="L688" title="All 2 branches covered.">        if (ref != null) {</span>
+<span class="fc" id="L689">          inIndexDoc.seek(ref);</span>
+        }
+<span class="fc" id="L691">        docId = inIndexDoc.readVInt(); // docId</span>
+<span class="fc" id="L692">        fpIndexObjectId = inIndexDoc.readVLong(); // ref indexObjectId</span>
+<span class="fc" id="L693">        fpIndexObjectPosition = inIndexDoc.readVLong(); // ref indexObjectPosition</span>
+<span class="fc" id="L694">        fpIndexObjectParent = inIndexDoc.readVLong(); // ref indexObjectParent</span>
+<span class="fc" id="L695">        smallestObjectFilepointer = inIndexDoc.readVLong(); // offset</span>
+<span class="fc" id="L696">        objectRefApproxQuotient = inIndexDoc.readVInt(); // slope</span>
+<span class="fc" id="L697">        objectRefApproxOffset = inIndexDoc.readZLong(); // offset</span>
+<span class="fc" id="L698">        storageFlags = inIndexDoc.readByte(); // flag</span>
+<span class="fc" id="L699">        size = inIndexDoc.readVInt(); // number of objects</span>
+<span class="fc" id="L700">        minPosition = inIndexDoc.readVInt(); // minimum position</span>
+<span class="fc" id="L701">        maxPosition = inIndexDoc.readVInt(); // maximum position</span>
+<span class="nc" id="L702">      } catch (Exception e) {</span>
+<span class="nc" id="L703">        throw new IOException(e);</span>
+<span class="fc" id="L704">      }</span>
+<span class="fc" id="L705">    }</span>
+  }
+
+  /**
+   * The Class FieldReferences.
+   */
+  private static class FieldReferences {
+
+    /** The ref prefix. */
+    public long refIndexDoc;
+    public long refIndexDocId;
+    public long refPrefix;
+
+    /** The number of prefixes. */
+    public int numberOfDocs;
+    public int numberOfPrefixes;
+
+    /**
+     * Instantiates a new field references.
+     *
+     * @param refIndexDoc the ref index doc
+     * @param refIndexDocId the ref index doc id
+     * @param numberOfDocs the number of docs
+     * @param refTerm the ref term
+     * @param numberOfTerms the number of terms
+     * @param refPrefix the ref prefix
+     * @param numberOfPrefixes the number of prefixes
+     */
+    public FieldReferences(long refIndexDoc, long refIndexDocId,
+        int numberOfDocs, long refPrefix,
+<span class="fc" id="L735">        int numberOfPrefixes) {</span>
+<span class="fc" id="L736">      this.refIndexDoc = refIndexDoc;</span>
+<span class="fc" id="L737">      this.refIndexDocId = refIndexDocId;</span>
+<span class="fc" id="L738">      this.numberOfDocs = numberOfDocs;</span>
+<span class="fc" id="L739">      this.refPrefix = refPrefix;</span>
+<span class="fc" id="L740">      this.numberOfPrefixes = numberOfPrefixes;</span>
+<span class="fc" id="L741">    }</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

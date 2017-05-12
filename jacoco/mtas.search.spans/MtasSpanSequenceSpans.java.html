@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanSequenceSpans.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanSequenceSpans.java</span></div><h1>MtasSpanSequenceSpans.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+import mtas.search.spans.MtasSpanSequenceQuery.MtasSpanSequenceQuerySpans;
+import mtas.search.spans.util.MtasIgnoreItem;
+import mtas.search.spans.util.MtasSpans;
+
+import org.apache.lucene.search.spans.SpanCollector;
+import org.apache.lucene.search.spans.Spans;
+
+/**
+ * The Class MtasSpanSequenceSpans.
+ */
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">public class MtasSpanSequenceSpans extends Spans implements MtasSpans {</span>
+
+  /** The queue spans. */
+  private List&lt;QueueItem&gt; queueSpans;
+
+  /** The ignore item. */
+  private MtasIgnoreItem ignoreItem;
+
+  /** The queue matches. */
+  private List&lt;Match&gt; queueMatches;
+
+  /** The current position. */
+  private int docId;
+  private int currentPosition;
+
+  private long cost;
+
+  /** The current match. */
+  Match currentMatch;
+
+  /**
+   * Instantiates a new mtas span sequence spans.
+   *
+   * @param mtasSpanSequenceQuery
+   *          the mtas span sequence query
+   * @param setSequenceSpans
+   *          the set sequence spans
+   * @param ignoreSpans
+   *          the ignore spans
+   * @param maximumIgnoreLength
+   *          the maximum ignore length
+   */
+  public MtasSpanSequenceSpans(
+      List&lt;MtasSpanSequenceQuerySpans&gt; setSequenceSpans, Spans ignoreSpans,
+      Integer maximumIgnoreLength) {
+<span class="fc" id="L55">    super();</span>
+<span class="fc" id="L56">    docId = -1;</span>
+<span class="fc" id="L57">    queueSpans = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L58">    queueMatches = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    for (MtasSpanSequenceQuerySpans sequenceSpans : setSequenceSpans) {</span>
+<span class="fc" id="L60">      queueSpans.add(new QueueItem(sequenceSpans));</span>
+<span class="fc" id="L61">    }</span>
+<span class="fc" id="L62">    ignoreItem = new MtasIgnoreItem(ignoreSpans, maximumIgnoreLength);</span>
+<span class="fc" id="L63">    resetQueue();</span>
+<span class="fc" id="L64">    computeCosts();</span>
+<span class="fc" id="L65">  }</span>
+
+  private void computeCosts() {
+<span class="fc" id="L68">    cost = Long.MAX_VALUE;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    for (QueueItem item : queueSpans) {</span>
+<span class="fc" id="L70">      cost = Math.min(cost, item.sequenceSpans.spans.cost());</span>
+<span class="fc" id="L71">    }</span>
+<span class="fc" id="L72">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
+  @Override
+  public int nextStartPosition() throws IOException {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (findMatches()) {</span>
+<span class="fc" id="L82">      currentMatch = queueMatches.get(0);</span>
+<span class="fc" id="L83">      currentPosition = currentMatch.startPosition();</span>
+<span class="fc" id="L84">      queueMatches.remove(0);</span>
+<span class="fc" id="L85">      return currentMatch.startPosition();</span>
+    } else {
+<span class="fc" id="L87">      currentMatch = new Match(NO_MORE_POSITIONS, NO_MORE_POSITIONS);</span>
+<span class="fc" id="L88">      currentPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L89">      return NO_MORE_POSITIONS;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
+  @Override
+  public int startPosition() {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (currentMatch == null) {</span>
+<span class="nc" id="L101">      return -1;</span>
+    } else {
+<span class="fc" id="L103">      return currentMatch.startPosition();</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
+  @Override
+  public int endPosition() {
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    if (currentMatch == null) {</span>
+<span class="nc" id="L115">      return -1;</span>
+    } else {
+<span class="fc" id="L117">      return currentMatch.endPosition();</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
+  @Override
+  public int width() {
+<span class="nc" id="L128">    return 0;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
+   */
+  @Override
+  public void collect(SpanCollector collector) throws IOException {
+<span class="nc bnc" id="L140" title="All 2 branches missed.">    for (QueueItem item : queueSpans) {</span>
+<span class="nc" id="L141">      item.sequenceSpans.spans.collect(collector);</span>
+<span class="nc" id="L142">    }</span>
+<span class="nc" id="L143">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
+  @Override
+  public int docID() {
+<span class="fc" id="L152">    return docId;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
+  @Override
+  public int nextDoc() throws IOException {
+<span class="fc" id="L162">    resetQueue();</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    while (!goToNextDoc())</span>
+<span class="fc" id="L164">      ;</span>
+<span class="fc" id="L165">    return docId;</span>
+  }
+
+  /**
+   * Go to next doc.
+   *
+   * @return true, if successful
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private boolean goToNextDoc() throws IOException {
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L177">      return true;</span>
+    } else {
+      // try to find docId with match for all items from sequence
+      Integer spanDocId;
+<span class="fc" id="L181">      Integer newDocId = null;</span>
+<span class="fc" id="L182">      Integer minOptionalDocId = null;</span>
+<span class="fc" id="L183">      boolean allItemsOptional = true;</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      for (QueueItem item : queueSpans) {</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">        if (!item.sequenceSpans.optional) {</span>
+<span class="fc" id="L186">          allItemsOptional = false;</span>
+        }
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if (!item.noMoreDocs) {</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">          if (item.sequenceSpans.spans == null) {</span>
+<span class="nc" id="L190">            spanDocId = NO_MORE_DOCS;</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">          } else if (newDocId == null) {</span>
+<span class="fc" id="L192">            spanDocId = item.sequenceSpans.spans.nextDoc();</span>
+          } else {
+<span class="fc bfc" id="L194" title="All 2 branches covered.">            if (!item.sequenceSpans.optional) {</span>
+<span class="fc" id="L195">              spanDocId = item.sequenceSpans.spans.advance(newDocId);</span>
+            } else {
+<span class="fc bfc" id="L197" title="All 2 branches covered.">              if (item.sequenceSpans.spans.docID() == -1</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">                  || newDocId &gt; item.sequenceSpans.spans.docID()) {</span>
+<span class="fc" id="L199">                spanDocId = item.sequenceSpans.spans.advance(newDocId);</span>
+              } else {
+<span class="nc" id="L201">                spanDocId = item.sequenceSpans.spans.docID();</span>
+              }
+            }
+          }
+<span class="fc bfc" id="L205" title="All 2 branches covered.">          if (spanDocId.equals(NO_MORE_DOCS)) {</span>
+<span class="fc" id="L206">            item.noMoreDocs = true;</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">            if (!item.sequenceSpans.optional) {</span>
+              // a not optional span has NO_MORE_DOCS: stop
+<span class="fc" id="L209">              docId = NO_MORE_DOCS;</span>
+<span class="fc" id="L210">              return true;</span>
+            }
+<span class="fc bfc" id="L212" title="All 2 branches covered.">          } else if (!spanDocId.equals(newDocId)) {</span>
+            // last found spanDocId not equal to potential new docId
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">            if (newDocId != null) {</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">              if (!item.sequenceSpans.optional) {</span>
+                // move also previous spans to at least spanDocId
+<span class="nc" id="L217">                advance(spanDocId);</span>
+<span class="nc" id="L218">                return true;</span>
+              }
+              // define potential new docId
+            } else {
+<span class="fc bfc" id="L222" title="All 2 branches covered.">              if (!item.sequenceSpans.optional) {</span>
+                // previous optional span with lower docId
+<span class="fc bfc" id="L224" title="All 2 branches covered.">                if ((minOptionalDocId != null)</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">                    &amp;&amp; (minOptionalDocId &lt; spanDocId)) {</span>
+<span class="nc" id="L226">                  advance(spanDocId);</span>
+<span class="nc" id="L227">                  return true;</span>
+                } else {
+                  // use spanDocId as potential newDocId
+<span class="fc" id="L230">                  newDocId = spanDocId;</span>
+                }
+              } else {
+                // remember minimum docId optional spans
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">                minOptionalDocId = (minOptionalDocId == null) ? spanDocId</span>
+<span class="nc" id="L235">                    : Math.min(minOptionalDocId, spanDocId);</span>
+              }
+            }
+          }
+        }
+<span class="fc" id="L240">      }</span>
+      // if all items are optional
+<span class="pc bpc" id="L242" title="5 of 6 branches missed.">      if (allItemsOptional &amp;&amp; newDocId == null &amp;&amp; minOptionalDocId != null) {</span>
+<span class="nc" id="L243">        newDocId = minOptionalDocId;</span>
+      }
+      // nothing found
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">      if (newDocId == null) {</span>
+<span class="nc" id="L247">        docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L248">        return true;</span>
+      } else {
+<span class="fc" id="L250">        docId = newDocId;</span>
+<span class="fc" id="L251">        ignoreItem.advanceToDoc(docId);</span>
+        // try and glue together
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        if (findMatches()) {</span>
+<span class="fc" id="L254">          return true;</span>
+          // no matches
+        } else {
+<span class="fc" id="L257">          resetQueue();</span>
+<span class="fc" id="L258">          return false;</span>
+        }
+      }
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
+  @Override
+  public int advance(int target) throws IOException {
+<span class="fc" id="L271">    resetQueue();</span>
+<span class="fc" id="L272">    Integer newTarget = target;</span>
+    do {
+<span class="fc" id="L274">      newTarget = advanceToDoc(newTarget);</span>
+<span class="pc bpc" id="L275" title="1 of 2 branches missed.">    } while (newTarget != null);</span>
+<span class="fc" id="L276">    return docId;</span>
+  }
+
+  /**
+   * Advance to doc.
+   *
+   * @param target
+   *          the target
+   * @return the integer
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private Integer advanceToDoc(int target) throws IOException {
+<span class="pc bpc" id="L289" title="2 of 4 branches missed.">    if (docId == NO_MORE_DOCS || target &lt;= docId) {</span>
+<span class="nc" id="L290">      return null;</span>
+    } else {
+      Integer spanDocId;
+<span class="fc" id="L293">      Integer newDocId = target;</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">      for (QueueItem item : queueSpans) {</span>
+<span class="pc bpc" id="L295" title="1 of 2 branches missed.">        if (item.sequenceSpans.spans != null) {</span>
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">          if (item.sequenceSpans.spans.docID() &lt; newDocId) {</span>
+<span class="fc" id="L297">            spanDocId = item.sequenceSpans.spans.advance(newDocId);</span>
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">            if (spanDocId.equals(NO_MORE_DOCS)) {</span>
+<span class="nc" id="L299">              item.noMoreDocs = true;</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">              if (!item.sequenceSpans.optional) {</span>
+                // a not optional span has NO_MORE_DOCS: stop
+<span class="nc" id="L302">                docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L303">                return null;</span>
+              }
+            } else {
+<span class="pc bpc" id="L306" title="3 of 4 branches missed.">              if (!spanDocId.equals(newDocId) &amp;&amp; !item.sequenceSpans.optional) {</span>
+                // a not optional span has nothing for newDocId: stop
+<span class="nc" id="L308">                return spanDocId;</span>
+              }
+            }
+<span class="nc bnc" id="L311" title="All 2 branches missed.">          } else if (item.sequenceSpans.spans.docID() != newDocId) {</span>
+<span class="nc" id="L312">            spanDocId = item.sequenceSpans.spans.docID();</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">            if (!item.sequenceSpans.optional) {</span>
+              // a not optional span seems to have nothing for newDocId: stop
+<span class="nc" id="L315">              return spanDocId;</span>
+            }
+          }
+        }
+<span class="fc" id="L319">      }</span>
+      // find match
+<span class="fc" id="L321">      docId = newDocId;</span>
+<span class="fc" id="L322">      ignoreItem.advanceToDoc(docId);</span>
+      // try and glue together
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">      if (findMatches()) {</span>
+<span class="fc" id="L325">        return null;</span>
+        // no matches
+      } else {
+<span class="nc" id="L328">        resetQueue();</span>
+        // try next document
+<span class="nc" id="L330">        return (newDocId + 1);</span>
+      }
+    }
+  }
+
+  /**
+   * Find matches.
+   *
+   * @return true, if successful
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private boolean findMatches() throws IOException {
+<span class="fc" id="L343">    Boolean status = _findMatches();</span>
+<span class="fc bfc" id="L344" title="All 4 branches covered.">    while (!(status || (currentPosition == NO_MORE_POSITIONS))) {</span>
+<span class="fc" id="L345">      status = _findMatches();</span>
+    }
+<span class="fc" id="L347">    return status;</span>
+  }
+
+  /**
+   * _find matches.
+   *
+   * @return true, if successful
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private boolean _findMatches() throws IOException {
+    // queue not empty
+<span class="fc bfc" id="L359" title="All 2 branches covered.">    if (!queueMatches.isEmpty()) {</span>
+<span class="fc" id="L360">      return true;</span>
+      // no more matches to be found
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">    } else if (currentPosition == NO_MORE_POSITIONS) {</span>
+<span class="nc" id="L363">      return false;</span>
+      // try to find matches
+    } else {
+      // subMatches: try to build matches while collecting
+<span class="fc" id="L367">      Integer subMatchesStartPosition = null;</span>
+<span class="fc" id="L368">      Boolean subMatchesOptional = true;</span>
+<span class="fc" id="L369">      List&lt;Match&gt; subMatchesQueue = new ArrayList&lt;&gt;();</span>
+      // minimum startPosition previous, used to set lower boundary on
+      // startPosition next
+<span class="fc" id="L372">      Integer minStartPositionPrevious = null;</span>
+      // maximum endPosition previous, used to set upper boundary on
+      // startPosition next
+<span class="fc" id="L375">      Integer maxEndPositionPrevious = null;</span>
+      // other variables
+<span class="fc" id="L377">      Integer minStartPositionNext = null;</span>
+<span class="fc" id="L378">      Integer minStartPosition = null;</span>
+<span class="fc" id="L379">      Integer minOptionalStartPosition = null;</span>
+      // adjusted minimum ignoreItem
+<span class="fc" id="L381">      boolean adjustedMinimumIgnoreItem = false;</span>
+      // fill queue if necessary and possible
+<span class="fc bfc" id="L383" title="All 2 branches covered.">      for (int i = 0; i &lt; queueSpans.size(); i++) {</span>
+<span class="fc" id="L384">        QueueItem item = queueSpans.get(i);</span>
+        // if span is optional, check docId
+<span class="pc bpc" id="L386" title="1 of 4 branches missed.">        if (!item.sequenceSpans.optional || (item.sequenceSpans.spans != null</span>
+<span class="pc bpc" id="L387" title="1 of 2 branches missed.">            &amp;&amp; item.sequenceSpans.spans.docID() == docId)) {</span>
+          // compute minimum startPosition until next non-optional item
+          // used as lower boundary on endPosition next
+<span class="fc" id="L390">          minStartPositionNext = null;</span>
+<span class="fc bfc" id="L391" title="All 2 branches covered.">          for (int j = (i + 1); j &lt; queueSpans.size(); j++) {</span>
+
+            // check for available lowestPosition
+<span class="fc bfc" id="L394" title="All 4 branches covered.">            if (!queueSpans.get(j).sequenceSpans.optional &amp;&amp; queueSpans.get(j).lowestPosition != null) {</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">                minStartPositionNext = (minStartPositionNext == null)</span>
+<span class="fc" id="L396">                    ? queueSpans.get(j).lowestPosition</span>
+<span class="fc" id="L397">                    : Math.min(minStartPositionNext,</span>
+<span class="fc" id="L398">                        queueSpans.get(j).lowestPosition);</span>
+                // computing restrictions not possible
+            } else {
+<span class="fc bfc" id="L401" title="All 2 branches covered.">              if (!queueSpans.get(j).sequenceSpans.optional) {</span>
+<span class="fc" id="L402">                minStartPositionNext = null;</span>
+              }
+              break;              
+            }
+          }
+          // fill queue
+<span class="fc bfc" id="L408" title="All 4 branches covered.">          if ((minStartPositionPrevious == null) || subMatchesOptional) {</span>
+<span class="fc" id="L409">            fillQueue(item, null, maxEndPositionPrevious, minStartPositionNext);</span>
+          } else {
+<span class="fc" id="L411">            fillQueue(item, minStartPositionPrevious, maxEndPositionPrevious,</span>
+                minStartPositionNext);
+          }
+          // try to adjust minimum ignoreItem
+<span class="fc bfc" id="L415" title="All 4 branches covered.">          if (!adjustedMinimumIgnoreItem &amp;&amp; !item.sequenceSpans.optional</span>
+<span class="fc bfc" id="L416" title="All 2 branches covered.">              &amp;&amp; item.filledPosition) {</span>
+<span class="fc bfc" id="L417" title="All 2 branches covered.">            if (minOptionalStartPosition != null) {</span>
+<span class="fc" id="L418">              ignoreItem.removeBefore(docId,</span>
+<span class="fc" id="L419">                  Math.min(minOptionalStartPosition, item.lowestPosition));</span>
+            } else {
+<span class="fc" id="L421">              ignoreItem.removeBefore(docId, item.lowestPosition);</span>
+            }
+<span class="fc" id="L423">            adjustedMinimumIgnoreItem = true;</span>
+          }
+          // check for available positions
+<span class="fc bfc" id="L426" title="All 4 branches covered.">          if (!item.sequenceSpans.optional &amp;&amp; item.noMorePositions</span>
+<span class="fc bfc" id="L427" title="All 2 branches covered.">              &amp;&amp; !item.filledPosition) {</span>
+<span class="fc" id="L428">            currentPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L429">            return false;</span>
+          }
+          // build matches
+<span class="fc" id="L432">          subMatchesQueue = _glue(subMatchesQueue, subMatchesOptional, item);</span>
+          // update subMatchesOptional
+<span class="fc bfc" id="L434" title="All 2 branches covered.">          if (!item.sequenceSpans.optional) {</span>
+<span class="fc" id="L435">            subMatchesOptional = false;</span>
+          }
+          // check if matches are still achievable
+<span class="fc bfc" id="L438" title="All 4 branches covered.">          if (!subMatchesOptional &amp;&amp; subMatchesQueue.isEmpty()) {</span>
+            // clean up previous queues
+<span class="pc bpc" id="L440" title="1 of 2 branches missed.">            if (subMatchesStartPosition != null) {</span>
+<span class="fc" id="L441">              int cleanStartPosition = subMatchesStartPosition;</span>
+<span class="fc bfc" id="L442" title="All 2 branches covered.">              for (int j = 0; j &lt;= i; j++) {</span>
+<span class="fc" id="L443">                queueSpans.get(j).del(cleanStartPosition);</span>
+<span class="fc bfc" id="L444" title="All 2 branches covered.">                if (!queueSpans.get(j).sequenceSpans.optional) {</span>
+<span class="fc" id="L445">                  cleanStartPosition++;</span>
+                }
+              }
+            }
+<span class="fc" id="L449">            return false;</span>
+          }
+          // update subMatchesStartPosition
+<span class="pc bpc" id="L452" title="1 of 2 branches missed.">          if (subMatchesQueue.isEmpty()) {</span>
+<span class="nc" id="L453">            subMatchesStartPosition = null;</span>
+          } else {
+<span class="fc" id="L455">            subMatchesStartPosition = subMatchesQueue.get(0).startPosition;</span>
+          }
+          // compute minimum startPosition for next span
+<span class="fc bfc" id="L458" title="All 2 branches covered.">          if (item.lowestPosition != null) {</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">            minStartPositionPrevious = (minStartPositionPrevious == null)</span>
+<span class="fc" id="L460">                ? item.lowestPosition</span>
+<span class="fc" id="L461">                : Math.min(minStartPositionPrevious, item.lowestPosition);</span>
+          }
+          // for optional spans
+<span class="fc bfc" id="L464" title="All 2 branches covered.">          if (item.sequenceSpans.optional) {</span>
+            // update stats
+<span class="fc bfc" id="L466" title="All 2 branches covered.">            if (item.lowestPosition != null) {</span>
+<span class="pc bpc" id="L467" title="1 of 2 branches missed.">              minOptionalStartPosition = (minOptionalStartPosition == null)</span>
+<span class="pc" id="L468">                  ? item.lowestPosition</span>
+<span class="nc" id="L469">                  : Math.min(minOptionalStartPosition, item.lowestPosition);</span>
+            }
+            // for not optional spans
+          } else {
+            // update stats, item.lowestPosition should be set
+<span class="fc bfc" id="L474" title="All 2 branches covered.">            minStartPosition = (minStartPosition == null) ? item.lowestPosition</span>
+<span class="fc" id="L475">                : Math.min(minStartPosition, item.lowestPosition);</span>
+            // reset maximum endPosition for next span
+<span class="fc" id="L477">            maxEndPositionPrevious = null;</span>
+          }
+          // compute maximum endPosition for next span
+<span class="fc bfc" id="L480" title="All 2 branches covered.">          if (item.lowestPosition != null) {</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">            for (Integer endPosition : item.queue.get(item.lowestPosition)) {</span>
+<span class="fc bfc" id="L482" title="All 2 branches covered.">              maxEndPositionPrevious = (maxEndPositionPrevious == null)</span>
+<span class="fc" id="L483">                  ? endPosition : Math.max(maxEndPositionPrevious, endPosition);</span>
+<span class="fc" id="L484">            }</span>
+          }
+        }
+      }
+<span class="pc bpc" id="L488" title="1 of 2 branches missed.">      if (subMatchesQueue.isEmpty()) {</span>
+        // condition has only optional parts
+<span class="nc bnc" id="L490" title="All 2 branches missed.">        if (subMatchesOptional) {</span>
+          // check for
+<span class="nc" id="L492">          boolean allFinished = true;</span>
+<span class="nc bnc" id="L493" title="All 2 branches missed.">          for (int i = 0; i &lt; queueSpans.size(); i++) {</span>
+<span class="nc bnc" id="L494" title="All 2 branches missed.">            if (!queueSpans.get(i).noMorePositions) {</span>
+<span class="nc" id="L495">              allFinished = false;</span>
+<span class="nc" id="L496">              break;</span>
+            }
+          }
+<span class="nc bnc" id="L499" title="All 2 branches missed.">          if (allFinished) {</span>
+<span class="nc" id="L500">            currentPosition = NO_MORE_POSITIONS;</span>
+          }
+        }
+<span class="nc" id="L503">        return false;</span>
+<span class="fc bfc" id="L504" title="All 2 branches covered.">      } else if ((minOptionalStartPosition != null)</span>
+<span class="pc bpc" id="L505" title="1 of 2 branches missed.">          &amp;&amp; (minOptionalStartPosition &lt; subMatchesStartPosition)) {</span>
+<span class="nc bnc" id="L506" title="All 2 branches missed.">        for (int i = 0; i &lt; queueSpans.size(); i++) {</span>
+<span class="nc bnc" id="L507" title="All 2 branches missed.">          if (!queueSpans.get(i).sequenceSpans.optional) {</span>
+<span class="nc" id="L508">            break;</span>
+          } else {
+<span class="nc" id="L510">            queueSpans.get(i).del(minOptionalStartPosition);</span>
+          }
+        }
+<span class="nc" id="L513">        return false;</span>
+      } else {
+<span class="fc bfc" id="L515" title="All 2 branches covered.">        for (int i = 0; i &lt; queueSpans.size(); i++) {</span>
+<span class="fc" id="L516">          queueSpans.get(i).del(subMatchesStartPosition);</span>
+        }
+<span class="fc bfc" id="L518" title="All 2 branches covered.">        for (Match m : subMatchesQueue) {</span>
+<span class="pc bpc" id="L519" title="1 of 2 branches missed.">          if (!queueMatches.contains(m)) {</span>
+<span class="fc" id="L520">            queueMatches.add(m);</span>
+          }
+<span class="fc" id="L522">        }</span>
+<span class="fc" id="L523">        ignoreItem.removeBefore(docId, queueMatches.get(0).startPosition);</span>
+<span class="fc" id="L524">        return true;</span>
+      }
+    }
+  }
+
+  /**
+   * _glue.
+   *
+   * @param subMatchesQueue
+   *          the sub matches queue
+   * @param subMatchesOptional
+   *          the sub matches optional
+   * @param item
+   *          the item
+   * @return the list
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private List&lt;Match&gt; _glue(List&lt;Match&gt; subMatchesQueue,
+      Boolean subMatchesOptional, QueueItem item) throws IOException {
+<span class="fc" id="L544">    List&lt;Match&gt; newSubMatchesQueue = new ArrayList&lt;&gt;();</span>
+    // no previous queue, only use current item
+<span class="fc bfc" id="L546" title="All 2 branches covered.">    if (subMatchesQueue.isEmpty()) {</span>
+<span class="pc bpc" id="L547" title="1 of 2 branches missed.">      if (item.filledPosition) {</span>
+<span class="fc bfc" id="L548" title="All 2 branches covered.">        for (Integer endPosition : item.queue.get(item.lowestPosition)) {</span>
+<span class="fc" id="L549">          Match m = new Match(item.lowestPosition, endPosition);</span>
+<span class="pc bpc" id="L550" title="1 of 2 branches missed.">          if (!newSubMatchesQueue.contains(m)) {</span>
+<span class="fc" id="L551">            newSubMatchesQueue.add(m);</span>
+          }
+<span class="fc" id="L553">        }</span>
+      }
+<span class="fc" id="L555">      return newSubMatchesQueue;</span>
+      // previous queue
+    } else {
+      // startposition from queue
+<span class="fc" id="L559">      int startPosition = subMatchesQueue.get(0).startPosition;</span>
+      // previous queue optional, current item optional
+<span class="pc bpc" id="L561" title="1 of 4 branches missed.">      if (subMatchesOptional &amp;&amp; item.sequenceSpans.optional) {</span>
+        // forget previous, because current has lower startposition
+<span class="nc bnc" id="L563" title="All 4 branches missed.">        if (item.filledPosition &amp;&amp; item.lowestPosition &lt; startPosition) {</span>
+<span class="nc bnc" id="L564" title="All 2 branches missed.">          for (Integer endPosition : item.queue.get(item.lowestPosition)) {</span>
+<span class="nc" id="L565">            Match m = new Match(item.lowestPosition, endPosition);</span>
+<span class="nc bnc" id="L566" title="All 2 branches missed.">            if (!newSubMatchesQueue.contains(m)) {</span>
+<span class="nc" id="L567">              newSubMatchesQueue.add(m);</span>
+            }
+<span class="nc" id="L569">          }</span>
+          // merge with previous
+<span class="nc bnc" id="L571" title="All 2 branches missed.">        } else if (item.filledPosition) {</span>
+<span class="nc bnc" id="L572" title="All 2 branches missed.">          if (item.lowestPosition.equals(startPosition)) {</span>
+<span class="nc bnc" id="L573" title="All 2 branches missed.">            for (Integer endPosition : item.queue.get(item.lowestPosition)) {</span>
+<span class="nc" id="L574">              Match m = new Match(item.lowestPosition, endPosition);</span>
+<span class="nc bnc" id="L575" title="All 2 branches missed.">              if (!newSubMatchesQueue.contains(m)) {</span>
+<span class="nc" id="L576">                newSubMatchesQueue.add(m);</span>
+              }
+<span class="nc" id="L578">            }</span>
+          }
+<span class="nc" id="L580">          newSubMatchesQueue.addAll(subMatchesQueue);</span>
+<span class="nc bnc" id="L581" title="All 2 branches missed.">          for (Match m : subMatchesQueue) {</span>
+<span class="nc bnc" id="L582" title="All 2 branches missed.">            if (item.queue.containsKey(m.endPosition)) {</span>
+<span class="nc bnc" id="L583" title="All 2 branches missed.">              for (Integer endPosition : item.queue.get(m.endPosition)) {</span>
+<span class="nc" id="L584">                Match o = new Match(m.startPosition, endPosition);</span>
+<span class="nc bnc" id="L585" title="All 2 branches missed.">                if (!newSubMatchesQueue.contains(o)) {</span>
+<span class="nc" id="L586">                  newSubMatchesQueue.add(o);</span>
+                }
+<span class="nc" id="L588">              }</span>
+            }
+<span class="nc" id="L590">          }</span>
+          // no filled position
+        } else {
+<span class="nc" id="L593">          newSubMatchesQueue.addAll(subMatchesQueue);</span>
+        }
+        // previous queue optional, current item not optional
+<span class="pc bpc" id="L596" title="1 of 4 branches missed.">      } else if (subMatchesOptional &amp;&amp; !item.sequenceSpans.optional) {</span>
+<span class="pc bpc" id="L597" title="2 of 4 branches missed.">        assert item.filledPosition : &quot;span not optional, should contain items&quot;;</span>
+        // forget previous
+<span class="pc bpc" id="L599" title="1 of 2 branches missed.">        if (item.lowestPosition &lt; startPosition) {</span>
+<span class="nc bnc" id="L600" title="All 2 branches missed.">          for (Integer endPosition : item.queue.get(item.lowestPosition)) {</span>
+<span class="nc" id="L601">            Match m = new Match(item.lowestPosition, endPosition);</span>
+<span class="nc bnc" id="L602" title="All 2 branches missed.">            if (!newSubMatchesQueue.contains(m)) {</span>
+<span class="nc" id="L603">              newSubMatchesQueue.add(m);</span>
+            }
+<span class="nc" id="L605">          }</span>
+          // merge with previous
+        } else {
+<span class="fc bfc" id="L608" title="All 2 branches covered.">          if (item.lowestPosition.equals(startPosition)) {</span>
+<span class="fc bfc" id="L609" title="All 2 branches covered.">            for (Integer endPosition : item.queue.get(item.lowestPosition)) {</span>
+<span class="fc" id="L610">              Match m = new Match(item.lowestPosition, endPosition);</span>
+<span class="pc bpc" id="L611" title="1 of 2 branches missed.">              if (!newSubMatchesQueue.contains(m)) {</span>
+<span class="fc" id="L612">                newSubMatchesQueue.add(m);</span>
+              }
+<span class="fc" id="L614">            }</span>
+          }
+<span class="fc bfc" id="L616" title="All 2 branches covered.">          for (Match m : subMatchesQueue) {</span>
+<span class="fc bfc" id="L617" title="All 2 branches covered.">            if (item.queue.containsKey(m.endPosition)) {</span>
+<span class="fc bfc" id="L618" title="All 2 branches covered.">              for (Integer endPosition : item.queue.get(m.endPosition)) {</span>
+<span class="fc" id="L619">                Match o = new Match(m.startPosition, endPosition);</span>
+<span class="pc bpc" id="L620" title="1 of 2 branches missed.">                if (!newSubMatchesQueue.contains(o)) {</span>
+<span class="fc" id="L621">                  newSubMatchesQueue.add(o);</span>
+                }
+<span class="fc" id="L623">              }</span>
+            }
+<span class="fc" id="L625">          }</span>
+        }
+        // previous queue not optional, current item optional
+<span class="pc bpc" id="L628" title="1 of 4 branches missed.">      } else if (!subMatchesOptional &amp;&amp; item.sequenceSpans.optional) {</span>
+<span class="fc" id="L629">        newSubMatchesQueue.addAll(subMatchesQueue);</span>
+        // merge with previous
+<span class="fc bfc" id="L631" title="All 2 branches covered.">        if (item.filledPosition) {</span>
+<span class="fc bfc" id="L632" title="All 2 branches covered.">          for (Match m : subMatchesQueue) {</span>
+<span class="fc bfc" id="L633" title="All 2 branches covered.">            if (item.queue.containsKey(m.endPosition)) {</span>
+<span class="fc bfc" id="L634" title="All 2 branches covered.">              for (Integer endPosition : item.queue.get(m.endPosition)) {</span>
+<span class="fc" id="L635">                Match o = new Match(m.startPosition, endPosition);</span>
+<span class="pc bpc" id="L636" title="1 of 2 branches missed.">                if (!newSubMatchesQueue.contains(o)) {</span>
+<span class="fc" id="L637">                  newSubMatchesQueue.add(o);</span>
+                }
+<span class="fc" id="L639">              }</span>
+            }
+<span class="fc" id="L641">          }</span>
+        }
+        // previous queue not optional, current item not optional
+<span class="pc bpc" id="L644" title="2 of 4 branches missed.">      } else if (!subMatchesOptional &amp;&amp; !item.sequenceSpans.optional</span>
+<span class="pc bpc" id="L645" title="1 of 2 branches missed.">          &amp;&amp; item.filledPosition) {</span>
+<span class="fc bfc" id="L646" title="All 2 branches covered.">        for (Match m : subMatchesQueue) {</span>
+<span class="fc" id="L647">          HashSet&lt;Integer&gt; ignoreList = ignoreItem.getFullEndPositionList(docId,</span>
+<span class="fc" id="L648">              m.endPosition);</span>
+          Integer[] checkList;
+<span class="fc bfc" id="L650" title="All 2 branches covered.">          if (ignoreList == null) {</span>
+<span class="fc" id="L651">            checkList = new Integer[] { m.endPosition };</span>
+          } else {
+<span class="fc" id="L653">            checkList = new Integer[1 + ignoreList.size()];</span>
+<span class="fc" id="L654">            checkList = ignoreList.toArray(checkList);</span>
+<span class="fc" id="L655">            checkList[ignoreList.size()] = m.endPosition;</span>
+          }
+<span class="fc bfc" id="L657" title="All 2 branches covered.">          for (Integer checkEndPosition : checkList) {</span>
+<span class="fc bfc" id="L658" title="All 2 branches covered.">            if (item.queue.containsKey(checkEndPosition)) {</span>
+<span class="fc bfc" id="L659" title="All 2 branches covered.">              for (Integer endPosition : item.queue.get(checkEndPosition)) {</span>
+<span class="fc" id="L660">                Match o = new Match(m.startPosition, endPosition);</span>
+<span class="pc bpc" id="L661" title="1 of 2 branches missed.">                if (!newSubMatchesQueue.contains(o)) {</span>
+<span class="fc" id="L662">                  newSubMatchesQueue.add(o);</span>
+                }
+<span class="fc" id="L664">              }</span>
+            }
+          }
+<span class="fc" id="L667">        }</span>
+      }
+    }
+<span class="fc" id="L670">    return newSubMatchesQueue;</span>
+  }
+
+  /**
+   * Fill queue.
+   *
+   * @param item
+   *          the item
+   * @param minStartPosition
+   *          the min start position
+   * @param maxStartPosition
+   *          the max start position
+   * @param minEndPosition
+   *          the min end position
+   * @param adjustIgnore
+   *          the adjust ignore
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void fillQueue(QueueItem item, Integer minStartPosition,
+      Integer maxStartPosition, Integer minEndPosition) throws IOException {
+    int newStartPosition;
+    int newEndPosition;
+<span class="fc" id="L693">    Integer firstRetrievedPosition = null;</span>
+    // remove everything below minStartPosition
+<span class="fc bfc" id="L695" title="All 4 branches covered.">    if ((minStartPosition != null) &amp;&amp; (item.lowestPosition != null)</span>
+<span class="fc bfc" id="L696" title="All 2 branches covered.">        &amp;&amp; (item.lowestPosition &lt; minStartPosition)) {</span>
+<span class="fc" id="L697">      item.del((minStartPosition - 1));</span>
+    }
+    // fill queue
+<span class="fc bfc" id="L700" title="All 2 branches covered.">    while (!item.noMorePositions) {</span>
+      boolean doNotCollectAnotherPosition;
+<span class="fc bfc" id="L702" title="All 6 branches covered.">      doNotCollectAnotherPosition = item.filledPosition</span>
+          &amp;&amp; (minStartPosition == null) &amp;&amp; (maxStartPosition == null);
+<span class="fc bfc" id="L704" title="All 4 branches covered.">      doNotCollectAnotherPosition |= item.filledPosition</span>
+<span class="pc bpc" id="L705" title="1 of 2 branches missed.">          &amp;&amp; (maxStartPosition != null) &amp;&amp; (item.lastRetrievedPosition != null)</span>
+<span class="fc bfc" id="L706" title="All 2 branches covered.">          &amp;&amp; (maxStartPosition &lt; item.lastRetrievedPosition);</span>
+<span class="fc bfc" id="L707" title="All 2 branches covered.">      if (doNotCollectAnotherPosition) {</span>
+<span class="fc" id="L708">        return;</span>
+      } else {
+        // collect another full position
+<span class="fc" id="L711">        firstRetrievedPosition = null;</span>
+<span class="pc bpc" id="L712" title="1 of 2 branches missed.">        while (!item.noMorePositions) {</span>
+<span class="fc" id="L713">          newStartPosition = item.sequenceSpans.spans.nextStartPosition();</span>
+<span class="fc bfc" id="L714" title="All 2 branches covered.">          if (newStartPosition == NO_MORE_POSITIONS) {</span>
+<span class="pc bpc" id="L715" title="1 of 2 branches missed.">            if (!item.queue.isEmpty()) {</span>
+<span class="fc" id="L716">              item.filledPosition = true;</span>
+<span class="fc" id="L717">              item.lastFilledPosition = item.lastRetrievedPosition;</span>
+            }
+<span class="fc" id="L719">            item.noMorePositions = true;</span>
+<span class="fc" id="L720">            return;</span>
+<span class="fc bfc" id="L721" title="All 2 branches covered.">          } else if ((minStartPosition != null)</span>
+<span class="fc bfc" id="L722" title="All 2 branches covered.">              &amp;&amp; (newStartPosition &lt; minStartPosition)) {</span>
+            // do nothing
+          } else {
+<span class="fc" id="L725">            newEndPosition = item.sequenceSpans.spans.endPosition();</span>
+<span class="fc bfc" id="L726" title="All 2 branches covered.">            if ((minEndPosition == null) || (newEndPosition &gt;= minEndPosition</span>
+<span class="fc bfc" id="L727" title="All 2 branches covered.">                - ignoreItem.getMinStartPosition(docId, newEndPosition))) {</span>
+<span class="fc" id="L728">              item.add(newStartPosition, newEndPosition);</span>
+<span class="fc bfc" id="L729" title="All 2 branches covered.">              if (firstRetrievedPosition == null) {</span>
+<span class="fc" id="L730">                firstRetrievedPosition = newStartPosition;</span>
+<span class="fc bfc" id="L731" title="All 2 branches covered.">              } else if (!firstRetrievedPosition.equals(newStartPosition)) {</span>
+<span class="fc" id="L732">                break;</span>
+              }
+            }
+          }
+        }
+      }
+<span class="fc" id="L738">    }</span>
+<span class="fc" id="L739">  }</span>
+
+  /**
+   * Reset queue.
+   */
+  void resetQueue() {
+<span class="fc" id="L745">    currentPosition = -1;</span>
+<span class="fc" id="L746">    queueMatches.clear();</span>
+<span class="fc bfc" id="L747" title="All 2 branches covered.">    for (QueueItem item : queueSpans) {</span>
+<span class="fc" id="L748">      item.reset();</span>
+<span class="fc" id="L749">    }</span>
+<span class="fc" id="L750">    currentMatch = null;</span>
+<span class="fc" id="L751">  }</span>
+
+  /**
+   * The Class QueueItem.
+   */
+  private static class QueueItem {
+
+    /** The filled position. */
+    private boolean noMoreDocs;
+    private boolean noMorePositions;
+    private boolean filledPosition;
+
+    /** The last retrieved position. */
+    private Integer lowestPosition;
+    private Integer lastFilledPosition;
+    private Integer lastRetrievedPosition;
+
+    /** The queue. */
+    private HashMap&lt;Integer, List&lt;Integer&gt;&gt; queue;
+
+    /** The sequence spans. */
+    public MtasSpanSequenceQuerySpans sequenceSpans;
+
+    /**
+     * Instantiates a new queue item.
+     *
+     * @param sequenceSpans
+     *          the sequence spans
+     */
+<span class="fc" id="L780">    QueueItem(MtasSpanSequenceQuerySpans sequenceSpans) {</span>
+<span class="fc" id="L781">      noMoreDocs = false;</span>
+<span class="fc" id="L782">      this.sequenceSpans = sequenceSpans;</span>
+<span class="fc" id="L783">      queue = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L784">      reset();</span>
+<span class="fc" id="L785">    }</span>
+
+    /**
+     * Reset.
+     */
+    public void reset() {
+<span class="fc" id="L791">      noMorePositions = false;</span>
+<span class="fc" id="L792">      lowestPosition = null;</span>
+<span class="fc" id="L793">      lastFilledPosition = null;</span>
+<span class="fc" id="L794">      lastRetrievedPosition = null;</span>
+<span class="fc" id="L795">      filledPosition = false;</span>
+<span class="fc" id="L796">      queue.clear();</span>
+<span class="fc" id="L797">    }</span>
+
+    /**
+     * Adds the.
+     *
+     * @param startPosition
+     *          the start position
+     * @param endPosition
+     *          the end position
+     */
+    public void add(int startPosition, int endPosition) {
+<span class="fc bfc" id="L808" title="All 2 branches covered.">      if (!queue.keySet().contains(startPosition)) {</span>
+<span class="fc bfc" id="L809" title="All 2 branches covered.">        if (!queue.isEmpty()) {</span>
+<span class="fc" id="L810">          filledPosition = true;</span>
+<span class="fc" id="L811">          lastFilledPosition = lastRetrievedPosition;</span>
+        }
+<span class="fc" id="L813">        queue.put(startPosition, new ArrayList&lt;Integer&gt;());</span>
+      }
+<span class="fc" id="L815">      queue.get(startPosition).add(endPosition);</span>
+<span class="pc bpc" id="L816" title="1 of 4 branches missed.">      if ((lowestPosition == null) || (lowestPosition &gt; startPosition)) {</span>
+<span class="fc" id="L817">        lowestPosition = startPosition;</span>
+      }
+<span class="fc" id="L819">      lastRetrievedPosition = startPosition;</span>
+<span class="fc" id="L820">    }</span>
+
+    /**
+     * Del.
+     *
+     * @param position
+     *          the position
+     */
+    public void del(int position) {
+<span class="fc" id="L829">      ArrayList&lt;Integer&gt; removePositions = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L830" title="All 2 branches covered.">      for (int p : queue.keySet()) {</span>
+<span class="fc bfc" id="L831" title="All 2 branches covered.">        if (p &lt;= position) {</span>
+<span class="fc" id="L832">          removePositions.add(p);</span>
+        }
+<span class="fc" id="L834">      }</span>
+<span class="fc bfc" id="L835" title="All 2 branches covered.">      if (!removePositions.isEmpty()) {</span>
+        // positions.removeAll(removePositions);
+<span class="fc bfc" id="L837" title="All 2 branches covered.">        for (int p : removePositions) {</span>
+<span class="fc" id="L838">          queue.remove(p);</span>
+<span class="fc" id="L839">        }</span>
+<span class="fc bfc" id="L840" title="All 2 branches covered.">        if (queue.isEmpty()) {</span>
+<span class="fc" id="L841">          lowestPosition = null;</span>
+<span class="fc" id="L842">          lastFilledPosition = null;</span>
+<span class="fc" id="L843">          filledPosition = false;</span>
+        } else {
+<span class="fc" id="L845">          lowestPosition = Collections.min(queue.keySet());</span>
+<span class="pc bpc" id="L846" title="1 of 4 branches missed.">          if (filledPosition &amp;&amp; !queue.keySet().contains(lastFilledPosition)) {</span>
+<span class="fc" id="L847">            lastFilledPosition = null;</span>
+<span class="fc" id="L848">            filledPosition = false;</span>
+          }
+        }
+      }
+<span class="fc" id="L852">    }</span>
+  }
+
+  /**
+   * The Class Match.
+   */
+  private static class Match {
+
+    /** The start position. */
+    private int startPosition;
+
+    /** The end position. */
+    private int endPosition;
+
+    /**
+     * Instantiates a new match.
+     *
+     * @param startPosition
+     *          the start position
+     * @param endPosition
+     *          the end position
+     */
+<span class="fc" id="L874">    Match(int startPosition, int endPosition) {</span>
+<span class="fc" id="L875">      this.startPosition = startPosition;</span>
+<span class="fc" id="L876">      this.endPosition = endPosition;</span>
+<span class="fc" id="L877">    }</span>
+
+    /**
+     * Start position.
+     *
+     * @return the int
+     */
+    public int startPosition() {
+<span class="fc" id="L885">      return startPosition;</span>
+    }
+
+    /**
+     * End position.
+     *
+     * @return the int
+     */
+    public int endPosition() {
+<span class="fc" id="L894">      return endPosition;</span>
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L904" title="1 of 2 branches missed.">      if (this == obj)</span>
+<span class="nc" id="L905">        return true;</span>
+<span class="pc bpc" id="L906" title="1 of 2 branches missed.">      if (obj == null)</span>
+<span class="nc" id="L907">        return false;</span>
+<span class="pc bpc" id="L908" title="1 of 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc" id="L909">        return false;</span>
+<span class="fc" id="L910">      final Match that = (Match) obj;</span>
+<span class="pc bpc" id="L911" title="2 of 4 branches missed.">      return startPosition == that.startPosition</span>
+          &amp;&amp; endPosition == that.endPosition;
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L917">      int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L918">      h = (h * 5) ^ startPosition;</span>
+<span class="nc" id="L919">      h = (h * 7) ^ endPosition;</span>
+<span class="nc" id="L920">      return h;</span>
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L930">      return &quot;[&quot; + startPosition + &quot;,&quot; + endPosition + &quot;]&quot;;</span>
+    }
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
+  @Override
+  public long cost() {
+<span class="nc" id="L942">    return cost;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
+  @Override
+  public float positionsCost() {
+<span class="nc" id="L952">    return 0;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

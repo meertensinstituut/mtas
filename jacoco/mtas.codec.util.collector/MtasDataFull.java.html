@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataFull.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataFull.java</span></div><h1>MtasDataFull.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
+
+import mtas.codec.util.CodecUtil;
+import mtas.codec.util.DataCollector;
+
+/**
+ * The Class MtasDataFull.
+ *
+ * @param &lt;T1&gt; the generic type
+ * @param &lt;T2&gt; the generic type
+ */
+abstract class MtasDataFull&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2 extends Number &amp; Comparable&lt;T2&gt;&gt;
+    extends MtasDataCollector&lt;T1, T2&gt; implements Serializable {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The new full value list. */
+<span class="fc" id="L25">  protected T1[][] fullValueList = null, newFullValueList = null;</span>
+
+  /** The operations. */
+  protected MtasDataOperations&lt;T1, T2&gt; operations;
+
+  /**
+   * Instantiates a new mtas data full.
+   *
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param operations the operations
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public MtasDataFull(String collectorType, String dataType,
+      Set&lt;String&gt; statsItems, String sortType, String sortDirection,
+      Integer start, Integer number, String[] subCollectorTypes,
+      String[] subDataTypes, String[] subStatsTypes,
+      Set&lt;String&gt;[] subStatsItems, String[] subSortTypes,
+      String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
+      MtasDataOperations&lt;T1, T2&gt; operations, String segmentRegistration,
+      String boundary) throws IOException {
+<span class="fc" id="L61">    super(collectorType, dataType, CodecUtil.STATS_FULL, statsItems, sortType,</span>
+        sortDirection, start, number, subCollectorTypes, subDataTypes,
+        subStatsTypes, subStatsItems, subSortTypes, subSortDirections, subStart,
+        subNumber, segmentRegistration, boundary);
+<span class="fc" id="L65">    this.operations = operations;</span>
+<span class="fc" id="L66">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String)
+   */
+  @Override
+  public final void error(String error) throws IOException {
+<span class="nc" id="L76">    add(false);</span>
+<span class="nc" id="L77">    setError(newCurrentPosition, error, newCurrentExisting);</span>
+<span class="nc" id="L78">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String[],
+   * java.lang.String)
+   */
+  @Override
+  public final void error(String key, String error) throws IOException {
+<span class="nc bnc" id="L89" title="All 2 branches missed.">    if (key != null) {</span>
+<span class="nc" id="L90">      add(key, false);</span>
+<span class="nc" id="L91">      setError(newCurrentPosition, error, newCurrentExisting);      </span>
+    }
+<span class="nc" id="L93">  }</span>
+
+  /**
+   * Sets the error.
+   *
+   * @param newPosition the new position
+   * @param error the error
+   * @param currentExisting the current existing
+   */
+  protected void setError(int newPosition, String error,
+      boolean currentExisting) {
+<span class="nc bnc" id="L104" title="All 2 branches missed.">    if (!currentExisting) {</span>
+<span class="nc" id="L105">      newFullValueList[newPosition] = operations.createVector1(0);</span>
+    }
+<span class="nc" id="L107">    newErrorNumber[newPosition]++;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">    if (newErrorList[newPosition].containsKey(error)) {</span>
+<span class="nc" id="L109">      newErrorList[newPosition].put(error,</span>
+<span class="nc" id="L110">          newErrorList[newPosition].get(error) + 1);</span>
+    } else {
+<span class="nc" id="L112">      newErrorList[newPosition].put(error, 1);</span>
+    }
+<span class="nc" id="L114">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
+   */
+  @Override
+  protected final void increaseNewListSize() throws IOException {
+    // register old situation
+<span class="nc" id="L124">    int tmpOldSize = newKeyList.length;</span>
+<span class="nc" id="L125">    int tmpNewPosition = newPosition;</span>
+    // increase
+<span class="nc" id="L127">    super.increaseNewListSize();</span>
+    // reconstruct
+<span class="nc" id="L129">    T1[][] tmpNewFullValueList = newFullValueList;</span>
+<span class="nc" id="L130">    newFullValueList = operations.createMatrix1(newSize);</span>
+<span class="nc" id="L131">    newPosition = tmpNewPosition;</span>
+<span class="nc" id="L132">    System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);</span>
+<span class="nc" id="L133">  }</span>
+
+  /* (non-Javadoc)
+   * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
+   */
+  public void reduceToSegmentKeys() {
+<span class="nc bnc" id="L139" title="All 4 branches missed.">    if (segmentRegistration != null &amp;&amp; size &gt; 0) {</span>
+<span class="nc" id="L140">      int sizeCopy = size;</span>
+<span class="nc" id="L141">      String[] keyListCopy = keyList.clone();</span>
+<span class="nc" id="L142">      T1[][] fullValueListCopy = fullValueList.clone();</span>
+<span class="nc" id="L143">      size = 0;</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (segmentKeys.contains(keyListCopy[i])) {</span>
+<span class="nc" id="L146">          keyList[size] = keyListCopy[i];</span>
+<span class="nc" id="L147">          fullValueList[size] = fullValueListCopy[i];</span>
+<span class="nc" id="L148">          size++;</span>
+        }
+      }
+    }
+<span class="nc" id="L152">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.collector.MtasDataCollector#reduceToKeys(java.util.Set)
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public void reduceToKeys(Set&lt;String&gt; keys) {
+<span class="nc bnc" id="L162" title="All 2 branches missed.">    if (size &gt; 0) {</span>
+<span class="nc" id="L163">      int sizeCopy = size;</span>
+<span class="nc" id="L164">      String[] keyListCopy = keyList.clone();</span>
+<span class="nc" id="L165">      int[] errorNumberCopy = errorNumber.clone();</span>
+<span class="nc" id="L166">      HashMap&lt;String, Integer&gt;[] errorListCopy = errorList.clone();</span>
+<span class="nc" id="L167">      int[] sourceNumberListCopy = sourceNumberList.clone();</span>
+<span class="nc" id="L168">      T1[][] fullValueListCopy = fullValueList.clone();</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">      for (int i = 0; i &lt; fullValueListCopy.length; i++) {</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if (fullValueListCopy[i] != null) {</span>
+<span class="nc" id="L171">          fullValueListCopy[i] = fullValueListCopy[i].clone();</span>
+        }
+      }
+<span class="nc" id="L174">      keyList = new String[keys.size()];</span>
+<span class="nc" id="L175">      errorNumber = new int[keys.size()];</span>
+<span class="nc" id="L176">      errorList = new HashMap[keys.size()];</span>
+<span class="nc" id="L177">      sourceNumberList = new int[keys.size()];</span>
+<span class="nc" id="L178">      fullValueList = operations.createMatrix1(keys.size());</span>
+<span class="nc" id="L179">      size = 0;</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (keys.contains(keyListCopy[i])) {</span>
+<span class="nc" id="L182">          keyList[size] = keyListCopy[i];</span>
+<span class="nc" id="L183">          errorNumber[size] = errorNumberCopy[i];</span>
+<span class="nc" id="L184">          errorList[size] = errorListCopy[i];</span>
+<span class="nc" id="L185">          sourceNumberList[size] = sourceNumberListCopy[i];</span>
+<span class="nc" id="L186">          fullValueList[size] = fullValueListCopy[i];</span>
+<span class="nc" id="L187">          size++;</span>
+        }
+      }
+    }
+<span class="nc" id="L191">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#copyToNew(int, int)
+   */
+  @Override
+  protected void copyToNew(int position, int newPosition) {
+<span class="fc" id="L200">    newFullValueList[newPosition] = fullValueList[position];</span>
+<span class="fc" id="L201">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#copyFromNew()
+   */
+  @Override
+  protected void copyFromNew() {
+<span class="fc" id="L210">    fullValueList = newFullValueList;</span>
+<span class="fc" id="L211">  }</span>
+
+  /**
+   * Sets the value.
+   *
+   * @param newPosition the new position
+   * @param values the values
+   * @param number the number
+   * @param currentExisting the current existing
+   */
+  protected void setValue(int newPosition, T1[] values, int number,
+      boolean currentExisting) {
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">    if (number &gt; 0) {</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">      if (currentExisting) {</span>
+<span class="fc" id="L225">        T1[] tmpList = operations</span>
+<span class="fc" id="L226">            .createVector1(newFullValueList[newPosition].length + number);</span>
+<span class="fc" id="L227">        System.arraycopy(newFullValueList[newPosition], 0, tmpList, 0,</span>
+            newFullValueList[newPosition].length);
+<span class="fc" id="L229">        System.arraycopy(values, 0, tmpList,</span>
+            newFullValueList[newPosition].length, number);
+<span class="fc" id="L231">        newFullValueList[newPosition] = tmpList;</span>
+<span class="fc" id="L232">      } else {</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">        if (number &lt; values.length) {</span>
+<span class="nc" id="L234">          T1[] tmpList = operations.createVector1(number);</span>
+<span class="nc" id="L235">          System.arraycopy(values, 0, tmpList, 0, number);</span>
+<span class="nc" id="L236">          newFullValueList[newPosition] = tmpList;</span>
+<span class="nc" id="L237">        } else {</span>
+<span class="fc" id="L238">          newFullValueList[newPosition] = values;</span>
+        }
+      }
+    }
+<span class="fc" id="L242">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#remapData(int[][])
+   */
+  @Override
+  protected void remapData(int[][] mapping) throws IOException {
+<span class="nc" id="L251">    super.remapData(mapping);</span>
+<span class="nc" id="L252">    T1[][] originalFullValueList = fullValueList.clone();</span>
+<span class="nc" id="L253">    fullValueList = operations.createMatrix1(mapping.length);</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">    for (int i = 0; i &lt; mapping.length; i++) {</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">      for (int j = 0; j &lt; mapping[i].length; j++) {</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (j == 0) {</span>
+<span class="nc" id="L257">          setValue(i, originalFullValueList[mapping[i][j]],</span>
+              originalFullValueList[mapping[i][j]].length, false);
+        } else {
+<span class="nc" id="L260">          setValue(i, originalFullValueList[mapping[i][j]],</span>
+              originalFullValueList[mapping[i][j]].length, true);
+        }
+      }
+    }
+<span class="nc" id="L265">    fullValueList = newFullValueList;</span>
+<span class="nc" id="L266">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.
+   * DataCollector.MtasDataCollector)
+   */
+  @Override
+  public void merge(MtasDataCollector&lt;?, ?&gt; newDataCollector,
+      HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map,
+      boolean increaseSourceNumber) throws IOException {
+<span class="nc" id="L278">    closeNewList();</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">    if (!collectorType.equals(newDataCollector.getCollectorType())</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">        || !dataType.equals(newDataCollector.getDataType())</span>
+<span class="nc bnc" id="L281" title="All 4 branches missed.">        || !statsType.equals(newDataCollector.getStatsType())</span>
+        || !(newDataCollector instanceof MtasDataFull)) {
+<span class="nc" id="L283">      throw new IOException(&quot;cannot merge different dataCollectors&quot;);</span>
+    } else {
+<span class="nc" id="L285">      segmentRegistration = null;</span>
+      @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L287">      MtasDataFull&lt;T1, T2&gt; newMtasDataFull = (MtasDataFull&lt;T1, T2&gt;) newDataCollector;</span>
+<span class="nc" id="L288">      closeNewList();</span>
+<span class="nc" id="L289">      initNewList(newMtasDataFull.getSize());</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L291">        map.put(newDataCollector, this);</span>
+<span class="nc bnc" id="L292" title="All 2 branches missed.">        for (int i = 0; i &lt; newMtasDataFull.getSize(); i++) {</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">          if (newMtasDataFull.fullValueList[i].length &gt; 0) {</span>
+<span class="nc" id="L294">            MtasDataCollector&lt;?, ?&gt;[] subCollectors = new MtasDataCollector&lt;?, ?&gt;[1];</span>
+<span class="nc" id="L295">            subCollectors[0] = add(newMtasDataFull.keyList[i],</span>
+                increaseSourceNumber);
+<span class="nc" id="L297">            setError(newCurrentPosition, newMtasDataFull.errorNumber[i],</span>
+                newMtasDataFull.errorList[i], newCurrentExisting);
+<span class="nc" id="L299">            setValue(newCurrentPosition, newMtasDataFull.fullValueList[i],</span>
+                newMtasDataFull.fullValueList[i].length, newCurrentExisting);
+<span class="nc bnc" id="L301" title="All 4 branches missed.">            if (hasSub() &amp;&amp; newMtasDataFull.hasSub()) {</span>
+              // single key implies exactly one subCollector if hasSub
+<span class="nc" id="L303">              subCollectors[0].merge(</span>
+                  newMtasDataFull.subCollectorListNextLevel[i], map,
+                  increaseSourceNumber);
+            }
+          }
+        }
+<span class="nc bnc" id="L309" title="All 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L310">        map.put(newDataCollector, this);</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">        if (newMtasDataFull.getSize() &gt; 0) {</span>
+<span class="nc" id="L312">          MtasDataCollector&lt;?, ?&gt; subCollector = add(increaseSourceNumber);</span>
+<span class="nc" id="L313">          setError(newCurrentPosition, newMtasDataFull.errorNumber[0],</span>
+              newMtasDataFull.errorList[0], newCurrentExisting);
+<span class="nc" id="L315">          setValue(newCurrentPosition, newMtasDataFull.fullValueList[0],</span>
+              newMtasDataFull.fullValueList[0].length, newCurrentExisting);
+<span class="nc bnc" id="L317" title="All 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataFull.hasSub()) {</span>
+<span class="nc" id="L318">            subCollector.merge(newMtasDataFull.subCollectorNextLevel, map,</span>
+                increaseSourceNumber);
+          }
+<span class="nc" id="L321">        }</span>
+      } else {
+<span class="nc" id="L323">        throw new IOException(&quot;cannot merge &quot; + collectorType);</span>
+      }
+<span class="nc" id="L325">      closeNewList();</span>
+    }
+<span class="nc" id="L327">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int)
+   */
+  @Override
+  public final void initNewList(int maxNumberOfTerms) throws IOException {
+<span class="fc" id="L336">    super.initNewList(maxNumberOfTerms);</span>
+<span class="fc" id="L337">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L338">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int,
+   * java.lang.String)
+   */
+  @Override
+  public final void initNewList(int maxNumberOfTerms, String segmentName,
+      int segmentNumber, String boundary) throws IOException {
+<span class="nc" id="L349">    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);</span>
+<span class="nc" id="L350">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="nc" id="L351">  }</span>
+
+  /**
+   * Inits the new list basic.
+   *
+   * @param maxNumberOfTerms the max number of terms
+   */
+  private void initNewListBasic(int maxNumberOfTerms) {
+<span class="fc" id="L359">    newFullValueList = operations.createMatrix1(newSize);</span>
+<span class="fc" id="L360">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

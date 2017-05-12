@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasPrefixTokenFilterFactory.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasPrefixTokenFilterFactory.java</span></div><h1>MtasPrefixTokenFilterFactory.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
+
+import java.io.IOException;
+import java.util.Map;
+import mtas.analysis.token.MtasToken;
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
+
+/**
+ * A factory for creating MtasPrefixTokenFilter objects.
+ */
+public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
+
+  /** The prefix. */
+  private String prefix;
+
+  /**
+   * Instantiates a new mtas prefix token filter factory.
+   *
+   * @param args the args
+   */
+  public MtasPrefixTokenFilterFactory(Map&lt;String, String&gt; args) {
+<span class="nc" id="L25">    super(args);</span>
+<span class="nc" id="L26">    prefix = get(args, &quot;prefix&quot;);</span>
+<span class="nc" id="L27">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.analysis.util.TokenFilterFactory#create(org.apache.lucene
+   * .analysis.TokenStream)
+   */
+  @Override
+  public TokenStream create(TokenStream input) {
+<span class="nc" id="L38">    return new MtasPrefixTokenFilter(input, prefix);</span>
+  }
+
+  /**
+   * The Class MtasPrefixTokenFilter.
+   */
+  private static class MtasPrefixTokenFilter extends TokenFilter {
+
+    /** The prefix. */
+    private String prefix;
+
+    /** The term att. */
+<span class="nc" id="L50">    private final CharTermAttribute termAtt = addAttribute(</span>
+        CharTermAttribute.class);
+
+    /**
+     * Instantiates a new mtas prefix token filter.
+     *
+     * @param input the input
+     * @param prefix the prefix
+     */
+    protected MtasPrefixTokenFilter(TokenStream input, String prefix) {
+<span class="nc" id="L60">      super(input);</span>
+<span class="nc" id="L61">      this.prefix = prefix + MtasToken.DELIMITER;</span>
+<span class="nc" id="L62">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.lucene.analysis.TokenStream#incrementToken()
+     */
+    @Override
+    public final boolean incrementToken() throws IOException {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">      if (input.incrementToken()) {</span>
+<span class="nc" id="L72">        int oldLen = termAtt.length();</span>
+<span class="nc" id="L73">        char[] buffer = termAtt.resizeBuffer(oldLen + prefix.length());</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        for (int i = 0; i &lt; oldLen; i++) {</span>
+<span class="nc" id="L76">          buffer[(oldLen + prefix.length() - 1 - i)] = buffer[(oldLen - 1 - i)];</span>
+        }
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        for (int i = 0; i &lt; prefix.length(); i++) {</span>
+<span class="nc" id="L79">          buffer[i] = prefix.charAt(i);</span>
+        }
+<span class="nc" id="L81">        termAtt.copyBuffer(buffer, 0, oldLen + prefix.length());</span>
+<span class="nc" id="L82">        return true;</span>
+      } else {
+<span class="nc" id="L84">        return false;</span>
+      }
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.lucene.util.AttributeSource#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">      if (this == obj)</span>
+<span class="nc" id="L94">        return true;</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      if (obj == null)</span>
+<span class="nc" id="L96">        return false;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc" id="L98">        return false;</span>
+<span class="nc" id="L99">      final MtasPrefixTokenFilter that = (MtasPrefixTokenFilter) obj;</span>
+<span class="nc bnc" id="L100" title="All 4 branches missed.">      return prefix.equals(that.prefix) &amp;&amp; super.equals(that);</span>
+    }
+
+    /* (non-Javadoc)
+     * @see org.apache.lucene.util.AttributeSource#hashCode()
+     */
+    @Override
+    public int hashCode() {
+<span class="nc" id="L108">      int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L109">      h = (h * 7) ^ prefix.hashCode();</span>
+<span class="nc" id="L110">      return h;</span>
+    }
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

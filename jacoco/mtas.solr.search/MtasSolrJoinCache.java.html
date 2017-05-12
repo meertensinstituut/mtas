@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrJoinCache.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.search</a> &gt; <span class="el_source">MtasSolrJoinCache.java</span></div><h1>MtasSolrJoinCache.java</h1><pre class="source lang-java linenums">package mtas.solr.search;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.util.Base64;
+
+public class MtasSolrJoinCache {
+
+<span class="fc" id="L34">  private static Log log = LogFactory.getLog(MtasSolrJoinCache.class);</span>
+  private static final long DEFAULT_LIFETIME = 86400;
+  private static final int DEFAULT_MAXIMUM_NUMBER = 1000;
+  private static final int DEFAULT_MAXIMUM_OVERFLOW = 10;
+  private HashMap&lt;MtasSolrJoinCacheItem, String&gt; administration;
+  private HashMap&lt;String, MtasSolrJoinCacheItem&gt; index;
+  private HashMap&lt;String, Long&gt; expiration;
+  private Path joinCachePath;
+  private long lifeTime;
+  private int maximumNumber;
+  private int maximumOverflow;
+
+  public MtasSolrJoinCache(String cacheDirectory, Long lifeTime,
+<span class="fc" id="L47">      Integer maximumNumber, Integer maximumOverflow) {</span>
+<span class="fc" id="L48">    joinCachePath = null;</span>
+<span class="pc bpc" id="L49" title="3 of 4 branches missed.">    this.lifeTime = (lifeTime != null &amp;&amp; lifeTime &gt; 0) ? lifeTime</span>
+        : DEFAULT_LIFETIME;
+<span class="pc bpc" id="L51" title="3 of 4 branches missed.">    this.maximumNumber = (maximumNumber != null &amp;&amp; maximumNumber &gt; 0)</span>
+<span class="pc" id="L52">        ? maximumNumber : DEFAULT_MAXIMUM_NUMBER;</span>
+<span class="pc bpc" id="L53" title="3 of 4 branches missed.">    this.maximumOverflow = (maximumOverflow != null &amp;&amp; maximumOverflow &gt; 0)</span>
+<span class="pc" id="L54">        ? maximumOverflow : DEFAULT_MAXIMUM_OVERFLOW;</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">    if (cacheDirectory != null) {</span>
+      try {
+<span class="nc" id="L57">        joinCachePath = Files.createDirectories(Paths.get(cacheDirectory));</span>
+<span class="nc" id="L58">        File[] fileList = joinCachePath.toFile().listFiles();</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (fileList != null) {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">          for (File file : fileList) {</span>
+<span class="nc bnc" id="L61" title="All 4 branches missed.">            if (file.isFile() &amp;&amp; !file.delete()) {</span>
+<span class="nc" id="L62">              log.error(&quot;couldn't delete &quot; + file);</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            } else if (file.isDirectory()) {</span>
+<span class="nc" id="L64">              log.info(&quot;unexpected directory &quot; + file.getName());</span>
+            }
+          }
+        }
+<span class="nc" id="L68">      } catch (IOException e) {</span>
+<span class="nc" id="L69">        joinCachePath = null;</span>
+<span class="nc" id="L70">        log.info(&quot;couldn't create cache directory &quot; + cacheDirectory, e);</span>
+<span class="nc" id="L71">      }</span>
+    }
+<span class="fc" id="L73">    administration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L74">    expiration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L75">  }</span>
+
+  public String create(String url, String request, Serializable data)
+      throws IOException {
+<span class="nc" id="L79">    MtasSolrJoinCacheItem item = new MtasSolrJoinCacheItem(url, request, null);</span>
+<span class="nc" id="L80">    return create(item, data);</span>
+  }
+
+  private String create(MtasSolrJoinCacheItem item, Serializable data)
+      throws IOException {
+    // initialisation
+<span class="nc" id="L86">    Date date = clear();</span>
+<span class="nc" id="L87">    delete(item);</span>
+    // create always new key
+    String key;
+    do {
+<span class="nc" id="L91">      key = UUID.randomUUID().toString();</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">    } while (index.containsKey(key));</span>
+    // register
+<span class="nc" id="L94">    administration.put(item, key);</span>
+<span class="nc" id="L95">    expiration.put(key, date.getTime() + lifeTime);</span>
+<span class="nc" id="L96">    index.put(key, item);</span>
+    // store data
+<span class="nc bnc" id="L98" title="All 2 branches missed.">    if (joinCachePath != null) {</span>
+<span class="nc" id="L99">      File file = joinCachePath.resolve(key).toFile();</span>
+<span class="nc" id="L100">      try (OutputStream outputStream = new FileOutputStream(file);</span>
+<span class="nc" id="L101">          Writer outputStreamWriter = new OutputStreamWriter(outputStream,</span>
+              StandardCharsets.UTF_8);) {
+<span class="nc" id="L103">        outputStreamWriter.write(encode(data));</span>
+<span class="nc" id="L104">        return key;</span>
+<span class="nc bnc" id="L105" title="All 16 branches missed.">      } catch (IOException e) {</span>
+<span class="nc" id="L106">        administration.remove(item);</span>
+<span class="nc" id="L107">        expiration.remove(key);</span>
+<span class="nc" id="L108">        log.error(&quot;couldn't create &quot; + key, e);</span>
+<span class="nc" id="L109">        return null;</span>
+      }
+    } else {
+<span class="nc" id="L112">      item.data = encode(data);</span>
+<span class="nc" id="L113">      return key;</span>
+    }
+  }
+
+  public Object get(String url, String request) throws IOException {
+<span class="nc" id="L118">    MtasSolrJoinCacheItem item = new MtasSolrJoinCacheItem(url, request, null);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">    if (administration.containsKey(item)) {</span>
+<span class="nc" id="L120">      return get(item);</span>
+    } else {
+<span class="nc" id="L122">      return null;</span>
+    }
+  }
+
+  public Object get(String key) throws IOException {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
+<span class="nc" id="L128">      return get(index.get(key));</span>
+    } else {
+<span class="nc" id="L130">      return null;</span>
+    }
+  }
+
+  private Object get(MtasSolrJoinCacheItem item) throws IOException {
+<span class="nc" id="L135">    Date date = clear();</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    if (administration.containsKey(item)) {</span>
+<span class="nc" id="L137">      String key = administration.get(item);</span>
+<span class="nc" id="L138">      expiration.put(key, date.getTime() + lifeTime);</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">      if (joinCachePath != null) {</span>
+        try {
+<span class="nc" id="L141">          Path path = joinCachePath.resolve(key);</span>
+<span class="nc" id="L142">          String data = new String(Files.readAllBytes(path),</span>
+              StandardCharsets.UTF_8);
+<span class="nc" id="L144">          return decode(data);</span>
+<span class="nc" id="L145">        } catch (IOException e) {</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">          if (!joinCachePath.resolve(key).toFile().delete()) {</span>
+<span class="nc" id="L147">            log.debug(&quot;couldn't delete &quot; + key);</span>
+          }
+<span class="nc" id="L149">          administration.remove(item);</span>
+<span class="nc" id="L150">          expiration.remove(key);</span>
+<span class="nc" id="L151">          log.error(&quot;couldn't get &quot; + key, e);</span>
+<span class="nc" id="L152">        }</span>
+      } else {
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if(item.data!=null) {</span>
+<span class="nc" id="L155">          return decode(item.data);</span>
+        } else {
+<span class="nc" id="L157">          return null;</span>
+        }
+      }
+<span class="nc" id="L160">    } else {</span>
+<span class="nc" id="L161">      log.error(&quot;doesn't exist anymore&quot;);</span>
+    }
+<span class="nc" id="L163">    return null;</span>
+  }
+
+  private void delete(MtasSolrJoinCacheItem item) {
+<span class="nc bnc" id="L167" title="All 2 branches missed.">    if (administration.containsKey(item)) {</span>
+<span class="nc" id="L168">      String key = administration.remove(item);</span>
+<span class="nc" id="L169">      expiration.remove(key);</span>
+<span class="nc" id="L170">      index.remove(key);</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">      if (joinCachePath != null</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">          &amp;&amp; !joinCachePath.resolve(key).toFile().delete()) {</span>
+<span class="nc" id="L173">        log.debug(&quot;couldn't delete &quot; + key);</span>
+      }
+    }
+<span class="nc" id="L176">  }</span>
+
+  private Date clear() {
+<span class="nc" id="L179">    Date date = new Date();</span>
+<span class="nc" id="L180">    Long timestamp = date.getTime();</span>
+<span class="nc" id="L181">    HashSet&lt;MtasSolrJoinCacheItem&gt; toBeRemoved = new HashSet&lt;&gt;();</span>
+    // check expiration
+<span class="nc bnc" id="L183" title="All 2 branches missed.">    for (Entry&lt;String, Long&gt; entry : expiration.entrySet()) {</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">      if (entry.getValue() &lt; timestamp) {</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        for (Entry&lt;MtasSolrJoinCacheItem, String&gt; subEntry : administration</span>
+<span class="nc" id="L186">            .entrySet()) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">          if (subEntry.getValue().equals(entry.getKey())) {</span>
+<span class="nc" id="L188">            toBeRemoved.add(subEntry.getKey());</span>
+          }
+<span class="nc" id="L190">        }</span>
+      }
+<span class="nc" id="L192">    }</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">    for (MtasSolrJoinCacheItem item : toBeRemoved) {</span>
+<span class="nc" id="L194">      delete(item);</span>
+<span class="nc" id="L195">    }</span>
+    // check size
+<span class="nc bnc" id="L197" title="All 2 branches missed.">    if (expiration.size() &gt; maximumNumber + maximumOverflow) {</span>
+<span class="nc" id="L198">      Set&lt;Entry&lt;String, Long&gt;&gt; mapEntries = expiration.entrySet();</span>
+<span class="nc" id="L199">      List&lt;Entry&lt;String, Long&gt;&gt; aList = new LinkedList&lt;&gt;(mapEntries);</span>
+<span class="nc" id="L200">      Collections.sort(aList,</span>
+          (Entry&lt;String, Long&gt; ele1, Entry&lt;String, Long&gt; ele2) -&gt; ele2
+<span class="nc" id="L202">              .getValue().compareTo(ele1.getValue()));</span>
+<span class="nc" id="L203">      aList.subList(maximumNumber, aList.size()).clear();</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">      for (Entry&lt;String, MtasSolrJoinCacheItem&gt; entry : index.entrySet()) {</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">        if (!expiration.containsKey(entry.getKey())) {</span>
+<span class="nc" id="L206">          toBeRemoved.add(entry.getValue());</span>
+        }
+<span class="nc" id="L208">      }</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">      for (MtasSolrJoinCacheItem item : toBeRemoved) {</span>
+<span class="nc" id="L210">        delete(item);</span>
+<span class="nc" id="L211">      }</span>
+    }
+<span class="nc" id="L213">    return date;</span>
+  }
+
+  private String encode(Serializable o) throws IOException {
+<span class="nc" id="L217">    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();</span>
+    ObjectOutputStream objectOutputStream;
+<span class="nc" id="L219">    objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);</span>
+<span class="nc" id="L220">    objectOutputStream.writeObject(o);</span>
+<span class="nc" id="L221">    objectOutputStream.close();</span>
+<span class="nc" id="L222">    byte[] byteArray = byteArrayOutputStream.toByteArray();</span>
+<span class="nc" id="L223">    return Base64.byteArrayToBase64(byteArray);</span>
+  }
+
+  private Object decode(String s) throws IOException {
+<span class="nc" id="L227">    byte[] bytes = Base64.base64ToByteArray(s);</span>
+    ObjectInputStream objectInputStream;
+<span class="nc" id="L229">    objectInputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));</span>
+    try {
+<span class="nc" id="L231">      return objectInputStream.readObject();</span>
+<span class="nc" id="L232">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L233">      throw new IOException(e);</span>
+    }
+  }
+
+}
+
+class MtasSolrJoinCacheItem {
+
+  public String url;
+  public String request;
+  public String data;
+
+<span class="nc" id="L245">  public MtasSolrJoinCacheItem(String url, String request, String data) {</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">    this.url = url == null ? &quot;&quot; : url;</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">    this.request = request == null ? &quot;&quot; : request;</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">    this.data = data == null ? &quot;&quot; : data;</span>
+<span class="nc" id="L249">  }</span>
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L253">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L254">    h = (h * 3) ^ url.hashCode();</span>
+<span class="nc" id="L255">    h = (h * 5) ^ request.hashCode();</span>
+<span class="nc" id="L256">    return h;</span>
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L261" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L262">      return true;</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L264">      return false;</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L266">      return false;</span>
+<span class="nc" id="L267">    final MtasSolrJoinCacheItem that = (MtasSolrJoinCacheItem) obj;</span>
+<span class="nc bnc" id="L268" title="All 4 branches missed.">    return (url.equals(that.url)) &amp;&amp; (request.equals(that.request));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

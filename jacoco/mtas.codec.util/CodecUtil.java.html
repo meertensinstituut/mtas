@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CodecUtil.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">CodecUtil.java</span></div><h1>CodecUtil.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import mtas.analysis.token.MtasToken;
+import mtas.codec.MtasCodecPostingsFormat;
+import mtas.parser.function.util.MtasFunctionParserFunction;
+import mtas.search.spans.util.MtasSpanQuery;
+import mtas.codec.util.CodecComponent.ComponentField;
+import mtas.codec.util.CodecComponent.ComponentJoin;
+
+import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanWeight;
+
+/**
+ * The Class CodecUtil.
+ */
+<span class="nc" id="L28">public class CodecUtil {</span>
+
+  /** The Constant STATS_TYPE_GEOMETRICMEAN. */
+  public static final String STATS_TYPE_GEOMETRICMEAN = &quot;geometricmean&quot;;
+
+  /** The Constant STATS_TYPE_KURTOSIS. */
+  public static final String STATS_TYPE_KURTOSIS = &quot;kurtosis&quot;;
+
+  /** The Constant STATS_TYPE_MAX. */
+  public static final String STATS_TYPE_MAX = &quot;max&quot;;
+
+  /** The Constant STATS_TYPE_MEAN. */
+  public static final String STATS_TYPE_MEAN = &quot;mean&quot;;
+
+  /** The Constant STATS_TYPE_MIN. */
+  public static final String STATS_TYPE_MIN = &quot;min&quot;;
+
+  /** The Constant STATS_TYPE_N. */
+  public static final String STATS_TYPE_N = &quot;n&quot;;
+
+  /** The Constant STATS_TYPE_MEDIAN. */
+  public static final String STATS_TYPE_MEDIAN = &quot;median&quot;;
+
+  /** The Constant STATS_TYPE_POPULATIONVARIANCE. */
+  public static final String STATS_TYPE_POPULATIONVARIANCE = &quot;populationvariance&quot;;
+
+  /** The Constant STATS_TYPE_QUADRATICMEAN. */
+  public static final String STATS_TYPE_QUADRATICMEAN = &quot;quadraticmean&quot;;
+
+  /** The Constant STATS_TYPE_SKEWNESS. */
+  public static final String STATS_TYPE_SKEWNESS = &quot;skewness&quot;;
+
+  /** The Constant STATS_TYPE_STANDARDDEVIATION. */
+  public static final String STATS_TYPE_STANDARDDEVIATION = &quot;standarddeviation&quot;;
+
+  /** The Constant STATS_TYPE_SUM. */
+  public static final String STATS_TYPE_SUM = &quot;sum&quot;;
+
+  /** The Constant STATS_TYPE_SUMSQ. */
+  public static final String STATS_TYPE_SUMSQ = &quot;sumsq&quot;;
+
+  /** The Constant STATS_TYPE_SUMOFLOGS. */
+  public static final String STATS_TYPE_SUMOFLOGS = &quot;sumoflogs&quot;;
+
+  /** The Constant STATS_TYPE_VARIANCE. */
+  public static final String STATS_TYPE_VARIANCE = &quot;variance&quot;;
+
+  /** The Constant STATS_TYPE_ALL. */
+  public static final String STATS_TYPE_ALL = &quot;all&quot;;
+
+  /** The Constant STATS_FUNCTION_DISTRIBUTION. */
+  public static final String STATS_FUNCTION_DISTRIBUTION = &quot;distribution&quot;;
+
+  /** The Constant SORT_TERM. */
+  public static final String SORT_TERM = &quot;term&quot;;
+
+  /** The Constant SORT_ASC. */
+  public static final String SORT_ASC = &quot;asc&quot;;
+
+  /** The Constant SORT_DESC. */
+  public static final String SORT_DESC = &quot;desc&quot;;
+
+  /** The Constant STATS_FUNCTIONS. */
+<span class="fc" id="L91">  private static final List&lt;String&gt; STATS_FUNCTIONS = Arrays</span>
+<span class="fc" id="L92">      .asList(STATS_FUNCTION_DISTRIBUTION);</span>
+
+  /** The Constant STATS_TYPES. */
+<span class="fc" id="L95">  private final static List&lt;String&gt; STATS_TYPES = Arrays.asList(</span>
+      STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_KURTOSIS, STATS_TYPE_MAX,
+      STATS_TYPE_MEAN, STATS_TYPE_MIN, STATS_TYPE_N, STATS_TYPE_MEDIAN,
+      STATS_TYPE_POPULATIONVARIANCE, STATS_TYPE_QUADRATICMEAN,
+      STATS_TYPE_SKEWNESS, STATS_TYPE_STANDARDDEVIATION, STATS_TYPE_SUM,
+      STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS, STATS_TYPE_VARIANCE);
+
+  /** The Constant STATS_BASIC_TYPES. */
+<span class="fc" id="L103">  private final static List&lt;String&gt; STATS_BASIC_TYPES = Arrays</span>
+<span class="fc" id="L104">      .asList(STATS_TYPE_N, STATS_TYPE_SUM, STATS_TYPE_MEAN);</span>
+
+  /** The Constant STATS_ADVANCED_TYPES. */
+<span class="fc" id="L107">  private static final List&lt;String&gt; STATS_ADVANCED_TYPES = Arrays.asList(</span>
+      STATS_TYPE_MAX, STATS_TYPE_MIN, STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS,
+      STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_STANDARDDEVIATION,
+      STATS_TYPE_VARIANCE, STATS_TYPE_POPULATIONVARIANCE,
+      STATS_TYPE_QUADRATICMEAN);
+
+  /** The Constant STATS_FULL_TYPES. */
+<span class="fc" id="L114">  private static final List&lt;String&gt; STATS_FULL_TYPES = Arrays</span>
+<span class="fc" id="L115">      .asList(STATS_TYPE_KURTOSIS, STATS_TYPE_MEDIAN, STATS_TYPE_SKEWNESS);</span>
+
+  /** The Constant STATS_BASIC. */
+  public static final String STATS_BASIC = &quot;basic&quot;;
+
+  /** The Constant STATS_ADVANCED. */
+  public static final String STATS_ADVANCED = &quot;advanced&quot;;
+
+  /** The Constant STATS_FULL. */
+  public static final String STATS_FULL = &quot;full&quot;;
+
+  /** The Constant DATA_TYPE_LONG. */
+  public static final String DATA_TYPE_LONG = &quot;long&quot;;
+
+  /** The Constant DATA_TYPE_DOUBLE. */
+  public static final String DATA_TYPE_DOUBLE = &quot;double&quot;;
+
+  /** The fp stats items. */
+<span class="fc" id="L133">  private static Pattern fpStatsItems = Pattern</span>
+<span class="fc" id="L134">      .compile(&quot;(([^\\(,]+)(\\([^\\)]*\\))?)&quot;);</span>
+
+  /** The fp stats function items. */
+<span class="fc" id="L137">  private static Pattern fpStatsFunctionItems = Pattern</span>
+<span class="fc" id="L138">      .compile(&quot;(([^\\(,]+)(\\(([^\\)]*)\\)))&quot;);</span>
+
+  /**
+   * Checks if is single position prefix.
+   *
+   * @param fieldInfo
+   *          the field info
+   * @param prefix
+   *          the prefix
+   * @return true, if is single position prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public static boolean isSinglePositionPrefix(FieldInfo fieldInfo,
+      String prefix) throws IOException {
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">    if (fieldInfo == null) {</span>
+<span class="nc" id="L154">      throw new IOException(&quot;no fieldInfo&quot;);</span>
+    } else {
+<span class="fc" id="L156">      String info = fieldInfo.getAttribute(</span>
+          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">      if (info == null) {</span>
+<span class="nc" id="L159">        throw new IOException(&quot;no &quot;</span>
+            + MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
+      } else {
+<span class="fc" id="L162">        return Arrays.asList(info.split(Pattern.quote(MtasToken.DELIMITER)))</span>
+<span class="fc" id="L163">            .contains(prefix);</span>
+      }
+    }
+  }
+
+  /**
+   * Term value.
+   *
+   * @param term
+   *          the term
+   * @return the string
+   */
+  public static String termValue(String term) {
+<span class="nc" id="L176">    int i = term.indexOf(MtasToken.DELIMITER);</span>
+<span class="nc" id="L177">    String value = null;</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="nc" id="L179">      value = term.substring((i + MtasToken.DELIMITER.length()));</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">      value = (value.length() &gt; 0) ? value : null;</span>
+    }
+<span class="nc bnc" id="L182" title="All 2 branches missed.">    return (value == null) ? null : value.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+  }
+
+  /**
+   * Term prefix.
+   *
+   * @param term
+   *          the term
+   * @return the string
+   */
+  public static String termPrefix(String term) {
+<span class="nc" id="L193">    int i = term.indexOf(MtasToken.DELIMITER);</span>
+<span class="nc" id="L194">    String prefix = term;</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="nc" id="L196">      prefix = term.substring(0, i);</span>
+    }
+<span class="nc" id="L198">    return prefix.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+  }
+
+  /**
+   * Term prefix value.
+   *
+   * @param term
+   *          the term
+   * @return the string
+   */
+  public static String termPrefixValue(String term) {
+<span class="nc bnc" id="L209" title="All 2 branches missed.">    return (term == null) ? null : term.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+  }
+
+  /**
+   * Collect.
+   *
+   * @param field
+   *          the field
+   * @param searcher
+   *          the searcher
+   * @param rawReader
+   *          the raw reader
+   * @param fullDocList
+   *          the full doc list
+   * @param fullDocSet
+   *          the full doc set
+   * @param fieldStats
+   *          the field stats
+   * @throws IllegalAccessException
+   *           the illegal access exception
+   * @throws IllegalArgumentException
+   *           the illegal argument exception
+   * @throws InvocationTargetException
+   *           the invocation target exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public static void collectField(String field, IndexSearcher searcher,
+      IndexReader rawReader, ArrayList&lt;Integer&gt; fullDocList,
+      ArrayList&lt;Integer&gt; fullDocSet, ComponentField fieldStats)
+      throws IllegalAccessException, IllegalArgumentException,
+      InvocationTargetException, IOException {
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">    if (fieldStats != null) {</span>
+<span class="fc" id="L242">      IndexReader reader = searcher.getIndexReader();</span>
+<span class="fc" id="L243">      HashMap&lt;MtasSpanQuery, SpanWeight&gt; spansQueryWeight = new HashMap&lt;&gt;();</span>
+      // only if spanQueryList is not empty
+<span class="fc bfc" id="L245" title="All 2 branches covered.">      if (fieldStats.spanQueryList.size() &gt; 0) {</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        for (MtasSpanQuery sq : fieldStats.spanQueryList) {</span>
+<span class="fc" id="L247">          spansQueryWeight.put(sq, ((MtasSpanQuery) sq.rewrite(reader))</span>
+<span class="fc" id="L248">              .createWeight(searcher, false));</span>
+<span class="fc" id="L249">        }</span>
+      }
+      // collect
+<span class="fc" id="L252">      CodecCollector.collectField(field, searcher, reader, rawReader,</span>
+          fullDocList, fullDocSet, fieldStats, spansQueryWeight);
+    }
+<span class="fc" id="L255">  }</span>
+
+  public static void collectJoin(IndexReader reader,
+      ArrayList&lt;Integer&gt; fullDocSet, ComponentJoin joinInfo)
+      throws IOException {
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">    if (joinInfo != null) {</span>
+<span class="nc" id="L261">      CodecCollector.collectJoin(reader, fullDocSet, joinInfo);</span>
+    }
+<span class="fc" id="L263">  }</span>
+
+  /**
+   * Creates the stats items.
+   *
+   * @param statsType
+   *          the stats type
+   * @return the tree set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  static TreeSet&lt;String&gt; createStatsItems(String statsType) throws IOException {
+<span class="fc" id="L275">    TreeSet&lt;String&gt; statsItems = new TreeSet&lt;String&gt;();</span>
+<span class="fc" id="L276">    TreeSet&lt;String&gt; functionItems = new TreeSet&lt;String&gt;();</span>
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">    if (statsType != null) {</span>
+<span class="fc" id="L278">      Matcher m = fpStatsItems.matcher(statsType.trim());</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">      while (m.find()) {</span>
+<span class="fc" id="L280">        String tmpStatsItem = m.group(2).trim();</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        if (STATS_TYPES.contains(tmpStatsItem)) {</span>
+<span class="fc" id="L282">          statsItems.add(tmpStatsItem);</span>
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">        } else if (tmpStatsItem.equals(STATS_TYPE_ALL)) {</span>
+<span class="fc bfc" id="L284" title="All 2 branches covered.">          for (String type : STATS_TYPES) {</span>
+<span class="fc" id="L285">            statsItems.add(type);</span>
+<span class="fc" id="L286">          }</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">          if (m.group(3) == null) {</span>
+<span class="nc" id="L289">            throw new IOException(&quot;'&quot; + tmpStatsItem + &quot;' should be called as '&quot;</span>
+                + tmpStatsItem + &quot;()' with an optional argument&quot;);
+          } else {
+<span class="nc" id="L292">            functionItems.add(m.group(1).trim());</span>
+          }
+        } else {
+<span class="nc" id="L295">          throw new IOException(&quot;unknown statsType '&quot; + tmpStatsItem + &quot;'&quot;);</span>
+        }
+<span class="fc" id="L297">      }</span>
+    }
+<span class="pc bpc" id="L299" title="3 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
+<span class="nc" id="L300">      statsItems.add(STATS_TYPE_SUM);</span>
+<span class="nc" id="L301">      statsItems.add(STATS_TYPE_N);</span>
+<span class="nc" id="L302">      statsItems.add(STATS_TYPE_MEAN);</span>
+    }
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">    if (functionItems.size() &gt; 0) {</span>
+<span class="nc" id="L305">      statsItems.addAll(functionItems);</span>
+    }
+<span class="fc" id="L307">    return statsItems;</span>
+  }
+
+  /**
+   * Creates the stats type.
+   *
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param functionParser
+   *          the function parser
+   * @return the string
+   */
+  static String createStatsType(Set&lt;String&gt; statsItems, String sortType,
+      MtasFunctionParserFunction functionParser) {
+<span class="fc" id="L323">    String statsType = STATS_BASIC;</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">    for (String statsItem : statsItems) {</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">      if (STATS_FULL_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L326">        statsType = STATS_FULL;</span>
+<span class="fc" id="L327">        break;</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">      } else if (STATS_ADVANCED_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L329">        statsType = STATS_ADVANCED;</span>
+<span class="fc bfc" id="L330" title="All 2 branches covered.">      } else if (statsType != STATS_ADVANCED</span>
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">          &amp;&amp; STATS_BASIC_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L332">        statsType = STATS_BASIC;</span>
+      } else {
+<span class="fc" id="L334">        Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());</span>
+<span class="pc bpc" id="L335" title="1 of 2 branches missed.">        if (m.find()) {</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {</span>
+<span class="nc" id="L337">            statsType = STATS_FULL;</span>
+<span class="nc" id="L338">            break;</span>
+          }
+        }
+      }
+<span class="fc" id="L342">    }</span>
+<span class="pc bpc" id="L343" title="1 of 4 branches missed.">    if (sortType != null &amp;&amp; STATS_TYPES.contains(sortType)) {</span>
+<span class="pc bpc" id="L344" title="1 of 2 branches missed.">      if (STATS_FULL_TYPES.contains(sortType)) {</span>
+<span class="nc" id="L345">        statsType = STATS_FULL;</span>
+<span class="pc bpc" id="L346" title="1 of 2 branches missed.">      } else if (STATS_ADVANCED_TYPES.contains(sortType)) {</span>
+<span class="nc bnc" id="L347" title="All 4 branches missed.">        statsType = (statsType == null || statsType != STATS_FULL)</span>
+            ? STATS_ADVANCED : statsType;
+      } 
+    }
+<span class="fc" id="L351">    return statsType;</span>
+  }
+  
+  public static boolean isStatsType(String type) {
+<span class="fc" id="L355">    return STATS_TYPES.contains(type);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

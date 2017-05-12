@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasBufferedReader.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasBufferedReader.java</span></div><h1>MtasBufferedReader.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+/**
+ * The Class MtasBufferedReader.
+ */
+public class MtasBufferedReader extends Reader {
+
+  /** The in. */
+  private Reader in;
+
+  /** The cb. */
+  private char cb[];
+
+  /** The next char. */
+  private int nChars, nextChar;
+
+  /** The previous buffer size. */
+  private int previousBufferSize;
+
+  /** The skip lf. */
+<span class="nc" id="L31">  private boolean skipLF = false;</span>
+
+  /** The default char buffer size. */
+<span class="nc" id="L34">  private static int defaultCharBufferSize = 8192;</span>
+
+  /** The default expected line length. */
+<span class="nc" id="L37">  private static int defaultExpectedLineLength = 80;</span>
+
+  /**
+   * Instantiates a new mtas buffered reader.
+   *
+   * @param in
+   *          the in
+   * @param sz
+   *          the sz
+   */
+  public MtasBufferedReader(Reader in, int sz) {
+<span class="nc" id="L48">    super(in);</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">    if (sz &lt;= 0)</span>
+<span class="nc" id="L50">      throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);</span>
+<span class="nc" id="L51">    this.in = in;</span>
+<span class="nc" id="L52">    cb = new char[sz];</span>
+<span class="nc" id="L53">    nextChar = nChars = 0;</span>
+<span class="nc" id="L54">  }</span>
+
+  /**
+   * Instantiates a new mtas buffered reader.
+   *
+   * @param in
+   *          the in
+   */
+  public MtasBufferedReader(Reader in) {
+<span class="nc" id="L63">    this(in, defaultCharBufferSize);</span>
+<span class="nc" id="L64">  }</span>
+
+  /**
+   * Ensure open.
+   *
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void ensureOpen() throws IOException {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (in == null)</span>
+<span class="nc" id="L74">      throw new IOException(&quot;Stream closed&quot;);</span>
+<span class="nc" id="L75">  }</span>
+
+  /**
+   * Fill.
+   *
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void fill() throws IOException {
+    int n;
+<span class="nc" id="L85">    previousBufferSize += nChars;</span>
+    do {
+<span class="nc" id="L87">      n = in.read(cb, 0, cb.length);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">    } while (n == 0);</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">    if (n &gt; 0) {</span>
+<span class="nc" id="L90">      nChars = n;</span>
+<span class="nc" id="L91">      nextChar = 0;</span>
+    }
+<span class="nc" id="L93">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Reader#read()
+   */
+  @Override
+  public int read() throws IOException {
+<span class="nc" id="L102">    synchronized (lock) {</span>
+<span class="nc" id="L103">      ensureOpen();</span>
+      for (;;) {
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (nextChar &gt;= nChars) {</span>
+<span class="nc" id="L106">          fill();</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">          if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L108">            return -1;</span>
+        }
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (skipLF) {</span>
+<span class="nc" id="L111">          skipLF = false;</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">          if (cb[nextChar] == '\n') {</span>
+<span class="nc" id="L113">            nextChar++;</span>
+<span class="nc" id="L114">            continue;</span>
+          }
+        }
+<span class="nc" id="L117">        return cb[nextChar++];</span>
+      }
+<span class="nc" id="L119">    }</span>
+  }
+
+  /**
+   * Read1.
+   *
+   * @param cbuf
+   *          the cbuf
+   * @param off
+   *          the off
+   * @param len
+   *          the len
+   * @return the int
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private int read1(char[] cbuf, int off, int len) throws IOException {
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    if (nextChar &gt;= nChars) {</span>
+      /*
+       * If the requested length is at least as large as the buffer, and if
+       * there is no mark/reset activity, and if line feeds are not being
+       * skipped, do not bother to copy the characters into the local buffer. In
+       * this way buffered streams will cascade harmlessly.
+       */
+<span class="nc bnc" id="L143" title="All 4 branches missed.">      if (len &gt;= cb.length &amp;&amp; !skipLF) {</span>
+<span class="nc" id="L144">        return in.read(cbuf, off, len);</span>
+      }
+<span class="nc" id="L146">      fill();</span>
+    }
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L149">      return -1;</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">    if (skipLF) {</span>
+<span class="nc" id="L151">      skipLF = false;</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">      if (cb[nextChar] == '\n') {</span>
+<span class="nc" id="L153">        nextChar++;</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L155">          fill();</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L157">          return -1;</span>
+      }
+    }
+<span class="nc" id="L160">    int n = Math.min(len, nChars - nextChar);</span>
+<span class="nc" id="L161">    System.arraycopy(cb, nextChar, cbuf, off, n);</span>
+<span class="nc" id="L162">    nextChar += n;</span>
+<span class="nc" id="L163">    return n;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Reader#read(char[], int, int)
+   */
+  @Override
+  public int read(char cbuf[], int off, int len) throws IOException {
+<span class="nc" id="L173">    synchronized (lock) {</span>
+<span class="nc" id="L174">      ensureOpen();</span>
+<span class="nc bnc" id="L175" title="All 10 branches missed.">      if ((off &lt; 0) || (off &gt; cbuf.length) || (len &lt; 0)</span>
+          || ((off + len) &gt; cbuf.length) || ((off + len) &lt; 0)) {
+<span class="nc" id="L177">        throw new IndexOutOfBoundsException();</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">      } else if (len == 0) {</span>
+<span class="nc" id="L179">        return 0;</span>
+      }
+
+<span class="nc" id="L182">      int n = read1(cbuf, off, len);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">      if (n &lt;= 0)</span>
+<span class="nc" id="L184">        return n;</span>
+<span class="nc bnc" id="L185" title="All 4 branches missed.">      while ((n &lt; len) &amp;&amp; in.ready()) {</span>
+<span class="nc" id="L186">        int n1 = read1(cbuf, off + n, len - n);</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (n1 &lt;= 0)</span>
+<span class="nc" id="L188">          break;</span>
+<span class="nc" id="L189">        n += n1;</span>
+<span class="nc" id="L190">      }</span>
+<span class="nc" id="L191">      return n;</span>
+<span class="nc" id="L192">    }</span>
+  }
+
+  /**
+   * Read line.
+   *
+   * @param ignoreLF
+   *          the ignore lf
+   * @return the string
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  String readLine(boolean ignoreLF) throws IOException {
+<span class="nc" id="L205">    StringBuffer s = null;</span>
+    int startChar;
+
+<span class="nc" id="L208">    synchronized (lock) {</span>
+<span class="nc" id="L209">      ensureOpen();</span>
+<span class="nc bnc" id="L210" title="All 4 branches missed.">      boolean omitLF = ignoreLF || skipLF;</span>
+
+      for (;;) {
+
+<span class="nc bnc" id="L214" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L215">          fill();</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (nextChar &gt;= nChars) { /* EOF */</span>
+<span class="nc bnc" id="L217" title="All 4 branches missed.">          if (s != null &amp;&amp; s.length() &gt; 0)</span>
+<span class="nc" id="L218">            return s.toString();</span>
+          else
+<span class="nc" id="L220">            return null;</span>
+        }
+<span class="nc" id="L222">        boolean eol = false;</span>
+<span class="nc" id="L223">        char c = 0;</span>
+        int i;
+
+        /* Skip a leftover '\n', if necessary */
+<span class="nc bnc" id="L227" title="All 4 branches missed.">        if (omitLF &amp;&amp; (cb[nextChar] == '\n'))</span>
+<span class="nc" id="L228">          nextChar++;</span>
+<span class="nc" id="L229">        skipLF = false;</span>
+<span class="nc" id="L230">        omitLF = false;</span>
+
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        charLoop: for (i = nextChar; i &lt; nChars; i++) {</span>
+<span class="nc" id="L233">          c = cb[i];</span>
+<span class="nc bnc" id="L234" title="All 4 branches missed.">          if ((c == '\n') || (c == '\r')) {</span>
+<span class="nc" id="L235">            eol = true;</span>
+<span class="nc" id="L236">            break charLoop;</span>
+          }
+        }
+
+<span class="nc" id="L240">        startChar = nextChar;</span>
+<span class="nc" id="L241">        nextChar = i;</span>
+
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        if (eol) {</span>
+          String str;
+<span class="nc bnc" id="L245" title="All 2 branches missed.">          if (s == null) {</span>
+<span class="nc" id="L246">            str = new String(cb, startChar, i - startChar);</span>
+          } else {
+<span class="nc" id="L248">            s.append(cb, startChar, i - startChar);</span>
+<span class="nc" id="L249">            str = s.toString();</span>
+          }
+<span class="nc" id="L251">          nextChar++;</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">          if (c == '\r') {</span>
+<span class="nc" id="L253">            skipLF = true;</span>
+          }
+<span class="nc" id="L255">          return str;</span>
+        }
+
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (s == null)</span>
+<span class="nc" id="L259">          s = new StringBuffer(defaultExpectedLineLength);</span>
+<span class="nc" id="L260">        s.append(cb, startChar, i - startChar);</span>
+<span class="nc" id="L261">      }</span>
+<span class="nc" id="L262">    }</span>
+  }
+
+  /**
+   * Read line.
+   *
+   * @return the string
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public String readLine() throws IOException {
+<span class="nc" id="L273">    return readLine(false);</span>
+  }
+
+  /**
+   * Gets the position.
+   *
+   * @return the position
+   */
+  public int getPosition() {
+<span class="nc" id="L282">    return previousBufferSize + nextChar;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Reader#skip(long)
+   */
+  @Override
+  public long skip(long n) throws IOException {
+<span class="nc bnc" id="L292" title="All 2 branches missed.">    if (n &lt; 0L) {</span>
+<span class="nc" id="L293">      throw new IllegalArgumentException(&quot;skip value is negative&quot;);</span>
+    }
+<span class="nc" id="L295">    synchronized (lock) {</span>
+<span class="nc" id="L296">      ensureOpen();</span>
+<span class="nc" id="L297">      long r = n;</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">      while (r &gt; 0) {</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L300">          fill();</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">        if (nextChar &gt;= nChars) /* EOF */</span>
+<span class="nc" id="L302">          break;</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">        if (skipLF) {</span>
+<span class="nc" id="L304">          skipLF = false;</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">          if (cb[nextChar] == '\n') {</span>
+<span class="nc" id="L306">            nextChar++;</span>
+          }
+        }
+<span class="nc" id="L309">        long d = nChars - nextChar;</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (r &lt;= d) {</span>
+<span class="nc" id="L311">          nextChar += r;</span>
+<span class="nc" id="L312">          r = 0;</span>
+<span class="nc" id="L313">          break;</span>
+        } else {
+<span class="nc" id="L315">          r -= d;</span>
+<span class="nc" id="L316">          nextChar = nChars;</span>
+        }
+<span class="nc" id="L318">      }</span>
+<span class="nc" id="L319">      return n - r;</span>
+<span class="nc" id="L320">    }</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Reader#ready()
+   */
+  @Override
+  public boolean ready() throws IOException {
+<span class="nc" id="L330">    synchronized (lock) {</span>
+<span class="nc" id="L331">      ensureOpen();</span>
+
+      /*
+       * If newline needs to be skipped and the next char to be read is a
+       * newline character, then just skip it right away.
+       */
+<span class="nc bnc" id="L337" title="All 2 branches missed.">      if (skipLF) {</span>
+        /*
+         * Note that in.ready() will return true if and only if the next read on
+         * the stream will not block.
+         */
+<span class="nc bnc" id="L342" title="All 4 branches missed.">        if (nextChar &gt;= nChars &amp;&amp; in.ready()) {</span>
+<span class="nc" id="L343">          fill();</span>
+        }
+<span class="nc bnc" id="L345" title="All 2 branches missed.">        if (nextChar &lt; nChars) {</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">          if (cb[nextChar] == '\n')</span>
+<span class="nc" id="L347">            nextChar++;</span>
+<span class="nc" id="L348">          skipLF = false;</span>
+        }
+      }
+<span class="nc bnc" id="L351" title="All 4 branches missed.">      return (nextChar &lt; nChars) || in.ready();</span>
+<span class="nc" id="L352">    }</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Reader#reset()
+   */
+  @Override
+  public void reset() throws IOException {
+<span class="nc" id="L362">    synchronized (lock) {</span>
+<span class="nc" id="L363">      ensureOpen();</span>
+<span class="nc" id="L364">      nextChar = -1;</span>
+<span class="nc" id="L365">      previousBufferSize = 0;</span>
+<span class="nc" id="L366">    }</span>
+<span class="nc" id="L367">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.io.Reader#close()
+   */
+  @Override
+  public void close() throws IOException {
+<span class="nc" id="L376">    synchronized (lock) {</span>
+<span class="nc bnc" id="L377" title="All 2 branches missed.">      if (in == null)</span>
+<span class="nc" id="L378">        return;</span>
+      try {
+<span class="nc" id="L380">        in.close();</span>
+      } finally {
+<span class="nc" id="L382">        in = null;</span>
+<span class="nc" id="L383">        cb = null;</span>
+<span class="nc" id="L384">      }</span>
+<span class="nc" id="L385">    }</span>
+<span class="nc" id="L386">  }</span>
+
+  /**
+   * Lines.
+   *
+   * @return the stream
+   */
+  public Stream&lt;String&gt; lines() {
+<span class="nc" id="L394">    Iterator&lt;String&gt; iter = new Iterator&lt;String&gt;() {</span>
+<span class="nc" id="L395">      String nextLine = null;</span>
+
+      @Override
+      public boolean hasNext() {
+<span class="nc bnc" id="L399" title="All 2 branches missed.">        if (nextLine != null) {</span>
+<span class="nc" id="L400">          return true;</span>
+        } else {
+          try {
+<span class="nc" id="L403">            nextLine = readLine();</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">            return (nextLine != null);</span>
+<span class="nc" id="L405">          } catch (IOException e) {</span>
+<span class="nc" id="L406">            throw new UncheckedIOException(e);</span>
+          }
+        }
+      }
+
+      @Override
+      public String next() {
+<span class="nc bnc" id="L413" title="All 4 branches missed.">        if (nextLine != null || hasNext()) {</span>
+<span class="nc" id="L414">          String line = nextLine;</span>
+<span class="nc" id="L415">          nextLine = null;</span>
+<span class="nc" id="L416">          return line;</span>
+        } else {
+<span class="nc" id="L418">          throw new NoSuchElementException();</span>
+        }
+      }
+    };
+<span class="nc" id="L422">    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter,</span>
+        Spliterator.ORDERED | Spliterator.NONNULL), false);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

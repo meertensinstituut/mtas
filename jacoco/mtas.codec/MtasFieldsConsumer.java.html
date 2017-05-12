@@ -1,0 +1,1746 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasFieldsConsumer.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasFieldsConsumer.java</span></div><h1>MtasFieldsConsumer.java</h1><pre class="source lang-java linenums">package mtas.codec;
+
+import java.io.Closeable;
+import java.io.EOFException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import mtas.analysis.token.MtasOffset;
+import mtas.analysis.token.MtasPosition;
+import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenString;
+import mtas.codec.payload.MtasPayloadDecoder;
+import mtas.codec.tree.MtasRBTree;
+import mtas.codec.tree.MtasTree;
+import mtas.codec.tree.MtasTreeNode;
+import mtas.codec.tree.MtasTreeNodeId;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.codecs.FieldsConsumer;
+import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.FieldInfos;
+import org.apache.lucene.index.Fields;
+import org.apache.lucene.index.IndexFileNames;
+import org.apache.lucene.index.MappedMultiFields;
+import org.apache.lucene.index.MergeState;
+import org.apache.lucene.index.MultiFields;
+import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.ReaderSlice;
+import org.apache.lucene.index.SegmentWriteState;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.store.IndexInput;
+import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.IOUtils;
+
+/**
+ * The Class MtasFieldsConsumer.
+ */
+
+/**
+ * The Class MtasFieldsConsumer constructs several temporal and permanent files
+ * to provide a forward index
+ *
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;Temporary files&lt;/b&gt;&lt;br&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;Temporary file {@link #mtasTmpFieldFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_FIELD_EXTENSION} &lt;/b&gt;&lt;br&gt;
+ * Contains for each field a reference to the list of documents. Structure of
+ * content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;String&lt;/b&gt;: field&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasDocFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of documents&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasTermFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of terms&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasPrefixFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of prefixes&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Temporary file {@link #mtasTmpObjectFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_OBJECT_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * Contains for a specific field all objects constructed by
+ * {@link createObjectAndRegisterPrefix}. For all fields, the objects are later
+ * on copied to {@link #mtasObjectFileName} while statistics are collected.
+ * Structure of content identical to {@link #mtasObjectFileName}.&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Temporary file {@link #mtasTmpDocsFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOCS_EXTENSION}&lt;/b&gt; &lt;br&gt;
+ * Contains for a specific field for each doc multiple fragments. Each occurring
+ * term results in a fragment. Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: docId&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects in this fragment&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: offset references to {@link #mtasTmpObjectFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;: mtasId object, reference temporary object in
+ * {@link #mtasTmpObjectFileName} minus offset&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;: ...&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Temporary file {@link #mtasTmpDocsChainedFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOCS_CHAINED_EXTENSION}
+ * &lt;/b&gt;&lt;br&gt;
+ * Contains for a specific field for each doc multiple chained fragments.
+ * Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: docId&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects in this fragment&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: offset references to {@link #mtasTmpObjectFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;: mtasId object, reference temporary object in
+ * {@link #mtasTmpObjectFileName} minus offset&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;: ...&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to next fragment in
+ * {@link #mtasTmpDocsChainedFileName}, self reference indicates end of chain
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Temporary file {@link #mtasTmpDocFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TMP_DOC_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * For each document
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: docId&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasIndexObjectIdFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference first object, used as offset for tree index
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: slope used in approximation reference objects index on id
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;ZLong&lt;/b&gt;: offset used in approximation reference objects index on id
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Byte&lt;/b&gt;: flag indicating how corrections on the approximation
+ * references objects for the index on id are stored:
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_BYTE},
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_SHORT},
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_INTEGER} or
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_LONG}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects in this document&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: first position&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: last position&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Final files&lt;/b&gt;&lt;br&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasIndexFieldFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_FIELD_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * Contains for each field a reference to the list of documents and the
+ * prefixes. Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;String&lt;/b&gt;: field&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasDocFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasIndexDocIdFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of documents&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasTermFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of terms&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasPrefixFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of prefixes&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasTermFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_TERM_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * For each field, all unique terms are stored here. Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;String&lt;/b&gt;: term&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasPrefixFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_PREFIX_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * For each field, all unique prefixes are stored here. Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;String&lt;/b&gt;: prefix&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasObjectFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_OBJECT_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * Contains all objects for all fields. Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: mtasId&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: objectFlags
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PARENT}&lt;/li&gt;
+ * &lt;li&gt;{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}&lt;/li&gt;
+ * &lt;li&gt;{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}&lt;/li&gt;
+ * &lt;li&gt;{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_OFFSET}&lt;/li&gt;
+ * &lt;li&gt;{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_REALOFFSET}&lt;/li&gt;
+ * &lt;li&gt;{@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PAYLOAD}&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PARENT}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;: parentId
+ * &lt;li&gt;Only if
+ * {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;: startPosition and (endPosition-startPosition)
+ * &lt;li&gt;Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;,...: number of positions, firstPosition,
+ * (position-previousPosition),...
+ * &lt;li&gt;Only if no {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_RANGE}
+ * or {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_POSITION_SET}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;: position
+ * &lt;li&gt;Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_OFFSET}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;: startOffset, (endOffset-startOffset)
+ * &lt;li&gt;Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_REALOFFSET}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;: startRealOffset, (endRealOffset-startRealOffset)
+ * &lt;li&gt;Only if {@link MtasCodecPostingsFormat#MTAS_OBJECT_HAS_PAYLOAD}&lt;br&gt;
+ * &lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;Bytes&lt;/b&gt;: number of bytes, payload
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to Term in {@link #mtasTermFileName}&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasIndexDocIdFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_DOC_ID_EXTENSION}
+ * &lt;/b&gt;&lt;br&gt;
+ * Contains for each field a tree structure {@link MtasTree} to search reference
+ * to {@link #mtasDocFileName} by id. Structure of content for each node:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: offset references to {@link #mtasIndexDocIdFileName}, only
+ * available in root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Byte&lt;/b&gt;: flag, should be zero for this tree, only available in root
+ * node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: left&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: right&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: max&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: left reference to {@link #mtasIndexDocIdFileName} minus the
+ * offset stored in the root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: right reference to {@link #mtasIndexDocIdFileName} minus
+ * the offset stored in the root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects on this node (always 1 for this tree)&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasDocFileName} minus offset&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasDocFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_DOC_EXTENSION}&lt;/b&gt;&lt;br&gt;
+ * For each document
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: docId&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasIndexObjectIdFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasIndexObjectPositionFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference to {@link #mtasIndexObjectParentFileName}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: reference first object, used as offset for tree index
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: slope used in approximation reference objects index on id
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;ZLong&lt;/b&gt;: offset used in approximation reference objects index on id
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Byte&lt;/b&gt;: flag indicating how corrections on the approximation
+ * references objects for the index on id are stored:
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_BYTE},
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_SHORT},
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_INTEGER} or
+ * {@link MtasCodecPostingsFormat#MTAS_STORAGE_LONG}&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: first position&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: last position&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasIndexObjectIdFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_ID_EXTENSION}
+ * &lt;/b&gt;&lt;br&gt;
+ * Provides for each mtasId the reference to {@link #mtasObjectFileName}. These
+ * references are grouped by document, sorted by mtasId, and because the
+ * mtasId's for each document will always start with 0 and are sequential
+ * without gaps, a reference can be computed if the position of the first
+ * reference for a document is known from {@link #mtasDocFileName}. The
+ * reference is approximated by the reference to the first object plus the
+ * mtasId times a slope. Only a correction to this approximation is stored.
+ * Structure of content:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;Byte&lt;/b&gt;/&lt;b&gt;Short&lt;/b&gt;/&lt;b&gt;Int&lt;/b&gt;/&lt;b&gt;Long&lt;/b&gt;: correction reference to
+ * {@link #mtasObjectFileName}&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasIndexObjectPositionFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_POSITION_EXTENSION}
+ * &lt;/b&gt;&lt;br&gt;
+ * Contains for each document a tree structure {@link MtasTree} to search
+ * objects by position. Structure of content for each node:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: offset references to
+ * {@link #mtasIndexObjectPositionFileName}, only available in root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Byte&lt;/b&gt;: flag, should be zero for this tree, only available in root
+ * node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: left&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: right&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: max&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: left reference to {@link #mtasIndexObjectPositionFileName}
+ * minus the offset stored in the root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: right reference to {@link #mtasIndexObjectPositionFileName}
+ * minus the offset stored in the root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects on this node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;: set of the first reference to
+ * {@link #mtasObjectFileName} minus offset, the prefixId referring to the
+ * position the prefix in {@link #mtasPrefixFileName} and the reference to
+ * {@link #mtasTermFileName} minus offset&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;,...: for optional other sets of
+ * reference to {@link #mtasObjectFileName}, position of the prefix in
+ * {@link #mtasPrefixFileName} and the reference to {@link #mtasTermFileName};
+ * for the first item the difference between this reference minus the previous
+ * reference is stored&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;File {@link #mtasIndexObjectParentFileName} with extension
+ * {@value mtas.codec.MtasCodecPostingsFormat#MTAS_INDEX_OBJECT_PARENT_EXTENSION}
+ * &lt;/b&gt;&lt;br&gt;
+ * Contains for each document a tree structure {@link MtasTree} to search
+ * objects by parent. Structure of content for each node:
+ * &lt;ul&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: offset references to {@link #mtasIndexObjectParentFileName}
+ * , only available in root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;Byte&lt;/b&gt;: flag, for this tree equal to
+ * {@link mtas.codec.tree.MtasTree#SINGLE_POSITION_TREE} indicating a tree with
+ * exactly one point at each node, only available in root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: left&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: right&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: max&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: left reference to {@link #mtasIndexObjectParentFileName}
+ * minus the offset stored in the root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;: right reference to {@link #mtasIndexObjectParentFileName}
+ * minus the offset stored in the root node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VInt&lt;/b&gt;: number of objects on this node&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;: set of the first reference to
+ * {@link #mtasObjectFileName} minus offset, the prefixId referring to the
+ * position the prefix in {@link #mtasPrefixFileName} and the reference to
+ * {@link #mtasTermFileName} minus offset&lt;/li&gt;
+ * &lt;li&gt;&lt;b&gt;VLong&lt;/b&gt;,&lt;b&gt;VInt&lt;/b&gt;,&lt;b&gt;VLong&lt;/b&gt;,...: for optional other sets of
+ * reference to {@link #mtasObjectFileName}, position of the prefix in
+ * {@link #mtasPrefixFileName} and the reference to {@link #mtasTermFileName};
+ * for the first item the difference between this reference minus the previous
+ * reference is stored&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;/li&gt;
+ * &lt;/ul&gt;
+ * 
+ */
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">public class MtasFieldsConsumer extends FieldsConsumer {</span>
+
+  /** The log. */
+<span class="fc" id="L328">  private static Log log = LogFactory.getLog(MtasFieldsConsumer.class);</span>
+
+  /** The delegate fields consumer. */
+  private FieldsConsumer delegateFieldsConsumer;
+
+  /** The state. */
+  private SegmentWriteState state;
+
+  /** The intersecting prefixes. */
+  private HashMap&lt;String, HashSet&lt;String&gt;&gt; intersectingPrefixes;
+
+  /** The single position prefix. */
+  private HashMap&lt;String, HashSet&lt;String&gt;&gt; singlePositionPrefix;
+
+  /** The multiple position prefix. */
+  private HashMap&lt;String, HashSet&lt;String&gt;&gt; multiplePositionPrefix;
+
+  /** The set position prefix. */
+  private HashMap&lt;String, HashSet&lt;String&gt;&gt; setPositionPrefix;
+
+  /** The prefix reference index. */
+  private HashMap&lt;String, HashMap&lt;String, Long&gt;&gt; prefixReferenceIndex;
+
+  /** The prefix id index. */
+  private HashMap&lt;String, HashMap&lt;String, Integer&gt;&gt; prefixIdIndex;
+
+  /** The token stats min pos. */
+  Integer tokenStatsMinPos;
+
+  /** The token stats max pos. */
+  Integer tokenStatsMaxPos;
+
+  /** The token stats number. */
+  Integer tokenStatsNumber;
+
+  /** The mtas tmp docs chained file name. */
+  private String mtasTmpFieldFileName;
+  private String mtasTmpObjectFileName;
+  private String mtasTmpDocsFileName;
+  private String mtasTmpDocFileName;
+  private String mtasTmpDocsChainedFileName;
+
+  /** The mtas index object parent file name. */
+  private String mtasObjectFileName;
+  private String mtasTermFileName;
+  private String mtasIndexFieldFileName;
+  private String mtasPrefixFileName;
+  private String mtasDocFileName;
+  private String mtasIndexDocIdFileName;
+  private String mtasIndexObjectIdFileName;
+  private String mtasIndexObjectPositionFileName;
+  private String mtasIndexObjectParentFileName;
+
+  /** The delegate postings format name. */
+  private String name;
+  private String delegatePostingsFormatName;
+
+  /**
+   * Instantiates a new mtas fields consumer.
+   *
+   * @param fieldsConsumer
+   *          the fields consumer
+   * @param state
+   *          the state
+   * @param name
+   *          the name
+   * @param delegatePostingsFormatName
+   *          the delegate postings format name
+   */
+  public MtasFieldsConsumer(FieldsConsumer fieldsConsumer,
+<span class="fc" id="L398">      SegmentWriteState state, String name, String delegatePostingsFormatName) {</span>
+<span class="fc" id="L399">    this.delegateFieldsConsumer = fieldsConsumer;</span>
+<span class="fc" id="L400">    this.state = state;</span>
+<span class="fc" id="L401">    this.name = name;</span>
+<span class="fc" id="L402">    this.delegatePostingsFormatName = delegatePostingsFormatName;</span>
+    // temporary fileNames
+<span class="fc" id="L404">    mtasTmpFieldFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_TMP_FIELD_EXTENSION);
+<span class="fc" id="L407">    mtasTmpObjectFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_TMP_OBJECT_EXTENSION);
+<span class="fc" id="L410">    mtasTmpDocsFileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+        state.segmentSuffix, MtasCodecPostingsFormat.MTAS_TMP_DOCS_EXTENSION);
+<span class="fc" id="L412">    mtasTmpDocFileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+        state.segmentSuffix, MtasCodecPostingsFormat.MTAS_TMP_DOC_EXTENSION);
+<span class="fc" id="L414">    mtasTmpDocsChainedFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_TMP_DOCS_CHAINED_EXTENSION);
+    // fileNames
+<span class="fc" id="L418">    mtasObjectFileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+        state.segmentSuffix, MtasCodecPostingsFormat.MTAS_OBJECT_EXTENSION);
+<span class="fc" id="L420">    mtasTermFileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+        state.segmentSuffix, MtasCodecPostingsFormat.MTAS_TERM_EXTENSION);
+<span class="fc" id="L422">    mtasIndexFieldFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_FIELD_EXTENSION);
+<span class="fc" id="L425">    mtasPrefixFileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+        state.segmentSuffix, MtasCodecPostingsFormat.MTAS_PREFIX_EXTENSION);
+<span class="fc" id="L427">    mtasDocFileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+        state.segmentSuffix, MtasCodecPostingsFormat.MTAS_DOC_EXTENSION);
+<span class="fc" id="L429">    mtasIndexDocIdFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_INDEX_DOC_ID_EXTENSION);
+<span class="fc" id="L432">    mtasIndexObjectIdFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_ID_EXTENSION);
+<span class="fc" id="L435">    mtasIndexObjectPositionFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION);
+<span class="fc" id="L438">    mtasIndexObjectParentFileName = IndexFileNames.segmentFileName(</span>
+        state.segmentInfo.name, state.segmentSuffix,
+        MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION);
+<span class="fc" id="L441">  }</span>
+
+  /**
+   * Register prefix.
+   *
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void registerPrefix(String field, String prefix,
+      IndexOutput outPrefix) throws IOException {
+<span class="fc bfc" id="L457" title="All 2 branches covered.">    if (!prefixReferenceIndex.containsKey(field)) {</span>
+<span class="fc" id="L458">      prefixReferenceIndex.put(field, new HashMap&lt;String, Long&gt;());</span>
+<span class="fc" id="L459">      prefixIdIndex.put(field, new HashMap&lt;String, Integer&gt;());</span>
+    }
+<span class="fc bfc" id="L461" title="All 2 branches covered.">    if (!prefixReferenceIndex.get(field).containsKey(prefix)) {</span>
+<span class="fc" id="L462">      int id = 1 + prefixReferenceIndex.get(field).size();</span>
+<span class="fc" id="L463">      prefixReferenceIndex.get(field).put(prefix, outPrefix.getFilePointer());</span>
+<span class="fc" id="L464">      prefixIdIndex.get(field).put(prefix, id);</span>
+<span class="fc" id="L465">      outPrefix.writeString(prefix);</span>
+    }
+<span class="fc" id="L467">  }</span>
+
+  /**
+   * Register prefix intersection.
+   *
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param tmp
+   *          the tmp
+   * @param docId
+   *          the doc id
+   * @param start
+   *          the start
+   * @param end
+   *          the end
+   * @param docFieldAdministration
+   *          the doc field administration
+   */
+  private void registerPrefixIntersection(String field, String prefix,
+      int start, int end,
+      HashMap&lt;String, HashSet&lt;Integer&gt;&gt; docFieldAdministration) {
+<span class="fc bfc" id="L490" title="All 2 branches covered.">    if (!intersectingPrefixes.containsKey(field)) {</span>
+<span class="fc" id="L491">      intersectingPrefixes.put(field, new HashSet&lt;String&gt;());</span>
+<span class="fc bfc" id="L492" title="All 2 branches covered.">    } else if (intersectingPrefixes.get(field).contains(prefix)) {</span>
+<span class="fc" id="L493">      return;</span>
+    }
+    HashSet&lt;Integer&gt; docFieldPrefixAdministration;
+<span class="fc bfc" id="L496" title="All 2 branches covered.">    if (!docFieldAdministration.containsKey(prefix)) {</span>
+<span class="fc" id="L497">      docFieldPrefixAdministration = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L498">      docFieldAdministration.put(prefix, docFieldPrefixAdministration);</span>
+    } else {
+<span class="fc" id="L500">      docFieldPrefixAdministration = docFieldAdministration.get(prefix);</span>
+      // check
+<span class="fc bfc" id="L502" title="All 2 branches covered.">      for (int p = start; p &lt;= end; p++) {</span>
+<span class="fc bfc" id="L503" title="All 2 branches covered.">        if (docFieldPrefixAdministration.contains(p)) {</span>
+<span class="fc" id="L504">          intersectingPrefixes.get(field).add(prefix);</span>
+<span class="fc" id="L505">          docFieldAdministration.remove(prefix);</span>
+<span class="fc" id="L506">          return;</span>
+        }
+      }
+    }
+    // update
+<span class="fc bfc" id="L511" title="All 2 branches covered.">    for (int p = start; p &lt;= end; p++) {</span>
+<span class="fc" id="L512">      docFieldPrefixAdministration.add(p);</span>
+    }
+<span class="fc" id="L514">  }</span>
+
+  /**
+   * Register prefix stats single position value.
+   *
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public void registerPrefixStatsSinglePositionValue(String field,
+      String prefix, IndexOutput outPrefix) throws IOException {
+<span class="fc" id="L530">    initPrefixStatsField(field);</span>
+<span class="fc" id="L531">    registerPrefix(field, prefix, outPrefix);</span>
+<span class="fc bfc" id="L532" title="All 2 branches covered.">    if (!multiplePositionPrefix.get(field).contains(prefix)) {</span>
+<span class="fc" id="L533">      singlePositionPrefix.get(field).add(prefix);</span>
+    }
+<span class="fc" id="L535">  }</span>
+
+  /**
+   * Register prefix stats range position value.
+   *
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public void registerPrefixStatsRangePositionValue(String field, String prefix,
+      IndexOutput outPrefix) throws IOException {
+<span class="fc" id="L551">    initPrefixStatsField(field);</span>
+<span class="fc" id="L552">    registerPrefix(field, prefix, outPrefix);</span>
+<span class="fc" id="L553">    singlePositionPrefix.get(field).remove(prefix);</span>
+<span class="fc" id="L554">    multiplePositionPrefix.get(field).add(prefix);</span>
+<span class="fc" id="L555">  }</span>
+
+  /**
+   * Register prefix stats set position value.
+   *
+   * @param field
+   *          the field
+   * @param prefix
+   *          the prefix
+   * @param outPrefix
+   *          the out prefix
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public void registerPrefixStatsSetPositionValue(String field, String prefix,
+      IndexOutput outPrefix) throws IOException {
+<span class="fc" id="L571">    initPrefixStatsField(field);</span>
+<span class="fc" id="L572">    registerPrefix(field, prefix, outPrefix);</span>
+<span class="fc" id="L573">    singlePositionPrefix.get(field).remove(prefix);</span>
+<span class="fc" id="L574">    multiplePositionPrefix.get(field).add(prefix);</span>
+<span class="fc" id="L575">    setPositionPrefix.get(field).add(prefix);</span>
+<span class="fc" id="L576">  }</span>
+
+  /**
+   * Inits the prefix stats field.
+   *
+   * @param field
+   *          the field
+   */
+  private void initPrefixStatsField(String field) {
+<span class="fc bfc" id="L585" title="All 2 branches covered.">    if (!singlePositionPrefix.containsKey(field)) {</span>
+<span class="fc" id="L586">      singlePositionPrefix.put(field, new HashSet&lt;String&gt;());</span>
+    }
+<span class="fc bfc" id="L588" title="All 2 branches covered.">    if (!multiplePositionPrefix.containsKey(field)) {</span>
+<span class="fc" id="L589">      multiplePositionPrefix.put(field, new HashSet&lt;String&gt;());</span>
+    }
+<span class="fc bfc" id="L591" title="All 2 branches covered.">    if (!setPositionPrefix.containsKey(field)) {</span>
+<span class="fc" id="L592">      setPositionPrefix.put(field, new HashSet&lt;String&gt;());</span>
+    }
+<span class="fc" id="L594">  }</span>
+
+  /**
+   * Gets the prefix stats single position prefix attribute.
+   *
+   * @param field
+   *          the field
+   * @return the prefix stats single position prefix attribute
+   */
+  public String getPrefixStatsSinglePositionPrefixAttribute(String field) {
+<span class="fc" id="L604">    return StringUtils.join(singlePositionPrefix.get(field).toArray(),</span>
+        MtasToken.DELIMITER);
+  }
+
+  /**
+   * Gets the prefix stats multiple position prefix attribute.
+   *
+   * @param field
+   *          the field
+   * @return the prefix stats multiple position prefix attribute
+   */
+  public String getPrefixStatsMultiplePositionPrefixAttribute(String field) {
+<span class="fc" id="L616">    return StringUtils.join(multiplePositionPrefix.get(field).toArray(),</span>
+        MtasToken.DELIMITER);
+  }
+
+  /**
+   * Gets the prefix stats set position prefix attribute.
+   *
+   * @param field
+   *          the field
+   * @return the prefix stats set position prefix attribute
+   */
+  public String getPrefixStatsSetPositionPrefixAttribute(String field) {
+<span class="fc" id="L628">    return StringUtils.join(setPositionPrefix.get(field).toArray(),</span>
+        MtasToken.DELIMITER);
+  }
+
+  /**
+   * Gets the prefix stats intersection prefix attribute.
+   *
+   * @param field
+   *          the field
+   * @return the prefix stats intersection prefix attribute
+   */
+  public String getPrefixStatsIntersectionPrefixAttribute(String field) {
+<span class="pc bpc" id="L640" title="1 of 2 branches missed.">    if (intersectingPrefixes.containsKey(field)) {</span>
+<span class="fc" id="L641">      return StringUtils.join(intersectingPrefixes.get(field).toArray(),</span>
+          MtasToken.DELIMITER);
+    } else {
+<span class="nc" id="L644">      return &quot;&quot;;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.FieldsConsumer#merge(org.apache.lucene.index.
+   * MergeState)
+   */
+  @Override
+  public void merge(MergeState mergeState) throws IOException {
+<span class="nc" id="L656">    final List&lt;Fields&gt; fields = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L657">    final List&lt;ReaderSlice&gt; slices = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L659">    int docBase = 0;</span>
+
+<span class="nc bnc" id="L661" title="All 2 branches missed.">    for (int readerIndex = 0; readerIndex &lt; mergeState.fieldsProducers.length; readerIndex++) {</span>
+<span class="nc" id="L662">      final FieldsProducer f = mergeState.fieldsProducers[readerIndex];</span>
+
+<span class="nc" id="L664">      final int maxDoc = mergeState.maxDocs[readerIndex];</span>
+<span class="nc" id="L665">      f.checkIntegrity();</span>
+<span class="nc" id="L666">      slices.add(new ReaderSlice(docBase, maxDoc, readerIndex));</span>
+<span class="nc" id="L667">      fields.add(f);</span>
+<span class="nc" id="L668">      docBase += maxDoc;</span>
+    }
+
+<span class="nc" id="L671">    Fields mergedFields = new MappedMultiFields(mergeState,</span>
+<span class="nc" id="L672">        new MultiFields(fields.toArray(Fields.EMPTY_ARRAY),</span>
+<span class="nc" id="L673">            slices.toArray(ReaderSlice.EMPTY_ARRAY)));</span>
+<span class="nc" id="L674">    write(mergedFields);</span>
+<span class="nc" id="L675">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.FieldsConsumer#write(org.apache.lucene.index.
+   * Fields )
+   */
+  @Override
+  public void write(Fields fields) throws IOException {
+<span class="fc" id="L685">    delegateFieldsConsumer.write(fields);</span>
+<span class="fc" id="L686">    write(state.fieldInfos, fields);</span>
+<span class="fc" id="L687">  }</span>
+
+  /**
+   * Write.
+   *
+   * @param fieldInfos
+   *          the field infos
+   * @param fields
+   *          the fields
+   */
+  private void write(FieldInfos fieldInfos, Fields fields) {
+    IndexOutput outField;
+    IndexOutput outDoc;
+    IndexOutput outIndexDocId;
+    IndexOutput outIndexObjectId;
+    IndexOutput outIndexObjectPosition;
+    IndexOutput outIndexObjectParent;
+    IndexOutput outTerm;
+    IndexOutput outObject;
+    IndexOutput outPrefix;
+    IndexOutput outTmpDoc;
+    IndexOutput outTmpField;
+<span class="fc" id="L709">    HashSet&lt;Closeable&gt; closeables = new HashSet&lt;&gt;();</span>
+    // prefix stats
+<span class="fc" id="L711">    intersectingPrefixes = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L712">    singlePositionPrefix = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L713">    multiplePositionPrefix = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L714">    setPositionPrefix = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L715">    prefixReferenceIndex = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L716">    prefixIdIndex = new HashMap&lt;&gt;();</span>
+    // temporary temporary index in memory for doc
+<span class="fc" id="L718">    TreeMap&lt;Integer, Long&gt; memoryIndexTemporaryObject = new TreeMap&lt;&gt;();</span>
+    // create (backwards) chained new temporary index docs
+<span class="fc" id="L720">    TreeMap&lt;Integer, Long&gt; memoryTmpDocChainList = new TreeMap&lt;&gt;();</span>
+    // list of objectIds and references to objects
+<span class="fc" id="L722">    TreeMap&lt;Integer, Long&gt; memoryIndexDocList = new TreeMap&lt;&gt;();</span>
+
+    try {
+      // create file tmpDoc
+<span class="fc" id="L726">      closeables.add(outTmpDoc = state.directory</span>
+<span class="fc" id="L727">          .createOutput(mtasTmpDocFileName, state.context));</span>
+      // create file tmpField
+<span class="fc" id="L729">      closeables.add(outTmpField = state.directory</span>
+<span class="fc" id="L730">          .createOutput(mtasTmpFieldFileName, state.context));</span>
+      // create file indexDoc
+<span class="fc" id="L732">      closeables.add(outDoc = state.directory.createOutput(mtasDocFileName,</span>
+          state.context));
+<span class="fc" id="L734">      CodecUtil.writeIndexHeader(outDoc, name,</span>
+<span class="fc" id="L735">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L737">      outDoc.writeString(delegatePostingsFormatName);</span>
+      // create file indexDocId
+<span class="fc" id="L739">      closeables.add(outIndexDocId = state.directory</span>
+<span class="fc" id="L740">          .createOutput(mtasIndexDocIdFileName, state.context));</span>
+<span class="fc" id="L741">      CodecUtil.writeIndexHeader(outIndexDocId, name,</span>
+<span class="fc" id="L742">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L744">      outIndexDocId.writeString(delegatePostingsFormatName);</span>
+      // create file indexObjectId
+<span class="fc" id="L746">      closeables.add(outIndexObjectId = state.directory</span>
+<span class="fc" id="L747">          .createOutput(mtasIndexObjectIdFileName, state.context));</span>
+<span class="fc" id="L748">      CodecUtil.writeIndexHeader(outIndexObjectId, name,</span>
+<span class="fc" id="L749">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L751">      outIndexObjectId.writeString(delegatePostingsFormatName);</span>
+      // create file indexObjectPosition
+<span class="fc" id="L753">      closeables.add(outIndexObjectPosition = state.directory</span>
+<span class="fc" id="L754">          .createOutput(mtasIndexObjectPositionFileName, state.context));</span>
+<span class="fc" id="L755">      CodecUtil.writeIndexHeader(outIndexObjectPosition, name,</span>
+<span class="fc" id="L756">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L758">      outIndexObjectPosition.writeString(delegatePostingsFormatName);</span>
+      // create file indexObjectParent
+<span class="fc" id="L760">      closeables.add(outIndexObjectParent = state.directory</span>
+<span class="fc" id="L761">          .createOutput(mtasIndexObjectParentFileName, state.context));</span>
+<span class="fc" id="L762">      CodecUtil.writeIndexHeader(outIndexObjectParent, name,</span>
+<span class="fc" id="L763">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L765">      outIndexObjectParent.writeString(delegatePostingsFormatName);</span>
+      // create file term
+<span class="fc" id="L767">      closeables.add(outTerm = state.directory.createOutput(mtasTermFileName,</span>
+          state.context));
+<span class="fc" id="L769">      CodecUtil.writeIndexHeader(outTerm, name,</span>
+<span class="fc" id="L770">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L772">      outTerm.writeString(delegatePostingsFormatName);</span>
+      // create file prefix
+<span class="fc" id="L774">      closeables.add(outPrefix = state.directory</span>
+<span class="fc" id="L775">          .createOutput(mtasPrefixFileName, state.context));</span>
+<span class="fc" id="L776">      CodecUtil.writeIndexHeader(outPrefix, name,</span>
+<span class="fc" id="L777">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L779">      outPrefix.writeString(delegatePostingsFormatName);</span>
+      // create file object
+<span class="fc" id="L781">      closeables.add(outObject = state.directory</span>
+<span class="fc" id="L782">          .createOutput(mtasObjectFileName, state.context));</span>
+<span class="fc" id="L783">      CodecUtil.writeIndexHeader(outObject, name,</span>
+<span class="fc" id="L784">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L786">      outObject.writeString(delegatePostingsFormatName);</span>
+      // For each field
+<span class="fc bfc" id="L788" title="All 2 branches covered.">      for (String field : fields) {</span>
+<span class="fc" id="L789">        Terms terms = fields.terms(field);</span>
+<span class="pc bpc" id="L790" title="1 of 2 branches missed.">        if (terms == null) {</span>
+<span class="nc" id="L791">          continue;</span>
+        } else {
+          // new temporary object storage for this field
+<span class="fc" id="L794">          IndexOutput outTmpObject = state.directory</span>
+<span class="fc" id="L795">              .createOutput(mtasTmpObjectFileName, state.context);</span>
+<span class="fc" id="L796">          closeables.add(outTmpObject);</span>
+          // new temporary index docs for this field
+<span class="fc" id="L798">          IndexOutput outTmpDocs = state.directory</span>
+<span class="fc" id="L799">              .createOutput(mtasTmpDocsFileName, state.context);</span>
+<span class="fc" id="L800">          closeables.add(outTmpDocs);</span>
+          // get fieldInfo
+<span class="fc" id="L802">          FieldInfo fieldInfo = fieldInfos.fieldInfo(field);</span>
+          // get properties terms
+<span class="fc" id="L804">          boolean hasPositions = terms.hasPositions();</span>
+<span class="fc" id="L805">          boolean hasFreqs = terms.hasFreqs();</span>
+<span class="fc" id="L806">          boolean hasPayloads = fieldInfo.hasPayloads();</span>
+<span class="fc" id="L807">          boolean hasOffsets = terms.hasOffsets();</span>
+          // register references
+<span class="fc" id="L809">          Long smallestTermFilepointer = outTerm.getFilePointer();</span>
+<span class="fc" id="L810">          Long smallestPrefixFilepointer = outPrefix.getFilePointer();</span>
+<span class="fc" id="L811">          int termCounter = 0;</span>
+          // only if freqs, positions and payload available
+<span class="pc bpc" id="L813" title="2 of 6 branches missed.">          if (hasFreqs &amp;&amp; hasPositions &amp;&amp; hasPayloads) {</span>
+            // compute flags
+<span class="fc" id="L815">            int flags = PostingsEnum.POSITIONS | PostingsEnum.PAYLOADS;</span>
+<span class="pc bpc" id="L816" title="1 of 2 branches missed.">            if (hasOffsets) {</span>
+<span class="nc" id="L817">              flags = flags | PostingsEnum.OFFSETS;</span>
+            }
+            // get terms
+<span class="fc" id="L820">            TermsEnum termsEnum = terms.iterator();</span>
+<span class="fc" id="L821">            PostingsEnum postingsEnum = null;</span>
+            // for each term in field
+            while (true) {
+<span class="fc" id="L824">              BytesRef term = termsEnum.next();</span>
+<span class="fc bfc" id="L825" title="All 2 branches covered.">              if (term == null) {</span>
+<span class="fc" id="L826">                break;</span>
+              }
+              // store term and get ref
+<span class="fc" id="L829">              Long termRef = outTerm.getFilePointer();</span>
+<span class="fc" id="L830">              outTerm.writeString(term.utf8ToString());</span>
+<span class="fc" id="L831">              termCounter++;</span>
+              // get postings
+<span class="fc" id="L833">              postingsEnum = termsEnum.postings(postingsEnum, flags);</span>
+              // for each doc in field+term
+              while (true) {
+<span class="fc" id="L836">                Integer docId = postingsEnum.nextDoc();</span>
+<span class="fc bfc" id="L837" title="All 2 branches covered.">                if (docId.equals(DocIdSetIterator.NO_MORE_DOCS)) {</span>
+<span class="fc" id="L838">                  break;</span>
+                }
+<span class="fc" id="L840">                int freq = postingsEnum.freq();</span>
+                // temporary storage objects and temporary index in memory for
+                // doc
+<span class="fc" id="L843">                memoryIndexTemporaryObject.clear();</span>
+<span class="fc" id="L844">                Long offsetFilePointerTmpObject = outTmpObject.getFilePointer();</span>
+<span class="fc bfc" id="L845" title="All 2 branches covered.">                for (int i = 0; i &lt; freq; i++) {</span>
+<span class="fc" id="L846">                  Long currentFilePointerTmpObject = outTmpObject</span>
+<span class="fc" id="L847">                      .getFilePointer();</span>
+                  Integer mtasId;
+<span class="fc" id="L849">                  int position = postingsEnum.nextPosition();</span>
+<span class="fc" id="L850">                  BytesRef payload = postingsEnum.getPayload();</span>
+<span class="pc bpc" id="L851" title="1 of 2 branches missed.">                  if (hasOffsets) {</span>
+<span class="nc" id="L852">                    mtasId = createObjectAndRegisterPrefix(field, outTmpObject,</span>
+                        term, termRef, position, payload,
+<span class="nc" id="L854">                        postingsEnum.startOffset(), postingsEnum.endOffset(),</span>
+                        outPrefix);
+                  } else {
+<span class="fc" id="L857">                    mtasId = createObjectAndRegisterPrefix(field, outTmpObject,</span>
+                        term, termRef, position, payload, outPrefix);
+                  }
+<span class="pc bpc" id="L860" title="1 of 2 branches missed.">                  if (mtasId != null) {</span>
+<span class="pc bpc" id="L861" title="2 of 4 branches missed.">                    assert !memoryIndexTemporaryObject.containsKey(</span>
+                        mtasId) : &quot;mtasId should be unique in this selection&quot;;
+<span class="fc" id="L863">                    memoryIndexTemporaryObject.put(mtasId,</span>
+                        currentFilePointerTmpObject);
+                  }
+                } // end loop positions
+                // store temporary index for this doc
+<span class="pc bpc" id="L868" title="1 of 2 branches missed.">                if (memoryIndexTemporaryObject.size() &gt; 0) {</span>
+                  // docId for this part
+<span class="fc" id="L870">                  outTmpDocs.writeVInt(docId);</span>
+                  // number of objects/tokens in this part
+<span class="fc" id="L872">                  outTmpDocs.writeVInt(memoryIndexTemporaryObject.size());</span>
+                  // offset to be used for references
+<span class="fc" id="L874">                  outTmpDocs.writeVLong(offsetFilePointerTmpObject);</span>
+                  // loop over tokens
+<span class="fc bfc" id="L876" title="All 2 branches covered.">                  for (Entry&lt;Integer, Long&gt; entry : memoryIndexTemporaryObject</span>
+<span class="fc" id="L877">                      .entrySet()) {</span>
+                    // mtasId object
+<span class="fc" id="L879">                    outTmpDocs.writeVInt(entry.getKey());</span>
+                    // reference object
+<span class="fc" id="L881">                    outTmpDocs.writeVLong(</span>
+<span class="fc" id="L882">                        (entry.getValue() - offsetFilePointerTmpObject));</span>
+<span class="fc" id="L883">                  }</span>
+                }
+                // clean up
+<span class="fc" id="L886">                memoryIndexTemporaryObject.clear();</span>
+<span class="fc" id="L887">              } // end loop docs</span>
+<span class="fc" id="L888">            } // end loop terms</span>
+            // set fieldInfo
+<span class="fc" id="L890">            fieldInfos.fieldInfo(field).putAttribute(</span>
+                MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION,
+<span class="fc" id="L892">                getPrefixStatsSinglePositionPrefixAttribute(field));</span>
+<span class="fc" id="L893">            fieldInfos.fieldInfo(field).putAttribute(</span>
+                MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION,
+<span class="fc" id="L895">                getPrefixStatsMultiplePositionPrefixAttribute(field));</span>
+<span class="fc" id="L896">            fieldInfos.fieldInfo(field).putAttribute(</span>
+                MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION,
+<span class="fc" id="L898">                getPrefixStatsSetPositionPrefixAttribute(field));</span>
+          } // end processing field with freqs, positions and payload
+          // close temporary object storage and index docs
+<span class="fc" id="L901">          outTmpObject.close();</span>
+<span class="fc" id="L902">          closeables.remove(outTmpObject);</span>
+<span class="fc" id="L903">          outTmpDocs.close();</span>
+<span class="fc" id="L904">          closeables.remove(outTmpDocs);</span>
+
+          // create (backwards) chained new temporary index docs
+<span class="fc" id="L907">          IndexInput inTmpDocs = state.directory.openInput(mtasTmpDocsFileName,</span>
+              state.context);
+<span class="fc" id="L909">          closeables.add(inTmpDocs);</span>
+<span class="fc" id="L910">          IndexOutput outTmpDocsChained = state.directory</span>
+<span class="fc" id="L911">              .createOutput(mtasTmpDocsChainedFileName, state.context);</span>
+<span class="fc" id="L912">          closeables.add(outTmpDocsChained);</span>
+<span class="fc" id="L913">          memoryTmpDocChainList.clear();</span>
+          while (true) {
+            try {
+<span class="fc" id="L916">              Long currentFilepointer = outTmpDocsChained.getFilePointer();</span>
+              // copy docId
+<span class="fc" id="L918">              int docId = inTmpDocs.readVInt();</span>
+<span class="fc" id="L919">              outTmpDocsChained.writeVInt(docId);</span>
+              // copy size
+<span class="fc" id="L921">              int size = inTmpDocs.readVInt();</span>
+<span class="fc" id="L922">              outTmpDocsChained.writeVInt(size);</span>
+              // offset references
+<span class="fc" id="L924">              outTmpDocsChained.writeVLong(inTmpDocs.readVLong());</span>
+<span class="fc bfc" id="L925" title="All 2 branches covered.">              for (int t = 0; t &lt; size; t++) {</span>
+<span class="fc" id="L926">                outTmpDocsChained.writeVInt(inTmpDocs.readVInt());</span>
+<span class="fc" id="L927">                outTmpDocsChained.writeVLong(inTmpDocs.readVLong());</span>
+              }
+              // set back reference to part with same docId
+<span class="fc bfc" id="L930" title="All 2 branches covered.">              if (memoryTmpDocChainList.containsKey(docId)) {</span>
+                // reference to previous
+<span class="fc" id="L932">                outTmpDocsChained.writeVLong(memoryTmpDocChainList.get(docId));</span>
+              } else {
+                // self reference indicates end of chain
+<span class="fc" id="L935">                outTmpDocsChained.writeVLong(currentFilepointer);</span>
+              }
+              // update temporary index in memory
+<span class="fc" id="L938">              memoryTmpDocChainList.put(docId, currentFilepointer);</span>
+<span class="fc" id="L939">            } catch (IOException ex) {</span>
+<span class="fc" id="L940">              log.debug(ex);</span>
+<span class="fc" id="L941">              break;</span>
+<span class="fc" id="L942">            }</span>
+          }
+<span class="fc" id="L944">          outTmpDocsChained.close();</span>
+<span class="fc" id="L945">          closeables.remove(outTmpDocsChained);</span>
+<span class="fc" id="L946">          inTmpDocs.close();</span>
+<span class="fc" id="L947">          closeables.remove(inTmpDocs);</span>
+<span class="fc" id="L948">          state.directory.deleteFile(mtasTmpDocsFileName);</span>
+
+          // set reference to tmpDoc in Field
+<span class="fc bfc" id="L951" title="All 2 branches covered.">          if (memoryTmpDocChainList.size() &gt; 0) {</span>
+<span class="fc" id="L952">            outTmpField.writeString(field);</span>
+<span class="fc" id="L953">            outTmpField.writeVLong(outTmpDoc.getFilePointer());</span>
+<span class="fc" id="L954">            outTmpField.writeVInt(memoryTmpDocChainList.size());</span>
+<span class="fc" id="L955">            outTmpField.writeVLong(smallestTermFilepointer);</span>
+<span class="fc" id="L956">            outTmpField.writeVInt(termCounter);</span>
+<span class="fc" id="L957">            outTmpField.writeVLong(smallestPrefixFilepointer);</span>
+<span class="fc" id="L958">            outTmpField.writeVInt(prefixReferenceIndex.get(field).size());</span>
+            // fill indexDoc
+<span class="fc" id="L960">            IndexInput inTmpDocsChained = state.directory</span>
+<span class="fc" id="L961">                .openInput(mtasTmpDocsChainedFileName, state.context);</span>
+<span class="fc" id="L962">            closeables.add(inTmpDocsChained);</span>
+<span class="fc" id="L963">            IndexInput inTmpObject = state.directory</span>
+<span class="fc" id="L964">                .openInput(mtasTmpObjectFileName, state.context);</span>
+<span class="fc" id="L965">            closeables.add(inTmpObject);</span>
+<span class="fc bfc" id="L966" title="All 2 branches covered.">            for (Entry&lt;Integer, Long&gt; entry : memoryTmpDocChainList</span>
+<span class="fc" id="L967">                .entrySet()) {</span>
+<span class="fc" id="L968">              Integer docId = entry.getKey();</span>
+              Long currentFilePointer;
+              Long newFilePointer;
+              // list of objectIds and references to objects
+<span class="fc" id="L972">              memoryIndexDocList.clear();</span>
+              // construct final object + indexObjectId for docId
+<span class="fc" id="L974">              currentFilePointer = entry.getValue();</span>
+              // collect objects for document
+<span class="fc" id="L976">              tokenStatsMinPos = null;</span>
+<span class="fc" id="L977">              tokenStatsMaxPos = null;</span>
+<span class="fc" id="L978">              tokenStatsNumber = 0;</span>
+              while (true) {
+<span class="fc" id="L980">                inTmpDocsChained.seek(currentFilePointer);</span>
+<span class="fc" id="L981">                Integer docIdPart = inTmpDocsChained.readVInt();</span>
+<span class="pc bpc" id="L982" title="2 of 4 branches missed.">                assert docIdPart.equals(</span>
+                    docId) : &quot;conflicting docId in reference to temporaryIndexDocsChained&quot;;
+                // number of objects/tokens in part
+<span class="fc" id="L985">                int size = inTmpDocsChained.readVInt();</span>
+<span class="fc" id="L986">                long offsetFilePointerTmpObject = inTmpDocsChained.readVLong();</span>
+<span class="pc bpc" id="L987" title="2 of 4 branches missed.">                assert size &gt; 0 : &quot;number of objects/tokens in part cannot be &quot;</span>
+                    + size;
+<span class="fc bfc" id="L989" title="All 2 branches covered.">                for (int t = 0; t &lt; size; t++) {</span>
+<span class="fc" id="L990">                  int mtasId = inTmpDocsChained.readVInt();</span>
+<span class="fc" id="L991">                  Long tmpObjectRef = inTmpDocsChained.readVLong()</span>
+                      + offsetFilePointerTmpObject;
+<span class="pc bpc" id="L993" title="2 of 4 branches missed.">                  assert !memoryIndexDocList.containsKey(</span>
+<span class="fc" id="L994">                      mtasId) : &quot;mtasId should be unique in this selection&quot;;</span>
+                  // initially, store ref to tmpObject
+<span class="fc" id="L996">                  memoryIndexDocList.put(mtasId, tmpObjectRef);</span>
+                }
+                // reference to next part
+<span class="fc" id="L999">                newFilePointer = inTmpDocsChained.readVLong();</span>
+<span class="fc bfc" id="L1000" title="All 2 branches covered.">                if (newFilePointer.equals(currentFilePointer)) {</span>
+<span class="fc" id="L1001">                  break; // end of chained parts</span>
+                } else {
+<span class="fc" id="L1003">                  currentFilePointer = newFilePointer;</span>
+                }
+<span class="fc" id="L1005">              }</span>
+              // now create new objects, sorted by mtasId
+<span class="fc" id="L1007">              Long smallestObjectFilepointer = outObject.getFilePointer();</span>
+<span class="fc bfc" id="L1008" title="All 2 branches covered.">              for (Entry&lt;Integer, Long&gt; objectEntry : memoryIndexDocList</span>
+<span class="fc" id="L1009">                  .entrySet()) {</span>
+<span class="fc" id="L1010">                int mtasId = objectEntry.getKey();</span>
+<span class="fc" id="L1011">                Long tmpObjectRef = objectEntry.getValue();</span>
+<span class="fc" id="L1012">                Long objectRef = outObject.getFilePointer();</span>
+<span class="fc" id="L1013">                copyObjectAndUpdateStats(mtasId, inTmpObject, tmpObjectRef,</span>
+                    outObject);
+                // update with new ref
+<span class="fc" id="L1016">                memoryIndexDocList.put(mtasId, objectRef);</span>
+<span class="fc" id="L1017">              }</span>
+              // check mtasIds properties
+<span class="pc bpc" id="L1019" title="1 of 2 branches missed.">              assert memoryIndexDocList.firstKey()</span>
+<span class="pc bpc" id="L1020" title="1 of 2 branches missed.">                  .equals(0) : &quot;first mtasId should not be &quot;</span>
+<span class="nc" id="L1021">                      + memoryIndexDocList.firstKey();</span>
+<span class="pc bpc" id="L1022" title="1 of 2 branches missed.">              assert (1 + memoryIndexDocList.lastKey()</span>
+<span class="fc" id="L1023">                  - memoryIndexDocList.firstKey()) == memoryIndexDocList</span>
+<span class="pc bpc" id="L1024" title="1 of 2 branches missed.">                      .size() : &quot;missing mtasId&quot;;</span>
+<span class="pc bpc" id="L1025" title="2 of 4 branches missed.">              assert tokenStatsNumber.equals(memoryIndexDocList</span>
+<span class="fc" id="L1026">                  .size()) : &quot;incorrect number of items in tokenStats&quot;;</span>
+
+              // store item in tmpDoc
+<span class="fc" id="L1029">              outTmpDoc.writeVInt(docId);</span>
+<span class="fc" id="L1030">              outTmpDoc.writeVLong(outIndexObjectId.getFilePointer());</span>
+
+<span class="fc" id="L1032">              int mtasId = 0;</span>
+              // compute linear approximation (least squares method, integer
+              // constants)
+<span class="fc" id="L1035">              long tmpN = memoryIndexDocList.size();</span>
+<span class="fc" id="L1036">              long tmpSumY = 0;</span>
+<span class="fc" id="L1037">              long tmpSumXY = 0;</span>
+<span class="fc" id="L1038">              long tmpSumX = 0;</span>
+<span class="fc" id="L1039">              long tmpSumXX = 0;</span>
+<span class="fc bfc" id="L1040" title="All 2 branches covered.">              for (Entry&lt;Integer, Long&gt; objectEntry : memoryIndexDocList</span>
+<span class="fc" id="L1041">                  .entrySet()) {</span>
+<span class="pc bpc" id="L1042" title="1 of 2 branches missed.">                assert objectEntry.getKey()</span>
+<span class="pc bpc" id="L1043" title="1 of 2 branches missed.">                    .equals(mtasId) : &quot;unexpected mtasId&quot;;</span>
+<span class="fc" id="L1044">                tmpSumY += objectEntry.getValue();</span>
+<span class="fc" id="L1045">                tmpSumX += mtasId;</span>
+<span class="fc" id="L1046">                tmpSumXY += mtasId * objectEntry.getValue();</span>
+<span class="fc" id="L1047">                tmpSumXX += mtasId * mtasId;</span>
+<span class="fc" id="L1048">                mtasId++;</span>
+<span class="fc" id="L1049">              }</span>
+<span class="fc" id="L1050">              int objectRefApproxQuotient = (int) (((tmpN * tmpSumXY)</span>
+                  - (tmpSumX * tmpSumY))
+                  / ((tmpN * tmpSumXX) - (tmpSumX * tmpSumX)));
+<span class="fc" id="L1053">              long objectRefApproxOffset = (tmpSumY</span>
+                  - objectRefApproxQuotient * tmpSumX) / tmpN;
+              Long objectRefApproxCorrection;
+<span class="fc" id="L1056">              long maxAbsObjectRefApproxCorrection = 0;</span>
+              // compute maximum correction
+<span class="fc" id="L1058">              mtasId = 0;</span>
+<span class="fc bfc" id="L1059" title="All 2 branches covered.">              for (Entry&lt;Integer, Long&gt; objectEntry : memoryIndexDocList</span>
+<span class="fc" id="L1060">                  .entrySet()) {</span>
+<span class="fc" id="L1061">                objectRefApproxCorrection = (objectEntry.getValue()</span>
+                    - (objectRefApproxOffset
+                        + (mtasId * objectRefApproxQuotient)));
+<span class="fc" id="L1064">                maxAbsObjectRefApproxCorrection = Math.max(</span>
+                    maxAbsObjectRefApproxCorrection,
+<span class="fc" id="L1066">                    Math.abs(objectRefApproxCorrection));</span>
+<span class="fc" id="L1067">                mtasId++;</span>
+<span class="fc" id="L1068">              }</span>
+              byte storageFlags;
+<span class="pc bpc" id="L1070" title="1 of 2 branches missed.">              if (maxAbsObjectRefApproxCorrection &lt;= Long</span>
+<span class="fc" id="L1071">                  .valueOf(Byte.MAX_VALUE)) {</span>
+<span class="nc" id="L1072">                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_BYTE;</span>
+<span class="fc bfc" id="L1073" title="All 2 branches covered.">              } else if (maxAbsObjectRefApproxCorrection &lt;= Long</span>
+<span class="fc" id="L1074">                  .valueOf(Short.MAX_VALUE)) {</span>
+<span class="fc" id="L1075">                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_SHORT;</span>
+<span class="pc bpc" id="L1076" title="1 of 2 branches missed.">              } else if (maxAbsObjectRefApproxCorrection &lt;= Long</span>
+<span class="fc" id="L1077">                  .valueOf(Integer.MAX_VALUE)) {</span>
+<span class="fc" id="L1078">                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER;</span>
+              } else {
+<span class="nc" id="L1080">                storageFlags = MtasCodecPostingsFormat.MTAS_STORAGE_LONG;</span>
+              }
+              // update indexObjectId with correction on approximated ref
+              // (assume
+              // can be stored as int)
+<span class="fc" id="L1085">              mtasId = 0;</span>
+<span class="fc bfc" id="L1086" title="All 2 branches covered.">              for (Entry&lt;Integer, Long&gt; objectEntry : memoryIndexDocList</span>
+<span class="fc" id="L1087">                  .entrySet()) {</span>
+<span class="fc" id="L1088">                objectRefApproxCorrection = (objectEntry.getValue()</span>
+                    - (objectRefApproxOffset
+                        + (mtasId * objectRefApproxQuotient)));
+<span class="pc bpc" id="L1091" title="1 of 2 branches missed.">                if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {</span>
+<span class="nc" id="L1092">                  outIndexObjectId</span>
+<span class="nc" id="L1093">                      .writeByte(objectRefApproxCorrection.byteValue());</span>
+<span class="fc bfc" id="L1094" title="All 2 branches covered.">                } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_SHORT) {</span>
+<span class="fc" id="L1095">                  outIndexObjectId</span>
+<span class="fc" id="L1096">                      .writeShort(objectRefApproxCorrection.shortValue());</span>
+<span class="pc bpc" id="L1097" title="1 of 2 branches missed.">                } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER) {</span>
+<span class="fc" id="L1098">                  outIndexObjectId</span>
+<span class="fc" id="L1099">                      .writeInt(objectRefApproxCorrection.intValue());</span>
+                } else {
+<span class="nc" id="L1101">                  outIndexObjectId.writeLong(objectRefApproxCorrection);</span>
+                }
+<span class="fc" id="L1103">                mtasId++;</span>
+<span class="fc" id="L1104">              }</span>
+<span class="fc" id="L1105">              outTmpDoc.writeVLong(smallestObjectFilepointer);</span>
+<span class="fc" id="L1106">              outTmpDoc.writeVInt(objectRefApproxQuotient);</span>
+<span class="fc" id="L1107">              outTmpDoc.writeZLong(objectRefApproxOffset);</span>
+<span class="fc" id="L1108">              outTmpDoc.writeByte(storageFlags);</span>
+<span class="fc" id="L1109">              outTmpDoc.writeVInt(tokenStatsNumber);</span>
+<span class="fc" id="L1110">              outTmpDoc.writeVInt(tokenStatsMinPos);</span>
+<span class="fc" id="L1111">              outTmpDoc.writeVInt(tokenStatsMaxPos);</span>
+              // clean up
+<span class="fc" id="L1113">              memoryIndexDocList.clear();</span>
+<span class="fc" id="L1114">            } // end loop over docs</span>
+<span class="fc" id="L1115">            inTmpDocsChained.close();</span>
+<span class="fc" id="L1116">            closeables.remove(inTmpDocsChained);</span>
+<span class="fc" id="L1117">            inTmpObject.close();</span>
+<span class="fc" id="L1118">            closeables.remove(inTmpObject);</span>
+          }
+          // clean up
+<span class="fc" id="L1121">          memoryTmpDocChainList.clear();</span>
+          // remove temporary files
+<span class="fc" id="L1123">          state.directory.deleteFile(mtasTmpObjectFileName);</span>
+<span class="fc" id="L1124">          state.directory.deleteFile(mtasTmpDocsChainedFileName);</span>
+          // store references for field
+
+        } // end processing field
+<span class="fc" id="L1128">      } // end loop fields</span>
+      // close temporary index doc
+<span class="fc" id="L1130">      outTmpDoc.close();</span>
+<span class="fc" id="L1131">      closeables.remove(outTmpDoc);</span>
+      // close indexField, indexObjectId and object
+<span class="fc" id="L1133">      CodecUtil.writeFooter(outTmpField);</span>
+<span class="fc" id="L1134">      outTmpField.close();</span>
+<span class="fc" id="L1135">      closeables.remove(outTmpField);</span>
+<span class="fc" id="L1136">      CodecUtil.writeFooter(outIndexObjectId);</span>
+<span class="fc" id="L1137">      outIndexObjectId.close();</span>
+<span class="fc" id="L1138">      closeables.remove(outIndexObjectId);</span>
+<span class="fc" id="L1139">      CodecUtil.writeFooter(outObject);</span>
+<span class="fc" id="L1140">      outObject.close();</span>
+<span class="fc" id="L1141">      closeables.remove(outObject);</span>
+<span class="fc" id="L1142">      CodecUtil.writeFooter(outTerm);</span>
+<span class="fc" id="L1143">      outTerm.close();</span>
+<span class="fc" id="L1144">      closeables.remove(outTerm);</span>
+<span class="fc" id="L1145">      CodecUtil.writeFooter(outPrefix);</span>
+<span class="fc" id="L1146">      outPrefix.close();</span>
+<span class="fc" id="L1147">      closeables.remove(outPrefix);</span>
+
+      // create final doc, fill indexObjectPosition, indexObjectParent and
+      // indexTermPrefixPosition, create final field
+<span class="fc" id="L1151">      IndexInput inTmpField = state.directory.openInput(mtasTmpFieldFileName,</span>
+          state.context);
+<span class="fc" id="L1153">      closeables.add(inTmpField);</span>
+<span class="fc" id="L1154">      IndexInput inTmpDoc = state.directory.openInput(mtasTmpDocFileName,</span>
+          state.context);
+<span class="fc" id="L1156">      closeables.add(inTmpDoc);</span>
+<span class="fc" id="L1157">      IndexInput inObjectId = state.directory</span>
+<span class="fc" id="L1158">          .openInput(mtasIndexObjectIdFileName, state.context);</span>
+<span class="fc" id="L1159">      closeables.add(inObjectId);</span>
+<span class="fc" id="L1160">      IndexInput inObject = state.directory.openInput(mtasObjectFileName,</span>
+          state.context);
+<span class="fc" id="L1162">      closeables.add(inObject);</span>
+<span class="fc" id="L1163">      IndexInput inTerm = state.directory.openInput(mtasTermFileName,</span>
+          state.context);
+<span class="fc" id="L1165">      closeables.add(inTerm);</span>
+<span class="fc" id="L1166">      closeables.add(outField = state.directory</span>
+<span class="fc" id="L1167">          .createOutput(mtasIndexFieldFileName, state.context));</span>
+<span class="fc" id="L1168">      CodecUtil.writeIndexHeader(outField, name,</span>
+<span class="fc" id="L1169">          MtasCodecPostingsFormat.VERSION_CURRENT, state.segmentInfo.getId(),</span>
+          state.segmentSuffix);
+<span class="fc" id="L1171">      outField.writeString(delegatePostingsFormatName);</span>
+<span class="fc" id="L1172">      boolean doWrite = true;</span>
+      do {
+        try {
+          // read from tmpField
+<span class="fc" id="L1176">          String field = inTmpField.readString();</span>
+<span class="fc" id="L1177">          long fpTmpDoc = inTmpField.readVLong();</span>
+<span class="fc" id="L1178">          int numberDocs = inTmpField.readVInt();</span>
+<span class="fc" id="L1179">          long fpTerm = inTmpField.readVLong();</span>
+<span class="fc" id="L1180">          int numberTerms = inTmpField.readVInt();</span>
+<span class="fc" id="L1181">          long fpPrefix = inTmpField.readVLong();</span>
+<span class="fc" id="L1182">          int numberPrefixes = inTmpField.readVInt();</span>
+<span class="fc" id="L1183">          inTmpDoc.seek(fpTmpDoc);</span>
+<span class="fc" id="L1184">          long fpFirstDoc = outDoc.getFilePointer();</span>
+          // get prefixId index
+<span class="fc" id="L1186">          HashMap&lt;String, Integer&gt; prefixIdIndexField = prefixIdIndex</span>
+<span class="fc" id="L1187">              .get(field);</span>
+          // construct MtasRBTree for indexDocId
+<span class="fc" id="L1189">          MtasRBTree mtasDocIdTree = new MtasRBTree(true, false);</span>
+<span class="fc bfc" id="L1190" title="All 2 branches covered.">          for (int docCounter = 0; docCounter &lt; numberDocs; docCounter++) {</span>
+            // get info from tmpDoc
+<span class="fc" id="L1192">            int docId = inTmpDoc.readVInt();</span>
+            // filePointer indexObjectId
+<span class="fc" id="L1194">            Long fpIndexObjectId = inTmpDoc.readVLong();</span>
+            // filePointer indexObjectPosition (unknown)
+            Long fpIndexObjectPosition;
+            // filePointer indexObjectParent (unknown)
+            Long fpIndexObjectParent;
+            // constants for approximation object references for this document
+<span class="fc" id="L1200">            long smallestObjectFilepointer = inTmpDoc.readVLong();</span>
+<span class="fc" id="L1201">            int objectRefApproxQuotient = inTmpDoc.readVInt();</span>
+<span class="fc" id="L1202">            long objectRefApproxOffset = inTmpDoc.readZLong();</span>
+<span class="fc" id="L1203">            byte storageFlags = inTmpDoc.readByte();</span>
+            // number objects/tokens
+<span class="fc" id="L1205">            int size = inTmpDoc.readVInt();</span>
+            // construct MtasRBTree
+<span class="fc" id="L1207">            MtasRBTree mtasPositionTree = new MtasRBTree(false, true);</span>
+<span class="fc" id="L1208">            MtasRBTree mtasParentTree = new MtasRBTree(false, true);</span>
+<span class="fc" id="L1209">            inObjectId.seek(fpIndexObjectId);</span>
+            long refCorrection;
+            long ref;
+<span class="fc" id="L1212">            HashMap&lt;String, HashSet&lt;Integer&gt;&gt; docFieldAdministration = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L1213" title="All 2 branches covered.">            for (int mtasId = 0; mtasId &lt; size; mtasId++) {</span>
+<span class="pc bpc" id="L1214" title="1 of 2 branches missed.">              if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_BYTE) {</span>
+<span class="nc" id="L1215">                refCorrection = inObjectId.readByte();</span>
+<span class="fc bfc" id="L1216" title="All 2 branches covered.">              } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_SHORT) {</span>
+<span class="fc" id="L1217">                refCorrection = inObjectId.readShort();</span>
+<span class="pc bpc" id="L1218" title="1 of 2 branches missed.">              } else if (storageFlags == MtasCodecPostingsFormat.MTAS_STORAGE_INTEGER) {</span>
+<span class="fc" id="L1219">                refCorrection = inObjectId.readInt();</span>
+              } else {
+<span class="nc" id="L1221">                refCorrection = inObjectId.readLong();</span>
+              }
+<span class="fc" id="L1223">              ref = objectRefApproxOffset + mtasId * objectRefApproxQuotient</span>
+                  + refCorrection;
+<span class="fc" id="L1225">              MtasTokenString token = MtasCodecPostingsFormat</span>
+<span class="fc" id="L1226">                  .getToken(inObject, inTerm, ref);</span>
+<span class="fc" id="L1227">              String prefix = token.getPrefix();</span>
+<span class="fc" id="L1228">              registerPrefixIntersection(field, prefix,</span>
+<span class="fc" id="L1229">                  token.getPositionStart(), token.getPositionEnd(),</span>
+                  docFieldAdministration);
+<span class="pc bpc" id="L1231" title="1 of 2 branches missed.">              int prefixId = prefixIdIndexField.containsKey(prefix)</span>
+<span class="pc" id="L1232">                  ? prefixIdIndexField.get(prefix) : 0;</span>
+<span class="fc" id="L1233">              token.setPrefixId(prefixId);</span>
+<span class="pc bpc" id="L1234" title="2 of 4 branches missed.">              assert token.getId().equals(mtasId) : &quot;unexpected mtasId &quot;</span>
+                  + mtasId;
+<span class="fc" id="L1236">              mtasPositionTree.addPositionAndObjectFromToken(token);</span>
+<span class="fc" id="L1237">              mtasParentTree.addParentFromToken(token);</span>
+            }
+            // store mtasPositionTree and mtasParentTree
+<span class="fc" id="L1240">            fpIndexObjectPosition = storeTree(mtasPositionTree,</span>
+                outIndexObjectPosition, smallestObjectFilepointer);
+<span class="fc" id="L1242">            fpIndexObjectParent = storeTree(mtasParentTree,</span>
+                outIndexObjectParent, smallestObjectFilepointer);
+<span class="fc" id="L1244">            long fpDoc = outDoc.getFilePointer();</span>
+            // create indexDoc with updated fpIndexObjectPosition from tmpDoc
+<span class="fc" id="L1246">            outDoc.writeVInt(docId); // docId</span>
+            // reference indexObjectId
+<span class="fc" id="L1248">            outDoc.writeVLong(fpIndexObjectId);</span>
+            // reference indexObjectPosition
+<span class="fc" id="L1250">            outDoc.writeVLong(fpIndexObjectPosition);</span>
+            // reference indexObjectParent
+<span class="fc" id="L1252">            outDoc.writeVLong(fpIndexObjectParent);</span>
+            // variables approximation and storage references object
+<span class="fc" id="L1254">            outDoc.writeVLong(smallestObjectFilepointer);</span>
+<span class="fc" id="L1255">            outDoc.writeVInt(objectRefApproxQuotient);</span>
+<span class="fc" id="L1256">            outDoc.writeZLong(objectRefApproxOffset);</span>
+<span class="fc" id="L1257">            outDoc.writeByte(storageFlags);</span>
+            // number of objects
+<span class="fc" id="L1259">            outDoc.writeVInt(size);</span>
+            // minPosition
+<span class="fc" id="L1261">            outDoc.writeVInt(inTmpDoc.readVInt());</span>
+            // maxPosition
+<span class="fc" id="L1263">            outDoc.writeVInt(inTmpDoc.readVInt());</span>
+            // add to tree for indexDocId
+<span class="fc" id="L1265">            mtasDocIdTree.addIdFromDoc(docId, fpDoc);</span>
+          }
+<span class="fc" id="L1267">          long fpIndexDocId = storeTree(mtasDocIdTree, outIndexDocId,</span>
+              fpFirstDoc);
+
+          // store in indexField
+<span class="fc" id="L1271">          outField.writeString(field);</span>
+<span class="fc" id="L1272">          outField.writeVLong(fpFirstDoc);</span>
+<span class="fc" id="L1273">          outField.writeVLong(fpIndexDocId);</span>
+<span class="fc" id="L1274">          outField.writeVInt(numberDocs);</span>
+<span class="fc" id="L1275">          outField.writeVLong(fpTerm);</span>
+<span class="fc" id="L1276">          outField.writeVInt(numberTerms);</span>
+<span class="fc" id="L1277">          outField.writeVLong(fpPrefix);</span>
+<span class="fc" id="L1278">          outField.writeVInt(numberPrefixes);</span>
+          // register intersection
+<span class="fc" id="L1280">          fieldInfos.fieldInfo(field).putAttribute(</span>
+              MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION,
+<span class="fc" id="L1282">              getPrefixStatsIntersectionPrefixAttribute(field));</span>
+<span class="fc" id="L1283">        } catch (EOFException e) {</span>
+<span class="fc" id="L1284">          log.debug(e);</span>
+<span class="fc" id="L1285">          doWrite = false;</span>
+<span class="fc" id="L1286">        }</span>
+        // end loop over fields
+<span class="fc bfc" id="L1288" title="All 2 branches covered.">      } while (doWrite);</span>
+<span class="fc" id="L1289">      inTerm.close();</span>
+<span class="fc" id="L1290">      closeables.remove(inTerm);</span>
+<span class="fc" id="L1291">      inObject.close();</span>
+<span class="fc" id="L1292">      closeables.remove(inObject);</span>
+<span class="fc" id="L1293">      inObjectId.close();</span>
+<span class="fc" id="L1294">      closeables.remove(inObjectId);</span>
+<span class="fc" id="L1295">      inTmpDoc.close();</span>
+<span class="fc" id="L1296">      closeables.remove(inTmpDoc);</span>
+<span class="fc" id="L1297">      inTmpField.close();</span>
+<span class="fc" id="L1298">      closeables.remove(inTmpField);</span>
+
+      // remove temporary files
+<span class="fc" id="L1301">      state.directory.deleteFile(mtasTmpDocFileName);</span>
+<span class="fc" id="L1302">      state.directory.deleteFile(mtasTmpFieldFileName);</span>
+      // close indexDoc, indexObjectPosition and indexObjectParent
+<span class="fc" id="L1304">      CodecUtil.writeFooter(outDoc);</span>
+<span class="fc" id="L1305">      outDoc.close();</span>
+<span class="fc" id="L1306">      closeables.remove(outDoc);</span>
+<span class="fc" id="L1307">      CodecUtil.writeFooter(outIndexObjectPosition);</span>
+<span class="fc" id="L1308">      outIndexObjectPosition.close();</span>
+<span class="fc" id="L1309">      closeables.remove(outIndexObjectPosition);</span>
+<span class="fc" id="L1310">      CodecUtil.writeFooter(outIndexObjectParent);</span>
+<span class="fc" id="L1311">      outIndexObjectParent.close();</span>
+<span class="fc" id="L1312">      closeables.remove(outIndexObjectParent);</span>
+<span class="fc" id="L1313">      CodecUtil.writeFooter(outIndexDocId);</span>
+<span class="fc" id="L1314">      outIndexDocId.close();</span>
+<span class="fc" id="L1315">      closeables.remove(outIndexDocId);</span>
+<span class="fc" id="L1316">      CodecUtil.writeFooter(outField);</span>
+<span class="fc" id="L1317">      outField.close();</span>
+<span class="fc" id="L1318">      closeables.remove(outField);</span>
+<span class="nc" id="L1319">    } catch (IOException e) {</span>
+      // ignore, can happen when merging segment already written by
+      // delegateFieldsConsumer
+<span class="nc" id="L1322">      log.error(e);</span>
+    } finally {
+<span class="pc" id="L1324">      IOUtils.closeWhileHandlingException(closeables);</span>
+      try {
+<span class="nc" id="L1326">        state.directory.deleteFile(mtasTmpDocsFileName);</span>
+<span class="pc" id="L1327">      } catch (IOException e) {</span>
+<span class="pc" id="L1328">        log.debug(e);</span>
+<span class="nc" id="L1329">      }</span>
+      try {
+<span class="nc" id="L1331">        state.directory.deleteFile(mtasTmpDocFileName);</span>
+<span class="pc" id="L1332">      } catch (IOException e) {</span>
+<span class="pc" id="L1333">        log.debug(e);</span>
+<span class="nc" id="L1334">      }</span>
+      try {
+<span class="nc" id="L1336">        state.directory.deleteFile(mtasTmpFieldFileName);</span>
+<span class="pc" id="L1337">      } catch (IOException e) {</span>
+<span class="pc" id="L1338">        log.debug(e);</span>
+<span class="nc" id="L1339">      }</span>
+<span class="pc" id="L1340">    }</span>
+<span class="fc" id="L1341">  }</span>
+
+  /**
+   * Creates the object and register prefix.
+   *
+   * @param field
+   *          the field
+   * @param out
+   *          the out
+   * @param term
+   *          the term
+   * @param termRef
+   *          the term ref
+   * @param startPosition
+   *          the start position
+   * @param payload
+   *          the payload
+   * @param outPrefix
+   *          the out prefix
+   * @return the integer
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
+      BytesRef term, Long termRef, int startPosition, BytesRef payload,
+      IndexOutput outPrefix) throws IOException {
+<span class="fc" id="L1367">    return createObjectAndRegisterPrefix(field, out, term, termRef,</span>
+        startPosition, payload, null, null, outPrefix);
+  }
+
+  /**
+   * Creates the object and register prefix.
+   *
+   * @param field
+   *          the field
+   * @param out
+   *          the out
+   * @param term
+   *          the term
+   * @param termRef
+   *          the term ref
+   * @param startPosition
+   *          the start position
+   * @param payload
+   *          the payload
+   * @param startOffset
+   *          the start offset
+   * @param endOffset
+   *          the end offset
+   * @param outPrefix
+   *          the out prefix
+   * @return the integer
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
+      BytesRef term, Long termRef, int startPosition, BytesRef payload,
+      Integer startOffset, Integer endOffset, IndexOutput outPrefix)
+      throws IOException {
+    try {
+<span class="fc" id="L1401">      Integer mtasId = null;</span>
+<span class="fc" id="L1402">      String prefix = MtasToken.getPrefixFromValue(term.utf8ToString());</span>
+<span class="pc bpc" id="L1403" title="1 of 2 branches missed.">      if (payload != null) {</span>
+<span class="fc" id="L1404">        MtasPayloadDecoder payloadDecoder = new MtasPayloadDecoder();</span>
+<span class="fc" id="L1405">        payloadDecoder.init(startPosition, Arrays.copyOfRange(payload.bytes,</span>
+            payload.offset, (payload.offset + payload.length)));
+<span class="fc" id="L1407">        mtasId = payloadDecoder.getMtasId();</span>
+<span class="fc" id="L1408">        Integer mtasParentId = payloadDecoder.getMtasParentId();</span>
+<span class="fc" id="L1409">        byte[] mtasPayload = payloadDecoder.getMtasPayload();</span>
+<span class="fc" id="L1410">        MtasPosition mtasPosition = payloadDecoder.getMtasPosition();</span>
+<span class="fc" id="L1411">        MtasOffset mtasOffset = payloadDecoder.getMtasOffset();</span>
+<span class="pc bpc" id="L1412" title="2 of 4 branches missed.">        if (mtasOffset == null &amp;&amp; startOffset != null) {</span>
+<span class="nc" id="L1413">          mtasOffset = new MtasOffset(startOffset, endOffset);</span>
+        }
+<span class="fc" id="L1415">        MtasOffset mtasRealOffset = payloadDecoder.getMtasRealOffset();</span>
+        // only if really mtas object
+<span class="pc bpc" id="L1417" title="1 of 2 branches missed.">        if (mtasId != null) {</span>
+          // compute flags
+<span class="fc" id="L1419">          int objectFlags = 0;</span>
+<span class="pc bpc" id="L1420" title="1 of 2 branches missed.">          if (mtasPosition != null) {</span>
+<span class="fc bfc" id="L1421" title="All 2 branches covered.">            if (mtasPosition.checkType(MtasPosition.POSITION_RANGE)) {</span>
+<span class="fc" id="L1422">              objectFlags = objectFlags</span>
+                  | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE;
+<span class="fc" id="L1424">              registerPrefixStatsRangePositionValue(field, prefix, outPrefix);</span>
+<span class="fc bfc" id="L1425" title="All 2 branches covered.">            } else if (mtasPosition.checkType(MtasPosition.POSITION_SET)) {</span>
+<span class="fc" id="L1426">              objectFlags = objectFlags</span>
+                  | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET;
+<span class="fc" id="L1428">              registerPrefixStatsSetPositionValue(field, prefix, outPrefix);</span>
+            } else {
+<span class="fc" id="L1430">              registerPrefixStatsSinglePositionValue(field, prefix, outPrefix);</span>
+            }
+          } else {
+<span class="nc" id="L1433">            throw new IOException(&quot;no position&quot;);</span>
+          }
+<span class="fc bfc" id="L1435" title="All 2 branches covered.">          if (mtasParentId != null) {</span>
+<span class="fc" id="L1436">            objectFlags = objectFlags</span>
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT;
+          }
+<span class="pc bpc" id="L1439" title="1 of 2 branches missed.">          if (mtasOffset != null) {</span>
+<span class="nc" id="L1440">            objectFlags = objectFlags</span>
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET;
+          }
+<span class="pc bpc" id="L1443" title="1 of 2 branches missed.">          if (mtasRealOffset != null) {</span>
+<span class="nc" id="L1444">            objectFlags = objectFlags</span>
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET;
+          }
+<span class="pc bpc" id="L1447" title="1 of 2 branches missed.">          if (mtasPayload != null) {</span>
+<span class="nc" id="L1448">            objectFlags = objectFlags</span>
+                | MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD;
+          }
+          // create object
+<span class="fc" id="L1452">          out.writeVInt(mtasId);</span>
+<span class="fc" id="L1453">          out.writeVInt(objectFlags);</span>
+<span class="fc bfc" id="L1454" title="All 2 branches covered.">          if ((objectFlags</span>
+              &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
+<span class="fc" id="L1456">            out.writeVInt(mtasParentId);</span>
+          }
+<span class="fc bfc" id="L1458" title="All 2 branches covered.">          if ((objectFlags</span>
+              &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
+<span class="fc" id="L1460">            int tmpStart = mtasPosition.getStart();</span>
+<span class="fc" id="L1461">            out.writeVInt(tmpStart);</span>
+<span class="fc" id="L1462">            out.writeVInt((mtasPosition.getEnd() - tmpStart));</span>
+<span class="fc bfc" id="L1463" title="All 2 branches covered.">          } else if ((objectFlags</span>
+              &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
+<span class="fc" id="L1465">            int[] positions = mtasPosition.getPositions();</span>
+<span class="fc" id="L1466">            out.writeVInt(positions.length);</span>
+<span class="fc" id="L1467">            int tmpPrevious = 0;</span>
+<span class="fc bfc" id="L1468" title="All 2 branches covered.">            for (int position : positions) {</span>
+<span class="fc" id="L1469">              out.writeVInt((position - tmpPrevious));</span>
+<span class="fc" id="L1470">              tmpPrevious = position;</span>
+            }
+<span class="fc" id="L1472">          } else {</span>
+<span class="fc" id="L1473">            out.writeVInt(mtasPosition.getStart());</span>
+          }
+<span class="pc bpc" id="L1475" title="1 of 2 branches missed.">          if ((objectFlags</span>
+              &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
+<span class="nc" id="L1477">            int tmpStart = mtasOffset.getStart();</span>
+<span class="nc" id="L1478">            out.writeVInt(mtasOffset.getStart());</span>
+<span class="nc" id="L1479">            out.writeVInt((mtasOffset.getEnd() - tmpStart));</span>
+          }
+<span class="pc bpc" id="L1481" title="1 of 2 branches missed.">          if ((objectFlags</span>
+              &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
+<span class="nc" id="L1483">            int tmpStart = mtasRealOffset.getStart();</span>
+<span class="nc" id="L1484">            out.writeVInt(mtasRealOffset.getStart());</span>
+<span class="nc" id="L1485">            out.writeVInt((mtasRealOffset.getEnd() - tmpStart));</span>
+          }
+<span class="pc bpc" id="L1487" title="1 of 2 branches missed.">          if ((objectFlags</span>
+              &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
+<span class="nc bnc" id="L1489" title="All 2 branches missed.">            if (mtasPayload != null) {</span>
+<span class="nc" id="L1490">              out.writeVInt(mtasPayload.length);</span>
+<span class="nc" id="L1491">              out.writeBytes(mtasPayload, mtasPayload.length);</span>
+            } else {
+<span class="nc" id="L1493">              out.writeVInt(0);</span>
+            }
+          }
+<span class="fc" id="L1496">          out.writeVLong(termRef);</span>
+        } // storage token
+      }
+<span class="fc" id="L1499">      return mtasId;</span>
+<span class="nc" id="L1500">    } catch (Exception e) {</span>
+<span class="nc" id="L1501">      log.error(e);</span>
+<span class="nc" id="L1502">      throw new IOException(e);</span>
+    }
+  }
+
+  /**
+   * Store tree.
+   *
+   * @param tree
+   *          the tree
+   * @param out
+   *          the out
+   * @param refApproxOffset
+   *          the ref approx offset
+   * @return the long
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private Long storeTree(MtasTree&lt;?&gt; tree, IndexOutput out,
+      long refApproxOffset) throws IOException {
+<span class="fc" id="L1521">    return storeTree(tree.close(), tree.isSinglePoint(),</span>
+<span class="fc" id="L1522">        tree.isStorePrefixAndTermRef(), out, null, refApproxOffset);</span>
+  }
+
+  /**
+   * Store tree.
+   *
+   * @param node
+   *          the node
+   * @param isSinglePoint
+   *          the is single point
+   * @param storeAdditionalInformation
+   *          the store additional information
+   * @param out
+   *          the out
+   * @param nodeRefApproxOffset
+   *          the node ref approx offset
+   * @param refApproxOffset
+   *          the ref approx offset
+   * @return the long
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private Long storeTree(MtasTreeNode&lt;?&gt; node, boolean isSinglePoint,
+      boolean storeAdditionalInformation, IndexOutput out,
+      Long nodeRefApproxOffset, long refApproxOffset) throws IOException {
+
+<span class="pc bpc" id="L1548" title="1 of 2 branches missed.">    if (node != null) {</span>
+<span class="fc" id="L1549">      Boolean isRoot = false;</span>
+<span class="fc bfc" id="L1550" title="All 2 branches covered.">      if (nodeRefApproxOffset == null) {</span>
+<span class="fc" id="L1551">        nodeRefApproxOffset = out.getFilePointer();</span>
+<span class="fc" id="L1552">        isRoot = true;</span>
+      }
+      Long fpIndexObjectPositionLeftChild;
+      Long fpIndexObjectPositionRightChild;
+<span class="fc bfc" id="L1556" title="All 2 branches covered.">      if (node.leftChild != null) {</span>
+<span class="fc" id="L1557">        fpIndexObjectPositionLeftChild = storeTree(node.leftChild,</span>
+            isSinglePoint, storeAdditionalInformation, out, nodeRefApproxOffset,
+            refApproxOffset);
+      } else {
+<span class="fc" id="L1561">        fpIndexObjectPositionLeftChild = (long) 0; // tmp</span>
+      }
+<span class="fc bfc" id="L1563" title="All 2 branches covered.">      if (node.rightChild != null) {</span>
+<span class="fc" id="L1564">        fpIndexObjectPositionRightChild = storeTree(node.rightChild,</span>
+            isSinglePoint, storeAdditionalInformation, out, nodeRefApproxOffset,
+            refApproxOffset);
+      } else {
+<span class="fc" id="L1568">        fpIndexObjectPositionRightChild = (long) 0; // tmp</span>
+      }
+<span class="fc" id="L1570">      Long fpIndexObjectPosition = out.getFilePointer();</span>
+<span class="fc bfc" id="L1571" title="All 2 branches covered.">      if (node.leftChild == null) {</span>
+<span class="fc" id="L1572">        fpIndexObjectPositionLeftChild = fpIndexObjectPosition;</span>
+      }
+<span class="fc bfc" id="L1574" title="All 2 branches covered.">      if (node.rightChild == null) {</span>
+<span class="fc" id="L1575">        fpIndexObjectPositionRightChild = fpIndexObjectPosition;</span>
+      }
+<span class="fc bfc" id="L1577" title="All 2 branches covered.">      if (isRoot) {</span>
+<span class="pc bpc" id="L1578" title="2 of 4 branches missed.">        assert nodeRefApproxOffset &gt;= 0 : &quot;nodeRefApproxOffset &lt; 0 : &quot;</span>
+            + nodeRefApproxOffset;
+<span class="fc" id="L1580">        out.writeVLong(nodeRefApproxOffset);</span>
+<span class="fc" id="L1581">        byte flag = 0;</span>
+<span class="fc bfc" id="L1582" title="All 2 branches covered.">        if (isSinglePoint) {</span>
+<span class="fc" id="L1583">          flag |= MtasTree.SINGLE_POSITION_TREE;</span>
+        }
+<span class="fc bfc" id="L1585" title="All 2 branches covered.">        if (storeAdditionalInformation) {</span>
+<span class="fc" id="L1586">          flag |= MtasTree.STORE_ADDITIONAL_ID;</span>
+        }
+<span class="fc" id="L1588">        out.writeByte(flag);</span>
+      }
+<span class="pc bpc" id="L1590" title="2 of 4 branches missed.">      assert node.left &gt;= 0 : &quot;node.left &lt; 0 : &quot; + node.left;</span>
+<span class="fc" id="L1591">      out.writeVInt(node.left);</span>
+<span class="pc bpc" id="L1592" title="2 of 4 branches missed.">      assert node.right &gt;= 0 : &quot;node.right &lt; 0 : &quot; + node.right;</span>
+<span class="fc" id="L1593">      out.writeVInt(node.right);</span>
+<span class="pc bpc" id="L1594" title="2 of 4 branches missed.">      assert node.max &gt;= 0 : &quot;node.max &lt; 0 : &quot; + node.max;</span>
+<span class="fc" id="L1595">      out.writeVInt(node.max);</span>
+<span class="pc bpc" id="L1596" title="2 of 4 branches missed.">      assert fpIndexObjectPositionLeftChild &gt;= nodeRefApproxOffset : &quot;fpIndexObjectPositionLeftChild&lt;nodeRefApproxOffset : &quot;</span>
+          + fpIndexObjectPositionLeftChild + &quot; and &quot; + nodeRefApproxOffset;
+<span class="fc" id="L1598">      out.writeVLong((fpIndexObjectPositionLeftChild - nodeRefApproxOffset));</span>
+<span class="pc bpc" id="L1599" title="2 of 4 branches missed.">      assert fpIndexObjectPositionRightChild &gt;= nodeRefApproxOffset : &quot;fpIndexObjectPositionRightChild&lt;nodeRefApproxOffset&quot;</span>
+          + fpIndexObjectPositionRightChild + &quot; and &quot; + nodeRefApproxOffset;
+<span class="fc" id="L1601">      out.writeVLong((fpIndexObjectPositionRightChild - nodeRefApproxOffset));</span>
+<span class="fc bfc" id="L1602" title="All 2 branches covered.">      if (!isSinglePoint) {</span>
+<span class="fc" id="L1603">        out.writeVInt(node.ids.size());</span>
+      }
+<span class="fc" id="L1605">      HashMap&lt;Integer, MtasTreeNodeId&gt; ids = node.ids;</span>
+      Long objectRefCorrected;
+<span class="fc" id="L1607">      long objectRefCorrectedPrevious = 0;</span>
+      // sort refs
+<span class="fc" id="L1609">      List&lt;MtasTreeNodeId&gt; nodeIds = new ArrayList&lt;&gt;(ids.values());</span>
+<span class="fc" id="L1610">      Collections.sort(nodeIds);</span>
+<span class="pc bpc" id="L1611" title="1 of 4 branches missed.">      if (isSinglePoint &amp;&amp; (nodeIds.size() != 1)) {</span>
+<span class="nc" id="L1612">        throw new IOException(&quot;singlePoint tree, but missing single point...&quot;);</span>
+      }
+<span class="fc" id="L1614">      int counter = 0;</span>
+<span class="fc bfc" id="L1615" title="All 2 branches covered.">      for (MtasTreeNodeId nodeId : nodeIds) {</span>
+<span class="fc" id="L1616">        counter++;</span>
+<span class="fc" id="L1617">        objectRefCorrected = (nodeId.ref - refApproxOffset);</span>
+<span class="pc bpc" id="L1618" title="2 of 4 branches missed.">        assert objectRefCorrected &gt;= objectRefCorrectedPrevious : &quot;objectRefCorrected&lt;objectRefCorrectedPrevious : &quot;</span>
+            + objectRefCorrected + &quot; and &quot; + objectRefCorrectedPrevious;
+<span class="fc" id="L1620">        out.writeVLong((objectRefCorrected - objectRefCorrectedPrevious));</span>
+<span class="fc" id="L1621">        objectRefCorrectedPrevious = objectRefCorrected;</span>
+<span class="fc bfc" id="L1622" title="All 2 branches covered.">        if (storeAdditionalInformation) {</span>
+<span class="pc bpc" id="L1623" title="2 of 4 branches missed.">          assert nodeId.additionalId &gt;= 0 : &quot;nodeId.additionalId &lt; 0 for item &quot;</span>
+              + counter + &quot; : &quot; + nodeId.additionalId;
+<span class="fc" id="L1625">          out.writeVInt(nodeId.additionalId);</span>
+<span class="pc bpc" id="L1626" title="2 of 4 branches missed.">          assert nodeId.additionalRef &gt;= 0 : &quot;nodeId.additionalRef &lt; 0 for item &quot;</span>
+              + counter + &quot; : &quot; + nodeId.additionalRef;
+<span class="fc" id="L1628">          out.writeVLong(nodeId.additionalRef);</span>
+        }
+<span class="fc" id="L1630">      }</span>
+<span class="fc" id="L1631">      return fpIndexObjectPosition;</span>
+    } else {
+<span class="nc" id="L1633">      return null;</span>
+    }
+  }
+
+  /**
+   * Token stats add.
+   *
+   * @param min
+   *          the min
+   * @param max
+   *          the max
+   */
+  private void tokenStatsAdd(int min, int max) {
+<span class="fc" id="L1646">    tokenStatsNumber++;</span>
+<span class="fc bfc" id="L1647" title="All 2 branches covered.">    if (tokenStatsMinPos == null) {</span>
+<span class="fc" id="L1648">      tokenStatsMinPos = min;</span>
+    } else {
+<span class="fc" id="L1650">      tokenStatsMinPos = Math.min(tokenStatsMinPos, min);</span>
+    }
+<span class="fc bfc" id="L1652" title="All 2 branches covered.">    if (tokenStatsMaxPos == null) {</span>
+<span class="fc" id="L1653">      tokenStatsMaxPos = max;</span>
+    } else {
+<span class="fc" id="L1655">      tokenStatsMaxPos = Math.max(tokenStatsMaxPos, max);</span>
+    }
+<span class="fc" id="L1657">  }</span>
+
+  /**
+   * Copy object and update stats.
+   *
+   * @param id
+   *          the id
+   * @param in
+   *          the in
+   * @param inRef
+   *          the in ref
+   * @param out
+   *          the out
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void copyObjectAndUpdateStats(int id, IndexInput in, Long inRef,
+      IndexOutput out) throws IOException {
+    int mtasId;
+    int objectFlags;
+    // read
+<span class="fc" id="L1678">    in.seek(inRef);</span>
+<span class="fc" id="L1679">    mtasId = in.readVInt();</span>
+<span class="pc bpc" id="L1680" title="2 of 4 branches missed.">    assert id == mtasId : &quot;wrong id detected while copying object&quot;;</span>
+<span class="fc" id="L1681">    objectFlags = in.readVInt();</span>
+<span class="fc" id="L1682">    out.writeVInt(mtasId);</span>
+<span class="fc" id="L1683">    out.writeVInt(objectFlags);</span>
+<span class="fc bfc" id="L1684" title="All 2 branches covered.">    if ((objectFlags</span>
+        &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
+<span class="fc" id="L1686">      out.writeVInt(in.readVInt());</span>
+    }
+<span class="fc bfc" id="L1688" title="All 2 branches covered.">    if ((objectFlags</span>
+        &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
+<span class="fc" id="L1690">      int minPos = in.readVInt();</span>
+<span class="fc" id="L1691">      int maxPos = in.readVInt();</span>
+<span class="fc" id="L1692">      out.writeVInt(minPos);</span>
+<span class="fc" id="L1693">      out.writeVInt(maxPos);</span>
+<span class="fc" id="L1694">      tokenStatsAdd(minPos, maxPos);</span>
+<span class="fc bfc" id="L1695" title="All 2 branches covered.">    } else if ((objectFlags</span>
+        &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
+<span class="fc" id="L1697">      int size = in.readVInt();</span>
+<span class="fc" id="L1698">      out.writeVInt(size);</span>
+<span class="fc" id="L1699">      TreeSet&lt;Integer&gt; list = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L1700">      int previousPosition = 0;</span>
+<span class="fc bfc" id="L1701" title="All 2 branches covered.">      for (int t = 0; t &lt; size; t++) {</span>
+<span class="fc" id="L1702">        int pos = in.readVInt();</span>
+<span class="fc" id="L1703">        out.writeVInt(pos);</span>
+<span class="fc" id="L1704">        previousPosition = (pos + previousPosition);</span>
+<span class="fc" id="L1705">        list.add(previousPosition);</span>
+      }
+<span class="pc bpc" id="L1707" title="2 of 4 branches missed.">      assert list.size() == size : &quot;duplicate positions in set are not allowed&quot;;</span>
+<span class="fc" id="L1708">      tokenStatsAdd(list.first(), list.last());</span>
+<span class="fc" id="L1709">    } else {</span>
+<span class="fc" id="L1710">      int pos = in.readVInt();</span>
+<span class="fc" id="L1711">      out.writeVInt(pos);</span>
+<span class="fc" id="L1712">      tokenStatsAdd(pos, pos);</span>
+    }
+<span class="pc bpc" id="L1714" title="1 of 2 branches missed.">    if ((objectFlags</span>
+        &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
+<span class="nc" id="L1716">      out.writeVInt(in.readVInt());</span>
+<span class="nc" id="L1717">      out.writeVInt(in.readVInt());</span>
+    }
+<span class="pc bpc" id="L1719" title="1 of 2 branches missed.">    if ((objectFlags</span>
+        &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
+<span class="nc" id="L1721">      out.writeVInt(in.readVInt());</span>
+<span class="nc" id="L1722">      out.writeVInt(in.readVInt());</span>
+    }
+<span class="pc bpc" id="L1724" title="1 of 2 branches missed.">    if ((objectFlags</span>
+        &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
+<span class="nc" id="L1726">      int length = in.readVInt();</span>
+<span class="nc" id="L1727">      out.writeVInt(length);</span>
+<span class="nc" id="L1728">      byte[] payload = new byte[length];</span>
+<span class="nc" id="L1729">      in.readBytes(payload, 0, length);</span>
+<span class="nc" id="L1730">      out.writeBytes(payload, payload.length);</span>
+    }
+<span class="fc" id="L1732">    out.writeVLong(in.readVLong());</span>
+<span class="fc" id="L1733">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.FieldsConsumer#close()
+   */
+  @Override
+  public void close() throws IOException {
+<span class="fc" id="L1742">    delegateFieldsConsumer.close();</span>
+<span class="fc" id="L1743">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

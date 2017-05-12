@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataItemLongBasic.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataItemLongBasic.java</span></div><h1>MtasDataItemLongBasic.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import mtas.codec.util.CodecUtil;
+
+/**
+ * The Class MtasDataItemLongBasic.
+ */
+class MtasDataItemLongBasic extends MtasDataItemBasic&lt;Long, Double&gt; {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Instantiates a new mtas data item long basic.
+   *
+   * @param valueSum
+   *          the value sum
+   * @param valueN
+   *          the value n
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param sourceNumber
+   *          the source number
+   */
+  public MtasDataItemLongBasic(Long valueSum, long valueN,
+      MtasDataCollector&lt;?, ?&gt; sub, Set&lt;String&gt; statsItems, String sortType,
+      String sortDirection, int errorNumber, Map&lt;String, Integer&gt; errorList,
+      int sourceNumber) {
+<span class="fc" id="L43">    super(valueSum, valueN, sub, statsItems, sortType, sortDirection,</span>
+        errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);
+<span class="fc" id="L45">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+  @Override
+  public int compareTo(MtasDataItem&lt;Long, Double&gt; o) {
+<span class="fc" id="L55">    int compare = 0;</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    if (o instanceof MtasDataItemLongBasic) {</span>
+<span class="fc" id="L57">      MtasDataItemLongBasic to = (MtasDataItemLongBasic) o;</span>
+<span class="fc" id="L58">      MtasDataItemNumberComparator c1 = getComparableValue();</span>
+<span class="fc" id="L59">      MtasDataItemNumberComparator c2 = to.getComparableValue();</span>
+<span class="pc bpc" id="L60" title="2 of 4 branches missed.">      compare = (c1 != null &amp;&amp; c2 != null) ? c1.compareTo(c2.getValue()) : 0;</span>
+    }
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue()
+   */
+  @Override
+  public MtasDataItemNumberComparator&lt;Long&gt; getCompareValue1() {
+<span class="pc bpc" id="L72" title="7 of 10 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_N:
+<span class="nc" id="L74">      return new MtasDataItemNumberComparator&lt;Long&gt;(valueN, sortDirection);</span>
+    case CodecUtil.STATS_TYPE_SUM:
+<span class="fc" id="L76">      return new MtasDataItemNumberComparator&lt;Long&gt;(valueSum, sortDirection);</span>
+    default:
+<span class="nc" id="L78">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
+   */
+  @Override
+  public MtasDataItemNumberComparator&lt;Double&gt; getCompareValue2() {
+<span class="nc bnc" id="L89" title="All 6 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_MEAN:
+<span class="nc" id="L91">      return new MtasDataItemNumberComparator&lt;Double&gt;(getValue(sortType), sortDirection);</span>
+    default:
+<span class="nc" id="L93">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+<span class="nc" id="L103">    return this.getClass().getSimpleName() + &quot;[&quot; + valueSum + &quot;,&quot; + valueN</span>
+        + &quot;]&quot;;
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L109" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L110">      return true;</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L112">      return false;</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L114">      return false;</span>
+<span class="nc" id="L115">    MtasDataItemLongBasic that = (MtasDataItemLongBasic) obj;</span>
+<span class="nc" id="L116">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
+<span class="nc" id="L117">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
+<span class="nc bnc" id="L118" title="All 6 branches missed.">    return (c1!=null&amp;&amp;c2!=null&amp;&amp;c1.equals(c2));    </span>
+  }
+  
+  @Override
+  public int hashCode() {
+<span class="nc" id="L123">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L124">    h = (h * 7) ^ getComparableValue().hashCode();</span>
+<span class="nc" id="L125">    return h;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

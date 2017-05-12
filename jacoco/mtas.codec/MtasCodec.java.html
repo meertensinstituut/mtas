@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasCodec.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasCodec.java</span></div><h1>MtasCodec.java</h1><pre class="source lang-java linenums">package mtas.codec;
+
+import org.apache.lucene.codecs.Codec;
+import org.apache.lucene.codecs.CompoundFormat;
+import org.apache.lucene.codecs.DocValuesFormat;
+import org.apache.lucene.codecs.FieldInfosFormat;
+import org.apache.lucene.codecs.LiveDocsFormat;
+import org.apache.lucene.codecs.NormsFormat;
+import org.apache.lucene.codecs.PointsFormat;
+import org.apache.lucene.codecs.PostingsFormat;
+import org.apache.lucene.codecs.SegmentInfoFormat;
+import org.apache.lucene.codecs.StoredFieldsFormat;
+import org.apache.lucene.codecs.TermVectorsFormat;
+import org.apache.lucene.codecs.perfield.PerFieldPostingsFormat;
+
+/**
+ * The Class MtasCodec.
+ */
+public class MtasCodec extends Codec {
+
+  /** The Constant MTAS_CODEC_NAME. */
+  public static final String MTAS_CODEC_NAME = &quot;MtasCodec&quot;;
+
+  /** The delegate. */
+  Codec delegate;
+
+  /**
+   * Instantiates a new mtas codec.
+   */
+  public MtasCodec() {
+<span class="fc" id="L31">    super(MTAS_CODEC_NAME);</span>
+<span class="fc" id="L32">    delegate = null;</span>
+<span class="fc" id="L33">  }</span>
+
+  /**
+   * Instantiates a new mtas codec.
+   *
+   * @param name
+   *          the name
+   * @param delegate
+   *          the delegate
+   */
+  protected MtasCodec(String name, Codec delegate) {
+<span class="fc" id="L44">    super(name);</span>
+<span class="fc" id="L45">    this.delegate = delegate;</span>
+<span class="fc" id="L46">  }</span>
+
+  /**
+   * Inits the delegate.
+   */
+  private void initDelegate() {
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (delegate == null) {</span>
+<span class="fc" id="L53">      delegate = Codec.getDefault();</span>
+    }
+<span class="fc" id="L55">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#postingsFormat()
+   */
+  @Override
+  public PostingsFormat postingsFormat() {
+<span class="fc" id="L64">    initDelegate();</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (delegate.postingsFormat() instanceof PerFieldPostingsFormat) {</span>
+<span class="fc" id="L66">      Codec defaultCodec = Codec.getDefault();</span>
+<span class="fc" id="L67">      PostingsFormat defaultPostingsFormat = defaultCodec.postingsFormat();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">      if (defaultPostingsFormat instanceof PerFieldPostingsFormat) {</span>
+<span class="fc" id="L69">        defaultPostingsFormat = ((PerFieldPostingsFormat) defaultPostingsFormat)</span>
+<span class="fc" id="L70">            .getPostingsFormatForField(null);</span>
+<span class="pc bpc" id="L71" title="2 of 4 branches missed.">        if ((defaultPostingsFormat == null)</span>
+            || (defaultPostingsFormat instanceof PerFieldPostingsFormat)) {
+          // fallback option
+<span class="nc" id="L74">          return new MtasCodecPostingsFormat(</span>
+<span class="nc" id="L75">              PostingsFormat.forName(&quot;Lucene62&quot;));</span>
+        } else {
+<span class="fc" id="L77">          return new MtasCodecPostingsFormat(defaultPostingsFormat);</span>
+        }
+      } else {
+<span class="nc" id="L80">        return new MtasCodecPostingsFormat(defaultPostingsFormat);</span>
+      }
+    } else {
+<span class="nc" id="L83">      return new MtasCodecPostingsFormat(delegate.postingsFormat());</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#docValuesFormat()
+   */
+  @Override
+  public DocValuesFormat docValuesFormat() {
+<span class="nc" id="L94">    initDelegate();</span>
+<span class="nc" id="L95">    return delegate.docValuesFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#storedFieldsFormat()
+   */
+  @Override
+  public StoredFieldsFormat storedFieldsFormat() {
+<span class="fc" id="L105">    initDelegate();</span>
+<span class="fc" id="L106">    return delegate.storedFieldsFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#termVectorsFormat()
+   */
+  @Override
+  public TermVectorsFormat termVectorsFormat() {
+<span class="nc" id="L116">    initDelegate();</span>
+<span class="nc" id="L117">    return delegate.termVectorsFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#fieldInfosFormat()
+   */
+  @Override
+  public FieldInfosFormat fieldInfosFormat() {
+<span class="fc" id="L127">    initDelegate();</span>
+<span class="fc" id="L128">    return delegate.fieldInfosFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#segmentInfoFormat()
+   */
+  @Override
+  public SegmentInfoFormat segmentInfoFormat() {
+<span class="fc" id="L138">    initDelegate();</span>
+<span class="fc" id="L139">    return delegate.segmentInfoFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#normsFormat()
+   */
+  @Override
+  public NormsFormat normsFormat() {
+<span class="fc" id="L149">    initDelegate();</span>
+<span class="fc" id="L150">    return delegate.normsFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#liveDocsFormat()
+   */
+  @Override
+  public LiveDocsFormat liveDocsFormat() {
+<span class="fc" id="L160">    initDelegate();</span>
+<span class="fc" id="L161">    return delegate.liveDocsFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#compoundFormat()
+   */
+  @Override
+  public CompoundFormat compoundFormat() {
+<span class="nc" id="L171">    initDelegate();</span>
+<span class="nc" id="L172">    return delegate.compoundFormat();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.codecs.Codec#pointsFormat()
+   */
+  @Override
+  public PointsFormat pointsFormat() {
+<span class="nc" id="L182">    initDelegate();</span>
+<span class="nc" id="L183">    return delegate.pointsFormat();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

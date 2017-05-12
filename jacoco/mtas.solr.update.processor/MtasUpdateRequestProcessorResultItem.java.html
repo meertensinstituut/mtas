@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasUpdateRequestProcessorResultItem.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.update.processor</a> &gt; <span class="el_source">MtasUpdateRequestProcessorResultItem.java</span></div><h1>MtasUpdateRequestProcessorResultItem.java</h1><pre class="source lang-java linenums">package mtas.solr.update.processor;
+
+import java.io.Serializable;
+
+import org.apache.lucene.util.BytesRef;
+
+/**
+ * The Class MtasUpdateRequestProcessorResultItem.
+ */
+public class MtasUpdateRequestProcessorResultItem implements Serializable {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The token term. */
+  public String tokenTerm;
+
+  /** The token offset start. */
+  public Integer tokenOffsetStart;
+
+  /** The token offset end. */
+  public Integer tokenOffsetEnd;
+
+  /** The token pos incr. */
+  public Integer tokenPosIncr;
+
+  /** The token payload. */
+  public byte[] tokenPayload;
+
+  /** The token flags. */
+  public Integer tokenFlags;
+
+  /**
+   * Instantiates a new mtas update request processor result item.
+   *
+   * @param term the term
+   * @param offsetStart the offset start
+   * @param offsetEnd the offset end
+   * @param posIncr the pos incr
+   * @param payload the payload
+   * @param flags the flags
+   */
+  public MtasUpdateRequestProcessorResultItem(String term, Integer offsetStart,
+<span class="nc" id="L44">      Integer offsetEnd, Integer posIncr, BytesRef payload, Integer flags) {</span>
+<span class="nc" id="L45">    tokenTerm = term;</span>
+<span class="nc bnc" id="L46" title="All 4 branches missed.">    if (offsetStart != null &amp;&amp; offsetEnd != null) {</span>
+<span class="nc" id="L47">      tokenOffsetStart = offsetStart;</span>
+<span class="nc" id="L48">      tokenOffsetEnd = offsetEnd;</span>
+    } else {
+<span class="nc" id="L50">      tokenOffsetStart = null;</span>
+<span class="nc" id="L51">      tokenOffsetEnd = null;</span>
+    }
+<span class="nc bnc" id="L53" title="All 4 branches missed.">    if (posIncr != null &amp;&amp; posIncr != 1) {</span>
+<span class="nc" id="L54">      tokenPosIncr = posIncr;</span>
+    } else {
+<span class="nc" id="L56">      tokenPosIncr = null;</span>
+    }
+<span class="nc bnc" id="L58" title="All 2 branches missed.">    if (payload != null) {</span>
+<span class="nc" id="L59">      tokenPayload = payload.bytes;</span>
+    } else {
+<span class="nc" id="L61">      tokenPayload = null;</span>
+    }
+<span class="nc" id="L63">    tokenFlags = flags;</span>
+<span class="nc" id="L64">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

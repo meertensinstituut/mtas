@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrJoinResult.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.handler.component.util</a> &gt; <span class="el_source">MtasSolrJoinResult.java</span></div><h1>MtasSolrJoinResult.java</h1><pre class="source lang-java linenums">package mtas.solr.handler.component.util;
+
+import java.io.Serializable;
+import java.util.Set;
+
+import org.apache.solr.common.util.NamedList;
+
+import mtas.codec.util.CodecComponent.ComponentJoin;
+
+public class MtasSolrJoinResult implements Serializable {
+  
+  private Set&lt;String&gt; values;
+  private String key;
+  
+<span class="nc" id="L15">  public MtasSolrJoinResult(ComponentJoin join) {</span>
+<span class="nc" id="L16">    values = join.values();</span>
+<span class="nc" id="L17">    key = join.key();</span>
+<span class="nc" id="L18">  }</span>
+  
+  public NamedList&lt;Object&gt; rewrite() {
+<span class="nc" id="L21">    NamedList&lt;Object&gt; response = new NamedList&lt;&gt;();</span>
+<span class="nc" id="L22">    response.add(&quot;values&quot;, values);</span>
+<span class="nc" id="L23">    response.add(&quot;key&quot;, key);</span>
+<span class="nc" id="L24">    return response;</span>
+  }
+  
+  public void merge(MtasSolrJoinResult newItem) {
+<span class="nc" id="L28">    values.addAll(newItem.values);</span>
+<span class="nc" id="L29">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

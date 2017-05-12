@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasTree.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">MtasTree.java</span></div><h1>MtasTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
+
+import java.util.TreeMap;
+import java.io.IOException;
+import java.util.Map.Entry;
+
+import mtas.analysis.token.MtasPosition;
+import mtas.analysis.token.MtasToken;
+
+/**
+ * The Class MtasTree.
+ *
+ * @param &lt;N&gt;
+ *          the number type
+ */
+abstract public class MtasTree&lt;N extends MtasTreeNode&lt;N&gt;&gt; {
+
+  /** The Constant SINGLE_POSITION_TREE. */
+  final public static byte SINGLE_POSITION_TREE = 1;
+
+  /** The Constant STORE_ADDITIONAL_ID. */
+  final public static byte STORE_ADDITIONAL_ID = 2;
+
+  /** The root. */
+  protected N root;
+
+  /** The closed. */
+  private Boolean closed;
+
+  /** The single point. */
+  protected Boolean singlePoint;
+
+  /** The store prefix and term ref. */
+  protected Boolean storePrefixAndTermRef;
+
+  /**
+   * Instantiates a new mtas tree.
+   *
+   * @param singlePoint
+   *          the single point
+   * @param storePrefixAndTermRef
+   *          the store prefix and term ref
+   */
+<span class="fc" id="L44">  public MtasTree(boolean singlePoint, boolean storePrefixAndTermRef) {</span>
+<span class="fc" id="L45">    root = null;</span>
+<span class="fc" id="L46">    closed = false;</span>
+<span class="fc" id="L47">    this.singlePoint = singlePoint;</span>
+<span class="fc" id="L48">    this.storePrefixAndTermRef = storePrefixAndTermRef;</span>
+<span class="fc" id="L49">  }</span>
+
+  /**
+   * Adds the id from doc.
+   *
+   * @param docId
+   *          the doc id
+   * @param reference
+   *          the reference
+   */
+  final public void addIdFromDoc(Integer docId, Long reference) {
+<span class="pc bpc" id="L60" title="2 of 4 branches missed.">    if (!closed &amp;&amp; (docId != null)) {</span>
+<span class="fc" id="L61">      addSinglePoint(docId, 0, 0, docId, reference);</span>
+    }
+<span class="fc" id="L63">  }</span>
+
+  /**
+   * Adds the parent from token.
+   *
+   * @param &lt;T&gt;
+   *          the generic type
+   * @param token
+   *          the token
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  final public void addParentFromToken(MtasToken token)
+      throws IOException {
+<span class="pc bpc" id="L77" title="2 of 4 branches missed.">    if (!closed &amp;&amp; (token != null)) {</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">      if (token.checkParentId()) {</span>
+<span class="fc" id="L79">        addSinglePoint(token.getParentId(), token.getPrefixId(),</span>
+<span class="fc" id="L80">            token.getTermRef(), token.getId(), token.getTokenRef());</span>
+      }
+    }
+<span class="fc" id="L83">  }</span>
+
+  /**
+   * Adds the position and object from token.
+   *
+   * @param &lt;T&gt;
+   *          the generic type
+   * @param token
+   *          the token
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  final public void addPositionAndObjectFromToken(MtasToken token)
+      throws IOException {
+<span class="fc" id="L97">    addPositionFromToken(token, token.getTokenRef());</span>
+<span class="fc" id="L98">  }</span>
+
+  // final public &lt;T&gt; void addPositionAndTermFromToken(MtasToken&lt;T&gt; token) {
+  // addPositionFromToken(token, token.getTermRef());
+  // }
+
+  /**
+   * Adds the position from token.
+   *
+   * @param &lt;T&gt;
+   *          the generic type
+   * @param token
+   *          the token
+   * @param ref
+   *          the ref
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  final private void addPositionFromToken(MtasToken token, Long ref)
+      throws IOException {
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">    int prefixId = storePrefixAndTermRef ? token.getPrefixId() : 0;</span>
+<span class="pc bpc" id="L119" title="2 of 4 branches missed.">    if (!closed &amp;&amp; (token != null)) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">      if (token.checkPositionType(MtasPosition.POSITION_SINGLE)) {</span>
+<span class="fc" id="L121">        addSinglePoint(token.getPositionStart(), prefixId, token.getTermRef(),</span>
+<span class="fc" id="L122">            token.getId(), ref);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">      } else if (token.checkPositionType(MtasPosition.POSITION_RANGE)) {</span>
+<span class="fc" id="L124">        addRange(token.getPositionStart(), token.getPositionEnd(), prefixId,</span>
+<span class="fc" id="L125">            token.getTermRef(), token.getId(), ref);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">      } else if (token.checkPositionType(MtasPosition.POSITION_SET)) {</span>
+        // split set into minimum number of single points and ranges
+<span class="fc" id="L128">        TreeMap&lt;Integer, Integer&gt; list = new TreeMap&lt;Integer, Integer&gt;();</span>
+<span class="fc" id="L129">        int[] positions = token.getPositions();</span>
+<span class="fc" id="L130">        Integer lastPoint = null;</span>
+<span class="fc" id="L131">        Integer startPoint = null;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (int position : positions) {</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">          if (lastPoint == null) {</span>
+<span class="fc" id="L134">            startPoint = position;</span>
+<span class="fc" id="L135">            lastPoint = position;</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">          } else if ((position - lastPoint) != 1) {</span>
+<span class="fc" id="L137">            list.put(startPoint, lastPoint);</span>
+<span class="fc" id="L138">            startPoint = position;</span>
+          }
+<span class="fc" id="L140">          lastPoint = position;</span>
+        }
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        if (lastPoint != null) {</span>
+<span class="fc" id="L143">          list.put(startPoint, lastPoint);</span>
+        }
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        for (Entry&lt;Integer, Integer&gt; entry : list.entrySet()) {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">          if (entry.getKey().equals(entry.getValue())) {</span>
+<span class="fc" id="L147">            addSinglePoint(entry.getKey(), prefixId, token.getTermRef(),</span>
+<span class="fc" id="L148">                token.getId(), ref);</span>
+          } else {
+<span class="fc" id="L150">            addRange(entry.getKey(), entry.getValue(), prefixId,</span>
+<span class="fc" id="L151">                token.getTermRef(), token.getId(), ref);</span>
+          }
+<span class="fc" id="L153">        }</span>
+      }
+    }
+<span class="fc" id="L156">  }</span>
+
+  /**
+   * Close.
+   *
+   * @return the n
+   */
+  final public N close() {
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (root == null) {</span>
+<span class="nc" id="L165">      addRangeEmpty(0, 0, 0, 0);</span>
+    }
+<span class="fc" id="L167">    closed = true;</span>
+<span class="fc" id="L168">    return root;</span>
+  }
+
+  /**
+   * Adds the single point.
+   *
+   * @param position
+   *          the position
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
+   * @param id
+   *          the id
+   * @param ref
+   *          the ref
+   */
+  abstract protected void addSinglePoint(int position, int additionalId,
+      long additionalRef, Integer id, Long ref);
+
+  /**
+   * Adds the range.
+   *
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
+   * @param id
+   *          the id
+   * @param ref
+   *          the ref
+   */
+  abstract protected void addRange(int left, int right, int additionalId,
+      long additionalRef, Integer id, Long ref);
+
+  /**
+   * Adds the range empty.
+   *
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
+   */
+  abstract protected void addRangeEmpty(int left, int right, int additionalId,
+      long additionalRef);
+
+  /**
+   * Checks if is single point.
+   *
+   * @return true, if is single point
+   */
+  final public boolean isSinglePoint() {
+<span class="fc" id="L228">    return singlePoint;</span>
+  }
+
+  /**
+   * Checks if is store prefix and term ref.
+   *
+   * @return true, if is store prefix and term ref
+   */
+  final public boolean isStorePrefixAndTermRef() {
+<span class="fc" id="L237">    return storePrefixAndTermRef;</span>
+  }
+
+  /**
+   * Prints the balance.
+   */
+  final public void printBalance() {
+<span class="nc" id="L244">    printBalance(1, root);</span>
+<span class="nc" id="L245">  }</span>
+
+  /**
+   * Prints the balance.
+   *
+   * @param p
+   *          the p
+   * @param n
+   *          the n
+   */
+  final private void printBalance(Integer p, N n) {
+<span class="nc bnc" id="L256" title="All 2 branches missed.">    if (n != null) {</span>
+<span class="nc" id="L257">      printBalance((p + 1), n.leftChild);</span>
+<span class="nc" id="L258">      System.out.print(String.format(&quot;%&quot; + (3 * p) + &quot;s&quot;, &quot;&quot;));</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">      if (n.left == n.right) {</span>
+<span class="nc" id="L260">        System.out.println(</span>
+<span class="nc" id="L261">            &quot;[&quot; + n.left + &quot;] (&quot; + n.max + &quot;) : &quot; + n.ids.size() + &quot; tokens&quot;);</span>
+      } else {
+<span class="nc" id="L263">        System.out.println(&quot;[&quot; + n.left + &quot;-&quot; + n.right + &quot;] (&quot; + n.max + &quot;) : &quot;</span>
+<span class="nc" id="L264">            + n.ids.size() + &quot; tokens&quot;);</span>
+      }
+<span class="nc" id="L266">      printBalance((p + 1), n.rightChild);</span>
+    }
+<span class="nc" id="L268">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

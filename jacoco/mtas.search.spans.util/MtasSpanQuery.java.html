@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasSpanQuery.java</span></div><h1>MtasSpanQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanQuery;
+import org.apache.lucene.search.spans.SpanWeight;
+import mtas.search.spans.MtasSpanMatchNoneQuery;
+
+public abstract class MtasSpanQuery extends SpanQuery {
+
+  private Integer minimumSpanWidth, maximumSpanWidth, spanWidth;
+  private boolean singlePositionQuery;
+  
+  public MtasSpanQuery(Integer minimum, Integer maximum) {
+<span class="fc" id="L17">    super();</span>
+<span class="fc" id="L18">    initialize(minimum, maximum);</span>
+<span class="fc" id="L19">  }</span>
+
+  public void setWidth(Integer minimum, Integer maximum) {
+<span class="fc" id="L22">    initialize(minimum, maximum);</span>
+<span class="fc" id="L23">  }</span>
+
+  private void initialize(Integer minimum, Integer maximum) {
+<span class="fc" id="L26">    minimumSpanWidth = minimum;</span>
+<span class="fc" id="L27">    maximumSpanWidth = maximum;</span>
+<span class="fc bfc" id="L28" title="All 6 branches covered.">    spanWidth = (minimum != null &amp;&amp; maximum != null &amp;&amp; minimum.equals(maximum))</span>
+        ? minimum : null;
+<span class="fc bfc" id="L30" title="All 4 branches covered.">    singlePositionQuery = spanWidth != null &amp;&amp; spanWidth.equals(1);   </span>
+<span class="fc" id="L31">  }</span>
+
+  @Override
+  public abstract SpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException;
+
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+<span class="fc" id="L38">    MtasSpanQuery newClause = this;</span>
+<span class="pc bpc" id="L39" title="1 of 6 branches missed.">    if(minimumSpanWidth!=null &amp;&amp; maximumSpanWidth!=null &amp;&amp; minimumSpanWidth&gt;maximumSpanWidth) {</span>
+<span class="nc" id="L40">      newClause = new MtasSpanMatchNoneQuery(this.getField());</span>
+    } 
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">    return (newClause!=this)?newClause:this;</span>
+  }
+
+  public Integer getWidth() {
+<span class="nc" id="L46">    return spanWidth;</span>
+  }
+
+  public Integer getMinimumWidth() {
+<span class="fc" id="L50">    return minimumSpanWidth;</span>
+  }
+
+  public Integer getMaximumWidth() {
+<span class="fc" id="L54">    return maximumSpanWidth;</span>
+  }
+  
+  public boolean isSinglePositionQuery() {
+<span class="fc" id="L58">    return singlePositionQuery;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,1489 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataCollector.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataCollector.java</span></div><h1>MtasDataCollector.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Map.Entry;
+
+import mtas.codec.util.DataCollector;
+
+/**
+ * The Class MtasDataCollector.
+ *
+ * @param &lt;T1&gt; the generic type
+ * @param &lt;T2&gt; the generic type
+ */
+public abstract class MtasDataCollector&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2 extends Number &amp; Comparable&lt;T2&gt;&gt;
+    implements Serializable {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The Constant SEGMENT_SORT_ASC. */
+  public static final String SEGMENT_SORT_ASC = &quot;segment_asc&quot;;
+
+  /** The Constant SEGMENT_SORT_DESC. */
+  public static final String SEGMENT_SORT_DESC = &quot;segment_desc&quot;;
+
+  /** The Constant SEGMENT_BOUNDARY_ASC. */
+  public static final String SEGMENT_BOUNDARY_ASC = &quot;segment_boundary_asc&quot;;
+
+  /** The Constant SEGMENT_BOUNDARY_DESC. */
+  public static final String SEGMENT_BOUNDARY_DESC = &quot;segment_boundary_desc&quot;;
+
+  /** The Constant SEGMENT_KEY. */
+  public static final String SEGMENT_KEY = &quot;key&quot;;
+
+  /** The Constant SEGMENT_NEW. */
+  public static final String SEGMENT_NEW = &quot;new&quot;;
+
+  /** The Constant SEGMENT_KEY_OR_NEW. */
+  public static final String SEGMENT_KEY_OR_NEW = &quot;key_or_new&quot;;
+
+  /** The Constant SEGMENT_POSSIBLE_KEY. */
+  public static final String SEGMENT_POSSIBLE_KEY = &quot;possible_key&quot;;
+
+  /** The size. */
+  protected int size;
+
+  /** The position. */
+  protected int position;
+
+  /** The collector type. */
+  // properties collector
+  protected String collectorType;
+
+  /** The stats type. */
+  protected String statsType;
+
+  /** The data type. */
+  protected String dataType;
+
+  /** The stats items. */
+  public Set&lt;String&gt; statsItems;
+
+  /** The sort type. */
+  protected String sortType;
+
+  /** The sort direction. */
+  protected String sortDirection;
+
+  /** The start. */
+  protected Integer start;
+
+  /** The number. */
+  protected Integer number;
+
+  /** The error number. */
+  // error
+  protected int[] errorNumber;
+
+  /** The error list. */
+  protected HashMap&lt;String, Integer&gt;[] errorList;
+
+  /** The key list. */
+  protected String[] keyList;
+
+  /** The source number list. */
+  protected int[] sourceNumberList;
+
+  /** The with total. */
+  private boolean withTotal;
+
+  /** The segment registration. */
+  public transient String segmentRegistration;
+
+  /** The segment key value list. */
+  protected transient LinkedHashMap&lt;String, HashMap&lt;String, T1&gt;&gt; segmentKeyValueList;
+
+  /** The segment recompute key list. */
+  public transient LinkedHashMap&lt;String, HashSet&lt;String&gt;&gt; segmentRecomputeKeyList;
+
+  /** The segment keys. */
+  public transient HashSet&lt;String&gt; segmentKeys;
+
+  /** The segment values boundary. */
+  protected transient LinkedHashMap&lt;String, T1&gt; segmentValuesBoundary;
+
+  /** The segment value boundary. */
+  protected transient T1 segmentValueBoundary;
+
+  /** The segment value top list last. */
+  protected transient LinkedHashMap&lt;String, T1&gt; segmentValueTopListLast;
+
+  /** The segment value top list. */
+  protected transient ArrayList&lt;T1&gt; segmentValueTopList;
+
+  /** The segment name. */
+  protected transient String segmentName;
+
+  /** The segment number. */
+  protected transient int segmentNumber;
+
+  /** The has sub. */
+  private boolean hasSub;
+
+  /** The sub collector types. */
+  private String[] subCollectorTypes;
+
+  /** The sub data types. */
+  private String[] subDataTypes;
+
+  /** The sub stats types. */
+  private String[] subStatsTypes;
+
+  /** The sub stats items. */
+  private Set&lt;String&gt;[] subStatsItems;
+
+  /** The sub sort types. */
+  private String[] subSortTypes;
+
+  /** The sub sort directions. */
+  private String[] subSortDirections;
+
+  /** The sub start. */
+  private Integer[] subStart;
+
+  /** The sub number. */
+  private Integer[] subNumber;
+
+  /** The sub collector list next level. */
+<span class="fc" id="L160">  protected MtasDataCollector&lt;?, ?&gt;[] subCollectorListNextLevel = null;</span>
+
+  /** The sub collector next level. */
+<span class="fc" id="L163">  protected MtasDataCollector&lt;?, ?&gt; subCollectorNextLevel = null;</span>
+
+  /** The new current position. */
+  protected transient int newSize, newPosition, newCurrentPosition;
+
+  /** The new current existing. */
+  protected transient boolean newCurrentExisting;
+
+  /** The new key list. */
+<span class="fc" id="L172">  protected transient String[] newKeyList = null;</span>
+
+  /** The new source number list. */
+<span class="fc" id="L175">  protected transient int[] newSourceNumberList = null;</span>
+
+  /** The new error number. */
+  protected transient int[] newErrorNumber;
+
+  /** The new error list. */
+  protected transient HashMap&lt;String, Integer&gt;[] newErrorList;
+
+  /** The new known key found in segment. */
+  public transient HashSet&lt;String&gt; newKnownKeyFoundInSegment;
+
+  /** The new sub collector types. */
+  private transient String[] newSubCollectorTypes;
+
+  /** The new sub data types. */
+  private transient String[] newSubDataTypes;
+
+  /** The new sub stats types. */
+  private transient String[] newSubStatsTypes;
+
+  /** The new sub stats items. */
+  private transient Set&lt;String&gt;[] newSubStatsItems;
+
+  /** The new sub sort types. */
+  private transient String[] newSubSortTypes;
+
+  /** The new sub sort directions. */
+  private transient String[] newSubSortDirections;
+
+  /** The new sub start. */
+  private transient Integer[] newSubStart;
+
+  /** The new sub number. */
+  private transient Integer[] newSubNumber;
+
+  /** The new sub collector list next level. */
+  // subcollectors next level for adding
+<span class="fc" id="L212">  protected transient MtasDataCollector&lt;?, ?&gt;[] newSubCollectorListNextLevel = null;</span>
+
+  /** The new sub collector next level. */
+<span class="fc" id="L215">  protected transient MtasDataCollector&lt;?, ?&gt; newSubCollectorNextLevel = null;</span>
+
+  /** The closed. */
+<span class="fc" id="L218">  protected transient boolean closed = false;</span>
+
+  /** The result. */
+<span class="fc" id="L221">  private transient MtasDataCollectorResult&lt;T1, T2&gt; result = null;</span>
+
+  /**
+   * Instantiates a new mtas data collector.
+   *
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  protected MtasDataCollector(String collectorType, String dataType,
+      String statsType, Set&lt;String&gt; statsItems, String sortType,
+      String sortDirection, Integer start, Integer number,
+<span class="fc" id="L242">      String segmentRegistration, String boundary) throws IOException {</span>
+    // set properties
+<span class="fc" id="L244">    this.closed = false;</span>
+<span class="fc" id="L245">    this.collectorType = collectorType; // data or list</span>
+<span class="fc" id="L246">    this.dataType = dataType; // long or double</span>
+<span class="fc" id="L247">    this.statsType = statsType; // basic, advanced or full</span>
+<span class="fc" id="L248">    this.statsItems = statsItems; // sum, n, all, ...</span>
+<span class="fc" id="L249">    this.sortType = sortType;</span>
+<span class="fc" id="L250">    this.sortDirection = sortDirection;</span>
+<span class="fc" id="L251">    this.start = start;</span>
+<span class="fc" id="L252">    this.number = number;</span>
+<span class="fc" id="L253">    this.segmentRegistration = segmentRegistration;</span>
+<span class="fc" id="L254">    this.withTotal = false;</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">    if (segmentRegistration != null) {</span>
+<span class="fc" id="L256">      segmentKeys = new HashSet&lt;String&gt;();</span>
+<span class="fc" id="L257">      segmentKeyValueList = new LinkedHashMap&lt;String, HashMap&lt;String, T1&gt;&gt;();</span>
+<span class="fc" id="L258">      segmentValuesBoundary = new LinkedHashMap&lt;String, T1&gt;();</span>
+<span class="fc" id="L259">      segmentValueTopListLast = new LinkedHashMap&lt;String, T1&gt;();</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">      if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)</span>
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">          || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (boundary != null) {</span>
+<span class="nc" id="L263">          segmentValueBoundary = stringToBoundary(boundary);</span>
+        } else {
+<span class="nc" id="L265">          throw new IOException(&quot;did expect boundary with segmentRegistration &quot;</span>
+              + segmentRegistration);
+        }
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">      } else if (boundary != null) {</span>
+<span class="nc" id="L269">        throw new IOException(&quot;didn't expect boundary with segmentRegistration &quot;</span>
+            + segmentRegistration);
+      }
+    }
+    // initialize administration
+<span class="fc" id="L274">    keyList = new String[0];</span>
+<span class="fc" id="L275">    sourceNumberList = new int[0];</span>
+<span class="fc" id="L276">    errorNumber = new int[0];</span>
+<span class="fc" id="L277">    errorList = (HashMap&lt;String, Integer&gt;[]) new HashMap&lt;?, ?&gt;[0];</span>
+<span class="fc" id="L278">    size = 0;</span>
+<span class="fc" id="L279">    position = 0;</span>
+    // subCollectors properties
+<span class="fc" id="L281">    hasSub = false;</span>
+<span class="fc" id="L282">    subCollectorTypes = null;</span>
+<span class="fc" id="L283">    subDataTypes = null;</span>
+<span class="fc" id="L284">    subStatsTypes = null;</span>
+<span class="fc" id="L285">    subStatsItems = null;</span>
+<span class="fc" id="L286">    subSortTypes = null;</span>
+<span class="fc" id="L287">    subSortDirections = null;</span>
+<span class="fc" id="L288">    subStart = null;</span>
+<span class="fc" id="L289">    subNumber = null;</span>
+<span class="fc" id="L290">    subCollectorListNextLevel = null;</span>
+<span class="fc" id="L291">    subCollectorNextLevel = null;</span>
+<span class="fc" id="L292">  }</span>
+
+  /**
+   * Instantiates a new mtas data collector.
+   *
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected MtasDataCollector(String collectorType, String dataType,
+      String statsType, Set&lt;String&gt; statsItems, String sortType,
+      String sortDirection, Integer start, Integer number,
+      String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
+      Set&lt;String&gt;[] subStatsItems, String subSortTypes[],
+      String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
+      String segmentRegistration, String boundary) throws IOException {
+    // initialize
+<span class="fc" id="L325">    this(collectorType, dataType, statsType, statsItems, sortType,</span>
+        sortDirection, start, number, segmentRegistration, boundary);
+    // initialize subCollectors
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">    if (subCollectorTypes != null) {</span>
+<span class="nc" id="L329">      hasSub = true;</span>
+<span class="nc" id="L330">      this.subCollectorTypes = subCollectorTypes;</span>
+<span class="nc" id="L331">      this.subDataTypes = subDataTypes;</span>
+<span class="nc" id="L332">      this.subStatsTypes = subStatsTypes;</span>
+<span class="nc" id="L333">      this.subStatsItems = subStatsItems;</span>
+<span class="nc" id="L334">      this.subSortTypes = subSortTypes;</span>
+<span class="nc" id="L335">      this.subSortDirections = subSortDirections;</span>
+<span class="nc" id="L336">      this.subStart = subStart;</span>
+<span class="nc" id="L337">      this.subNumber = subNumber;</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">      if (subCollectorTypes.length &gt; 1) {</span>
+<span class="nc" id="L339">        newSubCollectorTypes = Arrays.copyOfRange(subCollectorTypes, 1,</span>
+            subCollectorTypes.length);
+<span class="nc" id="L341">        newSubDataTypes = Arrays.copyOfRange(subDataTypes, 1,</span>
+            subStatsTypes.length);
+<span class="nc" id="L343">        newSubStatsTypes = Arrays.copyOfRange(subStatsTypes, 1,</span>
+            subStatsTypes.length);
+<span class="nc" id="L345">        newSubStatsItems = Arrays.copyOfRange(subStatsItems, 1,</span>
+            subStatsItems.length);
+<span class="nc" id="L347">        newSubSortTypes = Arrays.copyOfRange(subSortTypes, 1,</span>
+            subSortTypes.length);
+<span class="nc" id="L349">        newSubSortDirections = Arrays.copyOfRange(subSortDirections, 1,</span>
+            subSortDirections.length);
+<span class="nc" id="L351">        newSubStart = Arrays.copyOfRange(subStart, 1, subStart.length);</span>
+<span class="nc" id="L352">        newSubNumber = Arrays.copyOfRange(subNumber, 1, subNumber.length);</span>
+      }
+<span class="nc" id="L354">      newSubCollectorListNextLevel = new MtasDataCollector[0];</span>
+    }
+<span class="fc" id="L356">  }</span>
+
+  /**
+   * Merge.
+   *
+   * @param newDataCollector the new data collector
+   * @param map the map
+   * @param increaseSourceNumber the increase source number
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  abstract public void merge(MtasDataCollector&lt;?, ?&gt; newDataCollector,
+      HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map,
+      boolean increaseSourceNumber) throws IOException;
+
+  /**
+   * Inits the new list.
+   *
+   * @param maxNumberOfTerms the max number of terms
+   * @param segmentName the segment name
+   * @param segmentNumber the segment number
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void initNewList(int maxNumberOfTerms, String segmentName,
+      int segmentNumber, String boundary) throws IOException {
+<span class="pc bpc" id="L381" title="1 of 2 branches missed.">    if (closed) {</span>
+<span class="nc" id="L382">      result = null;</span>
+<span class="nc" id="L383">      closed = false;</span>
+    }
+<span class="fc" id="L385">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">    if (segmentRegistration != null) {</span>
+<span class="fc" id="L387">      this.segmentName = segmentName;</span>
+<span class="fc" id="L388">      this.segmentNumber = segmentNumber;</span>
+<span class="fc bfc" id="L389" title="All 2 branches covered.">      if (!segmentKeyValueList.containsKey(segmentName)) {</span>
+<span class="fc" id="L390">        segmentKeyValueList.put(segmentName, new HashMap&lt;String, T1&gt;());</span>
+<span class="pc bpc" id="L391" title="1 of 2 branches missed.">        if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)</span>
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">            || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">          if (boundary != null) {</span>
+<span class="nc" id="L394">            segmentValuesBoundary.put(segmentName,</span>
+<span class="nc" id="L395">                stringToBoundary(boundary, segmentNumber));</span>
+          } else {
+<span class="nc" id="L397">            throw new IOException(&quot;expected boundary&quot;);</span>
+          }
+        } else {
+<span class="fc" id="L400">          segmentValuesBoundary.put(segmentName, null);</span>
+        }
+<span class="fc" id="L402">        segmentValueTopListLast.put(segmentName, null);</span>
+      }
+<span class="fc" id="L404">      this.segmentValueTopList = new ArrayList&lt;T1&gt;();</span>
+    }
+<span class="fc" id="L406">  }</span>
+
+  /**
+   * Inits the new list.
+   *
+   * @param maxNumberOfTerms the max number of terms
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void initNewList(int maxNumberOfTerms) throws IOException {
+<span class="pc bpc" id="L415" title="1 of 2 branches missed.">    if (closed) {</span>
+<span class="nc" id="L416">      result = null;</span>
+<span class="nc" id="L417">      closed = false;</span>
+    }
+<span class="pc bpc" id="L419" title="1 of 2 branches missed.">    if (segmentRegistration != null) {</span>
+<span class="nc" id="L420">      throw new IOException(&quot;missing segment name&quot;);</span>
+    } else {
+<span class="fc" id="L422">      initNewListBasic(maxNumberOfTerms);</span>
+    }
+<span class="fc" id="L424">  }</span>
+
+  /**
+   * Inits the new list basic.
+   *
+   * @param maxNumberOfTerms the max number of terms
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  private void initNewListBasic(int maxNumberOfTerms) throws IOException {
+<span class="pc bpc" id="L434" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc" id="L435">      position = 0;</span>
+<span class="fc" id="L436">      newPosition = 0;</span>
+<span class="fc" id="L437">      newCurrentPosition = 0;</span>
+<span class="fc" id="L438">      newSize = maxNumberOfTerms + size;</span>
+<span class="fc" id="L439">      newKeyList = new String[newSize];</span>
+<span class="fc" id="L440">      newSourceNumberList = new int[newSize];</span>
+<span class="fc" id="L441">      newErrorNumber = new int[newSize];</span>
+<span class="fc" id="L442">      newErrorList = (HashMap&lt;String, Integer&gt;[]) new HashMap&lt;?, ?&gt;[newSize];</span>
+<span class="fc" id="L443">      newKnownKeyFoundInSegment = new HashSet&lt;String&gt;();</span>
+<span class="pc bpc" id="L444" title="1 of 2 branches missed.">      if (hasSub) {</span>
+<span class="nc" id="L445">        newSubCollectorListNextLevel = new MtasDataCollector[newSize];</span>
+      }
+    } else {
+<span class="nc" id="L448">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+<span class="fc" id="L450">  }</span>
+
+  /**
+   * Increase new list size.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  protected void increaseNewListSize() throws IOException {
+<span class="pc bpc" id="L459" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc" id="L460">      String[] tmpNewKeyList = newKeyList;</span>
+<span class="fc" id="L461">      int[] tmpNewSourceNumberList = newSourceNumberList;</span>
+<span class="fc" id="L462">      int[] tmpNewErrorNumber = newErrorNumber;</span>
+<span class="fc" id="L463">      HashMap&lt;String, Integer&gt;[] tmpNewErrorList = newErrorList;</span>
+<span class="fc" id="L464">      int tmpNewSize = newSize;</span>
+<span class="fc" id="L465">      newSize = 2 * newSize;</span>
+<span class="fc" id="L466">      newKeyList = new String[newSize];</span>
+<span class="fc" id="L467">      newSourceNumberList = new int[newSize];</span>
+<span class="fc" id="L468">      newErrorNumber = new int[newSize];</span>
+<span class="fc" id="L469">      newErrorList = (HashMap&lt;String, Integer&gt;[]) new HashMap&lt;?, ?&gt;[newSize];</span>
+<span class="fc" id="L470">      System.arraycopy(tmpNewKeyList, 0, newKeyList, 0, tmpNewSize);</span>
+<span class="fc" id="L471">      System.arraycopy(tmpNewSourceNumberList, 0, newSourceNumberList, 0,</span>
+          tmpNewSize);
+<span class="fc" id="L473">      System.arraycopy(tmpNewErrorNumber, 0, newErrorNumber, 0, tmpNewSize);</span>
+<span class="fc" id="L474">      System.arraycopy(tmpNewErrorList, 0, newErrorList, 0, tmpNewSize);</span>
+<span class="pc bpc" id="L475" title="1 of 2 branches missed.">      if (hasSub) {</span>
+<span class="nc" id="L476">        MtasDataCollector&lt;?, ?&gt;[] tmpNewSubCollectorListNextLevel = newSubCollectorListNextLevel;</span>
+<span class="nc" id="L477">        newSubCollectorListNextLevel = new MtasDataCollector[newSize];</span>
+<span class="nc" id="L478">        System.arraycopy(tmpNewSubCollectorListNextLevel, 0,</span>
+            newSubCollectorListNextLevel, 0, tmpNewSize);
+      }
+<span class="fc" id="L481">    } else {</span>
+<span class="nc" id="L482">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+<span class="fc" id="L484">  }</span>
+
+  /**
+   * Adds the.
+   *
+   * @param increaseSourceNumber the increase source number
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected final MtasDataCollector&lt;?, ?&gt; add(boolean increaseSourceNumber)
+      throws IOException {
+<span class="pc bpc" id="L495" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L496" title="1 of 2 branches missed.">      if (!collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L497">        throw new IOException(</span>
+            &quot;collector should be &quot; + DataCollector.COLLECTOR_TYPE_DATA);
+      } else {
+<span class="pc bpc" id="L500" title="1 of 2 branches missed.">        if (newPosition &gt; 0) {</span>
+<span class="nc" id="L501">          newCurrentExisting = true;</span>
+<span class="fc bfc" id="L502" title="All 2 branches covered.">        } else if (position &lt; getSize()) {</span>
+          // copy
+<span class="fc" id="L504">          newKeyList[0] = keyList[0];</span>
+<span class="fc" id="L505">          newSourceNumberList[0] = sourceNumberList[0];</span>
+<span class="fc bfc" id="L506" title="All 2 branches covered.">          if (increaseSourceNumber) {</span>
+<span class="fc" id="L507">            newSourceNumberList[0]++;</span>
+          }
+<span class="fc" id="L509">          newErrorNumber[0] = errorNumber[0];</span>
+<span class="fc" id="L510">          newErrorList[0] = errorList[0];</span>
+<span class="pc bpc" id="L511" title="1 of 2 branches missed.">          if (hasSub) {</span>
+<span class="nc" id="L512">            newSubCollectorNextLevel = subCollectorNextLevel;</span>
+          }
+<span class="fc" id="L514">          copyToNew(0, 0);</span>
+<span class="fc" id="L515">          newPosition = 1;</span>
+<span class="fc" id="L516">          position = 1;</span>
+<span class="fc" id="L517">          newCurrentExisting = true;</span>
+        } else {
+          // add key
+<span class="fc" id="L520">          newKeyList[0] = DataCollector.COLLECTOR_TYPE_DATA;</span>
+<span class="fc" id="L521">          newSourceNumberList[0] = 1;</span>
+<span class="fc" id="L522">          newErrorNumber[0] = 0;</span>
+<span class="fc" id="L523">          newErrorList[0] = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L524">          newPosition = 1;</span>
+<span class="fc" id="L525">          newCurrentPosition = newPosition - 1;</span>
+<span class="fc" id="L526">          newCurrentExisting = false;</span>
+          // ready, only handle sub
+<span class="pc bpc" id="L528" title="1 of 2 branches missed.">          if (hasSub) {</span>
+<span class="nc" id="L529">            newSubCollectorNextLevel = DataCollector.getCollector(</span>
+                subCollectorTypes[0], subDataTypes[0], subStatsTypes[0],
+                subStatsItems[0], subSortTypes[0], subSortDirections[0],
+                subStart[0], subNumber[0], newSubCollectorTypes,
+                newSubDataTypes, newSubStatsTypes, newSubStatsItems,
+                newSubSortTypes, newSubSortDirections, newSubStart,
+                newSubNumber, segmentRegistration, null);
+          } else {
+<span class="fc" id="L537">            newSubCollectorNextLevel = null;</span>
+          }
+        }
+<span class="fc" id="L540">        return newSubCollectorNextLevel;</span>
+      }
+    } else {
+<span class="nc" id="L543">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Adds the.
+   *
+   * @param key the key
+   * @param increaseSourceNumber the increase source number
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected final MtasDataCollector&lt;?, ?&gt; add(String key,
+      boolean increaseSourceNumber) throws IOException {
+<span class="pc bpc" id="L557" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L558" title="1 of 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L559">        throw new IOException(</span>
+            &quot;collector should be &quot; + DataCollector.COLLECTOR_TYPE_LIST);
+<span class="pc bpc" id="L561" title="1 of 2 branches missed.">      } else if (key == null) {</span>
+<span class="nc" id="L562">        throw new IOException(&quot;key shouldn't be null&quot;);</span>
+      } else {
+        // check previous added
+<span class="fc bfc" id="L565" title="All 2 branches covered.">        if ((newPosition &gt; 0)</span>
+<span class="fc bfc" id="L566" title="All 2 branches covered.">            &amp;&amp; newKeyList[(newPosition - 1)].compareTo(key) &gt;= 0) {</span>
+<span class="fc" id="L567">          int i = newPosition;</span>
+          do {
+<span class="fc" id="L569">            i--;</span>
+<span class="fc bfc" id="L570" title="All 2 branches covered.">            if (newKeyList[i].equals(key)) {</span>
+<span class="fc" id="L571">              newCurrentPosition = i;</span>
+<span class="fc" id="L572">              newCurrentExisting = true;</span>
+<span class="pc bpc" id="L573" title="1 of 2 branches missed.">              if (subDataTypes != null) {</span>
+<span class="nc" id="L574">                return newSubCollectorListNextLevel[newCurrentPosition];</span>
+              } else {
+<span class="fc" id="L576">                return null;</span>
+              }
+            }
+<span class="fc bfc" id="L579" title="All 4 branches covered.">          } while ((i &gt; 0) &amp;&amp; (newKeyList[i].compareTo(key) &gt; 0));</span>
+        }
+        // move position in old list
+<span class="fc bfc" id="L582" title="All 2 branches covered.">        if (position &lt; getSize()) {</span>
+          // just add smaller or equal items
+<span class="fc bfc" id="L584" title="All 2 branches covered.">          while (keyList[position].compareTo(key) &lt;= 0) {</span>
+<span class="pc bpc" id="L585" title="1 of 2 branches missed.">            if (newPosition == newSize) {</span>
+<span class="nc" id="L586">              increaseNewListSize();</span>
+            }
+            // copy
+<span class="fc" id="L589">            newKeyList[newPosition] = keyList[position];</span>
+<span class="fc" id="L590">            newSourceNumberList[newPosition] = sourceNumberList[position];</span>
+<span class="fc" id="L591">            newErrorNumber[newPosition] = errorNumber[position];</span>
+<span class="fc" id="L592">            newErrorList[newPosition] = errorList[position];</span>
+<span class="pc bpc" id="L593" title="1 of 2 branches missed.">            if (hasSub) {</span>
+<span class="nc" id="L594">              newSubCollectorListNextLevel[newPosition] = subCollectorListNextLevel[position];</span>
+            }
+<span class="fc" id="L596">            copyToNew(position, newPosition);</span>
+<span class="fc" id="L597">            newPosition++;</span>
+<span class="fc" id="L598">            position++;</span>
+            // check if added key from list is right key
+<span class="fc bfc" id="L600" title="All 2 branches covered.">            if (newKeyList[(newPosition - 1)].equals(key)) {</span>
+<span class="pc bpc" id="L601" title="1 of 2 branches missed.">              if (increaseSourceNumber) {</span>
+<span class="nc" id="L602">                newSourceNumberList[(newPosition - 1)]++;</span>
+              }
+<span class="fc" id="L604">              newCurrentPosition = newPosition - 1;</span>
+<span class="fc" id="L605">              newCurrentExisting = true;</span>
+              // register known key found again in segment
+<span class="fc" id="L607">              newKnownKeyFoundInSegment.add(key);</span>
+              // ready
+<span class="pc bpc" id="L609" title="1 of 2 branches missed.">              if (hasSub) {</span>
+<span class="nc" id="L610">                return newSubCollectorListNextLevel[newCurrentPosition];</span>
+              } else {
+<span class="fc" id="L612">                return null;</span>
+              }
+              // stop if position exceeds size
+<span class="pc bpc" id="L615" title="1 of 2 branches missed.">            } else if (position == getSize()) {</span>
+<span class="nc" id="L616">              break;</span>
+            }
+          }
+        }
+        // check size
+<span class="fc bfc" id="L621" title="All 2 branches covered.">        if (newPosition == newSize) {</span>
+<span class="fc" id="L622">          increaseNewListSize();</span>
+        }
+        // add key
+<span class="fc" id="L625">        newKeyList[newPosition] = key;</span>
+<span class="fc" id="L626">        newSourceNumberList[newPosition] = 1;</span>
+<span class="fc" id="L627">        newErrorNumber[newPosition] = 0;</span>
+<span class="fc" id="L628">        newErrorList[newPosition] = new HashMap&lt;String, Integer&gt;();</span>
+<span class="fc" id="L629">        newPosition++;</span>
+<span class="fc" id="L630">        newCurrentPosition = newPosition - 1;</span>
+<span class="fc" id="L631">        newCurrentExisting = false;</span>
+        // ready, only handle sub
+<span class="pc bpc" id="L633" title="1 of 2 branches missed.">        if (hasSub) {</span>
+<span class="nc" id="L634">          newSubCollectorListNextLevel[newCurrentPosition] = DataCollector</span>
+<span class="nc" id="L635">              .getCollector(subCollectorTypes[0], subDataTypes[0],</span>
+                  subStatsTypes[0], subStatsItems[0], subSortTypes[0],
+                  subSortDirections[0], subStart[0], subNumber[0],
+                  newSubCollectorTypes, newSubDataTypes, newSubStatsTypes,
+                  newSubStatsItems, newSubSortTypes, newSubSortDirections,
+                  newSubStart, newSubNumber, segmentRegistration, null);
+<span class="nc" id="L641">          return newSubCollectorListNextLevel[newCurrentPosition];</span>
+        } else {
+<span class="fc" id="L643">          return null;</span>
+        }
+      }
+    } else {
+<span class="nc" id="L647">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Copy to new.
+   *
+   * @param position the position
+   * @param newPosition the new position
+   */
+  protected abstract void copyToNew(int position, int newPosition);
+
+  /**
+   * Copy from new.
+   */
+  protected abstract void copyFromNew();
+
+  /**
+   * Compare with boundary.
+   *
+   * @param value the value
+   * @param boundary the boundary
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected abstract boolean compareWithBoundary(T1 value, T1 boundary)
+      throws IOException;
+
+  /**
+   * Last for computing segment.
+   *
+   * @param value the value
+   * @param boundary the boundary
+   * @return the t1
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected abstract T1 lastForComputingSegment(T1 value, T1 boundary)
+      throws IOException;
+
+  /**
+   * Last for computing segment.
+   *
+   * @return the t1
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected abstract T1 lastForComputingSegment() throws IOException;
+
+  /**
+   * Boundary for segment.
+   *
+   * @param segmentName the segment name
+   * @return the t1
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected abstract T1 boundaryForSegment(String segmentName)
+      throws IOException;
+
+  /**
+   * Boundary for segment computing.
+   *
+   * @param segmentName the segment name
+   * @return the t1
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected abstract T1 boundaryForSegmentComputing(String segmentName)
+      throws IOException;
+
+  /**
+   * String to boundary.
+   *
+   * @param boundary the boundary
+   * @param segmentNumber the segment number
+   * @return the t1
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected abstract T1 stringToBoundary(String boundary, Integer segmentNumber)
+      throws IOException;
+
+  /**
+   * String to boundary.
+   *
+   * @param boundary the boundary
+   * @return the t1
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected T1 stringToBoundary(String boundary) throws IOException {
+<span class="nc" id="L733">    return stringToBoundary(boundary, null);</span>
+  }
+
+  /**
+   * Close segment key value registration.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void closeSegmentKeyValueRegistration() throws IOException {
+<span class="pc bpc" id="L742" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L743" title="1 of 2 branches missed.">      if (segmentRegistration != null) {</span>
+<span class="fc" id="L744">        HashMap&lt;String, T1&gt; keyValueList = segmentKeyValueList.get(segmentName);</span>
+<span class="fc" id="L745">        T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);</span>
+<span class="fc bfc" id="L746" title="All 2 branches covered.">        for (Entry&lt;String,T1&gt; entry : keyValueList.entrySet()) {</span>
+<span class="pc bpc" id="L747" title="1 of 4 branches missed.">          if (tmpSegmentValueBoundary == null || compareWithBoundary(</span>
+<span class="fc" id="L748">              entry.getValue(), tmpSegmentValueBoundary)) {</span>
+<span class="fc" id="L749">            segmentKeys.add(entry.getKey());</span>
+          }
+<span class="fc" id="L751">        }</span>
+<span class="fc" id="L752">      }</span>
+    } else {
+<span class="nc" id="L754">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+<span class="fc" id="L756">  }</span>
+
+  /**
+   * Recompute segment keys.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void recomputeSegmentKeys() throws IOException {
+<span class="pc bpc" id="L764" title="2 of 4 branches missed.">    if (!closed &amp;&amp; segmentRegistration != null) {</span>
+<span class="pc bpc" id="L765" title="1 of 2 branches missed.">      if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L766" title="1 of 2 branches missed.">          || segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
+<span class="nc bnc" id="L767" title="All 2 branches missed.">          || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)</span>
+<span class="nc bnc" id="L768" title="All 2 branches missed.">          || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+
+<span class="pc bpc" id="L770" title="1 of 2 branches missed.">        if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L771" title="1 of 2 branches missed.">            || segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
+<span class="fc" id="L772">          segmentKeys.clear();</span>
+          // recompute boundaries
+<span class="fc bfc" id="L774" title="All 2 branches covered.">          for (Entry&lt;String, HashMap&lt;String,T1&gt;&gt; entry : segmentKeyValueList.entrySet()) {</span>
+<span class="fc" id="L775">            T1 tmpSegmentValueBoundary = boundaryForSegment(entry.getKey());</span>
+<span class="fc" id="L776">            segmentValuesBoundary.put(entry.getKey(), tmpSegmentValueBoundary);</span>
+<span class="fc" id="L777">          }</span>
+          // compute adjusted boundaries and compute keys
+<span class="fc bfc" id="L779" title="All 2 branches covered.">          for (Entry&lt;String, HashMap&lt;String,T1&gt;&gt; entry : segmentKeyValueList.entrySet()) {</span>
+<span class="fc" id="L780">            this.segmentName = entry.getKey();</span>
+<span class="fc" id="L781">            HashMap&lt;String, T1&gt; keyValueList = entry.getValue();</span>
+<span class="fc" id="L782">            T1 tmpSegmentValueBoundaryForComputing = boundaryForSegmentComputing(</span>
+<span class="fc" id="L783">                entry.getKey());</span>
+<span class="fc bfc" id="L784" title="All 2 branches covered.">            for(Entry&lt;String, T1&gt; subEntry : keyValueList.entrySet()) {</span>
+<span class="pc bpc" id="L785" title="1 of 2 branches missed.">              if (tmpSegmentValueBoundaryForComputing == null</span>
+<span class="fc bfc" id="L786" title="All 2 branches covered.">                  || compareWithBoundary(subEntry.getValue(),</span>
+                      tmpSegmentValueBoundaryForComputing)) {
+<span class="fc bfc" id="L788" title="All 2 branches covered.">                if (!segmentKeys.contains(subEntry.getKey())) {</span>
+<span class="fc" id="L789">                  segmentKeys.add(subEntry.getKey());</span>
+                }
+              }
+<span class="fc" id="L792">            }</span>
+<span class="fc" id="L793">          }</span>
+        }
+
+        HashMap&lt;String, T1&gt; keyValueList;
+        HashSet&lt;String&gt; recomputeKeyList;
+<span class="fc" id="L798">        segmentRecomputeKeyList = new LinkedHashMap&lt;String, HashSet&lt;String&gt;&gt;();</span>
+<span class="fc bfc" id="L799" title="All 2 branches covered.">        for (String key : segmentKeys) {</span>
+<span class="fc bfc" id="L800" title="All 2 branches covered.">          for (Entry&lt;String, HashMap&lt;String, T1&gt;&gt; entry : segmentKeyValueList.entrySet()) {</span>
+<span class="fc" id="L801">            keyValueList = entry.getValue();</span>
+<span class="fc bfc" id="L802" title="All 2 branches covered.">            if (!keyValueList.containsKey(key)) {</span>
+<span class="fc bfc" id="L803" title="All 2 branches covered.">              if (!segmentRecomputeKeyList.containsKey(entry.getKey())) {</span>
+<span class="fc" id="L804">                recomputeKeyList = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L805">                segmentRecomputeKeyList.put(entry.getKey(), recomputeKeyList);</span>
+              } else {
+<span class="fc" id="L807">                recomputeKeyList = segmentRecomputeKeyList.get(entry.getKey());</span>
+              }
+<span class="fc" id="L809">              recomputeKeyList.add(key);</span>
+            }
+<span class="fc" id="L811">          }</span>
+<span class="fc" id="L812">        }</span>
+<span class="fc" id="L813">        this.segmentName = null;</span>
+      } else {
+<span class="nc" id="L815">        throw new IOException(</span>
+            &quot;not for segmentRegistration &quot; + segmentRegistration);
+      }
+    } else {
+<span class="nc" id="L819">      throw new IOException(&quot;already closed or no segmentRegistration (&quot;</span>
+          + segmentRegistration + &quot;)&quot;);
+    }
+<span class="fc" id="L822">  }</span>
+
+  /**
+   * Reduce to keys.
+   *
+   * @param keys the keys
+   */
+  public abstract void reduceToKeys(Set&lt;String&gt; keys);
+
+  /**
+   * Reduce to segment keys.
+   */
+  public void reduceToSegmentKeys() {
+<span class="nc bnc" id="L835" title="All 2 branches missed.">    if (segmentRegistration != null) {</span>
+<span class="nc" id="L836">      reduceToKeys(segmentKeys);</span>
+    }
+<span class="nc" id="L838">  }</span>
+
+  /**
+   * Check existence necessary keys.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public boolean checkExistenceNecessaryKeys() throws IOException {
+<span class="pc bpc" id="L847" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L848" title="1 of 2 branches missed.">      if (segmentRegistration != null) {</span>
+<span class="pc bpc" id="L849" title="1 of 2 branches missed.">        return segmentRecomputeKeyList.size() == 0;</span>
+      } else {
+<span class="nc" id="L851">        return true;</span>
+      }
+    } else {
+<span class="nc" id="L854">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Validate segment boundary.
+   *
+   * @param o the o
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  abstract public boolean validateSegmentBoundary(Object o) throws IOException;
+
+  /**
+   * Validate with segment boundary.
+   *
+   * @param value the value
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected boolean validateWithSegmentBoundary(T1 value) throws IOException {
+<span class="nc bnc" id="L875" title="All 2 branches missed.">    if (!closed) {</span>
+<span class="nc bnc" id="L876" title="All 2 branches missed.">      if (segmentRegistration != null) {</span>
+<span class="nc" id="L877">        T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);</span>
+<span class="nc bnc" id="L878" title="All 2 branches missed.">        if (tmpSegmentValueBoundary == null) {</span>
+<span class="nc" id="L879">          return true;</span>
+<span class="nc bnc" id="L880" title="All 2 branches missed.">        } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {</span>
+<span class="nc" id="L881">          return true;</span>
+        }
+      }
+    }
+<span class="nc" id="L885">    return false;</span>
+  }
+
+  /**
+   * Validate segment value.
+   *
+   * @param value the value
+   * @param maximumNumber the maximum number
+   * @param segmentNumber the segment number
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String validateSegmentValue(T1 value, int maximumNumber,
+      int segmentNumber) throws IOException {
+<span class="pc bpc" id="L899" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L900" title="1 of 2 branches missed.">      if (segmentRegistration != null) {</span>
+<span class="pc bpc" id="L901" title="1 of 2 branches missed.">        if (maximumNumber &gt; 0) {</span>
+<span class="fc" id="L902">          T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);</span>
+<span class="fc bfc" id="L903" title="All 2 branches covered.">          if (segmentValueTopList.size() &lt; maximumNumber) {</span>
+<span class="fc" id="L904">            return SEGMENT_KEY_OR_NEW;</span>
+<span class="fc bfc" id="L905" title="All 2 branches covered.">          } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {</span>
+<span class="fc" id="L906">            return SEGMENT_KEY_OR_NEW;</span>
+<span class="fc bfc" id="L907" title="All 2 branches covered.">          } else if (segmentKeys.size() &gt; newKnownKeyFoundInSegment.size()) {</span>
+<span class="fc" id="L908">            return SEGMENT_POSSIBLE_KEY;</span>
+          } else {
+<span class="fc" id="L910">            return null;</span>
+          }
+        } else {
+<span class="nc" id="L913">          return null;</span>
+        }
+      } else {
+<span class="nc" id="L916">        return null;</span>
+      }
+    } else {
+<span class="nc" id="L919">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Validate segment value.
+   *
+   * @param key the key
+   * @param value the value
+   * @param maximumNumber the maximum number
+   * @param segmentNumber the segment number
+   * @param test the test
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String validateSegmentValue(String key, T1 value, int maximumNumber,
+      int segmentNumber, boolean test) throws IOException {
+<span class="pc bpc" id="L936" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L937" title="1 of 2 branches missed.">      if (segmentRegistration != null) {</span>
+<span class="pc bpc" id="L938" title="1 of 2 branches missed.">        if (maximumNumber &gt; 0) {</span>
+<span class="fc" id="L939">          T1 tmpSegmentValueMaxListMin = segmentValueTopListLast</span>
+<span class="fc" id="L940">              .get(segmentName);</span>
+<span class="fc" id="L941">          T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);</span>
+<span class="fc bfc" id="L942" title="All 2 branches covered.">          if (segmentValueTopList.size() &lt; maximumNumber) {</span>
+<span class="pc bpc" id="L943" title="1 of 2 branches missed.">            if (!test) {</span>
+<span class="fc" id="L944">              segmentKeyValueList.get(segmentName).put(key, value);</span>
+<span class="fc" id="L945">              segmentValueTopList.add(value);</span>
+<span class="fc bfc" id="L946" title="All 2 branches covered.">              segmentValueTopListLast.put(segmentName,</span>
+                  (tmpSegmentValueMaxListMin == null) ? value
+<span class="fc" id="L948">                      : lastForComputingSegment(tmpSegmentValueMaxListMin,</span>
+                          value));
+<span class="fc bfc" id="L950" title="All 2 branches covered.">              if (segmentValueTopList.size() == maximumNumber) {</span>
+<span class="fc" id="L951">                tmpSegmentValueMaxListMin = segmentValueTopListLast</span>
+<span class="fc" id="L952">                    .get(segmentName);</span>
+<span class="fc" id="L953">                segmentValueTopListLast.put(segmentName,</span>
+                    tmpSegmentValueMaxListMin);
+<span class="fc" id="L955">                segmentValuesBoundary.put(segmentName,</span>
+<span class="fc" id="L956">                    boundaryForSegmentComputing(segmentName));</span>
+              }
+            }
+<span class="fc bfc" id="L959" title="All 2 branches covered.">            return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;</span>
+<span class="fc bfc" id="L960" title="All 2 branches covered.">          } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {</span>
+            // System.out.println(key+&quot; &quot;+value+&quot; &quot;+tmpSegmentValueBoundary);
+<span class="pc bpc" id="L962" title="1 of 2 branches missed.">            if (!test) {</span>
+<span class="fc" id="L963">              segmentKeyValueList.get(segmentName).put(key, value);</span>
+<span class="fc bfc" id="L964" title="All 2 branches covered.">              if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {</span>
+<span class="fc" id="L965">                segmentValueTopList.add(value);</span>
+<span class="fc" id="L966">                segmentValueTopList.remove(tmpSegmentValueMaxListMin);</span>
+<span class="fc" id="L967">                tmpSegmentValueMaxListMin = lastForComputingSegment();</span>
+<span class="fc" id="L968">                segmentValueTopListLast.put(segmentName,</span>
+                    tmpSegmentValueMaxListMin);
+<span class="fc" id="L970">                segmentValuesBoundary.put(segmentName,</span>
+<span class="fc" id="L971">                    boundaryForSegmentComputing(segmentName));</span>
+              }
+            }
+<span class="fc bfc" id="L974" title="All 2 branches covered.">            return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;</span>
+<span class="fc bfc" id="L975" title="All 2 branches covered.">          } else if (segmentKeys.contains(key)) {</span>
+<span class="fc bfc" id="L976" title="All 2 branches covered.">            if (!test) {</span>
+<span class="fc" id="L977">              segmentKeyValueList.get(segmentName).put(key, value);</span>
+            }
+<span class="fc" id="L979">            return SEGMENT_KEY;</span>
+          } else {
+<span class="fc" id="L981">            return null;</span>
+          }
+        } else {
+<span class="nc" id="L984">          return null;</span>
+        }
+      } else {
+<span class="nc" id="L987">        return null;</span>
+      }
+    } else {
+<span class="nc" id="L990">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Sets the error.
+   *
+   * @param newPosition the new position
+   * @param errorNumberItem the error number item
+   * @param errorListItem the error list item
+   * @param currentExisting the current existing
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected final void setError(int newPosition, int errorNumberItem,
+      HashMap&lt;String, Integer&gt; errorListItem, boolean currentExisting)
+      throws IOException {
+<span class="pc bpc" id="L1006" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L1007" title="1 of 2 branches missed.">      if (currentExisting) {</span>
+<span class="fc" id="L1008">        newErrorNumber[newPosition] += errorNumberItem;</span>
+<span class="fc" id="L1009">        HashMap&lt;String, Integer&gt; item = newErrorList[newPosition];</span>
+<span class="pc bpc" id="L1010" title="1 of 2 branches missed.">        for (Entry&lt;String, Integer&gt; entry : errorListItem.entrySet()) {</span>
+<span class="nc bnc" id="L1011" title="All 2 branches missed.">          if (item.containsKey(entry.getKey())) {</span>
+<span class="nc" id="L1012">            item.put(entry.getKey(),</span>
+<span class="nc" id="L1013">                item.get(entry.getKey()) + entry.getValue());</span>
+          } else {
+<span class="nc" id="L1015">            item.put(entry.getKey(), entry.getValue());</span>
+          }
+<span class="nc" id="L1017">        }</span>
+<span class="fc" id="L1018">      } else {</span>
+<span class="nc" id="L1019">        newErrorNumber[newPosition] = errorNumberItem;</span>
+<span class="nc" id="L1020">        newErrorList[newPosition] = errorListItem;</span>
+      }
+    } else {
+<span class="nc" id="L1023">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+<span class="fc" id="L1025">  }</span>
+
+  /**
+   * Sorted and unique.
+   *
+   * @param keyList the key list
+   * @param size the size
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private boolean sortedAndUnique(String[] keyList, int size)
+      throws IOException {
+<span class="pc bpc" id="L1037" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc bfc" id="L1038" title="All 2 branches covered.">      for (int i = 1; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L1039" title="All 2 branches covered.">        if (keyList[(i - 1)].compareTo(keyList[i]) &gt;= 0) {</span>
+<span class="fc" id="L1040">          return false;</span>
+        }
+      }
+<span class="fc" id="L1043">      return true;</span>
+    } else {
+<span class="nc" id="L1045">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Compute sort and unique mapping.
+   *
+   * @param keyList the key list
+   * @param size the size
+   * @return the int[][]
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private int[][] computeSortAndUniqueMapping(String[] keyList, int size)
+      throws IOException {
+<span class="pc bpc" id="L1059" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="pc bpc" id="L1060" title="1 of 2 branches missed.">      if (size &gt; 0) {</span>
+<span class="fc" id="L1061">        SortedMap&lt;String, int[]&gt; sortedMap = new TreeMap&lt;String, int[]&gt;();</span>
+<span class="fc bfc" id="L1062" title="All 2 branches covered.">        for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L1063" title="All 2 branches covered.">          if (sortedMap.containsKey(keyList[i])) {</span>
+<span class="fc" id="L1064">            int[] previousList = sortedMap.get(keyList[i]);</span>
+<span class="fc" id="L1065">            int[] newList = new int[previousList.length + 1];</span>
+<span class="fc" id="L1066">            System.arraycopy(previousList, 0, newList, 0, previousList.length);</span>
+<span class="fc" id="L1067">            newList[previousList.length] = i;</span>
+<span class="fc" id="L1068">            sortedMap.put(keyList[i], newList);</span>
+<span class="fc" id="L1069">          } else {</span>
+<span class="fc" id="L1070">            sortedMap.put(keyList[i], new int[] { i });</span>
+          }
+        }
+<span class="fc" id="L1073">        Collection&lt;int[]&gt; values = sortedMap.values();</span>
+<span class="fc" id="L1074">        int[][] result = new int[sortedMap.size()][];</span>
+<span class="fc" id="L1075">        return values.toArray(result);</span>
+      } else {
+<span class="nc" id="L1077">        return null;</span>
+      }
+    } else {
+<span class="nc" id="L1080">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+  }
+
+  /**
+   * Remap data.
+   *
+   * @param mapping the mapping
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  protected void remapData(int[][] mapping) throws IOException {
+<span class="pc bpc" id="L1091" title="1 of 2 branches missed.">    if (!closed) {</span>
+      // remap and merge keys
+<span class="fc" id="L1093">      String[] newKeyList = new String[mapping.length];</span>
+      // TODO: process mapping for functions
+<span class="fc" id="L1095">      HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map = new HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt;();</span>
+<span class="fc" id="L1096">      int[] newSourceNumberList = new int[mapping.length];</span>
+<span class="fc" id="L1097">      int[] newErrorNumber = new int[mapping.length];</span>
+      @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L1099">      HashMap&lt;String, Integer&gt;[] newErrorList = (HashMap&lt;String, Integer&gt;[]) new HashMap&lt;?, ?&gt;[mapping.length];</span>
+<span class="fc bfc" id="L1100" title="All 2 branches covered.">      for (int i = 0; i &lt; mapping.length; i++) {</span>
+<span class="fc" id="L1101">        newKeyList[i] = keyList[mapping[i][0]];</span>
+<span class="fc" id="L1102">        newSourceNumberList[i] = sourceNumberList[mapping[i][0]];</span>
+<span class="fc bfc" id="L1103" title="All 2 branches covered.">        for (int j = 0; j &lt; mapping[i].length; j++) {</span>
+<span class="fc bfc" id="L1104" title="All 2 branches covered.">          if (j == 0) {</span>
+<span class="fc" id="L1105">            newErrorNumber[i] = errorNumber[mapping[i][j]];</span>
+<span class="fc" id="L1106">            newErrorList[i] = errorList[mapping[i][j]];</span>
+          } else {
+<span class="fc" id="L1108">            newErrorNumber[i] += errorNumber[mapping[i][j]];</span>
+<span class="pc bpc" id="L1109" title="1 of 2 branches missed.">            for (Entry&lt;String, Integer&gt; entry : errorList[mapping[i][j]]</span>
+<span class="fc" id="L1110">                .entrySet()) {</span>
+<span class="nc bnc" id="L1111" title="All 2 branches missed.">              if (newErrorList[i].containsKey(entry.getKey())) {</span>
+<span class="nc" id="L1112">                newErrorList[i].put(entry.getKey(),</span>
+<span class="nc" id="L1113">                    newErrorList[i].get(entry.getKey()) + entry.getValue());</span>
+              } else {
+<span class="nc" id="L1115">                newErrorList[i].put(entry.getKey(), entry.getValue());</span>
+              }
+<span class="nc" id="L1117">            }</span>
+          }
+        }
+      }
+<span class="pc bpc" id="L1121" title="1 of 2 branches missed.">      if (hasSub) {</span>
+<span class="nc" id="L1122">        newSubCollectorListNextLevel = new MtasDataCollector&lt;?, ?&gt;[mapping.length];</span>
+<span class="nc bnc" id="L1123" title="All 2 branches missed.">        for (int i = 0; i &lt; mapping.length; i++) {</span>
+<span class="nc bnc" id="L1124" title="All 2 branches missed.">          for (int j = 0; j &lt; mapping[i].length; j++) {</span>
+<span class="nc bnc" id="L1125" title="All 4 branches missed.">            if (j == 0 || newSubCollectorListNextLevel[i] == null) {</span>
+<span class="nc" id="L1126">              newSubCollectorListNextLevel[i] = subCollectorListNextLevel[mapping[i][j]];</span>
+            } else {
+<span class="nc" id="L1128">              newSubCollectorListNextLevel[i]</span>
+<span class="nc" id="L1129">                  .merge(subCollectorListNextLevel[mapping[i][j]], map, false);</span>
+            }
+          }
+        }
+<span class="nc" id="L1133">        subCollectorListNextLevel = newSubCollectorListNextLevel;</span>
+      }
+<span class="fc" id="L1135">      keyList = newKeyList;</span>
+<span class="fc" id="L1136">      sourceNumberList = newSourceNumberList;</span>
+<span class="fc" id="L1137">      errorNumber = newErrorNumber;</span>
+<span class="fc" id="L1138">      errorList = newErrorList;</span>
+<span class="fc" id="L1139">      size = keyList.length;</span>
+<span class="fc" id="L1140">      position = 0;</span>
+<span class="fc" id="L1141">    } else {</span>
+<span class="nc" id="L1142">      throw new IOException(&quot;already closed&quot;);</span>
+    }
+<span class="fc" id="L1144">  }</span>
+
+  /**
+   * Close new list.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void closeNewList() throws IOException {
+<span class="pc bpc" id="L1152" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc bfc" id="L1153" title="All 2 branches covered.">      if (segmentRegistration != null) {</span>
+<span class="fc" id="L1154">        this.segmentName = null;</span>
+      }
+<span class="fc bfc" id="L1156" title="All 2 branches covered.">      if (newSize &gt; 0) {</span>
+        // add remaining old
+<span class="fc bfc" id="L1158" title="All 2 branches covered.">        while (position &lt; getSize()) {</span>
+<span class="pc bpc" id="L1159" title="1 of 2 branches missed.">          if (newPosition == newSize) {</span>
+<span class="nc" id="L1160">            increaseNewListSize();</span>
+          }
+<span class="fc" id="L1162">          newKeyList[newPosition] = keyList[position];</span>
+<span class="fc" id="L1163">          newSourceNumberList[newPosition] = sourceNumberList[position];</span>
+<span class="fc" id="L1164">          newErrorNumber[newPosition] = errorNumber[position];</span>
+<span class="fc" id="L1165">          newErrorList[newPosition] = errorList[position];</span>
+<span class="pc bpc" id="L1166" title="1 of 2 branches missed.">          if (hasSub) {</span>
+<span class="nc" id="L1167">            newSubCollectorListNextLevel[newPosition] = subCollectorListNextLevel[position];</span>
+          }
+<span class="fc" id="L1169">          copyToNew(position, newPosition);</span>
+<span class="fc" id="L1170">          position++;</span>
+<span class="fc" id="L1171">          newPosition++;</span>
+        }
+        // copy
+<span class="fc" id="L1174">        keyList = newKeyList;</span>
+<span class="fc" id="L1175">        sourceNumberList = newSourceNumberList;</span>
+<span class="fc" id="L1176">        errorNumber = newErrorNumber;</span>
+<span class="fc" id="L1177">        errorList = newErrorList;</span>
+<span class="fc" id="L1178">        subCollectorListNextLevel = newSubCollectorListNextLevel;</span>
+<span class="fc" id="L1179">        copyFromNew();</span>
+<span class="fc" id="L1180">        size = newPosition;</span>
+        // sort and merge
+<span class="fc bfc" id="L1182" title="All 2 branches covered.">        if (!sortedAndUnique(keyList, getSize())) {</span>
+<span class="fc" id="L1183">          remapData(computeSortAndUniqueMapping(keyList, getSize()));</span>
+        }
+      }
+<span class="fc" id="L1186">      position = 0;</span>
+<span class="fc" id="L1187">      newSize = 0;</span>
+<span class="fc" id="L1188">      newPosition = 0;</span>
+<span class="fc" id="L1189">      newCurrentPosition = 0;</span>
+    }
+<span class="fc" id="L1191">  }</span>
+
+  /**
+   * Gets the item.
+   *
+   * @param i the i
+   * @return the item
+   */
+  abstract protected MtasDataItem&lt;T1, T2&gt; getItem(int i);
+
+  /**
+   * Checks for sub.
+   *
+   * @return true, if successful
+   */
+  protected boolean hasSub() {
+<span class="fc" id="L1207">    return hasSub;</span>
+  }
+
+  /**
+   * Error.
+   *
+   * @param error the error
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract void error(String error) throws IOException;
+
+  /**
+   * Error.
+   *
+   * @param key the key
+   * @param error the error
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract void error(String key, String error) throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param valueSum the value sum
+   * @param valueN the value n
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(long valueSum, long valueN)
+      throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param values the values
+   * @param number the number
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(long[] values, int number)
+      throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param valueSum the value sum
+   * @param valueN the value n
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(double valueSum, long valueN)
+      throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param values the values
+   * @param number the number
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(double[] values, int number)
+      throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param key the key
+   * @param valueSum the value sum
+   * @param valueN the value n
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(String key, long valueSum,
+      long valueN) throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param key the key
+   * @param values the values
+   * @param number the number
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(String key, long[] values,
+      int number) throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param key the key
+   * @param valueSum the value sum
+   * @param valueN the value n
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(String key, double valueSum,
+      long valueN) throws IOException;
+
+  /**
+   * Adds the.
+   *
+   * @param key the key
+   * @param values the values
+   * @param number the number
+   * @return the mtas data collector
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public abstract MtasDataCollector&lt;?, ?&gt; add(String key, double[] values,
+      int number) throws IOException;
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+<span class="nc" id="L1326">    return this.getClass().getSimpleName() + &quot;-&quot; + this.hashCode() + &quot;: &quot;</span>
+        + collectorType + &quot; - &quot; + statsType + &quot; &quot; + statsItems + &quot; &quot; + hasSub;
+  }
+
+  /**
+   * Gets the result.
+   *
+   * @return the result
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public MtasDataCollectorResult&lt;T1, T2&gt; getResult() throws IOException {
+<span class="pc bpc" id="L1337" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc" id="L1338">      close();</span>
+    }
+<span class="fc" id="L1340">    return result;</span>
+  }
+
+  /**
+   * Gets the key list.
+   *
+   * @return the key list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Set&lt;String&gt; getKeyList() throws IOException {
+<span class="nc bnc" id="L1350" title="All 2 branches missed.">    if (!closed) {</span>
+<span class="nc" id="L1351">      close();</span>
+    }
+<span class="nc" id="L1353">    return new HashSet&lt;String&gt;(Arrays.asList(keyList));</span>
+  }
+
+  /**
+   * Close.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+  public void close() throws IOException {
+<span class="pc bpc" id="L1363" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc" id="L1364">      closeNewList();</span>
+<span class="fc bfc" id="L1365" title="All 2 branches covered.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+        // compute initial basic list
+<span class="fc" id="L1367">        TreeMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; basicList = new TreeMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt;();</span>
+<span class="fc bfc" id="L1368" title="All 2 branches covered.">        for (int i = 0; i &lt; getSize(); i++) {</span>
+<span class="fc" id="L1369">          MtasDataItem&lt;T1, T2&gt; newItem = getItem(i);</span>
+<span class="pc bpc" id="L1370" title="1 of 2 branches missed.">          if (basicList.containsKey(keyList[i])) {</span>
+<span class="nc" id="L1371">            newItem.add(basicList.get(keyList[i]));</span>
+          }
+<span class="fc" id="L1373">          basicList.put(keyList[i], newItem);</span>
+        }
+        // create result based on basic list
+<span class="fc" id="L1376">        result = new MtasDataCollectorResult&lt;T1, T2&gt;(collectorType, sortType,</span>
+            sortDirection, basicList, start, number);
+        // reduce
+<span class="fc bfc" id="L1379" title="All 2 branches covered.">        if (segmentRegistration != null) {</span>
+<span class="pc bpc" id="L1380" title="1 of 2 branches missed.">          if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L1381" title="1 of 2 branches missed.">              || segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
+<span class="fc" id="L1382">            reduceToKeys(result.getComparatorList().keySet());</span>
+<span class="nc bnc" id="L1383" title="All 2 branches missed.">          } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)</span>
+<span class="nc bnc" id="L1384" title="All 2 branches missed.">              || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="nc" id="L1385">            LinkedHashMap&lt;String, MtasDataItemNumberComparator&gt; comparatorList = result</span>
+<span class="nc" id="L1386">                .getComparatorList();</span>
+<span class="nc" id="L1387">            HashSet&lt;String&gt; filteredKeySet = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L1388" title="All 2 branches missed.">            if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
+<span class="nc bnc" id="L1389" title="All 2 branches missed.">              for(Entry&lt;String, MtasDataItemNumberComparator&gt; entry : comparatorList.entrySet()) {</span>
+<span class="nc" id="L1390">                if (entry.getValue()</span>
+<span class="nc bnc" id="L1391" title="All 2 branches missed.">                    .compareTo(segmentValueBoundary) &lt; 0) {</span>
+<span class="nc" id="L1392">                  filteredKeySet.add(entry.getKey());</span>
+                }
+<span class="nc" id="L1394">              }</span>
+            } else {
+<span class="nc bnc" id="L1396" title="All 2 branches missed.">              for (Entry&lt;String, MtasDataItemNumberComparator&gt; entry : comparatorList.entrySet()) {</span>
+<span class="nc" id="L1397">                if (entry.getValue()</span>
+<span class="nc bnc" id="L1398" title="All 2 branches missed.">                    .compareTo(segmentValueBoundary) &gt; 0) {</span>
+<span class="nc" id="L1399">                  filteredKeySet.add(entry.getKey());</span>
+                }
+<span class="nc" id="L1401">              }</span>
+            }
+<span class="nc" id="L1403">            reduceToKeys(filteredKeySet);</span>
+<span class="nc" id="L1404">            basicList.keySet().retainAll(filteredKeySet);</span>
+<span class="nc" id="L1405">            result = new MtasDataCollectorResult&lt;&gt;(collectorType,</span>
+                sortType, sortDirection, basicList, start, number);
+          }
+        }
+<span class="pc bpc" id="L1409" title="1 of 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="pc bpc" id="L1410" title="1 of 2 branches missed.">        if (getSize() &gt; 0) {</span>
+<span class="fc" id="L1411">          result = new MtasDataCollectorResult&lt;&gt;(collectorType,</span>
+<span class="fc" id="L1412">              getItem(0));</span>
+        } else {
+<span class="nc" id="L1414">          result = new MtasDataCollectorResult&lt;&gt;(collectorType, sortType,</span>
+              sortDirection);
+        }
+      } else {
+<span class="nc" id="L1418">        throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
+      }
+<span class="fc" id="L1420">      closed = true;</span>
+    }
+
+<span class="fc" id="L1423">  }</span>
+
+  /**
+   * Gets the collector type.
+   *
+   * @return the collector type
+   */
+  public String getCollectorType() {
+<span class="fc" id="L1431">    return collectorType;</span>
+  }
+
+  /**
+   * Gets the stats type.
+   *
+   * @return the stats type
+   */
+  public String getStatsType() {
+<span class="fc" id="L1440">    return statsType;</span>
+  }
+
+  /**
+   * Gets the data type.
+   *
+   * @return the data type
+   */
+  public String getDataType() {
+<span class="fc" id="L1449">    return dataType;</span>
+  }
+
+  /**
+   * Gets the size.
+   *
+   * @return the size
+   */
+  public int getSize() {
+<span class="fc" id="L1458">    return size;</span>
+  }
+
+  /**
+   * With total.
+   *
+   * @return true, if successful
+   */
+  public boolean withTotal() {
+<span class="fc" id="L1467">    return withTotal;</span>
+  }
+
+  /**
+   * Sets the with total.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void setWithTotal() throws IOException {
+<span class="pc bpc" id="L1476" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="pc bpc" id="L1477" title="1 of 2 branches missed.">      if (segmentName != null) {</span>
+<span class="nc" id="L1478">        throw new IOException(&quot;can't get total with segmentRegistration&quot;);</span>
+      } else {
+<span class="fc" id="L1480">        withTotal = true;</span>
+      }
+    } else {
+<span class="nc" id="L1483">      throw new IOException(</span>
+          &quot;can't get total for dataCollector of type &quot; + collectorType);
+    }
+<span class="fc" id="L1486">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

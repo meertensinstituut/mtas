@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasBitInputStream.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.payload</a> &gt; <span class="el_source">MtasBitInputStream.java</span></div><h1>MtasBitInputStream.java</h1><pre class="source lang-java linenums">package mtas.codec.payload;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+/**
+ * The Class MtasBitInputStream.
+ */
+public class MtasBitInputStream extends ByteArrayInputStream {
+
+  /** The bit buffer. */
+<span class="fc" id="L12">  private int bitBuffer = 0;</span>
+
+  /** The bit count. */
+<span class="fc" id="L15">  private int bitCount = 0;</span>
+
+  /**
+   * Instantiates a new mtas bit input stream.
+   *
+   * @param buf
+   *          the buf
+   */
+  public MtasBitInputStream(byte[] buf) {
+<span class="fc" id="L24">    super(buf);</span>
+<span class="fc" id="L25">  }</span>
+
+  /**
+   * Read bit.
+   *
+   * @return the int
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public int readBit() throws IOException {
+<span class="fc bfc" id="L35" title="All 2 branches covered.">    if (bitCount == 0) {</span>
+<span class="fc" id="L36">      bitBuffer = read();</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">      if (bitBuffer == -1) {</span>
+<span class="nc" id="L38">        throw new IOException(&quot;no more bits&quot;);</span>
+      }
+    }
+<span class="fc" id="L41">    int value = (bitBuffer &gt;&gt; bitCount) &amp; 1;</span>
+<span class="fc" id="L42">    bitCount++;</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    if (bitCount &gt; 7) {</span>
+<span class="fc" id="L44">      bitCount = 0;</span>
+    }
+<span class="fc" id="L46">    return value;</span>
+  }
+
+  /**
+   * Read remaining bytes.
+   *
+   * @return the byte[]
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public byte[] readRemainingBytes() throws IOException {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">    if (this.available() &gt; 0) {</span>
+<span class="nc" id="L58">      byte[] b = new byte[this.available()];</span>
+<span class="nc" id="L59">      read(b);</span>
+<span class="nc" id="L60">      return b;</span>
+    } else {
+<span class="nc" id="L62">      throw new IOException(&quot;no more bytes&quot;);</span>
+    }
+  }
+
+  /**
+   * Read elias gamma coding integer.
+   *
+   * @return the int
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public int readEliasGammaCodingInteger() throws IOException {
+<span class="fc" id="L74">    int value = readEliasGammaCodingPositiveInteger();</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if ((value % 2) == 0) {</span>
+<span class="nc" id="L76">      return (-value) / 2;</span>
+    } else {
+<span class="fc" id="L78">      return (value - 1) / 2;      </span>
+    }
+  }
+
+  /**
+   * Read elias gamma coding non negative integer.
+   *
+   * @return the int
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public int readEliasGammaCodingNonNegativeInteger() throws IOException {
+<span class="fc" id="L90">    int value = readEliasGammaCodingPositiveInteger();</span>
+<span class="fc" id="L91">    return (value - 1);</span>
+  }
+
+  /**
+   * Read elias gamma coding positive integer.
+   *
+   * @return the int
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public int readEliasGammaCodingPositiveInteger() throws IOException {
+    int value;
+<span class="fc" id="L103">    int counter = 0;</span>
+<span class="fc" id="L104">    int bit = readBit();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    while (bit == 0) {</span>
+<span class="fc" id="L106">      counter++;</span>
+<span class="fc" id="L107">      bit = readBit();</span>
+    }
+<span class="fc" id="L109">    value = 1;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    for (int i = 0; i &lt; counter; i++) {</span>
+<span class="fc" id="L111">      value = (2 * value) + readBit();</span>
+    }
+<span class="fc" id="L113">    return value;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

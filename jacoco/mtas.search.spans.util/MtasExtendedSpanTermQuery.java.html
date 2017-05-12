@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasExtendedSpanTermQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasExtendedSpanTermQuery.java</span></div><h1>MtasExtendedSpanTermQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import mtas.analysis.token.MtasToken;
+import mtas.codec.util.CodecUtil;
+import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.IndexReaderContext;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.TermState;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.FilterSpans;
+import org.apache.lucene.search.spans.SpanTermQuery;
+import org.apache.lucene.search.spans.SpanWeight;
+import org.apache.lucene.search.spans.Spans;
+
+/**
+ * The Class MtasExtendedSpanTermQuery.
+ */
+public class MtasExtendedSpanTermQuery extends SpanTermQuery {
+
+  /** The prefix. */
+  private String prefix;
+
+  /** The value. */
+  private String value;
+
+  /** The single position. */
+  private boolean singlePosition;
+
+  /** The term. */
+  private Term localTerm;
+
+  /**
+   * Instantiates a new mtas extended span term query.
+   *
+   * @param term the term
+   */
+  public MtasExtendedSpanTermQuery(Term term) {
+<span class="nc" id="L49">    this(term, true);</span>
+<span class="nc" id="L50">  }</span>
+
+  /**
+   * Instantiates a new mtas extended span term query.
+   *
+   * @param term the term
+   * @param singlePosition the single position
+   */
+  private MtasExtendedSpanTermQuery(Term term, boolean singlePosition) {
+<span class="nc" id="L59">    this(new SpanTermQuery(term), singlePosition);</span>
+<span class="nc" id="L60">  }</span>
+
+  /**
+   * Instantiates a new mtas extended span term query.
+   *
+   * @param query the query
+   * @param singlePosition the single position
+   */
+  public MtasExtendedSpanTermQuery(SpanTermQuery query,
+      boolean singlePosition) {
+<span class="fc" id="L70">    super(query.getTerm());</span>
+<span class="fc" id="L71">    localTerm = query.getTerm();    </span>
+<span class="fc" id="L72">    this.singlePosition = singlePosition;</span>
+<span class="fc" id="L73">    int i = localTerm.text().indexOf(MtasToken.DELIMITER);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="fc" id="L75">      prefix = localTerm.text().substring(0, i);</span>
+<span class="fc" id="L76">      value = localTerm.text().substring((i + MtasToken.DELIMITER.length()));</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">      value = (value.length() &gt; 0) ? value : null;</span>
+    } else {
+<span class="nc" id="L79">      prefix = localTerm.text();</span>
+<span class="nc" id="L80">      value = null;</span>
+    }
+<span class="fc" id="L82">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanTermQuery#createWeight(org.apache.lucene
+   * .search.IndexSearcher, boolean)
+   */
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+    final TermContext context;
+<span class="fc" id="L95">    final IndexReaderContext topContext = searcher.getTopReaderContext();</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (termContext == null) {</span>
+<span class="fc" id="L97">      context = TermContext.build(topContext, localTerm);</span>
+    } else {
+<span class="nc" id="L99">      context = termContext;</span>
+    }
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    return new SpanTermWeight(context, searcher,</span>
+<span class="pc" id="L102">        needsScores ? Collections.singletonMap(localTerm, context) : null);</span>
+  }
+
+  /**
+   * The Class SpanTermWeight.
+   */
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">  public class SpanTermWeight extends SpanWeight {</span>
+
+    /** The term context. */
+    final TermContext termContext;
+
+    /**
+     * Instantiates a new span term weight.
+     *
+     * @param termContext the term context
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public SpanTermWeight(TermContext termContext, IndexSearcher searcher,
+<span class="fc" id="L122">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
+<span class="fc" id="L123">      super(MtasExtendedSpanTermQuery.this, searcher, terms);</span>
+<span class="fc" id="L124">      this.termContext = termContext;</span>
+<span class="pc bpc" id="L125" title="2 of 4 branches missed.">      assert termContext != null : &quot;TermContext must not be null&quot;;</span>
+<span class="fc" id="L126">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
+    @Override
+    public void extractTerms(Set&lt;Term&gt; terms) {
+<span class="nc" id="L135">      terms.add(localTerm);</span>
+<span class="nc" id="L136">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util
+     * .Map)
+     */
+    @Override
+    public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
+<span class="fc" id="L147">      contexts.put(localTerm, termContext);</span>
+<span class="fc" id="L148">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
+    @Override
+    public Spans getSpans(final LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
+<span class="fc" id="L161">      final TermState state = termContext.get(context.ord);</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">      if (state == null) { // term is not present in that reader</span>
+<span class="pc bpc" id="L163" title="2 of 4 branches missed.">        assert context.reader().docFreq(</span>
+<span class="fc" id="L164">            localTerm) == 0 : &quot;no termstate found but term exists in reader term=&quot;</span>
+<span class="nc" id="L165">                + localTerm;</span>
+<span class="fc" id="L166">        return null;</span>
+      }
+
+<span class="fc" id="L169">      final Terms terms = context.reader().terms(localTerm.field());</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">      if (terms == null)</span>
+<span class="nc" id="L171">        return null;</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">      if (!terms.hasPositions())</span>
+<span class="nc" id="L173">        throw new IllegalStateException(&quot;field \&quot;&quot; + localTerm.field()</span>
+            + &quot;\&quot; was indexed without position data; cannot run SpanTermQuery (term=&quot;
+<span class="nc" id="L175">            + localTerm.text() + &quot;)&quot;);</span>
+
+<span class="fc" id="L177">      final TermsEnum termsEnum = terms.iterator();</span>
+<span class="fc" id="L178">      termsEnum.seekExact(localTerm.bytes(), state);</span>
+
+      final PostingsEnum postings;
+      Spans matchSpans;
+
+      try {
+        // get leafreader
+<span class="fc" id="L185">        LeafReader r = context.reader();</span>
+
+        // get delegate
+<span class="fc" id="L188">        Boolean hasMethod = true;</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">        while (hasMethod) {</span>
+<span class="fc" id="L190">          hasMethod = false;</span>
+<span class="fc" id="L191">          Method[] methods = r.getClass().getMethods();</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">          for (Method m : methods) {</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">            if (m.getName().equals(&quot;getDelegate&quot;)) {</span>
+<span class="fc" id="L194">              hasMethod = true;</span>
+<span class="fc" id="L195">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="fc" id="L196">              break;</span>
+            }
+          }
+<span class="fc" id="L199">        }</span>
+
+<span class="fc" id="L201">        FieldInfo fieldInfo = r.getFieldInfos().fieldInfo(field);</span>
+
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (CodecUtil.isSinglePositionPrefix(fieldInfo, prefix)) {</span>
+<span class="fc" id="L204">          postings = termsEnum.postings(null,</span>
+<span class="fc" id="L205">              requiredPostings.getRequiredPostings());</span>
+<span class="fc" id="L206">          matchSpans = new MtasExtendedTermSpans(postings, localTerm, true);</span>
+        } else {
+<span class="fc" id="L208">          postings = termsEnum.postings(null, requiredPostings</span>
+<span class="fc" id="L209">              .atLeast(Postings.PAYLOADS).getRequiredPostings());</span>
+<span class="fc" id="L210">          matchSpans = new MtasExtendedTermSpans(postings, localTerm, false);</span>
+        }
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        if(singlePosition) {</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">          return new FilterSpans(matchSpans) {</span>
+            @Override
+            protected AcceptStatus accept(Spans candidate)
+                throws IOException {
+<span class="pc bpc" id="L217" title="2 of 4 branches missed.">              assert candidate.startPosition() != candidate.endPosition();</span>
+<span class="fc" id="L218">              if((candidate.endPosition()</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">                  - candidate.startPosition()) == 1) {</span>
+<span class="fc" id="L220">                return AcceptStatus.YES;</span>
+              } else {
+<span class="nc" id="L222">                return AcceptStatus.NO;</span>
+              }                           
+            }
+          };
+        } else {
+<span class="fc" id="L227">          return matchSpans;</span>
+        }        
+<span class="nc" id="L229">      } catch (Exception e) {</span>
+        // e.printStackTrace();
+<span class="nc" id="L231">        throw new IOException(&quot;Can't get reader: &quot; + e.getMessage(), e);</span>
+      }
+
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanTermQuery#toString(java.lang.String)
+   */
+  @Override
+  public String toString(String field) {
+<span class="nc" id="L245">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L246">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">    if (value == null) {</span>
+<span class="nc" id="L248">      buffer.append(field + &quot;:&quot; + prefix);</span>
+    } else {
+<span class="nc" id="L250">      buffer.append(field + &quot;:&quot; + prefix + &quot;=&quot; + value);</span>
+    }
+<span class="nc" id="L252">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L253">    return buffer.toString();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.SpanTermQuery#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L264">      return true;</span>
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L266">      return false;</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L268">      return false;</span>
+<span class="fc" id="L269">    MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;</span>
+<span class="pc bpc" id="L270" title="3 of 4 branches missed.">    return other.localTerm.equals(localTerm) &amp;&amp; (other.singlePosition == singlePosition);</span>
+  }
+  
+  @Override
+  public int hashCode() {
+<span class="fc" id="L275">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L276">    h = (h * 5) ^ localTerm.hashCode();</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">    if(singlePosition) {</span>
+<span class="fc" id="L278">      h+=1;</span>
+    }
+<span class="fc" id="L280">    return h;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

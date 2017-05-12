@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasFunctionParserFunctionResponseDouble.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.function.util</a> &gt; <span class="el_source">MtasFunctionParserFunctionResponseDouble.java</span></div><h1>MtasFunctionParserFunctionResponseDouble.java</h1><pre class="source lang-java linenums">package mtas.parser.function.util;
+
+import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * The Class MtasFunctionParserFunctionResponseDouble.
+ */
+public class MtasFunctionParserFunctionResponseDouble
+    extends MtasFunctionParserFunctionResponse {
+
+  /** The log. */
+<span class="fc" id="L15">  private static Log log = LogFactory</span>
+<span class="fc" id="L16">      .getLog(MtasFunctionParserFunctionResponseDouble.class);</span>
+
+  /** The value. */
+  private double value;
+
+  /**
+   * Instantiates a new mtas function parser function response double.
+   *
+   * @param d
+   *          the d
+   * @param s
+   *          the s
+   */
+  public MtasFunctionParserFunctionResponseDouble(double d, boolean s) {
+<span class="fc" id="L30">    super(s);</span>
+<span class="fc" id="L31">    value = d;</span>
+<span class="fc" id="L32">  }</span>
+
+  /**
+   * Gets the value.
+   *
+   * @return the value
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public double getValue() throws IOException {
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    if (defined) {</span>
+<span class="fc" id="L43">      return value;</span>
+    } else {
+<span class="fc" id="L45">      throw new IOException(&quot;undefined&quot;);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.function.util.MtasFunctionParserFunctionResponse#equals(java.
+   * lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L59">      return true;</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L61">      return false;</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L63">      return false;</span>
+<span class="fc" id="L64">    MtasFunctionParserFunctionResponseDouble other = (MtasFunctionParserFunctionResponseDouble) obj;</span>
+    try {
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">      if (value == other.getValue()) {</span>
+<span class="fc" id="L67">        return defined;</span>
+      } else {        
+<span class="nc" id="L69">        return false;</span>
+      }
+<span class="fc" id="L71">    } catch (IOException e) {</span>
+<span class="fc" id="L72">      log.debug(e);</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">      return !defined;</span>
+    }
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L79">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L80">    h = (h * 7) ^ (int) value;</span>
+<span class="nc" id="L81">    return h;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">    return defined ? &quot;double:&quot; + value : &quot;double:undefined&quot;;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataItemLongFull.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataItemLongFull.java</span></div><h1>MtasDataItemLongFull.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang.ArrayUtils;
+import mtas.codec.util.CodecUtil;
+
+/**
+ * The Class MtasDataItemLongFull.
+ */
+class MtasDataItemLongFull extends MtasDataItemFull&lt;Long, Double&gt; {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The fp argument. */
+<span class="fc" id="L22">  private static Pattern fpArgument = Pattern.compile(&quot;([^=,]+)=([^,]*)&quot;);</span>
+
+  /**
+   * Instantiates a new mtas data item long full.
+   *
+   * @param value
+   *          the value
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param sourceNumber
+   *          the source number
+   */
+  public MtasDataItemLongFull(long[] value, MtasDataCollector&lt;?, ?&gt; sub,
+      Set&lt;String&gt; statsItems, String sortType, String sortDirection,
+      int errorNumber, Map&lt;String, Integer&gt; errorList, int sourceNumber) {
+<span class="fc" id="L47">    super(ArrayUtils.toObject(value), sub, statsItems, sortType, sortDirection,</span>
+        errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);
+<span class="fc" id="L49">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataItemFull#getDistribution(java.lang.
+   * String)
+   */
+  @Override
+  protected HashMap&lt;String, Object&gt; getDistribution(String argument) {
+<span class="nc" id="L60">    HashMap&lt;String, Object&gt; result = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L61">    Long start = null, end = null, step = null;</span>
+<span class="nc" id="L62">    Integer number = null;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">    if (argument != null) {</span>
+<span class="nc" id="L64">      Matcher m = fpArgument.matcher(argument);</span>
+      // get settings
+<span class="nc bnc" id="L66" title="All 2 branches missed.">      while (m.find()) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (m.group(1).trim().equals(&quot;start&quot;)) {</span>
+<span class="nc" id="L68">          start = Long.parseLong(m.group(2));</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        } else if (m.group(1).trim().equals(&quot;end&quot;)) {</span>
+<span class="nc" id="L70">          end = Long.parseLong(m.group(2));</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        } else if (m.group(1).trim().equals(&quot;step&quot;)) {</span>
+<span class="nc" id="L72">          step = Long.parseLong(m.group(2));</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        } else if (m.group(1).trim().equals(&quot;number&quot;)) {</span>
+<span class="nc" id="L74">          number = Integer.parseInt(m.group(2));</span>
+        }
+      }
+    }
+    // always exactly one of (positive) number and (positive) step, other null
+<span class="nc bnc" id="L79" title="All 8 branches missed.">    if ((number == null || number &lt; 1) &amp;&amp; (step == null || step &lt; 1)) {</span>
+<span class="nc" id="L80">      number = 10;</span>
+<span class="nc" id="L81">      step = null;</span>
+<span class="nc bnc" id="L82" title="All 4 branches missed.">    } else if (step != null &amp;&amp; step &lt; 1) {</span>
+<span class="nc" id="L83">      step = null;</span>
+<span class="nc bnc" id="L84" title="All 4 branches missed.">    } else if (number != null &amp;&amp; number &lt; 1) {</span>
+<span class="nc" id="L85">      number = null;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">    } else if (step != null) {</span>
+<span class="nc" id="L87">      number = null;</span>
+    }
+    // sanity checks start/end
+<span class="nc" id="L90">    createStats();</span>
+<span class="nc" id="L91">    long tmpStart = Double.valueOf(Math.floor(stats.getMin())).longValue();</span>
+<span class="nc" id="L92">    long tmpEnd = Double.valueOf(Math.ceil(stats.getMax())).longValue();</span>
+<span class="nc bnc" id="L93" title="All 6 branches missed.">    if (start != null &amp;&amp; end != null &amp;&amp; start &gt; end) {</span>
+<span class="nc" id="L94">      return null;</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">    } else if (start != null &amp;&amp; start &gt; tmpEnd) {</span>
+<span class="nc" id="L96">      return null;</span>
+<span class="nc bnc" id="L97" title="All 4 branches missed.">    } else if (end != null &amp;&amp; end &lt; tmpStart) {</span>
+<span class="nc" id="L98">      return null;</span>
+    }
+    // check start and end
+<span class="nc bnc" id="L101" title="All 4 branches missed.">    if (start == null &amp;&amp; end == null) {</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L103">        step = -Math.floorDiv((tmpStart - tmpEnd - 1), number);</span>
+      }
+<span class="nc" id="L105">      number = Long.valueOf(-Math.floorDiv((tmpStart - tmpEnd - 1), step))</span>
+<span class="nc" id="L106">          .intValue();</span>
+<span class="nc" id="L107">      start = tmpStart;</span>
+<span class="nc" id="L108">      end = start + (number * step);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">    } else if (start == null) {</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L111">        step = -Math.floorDiv((tmpStart - end - 1), number);</span>
+      }
+<span class="nc" id="L113">      number = Long.valueOf(-Math.floorDiv((tmpStart - end - 1), step))</span>
+<span class="nc" id="L114">          .intValue();</span>
+<span class="nc" id="L115">      start = end - (number * step);</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">    } else if (end == null) {</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L118">        step = -Math.floorDiv((start - tmpEnd - 1), number);</span>
+      }
+<span class="nc" id="L120">      number = Long.valueOf(-Math.floorDiv((start - tmpEnd - 1), step))</span>
+<span class="nc" id="L121">          .intValue();</span>
+<span class="nc" id="L122">      end = start + (number * step);</span>
+    } else {
+<span class="nc bnc" id="L124" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L125">        step = -Math.floorDiv((start - end - 1), number);</span>
+      }
+<span class="nc" id="L127">      number = Long.valueOf(-Math.floorDiv((start - end - 1), step)).intValue();</span>
+    }
+<span class="nc" id="L129">    long[] list = new long[number];</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">    for (Long v : fullValues) {</span>
+<span class="nc bnc" id="L131" title="All 4 branches missed.">      if (v &gt;= start &amp;&amp; v &lt;= end) {</span>
+<span class="nc" id="L132">        int i = Long.valueOf(Math.floorDiv((v - start), step)).intValue();</span>
+<span class="nc" id="L133">        list[i]++;</span>
+      }
+    }
+<span class="nc bnc" id="L136" title="All 2 branches missed.">    for (int i = 0; i &lt; number; i++) {</span>
+<span class="nc" id="L137">      Long l = start + i * step;</span>
+<span class="nc" id="L138">      Long r = Math.min(end, l + step - 1);</span>
+      String key;
+<span class="nc bnc" id="L140" title="All 4 branches missed.">      if (step &gt; 1 &amp;&amp; r &gt; l) {</span>
+<span class="nc" id="L141">        key = &quot;[&quot; + l + &quot;,&quot; + r + &quot;]&quot;;</span>
+      } else {
+<span class="nc" id="L143">        key = &quot;[&quot; + l + &quot;]&quot;;</span>
+      }
+<span class="nc" id="L145">      result.put(key, list[i]);</span>
+    }
+<span class="nc" id="L147">    return result;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+  public int compareTo(MtasDataItem&lt;Long, Double&gt; o) {
+<span class="nc" id="L157">    int compare = 0;</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">    if (o instanceof MtasDataItemLongFull) {</span>
+<span class="nc" id="L159">      MtasDataItemLongFull to = (MtasDataItemLongFull) o;</span>
+<span class="nc" id="L160">      MtasDataItemNumberComparator c1 = getComparableValue();</span>
+<span class="nc" id="L161">      MtasDataItemNumberComparator c2 = to.getComparableValue();</span>
+<span class="nc bnc" id="L162" title="All 4 branches missed.">      compare = (c1 != null &amp;&amp; c2 != null) ? c1.compareTo(c2.getValue()) : 0;</span>
+    }
+<span class="nc bnc" id="L164" title="All 2 branches missed.">    return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue1()
+   */
+  @Override
+  public MtasDataItemNumberComparator&lt;Long&gt; getCompareValue1() {
+<span class="nc" id="L174">    createStats();</span>
+<span class="nc bnc" id="L175" title="All 18 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_SUM:
+<span class="nc" id="L177">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getSum()), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MAX:
+<span class="nc" id="L179">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getMax()), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MIN:
+<span class="nc" id="L181">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getMin()), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_SUMSQ:
+<span class="nc" id="L183">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getSumsq()), sortDirection);</span>
+    default:
+<span class="nc" id="L185">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
+   */
+  @Override
+  public MtasDataItemNumberComparator&lt;Double&gt; getCompareValue2() {
+<span class="nc" id="L196">    createStats();</span>
+<span class="nc bnc" id="L197" title="All 42 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_SUMOFLOGS:
+<span class="nc" id="L199">      return new MtasDataItemNumberComparator&lt;&gt;(</span>
+<span class="nc" id="L200">          stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MEAN:
+<span class="nc" id="L202">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getMean(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
+<span class="nc" id="L204">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getGeometricMean(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
+<span class="nc" id="L206">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getStandardDeviation(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_VARIANCE:
+<span class="nc" id="L208">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getVariance(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
+<span class="nc" id="L210">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPopulationVariance(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_QUADRATICMEAN:
+<span class="nc" id="L212">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getQuadraticMean(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_KURTOSIS:
+<span class="nc" id="L214">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getKurtosis(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MEDIAN:
+<span class="nc" id="L216">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPercentile(50), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_SKEWNESS:
+<span class="nc" id="L218">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getSkewness(), sortDirection);</span>
+    default:
+<span class="nc" id="L220">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+<span class="nc" id="L230">    return this.getClass().getSimpleName() + &quot;[&quot; + fullValues.length + &quot;]&quot;;</span>
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L235" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L236">      return true;</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L238">      return false;</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L240">      return false;</span>
+<span class="nc" id="L241">    MtasDataItemLongFull that = (MtasDataItemLongFull) obj;</span>
+<span class="nc" id="L242">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
+<span class="nc" id="L243">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
+<span class="nc bnc" id="L244" title="All 6 branches missed.">    return (c1!=null&amp;&amp;c2!=null&amp;&amp;c1.equals(c2));    </span>
+  }
+  
+  @Override
+  public int hashCode() {
+<span class="nc" id="L249">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L250">    h = (h * 7) ^ getComparableValue().hashCode();</span>
+<span class="nc" id="L251">    return h;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

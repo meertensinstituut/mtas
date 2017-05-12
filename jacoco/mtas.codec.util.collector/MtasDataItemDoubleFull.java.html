@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataItemDoubleFull.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataItemDoubleFull.java</span></div><h1>MtasDataItemDoubleFull.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang.ArrayUtils;
+import mtas.codec.util.CodecUtil;
+
+/**
+ * The Class MtasDataItemDoubleFull.
+ */
+public class MtasDataItemDoubleFull extends MtasDataItemFull&lt;Double, Double&gt; {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The fp argument. */
+<span class="nc" id="L22">  private static Pattern fpArgument = Pattern.compile(&quot;([^=,]+)=([^,]*)&quot;);</span>
+
+  /**
+   * Instantiates a new mtas data item double full.
+   *
+   * @param value
+   *          the value
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param sourceNumber
+   *          the source number
+   */
+  public MtasDataItemDoubleFull(double[] value, MtasDataCollector&lt;?, ?&gt; sub,
+      Set&lt;String&gt; statsItems, String sortType, String sortDirection,
+      int errorNumber, Map&lt;String, Integer&gt; errorList, int sourceNumber) {
+<span class="nc" id="L47">    super(ArrayUtils.toObject(value), sub, statsItems, sortType, sortDirection,</span>
+        errorNumber, errorList, new MtasDataDoubleOperations(), sourceNumber);
+<span class="nc" id="L49">  }</span>
+
+  /**
+   * Gets the number of decimals.
+   *
+   * @param ds
+   *          the ds
+   * @return the number of decimals
+   */
+  private int getNumberOfDecimals(String ds) {
+<span class="nc bnc" id="L59" title="All 2 branches missed.">    if (!ds.contains(&quot;.&quot;)) {</span>
+<span class="nc" id="L60">      return 0;</span>
+    } else {
+<span class="nc" id="L62">      return (ds.length() - ds.indexOf(&quot;.&quot;) - 1);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataItemFull#getDistribution(java.lang.
+   * String)
+   */
+  @Override
+  protected HashMap&lt;String, Object&gt; getDistribution(String argument) {
+<span class="nc" id="L75">    HashMap&lt;String, Object&gt; result = new LinkedHashMap&lt;String, Object&gt;();</span>
+<span class="nc" id="L76">    Double start = null, end = null, step = null;</span>
+<span class="nc" id="L77">    Integer d = null, number = null;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">    if (argument != null) {</span>
+<span class="nc" id="L79">      Matcher m = fpArgument.matcher(argument);</span>
+      // get settings
+<span class="nc bnc" id="L81" title="All 2 branches missed.">      while (m.find()) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (m.group(1).trim().equals(&quot;start&quot;)) {</span>
+<span class="nc" id="L83">          start = Double.parseDouble(m.group(2));</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">          d = (d == null) ? getNumberOfDecimals(m.group(2))</span>
+<span class="nc" id="L85">              : Math.max(d, getNumberOfDecimals(m.group(2)));</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        } else if (m.group(1).trim().equals(&quot;end&quot;)) {</span>
+<span class="nc" id="L87">          end = Double.parseDouble(m.group(2));</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">          d = (d == null) ? getNumberOfDecimals(m.group(2))</span>
+<span class="nc" id="L89">              : Math.max(d, getNumberOfDecimals(m.group(2)));</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        } else if (m.group(1).trim().equals(&quot;step&quot;)) {</span>
+<span class="nc" id="L91">          step = Double.parseDouble(m.group(2));</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">          d = (d == null) ? getNumberOfDecimals(m.group(2))</span>
+<span class="nc" id="L93">              : Math.max(d, getNumberOfDecimals(m.group(2)));</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        } else if (m.group(1).trim().equals(&quot;number&quot;)) {</span>
+<span class="nc" id="L95">          number = Integer.parseInt(m.group(2));</span>
+        }
+      }
+    }
+    // always exactly one of (positive) number and (positive) step, other null
+<span class="nc bnc" id="L100" title="All 8 branches missed.">    if ((number == null || number &lt; 1) &amp;&amp; (step == null || step &lt;= 0)) {</span>
+<span class="nc" id="L101">      number = 10;</span>
+<span class="nc" id="L102">      step = null;</span>
+<span class="nc bnc" id="L103" title="All 4 branches missed.">    } else if (step != null &amp;&amp; step &lt;= 0) {</span>
+<span class="nc" id="L104">      step = null;</span>
+<span class="nc bnc" id="L105" title="All 4 branches missed.">    } else if (number != null &amp;&amp; number &lt; 1) {</span>
+<span class="nc" id="L106">      number = null;</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">    } else if (step != null) {</span>
+<span class="nc" id="L108">      number = null;</span>
+    }
+    // sanity checks start/end
+<span class="nc" id="L111">    createStats();</span>
+<span class="nc" id="L112">    double tmpStart = stats.getMin();</span>
+<span class="nc" id="L113">    double tmpEnd = stats.getMax();</span>
+<span class="nc bnc" id="L114" title="All 6 branches missed.">    if (start != null &amp;&amp; end != null &amp;&amp; start &gt; end) {</span>
+<span class="nc" id="L115">      return null;</span>
+<span class="nc bnc" id="L116" title="All 4 branches missed.">    } else if (start != null &amp;&amp; start &gt; tmpEnd) {</span>
+<span class="nc" id="L117">      return null;</span>
+<span class="nc bnc" id="L118" title="All 4 branches missed.">    } else if (end != null &amp;&amp; end &lt; tmpStart) {</span>
+<span class="nc" id="L119">      return null;</span>
+    }
+    // check start and end
+<span class="nc bnc" id="L122" title="All 4 branches missed.">    if (start == null &amp;&amp; end == null) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L124">        step = (tmpEnd - tmpStart) / number;</span>
+      }
+<span class="nc" id="L126">      number = Double.valueOf(Math.ceil((tmpEnd - tmpStart) / step)).intValue();</span>
+<span class="nc" id="L127">      start = tmpStart;</span>
+<span class="nc" id="L128">      end = start + (number * step);</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">    } else if (start == null) {</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L131">        step = (end - tmpStart) / number;</span>
+      }
+<span class="nc" id="L133">      number = Double.valueOf(Math.ceil((end - tmpStart) / step)).intValue();</span>
+<span class="nc" id="L134">      start = end - (number * step);</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">    } else if (end == null) {</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L137">        step = (tmpEnd - start) / number;</span>
+      }
+<span class="nc" id="L139">      number = Double.valueOf(Math.ceil((tmpEnd - start) / step)).intValue();</span>
+<span class="nc" id="L140">      end = start + (number * step);</span>
+    } else {
+<span class="nc bnc" id="L142" title="All 2 branches missed.">      if (step == null) {</span>
+<span class="nc" id="L143">        step = (end - start) / number;</span>
+      }
+<span class="nc" id="L145">      number = Double.valueOf(Math.ceil((end - start) / step)).intValue();</span>
+    }
+    // round step to agreeable format and recompute number
+<span class="nc" id="L148">    int tmpD = Double.valueOf(Math.max(0, 1 + Math.ceil(-1 * Math.log10(step))))</span>
+<span class="nc" id="L149">        .intValue();</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">    d = (d == null) ? tmpD : Math.max(d, tmpD);</span>
+<span class="nc" id="L151">    double tmp = Math.pow(10.0, d);</span>
+<span class="nc" id="L152">    step = Math.round(step * tmp) / tmp;</span>
+<span class="nc" id="L153">    number = Double.valueOf(Math.ceil((end - start) / step)).intValue();</span>
+
+    // compute distribution
+<span class="nc" id="L156">    long[] list = new long[number];</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">    for (Double v : fullValues) {</span>
+<span class="nc bnc" id="L158" title="All 4 branches missed.">      if (v &gt;= start &amp;&amp; v &lt;= end) {</span>
+<span class="nc" id="L159">        int i = Math.min(</span>
+<span class="nc" id="L160">            Double.valueOf(Math.floor((v - start) / step)).intValue(),</span>
+<span class="nc" id="L161">            (number - 1));</span>
+<span class="nc" id="L162">        list[i]++;</span>
+      }
+    }
+    Double l, r;
+    String ls, rs;
+<span class="nc bnc" id="L167" title="All 2 branches missed.">    for (int i = 0; i &lt; number; i++) {</span>
+<span class="nc" id="L168">      l = start + i * step;</span>
+<span class="nc" id="L169">      r = Math.min(end, l + step);</span>
+<span class="nc" id="L170">      ls = String.format(&quot;%.&quot; + d + &quot;f&quot;, l);</span>
+<span class="nc" id="L171">      rs = String.format(&quot;%.&quot; + d + &quot;f&quot;, r);</span>
+<span class="nc" id="L172">      String key = &quot;[&quot; + ls + &quot;,&quot; + rs</span>
+<span class="nc bnc" id="L173" title="All 6 branches missed.">          + ((i == (number - 1) &amp;&amp; r &gt;= tmpEnd &amp;&amp; l &lt;= tmpEnd) ? &quot;]&quot; : &quot;)&quot;);</span>
+<span class="nc" id="L174">      result.put(key, list[i]);</span>
+    }
+<span class="nc" id="L176">    return result;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+  public int compareTo(MtasDataItem&lt;Double, Double&gt; o) {
+<span class="nc" id="L186">    int compare = 0;</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">    if (o instanceof MtasDataItemDoubleFull) {</span>
+<span class="nc" id="L188">      MtasDataItemDoubleFull to = (MtasDataItemDoubleFull) o;</span>
+<span class="nc" id="L189">      MtasDataItemNumberComparator c1 = getComparableValue();</span>
+<span class="nc" id="L190">      MtasDataItemNumberComparator c2 = to.getComparableValue();</span>
+<span class="nc bnc" id="L191" title="All 4 branches missed.">      compare = (c1 != null &amp;&amp; c2 != null) ? c1.compareTo(c2.getValue()) : 0;</span>
+    }
+<span class="nc bnc" id="L193" title="All 2 branches missed.">    return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue1()
+   */
+  @Override
+  public MtasDataItemNumberComparator&lt;Double&gt; getCompareValue1() {
+<span class="nc" id="L203">    createStats();</span>
+<span class="nc bnc" id="L204" title="All 18 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_SUM:
+<span class="nc" id="L206">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getSum(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MAX:
+<span class="nc" id="L208">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getMax(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MIN:
+<span class="nc" id="L210">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getMin(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_SUMSQ:
+<span class="nc" id="L212">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getSumsq(), sortDirection);</span>
+    default:
+<span class="nc" id="L214">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
+   */
+  @Override
+  public MtasDataItemNumberComparator&lt;Double&gt; getCompareValue2() {
+<span class="nc" id="L225">    createStats();</span>
+<span class="nc bnc" id="L226" title="All 42 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_SUMOFLOGS:
+<span class="nc" id="L228">      return new MtasDataItemNumberComparator&lt;Double&gt;(</span>
+<span class="nc" id="L229">          stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MEAN:
+<span class="nc" id="L231">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getMean(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
+<span class="nc" id="L233">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getGeometricMean(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
+<span class="nc" id="L235">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getStandardDeviation(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_VARIANCE:
+<span class="nc" id="L237">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getVariance(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
+<span class="nc" id="L239">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getPopulationVariance(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_QUADRATICMEAN:
+<span class="nc" id="L241">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getQuadraticMean(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_KURTOSIS:
+<span class="nc" id="L243">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getKurtosis(), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_MEDIAN:
+<span class="nc" id="L245">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getPercentile(50), sortDirection);</span>
+    case CodecUtil.STATS_TYPE_SKEWNESS:
+<span class="nc" id="L247">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getSkewness(), sortDirection);</span>
+    default:
+<span class="nc" id="L249">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+<span class="nc" id="L259">    return this.getClass().getSimpleName() + &quot;[&quot; + fullValues.length + &quot;]&quot;;</span>
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L264" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L265">      return true;</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L267">      return false;</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L269">      return false;</span>
+<span class="nc" id="L270">    MtasDataItemDoubleFull that = (MtasDataItemDoubleFull) obj;</span>
+<span class="nc" id="L271">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
+<span class="nc" id="L272">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
+<span class="nc bnc" id="L273" title="All 6 branches missed.">    return (c1!=null&amp;&amp;c2!=null&amp;&amp;c1.equals(c2));    </span>
+  }
+  
+  @Override
+  public int hashCode() {
+<span class="nc" id="L278">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L279">    h = (h * 7) ^ getComparableValue().hashCode();</span>
+<span class="nc" id="L280">    return h;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

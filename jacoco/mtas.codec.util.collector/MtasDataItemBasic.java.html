@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataItemBasic.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataItemBasic.java</span></div><h1>MtasDataItemBasic.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import mtas.codec.util.CodecUtil;
+
+/**
+ * The Class MtasDataItemBasic.
+ *
+ * @param &lt;T1&gt;
+ *          the generic type
+ * @param &lt;T2&gt;
+ *          the generic type
+ */
+abstract class MtasDataItemBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2 extends Number &amp; Comparable&lt;T2&gt;&gt;
+    extends MtasDataItem&lt;T1, T2&gt; implements Serializable {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /** The value sum. */
+  protected T1 valueSum;
+
+  /** The value n. */
+  protected Long valueN;
+
+  /** The operations. */
+  protected MtasDataOperations&lt;T1, T2&gt; operations;
+
+  /**
+   * Instantiates a new mtas data item basic.
+   *
+   * @param valueSum
+   *          the value sum
+   * @param valueN
+   *          the value n
+   * @param sub
+   *          the sub
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param errorNumber
+   *          the error number
+   * @param errorList
+   *          the error list
+   * @param operations
+   *          the operations
+   * @param sourceNumber
+   *          the source number
+   */
+  public MtasDataItemBasic(T1 valueSum, long valueN,
+      MtasDataCollector&lt;?, ?&gt; sub, Set&lt;String&gt; statsItems, String sortType,
+      String sortDirection, int errorNumber, Map&lt;String, Integer&gt; errorList,
+      MtasDataOperations&lt;T1, T2&gt; operations, int sourceNumber) {
+<span class="fc" id="L64">    super(sub, statsItems, sortType, sortDirection, errorNumber, errorList,</span>
+        sourceNumber);
+<span class="fc" id="L66">    this.valueSum = valueSum;</span>
+<span class="fc" id="L67">    this.valueN = valueN;</span>
+<span class="fc" id="L68">    this.operations = operations;</span>
+<span class="fc" id="L69">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.
+   * DataCollector.MtasDataItem)
+   */
+  @Override
+  public void add(MtasDataItem&lt;T1, T2&gt; newItem) throws IOException {
+<span class="nc bnc" id="L79" title="All 2 branches missed.">    if (newItem instanceof MtasDataItemBasic) {</span>
+<span class="nc" id="L80">      MtasDataItemBasic&lt;T1, T2&gt; newTypedItem = (MtasDataItemBasic&lt;T1, T2&gt;) newItem;</span>
+<span class="nc" id="L81">      this.valueSum = operations.add11(this.valueSum, newTypedItem.valueSum);</span>
+<span class="nc" id="L82">      this.valueN += newTypedItem.valueN;</span>
+<span class="nc" id="L83">      recomputeComparableSortValue = true;</span>
+<span class="nc" id="L84">    } else {</span>
+<span class="nc" id="L85">      throw new IOException(&quot;can only add MtasDataItemBasic&quot;);</span>
+    }
+<span class="nc" id="L87">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
+   */
+  @Override
+  public Map&lt;String, Object&gt; rewrite(boolean showDebugInfo) throws IOException {
+<span class="fc" id="L96">    Map&lt;String, Object&gt; response = new HashMap&lt;String, Object&gt;();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    for (String statsItem : statsItems) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {</span>
+<span class="fc" id="L99">        response.put(statsItem, valueSum);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      } else if (statsItem.equals(CodecUtil.STATS_TYPE_N)) {</span>
+<span class="fc" id="L101">        response.put(statsItem, valueN);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">      } else if (statsItem.equals(CodecUtil.STATS_TYPE_MEAN)) {</span>
+<span class="fc" id="L103">        response.put(statsItem, getValue(statsItem));</span>
+      } else {
+<span class="nc" id="L105">        response.put(statsItem, null);</span>
+      }
+<span class="fc" id="L107">    }</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    if (errorNumber &gt; 0) {</span>
+<span class="nc" id="L109">      Map&lt;String, Object&gt; errorResponse = new HashMap&lt;String, Object&gt;();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">      for (Entry&lt;String, Integer&gt; entry : errorList.entrySet()) {</span>
+<span class="nc" id="L111">        errorResponse.put(entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L112">      }</span>
+<span class="nc" id="L113">      response.put(&quot;errorNumber&quot;, errorNumber);</span>
+<span class="nc" id="L114">      response.put(&quot;errorList&quot;, errorResponse);</span>
+    }
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    if (showDebugInfo) {</span>
+<span class="nc" id="L117">      response.put(&quot;sourceNumber&quot;, sourceNumber);</span>
+<span class="nc" id="L118">      response.put(&quot;stats&quot;, &quot;basic&quot;);</span>
+    }
+<span class="fc" id="L120">    return response;</span>
+  }
+
+  /**
+   * Gets the value.
+   *
+   * @param statsType
+   *          the stats type
+   * @return the value
+   */
+  protected T2 getValue(String statsType) {
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    if (statsType.equals(CodecUtil.STATS_TYPE_MEAN)) {</span>
+<span class="fc" id="L132">      return operations.divide1(valueSum, valueN);</span>
+    } else {
+<span class="nc" id="L134">      return null;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValueType()
+   */
+  public final int getCompareValueType() throws IOException {
+<span class="pc bpc" id="L144" title="11 of 14 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_N:
+<span class="nc" id="L146">      return 0;</span>
+    case CodecUtil.STATS_TYPE_SUM:
+<span class="fc" id="L148">      return 1;</span>
+    case CodecUtil.STATS_TYPE_MEAN:
+<span class="nc" id="L150">      return 2;</span>
+    default:
+<span class="nc" id="L152">      throw new IOException(&quot;sortType &quot; + sortType + &quot; not supported&quot;);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
+   */
+  public final MtasDataItemNumberComparator&lt;Long&gt; getCompareValue0() {
+<span class="nc bnc" id="L162" title="All 6 branches missed.">    switch (sortType) {</span>
+    case CodecUtil.STATS_TYPE_N:
+<span class="nc" id="L164">      return new MtasDataItemNumberComparator&lt;Long&gt;(valueN, sortDirection);</span>
+    default:
+<span class="nc" id="L166">      return null;</span>
+    }
+  }
+  
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

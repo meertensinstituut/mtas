@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasRBTree.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">MtasRBTree.java</span></div><h1>MtasRBTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
+
+import java.util.HashMap;
+import mtas.codec.tree.MtasTree;
+import mtas.codec.tree.MtasRBTreeNode;
+
+/**
+ * The Class MtasRBTree.
+ */
+<span class="pc bpc" id="L10" title="1 of 2 branches missed.">public class MtasRBTree extends MtasTree&lt;MtasRBTreeNode&gt; {</span>
+
+  /** The index. */
+  private final HashMap&lt;String, MtasRBTreeNode&gt; index;
+
+  /**
+   * Instantiates a new mtas rb tree.
+   *
+   * @param singlePoint
+   *          the single point
+   * @param storePrefixId
+   *          the store prefix id
+   */
+  public MtasRBTree(boolean singlePoint, boolean storePrefixId) {
+<span class="fc" id="L24">    super(singlePoint, storePrefixId);</span>
+<span class="fc" id="L25">    index = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L26">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.tree.MtasTree#addRangeEmpty(int, int)
+   */
+  @Override
+  final protected void addRangeEmpty(int left, int right, int additionalId,
+      long additionalRef) {
+<span class="nc" id="L36">    String key = left + &quot;_&quot; + right;</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
+      // do nothing (empty...)
+    } else {
+<span class="nc" id="L40">      root = addRange(root, left, right, additionalId, additionalRef, null,</span>
+          null);
+<span class="nc" id="L42">      root.color = MtasRBTreeNode.BLACK;</span>
+    }
+<span class="nc" id="L44">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.tree.MtasTree#addSinglePoint(int, java.lang.Integer,
+   * java.lang.Long)
+   */
+  @Override
+  final protected void addSinglePoint(int position, int additionalId,
+      long additionalRef, Integer id, Long ref) {
+<span class="fc" id="L55">    addRange(position, position, additionalId, additionalRef, id, ref);</span>
+<span class="fc" id="L56">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.tree.MtasTree#addRange(int, int, java.lang.Integer,
+   * java.lang.Long)
+   */
+  @Override
+  final protected void addRange(int left, int right, int additionalId,
+      long additionalRef, Integer id, Long ref) {
+<span class="fc" id="L67">    String key = left + &quot;_&quot; + right;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (index.containsKey(key)) {</span>
+<span class="fc" id="L69">      index.get(key).addIdAndRef(id, ref, additionalId, additionalRef);</span>
+    } else {
+<span class="fc" id="L71">      root = addRange(root, left, right, additionalId, additionalRef, id, ref);</span>
+<span class="fc" id="L72">      root.color = MtasRBTreeNode.BLACK;</span>
+    }
+<span class="fc" id="L74">  }</span>
+
+  /**
+   * Adds the range.
+   *
+   * @param n
+   *          the n
+   * @param left
+   *          the left
+   * @param right
+   *          the right
+   * @param additionalId
+   *          the additional id
+   * @param additionalRef
+   *          the additional ref
+   * @param id
+   *          the id
+   * @param ref
+   *          the ref
+   * @return the mtas rb tree node
+   */
+  private MtasRBTreeNode addRange(MtasRBTreeNode n, Integer left, Integer right,
+      int additionalId, long additionalRef, Integer id, Long ref) {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    if (n == null) {</span>
+<span class="fc" id="L98">      String key = left.toString() + &quot;_&quot; + right.toString();</span>
+<span class="fc" id="L99">      n = new MtasRBTreeNode(left, right, MtasRBTreeNode.RED, 1);</span>
+<span class="fc" id="L100">      n.addIdAndRef(id, ref, additionalId, additionalRef);</span>
+<span class="fc" id="L101">      index.put(key, n);</span>
+<span class="fc" id="L102">    } else {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">      if (left &lt;= n.left) {</span>
+<span class="fc" id="L104">        n.leftChild = addRange(n.leftChild, left, right, additionalId,</span>
+            additionalRef, id, ref);
+<span class="fc" id="L106">        updateMax(n, n.leftChild);</span>
+      } else {
+<span class="fc" id="L108">        n.rightChild = addRange(n.rightChild, left, right, additionalId,</span>
+            additionalRef, id, ref);
+<span class="fc" id="L110">        updateMax(n, n.rightChild);</span>
+      }
+<span class="fc bfc" id="L112" title="All 4 branches covered.">      if (isRed(n.rightChild) &amp;&amp; !isRed(n.leftChild)) {</span>
+<span class="fc" id="L113">        n = rotateLeft(n);</span>
+      }
+<span class="fc bfc" id="L115" title="All 4 branches covered.">      if (isRed(n.leftChild) &amp;&amp; isRed(n.leftChild.leftChild)) {</span>
+<span class="fc" id="L116">        n = rotateRight(n);</span>
+      }
+<span class="fc bfc" id="L118" title="All 4 branches covered.">      if (isRed(n.leftChild) &amp;&amp; isRed(n.rightChild)) {</span>
+<span class="fc" id="L119">        flipColors(n);</span>
+      }
+<span class="fc" id="L121">      n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
+    }
+<span class="fc" id="L123">    return n;</span>
+  }
+
+  /**
+   * Update max.
+   *
+   * @param n
+   *          the n
+   * @param c
+   *          the c
+   */
+  private void updateMax(MtasRBTreeNode n, MtasRBTreeNode c) {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (c != null) {</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">      if (n.max &lt; c.max) {</span>
+<span class="fc" id="L137">        n.max = c.max;</span>
+      }
+    }
+<span class="fc" id="L140">  }</span>
+
+  // make a left-leaning link lean to the right
+  /**
+   * Rotate right.
+   *
+   * @param n
+   *          the n
+   * @return the mtas rb tree node
+   */
+  private MtasRBTreeNode rotateRight(MtasRBTreeNode n) {
+<span class="pc bpc" id="L151" title="3 of 6 branches missed.">    assert (n != null) &amp;&amp; isRed(n.leftChild);</span>
+<span class="fc" id="L152">    MtasRBTreeNode x = n.leftChild;</span>
+<span class="fc" id="L153">    n.leftChild = x.rightChild;</span>
+<span class="fc" id="L154">    x.rightChild = n;</span>
+<span class="fc" id="L155">    x.color = x.rightChild.color;</span>
+<span class="fc" id="L156">    x.rightChild.color = MtasRBTreeNode.RED;</span>
+<span class="fc" id="L157">    x.n = n.n;</span>
+<span class="fc" id="L158">    n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
+<span class="fc" id="L159">    setMax(n);</span>
+<span class="fc" id="L160">    setMax(x);</span>
+<span class="fc" id="L161">    return x;</span>
+  }
+
+  // make a right-leaning link lean to the left
+  /**
+   * Rotate left.
+   *
+   * @param n
+   *          the n
+   * @return the mtas rb tree node
+   */
+  private MtasRBTreeNode rotateLeft(MtasRBTreeNode n) {
+<span class="pc bpc" id="L173" title="3 of 6 branches missed.">    assert (n != null) &amp;&amp; isRed(n.rightChild);</span>
+<span class="fc" id="L174">    MtasRBTreeNode x = n.rightChild;</span>
+<span class="fc" id="L175">    n.rightChild = x.leftChild;</span>
+<span class="fc" id="L176">    x.leftChild = n;</span>
+<span class="fc" id="L177">    x.color = x.leftChild.color;</span>
+<span class="fc" id="L178">    x.leftChild.color = MtasRBTreeNode.RED;</span>
+<span class="fc" id="L179">    x.n = n.n;</span>
+<span class="fc" id="L180">    n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
+<span class="fc" id="L181">    setMax(n);</span>
+<span class="fc" id="L182">    setMax(x);</span>
+<span class="fc" id="L183">    return x;</span>
+  }
+
+  // flip the colors of a node and its two children
+  /**
+   * Flip colors.
+   *
+   * @param n
+   *          the n
+   */
+  private void flipColors(MtasRBTreeNode n) {
+    // n must have opposite color of its two children
+<span class="pc bpc" id="L195" title="4 of 8 branches missed.">    assert (n != null) &amp;&amp; (n.leftChild != null) &amp;&amp; (n.rightChild != null);</span>
+<span class="pc bpc" id="L196" title="4 of 8 branches missed.">    assert (!isRed(n) &amp;&amp; isRed(n.leftChild) &amp;&amp; isRed(n.rightChild))</span>
+<span class="nc bnc" id="L197" title="All 6 branches missed.">        || (isRed(n) &amp;&amp; !isRed(n.leftChild) &amp;&amp; !isRed(n.rightChild));</span>
+<span class="fc" id="L198">    n.color ^= 1;</span>
+<span class="fc" id="L199">    n.leftChild.color ^= 1;</span>
+<span class="fc" id="L200">    n.rightChild.color ^= 1;</span>
+<span class="fc" id="L201">  }</span>
+
+  /**
+   * Checks if is red.
+   *
+   * @param n
+   *          the n
+   * @return true, if is red
+   */
+  private boolean isRed(MtasRBTreeNode n) {
+<span class="fc bfc" id="L211" title="All 2 branches covered.">    if (n == null) {</span>
+<span class="fc" id="L212">      return false;</span>
+    }
+<span class="fc bfc" id="L214" title="All 2 branches covered.">    return n.color == MtasRBTreeNode.RED;</span>
+  }
+
+  /**
+   * Size.
+   *
+   * @param n
+   *          the n
+   * @return the int
+   */
+  private int size(MtasRBTreeNode n) {
+<span class="fc bfc" id="L225" title="All 2 branches covered.">    if (n == null)</span>
+<span class="fc" id="L226">      return 0;</span>
+<span class="fc" id="L227">    return n.n;</span>
+  }
+
+  /**
+   * Sets the max.
+   *
+   * @param n
+   *          the new max
+   */
+  private void setMax(MtasRBTreeNode n) {
+<span class="fc" id="L237">    n.max = n.right;</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">    if (n.leftChild != null) {</span>
+<span class="fc" id="L239">      n.max = Math.max(n.max, n.leftChild.max);</span>
+    }
+<span class="fc bfc" id="L241" title="All 2 branches covered.">    if (n.rightChild != null) {</span>
+<span class="fc" id="L242">      n.max = Math.max(n.max, n.rightChild.max);</span>
+    }
+<span class="fc" id="L244">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

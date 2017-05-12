@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanWildcardQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanWildcardQuery.java</span></div><h1>MtasSpanWildcardQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+
+import java.io.IOException;
+
+import mtas.analysis.token.MtasToken;
+import mtas.codec.util.CodecUtil;
+import mtas.search.spans.util.MtasSpanQuery;
+
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.search.spans.SpanMultiTermQueryWrapper;
+import org.apache.lucene.search.spans.SpanOrQuery;
+import org.apache.lucene.search.spans.SpanQuery;
+import org.apache.lucene.search.spans.SpanTermQuery;
+import org.apache.lucene.search.spans.SpanWeight;
+
+/**
+ * The Class MtasSpanWildcardQuery.
+ */
+public class MtasSpanWildcardQuery extends MtasSpanQuery {
+
+  /** The Constant MTAS_WILDCARD_EXPAND_BOUNDARY. */
+  private static final int MTAS_WILDCARD_EXPAND_BOUNDARY = 1000000;
+
+  /** The prefix. */
+  private String prefix;
+
+  /** The value. */
+  private String value;
+
+  /** The single position. */
+  private boolean singlePosition;
+
+  /** The term. */
+  private Term term;
+
+  /** The query. */
+  private SpanMultiTermQueryWrapper&lt;WildcardQuery&gt; query;
+
+  /**
+   * Instantiates a new mtas span wildcard query.
+   *
+   * @param term
+   *          the term
+   */
+  public MtasSpanWildcardQuery(Term term) {
+<span class="nc" id="L50">    this(term, true);</span>
+<span class="nc" id="L51">  }</span>
+
+  /**
+   * Instantiates a new mtas span wildcard query.
+   *
+   * @param term
+   *          the term
+   * @param singlePosition
+   *          the single position
+   */
+  public MtasSpanWildcardQuery(Term term, boolean singlePosition) {
+<span class="nc bnc" id="L62" title="All 4 branches missed.">    super(singlePosition?1:null, singlePosition?1:null);</span>
+<span class="nc" id="L63">    WildcardQuery wcq = new WildcardQuery(term);</span>
+<span class="nc" id="L64">    query = new SpanMultiTermQueryWrapper&lt;WildcardQuery&gt;(wcq);</span>
+<span class="nc" id="L65">    this.term = term;</span>
+<span class="nc" id="L66">    this.singlePosition = singlePosition;</span>
+<span class="nc" id="L67">    int i = term.text().indexOf(MtasToken.DELIMITER);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="nc" id="L69">      prefix = term.text().substring(0, i);</span>
+<span class="nc" id="L70">      value = term.text().substring((i + MtasToken.DELIMITER.length()));</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">      value = (value.length() &gt; 0) ? value : null;</span>
+    } else {
+<span class="nc" id="L73">      prefix = term.text();</span>
+<span class="nc" id="L74">      value = null;</span>
+    }
+<span class="nc" id="L76">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+   */
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+<span class="nc" id="L86">    Query q = query.rewrite(reader);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    if (q instanceof SpanOrQuery) {</span>
+<span class="nc" id="L88">      SpanQuery[] clauses = ((SpanOrQuery) q).getClauses();</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">      if (clauses.length &gt; MTAS_WILDCARD_EXPAND_BOUNDARY) {</span>
+        // TODO : forward index solution
+<span class="nc" id="L91">        throw new IOException(&quot;Wildcard expression \&quot;&quot;</span>
+<span class="nc" id="L92">            + CodecUtil.termValue(term.text()) + &quot;\&quot; expands to &quot;</span>
+            + clauses.length + &quot; terms, too many (boundary &quot;
+            + MTAS_WILDCARD_EXPAND_BOUNDARY + &quot;)!&quot;);
+      }
+<span class="nc" id="L96">      MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.length];</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">      for (int i = 0; i &lt; clauses.length; i++) {</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (clauses[i] instanceof SpanTermQuery) {</span>
+<span class="nc" id="L99">          newClauses[i] = new MtasSpanTermQuery((SpanTermQuery) clauses[i],</span>
+              singlePosition);
+        } else {
+<span class="nc" id="L102">          throw new IOException(&quot;no SpanTermQuery after rewrite&quot;);</span>
+        }
+      }
+<span class="nc" id="L105">      return new MtasSpanOrQuery(newClauses).rewrite(reader);</span>
+    } else {
+<span class="nc" id="L107">      throw new IOException(&quot;no SpanOrQuery after rewrite&quot;);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanTermQuery#toString(java.lang.String)
+   */
+  @Override
+  public String toString(String field) {
+<span class="nc" id="L119">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L120">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">    if (value == null) {</span>
+<span class="nc" id="L122">      buffer.append(this.query.getField() + &quot;:&quot; + prefix);</span>
+    } else {
+<span class="nc" id="L124">      buffer.append(this.query.getField() + &quot;:&quot; + prefix + &quot;=&quot; + value);</span>
+    }
+<span class="nc" id="L126">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L127">    return buffer.toString();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
+  @Override
+  public String getField() {
+<span class="nc" id="L137">    return term.field();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
+   */
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+<span class="nc" id="L150">    return ((SpanQuery) searcher.rewrite(query)).createWeight(searcher,</span>
+        needsScores);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L161" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L162">      return true;</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L164">      return false;</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L166">      return false;</span>
+<span class="nc" id="L167">    final MtasSpanWildcardQuery that = (MtasSpanWildcardQuery) obj;</span>
+<span class="nc bnc" id="L168" title="All 4 branches missed.">    return term.equals(that.term) &amp;&amp; singlePosition == that.singlePosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
+  @Override
+  public int hashCode() {
+<span class="nc" id="L178">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L179">    h = (h * 7) ^ term.hashCode();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">    h += (singlePosition ? 1 : 0);</span>
+<span class="nc" id="L181">    return h;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

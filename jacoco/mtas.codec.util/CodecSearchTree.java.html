@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CodecSearchTree.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">CodecSearchTree.java</span></div><h1>CodecSearchTree.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import mtas.codec.tree.IntervalTree;
+import mtas.codec.tree.IntervalTreeNode;
+import mtas.codec.tree.MtasTree;
+import org.apache.lucene.store.IndexInput;
+
+/**
+ * The Class CodecSearchTree.
+ */
+<span class="nc" id="L16">public class CodecSearchTree {</span>
+
+  /**
+   * Advance mtas tree.
+   *
+   * @param position the position
+   * @param in the in
+   * @param ref the ref
+   * @param objectRefApproxOffset the object ref approx offset
+   * @return the array list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public static ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; advanceMtasTree(int position,
+      IndexInput in, long ref, long objectRefApproxOffset) throws IOException {
+<span class="fc" id="L30">    ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list = new ArrayList&lt;MtasTreeHit&lt;?&gt;&gt;();</span>
+<span class="fc" id="L31">    ArrayList&lt;MtasTreeItem&gt; checkList = new ArrayList&lt;MtasTreeItem&gt;();</span>
+<span class="fc" id="L32">    AtomicBoolean isSinglePoint = new AtomicBoolean(false);</span>
+<span class="fc" id="L33">    AtomicBoolean isStoreAdditonalId = new AtomicBoolean(false);</span>
+<span class="fc" id="L34">    AtomicLong nodeRefApproxOffset = new AtomicLong(-1);</span>
+<span class="fc" id="L35">    checkList.add(getMtasTreeItem(ref, isSinglePoint, isStoreAdditonalId,</span>
+        nodeRefApproxOffset, in, objectRefApproxOffset));
+<span class="fc" id="L37">    ArrayList&lt;Long&gt; history = new ArrayList&lt;Long&gt;();</span>
+    do {
+<span class="fc" id="L39">      MtasTreeItem checkItem = checkList.remove(checkList.size() - 1);</span>
+<span class="fc" id="L40">      advanceMtasTree(checkItem, position, in, isSinglePoint,</span>
+          isStoreAdditonalId, objectRefApproxOffset, list, nodeRefApproxOffset,
+          checkList);
+<span class="fc" id="L43">      history.add(checkItem.ref);</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">      if (history.size() &gt; 1000) {</span>
+<span class="nc" id="L45">        throw new IOException(</span>
+            &quot;ADVANCE &quot; + position + &quot; &quot; + checkList + &quot;\n&quot; + history);
+      }
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    } while (checkList.size() &gt; 0);</span>
+<span class="fc" id="L49">    return list;</span>
+  }
+
+  /**
+   * Advance mtas tree.
+   *
+   * @param treeItem the tree item
+   * @param position the position
+   * @param in the in
+   * @param isSinglePoint the is single point
+   * @param isStoreAdditionalId the is store additional id
+   * @param objectRefApproxOffset the object ref approx offset
+   * @param list the list
+   * @param nodeRefApproxOffset the node ref approx offset
+   * @param checkList the check list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private static void advanceMtasTree(MtasTreeItem treeItem, int position,
+      IndexInput in, AtomicBoolean isSinglePoint,
+      AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
+      ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list, AtomicLong nodeRefApproxOffset,
+      ArrayList&lt;MtasTreeItem&gt; checkList) throws IOException {
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (position &lt;= treeItem.max) {</span>
+      // check current node
+<span class="fc bfc" id="L73" title="All 2 branches covered.">      if (position &lt;= treeItem.left) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (list.size() &gt; 0) {</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">          if (list.get(0).startPosition &gt; treeItem.left) {</span>
+<span class="fc" id="L76">            list.clear();</span>
+          }
+        }
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        for (int i = 0; i &lt; treeItem.objectRefs.length; i++) {</span>
+<span class="pc bpc" id="L80" title="2 of 4 branches missed.">          list.add(new MtasTreeHit&lt;&gt;(treeItem.left, treeItem.right,</span>
+              treeItem.objectRefs[i],
+              treeItem.additionalIds == null ? 0 : treeItem.additionalIds[i],
+              treeItem.additionalRefs == null ? 0
+                  : treeItem.additionalRefs[i]));
+        }
+        // check leftChild
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (!treeItem.leftChild.equals(treeItem.ref)) {</span>
+<span class="fc" id="L88">          MtasTreeItem treeItemLeft = getMtasTreeItem(treeItem.leftChild,</span>
+              isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
+              objectRefApproxOffset);
+<span class="fc bfc" id="L91" title="All 2 branches covered.">          if (position &lt;= treeItemLeft.max) {</span>
+<span class="fc" id="L92">            checkList.add(treeItemLeft);</span>
+          }
+<span class="fc" id="L94">        }</span>
+      } else {
+        // check right
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (position &lt;= treeItem.max) {</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">          if (!treeItem.rightChild.equals(treeItem.ref)) {</span>
+<span class="fc" id="L99">            MtasTreeItem treeItemRight = getMtasTreeItem(treeItem.rightChild,</span>
+                isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
+                objectRefApproxOffset);
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            if (position &lt;= treeItemRight.max) {</span>
+<span class="fc" id="L103">              checkList.add(treeItemRight);</span>
+            }
+          }
+        }
+      }
+    }
+<span class="fc" id="L109">  }</span>
+
+  /**
+   * Search mtas tree.
+   *
+   * @param position the position
+   * @param in the in
+   * @param ref the ref
+   * @param objectRefApproxOffset the object ref approx offset
+   * @return the array list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public static ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; searchMtasTree(int position,
+      IndexInput in, long ref, long objectRefApproxOffset) throws IOException {
+<span class="fc" id="L123">    return searchMtasTree(position, position, in, ref, objectRefApproxOffset);</span>
+  }
+
+  /**
+   * Search mtas tree.
+   *
+   * @param startPosition the start position
+   * @param endPosition the end position
+   * @param in the in
+   * @param ref the ref
+   * @param objectRefApproxOffset the object ref approx offset
+   * @return the array list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public static ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; searchMtasTree(int startPosition,
+      int endPosition, IndexInput in, long ref, long objectRefApproxOffset)
+      throws IOException {
+<span class="fc" id="L140">    int boundary = 1000 + 10 * (endPosition - startPosition);</span>
+<span class="fc" id="L141">    ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list = new ArrayList&lt;MtasTreeHit&lt;?&gt;&gt;();</span>
+<span class="fc" id="L142">    ArrayList&lt;MtasTreeItem&gt; checkList = new ArrayList&lt;MtasTreeItem&gt;();</span>
+<span class="fc" id="L143">    AtomicBoolean isSinglePoint = new AtomicBoolean(false);</span>
+<span class="fc" id="L144">    AtomicBoolean isStoreAdditionalId = new AtomicBoolean(false);</span>
+<span class="fc" id="L145">    AtomicLong nodeRefApproxOffset = new AtomicLong(-1);</span>
+<span class="fc" id="L146">    checkList.add(getMtasTreeItem(ref, isSinglePoint, isStoreAdditionalId,</span>
+        nodeRefApproxOffset, in, objectRefApproxOffset));
+<span class="fc" id="L148">    ArrayList&lt;Long&gt; history = new ArrayList&lt;Long&gt;();</span>
+    do {
+<span class="fc" id="L150">      MtasTreeItem checkItem = checkList.remove(checkList.size() - 1);      </span>
+<span class="fc" id="L151">      searchMtasTree(checkItem, startPosition, endPosition, in, isSinglePoint,</span>
+          isStoreAdditionalId, objectRefApproxOffset, list, nodeRefApproxOffset,
+          checkList);
+<span class="fc" id="L154">      history.add(checkItem.ref);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">      if (history.size() &gt; boundary) {</span>
+<span class="nc" id="L156">        throw new IOException(&quot;Too many items collected from tree&quot;);</span>
+      }
+<span class="fc bfc" id="L158" title="All 2 branches covered.">    } while (checkList.size() &gt; 0);</span>
+<span class="fc" id="L159">    return list;</span>
+  }
+
+  /**
+   * Search mtas tree.
+   *
+   * @param treeItem the tree item
+   * @param startPosition the start position
+   * @param endPosition the end position
+   * @param in the in
+   * @param isSinglePoint the is single point
+   * @param isStoreAdditionalId the is store additional id
+   * @param objectRefApproxOffset the object ref approx offset
+   * @param list the list
+   * @param nodeRefApproxOffset the node ref approx offset
+   * @param checkList the check list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private static void searchMtasTree(MtasTreeItem treeItem, int startPosition,
+      int endPosition, IndexInput in, AtomicBoolean isSinglePoint,
+      AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
+      ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list, AtomicLong nodeRefApproxOffset,
+      ArrayList&lt;MtasTreeItem&gt; checkList) throws IOException {
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (startPosition &lt;= treeItem.max) {      </span>
+      // match current node
+<span class="pc bpc" id="L184" title="1 of 4 branches missed.">      if ((endPosition &gt;= treeItem.left) &amp;&amp; (startPosition &lt;= treeItem.right)) {</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">        for (int i = 0; i &lt; treeItem.objectRefs.length; i++) {</span>
+<span class="pc bpc" id="L186" title="2 of 4 branches missed.">          list.add(new MtasTreeHit&lt;&gt;(treeItem.left, treeItem.right,</span>
+              treeItem.objectRefs[i],
+              treeItem.additionalIds == null ? 0 : treeItem.additionalIds[i],
+              treeItem.additionalRefs == null ? 0
+                  : treeItem.additionalRefs[i]));
+        }
+      }
+      // check leftChild
+<span class="fc bfc" id="L194" title="All 2 branches covered.">      if (!treeItem.leftChild.equals(treeItem.ref)) {</span>
+<span class="fc" id="L195">        MtasTreeItem treeItemLeft = getMtasTreeItem(treeItem.leftChild,</span>
+            isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
+            objectRefApproxOffset);
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        if (treeItemLeft.max &gt;= startPosition) {</span>
+<span class="fc" id="L199">          checkList.add(treeItemLeft);</span>
+        }
+      }
+      // check rightChild
+<span class="fc bfc" id="L203" title="All 2 branches covered.">      if (treeItem.left &lt;= endPosition) {</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (!treeItem.rightChild.equals(treeItem.ref)) {</span>
+<span class="nc" id="L205">          MtasTreeItem treeItemRight = getMtasTreeItem(treeItem.rightChild,</span>
+              isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
+              objectRefApproxOffset);
+<span class="nc bnc" id="L208" title="All 4 branches missed.">          if ((treeItemRight.left &gt;= endPosition)</span>
+              || (treeItemRight.max &gt;= startPosition)) {
+<span class="nc" id="L210">            checkList.add(treeItemRight);</span>
+          }
+        }
+      }
+    }
+<span class="fc" id="L215">  }</span>
+
+  /**
+   * Gets the mtas tree item.
+   *
+   * @param ref the ref
+   * @param isSinglePoint the is single point
+   * @param isStoreAdditionalIdAndRef the is store additional id and ref
+   * @param nodeRefApproxOffset the node ref approx offset
+   * @param in the in
+   * @param objectRefApproxOffset the object ref approx offset
+   * @return the mtas tree item
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private static MtasTreeItem getMtasTreeItem(Long ref,
+      AtomicBoolean isSinglePoint, AtomicBoolean isStoreAdditionalIdAndRef,
+      AtomicLong nodeRefApproxOffset, IndexInput in, long objectRefApproxOffset)
+      throws IOException {
+    try {
+<span class="fc" id="L234">      Boolean isRoot = false;</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">      if (nodeRefApproxOffset.get() &lt; 0) {</span>
+<span class="fc" id="L236">        isRoot = true;</span>
+      }
+<span class="fc" id="L238">      in.seek(ref);</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">      if (isRoot) {</span>
+<span class="fc" id="L240">        nodeRefApproxOffset.set(in.readVLong());</span>
+<span class="fc" id="L241">        Byte flag = in.readByte();</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        if ((flag</span>
+            &amp; MtasTree.SINGLE_POSITION_TREE) == MtasTree.SINGLE_POSITION_TREE) {
+<span class="fc" id="L244">          isSinglePoint.set(true);</span>
+        }
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        if ((flag</span>
+            &amp; MtasTree.STORE_ADDITIONAL_ID) == MtasTree.STORE_ADDITIONAL_ID) {
+<span class="fc" id="L248">          isStoreAdditionalIdAndRef.set(true);</span>
+        }
+      }
+<span class="fc" id="L251">      int left = in.readVInt();</span>
+<span class="fc" id="L252">      int right = in.readVInt();</span>
+<span class="fc" id="L253">      int max = in.readVInt();</span>
+<span class="fc" id="L254">      Long leftChild = in.readVLong() + nodeRefApproxOffset.get();</span>
+<span class="fc" id="L255">      Long rightChild = in.readVLong() + nodeRefApproxOffset.get();</span>
+<span class="fc" id="L256">      int size = 1;</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">      if (!isSinglePoint.get()) {</span>
+<span class="fc" id="L258">        size = in.readVInt();</span>
+      }
+      // initialize
+<span class="fc" id="L261">      long[] objectRefs = new long[size];</span>
+<span class="fc" id="L262">      int[] objectAdditionalIds = null;</span>
+<span class="fc" id="L263">      long[] objectAdditionalRefs = null;</span>
+      // get first
+<span class="fc" id="L265">      long objectRef = in.readVLong();</span>
+<span class="fc" id="L266">      long objectRefPrevious = objectRef + objectRefApproxOffset;</span>
+<span class="fc" id="L267">      objectRefs[0] = objectRefPrevious;</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">      if (isStoreAdditionalIdAndRef.get()) {</span>
+<span class="fc" id="L269">        objectAdditionalIds = new int[size];</span>
+<span class="fc" id="L270">        objectAdditionalRefs = new long[size];</span>
+<span class="fc" id="L271">        objectAdditionalIds[0] = in.readVInt();</span>
+<span class="fc" id="L272">        objectAdditionalRefs[0] = in.readVLong();</span>
+      }
+      // get others
+<span class="fc bfc" id="L275" title="All 2 branches covered.">      for (int t = 1; t &lt; size; t++) {</span>
+<span class="fc" id="L276">        objectRef = objectRefPrevious + in.readVLong();</span>
+<span class="fc" id="L277">        objectRefs[t] = objectRef;</span>
+<span class="fc" id="L278">        objectRefPrevious = objectRef;</span>
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">        if (isStoreAdditionalIdAndRef.get()) {</span>
+<span class="fc" id="L280">          objectAdditionalIds[t] = in.readVInt();</span>
+<span class="fc" id="L281">          objectAdditionalRefs[t] = in.readVLong();</span>
+        }
+      }
+<span class="fc" id="L284">      return new MtasTreeItem(left, right, max, objectRefs, objectAdditionalIds,</span>
+          objectAdditionalRefs, ref, leftChild, rightChild);
+<span class="nc" id="L286">    } catch (Exception e) {</span>
+<span class="nc" id="L287">      throw new IOException(e.getMessage());</span>
+    }
+  }
+
+  /**
+   * The Class MtasTreeItem.
+   */
+  private static class MtasTreeItem {
+
+    /** The max. */
+    public int left, right, max;
+
+    /** The object refs. */
+    public long[] objectRefs;
+
+    /** The additional ids. */
+    public int[] additionalIds;
+
+    /** The additional refs. */
+    public long[] additionalRefs;
+
+    /** The right child. */
+    public Long ref, leftChild, rightChild;
+
+    /**
+     * Instantiates a new mtas tree item.
+     *
+     * @param left the left
+     * @param right the right
+     * @param max the max
+     * @param objectRefs the object refs
+     * @param additionalIds the additional ids
+     * @param additionalRefs the additional refs
+     * @param ref the ref
+     * @param leftChild the left child
+     * @param rightChild the right child
+     */
+    public MtasTreeItem(int left, int right, int max, long[] objectRefs,
+        int[] additionalIds, long[] additionalRefs, Long ref, Long leftChild,
+<span class="fc" id="L326">        Long rightChild) {</span>
+<span class="fc" id="L327">      this.left = left;</span>
+<span class="fc" id="L328">      this.right = right;</span>
+<span class="fc" id="L329">      this.max = max;</span>
+<span class="fc" id="L330">      this.objectRefs = objectRefs;</span>
+<span class="fc" id="L331">      this.additionalIds = additionalIds;</span>
+<span class="fc" id="L332">      this.additionalRefs = additionalRefs;</span>
+<span class="fc" id="L333">      this.ref = ref;</span>
+<span class="fc" id="L334">      this.leftChild = leftChild;</span>
+<span class="fc" id="L335">      this.rightChild = rightChild;</span>
+<span class="fc" id="L336">    }</span>
+  }
+
+  /**
+   * The Class MtasTreeHit.
+   *
+   * @param &lt;T&gt; the generic type
+   */
+  public static class MtasTreeHit&lt;T&gt; {
+
+    /** The start position. */
+    public int startPosition;
+
+    /** The end position. */
+    public int endPosition;
+
+    /** The ref. */
+    public long ref;
+
+    /** The additional id. */
+    public int additionalId;
+
+    /** The additional ref. */
+    public long additionalRef;
+
+    /** The ref data. */
+    public T data, idData, refData;
+
+    /**
+     * Instantiates a new mtas tree hit.
+     *
+     * @param startPosition the start position
+     * @param endPosition the end position
+     * @param ref the ref
+     * @param additionalId the additional id
+     * @param additionalRef the additional ref
+     */
+    public MtasTreeHit(int startPosition, int endPosition, long ref,
+<span class="fc" id="L374">        int additionalId, long additionalRef) {</span>
+<span class="fc" id="L375">      this.startPosition = startPosition;</span>
+<span class="fc" id="L376">      this.endPosition = endPosition;</span>
+<span class="fc" id="L377">      this.ref = ref;</span>
+<span class="fc" id="L378">      this.additionalId = additionalId;</span>
+<span class="fc" id="L379">      this.additionalRef = additionalRef;</span>
+<span class="fc" id="L380">      data = null;</span>
+<span class="fc" id="L381">      idData = null;</span>
+<span class="fc" id="L382">      refData = null;</span>
+<span class="fc" id="L383">    }</span>
+
+    /**
+     * Instantiates a new mtas tree hit.
+     *
+     * @param startPosition the start position
+     * @param endPosition the end position
+     * @param ref the ref
+     * @param additionalId the additional id
+     * @param additionalRef the additional ref
+     * @param data the data
+     */
+    public MtasTreeHit(int startPosition, int endPosition, long ref,
+        int additionalId, long additionalRef, T data) {
+<span class="nc" id="L397">      this(startPosition, endPosition, ref, additionalId, additionalRef);</span>
+<span class="nc" id="L398">      this.data = data;</span>
+<span class="nc" id="L399">      this.idData = null;</span>
+<span class="nc" id="L400">      this.refData = null;</span>
+<span class="nc" id="L401">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L410">      return &quot;hit[&quot; + startPosition + &quot;,&quot; + endPosition + &quot;,&quot; + ref + &quot;,&quot;</span>
+          + additionalId + &quot;,&quot; + additionalRef + &quot;] - &quot; + idData + &quot; - &quot;
+          + refData;
+    }
+  }
+
+  /**
+   * Search mtas tree with interval tree.
+   *
+   * @param &lt;T&gt; the generic type
+   * @param &lt;N&gt; the number type
+   * @param additionalIds the additional ids
+   * @param intervalTree the interval tree
+   * @param in the in
+   * @param ref the ref
+   * @param objectRefApproxOffset the object ref approx offset
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public static &lt;T, N extends IntervalTreeNode&lt;T, N&gt;&gt; void searchMtasTreeWithIntervalTree(
+      Collection&lt;Integer&gt; additionalIds, IntervalTree&lt;T, N&gt; intervalTree,
+      IndexInput in, long ref, long objectRefApproxOffset) throws IOException {
+<span class="fc" id="L431">    ArrayList&lt;IntervalItem&lt;T, N&gt;&gt; checkList = new ArrayList&lt;IntervalItem&lt;T, N&gt;&gt;();</span>
+<span class="fc" id="L432">    AtomicBoolean isSinglePoint = new AtomicBoolean(false);</span>
+<span class="fc" id="L433">    AtomicBoolean isStoreAdditionalId = new AtomicBoolean(false);</span>
+<span class="fc" id="L434">    AtomicLong nodeRefApproxOffset = new AtomicLong(-1);</span>
+<span class="fc" id="L435">    checkList.add(new IntervalItem&lt;T, N&gt;(</span>
+<span class="fc" id="L436">        getMtasTreeItem(ref, isSinglePoint, isStoreAdditionalId,</span>
+            nodeRefApproxOffset, in, objectRefApproxOffset),
+<span class="fc" id="L438">        intervalTree.getRoot()));</span>
+    do {
+<span class="fc" id="L440">      IntervalItem&lt;T, N&gt; checkItem = checkList.remove(checkList.size() - 1);</span>
+<span class="fc" id="L441">      searchMtasTreeWithIntervalTree(additionalIds, checkItem, in,</span>
+          isSinglePoint, isStoreAdditionalId, objectRefApproxOffset,
+          nodeRefApproxOffset, checkList);
+<span class="fc bfc" id="L444" title="All 2 branches covered.">    } while (checkList.size() &gt; 0);</span>
+<span class="fc" id="L445">  }</span>
+
+  /**
+   * Search mtas tree with interval tree.
+   *
+   * @param &lt;T&gt; the generic type
+   * @param &lt;N&gt; the number type
+   * @param additionalIds the additional ids
+   * @param checkItem the check item
+   * @param in the in
+   * @param isSinglePoint the is single point
+   * @param isStoreAdditionalId the is store additional id
+   * @param objectRefApproxOffset the object ref approx offset
+   * @param nodeRefApproxOffset the node ref approx offset
+   * @param checkList the check list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private static &lt;T, N extends IntervalTreeNode&lt;T, N&gt;&gt; void searchMtasTreeWithIntervalTree(
+      Collection&lt;Integer&gt; additionalIds, IntervalItem&lt;T, N&gt; checkItem,
+      IndexInput in, AtomicBoolean isSinglePoint,
+      AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
+      AtomicLong nodeRefApproxOffset, ArrayList&lt;IntervalItem&lt;T, N&gt;&gt; checkList)
+      throws IOException {
+<span class="fc" id="L468">    MtasTreeItem treeItem = checkItem.mtasTreeItem;</span>
+<span class="fc" id="L469">    IntervalTreeNode&lt;T, N&gt; intervalTreeNode = checkItem.intervalTreeNode;</span>
+<span class="fc bfc" id="L470" title="All 2 branches covered.">    if (intervalTreeNode.min &lt;= treeItem.max) {</span>
+      // advance intervalTree
+<span class="fc bfc" id="L472" title="All 2 branches covered.">      while (intervalTreeNode.left &gt; treeItem.max) {</span>
+<span class="pc bpc" id="L473" title="1 of 2 branches missed.">        if (intervalTreeNode.rightChild == null) {</span>
+<span class="nc bnc" id="L474" title="All 2 branches missed.">          if (intervalTreeNode.leftChild == null) {</span>
+<span class="nc" id="L475">            return;</span>
+          } else {
+<span class="nc" id="L477">            intervalTreeNode = intervalTreeNode.leftChild;</span>
+          }
+<span class="pc bpc" id="L479" title="1 of 2 branches missed.">        } else if (intervalTreeNode.leftChild == null) {</span>
+<span class="nc" id="L480">          intervalTreeNode = intervalTreeNode.rightChild;</span>
+        } else {
+<span class="pc bpc" id="L482" title="1 of 2 branches missed.">          if (intervalTreeNode.rightChild.min &gt; treeItem.max) {</span>
+<span class="fc" id="L483">            intervalTreeNode = intervalTreeNode.leftChild;</span>
+          } else {
+            break;
+          }
+        }
+      }
+      // find intervals matching current node
+<span class="fc" id="L490">      searchMtasTreeItemWithIntervalTree(additionalIds, treeItem,</span>
+          intervalTreeNode);
+      // check leftChild
+<span class="fc bfc" id="L493" title="All 2 branches covered.">      if (!treeItem.leftChild.equals(treeItem.ref)) {</span>
+<span class="fc" id="L494">        MtasTreeItem treeItemLeft = getMtasTreeItem(treeItem.leftChild,</span>
+            isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
+            objectRefApproxOffset);
+<span class="fc" id="L497">        checkList.add(new IntervalItem&lt;T, N&gt;(treeItemLeft, intervalTreeNode));</span>
+      }
+      // check rightChild
+<span class="fc bfc" id="L500" title="All 2 branches covered.">      if (!treeItem.rightChild.equals(treeItem.ref)) {</span>
+<span class="fc" id="L501">        MtasTreeItem treeItemRight = getMtasTreeItem(treeItem.rightChild,</span>
+            isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
+            objectRefApproxOffset);
+<span class="fc" id="L504">        checkList.add(new IntervalItem&lt;T, N&gt;(treeItemRight, intervalTreeNode));</span>
+      }
+    }
+<span class="fc" id="L507">  }</span>
+
+  /**
+   * Search mtas tree item with interval tree.
+   *
+   * @param &lt;T&gt; the generic type
+   * @param &lt;N&gt; the number type
+   * @param additionalIds the additional ids
+   * @param treeItem the tree item
+   * @param intervalTreeNode the interval tree node
+   */
+  private static &lt;T, N extends IntervalTreeNode&lt;T, N&gt;&gt; void searchMtasTreeItemWithIntervalTree(
+      Collection&lt;Integer&gt; additionalIds, MtasTreeItem treeItem,
+      IntervalTreeNode&lt;T, N&gt; intervalTreeNode) {
+<span class="fc" id="L521">    ArrayList&lt;IntervalTreeNode&lt;T, N&gt;&gt; checkList = new ArrayList&lt;IntervalTreeNode&lt;T, N&gt;&gt;();</span>
+<span class="fc" id="L522">    checkList.add(intervalTreeNode);</span>
+    do {
+<span class="fc" id="L524">      IntervalTreeNode&lt;T, N&gt; checkItem = checkList.remove(checkList.size() - 1);</span>
+<span class="fc" id="L525">      searchMtasTreeItemWithIntervalTree(additionalIds, checkItem,</span>
+          treeItem.left, treeItem.right, treeItem.objectRefs,
+          treeItem.additionalIds, treeItem.additionalRefs, checkList);
+<span class="fc bfc" id="L528" title="All 2 branches covered.">    } while (checkList.size() &gt; 0);</span>
+<span class="fc" id="L529">  }</span>
+
+  /**
+   * Search mtas tree item with interval tree.
+   *
+   * @param &lt;T&gt; the generic type
+   * @param &lt;N&gt; the number type
+   * @param requiredAdditionalIds the required additional ids
+   * @param intervalTreeItem the interval tree item
+   * @param startPosition the start position
+   * @param endPosition the end position
+   * @param refs the refs
+   * @param additionalIds the additional ids
+   * @param additionalRefs the additional refs
+   * @param checkList the check list
+   */
+  private static &lt;T, N extends IntervalTreeNode&lt;T, N&gt;&gt; void searchMtasTreeItemWithIntervalTree(
+      Collection&lt;Integer&gt; requiredAdditionalIds,
+      IntervalTreeNode&lt;T, N&gt; intervalTreeItem, int startPosition,
+      int endPosition, long[] refs, int[] additionalIds, long[] additionalRefs,
+      ArrayList&lt;IntervalTreeNode&lt;T, N&gt;&gt; checkList) {
+<span class="fc bfc" id="L550" title="All 2 branches covered.">    if (startPosition &lt;= intervalTreeItem.max) {</span>
+      // match current node
+<span class="fc bfc" id="L552" title="All 4 branches covered.">      if ((endPosition &gt;= intervalTreeItem.left)</span>
+          &amp;&amp; (startPosition &lt;= intervalTreeItem.right)) {
+        // System.out.print(&quot;[&quot; + startPosition + &quot;-&quot; + endPosition + &quot;] &quot;);
+<span class="pc bpc" id="L555" title="2 of 4 branches missed.">        if (requiredAdditionalIds == null || additionalIds == null) {</span>
+<span class="nc bnc" id="L556" title="All 2 branches missed.">          for (int i = 0; i &lt; refs.length; i++) {</span>
+<span class="nc" id="L557">            MtasTreeHit&lt;T&gt; hit = new MtasTreeHit&lt;T&gt;(startPosition, endPosition,</span>
+                refs[i], 0, 0);
+<span class="nc bnc" id="L559" title="All 2 branches missed.">            for (ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list : intervalTreeItem.lists) {</span>
+<span class="nc" id="L560">              list.add(hit);</span>
+<span class="nc" id="L561">            }</span>
+          }
+        } else {
+<span class="fc bfc" id="L564" title="All 2 branches covered.">          for (int i = 0; i &lt; refs.length; i++) {</span>
+<span class="fc" id="L565">            MtasTreeHit&lt;T&gt; hit = new MtasTreeHit&lt;T&gt;(startPosition, endPosition,</span>
+                refs[i], additionalIds[i], additionalRefs[i]);
+<span class="fc bfc" id="L567" title="All 2 branches covered.">            for (ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list : intervalTreeItem.lists) {</span>
+<span class="fc bfc" id="L568" title="All 2 branches covered.">              if (requiredAdditionalIds.contains(hit.additionalId)) {</span>
+<span class="fc" id="L569">                list.add(hit);</span>
+              }
+<span class="fc" id="L571">            }</span>
+          }
+        }
+      }
+      // check leftChild
+<span class="fc bfc" id="L576" title="All 2 branches covered.">      if (intervalTreeItem.leftChild != null) {</span>
+<span class="fc" id="L577">        IntervalTreeNode&lt;T, N&gt; treeItemLeft = intervalTreeItem.leftChild;</span>
+<span class="fc bfc" id="L578" title="All 2 branches covered.">        if (treeItemLeft.max &gt;= startPosition) {</span>
+<span class="fc" id="L579">          checkList.add(treeItemLeft);</span>
+        }
+      }
+      // check rightChild
+<span class="fc bfc" id="L583" title="All 2 branches covered.">      if (intervalTreeItem.left &lt; endPosition) {</span>
+<span class="fc bfc" id="L584" title="All 2 branches covered.">        if (intervalTreeItem.rightChild != null) {</span>
+<span class="fc" id="L585">          IntervalTreeNode&lt;T, N&gt; treeItemRight = intervalTreeItem.rightChild;</span>
+<span class="pc bpc" id="L586" title="1 of 4 branches missed.">          if ((treeItemRight.left &gt;= endPosition)</span>
+              || (treeItemRight.max &gt;= startPosition)) {
+<span class="fc" id="L588">            checkList.add(treeItemRight);</span>
+          }
+        }
+      }
+    }
+
+<span class="fc" id="L594">  }</span>
+
+  /**
+   * The Class IntervalItem.
+   *
+   * @param &lt;T&gt; the generic type
+   * @param &lt;N&gt; the number type
+   */
+<span class="nc" id="L602">  private static class IntervalItem&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&gt; {</span>
+
+    /** The mtas tree item. */
+    public MtasTreeItem mtasTreeItem;
+
+    /** The interval tree node. */
+    public IntervalTreeNode&lt;T, N&gt; intervalTreeNode;
+
+    /**
+     * Instantiates a new interval item.
+     *
+     * @param mtasTreeItem the mtas tree item
+     * @param intervalTreeNode the interval tree node
+     */
+    public IntervalItem(MtasTreeItem mtasTreeItem,
+<span class="fc" id="L617">        IntervalTreeNode&lt;T, N&gt; intervalTreeNode) {</span>
+<span class="fc" id="L618">      this.mtasTreeItem = mtasTreeItem;</span>
+<span class="fc" id="L619">      this.intervalTreeNode = intervalTreeNode;</span>
+<span class="fc" id="L620">    }</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

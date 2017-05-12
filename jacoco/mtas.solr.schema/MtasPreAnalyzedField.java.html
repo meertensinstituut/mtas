@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasPreAnalyzedField.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.schema</a> &gt; <span class="el_source">MtasPreAnalyzedField.java</span></div><h1>MtasPreAnalyzedField.java</h1><pre class="source lang-java linenums">package mtas.solr.schema;
+
+import java.util.Map;
+
+import org.apache.solr.schema.IndexSchema;
+import org.apache.solr.schema.PreAnalyzedField;
+
+/**
+ * The Class MtasPreAnalyzedField.
+ */
+<span class="nc" id="L11">public class MtasPreAnalyzedField extends PreAnalyzedField {</span>
+
+  /** The follow index analyzer. */
+<span class="nc" id="L14">  private static String FOLLOW_INDEX_ANALYZER = &quot;followIndexAnalyzer&quot;;</span>
+
+  /** The default configuration. */
+<span class="nc" id="L17">  private static String DEFAULT_CONFIGURATION = &quot;defaultConfiguration&quot;;</span>
+
+  /** The configuration from field. */
+<span class="nc" id="L20">  private static String CONFIGURATION_FROM_FIELD = &quot;configurationFromField&quot;;</span>
+
+  /** The set number of tokens. */
+<span class="nc" id="L23">  private static String SET_NUMBER_OF_TOKENS = &quot;setNumberOfTokens&quot;;</span>
+
+  /** The set number of positions. */
+<span class="nc" id="L26">  private static String SET_NUMBER_OF_POSITIONS = &quot;setNumberOfPositions&quot;;</span>
+
+  /** The set size. */
+<span class="nc" id="L29">  private static String SET_SIZE = &quot;setSize&quot;;</span>
+
+  /** The set error. */
+<span class="nc" id="L32">  private static String SET_ERROR = &quot;setError&quot;;</span>
+
+  /** The follow index analyzer. */
+<span class="nc" id="L35">  public String followIndexAnalyzer = null;</span>
+
+  /** The default configuration. */
+<span class="nc" id="L38">  public String defaultConfiguration = null;</span>
+
+  /** The configuration from field. */
+<span class="nc" id="L41">  public String configurationFromField = null;</span>
+
+  /** The set number of tokens. */
+<span class="nc" id="L44">  public String setNumberOfTokens = null;</span>
+
+  /** The set number of positions. */
+<span class="nc" id="L47">  public String setNumberOfPositions = null;</span>
+
+  /** The set size. */
+<span class="nc" id="L50">  public String setSize = null;</span>
+
+  /** The set error. */
+<span class="nc" id="L53">  public String setError = null;</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.solr.schema.PreAnalyzedField#init(org.apache.solr.schema.
+   * IndexSchema, java.util.Map)
+   */
+  @Override
+  public void init(IndexSchema schema, Map&lt;String, String&gt; args) {
+<span class="nc" id="L63">    args.put(PARSER_IMPL, MtasPreAnalyzedParser.class.getName());</span>
+<span class="nc" id="L64">    super.init(schema, args);</span>
+<span class="nc" id="L65">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.solr.schema.FieldType#setArgs(org.apache.solr.schema.
+   * IndexSchema, java.util.Map)
+   */
+  @Override
+  protected void setArgs(IndexSchema schema, Map&lt;String, String&gt; args) {
+<span class="nc" id="L75">    followIndexAnalyzer = args.get(FOLLOW_INDEX_ANALYZER);</span>
+<span class="nc" id="L76">    defaultConfiguration = args.get(DEFAULT_CONFIGURATION);</span>
+<span class="nc" id="L77">    configurationFromField = args.get(CONFIGURATION_FROM_FIELD);</span>
+<span class="nc" id="L78">    setNumberOfTokens = args.get(SET_NUMBER_OF_TOKENS);</span>
+<span class="nc" id="L79">    setNumberOfPositions = args.get(SET_NUMBER_OF_POSITIONS);</span>
+<span class="nc" id="L80">    setSize = args.get(SET_SIZE);</span>
+<span class="nc" id="L81">    setError = args.get(SET_ERROR);</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">    if (followIndexAnalyzer == null) {</span>
+<span class="nc" id="L83">      throw new RuntimeException(&quot;No &quot; + FOLLOW_INDEX_ANALYZER</span>
+<span class="nc" id="L84">          + &quot; for fieldType &quot; + this.getTypeName());</span>
+    }
+<span class="nc" id="L86">    args.remove(FOLLOW_INDEX_ANALYZER);</span>
+<span class="nc" id="L87">    args.remove(DEFAULT_CONFIGURATION);</span>
+<span class="nc" id="L88">    args.remove(CONFIGURATION_FROM_FIELD);</span>
+<span class="nc" id="L89">    args.remove(SET_NUMBER_OF_TOKENS);</span>
+<span class="nc" id="L90">    args.remove(SET_NUMBER_OF_POSITIONS);</span>
+<span class="nc" id="L91">    args.remove(SET_ERROR);</span>
+<span class="nc" id="L92">    args.remove(SET_SIZE);</span>
+<span class="nc" id="L93">    super.setArgs(schema, args);</span>
+<span class="nc" id="L94">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrComponentGroup.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.handler.component.util</a> &gt; <span class="el_source">MtasSolrComponentGroup.java</span></div><h1>MtasSolrComponentGroup.java</h1><pre class="source lang-java linenums">package mtas.solr.handler.component.util;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.handler.component.ResponseBuilder;
+import org.apache.solr.handler.component.SearchComponent;
+import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.handler.component.ShardResponse;
+
+import mtas.codec.util.CodecComponent.ComponentField;
+import mtas.codec.util.CodecComponent.ComponentFields;
+import mtas.codec.util.CodecComponent.ComponentGroup;
+import mtas.search.spans.util.MtasSpanQuery;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
+
+/**
+ * The Class MtasSolrComponentGroup.
+ */
+public class MtasSolrComponentGroup
+    implements MtasSolrComponent&lt;ComponentGroup&gt; {
+
+  /** The log. */
+<span class="fc" id="L34">  private static Log log = LogFactory.getLog(MtasSolrComponentGroup.class);</span>
+
+  /** The search component. */
+  MtasSolrSearchComponent searchComponent;
+
+  /** The Constant PARAM_MTAS_GROUP. */
+  public static final String PARAM_MTAS_GROUP = MtasSolrSearchComponent.PARAM_MTAS
+      + &quot;.group&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_FIELD. */
+  public static final String NAME_MTAS_GROUP_FIELD = &quot;field&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_TYPE. */
+  public static final String NAME_MTAS_GROUP_QUERY_TYPE = &quot;query.type&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_VALUE. */
+  public static final String NAME_MTAS_GROUP_QUERY_VALUE = &quot;query.value&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_PREFIX. */
+  public static final String NAME_MTAS_GROUP_QUERY_PREFIX = &quot;query.prefix&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_IGNORE. */
+  public static final String NAME_MTAS_GROUP_QUERY_IGNORE = &quot;query.ignore&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH. */
+  public static final String NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH = &quot;query.maximumIgnoreLength&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_VARIABLE. */
+  public static final String NAME_MTAS_GROUP_QUERY_VARIABLE = &quot;query.variable&quot;;
+
+  /** The Constant SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME. */
+  public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME = &quot;name&quot;;
+
+  /** The Constant SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE. */
+  public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE = &quot;value&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_KEY. */
+  public static final String NAME_MTAS_GROUP_KEY = &quot;key&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_NUMBER. */
+  public static final String NAME_MTAS_GROUP_NUMBER = &quot;number&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_LEFT. */
+  public static final String NAME_MTAS_GROUP_GROUPING_LEFT = &quot;grouping.left&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_RIGHT. */
+  public static final String NAME_MTAS_GROUP_GROUPING_RIGHT = &quot;grouping.right&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE. */
+  public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE = &quot;grouping.hit.inside&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_LEFT. */
+  public static final String NAME_MTAS_GROUP_GROUPING_HIT_LEFT = &quot;grouping.hit.left&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_RIGHT. */
+  public static final String NAME_MTAS_GROUP_GROUPING_HIT_RIGHT = &quot;grouping.hit.right&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT. */
+  public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT = &quot;grouping.hit.insideLeft&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT. */
+  public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT = &quot;grouping.hit.insideRight&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_POSITION. */
+  public static final String NAME_MTAS_GROUP_GROUPING_POSITION = &quot;position&quot;;
+
+  /** The Constant NAME_MTAS_GROUP_GROUPING_PREFIXES. */
+  public static final String NAME_MTAS_GROUP_GROUPING_PREFIXES = &quot;prefixes&quot;;
+
+  /** The Constant DEFAULT_NUMBER. */
+  private static final int DEFAULT_NUMBER = 10;
+
+  /**
+   * Instantiates a new mtas solr component group.
+   *
+   * @param searchComponent the search component
+   */
+<span class="fc" id="L111">  public MtasSolrComponentGroup(MtasSolrSearchComponent searchComponent) {</span>
+<span class="fc" id="L112">    this.searchComponent = searchComponent;</span>
+<span class="fc" id="L113">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
+   */
+  public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
+      throws IOException {
+<span class="nc" id="L125">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="nc" id="L126">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="nc" id="L128">      int tmpCounter = 0;</span>
+<span class="nc" id="L129">      String[] fields = new String[ids.size()];</span>
+<span class="nc" id="L130">      String[] queryTypes = new String[ids.size()];</span>
+<span class="nc" id="L131">      String[] queryValues = new String[ids.size()];</span>
+<span class="nc" id="L132">      String[] queryPrefixes = new String[ids.size()];</span>
+<span class="nc" id="L133">      String[] queryIgnores = new String[ids.size()];</span>
+<span class="nc" id="L134">      String[] queryMaximumIgnoreLengths = new String[ids.size()];</span>
+<span class="nc" id="L135">      HashMap&lt;String, String[]&gt;[] queryVariables = new HashMap[ids.size()];</span>
+<span class="nc" id="L136">      String[] keys = new String[ids.size()];</span>
+<span class="nc" id="L137">      String[] numbers = new String[ids.size()];</span>
+<span class="nc" id="L138">      String[][] groupingLeftPosition = new String[ids.size()][];</span>
+<span class="nc" id="L139">      String[][] groupingLeftPrefixes = new String[ids.size()][];</span>
+<span class="nc" id="L140">      String[][] groupingRightPosition = new String[ids.size()][];</span>
+<span class="nc" id="L141">      String[][] groupingRightPrefixes = new String[ids.size()][];</span>
+<span class="nc" id="L142">      String[] groupingHitInsidePrefixes = new String[ids.size()];</span>
+<span class="nc" id="L143">      String[][] groupingHitLeftPosition = new String[ids.size()][];</span>
+<span class="nc" id="L144">      String[][] groupingHitLeftPrefixes = new String[ids.size()][];</span>
+<span class="nc" id="L145">      String[][] groupingHitRightPosition = new String[ids.size()][];</span>
+<span class="nc" id="L146">      String[][] groupingHitRightPrefixes = new String[ids.size()][];</span>
+<span class="nc" id="L147">      String[][] groupingHitInsideLeftPosition = new String[ids.size()][];</span>
+<span class="nc" id="L148">      String[][] groupingHitInsideLeftPrefixes = new String[ids.size()][];</span>
+<span class="nc" id="L149">      String[][] groupingHitInsideRightPosition = new String[ids.size()][];</span>
+<span class="nc" id="L150">      String[][] groupingHitInsideRightPrefixes = new String[ids.size()][];</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">      for (String id : ids) {</span>
+<span class="nc" id="L152">        fields[tmpCounter] = rb.req.getParams().get(</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_FIELD, null);
+<span class="nc" id="L154">        keys[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L155">            .get(PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_KEY,</span>
+<span class="nc" id="L156">                String.valueOf(tmpCounter))</span>
+<span class="nc" id="L157">            .trim();</span>
+<span class="nc" id="L158">        numbers[tmpCounter] = rb.req.getParams().get(</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_NUMBER, null);
+<span class="nc" id="L160">        queryTypes[tmpCounter] = rb.req.getParams().get(</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_TYPE,
+            null);
+<span class="nc" id="L163">        queryValues[tmpCounter] = rb.req.getParams().get(</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_VALUE,
+            null);
+<span class="nc" id="L166">        queryPrefixes[tmpCounter] = rb.req.getParams().get(</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_PREFIX,
+            null);
+<span class="nc" id="L169">        queryIgnores[tmpCounter] = rb.req.getParams().get(</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_IGNORE,
+            null);
+<span class="nc" id="L172">        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L173">            .get(PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH, null);
+<span class="nc" id="L175">        Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L176">            rb.req.getParams(),</span>
+            PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_VARIABLE);
+<span class="nc" id="L178">        queryVariables[tmpCounter] = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (!vIds.isEmpty()) {</span>
+<span class="nc" id="L180">          HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">          for (String vId : vIds) {</span>
+<span class="nc" id="L182">            String name = rb.req.getParams()</span>
+<span class="nc" id="L183">                .get(PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+                    + NAME_MTAS_GROUP_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;
+                    + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME, null);
+<span class="nc bnc" id="L186" title="All 2 branches missed.">            if (name != null) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">              if (!tmpVariables.containsKey(name)) {</span>
+<span class="nc" id="L188">                tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
+              }
+<span class="nc" id="L190">              String value = rb.req.getParams()</span>
+<span class="nc" id="L191">                  .get(PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+                      + NAME_MTAS_GROUP_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;
+                      + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE, null);
+<span class="nc bnc" id="L194" title="All 2 branches missed.">              if (value != null) {</span>
+<span class="nc" id="L195">                ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L196">                String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">                for (int i = 0; i &lt; subList.length; i++) {</span>
+<span class="nc" id="L198">                  list.add(</span>
+<span class="nc" id="L199">                      subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
+                }
+<span class="nc" id="L201">                tmpVariables.get(name).addAll(list);</span>
+              }
+            }
+<span class="nc" id="L204">          }</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">          for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
+<span class="nc" id="L206">              .entrySet()) {</span>
+<span class="nc" id="L207">            queryVariables[tmpCounter].put(entry.getKey(),</span>
+<span class="nc" id="L208">                entry.getValue().toArray(new String[entry.getValue().size()]));</span>
+<span class="nc" id="L209">          }</span>
+        }
+<span class="nc" id="L211">        groupingHitInsidePrefixes[tmpCounter] = null;</span>
+        // collect
+        SortedSet&lt;String&gt; gids;
+        String tmpName;
+        // collect grouping inside
+<span class="nc" id="L216">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE;
+<span class="nc" id="L218">        groupingHitInsidePrefixes[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L219">            .get(tmpName + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_PREFIXES);</span>
+        // collect grouping left
+<span class="nc" id="L221">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_LEFT;
+<span class="nc" id="L223">        gids = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+            tmpName);
+<span class="nc" id="L225">        groupingLeftPosition[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L226">        groupingLeftPrefixes[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L227">        prepare(rb.req.getParams(), gids, tmpName,</span>
+            groupingLeftPosition[tmpCounter], groupingLeftPrefixes[tmpCounter]);
+        // collect grouping right
+<span class="nc" id="L230">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_RIGHT;
+<span class="nc" id="L232">        gids = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+            tmpName);
+<span class="nc" id="L234">        groupingRightPosition[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L235">        groupingRightPrefixes[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L236">        prepare(rb.req.getParams(), gids, tmpName,</span>
+            groupingRightPosition[tmpCounter],
+            groupingRightPrefixes[tmpCounter]);
+        // collect grouping hit left
+<span class="nc" id="L240">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_HIT_LEFT;
+<span class="nc" id="L242">        gids = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+            tmpName);
+<span class="nc" id="L244">        groupingHitLeftPosition[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L245">        groupingHitLeftPrefixes[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L246">        prepare(rb.req.getParams(), gids, tmpName,</span>
+            groupingHitLeftPosition[tmpCounter],
+            groupingHitLeftPrefixes[tmpCounter]);
+        // collect grouping hit right
+<span class="nc" id="L250">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_HIT_RIGHT;
+<span class="nc" id="L252">        gids = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+            tmpName);
+<span class="nc" id="L254">        groupingHitRightPosition[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L255">        groupingHitRightPrefixes[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L256">        prepare(rb.req.getParams(), gids, tmpName,</span>
+            groupingHitRightPosition[tmpCounter],
+            groupingHitRightPrefixes[tmpCounter]);
+        // collect grouping hit inside left
+<span class="nc" id="L260">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT;
+<span class="nc" id="L262">        gids = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+            tmpName);
+<span class="nc" id="L264">        groupingHitInsideLeftPosition[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L265">        groupingHitInsideLeftPrefixes[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L266">        prepare(rb.req.getParams(), gids, tmpName,</span>
+            groupingHitInsideLeftPosition[tmpCounter],
+            groupingHitInsideLeftPrefixes[tmpCounter]);
+        // collect grouping hit inside right
+<span class="nc" id="L270">        tmpName = PARAM_MTAS_GROUP + &quot;.&quot; + id + &quot;.&quot;</span>
+            + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT;
+<span class="nc" id="L272">        gids = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+            tmpName);
+<span class="nc" id="L274">        groupingHitInsideRightPosition[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L275">        groupingHitInsideRightPrefixes[tmpCounter] = new String[gids.size()];</span>
+<span class="nc" id="L276">        prepare(rb.req.getParams(), gids, tmpName,</span>
+            groupingHitInsideRightPosition[tmpCounter],
+            groupingHitInsideRightPrefixes[tmpCounter]);
+
+<span class="nc" id="L280">        tmpCounter++;</span>
+<span class="nc" id="L281">      }</span>
+<span class="nc" id="L282">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="nc" id="L283">      mtasFields.doGroup = true;</span>
+<span class="nc" id="L284">      rb.setNeedDocSet(true);</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">      for (String field : fields) {</span>
+<span class="nc bnc" id="L286" title="All 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L287">          throw new IOException(&quot;no (valid) field in mtas group&quot;);</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="nc" id="L289">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+        }
+      }
+<span class="nc" id="L292">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_GROUP_KEY,</span>
+<span class="nc" id="L293">          NAME_MTAS_GROUP_FIELD, true);</span>
+<span class="nc" id="L294">      MtasSolrResultUtil.compareAndCheck(queryValues, fields,</span>
+<span class="nc" id="L295">          NAME_MTAS_GROUP_QUERY_VALUE, NAME_MTAS_GROUP_FIELD, false);</span>
+<span class="nc" id="L296">      MtasSolrResultUtil.compareAndCheck(queryTypes, fields,</span>
+<span class="nc" id="L297">          NAME_MTAS_GROUP_QUERY_TYPE, NAME_MTAS_GROUP_FIELD, false);</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="nc" id="L299">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">        Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i] == null)</span>
+<span class="nc" id="L301">            ? null : Integer.parseInt(queryMaximumIgnoreLengths[i]);</span>
+<span class="nc" id="L302">        MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],</span>
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i],
+            queryIgnores[i], maximumIgnoreLength);
+        // minimize number of queries
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (cf.spanQueryList.contains(q)) {</span>
+<span class="nc" id="L307">          q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
+        } else {
+<span class="nc" id="L309">          cf.spanQueryList.add(q);</span>
+        }
+<span class="nc bnc" id="L311" title="All 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
+<span class="nc" id="L312">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryValues[i]</span>
+<span class="nc" id="L313">            : keys[i].trim();</span>
+<span class="nc bnc" id="L314" title="All 4 branches missed.">        int number = (numbers[i] == null) || (numbers[i].isEmpty())</span>
+<span class="nc" id="L315">            ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);</span>
+<span class="nc" id="L316">        mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q, key,</span>
+            number, groupingHitInsidePrefixes[i],
+            groupingHitInsideLeftPosition[i], groupingHitInsideLeftPrefixes[i],
+            groupingHitInsideRightPosition[i],
+            groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],
+            groupingHitLeftPrefixes[i], groupingHitRightPosition[i],
+            groupingHitRightPrefixes[i], groupingLeftPosition[i],
+            groupingLeftPrefixes[i], groupingRightPosition[i],
+            groupingRightPrefixes[i]));
+      }
+    }
+<span class="nc" id="L327">  }</span>
+
+  /**
+   * Prepare.
+   *
+   * @param solrParams the solr params
+   * @param gids the gids
+   * @param name the name
+   * @param positions the positions
+   * @param prefixes the prefixes
+   */
+  private void prepare(SolrParams solrParams, SortedSet&lt;String&gt; gids,
+      String name, String[] positions, String[] prefixes) {
+<span class="nc bnc" id="L340" title="All 2 branches missed.">    if (!gids.isEmpty()) {</span>
+<span class="nc" id="L341">      int tmpSubCounter = 0;</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">      for (String gid : gids) {</span>
+<span class="nc" id="L343">        positions[tmpSubCounter] = solrParams.get(</span>
+            name + &quot;.&quot; + gid + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_POSITION, null);
+<span class="nc" id="L345">        prefixes[tmpSubCounter] = solrParams.get(</span>
+            name + &quot;.&quot; + gid + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_PREFIXES, null);
+<span class="nc" id="L347">        tmpSubCounter++;</span>
+<span class="nc" id="L348">      }</span>
+    }
+<span class="nc" id="L350">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
+   */
+  public void modifyRequest(ResponseBuilder rb, SearchComponent who,
+      ShardRequest sreq) {
+<span class="nc bnc" id="L363" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+        // do nothing
+      } else {
+        // remove prefix for other requests
+<span class="nc" id="L369">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="nc" id="L370">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);</span>
+<span class="nc" id="L371">        sreq.params.remove(PARAM_MTAS_GROUP);</span>
+        Set&lt;String&gt; subKeys;
+<span class="nc bnc" id="L373" title="All 2 branches missed.">        for (String key : keys) {</span>
+<span class="nc" id="L374">          sreq.params.remove(</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_FIELD);
+<span class="nc" id="L376">          sreq.params</span>
+<span class="nc" id="L377">              .remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_KEY);</span>
+<span class="nc" id="L378">          sreq.params.remove(</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_TYPE);
+<span class="nc" id="L380">          sreq.params.remove(</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_VALUE);
+<span class="nc" id="L382">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+              + NAME_MTAS_GROUP_QUERY_PREFIX);
+<span class="nc" id="L384">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+              + NAME_MTAS_GROUP_QUERY_IGNORE);
+<span class="nc" id="L386">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+              + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH);
+<span class="nc" id="L388">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
+                  + NAME_MTAS_GROUP_GROUPING_LEFT);
+<span class="nc bnc" id="L391" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L392">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+<span class="nc" id="L395">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+<span class="nc" id="L398">          }</span>
+<span class="nc" id="L399">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
+                  + NAME_MTAS_GROUP_GROUPING_RIGHT);
+<span class="nc bnc" id="L402" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L403">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+<span class="nc" id="L406">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+<span class="nc" id="L409">          }</span>
+<span class="nc" id="L410">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
+                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE);
+<span class="nc bnc" id="L413" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L414">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+<span class="nc" id="L417">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+<span class="nc" id="L420">          }</span>
+<span class="nc" id="L421">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
+                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT);
+<span class="nc bnc" id="L424" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L425">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+<span class="nc" id="L428">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+<span class="nc" id="L431">          }</span>
+<span class="nc" id="L432">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
+                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT);
+<span class="nc bnc" id="L435" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L436">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+<span class="nc" id="L439">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+<span class="nc" id="L442">          }</span>
+<span class="nc" id="L443">        }</span>
+      }
+    }
+<span class="nc" id="L446">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public SimpleOrderedMap&lt;Object&gt; create(ComponentGroup group, Boolean encode)
+      throws IOException {
+<span class="nc" id="L458">    SimpleOrderedMap&lt;Object&gt; mtasGroupResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L459">    mtasGroupResponse.add(&quot;key&quot;, group.key);</span>
+<span class="nc" id="L460">    MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,</span>
+        new String[] { group.dataType }, new String[] { group.statsType },
+        new TreeSet[] { group.statsItems }, new String[] { group.sortType },
+        new String[] { group.sortDirection }, new Integer[] { group.start },
+        new Integer[] { group.number }, null);
+<span class="nc bnc" id="L465" title="All 2 branches missed.">    if (encode) {</span>
+<span class="nc" id="L466">      mtasGroupResponse.add(&quot;_encoded_list&quot;, MtasSolrResultUtil.encode(data));</span>
+    } else {
+<span class="nc" id="L468">      mtasGroupResponse.add(&quot;list&quot;, data);</span>
+<span class="nc" id="L469">      MtasSolrResultUtil.rewrite(mtasGroupResponse);</span>
+    }
+<span class="nc" id="L471">    return mtasGroupResponse;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public void finishStage(ResponseBuilder rb) {
+<span class="nc bnc" id="L483" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
+        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
+<span class="nc bnc" id="L486" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="nc bnc" id="L487" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L488" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc bnc" id="L489" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="nc" id="L490">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="nc" id="L491">                .getResponse();</span>
+            try {
+<span class="nc" id="L493">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
+<span class="nc" id="L494">                  .findRecursive(&quot;mtas&quot;, &quot;group&quot;);</span>
+<span class="nc bnc" id="L495" title="All 2 branches missed.">              if (data != null) {</span>
+<span class="nc" id="L496">                MtasSolrResultUtil.decode(data);</span>
+              }
+<span class="nc" id="L498">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L499">              log.debug(e);</span>
+              // shouldn't happen
+<span class="nc" id="L501">            }</span>
+<span class="nc" id="L502">          }</span>
+        }
+<span class="nc" id="L504">      }</span>
+    }
+<span class="nc" id="L506">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
+      throws IOException {
+    // rewrite
+<span class="nc" id="L520">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+    try {
+<span class="nc" id="L522">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L523">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L524">      log.debug(e);</span>
+<span class="nc" id="L525">      mtasResponse = null;</span>
+<span class="nc" id="L526">    }</span>
+<span class="nc bnc" id="L527" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
+      ArrayList&lt;Object&gt; mtasResponseGroup;
+      try {
+<span class="nc" id="L530">        mtasResponseGroup = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;group&quot;);</span>
+<span class="nc bnc" id="L531" title="All 2 branches missed.">        if (mtasResponseGroup != null) {</span>
+<span class="nc" id="L532">          MtasSolrResultUtil.rewrite(mtasResponseGroup);</span>
+        }
+<span class="nc" id="L534">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L535">        log.debug(e);</span>
+<span class="nc" id="L536">        mtasResponse.remove(&quot;group&quot;);</span>
+<span class="nc" id="L537">      }</span>
+    }
+<span class="nc" id="L539">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrResultMerge.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.handler.component.util</a> &gt; <span class="el_source">MtasSolrResultMerge.java</span></div><h1>MtasSolrResultMerge.java</h1><pre class="source lang-java linenums">package mtas.solr.handler.component.util;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
+import java.util.Map.Entry;
+import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.handler.component.ResponseBuilder;
+import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.handler.component.ShardResponse;
+
+import mtas.codec.util.CodecComponent.ComponentFields;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
+
+/**
+ * The Class MtasSolrResultMerge.
+ */
+<span class="fc" id="L21">public class MtasSolrResultMerge {</span>
+
+  /**
+   * Merge.
+   *
+   * @param rb
+   *          the rb
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public void merge(ResponseBuilder rb) {
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
+      // mtas response
+<span class="fc" id="L33">      NamedList&lt;Object&gt; mtasResponse = null;</span>
+      try {
+<span class="fc" id="L35">        mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L36">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L37">        mtasResponse = null;</span>
+<span class="fc" id="L38">      }</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">      if (mtasResponse == null) {</span>
+<span class="fc" id="L40">        mtasResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L41">        rb.rsp.add(&quot;mtas&quot;, mtasResponse);</span>
+      }
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {</span>
+          // merge stats
+<span class="fc" id="L47">          if (rb.req.getParams()</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">              .getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {</span>
+<span class="fc" id="L49">            mergeNamedList(sreq, mtasResponse, &quot;stats&quot;, null);</span>
+          }
+          // merge group
+<span class="fc" id="L52">          if (rb.req.getParams()</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">              .getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc" id="L54">            mergeArrayList(sreq, mtasResponse, &quot;group&quot;, null, false);</span>
+          }
+          // merge facet
+<span class="fc" id="L57">          if (rb.req.getParams()</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">              .getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {</span>
+<span class="nc" id="L59">            mergeArrayList(sreq, mtasResponse, &quot;facet&quot;, null, false);</span>
+          }
+          // merge join
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">          if (rb.req.getParams().getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN,</span>
+              false)) {
+<span class="nc" id="L64">            ComponentFields componentFields = (ComponentFields) rb.req.getContext().get(ComponentFields.class);</span>
+<span class="nc" id="L65">            mtasResponse.add(&quot;join&quot;, new MtasSolrJoinResult(componentFields.join));            </span>
+<span class="nc" id="L66">            mergeJoinResult(sreq, mtasResponse, &quot;join&quot;, null);</span>
+
+          }
+          // merge prefix
+<span class="fc" id="L70">          if (rb.req.getParams()</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">              .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {</span>
+<span class="nc" id="L72">            mergeArrayList(sreq, mtasResponse, &quot;prefix&quot;, null, false);</span>
+          }
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        } else if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_MISSING_KEY) {</span>
+          // merge termvector
+<span class="nc bnc" id="L76" title="All 2 branches missed.">          if (rb.req.getParams().getBool(</span>
+              MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+<span class="nc" id="L78">            mergeArrayList(sreq, mtasResponse, &quot;termvector&quot;, null, false);</span>
+          }
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        } else if (rb.stage == MtasSolrSearchComponent.STAGE_LIST) {</span>
+          // merge list
+<span class="nc bnc" id="L82" title="All 2 branches missed.">          if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,</span>
+              false)) {
+<span class="nc" id="L84">            mergeArrayList(sreq, mtasResponse, &quot;list&quot;,</span>
+<span class="nc" id="L85">                ShardRequest.PURPOSE_PRIVATE, true);</span>
+          }
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        } else if (rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {</span>
+          // merge document
+<span class="fc" id="L89">          if (rb.req.getParams()</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">              .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
+<span class="nc" id="L91">            mergeArrayList(sreq, mtasResponse, &quot;document&quot;,</span>
+<span class="nc" id="L92">                ShardRequest.PURPOSE_PRIVATE, true);</span>
+          }
+          // merge kwic
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">          if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,</span>
+              false)) {
+<span class="nc" id="L97">            mergeArrayList(sreq, mtasResponse, &quot;kwic&quot;,</span>
+<span class="nc" id="L98">                ShardRequest.PURPOSE_PRIVATE, true);</span>
+          }
+        }
+<span class="fc" id="L101">      }</span>
+    }
+<span class="fc" id="L103">  }</span>
+
+  @SuppressWarnings(&quot;unchecked&quot;)
+  private void mergeJoinResult(ShardRequest sreq,
+      NamedList&lt;Object&gt; mtasResponse, String key, Integer preferredPurpose) {
+<span class="nc" id="L108">    Object o = mtasResponse.get(key);</span>
+    MtasSolrJoinResult mtasJoinResponse;
+<span class="nc bnc" id="L110" title="All 2 branches missed.">    if (o instanceof MtasSolrJoinResult) {</span>
+<span class="nc" id="L111">      mtasJoinResponse = (MtasSolrJoinResult) o;</span>
+    } else {
+<span class="nc" id="L113">      mtasJoinResponse = null;</span>
+    }
+    // collect responses for each shard
+<span class="nc" id="L116">    HashMap&lt;String, NamedList&lt;Object&gt;&gt; mtasListShardResponses = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">    for (ShardResponse response : sreq.responses) {</span>
+      // only continue if new shard or preferred purpose
+<span class="nc bnc" id="L119" title="All 4 branches missed.">      if (mtasListShardResponses.containsKey(response.getShard())</span>
+          &amp;&amp; ((preferredPurpose == null)
+<span class="nc bnc" id="L121" title="All 2 branches missed.">              || (sreq.purpose != preferredPurpose))) {</span>
+<span class="nc" id="L122">        break;</span>
+      }
+      // update
+      try {
+<span class="nc" id="L126">        NamedList&lt;Object&gt; result = response.getSolrResponse().getResponse();</span>
+<span class="nc" id="L127">        String data = (String) result.findRecursive(&quot;mtas&quot;, key);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (data != null) {</span>
+<span class="nc" id="L129">          MtasSolrJoinResult decodedData = (MtasSolrJoinResult) MtasSolrResultUtil</span>
+<span class="nc" id="L130">              .decode(data);</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">          if (mtasJoinResponse == null) {</span>
+<span class="nc" id="L132">            mtasJoinResponse = decodedData;</span>
+          } else {
+<span class="nc" id="L134">            mtasJoinResponse.merge(decodedData);</span>
+          }
+        }
+<span class="nc" id="L137">      } catch (ClassCastException e) {</span>
+        
+<span class="nc" id="L139">      }</span>
+<span class="nc" id="L140">    }</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">    if (mtasJoinResponse != null) {</span>
+<span class="nc" id="L142">      mtasResponse.removeAll(key);</span>
+<span class="nc" id="L143">      mtasResponse.add(key, mtasJoinResponse);</span>
+    }
+<span class="nc" id="L145">  }</span>
+
+  /**
+   * Merge named list.
+   *
+   * @param sreq
+   *          the sreq
+   * @param mtasResponse
+   *          the mtas response
+   * @param key
+   *          the key
+   * @param preferredPurpose
+   *          the preferred purpose
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  private void mergeNamedList(ShardRequest sreq, NamedList&lt;Object&gt; mtasResponse,
+      String key, Integer preferredPurpose) {
+    // create new response for key
+    NamedList&lt;Object&gt; mtasListResponse;
+<span class="fc" id="L164">    Object o = mtasResponse.get(key);</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">    if (o instanceof NamedList) {</span>
+<span class="nc" id="L166">      mtasListResponse = (NamedList&lt;Object&gt;) o;</span>
+    } else {
+<span class="fc" id="L168">      mtasListResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L169">      mtasResponse.removeAll(key);</span>
+<span class="fc" id="L170">      mtasResponse.add(key, mtasListResponse);</span>
+    }
+    // collect responses for each shard
+<span class="fc" id="L173">    HashMap&lt;String, NamedList&lt;Object&gt;&gt; mtasListShardResponses = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">    for (ShardResponse response : sreq.responses) {</span>
+      // only continue if new shard or preferred purpose
+<span class="pc bpc" id="L176" title="3 of 4 branches missed.">      if (mtasListShardResponses.containsKey(response.getShard())</span>
+          &amp;&amp; ((preferredPurpose == null)
+<span class="nc bnc" id="L178" title="All 2 branches missed.">              || (sreq.purpose != preferredPurpose))) {</span>
+<span class="nc" id="L179">        break;</span>
+      }
+      // update
+      try {
+<span class="fc" id="L183">        NamedList&lt;Object&gt; result = response.getSolrResponse().getResponse();</span>
+<span class="fc" id="L184">        NamedList&lt;Object&gt; data = (NamedList&lt;Object&gt;) result</span>
+<span class="fc" id="L185">            .findRecursive(&quot;mtas&quot;, key);</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        if (data != null) {</span>
+<span class="fc" id="L187">          mtasListShardResponses.put(response.getShard(),</span>
+<span class="fc" id="L188">              MtasSolrResultUtil.decode(data));</span>
+        }
+<span class="nc" id="L190">      } catch (ClassCastException e) {</span>
+
+<span class="fc" id="L192">      }</span>
+<span class="fc" id="L193">    }</span>
+    try {
+<span class="fc bfc" id="L195" title="All 2 branches covered.">      for (NamedList&lt;Object&gt; mtasListShardResponse : mtasListShardResponses</span>
+<span class="fc" id="L196">          .values()) {</span>
+<span class="fc" id="L197">        mergeResponsesNamedList(mtasListResponse, mtasListShardResponse);</span>
+<span class="fc" id="L198">      }</span>
+<span class="nc" id="L199">    } catch (IOException e) {</span>
+<span class="nc" id="L200">      e.printStackTrace();</span>
+<span class="fc" id="L201">    }</span>
+<span class="fc" id="L202">  }</span>
+
+  /**
+   * Merge array list.
+   *
+   * @param sreq
+   *          the sreq
+   * @param mtasResponse
+   *          the mtas response
+   * @param key
+   *          the key
+   * @param preferredPurpose
+   *          the preferred purpose
+   * @param mergeAllShardResponses
+   *          the merge all shard responses
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  private void mergeArrayList(ShardRequest sreq, NamedList&lt;Object&gt; mtasResponse,
+      String key, Integer preferredPurpose, boolean mergeAllShardResponses) {
+    // create new response for key
+    ArrayList&lt;Object&gt; mtasListResponse;
+<span class="nc" id="L223">    Object o = mtasResponse.get(key);</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">    if (o instanceof ArrayList) {</span>
+<span class="nc" id="L225">      mtasListResponse = (ArrayList&lt;Object&gt;) o;</span>
+    } else {
+<span class="nc" id="L227">      mtasListResponse = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L228">      mtasResponse.removeAll(key);</span>
+<span class="nc" id="L229">      mtasResponse.add(key, mtasListResponse);</span>
+    }
+    // collect responses for each shard
+<span class="nc" id="L232">    HashMap&lt;String, ArrayList&lt;Object&gt;&gt; mtasListShardResponses = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L233">    ArrayList&lt;ArrayList&lt;Object&gt;&gt; mtasListShardResponsesExtra = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">    for (ShardResponse response : sreq.responses) {</span>
+      // only continue if new shard or preferred purpose
+<span class="nc bnc" id="L236" title="All 4 branches missed.">      if (mtasListShardResponses.containsKey(response.getShard())</span>
+          &amp;&amp; ((preferredPurpose == null)
+<span class="nc bnc" id="L238" title="All 2 branches missed.">              || (sreq.purpose != preferredPurpose))) {</span>
+<span class="nc" id="L239">        break;</span>
+      }
+      // update
+      try {
+<span class="nc" id="L243">        NamedList&lt;Object&gt; result = response.getSolrResponse().getResponse();</span>
+<span class="nc" id="L244">        ArrayList&lt;Object&gt; data = (ArrayList&lt;Object&gt;) result</span>
+<span class="nc" id="L245">            .findRecursive(&quot;mtas&quot;, key);</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">        if (data != null) {</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">          if (mtasListShardResponses.containsKey(response.getShardAddress())) {</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">            if (mergeAllShardResponses) {</span>
+<span class="nc" id="L249">              mtasListShardResponsesExtra.add(data);</span>
+            }
+          } else {
+<span class="nc" id="L252">            mtasListShardResponses.put(response.getShardAddress(), data);</span>
+          }
+        }
+<span class="nc" id="L255">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L256">        e.printStackTrace();</span>
+<span class="nc" id="L257">      }</span>
+<span class="nc" id="L258">    }</span>
+
+    try {
+<span class="nc bnc" id="L261" title="All 2 branches missed.">      for (ArrayList&lt;Object&gt; mtasListShardResponse : mtasListShardResponses</span>
+<span class="nc" id="L262">          .values()) {</span>
+<span class="nc" id="L263">        mergeResponsesArrayList(mtasListResponse, mtasListShardResponse);</span>
+<span class="nc" id="L264">      }</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">      for (ArrayList&lt;Object&gt; mtasListShardResponse : mtasListShardResponsesExtra) {</span>
+<span class="nc" id="L266">        mergeResponsesArrayList(mtasListResponse, mtasListShardResponse);</span>
+<span class="nc" id="L267">      }</span>
+<span class="nc" id="L268">    } catch (IOException e) {</span>
+<span class="nc" id="L269">      e.printStackTrace();</span>
+<span class="nc" id="L270">    }</span>
+<span class="nc" id="L271">  }</span>
+
+  /**
+   * Merge responses tree set.
+   *
+   * @param originalList
+   *          the original list
+   * @param shardList
+   *          the shard list
+   */
+  private void mergeResponsesTreeSet(TreeSet&lt;Object&gt; originalList,
+      TreeSet&lt;Object&gt; shardList) {
+<span class="nc bnc" id="L283" title="All 2 branches missed.">    for (Object item : shardList) {</span>
+<span class="nc" id="L284">      originalList.add(item);</span>
+<span class="nc" id="L285">    }</span>
+<span class="nc" id="L286">  }</span>
+
+  /**
+   * Merge responses array list.
+   *
+   * @param originalList
+   *          the original list
+   * @param shardList
+   *          the shard list
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  private void mergeResponsesArrayList(ArrayList&lt;Object&gt; originalList,
+      ArrayList&lt;Object&gt; shardList) throws IOException {
+    // get keys from original
+<span class="fc" id="L302">    HashMap&lt;String, Object&gt; originalKeyList = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L303" title="All 2 branches covered.">    for (Object item : originalList) {</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">      if (item instanceof NamedList&lt;?&gt;) {</span>
+<span class="fc" id="L305">        NamedList&lt;Object&gt; itemList = (NamedList&lt;Object&gt;) item;</span>
+<span class="fc" id="L306">        Object key = itemList.get(&quot;key&quot;);</span>
+<span class="pc bpc" id="L307" title="2 of 4 branches missed.">        if ((key != null) &amp;&amp; (key instanceof String)) {</span>
+<span class="fc" id="L308">          originalKeyList.put((String) key, item);</span>
+        }
+      }
+<span class="fc" id="L311">    }</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">    for (Object item : shardList) {</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">      if (item instanceof NamedList&lt;?&gt;) {</span>
+<span class="fc" id="L314">        NamedList&lt;Object&gt; itemList = (NamedList&lt;Object&gt;) item;</span>
+<span class="fc" id="L315">        Object key = itemList.get(&quot;key&quot;);</span>
+        // item with key
+<span class="pc bpc" id="L317" title="2 of 4 branches missed.">        if ((key != null) &amp;&amp; (key instanceof String)) {</span>
+          // merge
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">          if (originalKeyList.containsKey(key)) {</span>
+<span class="fc" id="L320">            Object originalItem = originalKeyList.get(key);</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">            if (originalItem.getClass().equals(item.getClass())) {</span>
+<span class="fc" id="L322">              mergeResponsesNamedList((NamedList&lt;Object&gt;) originalItem,</span>
+                  (NamedList&lt;Object&gt;) item);
+            } else {
+              // ignore?
+            }
+            // add
+<span class="fc" id="L328">          } else {</span>
+<span class="nc" id="L329">            originalList.add(adjustablePartsCloned(item));</span>
+          }
+        } else {
+<span class="nc" id="L332">          originalList.add(item);</span>
+        }
+<span class="fc" id="L334">      } else {</span>
+<span class="nc" id="L335">        originalList.add(item);</span>
+      }
+<span class="fc" id="L337">    }</span>
+<span class="fc" id="L338">  }</span>
+
+  /**
+   * Merge responses named list.
+   *
+   * @param mainResponse
+   *          the main response
+   * @param shardResponse
+   *          the shard response
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+  private void mergeResponsesNamedList(NamedList&lt;Object&gt; mainResponse,
+      NamedList&lt;Object&gt; shardResponse) throws IOException {
+<span class="fc" id="L353">    Iterator&lt;Entry&lt;String, Object&gt;&gt; it = shardResponse.iterator();</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">    while (it.hasNext()) {</span>
+<span class="fc" id="L355">      Entry&lt;String, Object&gt; entry = it.next();</span>
+<span class="fc" id="L356">      String name = entry.getKey();</span>
+<span class="fc" id="L357">      Object shardValue = entry.getValue();</span>
+<span class="fc" id="L358">      int originalId = mainResponse.indexOf(name, 0);</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">      if (originalId &lt; 0) {</span>
+<span class="fc" id="L360">        mainResponse.add(name, adjustablePartsCloned(shardValue));</span>
+      } else {
+<span class="fc" id="L362">        Object original = mainResponse.getVal(originalId);</span>
+<span class="pc bpc" id="L363" title="1 of 2 branches missed.">        if (original == null) {</span>
+<span class="nc" id="L364">          original = adjustablePartsCloned(shardValue);</span>
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">        } else if (shardValue != null</span>
+<span class="pc bpc" id="L366" title="1 of 2 branches missed.">            &amp;&amp; original.getClass().equals(shardValue.getClass())) {</span>
+          // merge ArrayList
+<span class="fc bfc" id="L368" title="All 2 branches covered.">          if (original instanceof ArrayList) {</span>
+<span class="fc" id="L369">            ArrayList originalList = (ArrayList) original;</span>
+<span class="fc" id="L370">            ArrayList shardList = (ArrayList) shardValue;</span>
+<span class="fc" id="L371">            mergeResponsesArrayList(originalList, shardList);</span>
+            // merge Namedlist
+<span class="pc bpc" id="L373" title="1 of 2 branches missed.">          } else if (original instanceof NamedList&lt;?&gt;) {</span>
+<span class="nc" id="L374">            mergeResponsesNamedList((NamedList&lt;Object&gt;) original,</span>
+                (NamedList&lt;Object&gt;) shardValue);
+            // merge TreeSet
+<span class="pc bpc" id="L377" title="1 of 2 branches missed.">          } else if (original instanceof TreeSet&lt;?&gt;) {</span>
+<span class="nc" id="L378">            mergeResponsesTreeSet((TreeSet&lt;Object&gt;) original,</span>
+                (TreeSet&lt;Object&gt;) shardValue);
+<span class="fc bfc" id="L380" title="All 2 branches covered.">          } else if (original instanceof MtasSolrMtasResult) {</span>
+<span class="fc" id="L381">            MtasSolrMtasResult originalComponentResult = (MtasSolrMtasResult) original;</span>
+<span class="fc" id="L382">            originalComponentResult.merge((MtasSolrMtasResult) shardValue);</span>
+<span class="pc bpc" id="L383" title="1 of 2 branches missed.">          } else if (original instanceof MtasSolrJoinResult) {</span>
+<span class="nc" id="L384">            MtasSolrJoinResult originalComponentResult = (MtasSolrJoinResult) original;</span>
+<span class="nc" id="L385">            originalComponentResult.merge((MtasSolrJoinResult) shardValue);</span>
+<span class="pc bpc" id="L386" title="1 of 2 branches missed.">          } else if (original instanceof String) {</span>
+            // ignore?
+<span class="nc bnc" id="L388" title="All 2 branches missed.">          } else if (original instanceof Integer) {</span>
+<span class="nc" id="L389">            original = (Integer) original + ((Integer) shardValue);</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">          } else if (original instanceof Long) {</span>
+<span class="nc" id="L391">            original = (Long) original + ((Long) shardValue);</span>
+          } else {
+            // ignore?
+          }
+<span class="fc" id="L395">          mainResponse.setVal(originalId, original);</span>
+        } else {
+          // ignore?
+        }
+      }
+<span class="fc" id="L400">    }</span>
+<span class="fc" id="L401">  }</span>
+
+  /**
+   * Adjustable parts cloned.
+   *
+   * @param original
+   *          the original
+   * @return the object
+   */
+  @SuppressWarnings({ &quot;rawtypes&quot;, &quot;unchecked&quot; })
+  private Object adjustablePartsCloned(Object original) {
+<span class="fc bfc" id="L412" title="All 2 branches covered.">    if (original instanceof NamedList) {</span>
+<span class="fc" id="L413">      NamedList&lt;Object&gt; newObject = new SimpleOrderedMap();</span>
+<span class="fc" id="L414">      NamedList&lt;Object&gt; originalObject = (NamedList&lt;Object&gt;) original;</span>
+<span class="fc bfc" id="L415" title="All 2 branches covered.">      for (int i = 0; i &lt; originalObject.size(); i++) {</span>
+<span class="fc" id="L416">        newObject.add(originalObject.getName(i),</span>
+<span class="fc" id="L417">            adjustablePartsCloned(originalObject.getVal(i)));</span>
+      }
+<span class="fc" id="L419">      return newObject;</span>
+<span class="fc bfc" id="L420" title="All 2 branches covered.">    } else if (original instanceof ArrayList) {</span>
+<span class="fc" id="L421">      ArrayList&lt;Object&gt; newObject = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L422">      ArrayList&lt;Object&gt; originalObject = (ArrayList&lt;Object&gt;) original;</span>
+<span class="fc bfc" id="L423" title="All 2 branches covered.">      for (int i = 0; i &lt; originalObject.size(); i++) {</span>
+<span class="fc" id="L424">        newObject.add(adjustablePartsCloned(originalObject.get(i)));</span>
+      }
+<span class="fc" id="L426">      return newObject;</span>
+<span class="pc bpc" id="L427" title="1 of 2 branches missed.">    } else if (original instanceof Integer) {</span>
+<span class="nc" id="L428">      return original;</span>
+    }
+<span class="fc" id="L430">    return original;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

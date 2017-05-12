@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrComponentJoin.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.handler.component.util</a> &gt; <span class="el_source">MtasSolrComponentJoin.java</span></div><h1>MtasSolrComponentJoin.java</h1><pre class="source lang-java linenums">package mtas.solr.handler.component.util;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.handler.component.ResponseBuilder;
+import org.apache.solr.handler.component.SearchComponent;
+import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.handler.component.ShardResponse;
+
+import mtas.codec.util.CodecComponent.BasicComponent;
+import mtas.codec.util.CodecComponent.ComponentFields;
+import mtas.codec.util.CodecComponent.ComponentJoin;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
+
+/**
+ * The Class MtasSolrComponentJoin.
+ */
+@SuppressWarnings(&quot;deprecation&quot;)
+public class MtasSolrComponentJoin implements MtasSolrComponent&lt;ComponentJoin&gt; {
+
+  /** The log. */
+<span class="fc" id="L29">  private static Log log = LogFactory.getLog(MtasSolrComponentJoin.class);</span>
+
+  /** The Constant PARAM_MTAS_JOIN. */
+  public static final String PARAM_MTAS_JOIN = MtasSolrSearchComponent.PARAM_MTAS
+      + &quot;.join&quot;;
+
+  /** The Constant NAME_MTAS_JOIN_FIELD. */
+  public static final String NAME_MTAS_JOIN_FIELD = &quot;field&quot;;
+
+  /**
+   * Instantiates a new mtas solr component join.
+   *
+   * @param searchComponent the search component
+   */
+<span class="fc" id="L43">  public MtasSolrComponentJoin(MtasSolrSearchComponent searchComponent) {</span>
+<span class="fc" id="L44">  }</span>
+
+  /**
+   * Prepare.
+   *
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
+      throws IOException {
+<span class="nc bnc" id="L55" title="All 2 branches missed.">    if (rb.req.getParams().get(PARAM_MTAS_JOIN + &quot;.&quot; + NAME_MTAS_JOIN_FIELD,</span>
+        null) != null) {
+<span class="nc" id="L57">      Set&lt;String&gt; fields = new HashSet&lt;&gt;(Arrays.asList(rb.req.getParams()</span>
+<span class="nc" id="L58">          .get(PARAM_MTAS_JOIN + &quot;.&quot; + NAME_MTAS_JOIN_FIELD).split(&quot;,&quot;)));</span>
+<span class="nc" id="L59">      String key = createKeyFromRequest(rb);</span>
+<span class="nc" id="L60">      mtasFields.doJoin = true;</span>
+<span class="nc" id="L61">      mtasFields.join = new ComponentJoin(fields, key);</span>
+<span class="nc" id="L62">      rb.setNeedDocSet(true);</span>
+    }
+
+<span class="nc" id="L65">  }</span>
+
+  /**
+   * Modify request.
+   *
+   * @param rb the rb
+   * @param who the who
+   * @param sreq the sreq
+   */
+  public void modifyRequest(ResponseBuilder rb, SearchComponent who,
+      ShardRequest sreq) {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_JOIN, false)) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+        // do nothing
+      } else {
+        // remove for other requests
+<span class="nc" id="L82">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="nc" id="L83">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_JOIN);</span>
+<span class="nc" id="L84">        sreq.params.remove(PARAM_MTAS_JOIN);</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        for (String key : keys) {</span>
+<span class="nc" id="L86">          sreq.params.remove(PARAM_MTAS_JOIN + &quot;.&quot; + key);</span>
+<span class="nc" id="L87">        }</span>
+      }
+    }
+<span class="nc" id="L90">  }</span>
+
+  /**
+   * Creates the.
+   *
+   * @param join the join
+   * @param encode the encode
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public SimpleOrderedMap&lt;Object&gt; create(ComponentJoin join, Boolean encode) throws IOException {
+<span class="nc" id="L101">    MtasSolrJoinResult data = new MtasSolrJoinResult(join);</span>
+<span class="nc" id="L102">    SimpleOrderedMap&lt;Object&gt; mtasJoinResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">    if (encode) {</span>
+<span class="nc" id="L104">      mtasJoinResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
+    } else {
+<span class="nc" id="L106">      mtasJoinResponse.add(&quot;data&quot;, data.rewrite());</span>
+    }
+<span class="nc" id="L108">    return mtasJoinResponse;</span>
+  }
+
+  /**
+   * Finish stage.
+   *
+   * @param rb the rb
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public void finishStage(ResponseBuilder rb) {
+<span class="nc bnc" id="L118" title="All 4 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+        &amp;&amp; rb.stage == MtasSolrSearchComponent.STAGE_JOIN) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_JOIN, false)) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="nc" id="L124">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="nc" id="L125">                .getResponse();</span>
+            try {
+<span class="nc" id="L127">              Object data = response.findRecursive(&quot;mtas&quot;, &quot;join&quot;);</span>
+<span class="nc bnc" id="L128" title="All 4 branches missed.">              if (data != null &amp;&amp; data instanceof String) {</span>
+<span class="nc" id="L129">                NamedList&lt;Object&gt; mtasResponse = (NamedList&lt;Object&gt;) response</span>
+<span class="nc" id="L130">                    .get(&quot;mtas&quot;);</span>
+<span class="nc" id="L131">                mtasResponse.remove(&quot;join&quot;);</span>
+<span class="nc" id="L132">                mtasResponse.add(&quot;join&quot;,</span>
+<span class="nc" id="L133">                    MtasSolrResultUtil.decode((String) data));</span>
+              }
+<span class="nc" id="L135">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L136">              log.debug(e);</span>
+              // shouldn't happen
+<span class="nc" id="L138">            }</span>
+<span class="nc" id="L139">          }</span>
+        }
+<span class="nc" id="L141">      }</span>
+    }
+<span class="nc" id="L143">  }</span>
+
+  /**
+   * Distributed process.
+   *
+   * @param rb the rb
+   * @param mtasFields the mtas fields
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
+      throws IOException {
+    // rewrite
+<span class="nc" id="L156">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+    try {
+<span class="nc" id="L158">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L159">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L160">      log.debug(e);</span>
+<span class="nc" id="L161">      mtasResponse = null;</span>
+<span class="nc" id="L162">    }</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
+      MtasSolrJoinResult mtasSolrJoinResult;
+      try {
+<span class="nc" id="L166">        mtasSolrJoinResult = (MtasSolrJoinResult) mtasResponse.get(&quot;join&quot;);</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        if (mtasSolrJoinResult != null) {</span>
+<span class="nc" id="L168">          mtasResponse.removeAll(&quot;join&quot;);</span>
+<span class="nc" id="L169">          mtasResponse.add(&quot;join&quot;, mtasSolrJoinResult.rewrite());</span>
+        }
+<span class="nc" id="L171">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L172">        log.debug(e);</span>
+<span class="nc" id="L173">        mtasResponse.remove(&quot;join&quot;);</span>
+<span class="nc" id="L174">      }</span>
+    }
+<span class="nc" id="L176">  }</span>
+
+  /**
+   * Creates the key from request.
+   *
+   * @param rb the rb
+   * @return the string
+   */
+  private String createKeyFromRequest(ResponseBuilder rb) {
+<span class="nc" id="L185">    return rb.req.getParams().toQueryString();</span>
+  }
+
+
+  
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

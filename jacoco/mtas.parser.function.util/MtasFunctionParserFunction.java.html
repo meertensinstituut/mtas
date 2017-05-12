@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasFunctionParserFunction.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.function.util</a> &gt; <span class="el_source">MtasFunctionParserFunction.java</span></div><h1>MtasFunctionParserFunction.java</h1><pre class="source lang-java linenums">package mtas.parser.function.util;
+
+import java.io.IOException;
+import java.util.HashSet;
+
+import mtas.codec.util.CodecUtil;
+import mtas.parser.function.ParseException;
+
+/**
+ * The Class MtasFunctionParserFunction.
+ */
+<span class="fc" id="L12">public abstract class MtasFunctionParserFunction {</span>
+
+  /** The parser doubles. */
+  protected MtasFunctionParserFunction[] parserDoubles;
+
+  /** The parser longs. */
+  protected MtasFunctionParserFunction[] parserLongs;
+
+  /** The constant doubles. */
+  protected Double[] constantDoubles;
+
+  /** The constant longs. */
+  protected long[] constantLongs;
+
+  /** The data type. */
+<span class="fc" id="L27">  protected String dataType = null;</span>
+
+  /** The sum rule. */
+<span class="fc" id="L30">  protected boolean sumRule = false;</span>
+
+  /** The need positions. */
+<span class="fc" id="L33">  protected boolean needPositions = false;</span>
+
+  /** The degree. */
+<span class="fc" id="L36">  protected Integer degree = null;</span>
+
+  /** The need argument. */
+<span class="fc" id="L39">  protected HashSet&lt;Integer&gt; needArgument = new HashSet&lt;Integer&gt;();</span>
+
+  /** The defined. */
+<span class="fc" id="L42">  private boolean defined = false;</span>
+
+  /**
+   * Gets the response.
+   *
+   * @param args
+   *          the args
+   * @param n
+   *          the n
+   * @return the response
+   */
+  public final MtasFunctionParserFunctionResponse getResponse(long[] args,
+      long n) {
+<span class="fc bfc" id="L55" title="All 2 branches covered.">    if (dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
+      try {
+<span class="fc" id="L57">        long l = getValueLong(args, n);</span>
+<span class="fc" id="L58">        return new MtasFunctionParserFunctionResponseLong(l, true);</span>
+<span class="nc" id="L59">      } catch (IOException e) {</span>
+<span class="nc" id="L60">        return new MtasFunctionParserFunctionResponseLong(0, false);</span>
+      }
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    } else if (dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
+      try {
+<span class="fc" id="L64">        double d = getValueDouble(args, n);</span>
+<span class="fc" id="L65">        return new MtasFunctionParserFunctionResponseDouble(d, true);</span>
+<span class="fc" id="L66">      } catch (IOException e) {</span>
+<span class="fc" id="L67">        return new MtasFunctionParserFunctionResponseDouble(0, false);</span>
+      }
+    } else {
+<span class="nc" id="L70">      return null;</span>
+    }
+  }
+
+  /**
+   * Gets the value double.
+   *
+   * @param args
+   *          the args
+   * @param n
+   *          the n
+   * @return the value double
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public abstract double getValueDouble(long[] args, long n) throws IOException;
+
+  /**
+   * Gets the value long.
+   *
+   * @param args
+   *          the args
+   * @param n
+   *          the n
+   * @return the value long
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  public abstract long getValueLong(long[] args, long n) throws IOException;
+
+  /**
+   * Close.
+   *
+   * @throws ParseException
+   *           the parse exception
+   */
+  public void close() throws ParseException {
+<span class="fc" id="L107">    defined = true;</span>
+<span class="fc" id="L108">  }</span>
+
+  /**
+   * Gets the type.
+   *
+   * @return the type
+   */
+  public final String getType() {
+<span class="fc" id="L116">    return dataType;</span>
+  }
+
+  /**
+   * Sum rule.
+   *
+   * @return the boolean
+   */
+  public final Boolean sumRule() {
+<span class="fc" id="L125">    return sumRule;</span>
+  }
+
+  /**
+   * Need positions.
+   *
+   * @return the boolean
+   */
+  public final Boolean needPositions() {
+<span class="fc" id="L134">    return needPositions;</span>
+  }
+
+  /**
+   * Need argument.
+   *
+   * @param i
+   *          the i
+   * @return the boolean
+   */
+  public final Boolean needArgument(int i) {
+<span class="nc" id="L145">    return needArgument.contains(i);</span>
+  }
+
+  /**
+   * Need arguments number.
+   *
+   * @return the int
+   */
+  public final int needArgumentsNumber() {
+<span class="fc" id="L154">    int number = 0;</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">    for (int i : needArgument) {</span>
+<span class="fc" id="L156">      number = Math.max(number, (i + 1));</span>
+<span class="fc" id="L157">    }</span>
+<span class="fc" id="L158">    return number;</span>
+  }
+
+  /**
+   * Need argument.
+   *
+   * @return the hash set
+   */
+  public final HashSet&lt;Integer&gt; needArgument() {
+<span class="fc" id="L167">    return needArgument;</span>
+  }
+
+  /**
+   * Defined.
+   *
+   * @return true, if successful
+   */
+  protected final boolean defined() {
+<span class="fc" id="L176">    return defined;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

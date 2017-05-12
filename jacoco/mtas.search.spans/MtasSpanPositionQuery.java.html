@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanPositionQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanPositionQuery.java</span></div><h1>MtasSpanPositionQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Set;
+import mtas.codec.util.CodecInfo;
+import mtas.search.similarities.MtasSimScorer;
+import mtas.search.spans.util.MtasSpanQuery;
+
+import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.similarities.Similarity.SimScorer;
+import org.apache.lucene.search.spans.SpanWeight;
+import org.apache.lucene.search.spans.Spans;
+
+/**
+ * The Class MtasSpanPositionQuery.
+ */
+public class MtasSpanPositionQuery extends MtasSpanQuery {
+
+  /** The field. */
+  private String field;
+
+  /** The end. */
+  private int start, end;
+
+  /**
+   * Instantiates a new mtas span position query.
+   *
+   * @param field
+   *          the field
+   * @param position
+   *          the position
+   */
+  public MtasSpanPositionQuery(String field, int position) {
+<span class="fc" id="L44">    this(field, position, position);</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * Instantiates a new mtas span position query.
+   *
+   * @param field
+   *          the field
+   * @param start
+   *          the start
+   * @param end
+   *          the end
+   */
+  public MtasSpanPositionQuery(String field, int start, int end) {
+<span class="fc" id="L58">    super(1,1);</span>
+<span class="fc" id="L59">    this.field = field;</span>
+<span class="fc" id="L60">    this.start = start;</span>
+<span class="fc" id="L61">    this.end = end;</span>
+<span class="fc" id="L62">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
+  @Override
+  public String getField() {
+<span class="fc" id="L71">    return field;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
+   */
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+<span class="fc" id="L84">    return new SpanAllWeight(searcher, null);</span>
+  }
+  
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+<span class="fc" id="L89">    return super.rewrite(reader);</span>
+  }
+
+  /**
+   * The Class SpanAllWeight.
+   */
+  protected class SpanAllWeight extends SpanWeight {
+
+    /**
+     * Instantiates a new span all weight.
+     *
+     * @param searcher
+     *          the searcher
+     * @param termContexts
+     *          the term contexts
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     */
+    public SpanAllWeight(IndexSearcher searcher,
+<span class="fc" id="L108">        Map&lt;Term, TermContext&gt; termContexts) throws IOException {</span>
+<span class="fc" id="L109">      super(MtasSpanPositionQuery.this, searcher, termContexts);</span>
+<span class="fc" id="L110">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
+     */
+    @Override
+    public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
+<span class="nc" id="L121">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
+    @Override
+    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+        throws IOException {
+      try {
+        // get leafreader
+<span class="fc" id="L136">        LeafReader r = context.reader();</span>
+        // get delegate
+<span class="fc" id="L138">        Boolean hasMethod = true;</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        while (hasMethod) {</span>
+<span class="fc" id="L140">          hasMethod = false;</span>
+<span class="fc" id="L141">          Method[] methods = r.getClass().getMethods();</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">          for (Method m : methods) {</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if (m.getName().equals(&quot;getDelegate&quot;)) {</span>
+<span class="nc" id="L144">              hasMethod = true;</span>
+<span class="nc" id="L145">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="nc" id="L146">              break;</span>
+            }
+          }
+<span class="fc" id="L149">        }</span>
+        // get fieldsproducer
+<span class="fc" id="L151">        Method fpm = r.getClass().getMethod(&quot;getPostingsReader&quot;,</span>
+            (Class&lt;?&gt;[]) null);
+<span class="fc" id="L153">        FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
+        // get MtasFieldsProducer using terms
+<span class="fc" id="L155">        Terms t = fp.terms(field);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        if (t == null) {</span>
+<span class="nc" id="L157">          return new MtasSpanMatchNoneSpans(field);</span>
+        } else {
+<span class="fc" id="L159">          CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
+<span class="fc" id="L160">          return new MtasSpanPositionSpans(mtasCodecInfo, field, start, end);</span>
+        }
+<span class="nc" id="L162">      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {</span>
+<span class="nc" id="L163">        throw new IOException(&quot;Can't get reader&quot;, e);</span>
+      }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
+    @Override
+    public void extractTerms(Set&lt;Term&gt; terms) {
+<span class="nc" id="L175">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSimScorer(org.apache.lucene.
+     * index.LeafReaderContext)
+     */
+    @Override
+    public SimScorer getSimScorer(LeafReaderContext context) {
+<span class="nc" id="L186">      return new MtasSimScorer();</span>
+    }
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanTermQuery#toString(java.lang.String)
+   */
+  @Override
+  public String toString(String field) {
+<span class="nc" id="L199">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L200">    buffer.append(</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        this.getClass().getSimpleName() + &quot;([&quot; + start + (start != end ? &quot;,&quot; + end : &quot;&quot;) + &quot;])&quot;);</span>
+<span class="nc" id="L202">    return buffer.toString();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L212" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L213">      return true;</span>
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L215">      return false;</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L217">      return false;</span>
+<span class="fc" id="L218">    final MtasSpanPositionQuery that = (MtasSpanPositionQuery) obj;</span>
+<span class="pc bpc" id="L219" title="3 of 6 branches missed.">    return field.equals(that.field) &amp;&amp; start == that.start &amp;&amp; end == that.end;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
+  @Override
+  public int hashCode() {
+<span class="fc" id="L229">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L230">    h = (h * 7) ^ field.hashCode();</span>
+<span class="fc" id="L231">    h = (h * 13) ^ start;</span>
+<span class="fc" id="L232">    h = (h * 17) ^ end;</span>
+<span class="fc" id="L233">    return h;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

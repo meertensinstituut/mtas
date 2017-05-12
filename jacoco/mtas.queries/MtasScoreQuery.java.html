@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasScoreQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.queries</a> &gt; <span class="el_source">MtasScoreQuery.java</span></div><h1>MtasScoreQuery.java</h1><pre class="source lang-java linenums">package mtas.queries;
+
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.queries.CustomScoreProvider;
+import org.apache.lucene.queries.CustomScoreQuery;
+import org.apache.lucene.queries.function.FunctionQuery;
+import org.apache.lucene.search.Query;
+
+/**
+ * The Class MtasScoreQuery.
+ */
+public class MtasScoreQuery extends CustomScoreQuery {
+
+  /**
+   * Instantiates a new mtas score query.
+   *
+   * @param subQuery
+   *          the sub query
+   */
+  public MtasScoreQuery(Query subQuery) {
+<span class="nc" id="L21">    super(subQuery);</span>
+<span class="nc" id="L22">    System.out.println(&quot;* Init MTAS scorer &quot; + subQuery.toString());</span>
+<span class="nc" id="L23">  }</span>
+
+  /**
+   * Instantiates a new mtas score query.
+   *
+   * @param subQuery
+   *          the sub query
+   * @param scoringQuery
+   *          the scoring query
+   */
+  public MtasScoreQuery(Query subQuery, FunctionQuery scoringQuery) {
+<span class="nc" id="L34">    super(subQuery, scoringQuery);</span>
+<span class="nc" id="L35">    System.out.println(&quot;** Init MTAS scorer &quot; + subQuery.toString());</span>
+<span class="nc" id="L36">  }</span>
+
+  /**
+   * Instantiates a new mtas score query.
+   *
+   * @param subQuery
+   *          the sub query
+   * @param scoringQueries
+   *          the scoring queries
+   */
+  public MtasScoreQuery(Query subQuery, FunctionQuery... scoringQueries) {
+<span class="nc" id="L47">    super(subQuery, scoringQueries);</span>
+<span class="nc" id="L48">    System.out.println(&quot;*** Init MTAS scorer &quot; + subQuery.toString());</span>
+<span class="nc" id="L49">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.queries.CustomScoreQuery#getCustomScoreProvider(org.
+   * apache.lucene.index.LeafReaderContext)
+   */
+  @Override
+  public CustomScoreProvider getCustomScoreProvider(
+      final LeafReaderContext context) {
+<span class="nc" id="L60">    return new MtasScoreProvider(context);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

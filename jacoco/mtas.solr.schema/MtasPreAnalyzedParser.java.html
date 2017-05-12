@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasPreAnalyzedParser.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.schema</a> &gt; <span class="el_source">MtasPreAnalyzedParser.java</span></div><h1>MtasPreAnalyzedParser.java</h1><pre class="source lang-java linenums">package mtas.solr.schema;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.util.AttributeSource;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.AttributeSource.State;
+import org.apache.solr.schema.PreAnalyzedField.ParseResult;
+import org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser;
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultItem;
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
+
+/**
+ * The Class MtasPreAnalyzedParser.
+ */
+<span class="nc" id="L26">public class MtasPreAnalyzedParser implements PreAnalyzedParser {</span>
+
+  /** The log. */
+<span class="nc" id="L29">  private static Log log = LogFactory.getLog(MtasPreAnalyzedParser.class);</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#parse(java.io.
+   * Reader, org.apache.lucene.util.AttributeSource)
+   */
+  @Override
+  public ParseResult parse(Reader reader, AttributeSource parent)
+      throws IOException {
+<span class="nc" id="L41">    ParseResult res = new ParseResult();</span>
+    // get MtasUpdateRequestProcessorResult
+<span class="nc" id="L43">    StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L44">    char[] buf = new char[128];</span>
+    int cnt;
+<span class="nc bnc" id="L46" title="All 2 branches missed.">    while ((cnt = reader.read(buf)) &gt; 0) {</span>
+<span class="nc" id="L47">      sb.append(buf, 0, cnt);</span>
+    }
+
+    Iterator&lt;MtasUpdateRequestProcessorResultItem&gt; iterator;
+
+    try {
+<span class="nc" id="L53">      MtasUpdateRequestProcessorResultReader result = new MtasUpdateRequestProcessorResultReader(</span>
+<span class="nc" id="L54">          sb.toString());</span>
+<span class="nc" id="L55">      iterator = result.getIterator();</span>
+<span class="nc bnc" id="L56" title="All 4 branches missed.">      if (iterator != null &amp;&amp; iterator.hasNext()) {</span>
+<span class="nc" id="L57">        res.str = result.getStoredStringValue();</span>
+<span class="nc" id="L58">        res.bin = result.getStoredBinValue();</span>
+<span class="nc" id="L59">        result.close();</span>
+      } else {
+<span class="nc" id="L61">        res.str = null;</span>
+<span class="nc" id="L62">        res.bin = null;</span>
+<span class="nc" id="L63">        result.close();</span>
+<span class="nc" id="L64">        return res;</span>
+      }
+
+<span class="nc" id="L67">      parent.clearAttributes();</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">      while (iterator.hasNext()) {</span>
+<span class="nc" id="L69">        MtasUpdateRequestProcessorResultItem item = iterator.next();</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (item.tokenTerm != null) {</span>
+<span class="nc" id="L71">          CharTermAttribute catt = parent.addAttribute(CharTermAttribute.class);</span>
+<span class="nc" id="L72">          catt.append(item.tokenTerm);</span>
+        }
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (item.tokenFlags != null) {</span>
+<span class="nc" id="L75">          FlagsAttribute flags = parent.addAttribute(FlagsAttribute.class);</span>
+<span class="nc" id="L76">          flags.setFlags(item.tokenFlags);</span>
+        }
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (item.tokenPosIncr != null) {</span>
+<span class="nc" id="L79">          PositionIncrementAttribute patt = parent</span>
+<span class="nc" id="L80">              .addAttribute(PositionIncrementAttribute.class);</span>
+<span class="nc" id="L81">          patt.setPositionIncrement(item.tokenPosIncr);</span>
+        }
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (item.tokenPayload != null) {</span>
+<span class="nc" id="L84">          PayloadAttribute p = parent.addAttribute(PayloadAttribute.class);</span>
+<span class="nc" id="L85">          p.setPayload(new BytesRef(item.tokenPayload));</span>
+        }
+<span class="nc bnc" id="L87" title="All 4 branches missed.">        if (item.tokenOffsetStart != null &amp;&amp; item.tokenOffsetEnd != null) {</span>
+<span class="nc" id="L88">          OffsetAttribute offset = parent.addAttribute(OffsetAttribute.class);</span>
+<span class="nc" id="L89">          offset.setOffset(item.tokenOffsetStart, item.tokenOffsetEnd);</span>
+        }
+        // capture state and add to result
+<span class="nc" id="L92">        State state = parent.captureState();</span>
+<span class="nc" id="L93">        res.states.add(state.clone());</span>
+        // reset for reuse
+<span class="nc" id="L95">        parent.clearAttributes();</span>
+<span class="nc" id="L96">      }</span>
+<span class="nc" id="L97">    } catch (IOException e) {</span>
+<span class="nc" id="L98">      log.error(e);</span>
+<span class="nc" id="L99">    }</span>
+<span class="nc" id="L100">    return res;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#toFormattedString
+   * (org.apache.lucene.document.Field)
+   */
+  @Override
+  public String toFormattedString(Field f) throws IOException {
+<span class="nc" id="L112">    return this.getClass().getName() + &quot; &quot; + f.name();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

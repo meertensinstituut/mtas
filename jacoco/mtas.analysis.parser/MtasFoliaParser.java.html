@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasFoliaParser.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.parser</a> &gt; <span class="el_source">MtasFoliaParser.java</span></div><h1>MtasFoliaParser.java</h1><pre class="source lang-java linenums">/**
+ * 
+ */
+package mtas.analysis.parser;
+
+import mtas.analysis.util.MtasConfigException;
+import mtas.analysis.util.MtasConfiguration;
+
+/**
+ * The Class MtasFoliaParser.
+ */
+final public class MtasFoliaParser extends MtasXMLParser {
+
+  /**
+   * Instantiates a new mtas folia parser.
+   *
+   * @param config the config
+   */
+  public MtasFoliaParser(MtasConfiguration config) {
+<span class="fc" id="L20">    super(config);</span>
+<span class="fc" id="L21">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.analysis.parser.MtasXMLParser#initParser()
+   */
+  @Override
+  protected void initParser() throws MtasConfigException {
+<span class="fc" id="L30">    namespaceURI = &quot;http://ilk.uvt.nl/folia&quot;;</span>
+<span class="fc" id="L31">    namespaceURI_id = &quot;http://www.w3.org/XML/1998/namespace&quot;;</span>
+<span class="fc" id="L32">    rootTag = &quot;FoLiA&quot;;</span>
+<span class="fc" id="L33">    contentTag = &quot;text&quot;;</span>
+<span class="fc" id="L34">    allowNonContent = true;</span>
+<span class="fc" id="L35">    super.initParser();</span>
+<span class="fc" id="L36">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

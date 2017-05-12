@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasFunctionParserFunctionDefault.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.function.util</a> &gt; <span class="el_source">MtasFunctionParserFunctionDefault.java</span></div><h1>MtasFunctionParserFunctionDefault.java</h1><pre class="source lang-java linenums">package mtas.parser.function.util;
+
+import java.io.IOException;
+
+import mtas.codec.util.CodecUtil;
+
+/**
+ * The Class MtasFunctionParserFunctionDefault.
+ */
+public class MtasFunctionParserFunctionDefault
+    extends MtasFunctionParserFunction {
+
+  /**
+   * Instantiates a new mtas function parser function default.
+   *
+   * @param numberOfArguments
+   *          the number of arguments
+   */
+<span class="fc" id="L19">  public MtasFunctionParserFunctionDefault(int numberOfArguments) {</span>
+<span class="fc" id="L20">    this.dataType = CodecUtil.DATA_TYPE_LONG;</span>
+<span class="fc" id="L21">    this.needPositions = false;</span>
+<span class="fc" id="L22">    this.sumRule = true;</span>
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">    this.degree = numberOfArguments &gt; 0 ? 1 : 0;</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">    for (int i = 0; i &lt; numberOfArguments; i++) {</span>
+<span class="fc" id="L25">      this.needArgument.add(i);</span>
+    }
+<span class="fc" id="L27">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.function.util.MtasFunctionParserFunction#getValueDouble(long[],
+   * long)
+   */
+  @Override
+  public double getValueDouble(long[] args, long n) throws IOException {
+<span class="nc" id="L38">    double value = 0;</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">    if (args != null) {</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">      for (long a : args) {</span>
+<span class="nc" id="L41">        value += a;</span>
+      }
+    }
+<span class="nc" id="L44">    return value;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.parser.function.util.MtasFunctionParserFunction#getValueLong(long[],
+   * long)
+   */
+  @Override
+  public long getValueLong(long[] args, long n) throws IOException {
+<span class="fc" id="L56">    long value = 0;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">    if (args != null) {</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">      for (long a : args) {</span>
+<span class="fc" id="L59">        value += a;</span>
+      }
+    }
+<span class="fc" id="L62">    return value;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

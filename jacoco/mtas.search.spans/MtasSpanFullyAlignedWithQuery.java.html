@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanFullyAlignedWithQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanFullyAlignedWithQuery.java</span></div><h1>MtasSpanFullyAlignedWithQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanQuery;
+import org.apache.lucene.search.spans.SpanWeight;
+import org.apache.lucene.search.spans.Spans;
+import mtas.search.spans.util.MtasSpanQuery;
+
+/**
+ * The Class MtasSpanFullyAlignedWithQuery.
+ */
+public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
+
+  /** The field. */
+  private String field;
+
+  /** The q 2. */
+  private SpanQuery q1;
+  private SpanQuery q2;
+
+  /**
+   * Instantiates a new mtas span fully aligned with query.
+   *
+   * @param q1
+   *          the q 1
+   * @param q2
+   *          the q 2
+   */
+  public MtasSpanFullyAlignedWithQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
+<span class="pc bpc" id="L41" title="2 of 4 branches missed.">    super(q1 != null ? q1.getMinimumWidth() : null,</span>
+<span class="pc" id="L42">        q1 != null ? q1.getMaximumWidth() : null);</span>
+<span class="pc bpc" id="L43" title="2 of 4 branches missed.">    if (q1 != null &amp;&amp; (field = q1.getField()) != null) {</span>
+<span class="pc bpc" id="L44" title="3 of 6 branches missed.">      if (q2 != null &amp;&amp; q2.getField()!=null &amp;&amp; !q2.getField().equals(field)) {</span>
+<span class="nc" id="L45">        throw new IllegalArgumentException(&quot;Clauses must have same field.&quot;);</span>
+      }
+<span class="nc bnc" id="L47" title="All 2 branches missed.">    } else if (q2 != null) {</span>
+<span class="nc" id="L48">      field = q2.getField();</span>
+    } else {
+<span class="nc" id="L50">      field = null;</span>
+    }
+<span class="fc" id="L52">    this.q1 = q1;</span>
+<span class="fc" id="L53">    this.q2 = q2;</span>
+<span class="fc" id="L54">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
+  @Override
+  public String getField() {
+<span class="fc" id="L63">    return field;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
+   * search.IndexSearcher, boolean)
+   */
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+<span class="nc bnc" id="L76" title="All 4 branches missed.">    if (q1 == null || q2 == null) {</span>
+<span class="nc" id="L77">      return null;</span>
+    } else {
+<span class="nc" id="L79">      MtasSpanFullyAlignedWithQueryWeight w1 = new MtasSpanFullyAlignedWithQueryWeight(</span>
+<span class="nc" id="L80">          q1.createWeight(searcher, needsScores));</span>
+<span class="nc" id="L81">      MtasSpanFullyAlignedWithQueryWeight w2 = new MtasSpanFullyAlignedWithQueryWeight(</span>
+<span class="nc" id="L82">          q2.createWeight(searcher, needsScores));</span>
+      // subWeights
+<span class="nc" id="L84">      List&lt;MtasSpanFullyAlignedWithQueryWeight&gt; subWeights = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L85">      subWeights.add(w1);</span>
+<span class="nc" id="L86">      subWeights.add(w2);</span>
+      // return
+<span class="nc bnc" id="L88" title="All 2 branches missed.">      return new SpanFullyAlignedWithWeight(w1, w2, searcher,</span>
+<span class="nc" id="L89">          needsScores ? getTermContexts(subWeights) : null);</span>
+    }
+  }
+
+  /**
+   * Gets the term contexts.
+   *
+   * @param items
+   *          the items
+   * @return the term contexts
+   */
+  protected Map&lt;Term, TermContext&gt; getTermContexts(
+      List&lt;MtasSpanFullyAlignedWithQueryWeight&gt; items) {
+<span class="nc" id="L102">    List&lt;SpanWeight&gt; weights = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">    for (MtasSpanFullyAlignedWithQueryWeight item : items) {</span>
+<span class="nc" id="L104">      weights.add(item.spanWeight);</span>
+<span class="nc" id="L105">    }</span>
+<span class="nc" id="L106">    return getTermContexts(weights);</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
+  @Override
+  public String toString(String field) {
+<span class="nc" id="L116">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L117">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">    if (q1 != null) {</span>
+<span class="nc" id="L119">      buffer.append(q1.toString(q1.getField()));</span>
+    } else {
+<span class="nc" id="L121">      buffer.append(&quot;null&quot;);</span>
+    }
+<span class="nc" id="L123">    buffer.append(&quot;,&quot;);</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">    if (q2 != null) {</span>
+<span class="nc" id="L125">      buffer.append(q2.toString(q2.getField()));</span>
+    } else {
+<span class="nc" id="L127">      buffer.append(&quot;null&quot;);</span>
+    }
+<span class="nc" id="L129">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L130">    return buffer.toString();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L141">      return true;</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L143">      return false;</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L145">      return false;</span>
+<span class="fc" id="L146">    final MtasSpanFullyAlignedWithQuery other = (MtasSpanFullyAlignedWithQuery) obj;</span>
+<span class="pc bpc" id="L147" title="2 of 4 branches missed.">    return q1.equals(other.q1) &amp;&amp; q2.equals(other.q2);</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
+  @Override
+  public int hashCode() {
+<span class="nc" id="L157">    int h = Integer.rotateLeft(classHash(), 1);</span>
+<span class="nc" id="L158">    h ^= q1.hashCode();</span>
+<span class="nc" id="L159">    h = Integer.rotateLeft(h, 1);</span>
+<span class="nc" id="L160">    h ^= q2.hashCode();</span>
+<span class="nc" id="L161">    return h;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
+   */
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+<span class="nc" id="L172">    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);</span>
+<span class="nc" id="L173">    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);</span>
+<span class="nc bnc" id="L174" title="All 8 branches missed.">    if (newQ1 == null || newQ1 instanceof MtasSpanMatchNoneQuery</span>
+        || newQ2 == null || newQ2 instanceof MtasSpanMatchNoneQuery) {
+<span class="nc" id="L176">      return new MtasSpanMatchNoneQuery(field);</span>
+<span class="nc bnc" id="L177" title="All 4 branches missed.">    } else if (!newQ1.equals(q1) || !newQ2.equals(q2)) {</span>
+<span class="nc" id="L178">      return new MtasSpanFullyAlignedWithQuery(newQ1, newQ2).rewrite(reader);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">    } else if (newQ1.equals(newQ2)) {</span>
+<span class="nc" id="L180">      return newQ1;</span>
+    } else {
+      boolean returnNone;
+<span class="nc bnc" id="L183" title="All 2 branches missed.">      returnNone = newQ1.getMaximumWidth() != null</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">          &amp;&amp; newQ1.getMaximumWidth() == 0;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">      returnNone |= newQ2.getMaximumWidth() != null</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">          &amp;&amp; newQ2.getMaximumWidth() == 0;</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">      returnNone |= newQ1.getMinimumWidth() != null</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">          &amp;&amp; newQ2.getMaximumWidth() != null</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">          &amp;&amp; newQ1.getMinimumWidth() &gt; newQ2.getMaximumWidth();</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">      returnNone |= newQ2.getMinimumWidth() != null</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">          &amp;&amp; newQ1.getMaximumWidth() != null</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">          &amp;&amp; newQ2.getMinimumWidth() &gt; newQ1.getMaximumWidth();</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">      returnNone |= newQ2.getMinimumWidth() != null</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">          &amp;&amp; newQ1.getMaximumWidth() != null</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">          &amp;&amp; newQ2.getMinimumWidth() &gt; newQ1.getMaximumWidth();</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">      if (returnNone) {</span>
+<span class="nc" id="L197">        return new MtasSpanMatchNoneQuery(this.getField());</span>
+      } else {
+<span class="nc" id="L199">        return super.rewrite(reader);</span>
+      }
+    }
+  }
+
+  /**
+   * The Class SpanIntersectingWeight.
+   */
+  protected class SpanFullyAlignedWithWeight extends SpanWeight {
+
+    /** The w 2. */
+    MtasSpanFullyAlignedWithQueryWeight w1;
+    MtasSpanFullyAlignedWithQueryWeight w2;
+
+    /**
+     * Instantiates a new span intersecting weight.
+     *
+     * @param w1
+     *          the w 1
+     * @param w2
+     *          the w 2
+     * @param searcher
+     *          the searcher
+     * @param terms
+     *          the terms
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     */
+    public SpanFullyAlignedWithWeight(MtasSpanFullyAlignedWithQueryWeight w1,
+        MtasSpanFullyAlignedWithQueryWeight w2, IndexSearcher searcher,
+<span class="nc" id="L229">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
+<span class="nc" id="L230">      super(MtasSpanFullyAlignedWithQuery.this, searcher, terms);</span>
+<span class="nc" id="L231">      this.w1 = w1;</span>
+<span class="nc" id="L232">      this.w2 = w2;</span>
+<span class="nc" id="L233">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
+     */
+    @Override
+    public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
+<span class="nc" id="L244">      w1.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L245">      w2.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L246">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
+    @Override
+    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+        throws IOException {
+<span class="nc" id="L259">      Terms terms = context.reader().terms(field);</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">      if (terms == null) {</span>
+<span class="nc" id="L261">        return null; // field does not exist</span>
+      }
+<span class="nc" id="L263">      MtasSpanFullyAlignedWithQuerySpans s1 = new MtasSpanFullyAlignedWithQuerySpans(</span>
+<span class="nc" id="L264">          w1.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="nc" id="L265">      MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(</span>
+<span class="nc" id="L266">          w2.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="nc" id="L267">      return new MtasSpanFullyAlignedWithSpans(</span>
+          MtasSpanFullyAlignedWithQuery.this, s1, s2);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
+    @Override
+    public void extractTerms(Set&lt;Term&gt; terms) {
+<span class="nc" id="L278">      w1.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L279">      w2.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L280">    }</span>
+
+  }
+
+  /**
+   * The Class MtasSpanIntersectingQuerySpans.
+   */
+  protected class MtasSpanFullyAlignedWithQuerySpans {
+
+    /** The spans. */
+    public Spans spans;
+
+    /**
+     * Instantiates a new mtas span intersecting query spans.
+     *
+     * @param spans
+     *          the spans
+     */
+<span class="nc" id="L298">    public MtasSpanFullyAlignedWithQuerySpans(Spans spans) {</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);</span>
+<span class="nc" id="L300">    }</span>
+
+  }
+
+  /**
+   * The Class MtasSpanIntersectingQueryWeight.
+   */
+  private static class MtasSpanFullyAlignedWithQueryWeight {
+
+    /** The span weight. */
+    public SpanWeight spanWeight;
+
+    /**
+     * Instantiates a new mtas span intersecting query weight.
+     *
+     * @param spanWeight
+     *          the span weight
+     */
+<span class="nc" id="L318">    public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {</span>
+<span class="nc" id="L319">      this.spanWeight = spanWeight;</span>
+<span class="nc" id="L320">    }</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasTokenizer.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis</a> &gt; <span class="el_source">MtasTokenizer.java</span></div><h1>MtasTokenizer.java</h1><pre class="source lang-java linenums">package mtas.analysis;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import mtas.analysis.parser.MtasBasicParser;
+import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenCollection;
+import mtas.analysis.util.MtasConfigException;
+import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.MtasParserException;
+import mtas.codec.payload.MtasPayloadEncoder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.util.AttributeFactory;
+
+/**
+ * The Class MtasTokenizer.
+ */
+
+public final class MtasTokenizer extends Tokenizer {
+
+  /** The log. */
+<span class="fc" id="L35">  private static Log log = LogFactory.getLog(MtasTokenizer.class);</span>
+
+  /** The Constant CONFIGURATION_MTAS. */
+  public static final String CONFIGURATION_MTAS = &quot;mtas&quot;;
+
+  /** The current position. */
+<span class="pc" id="L41">  private int currentPosition = 0;</span>
+
+  /** The encoding flags. */
+<span class="pc" id="L44">  private int encodingFlags = MtasPayloadEncoder.ENCODE_DEFAULT;</span>
+
+  /** The parser name. */
+<span class="pc" id="L47">  private String parserName = null;</span>
+
+  /** The parser configuration. */
+<span class="pc" id="L50">  private MtasConfiguration parserConfiguration = null;</span>
+
+  /** The token collection. */
+  private MtasTokenCollection tokenCollection;
+
+  /** The term att. */
+<span class="pc" id="L56">  private final CharTermAttribute termAtt = addAttribute(</span>
+      CharTermAttribute.class);
+
+  /** The offset att. */
+<span class="pc" id="L60">  private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);</span>
+
+  /** The payload att. */
+<span class="pc" id="L63">  private final PayloadAttribute payloadAtt = addAttribute(</span>
+      PayloadAttribute.class);
+
+  /** The position increment att. */
+<span class="pc" id="L67">  private final PositionIncrementAttribute positionIncrementAtt = addAttribute(</span>
+      PositionIncrementAttribute.class);
+
+  /** The token collection iterator. */
+  private Iterator&lt;MtasToken&gt; tokenCollectionIterator;
+
+  /**
+   * Instantiates a new mtas tokenizer.
+   */
+<span class="nc" id="L76">  public MtasTokenizer() {</span>
+<span class="nc" id="L77">  }</span>
+
+  /**
+   * Instantiates a new mtas tokenizer.
+   *
+   * @param configFileName the config file name
+   */
+<span class="nc" id="L84">  public MtasTokenizer(final String configFileName) {</span>
+<span class="nc" id="L85">    readConfigurationFile(configFileName);</span>
+<span class="nc" id="L86">  }</span>
+
+  /**
+   * Instantiates a new mtas tokenizer.
+   *
+   * @param config the config
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+<span class="nc" id="L94">  public MtasTokenizer(final MtasConfiguration config) throws IOException {</span>
+<span class="nc" id="L95">    processConfiguration(config);</span>
+<span class="nc" id="L96">  }</span>
+
+  /**
+   * Instantiates a new mtas tokenizer.
+   *
+   * @param reader the reader
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+<span class="nc" id="L104">  public MtasTokenizer(final InputStream reader) throws IOException {</span>
+<span class="nc" id="L105">    processConfiguration(MtasConfiguration.readConfiguration(reader));</span>
+<span class="nc" id="L106">  }</span>
+
+  /**
+   * Instantiates a new mtas tokenizer.
+   *
+   * @param factory the factory
+   * @param config the config
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public MtasTokenizer(final AttributeFactory factory,
+      final MtasConfiguration config) throws IOException {
+<span class="fc" id="L117">    super(factory);</span>
+<span class="fc" id="L118">    processConfiguration(config);</span>
+<span class="fc" id="L119">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.analysis.TokenStream#incrementToken()
+   */
+  @Override
+  public boolean incrementToken() throws IOException {
+<span class="fc" id="L128">    clearAttributes();</span>
+    MtasToken token;
+    Integer positionIncrement;
+    MtasPayloadEncoder payloadEncoder;
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">    if (tokenCollectionIterator == null) {</span>
+<span class="nc" id="L133">      return false;</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">    } else if (tokenCollectionIterator.hasNext()) {</span>
+<span class="fc" id="L135">      token = tokenCollectionIterator.next();</span>
+      // compute info
+<span class="fc" id="L137">      positionIncrement = token.getPositionStart() - currentPosition;</span>
+<span class="fc" id="L138">      currentPosition = token.getPositionStart();</span>
+<span class="fc" id="L139">      payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);</span>
+      // set info
+<span class="fc" id="L141">      termAtt.append(token.getValue());</span>
+<span class="fc" id="L142">      positionIncrementAtt.setPositionIncrement(positionIncrement);</span>
+<span class="fc" id="L143">      offsetAtt.setOffset(token.getOffsetStart(), token.getOffsetEnd());</span>
+<span class="fc" id="L144">      payloadAtt.setPayload(payloadEncoder.getPayload());</span>
+<span class="fc" id="L145">      return true;</span>
+    }
+<span class="fc" id="L147">    return false;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.analysis.Tokenizer#reset()
+   */
+  @Override
+  public void reset() throws IOException {
+<span class="fc" id="L157">    super.reset();</span>
+<span class="fc" id="L158">    currentPosition = -1;</span>
+    try {
+<span class="fc" id="L160">      constructTokenCollection(input);</span>
+<span class="fc" id="L161">      tokenCollectionIterator = tokenCollection.iterator();</span>
+<span class="nc" id="L162">    } catch (MtasConfigException | MtasParserException e) {</span>
+<span class="nc" id="L163">      log.debug(e);</span>
+<span class="nc" id="L164">      tokenCollectionIterator = null;</span>
+<span class="nc" id="L165">      throw new IOException(</span>
+<span class="nc" id="L166">          e.getClass().getSimpleName() + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L167">    }</span>
+<span class="fc" id="L168">  }</span>
+
+  /**
+   * Prints the.
+   *
+   * @param r the r
+   * @throws MtasParserException the mtas parser exception
+   */
+  public void print(final Reader r) throws MtasParserException {
+    try {
+<span class="nc" id="L178">      setReader(r);</span>
+<span class="nc" id="L179">      reset();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">      if (tokenCollection != null) {</span>
+<span class="nc" id="L181">        tokenCollection.print();</span>
+      }
+<span class="nc" id="L183">      end();</span>
+<span class="nc" id="L184">      close();</span>
+<span class="nc" id="L185">    } catch (IOException e) {</span>
+<span class="nc" id="L186">      log.error(e);</span>
+<span class="nc" id="L187">      throw new MtasParserException(e.getClass() + &quot; : &quot; + e.getMessage());</span>
+<span class="nc" id="L188">    }</span>
+<span class="nc" id="L189">  }</span>
+
+  /**
+   * Gets the list.
+   *
+   * @param r the r
+   * @return the list
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String[][] getList(final Reader r) throws IOException {
+    try {
+<span class="nc" id="L200">      setReader(r);</span>
+<span class="nc" id="L201">      reset();</span>
+<span class="nc" id="L202">      String[][] result = tokenCollection.getList();</span>
+<span class="nc" id="L203">      end();</span>
+<span class="nc" id="L204">      close();</span>
+<span class="nc" id="L205">      return result;</span>
+<span class="nc" id="L206">    } catch (MtasParserException e) {</span>
+<span class="nc" id="L207">      log.info(e);</span>
+<span class="nc" id="L208">      throw new IOException(&quot;can't produce list&quot;);</span>
+    }
+  }
+
+  /**
+   * Construct token collection.
+   *
+   * @param reader the reader
+   * @throws MtasConfigException the mtas config exception
+   * @throws MtasParserException the mtas parser exception
+   */
+  private void constructTokenCollection(final Reader reader)
+      throws MtasConfigException, MtasParserException {
+<span class="fc" id="L221">    tokenCollection = null;</span>
+    try {
+<span class="fc" id="L223">      Constructor&lt;?&gt; c = Class.forName(parserName)</span>
+<span class="fc" id="L224">          .getDeclaredConstructor(MtasConfiguration.class);</span>
+      // try {
+<span class="fc" id="L226">      Object p = c.newInstance(parserConfiguration);</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">      if (p instanceof MtasBasicParser) {</span>
+<span class="fc" id="L228">        MtasBasicParser parser = (MtasBasicParser) p;</span>
+<span class="fc" id="L229">        tokenCollection = parser.createTokenCollection(reader);</span>
+<span class="fc" id="L230">        return;</span>
+      } else {
+<span class="nc" id="L232">        throw new MtasConfigException(&quot;no instance of MtasParser&quot;);</span>
+      }
+<span class="nc" id="L234">    } catch (MtasParserException e) {</span>
+<span class="nc" id="L235">      log.debug(e);</span>
+<span class="nc" id="L236">      tokenCollection = new MtasTokenCollection();</span>
+<span class="nc" id="L237">      throw new MtasParserException(e.getMessage());</span>
+<span class="nc" id="L238">    } catch (NoSuchMethodException | InvocationTargetException</span>
+        | IllegalAccessException | ClassNotFoundException
+        | InstantiationException e) {
+<span class="nc" id="L241">      log.debug(e);</span>
+<span class="nc" id="L242">      throw new MtasConfigException(</span>
+<span class="nc" id="L243">          e.getClass().getName() + &quot; : '&quot; + e.getMessage() + &quot;'&quot;);</span>
+    }
+
+  }
+
+  /**
+   * Read configuration file.
+   *
+   * @param configFile the config file
+   */
+  private void readConfigurationFile(final String configFile) {
+    InputStream is;
+    try {
+<span class="nc" id="L256">      is = new FileInputStream(configFile);</span>
+<span class="nc" id="L257">      processConfiguration(MtasConfiguration.readConfiguration(is));</span>
+<span class="nc" id="L258">      is.close();</span>
+<span class="nc" id="L259">    } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L260">      log.error(&quot;Couldn't find &quot; + configFile, e);</span>
+<span class="nc" id="L261">    } catch (IOException e) {</span>
+<span class="nc" id="L262">      log.error(&quot;Couldn't read &quot; + configFile, e);</span>
+<span class="nc" id="L263">    }</span>
+<span class="nc" id="L264">  }</span>
+
+  /**
+   * Process configuration.
+   *
+   * @param config the config
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private void processConfiguration(final MtasConfiguration config)
+      throws IOException {
+<span class="fc" id="L274">    final String nameIndex = &quot;index&quot;;</span>
+<span class="fc" id="L275">    final String nameParser = &quot;parser&quot;;</span>
+<span class="fc" id="L276">    final String nameName = &quot;name&quot;;</span>
+<span class="fc" id="L277">    final String valueTrue = &quot;true&quot;;</span>
+<span class="fc" id="L278">    final String valueFalse = &quot;false&quot;;</span>
+<span class="fc" id="L279">    final String value0 = &quot;0&quot;;</span>
+<span class="fc" id="L280">    final String value1 = &quot;1&quot;;</span>
+<span class="fc" id="L281">    HashMap&lt;String, Integer&gt; indexEncodingMapper = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L282">    indexEncodingMapper.put(&quot;payload&quot;, MtasPayloadEncoder.ENCODE_PAYLOAD);</span>
+<span class="fc" id="L283">    indexEncodingMapper.put(&quot;offset&quot;, MtasPayloadEncoder.ENCODE_OFFSET);</span>
+<span class="fc" id="L284">    indexEncodingMapper.put(&quot;realoffset&quot;, MtasPayloadEncoder.ENCODE_REALOFFSET);</span>
+<span class="fc" id="L285">    indexEncodingMapper.put(&quot;parent&quot;, MtasPayloadEncoder.ENCODE_PARENT);</span>
+    // process
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">    if (config != null) {</span>
+<span class="fc bfc" id="L288" title="All 2 branches covered.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if (config.children.get(i).name.equals(nameIndex)) {</span>
+<span class="fc" id="L290">          MtasConfiguration index = config.children.get(i);</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">          for (int j = 0; j &lt; index.children.size(); j++) {</span>
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">            if (indexEncodingMapper.containsKey(index.children.get(j).name)) {</span>
+<span class="fc" id="L293">              String value = index.children.get(j).attributes.get(nameIndex);</span>
+<span class="pc bpc" id="L294" title="1 of 4 branches missed.">              if ((value.equals(valueTrue)) || (value.equals(value1))) {</span>
+<span class="fc" id="L295">                encodingFlags |= indexEncodingMapper</span>
+<span class="fc" id="L296">                    .get(index.children.get(j).name);</span>
+<span class="pc bpc" id="L297" title="3 of 4 branches missed.">              } else if ((value.equals(valueFalse)) || (value.equals(value0))) {</span>
+<span class="fc" id="L298">                encodingFlags &amp;= ~indexEncodingMapper</span>
+<span class="fc" id="L299">                    .get(index.children.get(j).name);</span>
+              }
+            }
+          }
+<span class="pc bpc" id="L303" title="1 of 2 branches missed.">        } else if (config.children.get(i).name.equals(nameParser)) {</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">          if (config.children.get(i).attributes.containsKey(nameName)) {</span>
+<span class="fc" id="L305">            parserName = config.children.get(i).attributes.get(nameName);</span>
+<span class="fc" id="L306">            parserConfiguration = config.children.get(i);</span>
+          } else {
+<span class="nc" id="L308">            throw new IOException(&quot;no parser configuration&quot;);</span>
+          }
+        }
+      }
+    } else {
+<span class="nc" id="L313">      throw new IOException(&quot;no (valid) configuration&quot;);</span>
+    }
+<span class="fc" id="L315">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.util.AttributeSource#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L324" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L325">      return true;</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L327">      return false;</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L329">      return false;</span>
+<span class="nc" id="L330">    final MtasTokenizer that = (MtasTokenizer) obj;</span>
+<span class="nc" id="L331">    return super.equals(that);</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.util.AttributeSource#hashCode()
+   */
+  @Override
+  public int hashCode() {
+<span class="nc" id="L341">    return super.hashCode();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

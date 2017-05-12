@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataLongOperations.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataLongOperations.java</span></div><h1>MtasDataLongOperations.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+
+import java.io.Serializable;
+
+/**
+ * The Class MtasDataLongOperations.
+ */
+<span class="fc" id="L8">class MtasDataLongOperations</span>
+    implements MtasDataOperations&lt;Long, Double&gt;, Serializable {
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#product11(java.lang.
+   * Number, java.lang.Number)
+   */
+  @Override
+  public Long product11(Long arg1, Long arg2) {
+<span class="pc bpc" id="L22" title="2 of 4 branches missed.">    if (arg1 == null || arg2 == null) {</span>
+<span class="nc" id="L23">      return null;</span>
+    } else {
+<span class="fc" id="L25">      return arg1 * arg2;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#add11(java.lang.Number,
+   * java.lang.Number)
+   */
+  @Override
+  public Long add11(Long arg1, Long arg2) {
+<span class="pc bpc" id="L38" title="2 of 4 branches missed.">    if (arg1 == null || arg2 == null) {</span>
+<span class="nc" id="L39">      return null;</span>
+    } else {
+<span class="fc" id="L41">      return arg1 + arg2;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#add22(java.lang.Number,
+   * java.lang.Number)
+   */
+  @Override
+  public Double add22(Double arg1, Double arg2) {
+<span class="pc bpc" id="L54" title="2 of 4 branches missed.">    if (arg1 == null || arg2 == null) {</span>
+<span class="nc" id="L55">      return Double.NaN;</span>
+    } else {
+<span class="fc" id="L57">      return arg1 + arg2;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#subtract12(java.lang.
+   * Number, java.lang.Number)
+   */
+  @Override
+  public Double subtract12(Long arg1, Double arg2) {
+<span class="nc bnc" id="L69" title="All 4 branches missed.">    if (arg1 == null || arg2 == null) {</span>
+<span class="nc" id="L70">      return Double.NaN;</span>
+    } else {
+<span class="nc" id="L72">      return arg1.doubleValue() - arg2;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#divide1(java.lang.
+   * Number, long)
+   */
+  @Override
+  public Double divide1(Long arg1, long arg2) {
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    if (arg1 == null) {</span>
+<span class="nc" id="L85">      return Double.NaN;</span>
+    } else {
+<span class="fc" id="L87">      return arg1 / (double) arg2;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#divide2(java.lang.
+   * Number, long)
+   */
+  @Override
+  public Double divide2(Double arg1, long arg2) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    if (arg1 == null) {</span>
+<span class="nc" id="L100">      return Double.NaN;</span>
+    } else {
+<span class="nc" id="L102">      return arg1 / arg2;</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#min11(java.lang.Number,
+   * java.lang.Number)
+   */
+  @Override
+  public Long min11(Long arg1, Long arg2) {
+<span class="pc bpc" id="L115" title="2 of 4 branches missed.">    if (arg1 == null || arg2 == null) {</span>
+<span class="nc" id="L116">      return null;</span>
+    } else {
+<span class="fc" id="L118">      return Math.min(arg1, arg2);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#max11(java.lang.Number,
+   * java.lang.Number)
+   */
+  @Override
+  public Long max11(Long arg1, Long arg2) {
+<span class="pc bpc" id="L131" title="2 of 4 branches missed.">    if (arg1 == null || arg2 == null) {</span>
+<span class="nc" id="L132">      return null;</span>
+    } else {
+<span class="fc" id="L134">      return Math.max(arg1, arg2);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#exp2(java.lang.Number)
+   */
+  @Override
+  public Double exp2(Double arg1) {
+<span class="nc bnc" id="L146" title="All 2 branches missed.">    if (arg1 == null) {</span>
+<span class="nc" id="L147">      return Double.NaN;</span>
+    } else {
+<span class="nc" id="L149">      return Math.exp(arg1);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#sqrt2(java.lang.Number)
+   */
+  @Override
+  public Double sqrt2(Double arg1) {
+<span class="nc bnc" id="L161" title="All 2 branches missed.">    if (arg1 == null) {</span>
+<span class="nc" id="L162">      return Double.NaN;</span>
+    } else {
+<span class="nc" id="L164">      return Math.sqrt(arg1);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.DataCollector.MtasDataOperations#log1(java.lang.Number)
+   */
+  @Override
+  public Double log1(Long arg1) {
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    if (arg1 == null) {</span>
+<span class="nc" id="L177">      return Double.NaN;</span>
+    } else {
+<span class="fc" id="L179">      return Math.log(arg1);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#createVector1(int)
+   */
+  @Override
+  public Long[] createVector1(int length) {
+<span class="fc" id="L190">    return new Long[length];</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#createVector2(int)
+   */
+  @Override
+  public Double[] createVector2(int length) {
+<span class="fc" id="L200">    return new Double[length];</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#createMatrix1(int)
+   */
+  @Override
+  public Long[][] createMatrix1(int length) {
+<span class="fc" id="L210">    return new Long[length][];</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#getZero1()
+   */
+  @Override
+  public Long getZero1() {
+<span class="nc" id="L220">    return Long.valueOf(0);</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.DataCollector.MtasDataOperations#getZero2()
+   */
+  @Override
+  public Double getZero2() {
+<span class="nc" id="L230">    return Double.valueOf(0);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
