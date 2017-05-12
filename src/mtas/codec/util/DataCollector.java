@@ -1,6 +1,7 @@
 package mtas.codec.util;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.TreeSet;
 
 import mtas.codec.util.collector.MtasDataCollector;
@@ -50,7 +51,7 @@ public class DataCollector {
    *           Signals that an I/O exception has occurred.
    */
   public static MtasDataCollector<?, ?> getCollector(String collectorType,
-      String dataType, String statsType, TreeSet<String> statsItems,
+      String dataType, String statsType, Set<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String segmentRegistration, String boundary) throws IOException {
     return getCollector(collectorType, dataType, statsType, statsItems,
@@ -102,10 +103,10 @@ public class DataCollector {
    *           Signals that an I/O exception has occurred.
    */
   public static MtasDataCollector<?, ?> getCollector(String collectorType,
-      String dataType, String statsType, TreeSet<String> statsItems,
+      String dataType, String statsType, Set<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      TreeSet<String>[] subStatsItems, String[] subSortTypes,
+      Set<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
     if (dataType != null && dataType.equals(CodecUtil.DATA_TYPE_LONG)) {

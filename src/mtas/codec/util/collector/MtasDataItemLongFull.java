@@ -2,6 +2,8 @@ package mtas.codec.util.collector;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,8 +42,8 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
    *          the source number
    */
   public MtasDataItemLongFull(long[] value, MtasDataCollector<?, ?> sub,
-      TreeSet<String> statsItems, String sortType, String sortDirection,
-      int errorNumber, HashMap<String, Integer> errorList, int sourceNumber) {
+      Set<String> statsItems, String sortType, String sortDirection,
+      int errorNumber, Map<String, Integer> errorList, int sourceNumber) {
     super(ArrayUtils.toObject(value), sub, statsItems, sortType, sortDirection,
         errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);
   }
@@ -55,7 +57,7 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
    */
   @Override
   protected HashMap<String, Object> getDistribution(String argument) {
-    HashMap<String, Object> result = new LinkedHashMap<String, Object>();
+    HashMap<String, Object> result = new LinkedHashMap<>();
     Long start = null, end = null, step = null;
     Integer number = null;
     if (argument != null) {
@@ -136,9 +138,9 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
       Long r = Math.min(end, l + step - 1);
       String key;
       if (step > 1 && r > l) {
-        key = "[" + String.valueOf(l) + "," + String.valueOf(r) + "]";
+        key = "[" + l + "," + r + "]";
       } else {
-        key = "[" + String.valueOf(l) + "]";
+        key = "[" + l + "]";
       }
       result.put(key, list[i]);
     }
@@ -172,13 +174,13 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUM:
-      return new MtasDataItemNumberComparator<Long>(Math.round(stats.getSum()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getSum()), sortDirection);
     case CodecUtil.STATS_TYPE_MAX:
-      return new MtasDataItemNumberComparator<Long>(Math.round(stats.getMax()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getMax()), sortDirection);
     case CodecUtil.STATS_TYPE_MIN:
-      return new MtasDataItemNumberComparator<Long>(Math.round(stats.getMin()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getMin()), sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
-      return new MtasDataItemNumberComparator<Long>(Math.round(stats.getSumsq()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getSumsq()), sortDirection);
     default:
       return null;
     }
@@ -194,26 +196,26 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUMOFLOGS:
-      return new MtasDataItemNumberComparator<Double>(
+      return new MtasDataItemNumberComparator<>(
           stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);
     case CodecUtil.STATS_TYPE_MEAN:
-      return new MtasDataItemNumberComparator<Double>(stats.getMean(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getMean(), sortDirection);
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-      return new MtasDataItemNumberComparator<Double>(stats.getGeometricMean(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getGeometricMean(), sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-      return new MtasDataItemNumberComparator<Double>(stats.getStandardDeviation(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getStandardDeviation(), sortDirection);
     case CodecUtil.STATS_TYPE_VARIANCE:
-      return new MtasDataItemNumberComparator<Double>(stats.getVariance(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getVariance(), sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-      return new MtasDataItemNumberComparator<Double>(stats.getPopulationVariance(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getPopulationVariance(), sortDirection);
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-      return new MtasDataItemNumberComparator<Double>(stats.getQuadraticMean(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getQuadraticMean(), sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
-      return new MtasDataItemNumberComparator<Double>(stats.getKurtosis(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getKurtosis(), sortDirection);
     case CodecUtil.STATS_TYPE_MEDIAN:
-      return new MtasDataItemNumberComparator<Double>(stats.getPercentile(50), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getPercentile(50), sortDirection);
     case CodecUtil.STATS_TYPE_SKEWNESS:
-      return new MtasDataItemNumberComparator<Double>(stats.getSkewness(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getSkewness(), sortDirection);
     default:
       return null;
     }

@@ -27,7 +27,7 @@ public class MtasSolrMtasResult implements Serializable {
   public String statsType;
 
   /** The stats items. */
-  public TreeSet<String> statsItems;
+  public Set<String> statsItems;
 
   /** The sort direction. */
   public String sortType;
@@ -41,14 +41,14 @@ public class MtasSolrMtasResult implements Serializable {
   public MtasDataCollector<?, ?> dataCollector = null;
 
   /** The function data. */
-  public HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData;
+  public Map<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData;
 
   /** The sub stats type. */
   private String[] subDataType;
   private String[] subStatsType;
 
   /** The sub stats items. */
-  private TreeSet<String>[] subStatsItems;
+  private Set<String>[] subStatsItems;
 
   /** The sub sort direction. */
   private String[] subSortType;
@@ -82,10 +82,10 @@ public class MtasSolrMtasResult implements Serializable {
    */
   @SuppressWarnings("unchecked")
   public MtasSolrMtasResult(MtasDataCollector<?, ?> dataCollector,
-      String[] dataType, String[] statsType, TreeSet<String>[] statsItems,
+      String[] dataType, String[] statsType, Set<String>[] statsItems,
       String[] sortType, String[] sortDirection, Integer[] start,
       Integer[] number,
-      HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData) {
+      Map<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData) {
     this.dataCollector = dataCollector;
     this.functionData = functionData;
     this.dataType = (dataType == null) ? null : dataType[0];
@@ -134,10 +134,10 @@ public class MtasSolrMtasResult implements Serializable {
    */
   @SuppressWarnings("unchecked")
   public MtasSolrMtasResult(MtasDataCollector<?, ?> dataCollector, String dataType,
-      String statsType, TreeSet<String> statsItems,
-      HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData) {
+      String statsType, Set<String> statsItems,
+      Map<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData) {
     this(dataCollector, new String[] { dataType }, new String[] { statsType },
-        new TreeSet[] { statsItems }, new String[] { null },
+        new Set[] { statsItems }, new String[] { null },
         new String[] { null }, new Integer[] { 0 }, new Integer[] { 1 },
         functionData);
   }

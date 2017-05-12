@@ -5,6 +5,9 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.StringReader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
 import mtas.parser.cql.util.MtasCQLParserWordPositionQuery;
@@ -17,14 +20,16 @@ import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 public class MtasCQLParserTestWord {
 
- private void testCQLParse(String field, String defaultPrefix, String cql, MtasSpanQuery q) {    
+  private static Log log = LogFactory.getLog(MtasCQLParserTestWord.class);
+
+  private void testCQLParse(String field, String defaultPrefix, String cql, MtasSpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));
     try {
       assertEquals(p.parse(field, defaultPrefix, null, null, null) ,q);
       //System.out.println("Tested CQL parsing:\t"+cql);
     } catch (ParseException e) {
       //System.out.println("Error CQL parsing:\t"+cql);
-      e.printStackTrace();
+      log.error(e);
     }
   }
   
@@ -36,7 +41,7 @@ public class MtasCQLParserTestWord {
       //System.out.println("Tested CQL equivalent:\t"+cql1+" and "+cql2);
     } catch (ParseException e) {
       //System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
-      e.printStackTrace();
+      log.error(e);
     }
   }
   

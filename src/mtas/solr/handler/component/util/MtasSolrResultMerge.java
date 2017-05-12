@@ -113,7 +113,7 @@ public class MtasSolrResultMerge {
       mtasJoinResponse = null;
     }
     // collect responses for each shard
-    HashMap<String, NamedList<Object>> mtasListShardResponses = new HashMap<String, NamedList<Object>>();
+    HashMap<String, NamedList<Object>> mtasListShardResponses = new HashMap<>();
     for (ShardResponse response : sreq.responses) {
       // only continue if new shard or preferred purpose
       if (mtasListShardResponses.containsKey(response.getShard())
@@ -170,7 +170,7 @@ public class MtasSolrResultMerge {
       mtasResponse.add(key, mtasListResponse);
     }
     // collect responses for each shard
-    HashMap<String, NamedList<Object>> mtasListShardResponses = new HashMap<String, NamedList<Object>>();
+    HashMap<String, NamedList<Object>> mtasListShardResponses = new HashMap<>();
     for (ShardResponse response : sreq.responses) {
       // only continue if new shard or preferred purpose
       if (mtasListShardResponses.containsKey(response.getShard())
@@ -224,13 +224,13 @@ public class MtasSolrResultMerge {
     if (o instanceof ArrayList) {
       mtasListResponse = (ArrayList<Object>) o;
     } else {
-      mtasListResponse = new ArrayList<Object>();
+      mtasListResponse = new ArrayList<>();
       mtasResponse.removeAll(key);
       mtasResponse.add(key, mtasListResponse);
     }
     // collect responses for each shard
-    HashMap<String, ArrayList<Object>> mtasListShardResponses = new HashMap<String, ArrayList<Object>>();
-    ArrayList<ArrayList<Object>> mtasListShardResponsesExtra = new ArrayList<ArrayList<Object>>();
+    HashMap<String, ArrayList<Object>> mtasListShardResponses = new HashMap<>();
+    ArrayList<ArrayList<Object>> mtasListShardResponsesExtra = new ArrayList<>();
     for (ShardResponse response : sreq.responses) {
       // only continue if new shard or preferred purpose
       if (mtasListShardResponses.containsKey(response.getShard())
@@ -299,7 +299,7 @@ public class MtasSolrResultMerge {
   private void mergeResponsesArrayList(ArrayList<Object> originalList,
       ArrayList<Object> shardList) throws IOException {
     // get keys from original
-    HashMap<String, Object> originalKeyList = new HashMap<String, Object>();
+    HashMap<String, Object> originalKeyList = new HashMap<>();
     for (Object item : originalList) {
       if (item instanceof NamedList<?>) {
         NamedList<Object> itemList = (NamedList<Object>) item;
@@ -418,15 +418,14 @@ public class MtasSolrResultMerge {
       }
       return newObject;
     } else if (original instanceof ArrayList) {
-      ArrayList<Object> newObject = new ArrayList<Object>();
+      ArrayList<Object> newObject = new ArrayList<>();
       ArrayList<Object> originalObject = (ArrayList<Object>) original;
       for (int i = 0; i < originalObject.size(); i++) {
         newObject.add(adjustablePartsCloned(originalObject.get(i)));
       }
       return newObject;
     } else if (original instanceof Integer) {
-      Integer originalObject = (Integer) original;
-      return new Integer(originalObject.intValue());
+      return original;
     }
     return original;
   }

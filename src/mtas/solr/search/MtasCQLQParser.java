@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import mtas.parser.cql.MtasCQLParser;
 import mtas.search.spans.util.MtasSpanQuery;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.request.SolrQueryRequest;
@@ -29,6 +31,9 @@ public class MtasCQLQParser extends QParser {
   /** The mtas cql qparser query. */
   public static final String MTAS_CQL_QPARSER_IGNORE = "ignore";
 
+  public static final String MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
+
+  
   /** The mtas cql qparser default prefix. */
   public static final String MTAS_CQL_QPARSER_PREFIX = "prefix";
 
@@ -71,6 +76,14 @@ public class MtasCQLQParser extends QParser {
     if ((localParams.getParams(MTAS_CQL_QPARSER_IGNORE) != null)
         && (localParams.getParams(MTAS_CQL_QPARSER_IGNORE).length == 1)) {
       ignoreQuery = localParams.getParams(MTAS_CQL_QPARSER_IGNORE)[0];
+    }
+    if ((localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH) != null)
+        && (localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH).length == 1)) {
+      try {
+        maximumIgnoreLength = Integer.parseInt(localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH)[0]);
+      } catch (NumberFormatException e) {
+        maximumIgnoreLength = null;
+      }
     }
     if ((localParams.getParams(MTAS_CQL_QPARSER_PREFIX) != null)
         && (localParams
@@ -118,7 +131,7 @@ public class MtasCQLQParser extends QParser {
         try {
           iq = ignoreParser.parse(field, null, null, null, null);
         } catch (mtas.parser.cql.TokenMgrError | mtas.parser.cql.ParseException e) {
-          throw new SyntaxError(e.getMessage());
+          throw new SyntaxError(e);
         }
       }
       Reader queryReader = new BufferedReader(new StringReader(cql));
@@ -126,7 +139,7 @@ public class MtasCQLQParser extends QParser {
       try {
         q = queryParser.parse(field, defaultPrefix, variables, iq, maximumIgnoreLength);
       } catch (mtas.parser.cql.TokenMgrError | mtas.parser.cql.ParseException e) {
-        throw new SyntaxError(e.getMessage());
+        throw new SyntaxError(e);
       }
       return q;
     }

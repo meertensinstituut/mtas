@@ -1,6 +1,8 @@
 package mtas.codec.util.collector;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import mtas.codec.util.CodecUtil;
 
@@ -35,8 +37,8 @@ class MtasDataItemLongBasic extends MtasDataItemBasic<Long, Double> {
    *          the source number
    */
   public MtasDataItemLongBasic(Long valueSum, long valueN,
-      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems, String sortType,
-      String sortDirection, int errorNumber, HashMap<String, Integer> errorList,
+      MtasDataCollector<?, ?> sub, Set<String> statsItems, String sortType,
+      String sortDirection, int errorNumber, Map<String, Integer> errorList,
       int sourceNumber) {
     super(valueSum, valueN, sub, statsItems, sortType, sortDirection,
         errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);

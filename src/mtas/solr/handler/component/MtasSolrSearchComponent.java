@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+
+import mtas.analysis.MtasTokenizer;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
@@ -28,6 +30,9 @@ import mtas.solr.handler.component.util.MtasSolrComponentList;
 import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
 import mtas.solr.handler.component.util.MtasSolrComponentStats;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -42,6 +47,9 @@ import org.apache.solr.search.SolrIndexSearcher;
  */
 public class MtasSolrSearchComponent extends SearchComponent {
 
+  private static Log log = LogFactory.getLog(MtasSolrSearchComponent.class);
+
+  
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
@@ -290,7 +298,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
                 docListList, docSetList, mtasFields.list.get(field));
           } catch (IllegalAccessException | IllegalArgumentException
               | InvocationTargetException e) {
-            e.printStackTrace();
+            log.error(e);
             throw new IOException(e.getMessage());
           }
         }

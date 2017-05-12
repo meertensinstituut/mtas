@@ -7,6 +7,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
 import mtas.parser.cql.util.MtasCQLParserGroupQuery;
@@ -28,6 +31,8 @@ import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 
 public class MtasCQLParserTestSentence {
 
+  private static Log log = LogFactory.getLog(MtasCQLParserTestSentence.class);
+
   private void testCQLParse(String field, String defaultPrefix, String cql, MtasSpanQuery q) {    
     MtasCQLParser p = new MtasCQLParser(new BufferedReader(new StringReader(cql)));   
     try {
@@ -36,7 +41,7 @@ public class MtasCQLParserTestSentence {
       //System.out.print("\n");
     } catch (ParseException e) {
       //System.out.println("Error CQL parsing:\t"+cql);
-      e.printStackTrace();
+      log.error(e);
     }
   }
   
@@ -48,7 +53,7 @@ public class MtasCQLParserTestSentence {
       assertEquals(p1.parse(field, defaultPrefix, null, null, null) ,p2.parse(field, defaultPrefix, null, null, null));      
     } catch (ParseException e) {
       //System.out.println("Error CQL equivalent:\t"+cql1+" and "+cql2);
-      e.printStackTrace();
+      log.error(e);
     }
   }
   
@@ -59,7 +64,7 @@ public class MtasCQLParserTestSentence {
     String cql = "[pos=\"LID\"] [lemma=\"koe\"]";    
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q2, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
@@ -91,7 +96,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID", null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"lemma","de", null, null);
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe", null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q2, false));
     items.add(new MtasSpanSequenceItem(q3, false));
     MtasSpanQuery q4 = new MtasSpanSequenceQuery(items, null, null);
@@ -131,7 +136,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N", null, null);
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","ADJ", null, null);
     MtasSpanQuery q4 = new MtasSpanOrQuery(q2,q3);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
@@ -147,7 +152,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"pos","ADJ", null, null);
     MtasSpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);
     MtasSpanQuery q5 = new MtasSpanOrQuery(new MtasSpanRecurrenceQuery(q2,2,3,null, null),new MtasSpanRecurrenceQuery(q3,2,3,null, null));
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q5, false));
     items.add(new MtasSpanSequenceItem(q4, false));
@@ -162,7 +167,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"pos","LID",null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","ADJ",null, null);
     MtasSpanQuery q3 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q1, true));
     items.add(new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q2,1,3,null, null), false));
     items.add(new MtasSpanSequenceItem(q3, false));
@@ -198,7 +203,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"t","de",null, null);
     MtasSpanQuery q3 = new MtasCQLParserGroupQuery(field,"sentence");
     MtasSpanQuery q4 = new MtasSpanWithinQuery(q3, q2);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
@@ -213,7 +218,7 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q2 = new MtasCQLParserGroupQuery(field,"sentence");
     MtasSpanQuery q3 = new MtasSpanWithinQuery(q2, q1);
     MtasSpanQuery q4 = new MtasCQLParserWordQuery(field,"lemma","koe",null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q3, false));
     items.add(new MtasSpanSequenceItem(q4, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
@@ -230,12 +235,12 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q4 = new MtasSpanContainingQuery(q2, q3);
     MtasSpanQuery q5 = new MtasCQLParserGroupQuery(field,"sentence");
     MtasSpanQuery q6 = new MtasCQLParserWordQuery(field,"lemma","paard",null, null);    
-    List<MtasSpanSequenceItem> items1 = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items1 = new ArrayList<>();
     items1.add(new MtasSpanSequenceItem(q5, false));
     items1.add(new MtasSpanSequenceItem(q6, false));
     MtasSpanQuery q7 = new MtasSpanSequenceQuery(items1, null, null);
     MtasSpanQuery q8 = new MtasSpanWithinQuery(q7, q4);
-    List<MtasSpanSequenceItem> items2 = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items2 = new ArrayList<>();
     items2.add(new MtasSpanSequenceItem(q1, false));
     items2.add(new MtasSpanSequenceItem(q8, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items2, null, null);    
@@ -261,7 +266,7 @@ public class MtasCQLParserTestSentence {
     String cql = "[]<entity=\"loc\"/>{1,2}[]"; 
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
     MtasSpanQuery q2 = new MtasSpanRecurrenceQuery(q1,1,2,null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
     items.add(new MtasSpanSequenceItem(q2, false));
     items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
@@ -275,7 +280,7 @@ public class MtasCQLParserTestSentence {
     String cql = "\"de\" [pos=\"N\"]"; 
     MtasSpanQuery q1 = new MtasCQLParserWordQuery(field,"t_lc","de",null, null);
     MtasSpanQuery q2 = new MtasCQLParserWordQuery(field,"pos","N",null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(q1, false));
     items.add(new MtasSpanSequenceItem(q2, false));
     MtasSpanQuery q = new MtasSpanSequenceQuery(items, null, null);
@@ -288,7 +293,7 @@ public class MtasCQLParserTestSentence {
     String cql = "([]<entity=\"loc\"/>{1,2}[]){3,4}"; 
     MtasSpanQuery q1 = new MtasCQLParserGroupQuery(field,"entity","loc");
     MtasSpanQuery q2 = new MtasSpanRecurrenceQuery(q1,1,2,null, null);
-    List<MtasSpanSequenceItem> items = new ArrayList<MtasSpanSequenceItem>();
+    List<MtasSpanSequenceItem> items = new ArrayList<>();
     items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));
     items.add(new MtasSpanSequenceItem(q2, false));
     items.add(new MtasSpanSequenceItem(new MtasSpanMatchAllQuery(field), false));

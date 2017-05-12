@@ -22,7 +22,7 @@ public class MtasFunctionParserTest {
   private void testFunction(MtasFunctionParserFunction pf, long[] args, int n,
       MtasFunctionParserFunctionResponse r) {
     assertEquals(pf + "\tn:" + n + "\targs:" + Arrays.toString(args),
-        pf.getResponse(args, n), r);
+        pf.getResponse(args, n), r); 
   }
 
   private long[] getArgs(int n, int min, int max) {
@@ -373,10 +373,6 @@ public class MtasFunctionParserTest {
     } else {
       throw new IOException("unknown operator");
     }
-  }
-
-  private Double compute(int op, long v1, double v2) throws IOException {
-    return compute(op, (double) v1, v2);
   }
 
   private Double compute(int op, double v1, long v2) throws IOException {

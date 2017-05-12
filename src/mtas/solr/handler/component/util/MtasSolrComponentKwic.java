@@ -3,6 +3,7 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -27,9 +28,6 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
 
-  /** The search component. */
-  MtasSolrSearchComponent searchComponent;
-
   /** The Constant PARAM_MTAS_KWIC. */
   public static final String PARAM_MTAS_KWIC = MtasSolrSearchComponent.PARAM_MTAS
       + ".kwic";
@@ -50,7 +48,7 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   public static final String NAME_MTAS_KWIC_QUERY_IGNORE = "query.ignore";
 
   /** The Constant NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH. */
-  public static final String NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumQueryLength";
+  public static final String NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumIgnoreLength";
 
   /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
   public static final String NAME_MTAS_KWIC_QUERY_VARIABLE = "query.variable";
@@ -85,16 +83,17 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Instantiates a new mtas solr component kwic.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentKwic(MtasSolrSearchComponent searchComponent) {
-    this.searchComponent = searchComponent;
   }
 
   /**
    * Gets the positive integer.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -108,15 +107,18 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Prepare.
    *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param rb
+   *          the rb
+   * @param mtasFields
+   *          the mtas fields
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] queryTypes = new String[ids.size()];
@@ -152,9 +154,9 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
         Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
             rb.req.getParams(),
             PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_VARIABLE);
-        queryVariables[tmpCounter] = new HashMap<String, String[]>();
-        if (vIds.size() > 0) {
-          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+        queryVariables[tmpCounter] = new HashMap<>();
+        if (!vIds.isEmpty()) {
+          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<>();
           for (String vId : vIds) {
             String name = rb.req.getParams().get(
                 PARAM_MTAS_KWIC + "." + id + "." + NAME_MTAS_KWIC_QUERY_VARIABLE
@@ -169,7 +171,7 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
                       + NAME_MTAS_KWIC_QUERY_VARIABLE + "." + vId + "."
                       + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE, null);
               if (value != null) {
-                ArrayList<String> list = new ArrayList<String>();
+                ArrayList<String> list = new ArrayList<>();
                 String[] subList = value.split("(?<!\\\\),");
                 for (int i = 0; i < subList.length; i++) {
                   list.add(
@@ -179,9 +181,10 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
               }
             }
           }
-          for (String name : tmpVariables.keySet()) {
-            queryVariables[tmpCounter].put(name, tmpVariables.get(name)
-                .toArray(new String[tmpVariables.get(name).size()]));
+          for (Entry<String, ArrayList<String>> entry : tmpVariables
+              .entrySet()) {
+            queryVariables[tmpCounter].put(entry.getKey(),
+                entry.getValue().toArray(new String[entry.getValue().size()]));
           }
         }
         keys[tmpCounter] = rb.req.getParams()
@@ -271,44 +274,49 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Creates the.
    *
-   * @param kwic the kwic
+   * @param kwic
+   *          the kwic
    * @return the simple ordered map
    */
   public SimpleOrderedMap<Object> create(ComponentKwic kwic, Boolean encode) {
     SimpleOrderedMap<Object> mtasKwicResponse = new SimpleOrderedMap<>();
     mtasKwicResponse.add("key", kwic.key);
-    ArrayList<NamedList<Object>> mtasKwicItemResponses = new ArrayList<NamedList<Object>>();
+    ArrayList<NamedList<Object>> mtasKwicItemResponses = new ArrayList<>();
     if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_HIT)) {
       for (int docId : kwic.hits.keySet()) {
         NamedList<Object> mtasKwicItemResponse = new SimpleOrderedMap<>();
         ArrayList<KwicHit> list = kwic.hits.get(docId);
-        ArrayList<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<NamedList<Object>>();
+        ArrayList<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<>();
         for (KwicHit h : list) {
           NamedList<Object> mtasKwicItemResponseItem = new SimpleOrderedMap<>();
-          TreeMap<Integer, ArrayList<ArrayList<String>>> hitData = new TreeMap<Integer, ArrayList<ArrayList<String>>>();
-          TreeMap<Integer, ArrayList<ArrayList<String>>> leftData = null,
-              rightData = null;
+          TreeMap<Integer, ArrayList<ArrayList<String>>> hitData = new TreeMap<>();
+          TreeMap<Integer, ArrayList<ArrayList<String>>> leftData = null;
+          TreeMap<Integer, ArrayList<ArrayList<String>>> rightData = null;
           if (kwic.left > 0) {
-            leftData = new TreeMap<Integer, ArrayList<ArrayList<String>>>();
+            leftData = new TreeMap<>();
           }
           if (kwic.right > 0) {
-            rightData = new TreeMap<Integer, ArrayList<ArrayList<String>>>();
+            rightData = new TreeMap<>();
           }
           for (int position = Math.max(0,
               h.startPosition - kwic.left); position <= (h.endPosition
                   + kwic.right); position++) {
             if (h.hits.containsKey(position)) {
-              ArrayList<ArrayList<String>> hitDataItem = new ArrayList<ArrayList<String>>();
+              ArrayList<ArrayList<String>> hitDataItem = new ArrayList<>();
               for (String term : h.hits.get(position)) {
-                ArrayList<String> hitDataSubItem = new ArrayList<String>();
+                ArrayList<String> hitDataSubItem = new ArrayList<>();
                 hitDataSubItem.add(CodecUtil.termPrefix(term));
                 hitDataSubItem.add(CodecUtil.termValue(term));
                 hitDataItem.add(hitDataSubItem);
               }
               if (position < h.startPosition) {
-                leftData.put(position, hitDataItem);
+                if (leftData != null) {
+                  leftData.put(position, hitDataItem);
+                }
               } else if (position > h.endPosition) {
-                rightData.put(position, hitDataItem);
+                if (rightData != null) {
+                  rightData.put(position, hitDataItem);
+                }
               } else {
                 hitData.put(position, hitDataItem);
               }
@@ -336,12 +344,12 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
       for (int docId : kwic.tokens.keySet()) {
         NamedList<Object> mtasKwicItemResponse = new SimpleOrderedMap<>();
         ArrayList<KwicToken> list = kwic.tokens.get(docId);
-        ArrayList<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<NamedList<Object>>();
+        ArrayList<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<>();
         for (KwicToken k : list) {
           NamedList<Object> mtasKwicItemResponseItem = new SimpleOrderedMap<>();
           mtasKwicItemResponseItem.add("startPosition", k.startPosition);
           mtasKwicItemResponseItem.add("endPosition", k.endPosition);
-          ArrayList<NamedList<Object>> mtasKwicItemResponseItemTokens = new ArrayList<NamedList<Object>>();
+          ArrayList<NamedList<Object>> mtasKwicItemResponseItemTokens = new ArrayList<>();
           for (MtasToken token : k.tokens) {
             NamedList<Object> mtasKwicItemResponseItemToken = new SimpleOrderedMap<>();
             if (token.getId() != null) {
@@ -401,46 +409,48 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Modify request.
    *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+   * @param rb
+   *          the rb
+   * @param who
+   *          the who
+   * @param sreq
+   *          the sreq
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
     if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (sreq.params.getBool(PARAM_MTAS_KWIC, false)) {
-        if ((sreq.purpose & ShardRequest.PURPOSE_GET_FIELDS) != 0) {
-          // do nothing
-        } else {
-          Set<String> keys = MtasSolrResultUtil
-              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);
-          sreq.params.remove(PARAM_MTAS_KWIC);
-          for (String key : keys) {
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_FIELD);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_TYPE);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_VALUE);
-            sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
-                + NAME_MTAS_KWIC_QUERY_PREFIX);
-            sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
-                + NAME_MTAS_KWIC_QUERY_IGNORE);
-            sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
-                + NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH);
-            sreq.params
-                .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_KEY);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_PREFIX);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_NUMBER);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_LEFT);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_RIGHT);
-            sreq.params.remove(
-                PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_OUTPUT);
-          }
+      if (sreq.params.getBool(PARAM_MTAS_KWIC, false)
+          && (sreq.purpose & ShardRequest.PURPOSE_GET_FIELDS) != 0) {
+        // do nothing
+      } else {
+        Set<String> keys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);
+        sreq.params.remove(PARAM_MTAS_KWIC);
+        for (String key : keys) {
+          sreq.params
+              .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_FIELD);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_TYPE);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_VALUE);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_PREFIX);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_QUERY_IGNORE);
+          sreq.params.remove(PARAM_MTAS_KWIC + "." + key + "."
+              + NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH);
+          sreq.params
+              .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_KEY);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_PREFIX);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_NUMBER);
+          sreq.params
+              .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_LEFT);
+          sreq.params
+              .remove(PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_RIGHT);
+          sreq.params.remove(
+              PARAM_MTAS_KWIC + "." + key + "." + NAME_MTAS_KWIC_OUTPUT);
         }
       }
     }
@@ -449,25 +459,25 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Finish stage.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    */
   public void finishStage(ResponseBuilder rb) {
-    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
-          && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-        for (ShardRequest sreq : rb.finished) {
-          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
-              && sreq.params.getBool(PARAM_MTAS_KWIC, false)) {
-            // nothing to do
-          }
+    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
+        && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_KWIC, false)) {
+          // nothing to do
         }
       }
     }
   }
-  
+
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-    //nothing to do
+    // nothing to do
   }
 
 }

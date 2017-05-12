@@ -3,8 +3,11 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.FieldType.LegacyNumericType;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -29,7 +32,11 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  * The Class MtasSolrComponentFacet.
  */
 @SuppressWarnings("deprecation")
-public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet> {
+public class MtasSolrComponentFacet
+    implements MtasSolrComponent<ComponentFacet> {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSolrComponentFacet.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -107,8 +114,13 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
   /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE = "type";
 
+  /** The Constant SUBNAME_MTAS_FACET_BASE_RANGE. */
   public static final String SUBNAME_MTAS_FACET_BASE_RANGE = "range";
+
+  /** The Constant SUBNAME_MTAS_FACET_BASE_RANGE_SIZE. */
   public static final String SUBNAME_MTAS_FACET_BASE_RANGE_SIZE = "size";
+
+  /** The Constant SUBNAME_MTAS_FACET_BASE_RANGE_BASE. */
   public static final String SUBNAME_MTAS_FACET_BASE_RANGE_BASE = "base";
 
   /**
@@ -121,21 +133,19 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
     this.searchComponent = searchComponent;
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String tmpValue;
       String[] fields = new String[ids.size()];
@@ -169,7 +179,7 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
         Set<String> qIds = MtasSolrResultUtil.getIdsFromParameters(
             rb.req.getParams(),
             PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_QUERY);
-        if (qIds.size() > 0) {
+        if (!qIds.isEmpty()) {
           int tmpQCounter = 0;
           queryTypes[tmpCounter] = new String[qIds.size()];
           queryValues[tmpCounter] = new String[qIds.size()];
@@ -207,9 +217,9 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
                 rb.req.getParams(),
                 PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_QUERY + "."
                     + qId + "." + SUBNAME_MTAS_FACET_QUERY_VARIABLE);
-            queryVariables[tmpCounter][tmpQCounter] = new HashMap<String, String[]>();
-            if (vIds.size() > 0) {
-              HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+            queryVariables[tmpCounter][tmpQCounter] = new HashMap<>();
+            if (!vIds.isEmpty()) {
+              HashMap<String, ArrayList<String>> tmpVariables = new HashMap<>();
               for (String vId : vIds) {
                 String name = rb.req.getParams().get(PARAM_MTAS_FACET + "." + id
                     + "." + NAME_MTAS_FACET_QUERY + "." + qId + "."
@@ -224,7 +234,7 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
                       + SUBNAME_MTAS_FACET_QUERY_VARIABLE + "." + vId + "."
                       + SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE, null);
                   if (value != null) {
-                    ArrayList<String> list = new ArrayList<String>();
+                    ArrayList<String> list = new ArrayList<>();
                     String[] subList = value.split("(?<!\\\\),");
                     for (int i = 0; i < subList.length; i++) {
                       list.add(
@@ -234,10 +244,11 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
                   }
                 }
               }
-              for (String name : tmpVariables.keySet()) {
-                queryVariables[tmpCounter][tmpQCounter].put(name,
-                    tmpVariables.get(name)
-                        .toArray(new String[tmpVariables.get(name).size()]));
+              for (Entry<String, ArrayList<String>> entry : tmpVariables
+                  .entrySet()) {
+                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),
+                    entry.getValue()
+                        .toArray(new String[entry.getValue().size()]));
               }
             }
             tmpQCounter++;
@@ -249,7 +260,7 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
         Set<String> bIds = MtasSolrResultUtil.getIdsFromParameters(
             rb.req.getParams(),
             PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE);
-        if (bIds.size() > 0) {
+        if (!bIds.isEmpty()) {
           int tmpBCounter = 0;
           baseFields[tmpCounter] = new String[bIds.size()];
           baseFieldTypes[tmpCounter] = new String[bIds.size()];
@@ -279,15 +290,16 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
                 .get(PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
                     + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
                     + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE, null);
-            baseRangeSizes[tmpCounter][tmpBCounter] = tmpValue == null
-                ? null : Double.parseDouble(tmpValue);
+            baseRangeSizes[tmpCounter][tmpBCounter] = tmpValue == null ? null
+                : Double.parseDouble(tmpValue);
             tmpValue = rb.req.getParams()
                 .get(PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
                     + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
                     + SUBNAME_MTAS_FACET_BASE_RANGE_BASE, null);
-            baseRangeBases[tmpCounter][tmpBCounter] = tmpValue == null ? null : Double.parseDouble(tmpValue);
-            baseSortTypes[tmpCounter][tmpBCounter] = rb.req
-                .getParams().get(
+            baseRangeBases[tmpCounter][tmpBCounter] = tmpValue == null ? null
+                : Double.parseDouble(tmpValue);
+            baseSortTypes[tmpCounter][tmpBCounter] = rb.req.getParams()
+                .get(
                     PARAM_MTAS_FACET + "." + id + "." + NAME_MTAS_FACET_BASE
                         + "." + bId + "." + SUBNAME_MTAS_FACET_BASE_SORT_TYPE,
                     null);
@@ -372,7 +384,7 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
       for (int i = 0; i < fields.length; i++) {
         ComponentField cf = mtasFields.list.get(fields[i]);
         int queryNumber = queryValues[i].length;
-        MtasSpanQuery ql[] = new MtasSpanQuery[queryNumber];
+        MtasSpanQuery[] ql = new MtasSpanQuery[queryNumber];
         for (int j = 0; j < queryNumber; j++) {
           Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)
               ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);
@@ -403,119 +415,116 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
     }
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (sreq.params.getBool(PARAM_MTAS_FACET, false)) {
-        if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-          // do nothing
-        } else {
-          // remove prefix for other requests
-          Set<String> keys = MtasSolrResultUtil
-              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);
-          sreq.params.remove(PARAM_MTAS_FACET);
-          for (String key : keys) {
+    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && sreq.params.getBool(PARAM_MTAS_FACET, false)) {
+      if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
+        // do nothing
+      } else {
+        // remove prefix for other requests
+        Set<String> keys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);
+        sreq.params.remove(PARAM_MTAS_FACET);
+        for (String key : keys) {
+          sreq.params.remove(
+              PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_FIELD);
+          sreq.params
+              .remove(PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_KEY);
+          Set<String> subKeys = MtasSolrResultUtil.getIdsFromParameters(
+              rb.req.getParams(),
+              PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY);
+          for (String subKey : subKeys) {
             sreq.params.remove(
-                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_FIELD);
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_QUERY_TYPE);
             sreq.params.remove(
-                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_KEY);
-            Set<String> subKeys = MtasSolrResultUtil.getIdsFromParameters(
-                rb.req.getParams(),
-                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY);
-            for (String subKey : subKeys) {
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_QUERY_TYPE);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_QUERY_VALUE);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_QUERY_PREFIX);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_QUERY_IGNORE);
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_QUERY_VALUE);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_QUERY_PREFIX);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_QUERY_IGNORE);
+            sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
+                + NAME_MTAS_FACET_QUERY + "." + subKey + "."
+                + SUBNAME_MTAS_FACET_QUERY_MAXIMUM_IGNORE_LENGTH);
+            Set<String> subSubKeys = MtasSolrResultUtil
+                .getIdsFromParameters(rb.req.getParams(),
+                    PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY
+                        + "." + subKey + "."
+                        + SUBNAME_MTAS_FACET_QUERY_VARIABLE);
+            for (String subSubKey : subSubKeys) {
               sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
                   + NAME_MTAS_FACET_QUERY + "." + subKey + "."
-                  + SUBNAME_MTAS_FACET_QUERY_MAXIMUM_IGNORE_LENGTH);
-              Set<String> subSubKeys = MtasSolrResultUtil
-                  .getIdsFromParameters(rb.req.getParams(),
-                      PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_QUERY
-                          + "." + subKey + "."
-                          + SUBNAME_MTAS_FACET_QUERY_VARIABLE);
-              for (String subSubKey : subSubKeys) {
-                sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
-                    + NAME_MTAS_FACET_QUERY + "." + subKey + "."
-                    + SUBNAME_MTAS_FACET_QUERY_VARIABLE + "." + subSubKey + "."
-                    + SUBNAME_MTAS_FACET_QUERY_VARIABLE_NAME);
-                sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
-                    + NAME_MTAS_FACET_QUERY + "." + subKey + "."
-                    + SUBNAME_MTAS_FACET_QUERY_VARIABLE + "." + subSubKey + "."
-                    + SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE);
-              }
+                  + SUBNAME_MTAS_FACET_QUERY_VARIABLE + "." + subSubKey + "."
+                  + SUBNAME_MTAS_FACET_QUERY_VARIABLE_NAME);
+              sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
+                  + NAME_MTAS_FACET_QUERY + "." + subKey + "."
+                  + SUBNAME_MTAS_FACET_QUERY_VARIABLE + "." + subSubKey + "."
+                  + SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE);
             }
-            subKeys = MtasSolrResultUtil.getIdsFromParameters(
-                rb.req.getParams(),
-                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE);
-            for (String subKey : subKeys) {
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_FIELD);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_TYPE);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
-                      + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
-                      + SUBNAME_MTAS_FACET_BASE_RANGE_BASE);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_MAXIMUM);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_MINIMUM);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_NUMBER);
+          }
+          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+              PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE);
+          for (String subKey : subKeys) {
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_FIELD);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_TYPE);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
+                    + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_RANGE + "."
+                    + SUBNAME_MTAS_FACET_BASE_RANGE_BASE);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_MAXIMUM);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_MINIMUM);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_NUMBER);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION);
+            sreq.params.remove(
+                PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE + "."
+                    + subKey + "." + SUBNAME_MTAS_FACET_BASE_SORT_TYPE);
+            Set<String> subSubKeys = MtasSolrResultUtil
+                .getIdsFromParameters(rb.req.getParams(),
+                    PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
+                        + "." + subKey + "."
+                        + SUBNAME_MTAS_FACET_BASE_FUNCTION);
+            for (String subSubKey : subSubKeys) {
               sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
                   + NAME_MTAS_FACET_BASE + "." + subKey + "."
-                  + SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION);
-              sreq.params.remove(
-                  PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                      + "." + subKey + "." + SUBNAME_MTAS_FACET_BASE_SORT_TYPE);
-              Set<String> subSubKeys = MtasSolrResultUtil
-                  .getIdsFromParameters(rb.req.getParams(),
-                      PARAM_MTAS_FACET + "." + key + "." + NAME_MTAS_FACET_BASE
-                          + "." + subKey + "."
-                          + SUBNAME_MTAS_FACET_BASE_FUNCTION);
-              for (String subSubKey : subSubKeys) {
-                sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
-                    + NAME_MTAS_FACET_BASE + "." + subKey + "."
-                    + SUBNAME_MTAS_FACET_BASE_FUNCTION + "." + subSubKey + "."
-                    + SUBNAME_MTAS_FACET_BASE_FUNCTION_EXPRESSION);
-                sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
-                    + NAME_MTAS_FACET_BASE + "." + subKey + "."
-                    + SUBNAME_MTAS_FACET_BASE_FUNCTION + "." + subSubKey + "."
-                    + SUBNAME_MTAS_FACET_BASE_FUNCTION_KEY);
-                sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
-                    + NAME_MTAS_FACET_BASE + "." + subKey + "."
-                    + SUBNAME_MTAS_FACET_BASE_FUNCTION + "." + subSubKey + "."
-                    + SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE);
-              }
+                  + SUBNAME_MTAS_FACET_BASE_FUNCTION + "." + subSubKey + "."
+                  + SUBNAME_MTAS_FACET_BASE_FUNCTION_EXPRESSION);
+              sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
+                  + NAME_MTAS_FACET_BASE + "." + subKey + "."
+                  + SUBNAME_MTAS_FACET_BASE_FUNCTION + "." + subSubKey + "."
+                  + SUBNAME_MTAS_FACET_BASE_FUNCTION_KEY);
+              sreq.params.remove(PARAM_MTAS_FACET + "." + key + "."
+                  + NAME_MTAS_FACET_BASE + "." + subKey + "."
+                  + SUBNAME_MTAS_FACET_BASE_FUNCTION + "." + subSubKey + "."
+                  + SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE);
             }
           }
         }
@@ -523,22 +532,18 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param facet
-   *          the facet
-   * @param encode
-   *          the encode
-   * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentFacet facet, Boolean encode)
       throws IOException {
     SimpleOrderedMap<Object> mtasFacetResponse = new SimpleOrderedMap<>();
     mtasFacetResponse.add("key", facet.key);
-    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>>();
+    HashMap<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData = new HashMap<>();
     for (int i = 0; i < facet.baseFields.length; i++) {
       if (facet.baseFunctionList[i] != null) {
         for (MtasDataCollector<?, ?> functionDataCollector : facet.baseFunctionList[i]
@@ -546,7 +551,7 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
           SubComponentFunction[] tmpSubComponentFunctionList = facet.baseFunctionList[i]
               .get(functionDataCollector);
           if (tmpSubComponentFunctionList != null) {
-            HashMap<String, MtasSolrMtasResult> tmpList = new HashMap<String, MtasSolrMtasResult>();
+            HashMap<String, MtasSolrMtasResult> tmpList = new HashMap<>();
             for (SubComponentFunction tmpSubComponentFunction : tmpSubComponentFunctionList) {
               tmpList.put(tmpSubComponentFunction.key,
                   new MtasSolrMtasResult(tmpSubComponentFunction.dataCollector,
@@ -573,32 +578,33 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
     return mtasFacetResponse;
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb
-   *          the rb
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
-    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
-          && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-        for (ShardRequest sreq : rb.finished) {
-          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
-              && sreq.params.getBool(PARAM_MTAS_FACET, false)) {
-            for (ShardResponse shardResponse : sreq.responses) {
-              NamedList<Object> response = shardResponse.getSolrResponse()
-                  .getResponse();
-              try {
-                ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                    .findRecursive("mtas", "facet");
-                if (data != null) {
-                  MtasSolrResultUtil.decode(data);
-                }
-              } catch (ClassCastException e) {
-                // shouldn't happen
+    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
+        && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_FACET, false)) {
+          for (ShardResponse shardResponse : sreq.responses) {
+            NamedList<Object> response = shardResponse.getSolrResponse()
+                .getResponse();
+            try {
+              ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
+                  .findRecursive("mtas", "facet");
+              if (data != null) {
+                MtasSolrResultUtil.decode(data);
               }
+            } catch (ClassCastException e) {
+              log.debug(e);
+              // shouldn't happen
             }
           }
         }
@@ -606,15 +612,13 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -623,19 +627,21 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
     NamedList<Object> mtasResponse = null;
     try {
       mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
-      if (mtasResponse != null) {
-        ArrayList<Object> mtasResponseFacet;
-        try {
-          mtasResponseFacet = (ArrayList<Object>) mtasResponse.get("facet");
-          if (mtasResponseFacet != null) {
-            MtasSolrResultUtil.rewrite(mtasResponseFacet);
-          }
-        } catch (ClassCastException e) {
-          mtasResponseFacet = null;
-        }
-      }
     } catch (ClassCastException e) {
+      log.debug(e);
       mtasResponse = null;
+    }
+    if (mtasResponse != null) {
+      ArrayList<Object> mtasResponseFacet;
+      try {
+        mtasResponseFacet = (ArrayList<Object>) mtasResponse.get("facet");
+        if (mtasResponseFacet != null) {
+          MtasSolrResultUtil.rewrite(mtasResponseFacet);
+        }
+      } catch (ClassCastException e) {
+        log.debug(e);
+        mtasResponse.remove("facet");
+      }
     }
   }
 
@@ -651,18 +657,16 @@ public class MtasSolrComponentFacet implements MtasSolrComponent<ComponentFacet>
   private String getFieldType(IndexSchema schema, String field) {
     SchemaField sf = schema.getField(field);
     FieldType ft = sf.getType();
-    if (ft != null) {
-      if (ft.getNumericType() != null) {
-        LegacyNumericType nt = ft.getNumericType();
-        if (nt.equals(LegacyNumericType.INT)) {
-          return ComponentFacet.TYPE_INTEGER;
-        } else if (nt.equals(LegacyNumericType.DOUBLE)) {
-          return ComponentFacet.TYPE_DOUBLE;
-        } else if (nt.equals(LegacyNumericType.LONG)) {
-          return ComponentFacet.TYPE_LONG;
-        } else if (nt.equals(LegacyNumericType.FLOAT)) {
-          return ComponentFacet.TYPE_FLOAT;
-        }
+    if (ft != null && ft.getNumericType() != null) {
+      LegacyNumericType nt = ft.getNumericType();
+      if (nt.equals(LegacyNumericType.INT)) {
+        return ComponentFacet.TYPE_INTEGER;
+      } else if (nt.equals(LegacyNumericType.DOUBLE)) {
+        return ComponentFacet.TYPE_DOUBLE;
+      } else if (nt.equals(LegacyNumericType.LONG)) {
+        return ComponentFacet.TYPE_LONG;
+      } else if (nt.equals(LegacyNumericType.FLOAT)) {
+        return ComponentFacet.TYPE_FLOAT;
       }
     }
     return ComponentFacet.TYPE_STRING;

@@ -263,7 +263,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
   /**
    * The Class Match.
    */
-  private class Match {
+  private static class Match {
 
     /** The start position. */
     private int startPosition;

@@ -282,32 +282,39 @@ public class CodecComponent {
   public static class ComponentDocument implements BasicComponent {
 
     /** The regexp. */
-    public String key, prefix, regexp, ignoreRegexp;
+    public String key;
+    public String prefix;
+    public String regexp;
+    public String ignoreRegexp;
 
     /** The list. */
-    public HashSet<String> list, ignoreList;
+    public Set<String> list;
+    public Set<String> ignoreList;
 
-    public boolean listRegexp, listExpand, ignoreListRegexp;
+    public boolean listRegexp;
+    public boolean listExpand;
+    public boolean ignoreListRegexp;
 
     public int listExpandNumber;
 
     /** The stats type. */
-    public String dataType, statsType;
+    public String dataType;
+    public String statsType;
 
     /** The stats items. */
-    public TreeSet<String> statsItems;
+    public Set<String> statsItems;
 
     /** The number. */
     public int listNumber;
 
     /** The unique key. */
-    public HashMap<Integer, String> uniqueKey;
+    public Map<Integer, String> uniqueKey;
 
     /** The stats. */
-    public HashMap<Integer, MtasDataCollector<?, ?>> statsData;
+    public Map<Integer, MtasDataCollector<?, ?>> statsData;
 
     /** The list. */
-    public HashMap<Integer, MtasDataCollector<?, ?>> statsList;
+    public Map<Integer, MtasDataCollector<?, ?>> statsList;
 
     /**
      * Instantiates a new component document.
@@ -576,6 +583,7 @@ public class CodecComponent {
       this.queryType = queryType;
       this.queryPrefix = queryPrefix;
       this.queryIgnore = queryIgnore;
+      this.queryMaximumIgnoreLength = queryMaximumIgnoreLength;
       this.queryVariables = queryVariables;
       this.key = key;
       this.left = left;

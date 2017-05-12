@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -317,7 +318,7 @@ public class CodecUtil {
    *          the function parser
    * @return the string
    */
-  static String createStatsType(TreeSet<String> statsItems, String sortType,
+  static String createStatsType(Set<String> statsItems, String sortType,
       MtasFunctionParserFunction functionParser) {
     String statsType = STATS_BASIC;
     for (String statsItem : statsItems) {

@@ -3,10 +3,13 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -24,7 +27,11 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentGroup.
  */
-public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup> {
+public class MtasSolrComponentGroup
+    implements MtasSolrComponent<ComponentGroup> {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSolrComponentGroup.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -44,19 +51,20 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
 
   /** The Constant NAME_MTAS_GROUP_QUERY_PREFIX. */
   public static final String NAME_MTAS_GROUP_QUERY_PREFIX = "query.prefix";
-  
+
   /** The Constant NAME_MTAS_GROUP_QUERY_IGNORE. */
   public static final String NAME_MTAS_GROUP_QUERY_IGNORE = "query.ignore";
-  
-  public static final String NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumQueryLength";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
+  /** The Constant NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH. */
+  public static final String NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumIgnoreLength";
+
+  /** The Constant NAME_MTAS_GROUP_QUERY_VARIABLE. */
   public static final String NAME_MTAS_GROUP_QUERY_VARIABLE = "query.variable";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
+  /** The Constant SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME = "name";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
+  /** The Constant SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE = "value";
 
   /** The Constant NAME_MTAS_GROUP_KEY. */
@@ -98,28 +106,25 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
   /**
    * Instantiates a new mtas solr component group.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentGroup(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] queryTypes = new String[ids.size()];
@@ -164,15 +169,15 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
         queryIgnores[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_IGNORE,
             null);
-        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams().get(
-            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH,
-            null);
+        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams()
+            .get(PARAM_MTAS_GROUP + "." + id + "."
+                + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH, null);
         Set<String> vIds = MtasSolrResultUtil.getIdsFromParameters(
             rb.req.getParams(),
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_VARIABLE);
-        queryVariables[tmpCounter] = new HashMap<String, String[]>();
-        if (vIds.size() > 0) {
-          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<String, ArrayList<String>>();
+        queryVariables[tmpCounter] = new HashMap<>();
+        if (!vIds.isEmpty()) {
+          HashMap<String, ArrayList<String>> tmpVariables = new HashMap<>();
           for (String vId : vIds) {
             String name = rb.req.getParams()
                 .get(PARAM_MTAS_GROUP + "." + id + "."
@@ -187,7 +192,7 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
                       + NAME_MTAS_GROUP_QUERY_VARIABLE + "." + vId + "."
                       + SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE, null);
               if (value != null) {
-                ArrayList<String> list = new ArrayList<String>();
+                ArrayList<String> list = new ArrayList<>();
                 String[] subList = value.split("(?<!\\\\),");
                 for (int i = 0; i < subList.length; i++) {
                   list.add(
@@ -197,9 +202,10 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
               }
             }
           }
-          for (String name : tmpVariables.keySet()) {
-            queryVariables[tmpCounter].put(name, tmpVariables.get(name)
-                .toArray(new String[tmpVariables.get(name).size()]));
+          for (Entry<String, ArrayList<String>> entry : tmpVariables
+              .entrySet()) {
+            queryVariables[tmpCounter].put(entry.getKey(),
+                entry.getValue().toArray(new String[entry.getValue().size()]));
           }
         }
         groupingHitInsidePrefixes[tmpCounter] = null;
@@ -307,8 +313,7 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
             : keys[i].trim();
         int number = (numbers[i] == null) || (numbers[i].isEmpty())
             ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
-        mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q,
-            key,
+        mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q, key,
             number, groupingHitInsidePrefixes[i],
             groupingHitInsideLeftPosition[i], groupingHitInsideLeftPrefixes[i],
             groupingHitInsideRightPosition[i],
@@ -324,20 +329,15 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
   /**
    * Prepare.
    *
-   * @param solrParams
-   *          the solr params
-   * @param gids
-   *          the gids
-   * @param name
-   *          the name
-   * @param positions
-   *          the positions
-   * @param prefixes
-   *          the prefixes
+   * @param solrParams the solr params
+   * @param gids the gids
+   * @param name the name
+   * @param positions the positions
+   * @param prefixes the prefixes
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) {
-    if (gids.size() > 0) {
+    if (!gids.isEmpty()) {
       int tmpSubCounter = 0;
       for (String gid : gids) {
         positions[tmpSubCounter] = solrParams.get(
@@ -349,114 +349,108 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
     }
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
-        if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-          // do nothing
-        } else {
-          // remove prefix for other requests
-          Set<String> keys = MtasSolrResultUtil
-              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);
-          sreq.params.remove(PARAM_MTAS_GROUP);
-          Set<String> subKeys;
-          for (String key : keys) {
-            sreq.params.remove(
-                PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_FIELD);
-            sreq.params.remove(
-                PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_KEY);
+    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
+      if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
+        // do nothing
+      } else {
+        // remove prefix for other requests
+        Set<String> keys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);
+        sreq.params.remove(PARAM_MTAS_GROUP);
+        Set<String> subKeys;
+        for (String key : keys) {
+          sreq.params.remove(
+              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_FIELD);
+          sreq.params
+              .remove(PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_KEY);
+          sreq.params.remove(
+              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_QUERY_TYPE);
+          sreq.params.remove(
+              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_QUERY_VALUE);
+          sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+              + NAME_MTAS_GROUP_QUERY_PREFIX);
+          sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+              + NAME_MTAS_GROUP_QUERY_IGNORE);
+          sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+              + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH);
+          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+              PARAM_MTAS_GROUP + "." + key + "."
+                  + NAME_MTAS_GROUP_GROUPING_LEFT);
+          for (String subKey : subKeys) {
             sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                + NAME_MTAS_GROUP_QUERY_TYPE);
+                + NAME_MTAS_GROUP_GROUPING_LEFT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
             sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                + NAME_MTAS_GROUP_QUERY_VALUE);
+                + NAME_MTAS_GROUP_GROUPING_LEFT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+          }
+          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+              PARAM_MTAS_GROUP + "." + key + "."
+                  + NAME_MTAS_GROUP_GROUPING_RIGHT);
+          for (String subKey : subKeys) {
             sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                + NAME_MTAS_GROUP_QUERY_PREFIX);
+                + NAME_MTAS_GROUP_GROUPING_RIGHT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
             sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                + NAME_MTAS_GROUP_QUERY_IGNORE);
+                + NAME_MTAS_GROUP_GROUPING_RIGHT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+          }
+          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+              PARAM_MTAS_GROUP + "." + key + "."
+                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE);
+          for (String subKey : subKeys) {
             sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH);
-            subKeys = MtasSolrResultUtil
-                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP + "."
-                    + key + "." + NAME_MTAS_GROUP_GROUPING_LEFT);
-            for (String subKey : subKeys) {
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_LEFT + "." + subKey + "."
-                  + NAME_MTAS_GROUP_GROUPING_POSITION);
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_LEFT + "." + subKey + "."
-                  + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-            }
-            subKeys = MtasSolrResultUtil
-                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP + "."
-                    + key + "." + NAME_MTAS_GROUP_GROUPING_RIGHT);
-            for (String subKey : subKeys) {
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_RIGHT + "." + subKey + "."
-                  + NAME_MTAS_GROUP_GROUPING_POSITION);
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_RIGHT + "." + subKey + "."
-                  + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-            }
-            subKeys = MtasSolrResultUtil
-                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP + "."
-                    + key + "." + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE);
-            for (String subKey : subKeys) {
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + "." + subKey + "."
-                  + NAME_MTAS_GROUP_GROUPING_POSITION);
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + "." + subKey + "."
-                  + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-            }
-            subKeys = MtasSolrResultUtil
-                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP + "."
-                    + key + "." + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT);
-            for (String subKey : subKeys) {
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + "." + subKey
-                  + "." + NAME_MTAS_GROUP_GROUPING_POSITION);
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + "." + subKey
-                  + "." + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-            }
-            subKeys = MtasSolrResultUtil
-                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP + "."
-                    + key + "." + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT);
-            for (String subKey : subKeys) {
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + "." + subKey
-                  + "." + NAME_MTAS_GROUP_GROUPING_POSITION);
-              sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
-                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + "." + subKey
-                  + "." + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-            }
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+          }
+          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+              PARAM_MTAS_GROUP + "." + key + "."
+                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT);
+          for (String subKey : subKeys) {
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
+          }
+          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),
+              PARAM_MTAS_GROUP + "." + key + "."
+                  + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT);
+          for (String subKey : subKeys) {
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_POSITION);
+            sreq.params.remove(PARAM_MTAS_GROUP + "." + key + "."
+                + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + "." + subKey + "."
+                + NAME_MTAS_GROUP_GROUPING_PREFIXES);
           }
         }
       }
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param group
-   *          the group
-   * @param encode
-   *          the encode
-   * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   @SuppressWarnings("unchecked")
   public SimpleOrderedMap<Object> create(ComponentGroup group, Boolean encode)
@@ -477,32 +471,33 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
     return mtasGroupResponse;
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb
-   *          the rb
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
-    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
-          && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-        for (ShardRequest sreq : rb.finished) {
-          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
-              && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
-            for (ShardResponse shardResponse : sreq.responses) {
-              NamedList<Object> response = shardResponse.getSolrResponse()
-                  .getResponse();
-              try {
-                ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                    .findRecursive("mtas", "group");
-                if (data != null) {
-                  MtasSolrResultUtil.decode(data);
-                }
-              } catch (ClassCastException e) {
-                // shouldn't happen
+    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
+        && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
+          for (ShardResponse shardResponse : sreq.responses) {
+            NamedList<Object> response = shardResponse.getSolrResponse()
+                .getResponse();
+            try {
+              ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
+                  .findRecursive("mtas", "group");
+              if (data != null) {
+                MtasSolrResultUtil.decode(data);
               }
+            } catch (ClassCastException e) {
+              log.debug(e);
+              // shouldn't happen
             }
           }
         }
@@ -510,15 +505,13 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -527,19 +520,21 @@ public class MtasSolrComponentGroup implements MtasSolrComponent<ComponentGroup>
     NamedList<Object> mtasResponse = null;
     try {
       mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
-      if (mtasResponse != null) {
-        ArrayList<Object> mtasResponseGroup;
-        try {
-          mtasResponseGroup = (ArrayList<Object>) mtasResponse.get("group");
-          if (mtasResponseGroup != null) {
-            MtasSolrResultUtil.rewrite(mtasResponseGroup);
-          }
-        } catch (ClassCastException e) {
-          mtasResponseGroup = null;
-        }
-      }
     } catch (ClassCastException e) {
+      log.debug(e);
       mtasResponse = null;
+    }
+    if (mtasResponse != null) {
+      ArrayList<Object> mtasResponseGroup;
+      try {
+        mtasResponseGroup = (ArrayList<Object>) mtasResponse.get("group");
+        if (mtasResponseGroup != null) {
+          MtasSolrResultUtil.rewrite(mtasResponseGroup);
+        }
+      } catch (ClassCastException e) {
+        log.debug(e);
+        mtasResponse.remove("group");
+      }
     }
   }
 

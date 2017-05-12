@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -61,8 +62,8 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
    *          the source number
    */
   public MtasDataItemFull(T1[] value, MtasDataCollector<?, ?> sub,
-      TreeSet<String> statsItems, String sortType, String sortDirection,
-      int errorNumber, HashMap<String, Integer> errorList,
+      Set<String> statsItems, String sortType, String sortDirection,
+      int errorNumber, Map<String, Integer> errorList,
       MtasDataOperations<T1, T2> operations, int sourceNumber) {
     super(sub, statsItems, sortType, sortDirection, errorNumber, errorList,
         sourceNumber);

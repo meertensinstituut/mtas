@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -20,7 +22,11 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentPrefix.
  */
-public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefix> {
+public class MtasSolrComponentPrefix
+    implements MtasSolrComponent<ComponentPrefix> {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSolrComponentPrefix.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -44,18 +50,14 @@ public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefi
     this.searchComponent = searchComponent;
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);
-    if (ids.size() > 0) {
+    if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
@@ -90,45 +92,36 @@ public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefi
     }
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
     if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (sreq.params.getBool(PARAM_MTAS_PREFIX, false)) {
-        if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-          // do nothing
-        } else {
-          // remove prefix for other requests
-          Set<String> keys = MtasSolrResultUtil
-              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);
-          sreq.params.remove(PARAM_MTAS_PREFIX);
-          for (String key : keys) {
-            sreq.params.remove(
-                PARAM_MTAS_PREFIX + "." + key + "." + NAME_MTAS_PREFIX_FIELD);
-            sreq.params.remove(
-                PARAM_MTAS_PREFIX + "." + key + "." + NAME_MTAS_PREFIX_KEY);
-          }
+      if (sreq.params.getBool(PARAM_MTAS_PREFIX, false)
+          && (sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
+        // do nothing
+      } else {
+        // remove prefix for other requests
+        Set<String> keys = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);
+        sreq.params.remove(PARAM_MTAS_PREFIX);
+        for (String key : keys) {
+          sreq.params.remove(
+              PARAM_MTAS_PREFIX + "." + key + "." + NAME_MTAS_PREFIX_FIELD);
+          sreq.params.remove(
+              PARAM_MTAS_PREFIX + "." + key + "." + NAME_MTAS_PREFIX_KEY);
         }
       }
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param prefix the prefix
-   * @param encode the encode
-   * @return the simple ordered map
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentPrefix prefix,
       Boolean encode) {
-    SimpleOrderedMap<Object> mtasPrefixResponse = new SimpleOrderedMap<Object>();
+    SimpleOrderedMap<Object> mtasPrefixResponse = new SimpleOrderedMap<>();
     mtasPrefixResponse.add("key", prefix.key);
     if (encode) {
       mtasPrefixResponse.add("_encoded_singlePosition",
@@ -148,31 +141,29 @@ public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefi
     return mtasPrefixResponse;
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb the rb
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
-    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
-          && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-        for (ShardRequest sreq : rb.finished) {
-          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
-              && sreq.params.getBool(PARAM_MTAS_PREFIX, false)) {
-            for (ShardResponse shardResponse : sreq.responses) {
-              NamedList<Object> response = shardResponse.getSolrResponse()
-                  .getResponse();
-              try {
-                ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                    .findRecursive("mtas", "prefix");
-                if (data != null) {
-                  MtasSolrResultUtil.decode(data);
-                }
-              } catch (ClassCastException e) {
-                // shouldnt happen
+    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
+        && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_PREFIX, false)) {
+          for (ShardResponse shardResponse : sreq.responses) {
+            NamedList<Object> response = shardResponse.getSolrResponse()
+                .getResponse();
+            try {
+              ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
+                  .findRecursive("mtas", "prefix");
+              if (data != null) {
+                MtasSolrResultUtil.decode(data);
               }
+            } catch (ClassCastException e) {
+              log.debug(e);
+              // shouldnt happen
             }
           }
         }
@@ -180,12 +171,8 @@ public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefi
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -194,20 +181,22 @@ public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefi
     NamedList<Object> mtasResponse = null;
     try {
       mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
-      if (mtasResponse != null) {
-        NamedList<Object> mtasResponsePrefix;
-        try {
-          mtasResponsePrefix = (NamedList<Object>) mtasResponse.get("prefix");
-          if (mtasResponsePrefix != null) {
-            repairPrefixItems(mtasResponsePrefix);
-            MtasSolrResultUtil.rewrite(mtasResponsePrefix);
-          }
-        } catch (ClassCastException e) {
-          mtasResponsePrefix = null;
-        }
-      }
     } catch (ClassCastException e) {
+      log.debug(e);
       mtasResponse = null;
+    }
+    if (mtasResponse != null) {
+      NamedList<Object> mtasResponsePrefix;
+      try {
+        mtasResponsePrefix = (NamedList<Object>) mtasResponse.get("prefix");
+        if (mtasResponsePrefix != null) {
+          repairPrefixItems(mtasResponsePrefix);
+          MtasSolrResultUtil.rewrite(mtasResponsePrefix);
+        }
+      } catch (ClassCastException e) {
+        log.debug(e);
+        mtasResponse.remove("prefix");
+      }
     }
   }
 
@@ -229,19 +218,17 @@ public class MtasSolrComponentPrefix implements MtasSolrComponent<ComponentPrefi
               .get("singlePosition");
           TreeSet<String> multiplePosition = (TreeSet<String>) item
               .get("multiplePosition");
-          if (singlePosition != null) {
-            if (multiplePosition != null) {
-              for (String prefix : multiplePosition) {
-                if (singlePosition.contains(prefix)) {
-                  singlePosition.remove(prefix);
-                }
+          if (singlePosition != null && multiplePosition != null) {
+            for (String prefix : multiplePosition) {
+              if (singlePosition.contains(prefix)) {
+                singlePosition.remove(prefix);
               }
             }
           }
         }
       }
     } catch (ClassCastException e) {
-
+      log.debug(e);
     }
   }
 

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import mtas.codec.util.CodecUtil;
 
 /**
@@ -77,8 +79,8 @@ abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 exten
    */
   public MtasDataItemAdvanced(T1 valueSum, T2 valueSumOfLogs,
       T1 valueSumOfSquares, T1 valueMin, T1 valueMax, Long valueN,
-      MtasDataCollector<?, ?> sub, TreeSet<String> statsItems, String sortType,
-      String sortDirection, int errorNumber, HashMap<String, Integer> errorList,
+      MtasDataCollector<?, ?> sub, Set<String> statsItems, String sortType,
+      String sortDirection, int errorNumber, Map<String, Integer> errorList,
       MtasDataOperations<T1, T2> operations, int sourceNumber) {
     super(sub, statsItems, sortType, sortDirection, errorNumber, errorList,
         sourceNumber);

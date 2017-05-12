@@ -2,6 +2,7 @@ package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.lang.ArrayUtils;
 import mtas.codec.util.CodecUtil;
@@ -52,10 +53,10 @@ public class MtasDataLongAdvanced extends MtasDataAdvanced<Long, Double> {
    * @throws IOException
    *           Signals that an I/O exception has occurred.
    */
-  public MtasDataLongAdvanced(String collectorType, TreeSet<String> statsItems,
+  public MtasDataLongAdvanced(String collectorType, Set<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      TreeSet<String>[] subStatsItems, String[] subSortTypes,
+      Set<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
     super(collectorType, CodecUtil.DATA_TYPE_LONG, statsItems, sortType,

@@ -59,10 +59,10 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataBasic(String collectorType, String dataType,
-      TreeSet<String> statsItems, String sortType, String sortDirection,
+      Set<String> statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
       String[] subDataTypes, String[] subStatsTypes,
-      TreeSet<String>[] subStatsItems, String[] subSortTypes,
+      Set<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       MtasDataOperations<T1, T2> operations, String segmentRegistration,
       String boundary) throws IOException {

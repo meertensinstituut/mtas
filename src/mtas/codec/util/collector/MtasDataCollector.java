@@ -69,7 +69,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   protected String dataType;
 
   /** The stats items. */
-  public TreeSet<String> statsItems;
+  public Set<String> statsItems;
 
   /** The sort type. */
   protected String sortType;
@@ -142,7 +142,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   private String[] subStatsTypes;
 
   /** The sub stats items. */
-  private TreeSet<String>[] subStatsItems;
+  private Set<String>[] subStatsItems;
 
   /** The sub sort types. */
   private String[] subSortTypes;
@@ -193,7 +193,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   private transient String[] newSubStatsTypes;
 
   /** The new sub stats items. */
-  private transient TreeSet<String>[] newSubStatsItems;
+  private transient Set<String>[] newSubStatsItems;
 
   /** The new sub sort types. */
   private transient String[] newSubSortTypes;
@@ -237,7 +237,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    */
   @SuppressWarnings("unchecked")
   protected MtasDataCollector(String collectorType, String dataType,
-      String statsType, TreeSet<String> statsItems, String sortType,
+      String statsType, Set<String> statsItems, String sortType,
       String sortDirection, Integer start, Integer number,
       String segmentRegistration, String boundary) throws IOException {
     // set properties
@@ -315,10 +315,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    * @throws IOException Signals that an I/O exception has occurred.
    */
   protected MtasDataCollector(String collectorType, String dataType,
-      String statsType, TreeSet<String> statsItems, String sortType,
+      String statsType, Set<String> statsItems, String sortType,
       String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      TreeSet<String>[] subStatsItems, String subSortTypes[],
+      Set<String>[] subStatsItems, String subSortTypes[],
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
     // initialize
@@ -520,7 +520,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
           newKeyList[0] = DataCollector.COLLECTOR_TYPE_DATA;
           newSourceNumberList[0] = 1;
           newErrorNumber[0] = 0;
-          newErrorList[0] = new HashMap<String, Integer>();
+          newErrorList[0] = new HashMap<>();
           newPosition = 1;
           newCurrentPosition = newPosition - 1;
           newCurrentExisting = false;

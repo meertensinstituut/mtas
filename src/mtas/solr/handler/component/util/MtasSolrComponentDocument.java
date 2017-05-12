@@ -22,8 +22,10 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentDocument.
  */
-public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDocument> {
+public class MtasSolrComponentDocument
+    implements MtasSolrComponent<ComponentDocument> {
 
+  /** The log. */
   private static Log log = LogFactory.getLog(MtasSolrComponentDocument.class);
 
   /** The Constant PARAM_MTAS_DOCUMENT. */
@@ -76,15 +78,8 @@ public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDoc
     // do nothing for now
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -213,17 +208,11 @@ public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDoc
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param document
-   *          the document
-   * @return the simple ordered map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
    */
-  public SimpleOrderedMap<Object> create(ComponentDocument document, Boolean encode)
-      throws IOException {
+  public SimpleOrderedMap<Object> create(ComponentDocument document,
+      Boolean encode) throws IOException {
     SimpleOrderedMap<Object> mtasDocumentResponse = new SimpleOrderedMap<>();
     mtasDocumentResponse.add("key", document.key);
     ArrayList<NamedList<Object>> mtasDocumentItemResponses = new ArrayList<>();
@@ -244,7 +233,7 @@ public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDoc
               new MtasSolrMtasResult(list,
                   new String[] { list.getDataType(), list.getDataType() },
                   new String[] { list.getStatsType(), list.getStatsType() },
-                  new TreeSet[] { list.statsItems, list.statsItems },
+                  new Set[] { list.statsItems, list.statsItems },
                   new String[] { null, null }, new String[] { null, null },
                   new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
         } else {
@@ -261,15 +250,8 @@ public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDoc
     return mtasDocumentResponse;
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -294,11 +276,8 @@ public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDoc
 
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb
-   *          the rb
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
@@ -313,15 +292,8 @@ public class MtasSolrComponentDocument implements MtasSolrComponent<ComponentDoc
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {

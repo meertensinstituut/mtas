@@ -136,18 +136,26 @@ public class MtasSolrJoinCache {
     if (administration.containsKey(item)) {
       String key = administration.get(item);
       expiration.put(key, date.getTime() + lifeTime);
-      try {
-        Path path = joinCachePath.resolve(key);
-        String data = new String(Files.readAllBytes(path),
-            StandardCharsets.UTF_8);
-        return decode(data);
-      } catch (IOException e) {
-        if (!joinCachePath.resolve(key).toFile().delete()) {
-          log.debug("couldn't delete " + key);
+      if (joinCachePath != null) {
+        try {
+          Path path = joinCachePath.resolve(key);
+          String data = new String(Files.readAllBytes(path),
+              StandardCharsets.UTF_8);
+          return decode(data);
+        } catch (IOException e) {
+          if (!joinCachePath.resolve(key).toFile().delete()) {
+            log.debug("couldn't delete " + key);
+          }
+          administration.remove(item);
+          expiration.remove(key);
+          log.error("couldn't get " + key, e);
         }
-        administration.remove(item);
-        expiration.remove(key);
-        log.error("couldn't get " + key, e);
+      } else {
+        if(item.data!=null) {
+          return decode(item.data);
+        } else {
+          return null;
+        }
       }
     } else {
       log.error("doesn't exist anymore");

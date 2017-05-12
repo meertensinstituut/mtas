@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.JettyConfig;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -23,30 +27,59 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import com.google.common.io.Files;
 
+/**
+ * The Class MtasSolrTestDistributedSearchConsistency.
+ */
 public class MtasSolrTestDistributedSearchConsistency {
 
+  /** The log. */
+  private static Log log = LogFactory
+      .getLog(MtasSolrTestDistributedSearchConsistency.class);
+
+  /** The Constant COLLECTION_ALL_OPTIMIZED. */
   private static final String COLLECTION_ALL_OPTIMIZED = "collection1";
+  
+  /** The Constant COLLECTION_ALL_MULTIPLE_SEGMENTS. */
   private static final String COLLECTION_ALL_MULTIPLE_SEGMENTS = "collection2";
+  
+  /** The Constant COLLECTION_PART1_OPTIMIZED. */
   private static final String COLLECTION_PART1_OPTIMIZED = "collection3";
+  
+  /** The Constant COLLECTION_PART2_MULTIPLE_SEGMENTS. */
   private static final String COLLECTION_PART2_MULTIPLE_SEGMENTS = "collection4";
+  
+  /** The Constant COLLECTION_DISTRIBUTED. */
   private static final String COLLECTION_DISTRIBUTED = "collection5";
 
+  /** The cloud cluster. */
   private static MiniSolrCloudCluster cloudCluster;
+  
+  /** The cloud base dir. */
   private static Path cloudBaseDir;
 
-  private static HashMap<Integer, SolrInputDocument> solrDocuments;
+  /** The solr documents. */
+  private static Map<Integer, SolrInputDocument> solrDocuments;
 
+  /**
+   * Setup.
+   */
   @org.junit.BeforeClass
   public static void setup() {
     solrDocuments = MtasSolrBase.createDocuments();
     createCloud();
   }
 
+  /**
+   * Shutdown.
+   */
   @org.junit.AfterClass
   public static void shutdown() {
     shutdownCloud();
   }
 
+  /**
+   * Cql query parser.
+   */
   @org.junit.Test
   public void cqlQueryParser() {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -62,6 +95,9 @@ public class MtasSolrTestDistributedSearchConsistency {
         list.get(COLLECTION_DISTRIBUTED).getResults().size());
   }
 
+  /**
+   * Cql query parser filter.
+   */
   @org.junit.Test
   public void cqlQueryParserFilter() {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -77,9 +113,13 @@ public class MtasSolrTestDistributedSearchConsistency {
         list.get(COLLECTION_DISTRIBUTED).getResults().size());
   }
 
+  /**
+   * Mtas request handler stats tokens.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
-  public void mtasRequestHandlerStatsTokens()
-      throws SolrServerException, IOException {
+  public void mtasRequestHandlerStatsTokens() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     String[] types = new String[] { "n", "sum", "mean", "min", "max" };
     params.set("q", "*:*");
@@ -96,9 +136,13 @@ public class MtasSolrTestDistributedSearchConsistency {
         "statsKey", types);
   }
 
+  /**
+   * Mtas request handler stats positions.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
-  public void mtasRequestHandlerStatsPositions()
-      throws SolrServerException, IOException {
+  public void mtasRequestHandlerStatsPositions() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     String[] types = new String[] { "n", "sum", "mean", "min", "max" };
     params.set("q", "*:*");
@@ -115,9 +159,13 @@ public class MtasSolrTestDistributedSearchConsistency {
         "statsKey", types);
   }
 
+  /**
+   * Mtas request handler stats spans.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
-  public void mtasRequestHandlerStatsSpans()
-      throws SolrServerException, IOException {
+  public void mtasRequestHandlerStatsSpans() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     String[] types = new String[] { "n", "sum", "mean", "min", "max" };
     params.set("q", "*:*");
@@ -136,9 +184,15 @@ public class MtasSolrTestDistributedSearchConsistency {
         "statsKey", types);
   }
 
+  /**
+   * Creates the results.
+   *
+   * @param params the params
+   * @return the hash map
+   */
   private static HashMap<String, QueryResponse> createResults(
       final ModifiableSolrParams params) {
-    HashMap<String, QueryResponse> list = new HashMap<String, QueryResponse>();
+    HashMap<String, QueryResponse> list = new HashMap<>();
     CloudSolrClient client = cloudCluster.getSolrClient();
     try {
       list.put(COLLECTION_ALL_OPTIMIZED,
@@ -154,21 +208,40 @@ public class MtasSolrTestDistributedSearchConsistency {
       list.put(COLLECTION_DISTRIBUTED,
           client.query(COLLECTION_DISTRIBUTED, params));
     } catch (SolrServerException | IOException e) {
-      e.printStackTrace();
+      log.error(e);
     }
     return list;
   }
 
+  /**
+   * Creates the stats assertions.
+   *
+   * @param response1 the response 1
+   * @param response2 the response 2
+   * @param type the type
+   * @param key the key
+   * @param names the names
+   */
   private static void createStatsAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String type, String key, String[] names) {
     NamedList<Object>[] responses2 = new NamedList[] { response2 };
     createStatsAssertions(response1, responses2, type, key, names);
   }
 
+  /**
+   * Creates the stats assertions.
+   *
+   * @param response1 the response 1
+   * @param responses2 the responses 2
+   * @param type the type
+   * @param key the key
+   * @param names the names
+   */
   private static void createStatsAssertions(NamedList<Object> response1,
       NamedList<Object>[] responses2, String type, String key, String[] names) {
-    for (String name : names) {      
-      assertFalse("no "+type+" - "+name, MtasSolrBase.getFromMtasStats(response1, type, key, name).equals(0));
+    for (String name : names) {
+      assertFalse("no " + type + " - " + name,
+          MtasSolrBase.getFromMtasStats(response1, type, key, name).equals(0));
       for (NamedList<Object> response2 : responses2) {
         assertEquals(MtasSolrBase.getFromMtasStats(response1, type, key, name),
             MtasSolrBase.getFromMtasStats(response2, type, key, name));
@@ -176,59 +249,72 @@ public class MtasSolrTestDistributedSearchConsistency {
     }
   }
 
+  /**
+   * Creates the cloud.
+   */
   private static void createCloud() {
     Path dataPath = Paths.get("junit").resolve("data");
     String solrxml = MiniSolrCloudCluster.DEFAULT_CLOUD_SOLR_XML;
     JettyConfig jettyConfig = JettyConfig.builder().setContext("/solr").build();
-    File cloudBase = Files.createTempDir();    
+    File cloudBase = Files.createTempDir();
     cloudBaseDir = cloudBase.toPath();
-    //create subdirectories
+    // create subdirectories
     Path clusterDir = cloudBaseDir.resolve("cluster");
     Path logDir = cloudBaseDir.resolve("log");
-    clusterDir.toFile().mkdir();
-    logDir.toFile().mkdir();
-    //set log directory
-    System.setProperty("solr.log.dir", logDir.toAbsolutePath().toString());    
-    try {
-      cloudCluster = new MiniSolrCloudCluster(1, clusterDir, solrxml,
-          jettyConfig);
-      CloudSolrClient client = cloudCluster.getSolrClient();
-      client.connect();
-      createCloudCollection(COLLECTION_ALL_OPTIMIZED, 1, 1,
-          dataPath.resolve("conf"));
-      createCloudCollection(COLLECTION_ALL_MULTIPLE_SEGMENTS, 1, 1,
-          dataPath.resolve("conf"));
-      createCloudCollection(COLLECTION_PART1_OPTIMIZED, 1, 1,
-          dataPath.resolve("conf"));
-      createCloudCollection(COLLECTION_PART2_MULTIPLE_SEGMENTS, 1, 1,
-          dataPath.resolve("conf"));
-      createCloudCollection(COLLECTION_DISTRIBUTED, 1, 1,
-          dataPath.resolve("conf"));
+    if (clusterDir.toFile().mkdir() && logDir.toFile().mkdir()) {
+      // set log directory
+      System.setProperty("solr.log.dir", logDir.toAbsolutePath().toString());
+      try {
+        cloudCluster = new MiniSolrCloudCluster(1, clusterDir, solrxml,
+            jettyConfig);
+        CloudSolrClient client = cloudCluster.getSolrClient();
+        client.connect();
+        createCloudCollection(COLLECTION_ALL_OPTIMIZED, 1, 1,
+            dataPath.resolve("conf"));
+        createCloudCollection(COLLECTION_ALL_MULTIPLE_SEGMENTS, 1, 1,
+            dataPath.resolve("conf"));
+        createCloudCollection(COLLECTION_PART1_OPTIMIZED, 1, 1,
+            dataPath.resolve("conf"));
+        createCloudCollection(COLLECTION_PART2_MULTIPLE_SEGMENTS, 1, 1,
+            dataPath.resolve("conf"));
+        createCloudCollection(COLLECTION_DISTRIBUTED, 1, 1,
+            dataPath.resolve("conf"));
 
-      // collection1
-      client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(1));
-      client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(2));
-      client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(3));
-      client.commit(COLLECTION_ALL_OPTIMIZED);
-      // collection2
-      client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(1));
-      client.commit(COLLECTION_ALL_MULTIPLE_SEGMENTS);
-      client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(2));
-      client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(3));
-      client.commit(COLLECTION_ALL_MULTIPLE_SEGMENTS);
-      // collection3
-      client.add(COLLECTION_PART1_OPTIMIZED, solrDocuments.get(1));
-      client.commit(COLLECTION_PART1_OPTIMIZED);
-      // collection4
-      client.add(COLLECTION_PART2_MULTIPLE_SEGMENTS, solrDocuments.get(2));
-      client.add(COLLECTION_PART2_MULTIPLE_SEGMENTS, solrDocuments.get(3));
-      client.commit(COLLECTION_PART2_MULTIPLE_SEGMENTS);
-    } catch (Exception e) {
-      e.printStackTrace();
+        // collection1
+        client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(1));
+        client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(2));
+        client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(3));
+        client.commit(COLLECTION_ALL_OPTIMIZED);
+        // collection2
+        client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(1));
+        client.commit(COLLECTION_ALL_MULTIPLE_SEGMENTS);
+        client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(2));
+        client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(3));
+        client.commit(COLLECTION_ALL_MULTIPLE_SEGMENTS);
+        // collection3
+        client.add(COLLECTION_PART1_OPTIMIZED, solrDocuments.get(1));
+        client.commit(COLLECTION_PART1_OPTIMIZED);
+        // collection4
+        client.add(COLLECTION_PART2_MULTIPLE_SEGMENTS, solrDocuments.get(2));
+        client.add(COLLECTION_PART2_MULTIPLE_SEGMENTS, solrDocuments.get(3));
+        client.commit(COLLECTION_PART2_MULTIPLE_SEGMENTS);
+      } catch (Exception e) {
+        log.error(e);
+      }
+    } else {
+      log.error("couldn't create directories");
     }
-
   }
 
+  /**
+   * Creates the cloud collection.
+   *
+   * @param collectionName the collection name
+   * @param numShards the num shards
+   * @param replicationFactor the replication factor
+   * @param confDir the conf dir
+   * @throws Exception the exception
+   */
   private static void createCloudCollection(String collectionName,
       int numShards, int replicationFactor, Path confDir) throws Exception {
     CloudSolrClient client = cloudCluster.getSolrClient();
@@ -255,12 +341,15 @@ public class MtasSolrTestDistributedSearchConsistency {
     client.request(request);
   }
 
+  /**
+   * Shutdown cloud.
+   */
   private static void shutdownCloud() {
     try {
       System.clearProperty("solr.log.dir");
       cloudCluster.shutdown();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error(e);
     } finally {
       MtasSolrBase.deleteDirectory(cloudBaseDir.toFile());
     }

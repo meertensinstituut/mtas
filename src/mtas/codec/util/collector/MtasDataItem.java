@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -24,7 +25,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   protected MtasDataCollector<?, ?> sub;
 
   /** The stats items. */
-  protected TreeSet<String> statsItems;
+  protected Set<String> statsItems;
 
   /** The sort direction. */
   protected String sortType;
@@ -34,7 +35,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   protected int errorNumber;
 
   /** The error list. */
-  protected HashMap<String, Integer> errorList;
+  protected Map<String, Integer> errorList;
 
   /** The comparable sort value. */
   protected MtasDataItemNumberComparator<?> comparableSortValue;
@@ -63,9 +64,9 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    * @param sourceNumber
    *          the source number
    */
-  public MtasDataItem(MtasDataCollector<?, ?> sub, TreeSet<String> statsItems,
+  public MtasDataItem(MtasDataCollector<?, ?> sub, Set<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
-      HashMap<String, Integer> errorList, int sourceNumber) {
+      Map<String, Integer> errorList, int sourceNumber) {
     this.sub = sub;
     this.statsItems = statsItems;
     this.sortType = sortType;

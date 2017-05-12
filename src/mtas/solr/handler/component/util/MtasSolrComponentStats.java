@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -31,7 +34,11 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentStats.
  */
-public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats> {
+public class MtasSolrComponentStats
+    implements MtasSolrComponent<ComponentStats> {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSolrComponentStats.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -148,12 +155,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
     this.searchComponent = searchComponent;
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -449,10 +452,11 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
                   }
                 }
               }
-              for (String name : tmpVariables.keySet()) {
-                queryVariables[tmpCounter][tmpQCounter].put(name,
-                    tmpVariables.get(name)
-                        .toArray(new String[tmpVariables.get(name).size()]));
+              for (Entry<String, ArrayList<String>> entry : tmpVariables
+                  .entrySet()) {
+                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),
+                    entry.getValue()
+                        .toArray(new String[entry.getValue().size()]));
               }
             }
             tmpQCounter++;
@@ -536,8 +540,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
             for (int j = 0; j < queryNumber; j++) {
               Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)
                   ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);
-              MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],
-                  queryTypes[i][j], queryPrefixes[i][j],
+              MtasSpanQuery q = MtasSolrResultUtil.constructQuery(
+                  queryValues[i][j], queryTypes[i][j], queryPrefixes[i][j],
                   expandedQueryVariables[e][j], fields[i], queryIgnores[i][j],
                   maximumIgnoreLength);
               // minimize number of queries
@@ -582,8 +586,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
           newKey.append(" q" + q + ":$" + name + "=");
           if (queryVariables[q].get(name) != null
               && queryVariables[q].get(name).length == 1) {
-            newKey.append("'" + queryVariables[q].get(name)[0].replace("\\", "\\\\")
-                .replace(",", "\\,") + "'");
+            newKey.append("'" + queryVariables[q].get(name)[0]
+                .replace("\\", "\\\\").replace(",", "\\,") + "'");
           } else {
             newKey.append("-");
           }
@@ -620,11 +624,12 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
   private void generatePermutations(
       ArrayList<HashMap<String, String[]>[]> result, int index,
       HashMap<String, String[]>[][] subResult) {
-    HashMap<String, String[]>[] value = subResult[index];
-    if (index == 0) {
+    int localIndex = index;
+    HashMap<String, String[]>[] value = subResult[localIndex];
+    if (localIndex == 0) {
       for (int i = 0; i < value.length; i++) {
         HashMap<String, String[]>[] resultItem = new HashMap[subResult.length];
-        resultItem[index] = value[i];
+        resultItem[localIndex] = value[i];
         result.add(resultItem);
       }
     } else {
@@ -632,16 +637,16 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
       for (int e = 0; e < result.size(); e++) {
         for (int i = 0; i < value.length; i++) {
           HashMap<String, String[]>[] resultItem = result.get(e);
-          resultItem[index] = value[i];
+          resultItem[localIndex] = value[i];
           newResult.add(resultItem);
         }
       }
       result.clear();
       result.addAll(newResult);
     }
-    index++;
-    if (index < subResult.length) {
-      generatePermutations(result, index, subResult);
+    localIndex++;
+    if (localIndex < subResult.length) {
+      generatePermutations(result, localIndex, subResult);
     }
   }
 
@@ -713,12 +718,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
     }
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -824,20 +825,23 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
+   */
   @Override
   public SimpleOrderedMap<Object> create(ComponentStats response,
       Boolean encode) throws IOException {
-    if(response instanceof ComponentPosition) {
+    if (response instanceof ComponentPosition) {
       return createPosition((ComponentPosition) response, encode);
-    } else if(response instanceof ComponentToken) {
+    } else if (response instanceof ComponentToken) {
       return createToken((ComponentToken) response, encode);
-    } else if(response instanceof ComponentSpan) {
+    } else if (response instanceof ComponentSpan) {
       return createSpan((ComponentSpan) response, encode);
     } else {
-      throw new IOException("incorrect type "+response.getClass());
+      throw new IOException("incorrect type " + response.getClass());
     }
   }
-  
+
   /**
    * Creates the position.
    *
@@ -898,8 +902,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
    * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
-  private SimpleOrderedMap<Object> createSpan(ComponentSpan span, Boolean encode)
-      throws IOException {
+  private SimpleOrderedMap<Object> createSpan(ComponentSpan span,
+      Boolean encode) throws IOException {
     // System.out.println("Create stats span " + span.dataType + " "
     // + span.statsType + " " + span.statsItems + " --- " + encode);
     SimpleOrderedMap<Object> mtasSpanResponse = new SimpleOrderedMap<>();
@@ -919,8 +923,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
                 new Integer[] { Integer.MAX_VALUE }, null));
       }
     }
-    MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector, span.dataType,
-        span.statsType, span.statsItems, functionData);
+    MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector,
+        span.dataType, span.statsType, span.statsItems, functionData);
     if (encode) {
       mtasSpanResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));
     } else {
@@ -930,31 +934,29 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
     return mtasSpanResponse;
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb the rb
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
-    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
-      if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
-          && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-        for (ShardRequest sreq : rb.finished) {
-          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
-              && sreq.params.getBool(PARAM_MTAS_STATS, false)) {
-            for (ShardResponse shardResponse : sreq.responses) {
-              NamedList<Object> response = shardResponse.getSolrResponse()
-                  .getResponse();
-              try {
-                ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                    .findRecursive("mtas", "stats");
-                if (data != null) {
-                  MtasSolrResultUtil.decode(data);
-                }
-              } catch (ClassCastException e) {
-                // shouldnt happen
+    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+        && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
+        && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      for (ShardRequest sreq : rb.finished) {
+        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
+            && sreq.params.getBool(PARAM_MTAS_STATS, false)) {
+          for (ShardResponse shardResponse : sreq.responses) {
+            NamedList<Object> response = shardResponse.getSolrResponse()
+                .getResponse();
+            try {
+              ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
+                  .findRecursive("mtas", "stats");
+              if (data != null) {
+                MtasSolrResultUtil.decode(data);
               }
+            } catch (ClassCastException e) {
+              log.debug(e);
+              // shouldnt happen
             }
           }
         }
@@ -962,12 +964,8 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -976,22 +974,22 @@ public class MtasSolrComponentStats implements MtasSolrComponent<ComponentStats>
     NamedList<Object> mtasResponse = null;
     try {
       mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
-      if (mtasResponse != null) {
-        NamedList<Object> mtasResponseStats;
-        try {
-          mtasResponseStats = (NamedList<Object>) mtasResponse.get("stats");
-          if (mtasResponseStats != null) {
-            MtasSolrResultUtil.rewrite(mtasResponseStats);
-          }
-        } catch (ClassCastException e) {
-          mtasResponseStats = null;
-        }
-      }
     } catch (ClassCastException e) {
+      log.debug(e);
       mtasResponse = null;
     }
+    if (mtasResponse != null) {
+      NamedList<Object> mtasResponseStats;
+      try {
+        mtasResponseStats = (NamedList<Object>) mtasResponse.get("stats");
+        if (mtasResponseStats != null) {
+          MtasSolrResultUtil.rewrite(mtasResponseStats);
+        }
+      } catch (ClassCastException e) {
+        log.debug(e);
+        mtasResponse.remove("stats");
+      }
+    }
   }
-
-  
 
 }
