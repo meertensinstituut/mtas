@@ -1,0 +1,3 @@
+# Allow JaCoCo's directory to bypass GitHub's Jekyll-powered pages 
+# so that the web report renders properly
+include: ['.resources']
