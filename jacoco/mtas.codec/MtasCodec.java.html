@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasCodec.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasCodec.java</span></div><h1>MtasCodec.java</h1><pre class="source lang-java linenums">package mtas.codec;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasCodec.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasCodec.java</span></div><h1>MtasCodec.java</h1><pre class="source lang-java linenums">package mtas.codec;
 
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.CompoundFormat;
@@ -35,24 +35,22 @@ public class MtasCodec extends Codec {
   /**
    * Instantiates a new mtas codec.
    *
-   * @param name
-   *          the name
-   * @param delegate
-   *          the delegate
+   * @param name the name
+   * @param delegate the delegate
    */
   protected MtasCodec(String name, Codec delegate) {
-<span class="fc" id="L44">    super(name);</span>
-<span class="fc" id="L45">    this.delegate = delegate;</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L42">    super(name);</span>
+<span class="fc" id="L43">    this.delegate = delegate;</span>
+<span class="fc" id="L44">  }</span>
 
   /**
    * Inits the delegate.
    */
   private void initDelegate() {
-<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (delegate == null) {</span>
-<span class="fc" id="L53">      delegate = Codec.getDefault();</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    if (delegate == null) {</span>
+<span class="fc" id="L51">      delegate = Codec.getDefault();</span>
     }
-<span class="fc" id="L55">  }</span>
+<span class="fc" id="L53">  }</span>
 
   /*
    * (non-Javadoc)
@@ -61,26 +59,26 @@ public class MtasCodec extends Codec {
    */
   @Override
   public PostingsFormat postingsFormat() {
-<span class="fc" id="L64">    initDelegate();</span>
-<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (delegate.postingsFormat() instanceof PerFieldPostingsFormat) {</span>
-<span class="fc" id="L66">      Codec defaultCodec = Codec.getDefault();</span>
-<span class="fc" id="L67">      PostingsFormat defaultPostingsFormat = defaultCodec.postingsFormat();</span>
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">      if (defaultPostingsFormat instanceof PerFieldPostingsFormat) {</span>
-<span class="fc" id="L69">        defaultPostingsFormat = ((PerFieldPostingsFormat) defaultPostingsFormat)</span>
-<span class="fc" id="L70">            .getPostingsFormatForField(null);</span>
-<span class="pc bpc" id="L71" title="2 of 4 branches missed.">        if ((defaultPostingsFormat == null)</span>
+<span class="fc" id="L62">    initDelegate();</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    if (delegate.postingsFormat() instanceof PerFieldPostingsFormat) {</span>
+<span class="fc" id="L64">      Codec defaultCodec = Codec.getDefault();</span>
+<span class="fc" id="L65">      PostingsFormat defaultPostingsFormat = defaultCodec.postingsFormat();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">      if (defaultPostingsFormat instanceof PerFieldPostingsFormat) {</span>
+<span class="fc" id="L67">        defaultPostingsFormat = ((PerFieldPostingsFormat) defaultPostingsFormat)</span>
+<span class="fc" id="L68">            .getPostingsFormatForField(null);</span>
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">        if ((defaultPostingsFormat == null)</span>
             || (defaultPostingsFormat instanceof PerFieldPostingsFormat)) {
           // fallback option
-<span class="nc" id="L74">          return new MtasCodecPostingsFormat(</span>
-<span class="nc" id="L75">              PostingsFormat.forName(&quot;Lucene62&quot;));</span>
+<span class="nc" id="L72">          return new MtasCodecPostingsFormat(</span>
+<span class="nc" id="L73">              PostingsFormat.forName(&quot;Lucene62&quot;));</span>
         } else {
-<span class="fc" id="L77">          return new MtasCodecPostingsFormat(defaultPostingsFormat);</span>
+<span class="fc" id="L75">          return new MtasCodecPostingsFormat(defaultPostingsFormat);</span>
         }
       } else {
-<span class="nc" id="L80">        return new MtasCodecPostingsFormat(defaultPostingsFormat);</span>
+<span class="nc" id="L78">        return new MtasCodecPostingsFormat(defaultPostingsFormat);</span>
       }
     } else {
-<span class="nc" id="L83">      return new MtasCodecPostingsFormat(delegate.postingsFormat());</span>
+<span class="nc" id="L81">      return new MtasCodecPostingsFormat(delegate.postingsFormat());</span>
     }
   }
 
@@ -91,8 +89,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public DocValuesFormat docValuesFormat() {
-<span class="nc" id="L94">    initDelegate();</span>
-<span class="nc" id="L95">    return delegate.docValuesFormat();</span>
+<span class="nc" id="L92">    initDelegate();</span>
+<span class="nc" id="L93">    return delegate.docValuesFormat();</span>
   }
 
   /*
@@ -102,8 +100,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public StoredFieldsFormat storedFieldsFormat() {
-<span class="fc" id="L105">    initDelegate();</span>
-<span class="fc" id="L106">    return delegate.storedFieldsFormat();</span>
+<span class="fc" id="L103">    initDelegate();</span>
+<span class="fc" id="L104">    return delegate.storedFieldsFormat();</span>
   }
 
   /*
@@ -113,8 +111,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public TermVectorsFormat termVectorsFormat() {
-<span class="nc" id="L116">    initDelegate();</span>
-<span class="nc" id="L117">    return delegate.termVectorsFormat();</span>
+<span class="nc" id="L114">    initDelegate();</span>
+<span class="nc" id="L115">    return delegate.termVectorsFormat();</span>
   }
 
   /*
@@ -124,8 +122,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public FieldInfosFormat fieldInfosFormat() {
-<span class="fc" id="L127">    initDelegate();</span>
-<span class="fc" id="L128">    return delegate.fieldInfosFormat();</span>
+<span class="fc" id="L125">    initDelegate();</span>
+<span class="fc" id="L126">    return delegate.fieldInfosFormat();</span>
   }
 
   /*
@@ -135,8 +133,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public SegmentInfoFormat segmentInfoFormat() {
-<span class="fc" id="L138">    initDelegate();</span>
-<span class="fc" id="L139">    return delegate.segmentInfoFormat();</span>
+<span class="fc" id="L136">    initDelegate();</span>
+<span class="fc" id="L137">    return delegate.segmentInfoFormat();</span>
   }
 
   /*
@@ -146,8 +144,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public NormsFormat normsFormat() {
-<span class="fc" id="L149">    initDelegate();</span>
-<span class="fc" id="L150">    return delegate.normsFormat();</span>
+<span class="fc" id="L147">    initDelegate();</span>
+<span class="fc" id="L148">    return delegate.normsFormat();</span>
   }
 
   /*
@@ -157,8 +155,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public LiveDocsFormat liveDocsFormat() {
-<span class="fc" id="L160">    initDelegate();</span>
-<span class="fc" id="L161">    return delegate.liveDocsFormat();</span>
+<span class="fc" id="L158">    initDelegate();</span>
+<span class="fc" id="L159">    return delegate.liveDocsFormat();</span>
   }
 
   /*
@@ -168,8 +166,8 @@ public class MtasCodec extends Codec {
    */
   @Override
   public CompoundFormat compoundFormat() {
-<span class="nc" id="L171">    initDelegate();</span>
-<span class="nc" id="L172">    return delegate.compoundFormat();</span>
+<span class="nc" id="L169">    initDelegate();</span>
+<span class="nc" id="L170">    return delegate.compoundFormat();</span>
   }
 
   /*
@@ -179,9 +177,9 @@ public class MtasCodec extends Codec {
    */
   @Override
   public PointsFormat pointsFormat() {
-<span class="nc" id="L182">    initDelegate();</span>
-<span class="nc" id="L183">    return delegate.pointsFormat();</span>
+<span class="nc" id="L180">    initDelegate();</span>
+<span class="nc" id="L181">    return delegate.pointsFormat();</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

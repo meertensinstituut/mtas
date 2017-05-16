@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataAdvanced.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataAdvanced.java</span></div><h1>MtasDataAdvanced.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasDataAdvanced.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataAdvanced.java</span></div><h1>MtasDataAdvanced.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
@@ -21,25 +22,41 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
+  /** The advanced value sum list. */
+<span class="fc" id="L26">  protected T1[] advancedValueSumList = null;</span>
+  
   /** The new advanced value sum list. */
-<span class="fc" id="L25">  protected T1[] advancedValueSumList = null, newAdvancedValueSumList = null;</span>
+<span class="fc" id="L29">  protected T1[] newAdvancedValueSumList = null;</span>
 
+  /** The advanced value max list. */
+<span class="fc" id="L32">  protected T1[] advancedValueMaxList = null;</span>
+  
   /** The new advanced value max list. */
-<span class="fc" id="L28">  protected T1[] advancedValueMaxList = null, newAdvancedValueMaxList = null;</span>
+<span class="fc" id="L35">  protected T1[] newAdvancedValueMaxList = null;</span>
 
+  /** The advanced value min list. */
+<span class="fc" id="L38">  protected T1[] advancedValueMinList = null;</span>
+  
   /** The new advanced value min list. */
-<span class="fc" id="L31">  protected T1[] advancedValueMinList = null, newAdvancedValueMinList = null;</span>
+<span class="fc" id="L41">  protected T1[] newAdvancedValueMinList = null;</span>
 
+  /** The advanced value sum of squares list. */
+<span class="fc" id="L44">  protected T1[] advancedValueSumOfSquaresList = null;</span>
+  
   /** The new advanced value sum of squares list. */
-<span class="fc" id="L34">  protected T1[] advancedValueSumOfSquaresList = null,</span>
-      newAdvancedValueSumOfSquaresList = null;
+<span class="fc" id="L47">  protected T1[] newAdvancedValueSumOfSquaresList = null;</span>
 
+  /** The advanced value sum of logs list. */
+<span class="fc" id="L50">  protected T2[] advancedValueSumOfLogsList = null;</span>
+  
   /** The new advanced value sum of logs list. */
-<span class="fc" id="L38">  protected T2[] advancedValueSumOfLogsList = null,</span>
-      newAdvancedValueSumOfLogsList = null;
+<span class="fc" id="L53">  protected T2[] newAdvancedValueSumOfLogsList = null;</span>
 
-  /** The new advanced value n list. */
-<span class="fc" id="L42">  protected long[] advancedValueNList = null, newAdvancedValueNList = null;</span>
+  /** The advanced value N list. */
+<span class="fc" id="L56">  protected long[] advancedValueNList = null;</span>
+  
+  /** The new advanced value N list. */
+<span class="fc" id="L59">  protected long[] newAdvancedValueNList = null;</span>
 
   /** The operations. */
   protected MtasDataOperations&lt;T1, T2&gt; operations;
@@ -68,19 +85,19 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataAdvanced(String collectorType, String dataType,
-      Set&lt;String&gt; statsItems, String sortType, String sortDirection,
+      SortedSet&lt;String&gt; statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
       String[] subDataTypes, String[] subStatsTypes,
-      Set&lt;String&gt;[] subStatsItems, String[] subSortTypes,
+      SortedSet&lt;String&gt;[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       MtasDataOperations&lt;T1, T2&gt; operations, String segmentRegistration,
       String boundary) throws IOException {
-<span class="fc" id="L78">    super(collectorType, dataType, CodecUtil.STATS_ADVANCED, statsItems,</span>
+<span class="fc" id="L95">    super(collectorType, dataType, CodecUtil.STATS_ADVANCED, statsItems,</span>
         sortType, sortDirection, start, number, subCollectorTypes, subDataTypes,
         subStatsTypes, subStatsItems, subSortTypes, subSortDirections, subStart,
         subNumber, segmentRegistration, boundary);
-<span class="fc" id="L82">    this.operations = operations;</span>
-<span class="fc" id="L83">  }</span>
+<span class="fc" id="L99">    this.operations = operations;</span>
+<span class="fc" id="L100">  }</span>
 
   /*
    * (non-Javadoc)
@@ -90,9 +107,9 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   public final void error(String error) throws IOException {
-<span class="nc" id="L93">    add(false);</span>
-<span class="nc" id="L94">    setError(newCurrentPosition, error, newCurrentExisting);</span>
-<span class="nc" id="L95">  }</span>
+<span class="nc" id="L110">    add(false);</span>
+<span class="nc" id="L111">    setError(newCurrentPosition, error, newCurrentExisting);</span>
+<span class="nc" id="L112">  }</span>
 
   /*
    * (non-Javadoc)
@@ -103,11 +120,11 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   public final void error(String key, String error) throws IOException {
-<span class="nc bnc" id="L106" title="All 2 branches missed.">    if (key != null) {</span>
-<span class="nc" id="L107">      add(key, false);</span>
-<span class="nc" id="L108">      setError(newCurrentPosition, error, newCurrentExisting);      </span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    if (key != null) {</span>
+<span class="nc" id="L124">      add(key, false);</span>
+<span class="nc" id="L125">      setError(newCurrentPosition, error, newCurrentExisting);</span>
     }
-<span class="nc" id="L110">  }</span>
+<span class="nc" id="L127">  }</span>
 
   /**
    * Sets the error.
@@ -118,22 +135,22 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
-<span class="nc bnc" id="L121" title="All 2 branches missed.">    if (!currentExisting) {</span>
-<span class="nc" id="L122">      newAdvancedValueSumList[newPosition] = operations.getZero1();</span>
-<span class="nc" id="L123">      newAdvancedValueSumOfLogsList[newPosition] = operations.getZero2();</span>
-<span class="nc" id="L124">      newAdvancedValueSumOfSquaresList[newPosition] = operations.getZero1();</span>
-<span class="nc" id="L125">      newAdvancedValueMinList[newPosition] = operations.getZero1();</span>
-<span class="nc" id="L126">      newAdvancedValueMaxList[newPosition] = operations.getZero1();</span>
-<span class="nc" id="L127">      newAdvancedValueNList[newPosition] = 0;</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">    if (!currentExisting) {</span>
+<span class="nc" id="L139">      newAdvancedValueSumList[newPosition] = operations.getZero1();</span>
+<span class="nc" id="L140">      newAdvancedValueSumOfLogsList[newPosition] = operations.getZero2();</span>
+<span class="nc" id="L141">      newAdvancedValueSumOfSquaresList[newPosition] = operations.getZero1();</span>
+<span class="nc" id="L142">      newAdvancedValueMinList[newPosition] = operations.getZero1();</span>
+<span class="nc" id="L143">      newAdvancedValueMaxList[newPosition] = operations.getZero1();</span>
+<span class="nc" id="L144">      newAdvancedValueNList[newPosition] = 0;</span>
     }
-<span class="nc" id="L129">    newErrorNumber[newPosition]++;</span>
-<span class="nc bnc" id="L130" title="All 2 branches missed.">    if (newErrorList[newPosition].containsKey(error)) {</span>
-<span class="nc" id="L131">      newErrorList[newPosition].put(error,</span>
-<span class="nc" id="L132">          newErrorList[newPosition].get(error) + 1);</span>
+<span class="nc" id="L146">    newErrorNumber[newPosition]++;</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">    if (newErrorList[newPosition].containsKey(error)) {</span>
+<span class="nc" id="L148">      newErrorList[newPosition].put(error,</span>
+<span class="nc" id="L149">          newErrorList[newPosition].get(error) + 1);</span>
     } else {
-<span class="nc" id="L134">      newErrorList[newPosition].put(error, 1);</span>
+<span class="nc" id="L151">      newErrorList[newPosition].put(error, 1);</span>
     }
-<span class="nc" id="L136">  }</span>
+<span class="nc" id="L153">  }</span>
 
   /*
    * (non-Javadoc)
@@ -143,67 +160,70 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
   @Override
   protected final void increaseNewListSize() throws IOException {
     // register old situation
-<span class="nc" id="L146">    int tmpOldSize = newKeyList.length;</span>
-<span class="nc" id="L147">    int tmpNewPosition = newPosition;</span>
+<span class="fc" id="L163">    int tmpOldSize = newKeyList.length;</span>
+<span class="fc" id="L164">    int tmpNewPosition = newPosition;</span>
     // increase
-<span class="nc" id="L149">    super.increaseNewListSize();</span>
+<span class="fc" id="L166">    super.increaseNewListSize();</span>
     // reconstruct
-<span class="nc" id="L151">    T1[] tmpNewAdvancedValueSumList = newAdvancedValueSumList;</span>
-<span class="nc" id="L152">    T2[] tmpNewAdvancedValueSumOfLogsList = newAdvancedValueSumOfLogsList;</span>
-<span class="nc" id="L153">    T1[] tmpNewAdvancedValueSumOfSquaresList = newAdvancedValueSumOfSquaresList;</span>
-<span class="nc" id="L154">    T1[] tmpNewAdvancedValueMinList = newAdvancedValueMinList;</span>
-<span class="nc" id="L155">    T1[] tmpNewAdvancedValueMaxList = newAdvancedValueMaxList;</span>
-<span class="nc" id="L156">    long[] tmpNewAdvancedValueNList = newAdvancedValueNList;</span>
-<span class="nc" id="L157">    newAdvancedValueSumList = operations.createVector1(newSize);</span>
-<span class="nc" id="L158">    newAdvancedValueSumOfLogsList = operations.createVector2(newSize);</span>
-<span class="nc" id="L159">    newAdvancedValueSumOfSquaresList = operations.createVector1(newSize);</span>
-<span class="nc" id="L160">    newAdvancedValueMinList = operations.createVector1(newSize);</span>
-<span class="nc" id="L161">    newAdvancedValueMaxList = operations.createVector1(newSize);</span>
-<span class="nc" id="L162">    newAdvancedValueNList = new long[newSize];</span>
-<span class="nc" id="L163">    newPosition = tmpNewPosition;</span>
-<span class="nc" id="L164">    System.arraycopy(tmpNewAdvancedValueSumList, 0, newAdvancedValueSumList, 0,</span>
+<span class="fc" id="L168">    T1[] tmpNewAdvancedValueSumList = newAdvancedValueSumList;</span>
+<span class="fc" id="L169">    T2[] tmpNewAdvancedValueSumOfLogsList = newAdvancedValueSumOfLogsList;</span>
+<span class="fc" id="L170">    T1[] tmpNewAdvancedValueSumOfSquaresList = newAdvancedValueSumOfSquaresList;</span>
+<span class="fc" id="L171">    T1[] tmpNewAdvancedValueMinList = newAdvancedValueMinList;</span>
+<span class="fc" id="L172">    T1[] tmpNewAdvancedValueMaxList = newAdvancedValueMaxList;</span>
+<span class="fc" id="L173">    long[] tmpNewAdvancedValueNList = newAdvancedValueNList;</span>
+<span class="fc" id="L174">    newAdvancedValueSumList = operations.createVector1(newSize);</span>
+<span class="fc" id="L175">    newAdvancedValueSumOfLogsList = operations.createVector2(newSize);</span>
+<span class="fc" id="L176">    newAdvancedValueSumOfSquaresList = operations.createVector1(newSize);</span>
+<span class="fc" id="L177">    newAdvancedValueMinList = operations.createVector1(newSize);</span>
+<span class="fc" id="L178">    newAdvancedValueMaxList = operations.createVector1(newSize);</span>
+<span class="fc" id="L179">    newAdvancedValueNList = new long[newSize];</span>
+<span class="fc" id="L180">    newPosition = tmpNewPosition;</span>
+<span class="fc" id="L181">    System.arraycopy(tmpNewAdvancedValueSumList, 0, newAdvancedValueSumList, 0,</span>
         tmpOldSize);
-<span class="nc" id="L166">    System.arraycopy(tmpNewAdvancedValueSumOfLogsList, 0,</span>
+<span class="fc" id="L183">    System.arraycopy(tmpNewAdvancedValueSumOfLogsList, 0,</span>
         newAdvancedValueSumOfLogsList, 0, tmpOldSize);
-<span class="nc" id="L168">    System.arraycopy(tmpNewAdvancedValueSumOfSquaresList, 0,</span>
+<span class="fc" id="L185">    System.arraycopy(tmpNewAdvancedValueSumOfSquaresList, 0,</span>
         newAdvancedValueSumOfSquaresList, 0, tmpOldSize);
-<span class="nc" id="L170">    System.arraycopy(tmpNewAdvancedValueMinList, 0, newAdvancedValueMinList, 0,</span>
+<span class="fc" id="L187">    System.arraycopy(tmpNewAdvancedValueMinList, 0, newAdvancedValueMinList, 0,</span>
         tmpOldSize);
-<span class="nc" id="L172">    System.arraycopy(tmpNewAdvancedValueMaxList, 0, newAdvancedValueMaxList, 0,</span>
+<span class="fc" id="L189">    System.arraycopy(tmpNewAdvancedValueMaxList, 0, newAdvancedValueMaxList, 0,</span>
         tmpOldSize);
-<span class="nc" id="L174">    System.arraycopy(tmpNewAdvancedValueNList, 0, newAdvancedValueNList, 0,</span>
+<span class="fc" id="L191">    System.arraycopy(tmpNewAdvancedValueNList, 0, newAdvancedValueNList, 0,</span>
         tmpOldSize);
-<span class="nc" id="L176">  }</span>
+<span class="fc" id="L193">  }</span>
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
+  @Override
   public void reduceToSegmentKeys() {
-<span class="nc bnc" id="L182" title="All 4 branches missed.">    if (segmentRegistration != null &amp;&amp; size &gt; 0) {</span>
-<span class="nc" id="L183">      int sizeCopy = size;</span>
-<span class="nc" id="L184">      String[] keyListCopy = keyList.clone();</span>
-<span class="nc" id="L185">      T1[] advancedValueSumListCopy = advancedValueSumList.clone();</span>
-<span class="nc" id="L186">      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone();</span>
-<span class="nc" id="L187">      T1[] advancedValueMinListCopy = advancedValueMinList.clone();</span>
-<span class="nc" id="L188">      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList</span>
-<span class="nc" id="L189">          .clone();</span>
-<span class="nc" id="L190">      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone();</span>
-<span class="nc" id="L191">      long[] advancedValueNListCopy = advancedValueNList.clone();</span>
-<span class="nc" id="L192">      size = 0;</span>
-<span class="nc bnc" id="L193" title="All 2 branches missed.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
-<span class="nc bnc" id="L194" title="All 2 branches missed.">        if (segmentKeys.contains(keyListCopy[i])) {</span>
-<span class="nc" id="L195">          keyList[size] = keyListCopy[i];</span>
-<span class="nc" id="L196">          advancedValueSumList[size] = advancedValueSumListCopy[i];</span>
-<span class="nc" id="L197">          advancedValueMaxList[size] = advancedValueMaxListCopy[i];</span>
-<span class="nc" id="L198">          advancedValueMinList[size] = advancedValueMinListCopy[i];</span>
-<span class="nc" id="L199">          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];</span>
-<span class="nc" id="L200">          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];</span>
-<span class="nc" id="L201">          advancedValueNList[size] = advancedValueNListCopy[i];</span>
-<span class="nc" id="L202">          size++;</span>
+<span class="pc bpc" id="L202" title="2 of 4 branches missed.">    if (segmentRegistration != null &amp;&amp; size &gt; 0) {</span>
+<span class="fc" id="L203">      int sizeCopy = size;</span>
+<span class="fc" id="L204">      String[] keyListCopy = keyList.clone();</span>
+<span class="fc" id="L205">      T1[] advancedValueSumListCopy = advancedValueSumList.clone();</span>
+<span class="fc" id="L206">      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone();</span>
+<span class="fc" id="L207">      T1[] advancedValueMinListCopy = advancedValueMinList.clone();</span>
+<span class="fc" id="L208">      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList</span>
+<span class="fc" id="L209">          .clone();</span>
+<span class="fc" id="L210">      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone();</span>
+<span class="fc" id="L211">      long[] advancedValueNListCopy = advancedValueNList.clone();</span>
+<span class="fc" id="L212">      size = 0;</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">        if (segmentKeys.contains(keyListCopy[i])) {</span>
+<span class="fc" id="L215">          keyList[size] = keyListCopy[i];</span>
+<span class="fc" id="L216">          advancedValueSumList[size] = advancedValueSumListCopy[i];</span>
+<span class="fc" id="L217">          advancedValueMaxList[size] = advancedValueMaxListCopy[i];</span>
+<span class="fc" id="L218">          advancedValueMinList[size] = advancedValueMinListCopy[i];</span>
+<span class="fc" id="L219">          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];</span>
+<span class="fc" id="L220">          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];</span>
+<span class="fc" id="L221">          advancedValueNList[size] = advancedValueNListCopy[i];</span>
+<span class="fc" id="L222">          size++;</span>
         }
       }
     }
-<span class="nc" id="L206">  }</span>
+<span class="fc" id="L226">  }</span>
 
   /*
    * (non-Javadoc)
@@ -213,47 +233,47 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void reduceToKeys(Set&lt;String&gt; keys) {
-<span class="nc bnc" id="L216" title="All 2 branches missed.">    if (size &gt; 0) {</span>
-<span class="nc" id="L217">      int sizeCopy = size;</span>
-<span class="nc" id="L218">      String[] keyListCopy = keyList.clone();</span>
-<span class="nc" id="L219">      int[] errorNumberCopy = errorNumber.clone();</span>
-<span class="nc" id="L220">      HashMap&lt;String, Integer&gt;[] errorListCopy = errorList.clone();</span>
-<span class="nc" id="L221">      int[] sourceNumberListCopy = sourceNumberList.clone();</span>
-<span class="nc" id="L222">      T1[] advancedValueSumListCopy = advancedValueSumList.clone();</span>
-<span class="nc" id="L223">      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone();</span>
-<span class="nc" id="L224">      T1[] advancedValueMinListCopy = advancedValueMinList.clone();</span>
-<span class="nc" id="L225">      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList</span>
-<span class="nc" id="L226">          .clone();</span>
-<span class="nc" id="L227">      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone();</span>
-<span class="nc" id="L228">      long[] advancedValueNListCopy = advancedValueNList.clone();</span>
-<span class="nc" id="L229">      keyList = new String[keys.size()];</span>
-<span class="nc" id="L230">      errorNumber = new int[keys.size()];</span>
-<span class="nc" id="L231">      errorList = new HashMap[keys.size()];</span>
-<span class="nc" id="L232">      sourceNumberList = new int[keys.size()];</span>
-<span class="nc" id="L233">      advancedValueSumList = operations.createVector1(keys.size());</span>
-<span class="nc" id="L234">      advancedValueMaxList = operations.createVector1(keys.size());</span>
-<span class="nc" id="L235">      advancedValueMinList = operations.createVector1(keys.size());</span>
-<span class="nc" id="L236">      advancedValueSumOfSquaresList = operations.createVector1(keys.size());</span>
-<span class="nc" id="L237">      advancedValueSumOfLogsList = operations.createVector2(keys.size());</span>
-<span class="nc" id="L238">      advancedValueNList = new long[keys.size()];</span>
-<span class="nc" id="L239">      size = 0;</span>
-<span class="nc bnc" id="L240" title="All 2 branches missed.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
-<span class="nc bnc" id="L241" title="All 2 branches missed.">        if (keys.contains(keyListCopy[i])) {</span>
-<span class="nc" id="L242">          keyList[size] = keyListCopy[i];</span>
-<span class="nc" id="L243">          errorNumber[size] = errorNumberCopy[i];</span>
-<span class="nc" id="L244">          errorList[size] = errorListCopy[i];</span>
-<span class="nc" id="L245">          sourceNumberList[size] = sourceNumberListCopy[i];</span>
-<span class="nc" id="L246">          advancedValueSumList[size] = advancedValueSumListCopy[i];</span>
-<span class="nc" id="L247">          advancedValueMaxList[size] = advancedValueMaxListCopy[i];</span>
-<span class="nc" id="L248">          advancedValueMinList[size] = advancedValueMinListCopy[i];</span>
-<span class="nc" id="L249">          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];</span>
-<span class="nc" id="L250">          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];</span>
-<span class="nc" id="L251">          advancedValueNList[size] = advancedValueNListCopy[i];</span>
-<span class="nc" id="L252">          size++;</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">    if (size &gt; 0) {</span>
+<span class="fc" id="L237">      int sizeCopy = size;</span>
+<span class="fc" id="L238">      String[] keyListCopy = keyList.clone();</span>
+<span class="fc" id="L239">      int[] errorNumberCopy = errorNumber.clone();</span>
+<span class="fc" id="L240">      HashMap&lt;String, Integer&gt;[] errorListCopy = errorList.clone();</span>
+<span class="fc" id="L241">      int[] sourceNumberListCopy = sourceNumberList.clone();</span>
+<span class="fc" id="L242">      T1[] advancedValueSumListCopy = advancedValueSumList.clone();</span>
+<span class="fc" id="L243">      T1[] advancedValueMaxListCopy = advancedValueMaxList.clone();</span>
+<span class="fc" id="L244">      T1[] advancedValueMinListCopy = advancedValueMinList.clone();</span>
+<span class="fc" id="L245">      T1[] advancedValueSumOfSquaresListCopy = advancedValueSumOfSquaresList</span>
+<span class="fc" id="L246">          .clone();</span>
+<span class="fc" id="L247">      T2[] advancedValueSumOfLogsListCopy = advancedValueSumOfLogsList.clone();</span>
+<span class="fc" id="L248">      long[] advancedValueNListCopy = advancedValueNList.clone();</span>
+<span class="fc" id="L249">      keyList = new String[keys.size()];</span>
+<span class="fc" id="L250">      errorNumber = new int[keys.size()];</span>
+<span class="fc" id="L251">      errorList = new HashMap[keys.size()];</span>
+<span class="fc" id="L252">      sourceNumberList = new int[keys.size()];</span>
+<span class="fc" id="L253">      advancedValueSumList = operations.createVector1(keys.size());</span>
+<span class="fc" id="L254">      advancedValueMaxList = operations.createVector1(keys.size());</span>
+<span class="fc" id="L255">      advancedValueMinList = operations.createVector1(keys.size());</span>
+<span class="fc" id="L256">      advancedValueSumOfSquaresList = operations.createVector1(keys.size());</span>
+<span class="fc" id="L257">      advancedValueSumOfLogsList = operations.createVector2(keys.size());</span>
+<span class="fc" id="L258">      advancedValueNList = new long[keys.size()];</span>
+<span class="fc" id="L259">      size = 0;</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        if (keys.contains(keyListCopy[i])) {</span>
+<span class="fc" id="L262">          keyList[size] = keyListCopy[i];</span>
+<span class="fc" id="L263">          errorNumber[size] = errorNumberCopy[i];</span>
+<span class="fc" id="L264">          errorList[size] = errorListCopy[i];</span>
+<span class="fc" id="L265">          sourceNumberList[size] = sourceNumberListCopy[i];</span>
+<span class="fc" id="L266">          advancedValueSumList[size] = advancedValueSumListCopy[i];</span>
+<span class="fc" id="L267">          advancedValueMaxList[size] = advancedValueMaxListCopy[i];</span>
+<span class="fc" id="L268">          advancedValueMinList[size] = advancedValueMinListCopy[i];</span>
+<span class="fc" id="L269">          advancedValueSumOfSquaresList[size] = advancedValueSumOfSquaresListCopy[i];</span>
+<span class="fc" id="L270">          advancedValueSumOfLogsList[size] = advancedValueSumOfLogsListCopy[i];</span>
+<span class="fc" id="L271">          advancedValueNList[size] = advancedValueNListCopy[i];</span>
+<span class="fc" id="L272">          size++;</span>
         }
       }
     }
-<span class="nc" id="L256">  }</span>
+<span class="fc" id="L276">  }</span>
 
   /*
    * (non-Javadoc)
@@ -262,13 +282,13 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   protected void copyToNew(int position, int newPosition) {
-<span class="fc" id="L265">    newAdvancedValueSumList[newPosition] = advancedValueSumList[position];</span>
-<span class="fc" id="L266">    newAdvancedValueSumOfLogsList[newPosition] = advancedValueSumOfLogsList[position];</span>
-<span class="fc" id="L267">    newAdvancedValueSumOfSquaresList[newPosition] = advancedValueSumOfSquaresList[position];</span>
-<span class="fc" id="L268">    newAdvancedValueMinList[newPosition] = advancedValueMinList[position];</span>
-<span class="fc" id="L269">    newAdvancedValueMaxList[newPosition] = advancedValueMaxList[position];</span>
-<span class="fc" id="L270">    newAdvancedValueNList[newPosition] = advancedValueNList[position];</span>
-<span class="fc" id="L271">  }</span>
+<span class="fc" id="L285">    newAdvancedValueSumList[newPosition] = advancedValueSumList[position];</span>
+<span class="fc" id="L286">    newAdvancedValueSumOfLogsList[newPosition] = advancedValueSumOfLogsList[position];</span>
+<span class="fc" id="L287">    newAdvancedValueSumOfSquaresList[newPosition] = advancedValueSumOfSquaresList[position];</span>
+<span class="fc" id="L288">    newAdvancedValueMinList[newPosition] = advancedValueMinList[position];</span>
+<span class="fc" id="L289">    newAdvancedValueMaxList[newPosition] = advancedValueMaxList[position];</span>
+<span class="fc" id="L290">    newAdvancedValueNList[newPosition] = advancedValueNList[position];</span>
+<span class="fc" id="L291">  }</span>
 
   /*
    * (non-Javadoc)
@@ -277,13 +297,13 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   protected void copyFromNew() {
-<span class="fc" id="L280">    advancedValueSumList = newAdvancedValueSumList;</span>
-<span class="fc" id="L281">    advancedValueSumOfLogsList = newAdvancedValueSumOfLogsList;</span>
-<span class="fc" id="L282">    advancedValueSumOfSquaresList = newAdvancedValueSumOfSquaresList;</span>
-<span class="fc" id="L283">    advancedValueMinList = newAdvancedValueMinList;</span>
-<span class="fc" id="L284">    advancedValueMaxList = newAdvancedValueMaxList;</span>
-<span class="fc" id="L285">    advancedValueNList = newAdvancedValueNList;</span>
-<span class="fc" id="L286">  }</span>
+<span class="fc" id="L300">    advancedValueSumList = newAdvancedValueSumList;</span>
+<span class="fc" id="L301">    advancedValueSumOfLogsList = newAdvancedValueSumOfLogsList;</span>
+<span class="fc" id="L302">    advancedValueSumOfSquaresList = newAdvancedValueSumOfSquaresList;</span>
+<span class="fc" id="L303">    advancedValueMinList = newAdvancedValueMinList;</span>
+<span class="fc" id="L304">    advancedValueMaxList = newAdvancedValueMaxList;</span>
+<span class="fc" id="L305">    advancedValueNList = newAdvancedValueNList;</span>
+<span class="fc" id="L306">  }</span>
 
   /**
    * Sets the value.
@@ -295,27 +315,27 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
-<span class="pc bpc" id="L298" title="1 of 2 branches missed.">    if (number &gt; 0) {</span>
-<span class="fc" id="L299">      T1 valueSum = null;</span>
-<span class="fc" id="L300">      T2 valueSumOfLogs = null;</span>
-<span class="fc" id="L301">      T1 valueSumOfSquares = null;</span>
-<span class="fc" id="L302">      T1 valueMin = null;</span>
-<span class="fc" id="L303">      T1 valueMax = null;</span>
-<span class="fc bfc" id="L304" title="All 2 branches covered.">      for (int i = 0; i &lt; number; i++) {</span>
-<span class="fc bfc" id="L305" title="All 2 branches covered.">        valueSum = (i == 0) ? values[i] : operations.add11(valueSum, values[i]);</span>
-<span class="fc bfc" id="L306" title="All 2 branches covered.">        valueSumOfLogs = (i == 0) ? operations.log1(values[i])</span>
-<span class="fc" id="L307">            : operations.add22(valueSumOfLogs, operations.log1(values[i]));</span>
-<span class="fc bfc" id="L308" title="All 2 branches covered.">        valueSumOfSquares = (i == 0)</span>
-<span class="fc" id="L309">            ? operations.product11(values[i], values[i])</span>
-<span class="fc" id="L310">            : operations.add11(valueSumOfSquares,</span>
-<span class="fc" id="L311">                operations.product11(values[i], values[i]));</span>
-<span class="fc bfc" id="L312" title="All 2 branches covered.">        valueMin = (i == 0) ? values[i] : operations.min11(valueMin, values[i]);</span>
-<span class="fc bfc" id="L313" title="All 2 branches covered.">        valueMax = (i == 0) ? values[i] : operations.max11(valueMax, values[i]);</span>
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">    if (number &gt; 0) {</span>
+<span class="fc" id="L319">      T1 valueSum = null;</span>
+<span class="fc" id="L320">      T2 valueSumOfLogs = null;</span>
+<span class="fc" id="L321">      T1 valueSumOfSquares = null;</span>
+<span class="fc" id="L322">      T1 valueMin = null;</span>
+<span class="fc" id="L323">      T1 valueMax = null;</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">      for (int i = 0; i &lt; number; i++) {</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">        valueSum = (i == 0) ? values[i] : operations.add11(valueSum, values[i]);</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">        valueSumOfLogs = (i == 0) ? operations.log1(values[i])</span>
+<span class="fc" id="L327">            : operations.add22(valueSumOfLogs, operations.log1(values[i]));</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">        valueSumOfSquares = (i == 0)</span>
+<span class="fc" id="L329">            ? operations.product11(values[i], values[i])</span>
+<span class="fc" id="L330">            : operations.add11(valueSumOfSquares,</span>
+<span class="fc" id="L331">                operations.product11(values[i], values[i]));</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">        valueMin = (i == 0) ? values[i] : operations.min11(valueMin, values[i]);</span>
+<span class="fc bfc" id="L333" title="All 2 branches covered.">        valueMax = (i == 0) ? values[i] : operations.max11(valueMax, values[i]);</span>
       }
-<span class="fc" id="L315">      setValue(newPosition, valueSum, valueSumOfLogs, valueSumOfSquares,</span>
+<span class="fc" id="L335">      setValue(newPosition, valueSum, valueSumOfLogs, valueSumOfSquares,</span>
           valueMin, valueMax, number, currentExisting);
     }
-<span class="fc" id="L318">  }</span>
+<span class="fc" id="L338">  }</span>
 
   /**
    * Sets the value.
@@ -326,35 +346,35 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    * @param valueSumOfSquares the value sum of squares
    * @param valueMin the value min
    * @param valueMax the value max
-   * @param valueN the value n
+   * @param valueN the value N
    * @param currentExisting the current existing
    */
   private void setValue(int newPosition, T1 valueSum, T2 valueSumOfLogs,
       T1 valueSumOfSquares, T1 valueMin, T1 valueMax, long valueN,
       boolean currentExisting) {
-<span class="pc bpc" id="L335" title="1 of 2 branches missed.">    if (valueN &gt; 0) {</span>
-<span class="fc bfc" id="L336" title="All 2 branches covered.">      if (currentExisting) {</span>
-<span class="fc" id="L337">        newAdvancedValueSumList[newPosition] = operations</span>
-<span class="fc" id="L338">            .add11(newAdvancedValueSumList[newPosition], valueSum);</span>
-<span class="fc" id="L339">        newAdvancedValueSumOfLogsList[newPosition] = operations</span>
-<span class="fc" id="L340">            .add22(newAdvancedValueSumOfLogsList[newPosition], valueSumOfLogs);</span>
-<span class="fc" id="L341">        newAdvancedValueSumOfSquaresList[newPosition] = operations.add11(</span>
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">    if (valueN &gt; 0) {</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">      if (currentExisting) {</span>
+<span class="fc" id="L357">        newAdvancedValueSumList[newPosition] = operations</span>
+<span class="fc" id="L358">            .add11(newAdvancedValueSumList[newPosition], valueSum);</span>
+<span class="fc" id="L359">        newAdvancedValueSumOfLogsList[newPosition] = operations</span>
+<span class="fc" id="L360">            .add22(newAdvancedValueSumOfLogsList[newPosition], valueSumOfLogs);</span>
+<span class="fc" id="L361">        newAdvancedValueSumOfSquaresList[newPosition] = operations.add11(</span>
             newAdvancedValueSumOfSquaresList[newPosition], valueSumOfSquares);
-<span class="fc" id="L343">        newAdvancedValueMinList[newPosition] = operations</span>
-<span class="fc" id="L344">            .min11(newAdvancedValueMinList[newPosition], valueMin);</span>
-<span class="fc" id="L345">        newAdvancedValueMaxList[newPosition] = operations</span>
-<span class="fc" id="L346">            .max11(newAdvancedValueMaxList[newPosition], valueMax);</span>
-<span class="fc" id="L347">        newAdvancedValueNList[newPosition] += valueN;</span>
+<span class="fc" id="L363">        newAdvancedValueMinList[newPosition] = operations</span>
+<span class="fc" id="L364">            .min11(newAdvancedValueMinList[newPosition], valueMin);</span>
+<span class="fc" id="L365">        newAdvancedValueMaxList[newPosition] = operations</span>
+<span class="fc" id="L366">            .max11(newAdvancedValueMaxList[newPosition], valueMax);</span>
+<span class="fc" id="L367">        newAdvancedValueNList[newPosition] += valueN;</span>
       } else {
-<span class="fc" id="L349">        newAdvancedValueSumList[newPosition] = valueSum;</span>
-<span class="fc" id="L350">        newAdvancedValueSumOfLogsList[newPosition] = valueSumOfLogs;</span>
-<span class="fc" id="L351">        newAdvancedValueSumOfSquaresList[newPosition] = valueSumOfSquares;</span>
-<span class="fc" id="L352">        newAdvancedValueMinList[newPosition] = valueMin;</span>
-<span class="fc" id="L353">        newAdvancedValueMaxList[newPosition] = valueMax;</span>
-<span class="fc" id="L354">        newAdvancedValueNList[newPosition] = valueN;</span>
+<span class="fc" id="L369">        newAdvancedValueSumList[newPosition] = valueSum;</span>
+<span class="fc" id="L370">        newAdvancedValueSumOfLogsList[newPosition] = valueSumOfLogs;</span>
+<span class="fc" id="L371">        newAdvancedValueSumOfSquaresList[newPosition] = valueSumOfSquares;</span>
+<span class="fc" id="L372">        newAdvancedValueMinList[newPosition] = valueMin;</span>
+<span class="fc" id="L373">        newAdvancedValueMaxList[newPosition] = valueMax;</span>
+<span class="fc" id="L374">        newAdvancedValueNList[newPosition] = valueN;</span>
       }
     }
-<span class="fc" id="L357">  }</span>
+<span class="fc" id="L377">  }</span>
 
   /*
    * (non-Javadoc)
@@ -363,32 +383,32 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   protected void remapData(int[][] mapping) throws IOException {
-<span class="nc" id="L366">    super.remapData(mapping);</span>
-<span class="nc" id="L367">    T1[] originalAdvancedValueSumList = advancedValueSumList.clone();</span>
-<span class="nc" id="L368">    T2[] originalAdvancedValueSumOfLogsList = advancedValueSumOfLogsList</span>
-<span class="nc" id="L369">        .clone();</span>
-<span class="nc" id="L370">    T1[] originalAdvancedValueSumOfSquaresList = advancedValueSumOfSquaresList</span>
-<span class="nc" id="L371">        .clone();</span>
-<span class="nc" id="L372">    T1[] originalAdvancedValueMinList = advancedValueMinList.clone();</span>
-<span class="nc" id="L373">    T1[] originalAdvancedValueMaxList = advancedValueMaxList.clone();</span>
-<span class="nc" id="L374">    long[] originalAdvancedValueNList = advancedValueNList.clone();</span>
-<span class="nc" id="L375">    advancedValueSumList = operations.createVector1(mapping.length);</span>
-<span class="nc" id="L376">    advancedValueSumOfLogsList = operations.createVector2(mapping.length);</span>
-<span class="nc" id="L377">    advancedValueSumOfSquaresList = operations.createVector1(mapping.length);</span>
-<span class="nc" id="L378">    advancedValueMinList = operations.createVector1(mapping.length);</span>
-<span class="nc" id="L379">    advancedValueMaxList = operations.createVector1(mapping.length);</span>
-<span class="nc" id="L380">    advancedValueNList = new long[mapping.length];</span>
-<span class="nc bnc" id="L381" title="All 2 branches missed.">    for (int i = 0; i &lt; mapping.length; i++) {</span>
-<span class="nc bnc" id="L382" title="All 2 branches missed.">      for (int j = 0; j &lt; mapping[i].length; j++) {</span>
-<span class="nc bnc" id="L383" title="All 2 branches missed.">        if (j == 0) {</span>
-<span class="nc" id="L384">          setValue(i, originalAdvancedValueSumList[mapping[i][j]],</span>
+<span class="nc" id="L386">    super.remapData(mapping);</span>
+<span class="nc" id="L387">    T1[] originalAdvancedValueSumList = advancedValueSumList.clone();</span>
+<span class="nc" id="L388">    T2[] originalAdvancedValueSumOfLogsList = advancedValueSumOfLogsList</span>
+<span class="nc" id="L389">        .clone();</span>
+<span class="nc" id="L390">    T1[] originalAdvancedValueSumOfSquaresList = advancedValueSumOfSquaresList</span>
+<span class="nc" id="L391">        .clone();</span>
+<span class="nc" id="L392">    T1[] originalAdvancedValueMinList = advancedValueMinList.clone();</span>
+<span class="nc" id="L393">    T1[] originalAdvancedValueMaxList = advancedValueMaxList.clone();</span>
+<span class="nc" id="L394">    long[] originalAdvancedValueNList = advancedValueNList.clone();</span>
+<span class="nc" id="L395">    advancedValueSumList = operations.createVector1(mapping.length);</span>
+<span class="nc" id="L396">    advancedValueSumOfLogsList = operations.createVector2(mapping.length);</span>
+<span class="nc" id="L397">    advancedValueSumOfSquaresList = operations.createVector1(mapping.length);</span>
+<span class="nc" id="L398">    advancedValueMinList = operations.createVector1(mapping.length);</span>
+<span class="nc" id="L399">    advancedValueMaxList = operations.createVector1(mapping.length);</span>
+<span class="nc" id="L400">    advancedValueNList = new long[mapping.length];</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">    for (int i = 0; i &lt; mapping.length; i++) {</span>
+<span class="nc bnc" id="L402" title="All 2 branches missed.">      for (int j = 0; j &lt; mapping[i].length; j++) {</span>
+<span class="nc bnc" id="L403" title="All 2 branches missed.">        if (j == 0) {</span>
+<span class="nc" id="L404">          setValue(i, originalAdvancedValueSumList[mapping[i][j]],</span>
               originalAdvancedValueSumOfLogsList[mapping[i][j]],
               originalAdvancedValueSumOfSquaresList[mapping[i][j]],
               originalAdvancedValueMinList[mapping[i][j]],
               originalAdvancedValueMaxList[mapping[i][j]],
               originalAdvancedValueNList[mapping[i][j]], false);
         } else {
-<span class="nc" id="L391">          setValue(i, originalAdvancedValueSumList[mapping[i][j]],</span>
+<span class="nc" id="L411">          setValue(i, originalAdvancedValueSumList[mapping[i][j]],</span>
               originalAdvancedValueSumOfLogsList[mapping[i][j]],
               originalAdvancedValueSumOfSquaresList[mapping[i][j]],
               originalAdvancedValueMinList[mapping[i][j]],
@@ -397,13 +417,13 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
         }
       }
     }
-<span class="nc" id="L400">    advancedValueSumList = newAdvancedValueSumList;</span>
-<span class="nc" id="L401">    advancedValueSumOfLogsList = newAdvancedValueSumOfLogsList;</span>
-<span class="nc" id="L402">    advancedValueSumOfSquaresList = newAdvancedValueSumOfSquaresList;</span>
-<span class="nc" id="L403">    advancedValueMinList = newAdvancedValueMinList;</span>
-<span class="nc" id="L404">    advancedValueMaxList = newAdvancedValueMaxList;</span>
-<span class="nc" id="L405">    advancedValueNList = newAdvancedValueNList;</span>
-<span class="nc" id="L406">  }</span>
+<span class="nc" id="L420">    advancedValueSumList = newAdvancedValueSumList;</span>
+<span class="nc" id="L421">    advancedValueSumOfLogsList = newAdvancedValueSumOfLogsList;</span>
+<span class="nc" id="L422">    advancedValueSumOfSquaresList = newAdvancedValueSumOfSquaresList;</span>
+<span class="nc" id="L423">    advancedValueMinList = newAdvancedValueMinList;</span>
+<span class="nc" id="L424">    advancedValueMaxList = newAdvancedValueMaxList;</span>
+<span class="nc" id="L425">    advancedValueNList = newAdvancedValueNList;</span>
+<span class="nc" id="L426">  }</span>
 
   /*
    * (non-Javadoc)
@@ -413,66 +433,66 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   public void merge(MtasDataCollector&lt;?, ?&gt; newDataCollector,
-      HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map,
+      Map&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map,
       boolean increaseSourceNumber) throws IOException {
-<span class="fc" id="L418">    closeNewList();</span>
-<span class="pc bpc" id="L419" title="1 of 2 branches missed.">    if (!collectorType.equals(newDataCollector.getCollectorType())</span>
-<span class="pc bpc" id="L420" title="1 of 2 branches missed.">        || !dataType.equals(newDataCollector.getDataType())</span>
-<span class="pc bpc" id="L421" title="2 of 4 branches missed.">        || !statsType.equals(newDataCollector.getStatsType())</span>
+<span class="fc" id="L438">    closeNewList();</span>
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">    if (!collectorType.equals(newDataCollector.getCollectorType())</span>
+<span class="pc bpc" id="L440" title="1 of 2 branches missed.">        || !dataType.equals(newDataCollector.getDataType())</span>
+<span class="pc bpc" id="L441" title="2 of 4 branches missed.">        || !statsType.equals(newDataCollector.getStatsType())</span>
         || !(newDataCollector instanceof MtasDataAdvanced)) {
-<span class="nc" id="L423">      throw new IOException(&quot;cannot merge different dataCollectors&quot;);</span>
+<span class="nc" id="L443">      throw new IOException(&quot;cannot merge different dataCollectors&quot;);</span>
     } else {
-<span class="fc" id="L425">      segmentRegistration = null;</span>
+<span class="fc" id="L445">      segmentRegistration = null;</span>
       @SuppressWarnings(&quot;unchecked&quot;)
-<span class="fc" id="L427">      MtasDataAdvanced&lt;T1, T2&gt; newMtasDataAdvanced = (MtasDataAdvanced&lt;T1, T2&gt;) newDataCollector;</span>
-<span class="fc" id="L428">      newMtasDataAdvanced.closeNewList();</span>
-<span class="fc" id="L429">      initNewList(newMtasDataAdvanced.getSize());</span>
-<span class="pc bpc" id="L430" title="1 of 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L431">        map.put(newDataCollector, this);</span>
-<span class="nc bnc" id="L432" title="All 2 branches missed.">        for (int i = 0; i &lt; newMtasDataAdvanced.getSize(); i++) {</span>
-<span class="nc" id="L433">          MtasDataCollector&lt;?, ?&gt;[] subCollectors = new MtasDataCollector[1];</span>
-<span class="nc" id="L434">          subCollectors[0] = add(newMtasDataAdvanced.keyList[i],</span>
+<span class="fc" id="L447">      MtasDataAdvanced&lt;T1, T2&gt; newMtasDataAdvanced = (MtasDataAdvanced&lt;T1, T2&gt;) newDataCollector;</span>
+<span class="fc" id="L448">      newMtasDataAdvanced.closeNewList();</span>
+<span class="fc" id="L449">      initNewList(newMtasDataAdvanced.getSize());</span>
+<span class="fc bfc" id="L450" title="All 2 branches covered.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="fc" id="L451">        map.put(newDataCollector, this);</span>
+<span class="fc bfc" id="L452" title="All 2 branches covered.">        for (int i = 0; i &lt; newMtasDataAdvanced.getSize(); i++) {</span>
+<span class="fc" id="L453">          MtasDataCollector&lt;?, ?&gt;[] subCollectors = new MtasDataCollector[1];</span>
+<span class="fc" id="L454">          subCollectors[0] = add(newMtasDataAdvanced.keyList[i],</span>
               increaseSourceNumber);
-<span class="nc" id="L436">          setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[i],</span>
+<span class="fc" id="L456">          setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[i],</span>
               newMtasDataAdvanced.errorList[i], newCurrentExisting);
-<span class="nc" id="L438">          setValue(newCurrentPosition,</span>
+<span class="fc" id="L458">          setValue(newCurrentPosition,</span>
               newMtasDataAdvanced.advancedValueSumList[i],
               newMtasDataAdvanced.advancedValueSumOfLogsList[i],
               newMtasDataAdvanced.advancedValueSumOfSquaresList[i],
               newMtasDataAdvanced.advancedValueMinList[i],
               newMtasDataAdvanced.advancedValueMaxList[i],
               newMtasDataAdvanced.advancedValueNList[i], newCurrentExisting);
-<span class="nc bnc" id="L445" title="All 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataAdvanced.hasSub()) {</span>
-<span class="nc" id="L446">            subCollectors[0].merge(</span>
+<span class="pc bpc" id="L465" title="3 of 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataAdvanced.hasSub()) {</span>
+<span class="nc" id="L466">            subCollectors[0].merge(</span>
                 newMtasDataAdvanced.subCollectorListNextLevel[i], map,
                 increaseSourceNumber);
           }
         }
-<span class="nc" id="L451">        closeNewList();</span>
-<span class="pc bpc" id="L452" title="1 of 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="fc" id="L453">        map.put(newDataCollector, this);</span>
-<span class="pc bpc" id="L454" title="1 of 2 branches missed.">        if (newMtasDataAdvanced.getSize() &gt; 0) {</span>
-<span class="fc" id="L455">          MtasDataCollector&lt;?, ?&gt; subCollector = add(increaseSourceNumber);</span>
-<span class="fc" id="L456">          setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[0],</span>
+<span class="fc" id="L471">        closeNewList();</span>
+<span class="pc bpc" id="L472" title="1 of 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="fc" id="L473">        map.put(newDataCollector, this);</span>
+<span class="fc bfc" id="L474" title="All 2 branches covered.">        if (newMtasDataAdvanced.getSize() &gt; 0) {</span>
+<span class="fc" id="L475">          MtasDataCollector&lt;?, ?&gt; subCollector = add(increaseSourceNumber);</span>
+<span class="fc" id="L476">          setError(newCurrentPosition, newMtasDataAdvanced.errorNumber[0],</span>
               newMtasDataAdvanced.errorList[0], newCurrentExisting);
-<span class="fc" id="L458">          setValue(newCurrentPosition,</span>
+<span class="fc" id="L478">          setValue(newCurrentPosition,</span>
               newMtasDataAdvanced.advancedValueSumList[0],
               newMtasDataAdvanced.advancedValueSumOfLogsList[0],
               newMtasDataAdvanced.advancedValueSumOfSquaresList[0],
               newMtasDataAdvanced.advancedValueMinList[0],
               newMtasDataAdvanced.advancedValueMaxList[0],
               newMtasDataAdvanced.advancedValueNList[0], newCurrentExisting);
-<span class="pc bpc" id="L465" title="3 of 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataAdvanced.hasSub()) {</span>
-<span class="nc" id="L466">            subCollector.merge(newMtasDataAdvanced.subCollectorNextLevel, map,</span>
+<span class="pc bpc" id="L485" title="3 of 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataAdvanced.hasSub()) {</span>
+<span class="nc" id="L486">            subCollector.merge(newMtasDataAdvanced.subCollectorNextLevel, map,</span>
                 increaseSourceNumber);
           }
         }
-<span class="fc" id="L470">        closeNewList();</span>
+<span class="fc" id="L490">        closeNewList();</span>
       } else {
-<span class="nc" id="L472">        throw new IOException(&quot;cannot merge &quot; + collectorType);</span>
+<span class="nc" id="L492">        throw new IOException(&quot;cannot merge &quot; + collectorType);</span>
       }
     }
-<span class="fc" id="L475">  }</span>
+<span class="fc" id="L495">  }</span>
 
   /*
    * (non-Javadoc)
@@ -481,9 +501,9 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    */
   @Override
   public final void initNewList(int maxNumberOfTerms) throws IOException {
-<span class="fc" id="L484">    super.initNewList(maxNumberOfTerms);</span>
-<span class="fc" id="L485">    initNewListBasic(maxNumberOfTerms);</span>
-<span class="fc" id="L486">  }</span>
+<span class="fc" id="L504">    super.initNewList(maxNumberOfTerms);</span>
+<span class="fc" id="L505">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L506">  }</span>
 
   /*
    * (non-Javadoc)
@@ -494,9 +514,9 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
   @Override
   public final void initNewList(int maxNumberOfTerms, String segmentName,
       int segmentNumber, String boundary) throws IOException {
-<span class="nc" id="L497">    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);</span>
-<span class="nc" id="L498">    initNewListBasic(maxNumberOfTerms);</span>
-<span class="nc" id="L499">  }</span>
+<span class="fc" id="L517">    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);</span>
+<span class="fc" id="L518">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L519">  }</span>
 
   /**
    * Inits the new list basic.
@@ -504,13 +524,13 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    * @param maxNumberOfTerms the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
-<span class="fc" id="L507">    newAdvancedValueSumList = operations.createVector1(newSize);</span>
-<span class="fc" id="L508">    newAdvancedValueSumOfLogsList = operations.createVector2(newSize);</span>
-<span class="fc" id="L509">    newAdvancedValueSumOfSquaresList = operations.createVector1(newSize);</span>
-<span class="fc" id="L510">    newAdvancedValueMinList = operations.createVector1(newSize);</span>
-<span class="fc" id="L511">    newAdvancedValueMaxList = operations.createVector1(newSize);</span>
-<span class="fc" id="L512">    newAdvancedValueNList = new long[newSize];</span>
-<span class="fc" id="L513">  }</span>
+<span class="fc" id="L527">    newAdvancedValueSumList = operations.createVector1(newSize);</span>
+<span class="fc" id="L528">    newAdvancedValueSumOfLogsList = operations.createVector2(newSize);</span>
+<span class="fc" id="L529">    newAdvancedValueSumOfSquaresList = operations.createVector1(newSize);</span>
+<span class="fc" id="L530">    newAdvancedValueMinList = operations.createVector1(newSize);</span>
+<span class="fc" id="L531">    newAdvancedValueMaxList = operations.createVector1(newSize);</span>
+<span class="fc" id="L532">    newAdvancedValueNList = new long[newSize];</span>
+<span class="fc" id="L533">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

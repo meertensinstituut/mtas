@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanFollowedByQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanFollowedByQuery.java</span></div><h1>MtasSpanFollowedByQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSpanFollowedByQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanFollowedByQuery.java</span></div><h1>MtasSpanFollowedByQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,30 +18,41 @@ import org.apache.lucene.search.spans.Spans;
 
 import mtas.search.spans.util.MtasSpanQuery;
 
+/**
+ * The Class MtasSpanFollowedByQuery.
+ */
 public class MtasSpanFollowedByQuery extends MtasSpanQuery {
 
   /** The field. */
   private String field;
 
-  /** The q 2. */
+  /** The q 1. */
   private SpanQuery q1;
+  
+  /** The q 2. */
   private SpanQuery q2;
 
+  /**
+   * Instantiates a new mtas span followed by query.
+   *
+   * @param q1 the q 1
+   * @param q2 the q 2
+   */
   public MtasSpanFollowedByQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
-<span class="pc bpc" id="L31" title="2 of 4 branches missed.">    super(q1 != null ? q1.getMinimumWidth() : null,</span>
-<span class="pc" id="L32">        q1 != null ? q1.getMaximumWidth() : null);</span>
-<span class="pc bpc" id="L33" title="2 of 4 branches missed.">    if (q1 != null &amp;&amp; (field = q1.getField()) != null) {</span>
-<span class="pc bpc" id="L34" title="3 of 6 branches missed.">      if (q2 != null &amp;&amp; q2.getField()!=null &amp;&amp; !q2.getField().equals(field)) {</span>
-<span class="nc" id="L35">        throw new IllegalArgumentException(&quot;Clauses must have same field.&quot;);</span>
+<span class="pc bpc" id="L42" title="2 of 4 branches missed.">    super(q1 != null ? q1.getMinimumWidth() : null,</span>
+<span class="pc" id="L43">        q1 != null ? q1.getMaximumWidth() : null);</span>
+<span class="pc bpc" id="L44" title="2 of 4 branches missed.">    if (q1 != null &amp;&amp; (field = q1.getField()) != null) {</span>
+<span class="pc bpc" id="L45" title="3 of 6 branches missed.">      if (q2 != null &amp;&amp; q2.getField()!=null &amp;&amp; !q2.getField().equals(field)) {</span>
+<span class="nc" id="L46">        throw new IllegalArgumentException(&quot;Clauses must have same field.&quot;);</span>
       }
-<span class="nc bnc" id="L37" title="All 2 branches missed.">    } else if (q2 != null) {</span>
-<span class="nc" id="L38">      field = q2.getField();</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">    } else if (q2 != null) {</span>
+<span class="nc" id="L49">      field = q2.getField();</span>
     } else {
-<span class="nc" id="L40">      field = null;</span>
+<span class="nc" id="L51">      field = null;</span>
     }
-<span class="fc" id="L42">    this.q1 = q1;</span>
-<span class="fc" id="L43">    this.q2 = q2;</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L53">    this.q1 = q1;</span>
+<span class="fc" id="L54">    this.q2 = q2;</span>
+<span class="fc" id="L55">  }</span>
 
   /*
    * (non-Javadoc)
@@ -50,119 +61,140 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
    */
   @Override
   public String getField() {
-<span class="fc" id="L53">    return field;</span>
+<span class="fc" id="L64">    return field;</span>
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
-<span class="pc bpc" id="L59" title="2 of 4 branches missed.">    if (q1 == null || q2 == null) {</span>
-<span class="nc" id="L60">      return null;</span>
+<span class="pc bpc" id="L73" title="2 of 4 branches missed.">    if (q1 == null || q2 == null) {</span>
+<span class="nc" id="L74">      return null;</span>
     } else {
-<span class="fc" id="L62">      MtasSpanFollowedByQueryWeight w1 = new MtasSpanFollowedByQueryWeight(</span>
-<span class="fc" id="L63">          q1.createWeight(searcher, needsScores));</span>
-<span class="fc" id="L64">      MtasSpanFollowedByQueryWeight w2 = new MtasSpanFollowedByQueryWeight(</span>
-<span class="fc" id="L65">          q2.createWeight(searcher, needsScores));</span>
+<span class="fc" id="L76">      MtasSpanFollowedByQueryWeight w1 = new MtasSpanFollowedByQueryWeight(</span>
+<span class="fc" id="L77">          q1.createWeight(searcher, needsScores));</span>
+<span class="fc" id="L78">      MtasSpanFollowedByQueryWeight w2 = new MtasSpanFollowedByQueryWeight(</span>
+<span class="fc" id="L79">          q2.createWeight(searcher, needsScores));</span>
       // subWeights
-<span class="fc" id="L67">      List&lt;MtasSpanFollowedByQueryWeight&gt; subWeights = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L68">      subWeights.add(w1);</span>
-<span class="fc" id="L69">      subWeights.add(w2);</span>
+<span class="fc" id="L81">      List&lt;MtasSpanFollowedByQueryWeight&gt; subWeights = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L82">      subWeights.add(w1);</span>
+<span class="fc" id="L83">      subWeights.add(w2);</span>
       // return
-<span class="pc bpc" id="L71" title="1 of 2 branches missed.">      return new SpanFollowedByWeight(w1, w2, searcher,</span>
-<span class="pc" id="L72">          needsScores ? getTermContexts(subWeights) : null);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">      return new SpanFollowedByWeight(w1, w2, searcher,</span>
+<span class="pc" id="L86">          needsScores ? getTermContexts(subWeights) : null);</span>
     }
   }
 
+  /**
+   * Gets the term contexts.
+   *
+   * @param items the items
+   * @return the term contexts
+   */
   protected Map&lt;Term, TermContext&gt; getTermContexts(
       List&lt;MtasSpanFollowedByQueryWeight&gt; items) {
-<span class="nc" id="L78">    List&lt;SpanWeight&gt; weights = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">    for (MtasSpanFollowedByQueryWeight item : items) {</span>
-<span class="nc" id="L80">      weights.add(item.spanWeight);</span>
-<span class="nc" id="L81">    }</span>
-<span class="nc" id="L82">    return getTermContexts(weights);</span>
+<span class="nc" id="L98">    List&lt;SpanWeight&gt; weights = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    for (MtasSpanFollowedByQueryWeight item : items) {</span>
+<span class="nc" id="L100">      weights.add(item.spanWeight);</span>
+<span class="nc" id="L101">    }</span>
+<span class="nc" id="L102">    return getTermContexts(weights);</span>
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
-<span class="nc" id="L87">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L88">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
-<span class="nc bnc" id="L89" title="All 2 branches missed.">    if (q1 != null) {</span>
-<span class="nc" id="L90">      buffer.append(q1.toString(q1.getField()));</span>
+<span class="nc" id="L110">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L111">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">    if (q1 != null) {</span>
+<span class="nc" id="L113">      buffer.append(q1.toString(q1.getField()));</span>
     } else {
-<span class="nc" id="L92">      buffer.append(&quot;null&quot;);</span>
+<span class="nc" id="L115">      buffer.append(&quot;null&quot;);</span>
     }
-<span class="nc" id="L94">    buffer.append(&quot;,&quot;);</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">    if (q2 != null) {</span>
-<span class="nc" id="L96">      buffer.append(q2.toString(q2.getField()));</span>
+<span class="nc" id="L117">    buffer.append(&quot;,&quot;);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">    if (q2 != null) {</span>
+<span class="nc" id="L119">      buffer.append(q2.toString(q2.getField()));</span>
     } else {
-<span class="nc" id="L98">      buffer.append(&quot;null&quot;);</span>
+<span class="nc" id="L121">      buffer.append(&quot;null&quot;);</span>
     }
-<span class="nc" id="L100">    buffer.append(&quot;])&quot;);</span>
-<span class="nc" id="L101">    return buffer.toString();</span>
+<span class="nc" id="L123">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L124">    return buffer.toString();</span>
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L107">      return true;</span>
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L109">      return false;</span>
-<span class="pc bpc" id="L110" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L111">      return false;</span>
-<span class="fc" id="L112">    final MtasSpanFollowedByQuery other = (MtasSpanFollowedByQuery) obj;</span>
-<span class="pc bpc" id="L113" title="1 of 4 branches missed.">    return q1.equals(other.q1) &amp;&amp; q2.equals(other.q2);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L133">      return true;</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L135">      return false;</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L137">      return false;</span>
+<span class="fc" id="L138">    final MtasSpanFollowedByQuery other = (MtasSpanFollowedByQuery) obj;</span>
+<span class="pc bpc" id="L139" title="1 of 4 branches missed.">    return q1.equals(other.q1) &amp;&amp; q2.equals(other.q2);</span>
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
-<span class="nc" id="L118">    int h = Integer.rotateLeft(classHash(), 1);</span>
-<span class="nc" id="L119">    h ^= q1.hashCode();</span>
-<span class="nc" id="L120">    h = Integer.rotateLeft(h, 1);</span>
-<span class="nc" id="L121">    h ^= q2.hashCode();</span>
-<span class="nc" id="L122">    return h;</span>
+<span class="nc" id="L147">    int h = Integer.rotateLeft(classHash(), 1);</span>
+<span class="nc" id="L148">    h ^= q1.hashCode();</span>
+<span class="nc" id="L149">    h = Integer.rotateLeft(h, 1);</span>
+<span class="nc" id="L150">    h ^= q2.hashCode();</span>
+<span class="nc" id="L151">    return h;</span>
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L127">    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);</span>
-<span class="fc" id="L128">    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);</span>
-<span class="pc bpc" id="L129" title="4 of 8 branches missed.">    if (newQ1 == null || newQ1 instanceof MtasSpanMatchNoneQuery</span>
+<span class="fc" id="L159">    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);</span>
+<span class="fc" id="L160">    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);</span>
+<span class="pc bpc" id="L161" title="4 of 8 branches missed.">    if (newQ1 == null || newQ1 instanceof MtasSpanMatchNoneQuery</span>
         || newQ2 == null || newQ2 instanceof MtasSpanMatchNoneQuery) {
-<span class="nc" id="L131">      return new MtasSpanMatchNoneQuery(field);</span>
-<span class="pc bpc" id="L132" title="1 of 4 branches missed.">    } else if (!newQ1.equals(q1) || !newQ2.equals(q2)) {</span>
-<span class="fc" id="L133">      return new MtasSpanFollowedByQuery(newQ1, newQ2).rewrite(reader);</span>
+<span class="nc" id="L163">      return new MtasSpanMatchNoneQuery(field);</span>
+<span class="pc bpc" id="L164" title="1 of 4 branches missed.">    } else if (!newQ1.equals(q1) || !newQ2.equals(q2)) {</span>
+<span class="fc" id="L165">      return new MtasSpanFollowedByQuery(newQ1, newQ2).rewrite(reader);</span>
     } else {
-<span class="fc" id="L135">      return super.rewrite(reader);</span>
+<span class="fc" id="L167">      return super.rewrite(reader);</span>
     }
   }
 
+  /**
+   * The Class SpanFollowedByWeight.
+   */
   protected class SpanFollowedByWeight extends SpanWeight {
 
-    /** The w 2. */
+    /** The w 1. */
     MtasSpanFollowedByQueryWeight w1;
+    
+    /** The w 2. */
     MtasSpanFollowedByQueryWeight w2;
 
     /**
-     * Instantiates a new span intersecting weight.
+     * Instantiates a new span followed by weight.
      *
-     * @param w1
-     *          the w 1
-     * @param w2
-     *          the w 2
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param w1 the w 1
+     * @param w2 the w 2
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanFollowedByWeight(MtasSpanFollowedByQueryWeight w1,
         MtasSpanFollowedByQueryWeight w2, IndexSearcher searcher,
-<span class="fc" id="L161">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L162">      super(MtasSpanFollowedByQuery.this, searcher, terms);</span>
-<span class="fc" id="L163">      this.w1 = w1;</span>
-<span class="fc" id="L164">      this.w2 = w2;</span>
-<span class="fc" id="L165">    }</span>
+<span class="fc" id="L193">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
+<span class="fc" id="L194">      super(MtasSpanFollowedByQuery.this, searcher, terms);</span>
+<span class="fc" id="L195">      this.w1 = w1;</span>
+<span class="fc" id="L196">      this.w2 = w2;</span>
+<span class="fc" id="L197">    }</span>
 
     /*
      * (non-Javadoc)
@@ -173,9 +205,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L176">      w1.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L177">      w2.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L178">    }</span>
+<span class="nc" id="L208">      w1.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L209">      w2.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L210">    }</span>
 
     /*
      * (non-Javadoc)
@@ -188,15 +220,15 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
-<span class="fc" id="L191">      Terms terms = context.reader().terms(field);</span>
-<span class="pc bpc" id="L192" title="1 of 2 branches missed.">      if (terms == null) {</span>
-<span class="nc" id="L193">        return null; // field does not exist</span>
+<span class="fc" id="L223">      Terms terms = context.reader().terms(field);</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">      if (terms == null) {</span>
+<span class="nc" id="L225">        return null; // field does not exist</span>
       }
-<span class="fc" id="L195">      MtasSpanFollowedByQuerySpans s1 = new MtasSpanFollowedByQuerySpans(</span>
-<span class="fc" id="L196">          w1.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L197">      MtasSpanFollowedByQuerySpans s2 = new MtasSpanFollowedByQuerySpans(</span>
-<span class="fc" id="L198">          w2.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L199">      return new MtasSpanFollowedBySpans(MtasSpanFollowedByQuery.this, s1, s2);</span>
+<span class="fc" id="L227">      MtasSpanFollowedByQuerySpans s1 = new MtasSpanFollowedByQuerySpans(</span>
+<span class="fc" id="L228">          w1.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L229">      MtasSpanFollowedByQuerySpans s2 = new MtasSpanFollowedByQuerySpans(</span>
+<span class="fc" id="L230">          w2.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L231">      return new MtasSpanFollowedBySpans(MtasSpanFollowedByQuery.this, s1, s2);</span>
     }
 
     /*
@@ -206,14 +238,14 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L209">      w1.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L210">      w2.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L211">    }</span>
+<span class="nc" id="L241">      w1.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L242">      w2.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L243">    }</span>
 
   }
 
   /**
-   * The Class MtasSpanIntersectingQuerySpans.
+   * The Class MtasSpanFollowedByQuerySpans.
    */
   protected class MtasSpanFollowedByQuerySpans {
 
@@ -221,19 +253,18 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     public Spans spans;
 
     /**
-     * Instantiates a new mtas span intersecting query spans.
+     * Instantiates a new mtas span followed by query spans.
      *
-     * @param spans
-     *          the spans
+     * @param spans the spans
      */
-<span class="fc" id="L229">    public MtasSpanFollowedByQuerySpans(Spans spans) {</span>
-<span class="pc bpc" id="L230" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);</span>
-<span class="fc" id="L231">    }</span>
+<span class="fc" id="L260">    public MtasSpanFollowedByQuerySpans(Spans spans) {</span>
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);</span>
+<span class="fc" id="L262">    }</span>
 
   }
 
   /**
-   * The Class MtasSpanIntersectingQueryWeight.
+   * The Class MtasSpanFollowedByQueryWeight.
    */
   private static class MtasSpanFollowedByQueryWeight {
 
@@ -241,15 +272,14 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     public SpanWeight spanWeight;
 
     /**
-     * Instantiates a new mtas span intersecting query weight.
+     * Instantiates a new mtas span followed by query weight.
      *
-     * @param spanWeight
-     *          the span weight
+     * @param spanWeight the span weight
      */
-<span class="fc" id="L249">    public MtasSpanFollowedByQueryWeight(SpanWeight spanWeight) {</span>
-<span class="fc" id="L250">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L251">    }</span>
+<span class="fc" id="L279">    public MtasSpanFollowedByQueryWeight(SpanWeight spanWeight) {</span>
+<span class="fc" id="L280">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L281">    }</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

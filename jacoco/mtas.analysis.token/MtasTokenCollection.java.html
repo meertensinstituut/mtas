@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasTokenCollection.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.token</a> &gt; <span class="el_source">MtasTokenCollection.java</span></div><h1>MtasTokenCollection.java</h1><pre class="source lang-java linenums">package mtas.analysis.token;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasTokenCollection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.token</a> &gt; <span class="el_source">MtasTokenCollection.java</span></div><h1>MtasTokenCollection.java</h1><pre class="source lang-java linenums">package mtas.analysis.token;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,10 +20,10 @@ import mtas.analysis.util.MtasParserException;
 public class MtasTokenCollection {
 
   /** The token collection. */
-<span class="fc" id="L23">  private HashMap&lt;Integer, MtasToken&gt; tokenCollection = new HashMap&lt;Integer, MtasToken&gt;();</span>
+<span class="fc" id="L23">  private HashMap&lt;Integer, MtasToken&gt; tokenCollection = new HashMap&lt;&gt;();</span>
 
   /** The token collection index. */
-<span class="fc" id="L26">  private ArrayList&lt;Integer&gt; tokenCollectionIndex = new ArrayList&lt;Integer&gt;();</span>
+<span class="fc" id="L26">  private ArrayList&lt;Integer&gt; tokenCollectionIndex = new ArrayList&lt;&gt;();</span>
 
   /**
    * Instantiates a new mtas token collection.
@@ -35,318 +35,310 @@ public class MtasTokenCollection {
   /**
    * Adds the.
    *
-   * @param token
-   *          the token
+   * @param token the token
    * @return the integer
    */
   public Integer add(MtasToken token) {
-<span class="fc" id="L43">    Integer id = token.getId();</span>
-<span class="fc" id="L44">    tokenCollection.put(id, token);</span>
-<span class="fc" id="L45">    return id;</span>
+<span class="fc" id="L42">    Integer id = token.getId();</span>
+<span class="fc" id="L43">    tokenCollection.put(id, token);</span>
+<span class="fc" id="L44">    return id;</span>
   }
 
   /**
    * Gets the.
    *
-   * @param id
-   *          the id
+   * @param id the id
    * @return the mtas token
    */
   public MtasToken get(Integer id) {
-<span class="fc" id="L56">    return tokenCollection.get(id);</span>
+<span class="fc" id="L54">    return tokenCollection.get(id);</span>
   }
 
   /**
    * Iterator.
    *
    * @return the iterator
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public Iterator&lt;MtasToken&gt; iterator() throws MtasParserException {
-<span class="fc" id="L67">    checkTokenCollectionIndex();</span>
-<span class="fc" id="L68">    Iterator&lt;MtasToken&gt; it = new Iterator&lt;MtasToken&gt;() {</span>
+<span class="fc" id="L64">    checkTokenCollectionIndex();</span>
+<span class="fc" id="L65">    return new Iterator&lt;MtasToken&gt;() {</span>
 
-<span class="fc" id="L70">      private Iterator&lt;Integer&gt; indexIterator = tokenCollectionIndex.iterator();</span>
+<span class="fc" id="L67">      private Iterator&lt;Integer&gt; indexIterator = tokenCollectionIndex.iterator();</span>
 
       @Override
       public boolean hasNext() {
-<span class="fc" id="L74">        return indexIterator.hasNext();</span>
+<span class="fc" id="L71">        return indexIterator.hasNext();</span>
       }
 
       @Override
       public MtasToken next() {
-<span class="fc" id="L79">        return tokenCollection.get(indexIterator.next());</span>
+<span class="fc" id="L76">        return tokenCollection.get(indexIterator.next());</span>
       }
 
       @Override
       public void remove() {
-<span class="nc" id="L84">        throw new UnsupportedOperationException();</span>
+<span class="nc" id="L81">        throw new UnsupportedOperationException();</span>
       }
     };
-<span class="fc" id="L87">    return it;</span>
   }
 
   /**
    * Prints the.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public void print() throws MtasParserException {
-<span class="nc" id="L97">    Iterator&lt;MtasToken&gt; it = this.iterator();</span>
-<span class="nc bnc" id="L98" title="All 2 branches missed.">    while (it.hasNext()) {</span>
-<span class="nc" id="L99">      MtasToken token = it.next();</span>
-<span class="nc" id="L100">      System.out.println(token);</span>
-<span class="nc" id="L101">    }</span>
-<span class="nc" id="L102">  }</span>
+<span class="nc" id="L92">    Iterator&lt;MtasToken&gt; it = this.iterator();</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">    while (it.hasNext()) {</span>
+<span class="nc" id="L94">      MtasToken token = it.next();</span>
+<span class="nc" id="L95">      System.out.println(token);</span>
+<span class="nc" id="L96">    }</span>
+<span class="nc" id="L97">  }</span>
 
   /**
    * Gets the list.
    *
    * @return the list
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public String[][] getList() throws MtasParserException {
-<span class="nc" id="L112">    String[][] result = new String[(tokenCollection.size() + 1)][];</span>
-<span class="nc" id="L113">    result[0] = new String[] { &quot;id&quot;, &quot;start real offset&quot;, &quot;end real offset&quot;,</span>
+<span class="nc" id="L106">    String[][] result = new String[(tokenCollection.size() + 1)][];</span>
+<span class="nc" id="L107">    result[0] = new String[] { &quot;id&quot;, &quot;start real offset&quot;, &quot;end real offset&quot;,</span>
         &quot;provide real offset&quot;, &quot;start offset&quot;, &quot;end offset&quot;, &quot;provide offset&quot;,
         &quot;start position&quot;, &quot;end position&quot;, &quot;multiple positions&quot;, &quot;parent&quot;,
         &quot;provide parent&quot;, &quot;payload&quot;, &quot;prefix&quot;, &quot;postfix&quot; };
-<span class="nc" id="L117">    int number = 1;</span>
-<span class="nc" id="L118">    Iterator&lt;MtasToken&gt; it = this.iterator();</span>
-<span class="nc bnc" id="L119" title="All 2 branches missed.">    while (it.hasNext()) {</span>
-<span class="nc" id="L120">      MtasToken token = it.next();</span>
-<span class="nc" id="L121">      String[] row = new String[15];</span>
-<span class="nc" id="L122">      row[0] = token.getId().toString();</span>
-<span class="nc bnc" id="L123" title="All 2 branches missed.">      if (token.getRealOffsetStart() != null) {</span>
-<span class="nc" id="L124">        row[1] = token.getRealOffsetStart().toString();</span>
-<span class="nc" id="L125">        row[2] = token.getRealOffsetEnd().toString();</span>
-<span class="nc bnc" id="L126" title="All 2 branches missed.">        row[3] = token.getProvideRealOffset() ? &quot;1&quot; : null;</span>
+<span class="nc" id="L111">    int number = 1;</span>
+<span class="nc" id="L112">    Iterator&lt;MtasToken&gt; it = this.iterator();</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">    while (it.hasNext()) {</span>
+<span class="nc" id="L114">      MtasToken token = it.next();</span>
+<span class="nc" id="L115">      String[] row = new String[15];</span>
+<span class="nc" id="L116">      row[0] = token.getId().toString();</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">      if (token.getRealOffsetStart() != null) {</span>
+<span class="nc" id="L118">        row[1] = token.getRealOffsetStart().toString();</span>
+<span class="nc" id="L119">        row[2] = token.getRealOffsetEnd().toString();</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        row[3] = token.getProvideRealOffset() ? &quot;1&quot; : null;</span>
       }
-<span class="nc bnc" id="L128" title="All 2 branches missed.">      if (token.getOffsetStart() != null) {</span>
-<span class="nc" id="L129">        row[4] = token.getOffsetStart().toString();</span>
-<span class="nc" id="L130">        row[5] = token.getOffsetEnd().toString();</span>
-<span class="nc bnc" id="L131" title="All 2 branches missed.">        row[6] = token.getProvideOffset() ? &quot;1&quot; : null;</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">      if (token.getOffsetStart() != null) {</span>
+<span class="nc" id="L123">        row[4] = token.getOffsetStart().toString();</span>
+<span class="nc" id="L124">        row[5] = token.getOffsetEnd().toString();</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        row[6] = token.getProvideOffset() ? &quot;1&quot; : null;</span>
       }
-<span class="nc bnc" id="L133" title="All 2 branches missed.">      if (token.getPositionLength() != null) {</span>
-<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (token.getPositionStart().equals(token.getPositionEnd())) {</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">      if (token.getPositionLength() != null) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (token.getPositionStart().equals(token.getPositionEnd())) {</span>
+<span class="nc" id="L129">          row[7] = token.getPositionStart().toString();</span>
+<span class="nc" id="L130">          row[8] = token.getPositionEnd().toString();</span>
+<span class="nc" id="L131">          row[9] = null;</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        } else if ((token.getPositions() == null)</span>
+<span class="nc" id="L133">            || (token.getPositions().length == (1 + token.getPositionEnd()</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">                - token.getPositionStart()))) {</span>
 <span class="nc" id="L135">          row[7] = token.getPositionStart().toString();</span>
 <span class="nc" id="L136">          row[8] = token.getPositionEnd().toString();</span>
 <span class="nc" id="L137">          row[9] = null;</span>
-<span class="nc bnc" id="L138" title="All 2 branches missed.">        } else if ((token.getPositions() == null)</span>
-<span class="nc" id="L139">            || (token.getPositions().length == (1 + token.getPositionEnd()</span>
-<span class="nc bnc" id="L140" title="All 2 branches missed.">                - token.getPositionStart()))) {</span>
-<span class="nc" id="L141">          row[7] = token.getPositionStart().toString();</span>
-<span class="nc" id="L142">          row[8] = token.getPositionEnd().toString();</span>
-<span class="nc" id="L143">          row[9] = null;</span>
         } else {
-<span class="nc" id="L145">          row[7] = null;</span>
-<span class="nc" id="L146">          row[8] = null;</span>
-<span class="nc" id="L147">          row[9] = Arrays.toString(token.getPositions());</span>
+<span class="nc" id="L139">          row[7] = null;</span>
+<span class="nc" id="L140">          row[8] = null;</span>
+<span class="nc" id="L141">          row[9] = Arrays.toString(token.getPositions());</span>
         }
       }
-<span class="nc bnc" id="L150" title="All 2 branches missed.">      if (token.getParentId() != null) {</span>
-<span class="nc" id="L151">        row[10] = token.getParentId().toString();</span>
-<span class="nc bnc" id="L152" title="All 2 branches missed.">        row[11] = token.getProvideParentId() ? &quot;1&quot; : null;</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">      if (token.getParentId() != null) {</span>
+<span class="nc" id="L145">        row[10] = token.getParentId().toString();</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">        row[11] = token.getProvideParentId() ? &quot;1&quot; : null;</span>
       }
-<span class="nc bnc" id="L154" title="All 2 branches missed.">      if (token.getPayload() != null) {</span>
-<span class="nc" id="L155">        BytesRef payload = token.getPayload();</span>
-<span class="nc" id="L156">        row[12] = Float.toString(PayloadHelper.decodeFloat(Arrays.copyOfRange(</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">      if (token.getPayload() != null) {</span>
+<span class="nc" id="L149">        BytesRef payload = token.getPayload();</span>
+<span class="nc" id="L150">        row[12] = Float.toString(PayloadHelper.decodeFloat(Arrays.copyOfRange(</span>
             payload.bytes, payload.offset, (payload.offset + payload.length))));
       }
-<span class="nc" id="L159">      row[13] = token.getPrefix();</span>
-<span class="nc" id="L160">      row[14] = token.getPostfix();</span>
-<span class="nc" id="L161">      result[number] = row;</span>
-<span class="nc" id="L162">      number++;</span>
-<span class="nc" id="L163">    }</span>
-<span class="nc" id="L164">    return result;</span>
+<span class="nc" id="L153">      row[13] = token.getPrefix();</span>
+<span class="nc" id="L154">      row[14] = token.getPostfix();</span>
+<span class="nc" id="L155">      result[number] = row;</span>
+<span class="nc" id="L156">      number++;</span>
+<span class="nc" id="L157">    }</span>
+<span class="nc" id="L158">    return result;</span>
   }
 
   /**
    * Check.
    *
-   * @param autoRepair
-   *          the auto repair
-   * @param makeUnique
-   *          the make unique
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @param autoRepair the auto repair
+   * @param makeUnique the make unique
+   * @throws MtasParserException the mtas parser exception
    */
   public void check(Boolean autoRepair, Boolean makeUnique)
       throws MtasParserException {
-<span class="pc bpc" id="L179" title="1 of 2 branches missed.">    if (autoRepair) {</span>
-<span class="fc" id="L180">      autoRepair();</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">    if (autoRepair) {</span>
+<span class="fc" id="L171">      autoRepair();</span>
     }
-<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (makeUnique) {</span>
-<span class="fc" id="L183">      makeUnique();</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">    if (makeUnique) {</span>
+<span class="fc" id="L174">      makeUnique();</span>
     }
-<span class="fc" id="L185">    checkTokenCollectionIndex();</span>
-<span class="fc bfc" id="L186" title="All 2 branches covered.">    for (Integer i : tokenCollectionIndex) {</span>
+<span class="fc" id="L176">    checkTokenCollectionIndex();</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">    for (Integer i : tokenCollectionIndex) {</span>
       // minimal properties
-<span class="pc bpc" id="L188" title="1 of 2 branches missed.">      if (tokenCollection.get(i).getId() == null</span>
-<span class="pc bpc" id="L189" title="1 of 2 branches missed.">          || tokenCollection.get(i).getPositionStart() == null</span>
-<span class="pc bpc" id="L190" title="1 of 2 branches missed.">          || tokenCollection.get(i).getPositionEnd() == null</span>
-<span class="pc bpc" id="L191" title="1 of 2 branches missed.">          || tokenCollection.get(i).getValue() == null) {</span>
-<span class="nc" id="L192">        clear();</span>
-<span class="nc" id="L193">        break;</span>
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">      if (tokenCollection.get(i).getId() == null</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">          || tokenCollection.get(i).getPositionStart() == null</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">          || tokenCollection.get(i).getPositionEnd() == null</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">          || tokenCollection.get(i).getValue() == null) {</span>
+<span class="nc" id="L183">        clear();</span>
+<span class="nc" id="L184">        break;</span>
       }
-<span class="fc" id="L195">    }</span>
-<span class="fc" id="L196">  }</span>
+<span class="fc" id="L186">    }</span>
+<span class="fc" id="L187">  }</span>
 
   /**
    * Make unique.
    */
   private void makeUnique() {
-<span class="fc" id="L202">    HashMap&lt;String, ArrayList&lt;MtasToken&gt;&gt; currentPositionTokens = new HashMap&lt;String, ArrayList&lt;MtasToken&gt;&gt;();</span>
+<span class="fc" id="L193">    HashMap&lt;String, ArrayList&lt;MtasToken&gt;&gt; currentPositionTokens = new HashMap&lt;&gt;();</span>
     ArrayList&lt;MtasToken&gt; currentValueTokens;
-<span class="fc" id="L204">    int currentStartPosition = -1;</span>
-<span class="fc" id="L205">    MtasToken currentToken = null;</span>
-<span class="fc bfc" id="L206" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
-<span class="fc" id="L207">      currentToken = entry.getValue();</span>
-<span class="fc bfc" id="L208" title="All 2 branches covered.">      if (currentToken.getPositionStart() &gt; currentStartPosition) {</span>
-<span class="fc" id="L209">        currentPositionTokens.clear();</span>
-<span class="fc" id="L210">        currentStartPosition = currentToken.getPositionStart();</span>
+<span class="fc" id="L195">    int currentStartPosition = -1;</span>
+<span class="fc" id="L196">    MtasToken currentToken = null;</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
+<span class="fc" id="L198">      currentToken = entry.getValue();</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">      if (currentToken.getPositionStart() &gt; currentStartPosition) {</span>
+<span class="fc" id="L200">        currentPositionTokens.clear();</span>
+<span class="fc" id="L201">        currentStartPosition = currentToken.getPositionStart();</span>
       } else {
-<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (currentPositionTokens.containsKey(currentToken.getValue())) {</span>
-<span class="fc" id="L213">          currentValueTokens = currentPositionTokens</span>
-<span class="fc" id="L214">              .get(currentToken.getValue());</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (currentPositionTokens.containsKey(currentToken.getValue())) {</span>
+<span class="fc" id="L204">          currentValueTokens = currentPositionTokens</span>
+<span class="fc" id="L205">              .get(currentToken.getValue());</span>
 
         } else {
-<span class="fc" id="L217">          currentValueTokens = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L218">          currentPositionTokens.put(currentToken.getValue(),</span>
+<span class="fc" id="L208">          currentValueTokens = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L209">          currentPositionTokens.put(currentToken.getValue(),</span>
               currentValueTokens);
         }
-<span class="fc" id="L221">        currentValueTokens.add(currentToken);</span>
+<span class="fc" id="L212">        currentValueTokens.add(currentToken);</span>
       }
-<span class="fc" id="L223">    }</span>
-<span class="fc" id="L224">  }</span>
+<span class="fc" id="L214">    }</span>
+<span class="fc" id="L215">  }</span>
 
   /**
    * Auto repair.
    */
   private void autoRepair() {
-<span class="fc" id="L230">    ArrayList&lt;Integer&gt; trash = new ArrayList&lt;Integer&gt;();</span>
-<span class="fc" id="L231">    HashMap&lt;Integer, Integer&gt; translation = new HashMap&lt;Integer, Integer&gt;();</span>
-<span class="fc" id="L232">    HashMap&lt;Integer, MtasToken&gt; newTokenCollection = new HashMap&lt;Integer, MtasToken&gt;();</span>
-<span class="fc" id="L233">    Integer parentId, maxId = null, minId = null;</span>
+<span class="fc" id="L221">    ArrayList&lt;Integer&gt; trash = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L222">    HashMap&lt;Integer, Integer&gt; translation = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L223">    HashMap&lt;Integer, MtasToken&gt; newTokenCollection = new HashMap&lt;&gt;();</span>
+    Integer parentId;
+<span class="fc" id="L225">    Integer maxId = null;</span>
+<span class="fc" id="L226">    Integer minId = null;</span>
     MtasToken token;
     // check id, position and value
-<span class="fc bfc" id="L236" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
-<span class="fc" id="L237">      token = entry.getValue();</span>
-<span class="pc bpc" id="L238" title="1 of 2 branches missed.">      if (token.getId() == null) {</span>
-<span class="nc" id="L239">        trash.add(entry.getKey());</span>
-<span class="pc bpc" id="L240" title="1 of 2 branches missed.">      } else if ((token.getPositionStart() == null)</span>
-<span class="pc bpc" id="L241" title="1 of 2 branches missed.">          || (token.getPositionEnd() == null)) {</span>
-<span class="nc" id="L242">        trash.add(entry.getKey());</span>
-<span class="pc bpc" id="L243" title="2 of 4 branches missed.">      } else if (token.getValue() == null || (token.getValue().isEmpty())) {</span>
-<span class="nc" id="L244">        trash.add(entry.getKey());</span>
-<span class="pc bpc" id="L245" title="2 of 4 branches missed.">      } else if (token.getPrefix() == null || (token.getPrefix().isEmpty())) {</span>
-<span class="nc" id="L246">        trash.add(entry.getKey());</span>
-      }
-<span class="fc" id="L248">    }</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
+<span class="fc" id="L230">      token = entry.getValue();</span>
+      boolean putInTrash;
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">      putInTrash = token.getId() == null;</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">      putInTrash |= (token.getPositionStart() == null)</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">          || (token.getPositionEnd() == null);</span>
+<span class="pc bpc" id="L235" title="2 of 4 branches missed.">      putInTrash |= token.getValue() == null || (token.getValue().isEmpty());</span>
+<span class="pc bpc" id="L236" title="2 of 4 branches missed.">      putInTrash |= token.getPrefix() == null || (token.getPrefix().isEmpty());          </span>
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">      if (putInTrash) {</span>
+<span class="nc" id="L238">        trash.add(entry.getKey());</span>
+      } 
+<span class="fc" id="L240">    }</span>
     // check parentId
-<span class="fc bfc" id="L250" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
-<span class="fc" id="L251">      token = entry.getValue();</span>
-<span class="fc" id="L252">      parentId = token.getParentId();</span>
-<span class="pc bpc" id="L253" title="1 of 4 branches missed.">      if (parentId != null &amp;&amp; (!tokenCollection.containsKey(parentId)</span>
-<span class="pc bpc" id="L254" title="1 of 2 branches missed.">          || trash.contains(parentId))) {</span>
-<span class="nc" id="L255">        token.setParentId(null);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
+<span class="fc" id="L243">      token = entry.getValue();</span>
+<span class="fc" id="L244">      parentId = token.getParentId();</span>
+<span class="pc bpc" id="L245" title="1 of 4 branches missed.">      if (parentId != null &amp;&amp; (!tokenCollection.containsKey(parentId)</span>
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">          || trash.contains(parentId))) {</span>
+<span class="nc" id="L247">        token.setParentId(null);</span>
       }
-<span class="fc" id="L257">    }</span>
+<span class="fc" id="L249">    }</span>
     // empty bin
-<span class="pc bpc" id="L259" title="1 of 2 branches missed.">    if (trash.size() &gt; 0) {</span>
-<span class="nc bnc" id="L260" title="All 2 branches missed.">      for (Integer i : trash) {</span>
-<span class="nc" id="L261">        tokenCollection.remove(i);</span>
-<span class="nc" id="L262">      }</span>
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">    if (!trash.isEmpty()) {</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">      for (Integer i : trash) {</span>
+<span class="nc" id="L253">        tokenCollection.remove(i);</span>
+<span class="nc" id="L254">      }</span>
     }
     // always check ids
-<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (tokenCollection.size() &gt; 0) {</span>
-<span class="fc bfc" id="L266" title="All 2 branches covered.">      for (Integer i : tokenCollection.keySet()) {</span>
-<span class="fc bfc" id="L267" title="All 2 branches covered.">        maxId = ((maxId == null) ? i : Math.max(maxId, i));</span>
-<span class="fc bfc" id="L268" title="All 2 branches covered.">        minId = ((minId == null) ? i : Math.min(minId, i));</span>
-<span class="fc" id="L269">      }</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">    if (tokenCollection.size() &gt; 0) {</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">      for (Integer i : tokenCollection.keySet()) {</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        maxId = ((maxId == null) ? i : Math.max(maxId, i));</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        minId = ((minId == null) ? i : Math.min(minId, i));</span>
+<span class="fc" id="L261">      }</span>
       // check
-<span class="pc bpc" id="L271" title="2 of 4 branches missed.">      if ((minId &gt; 0) || ((1 + maxId - minId) != tokenCollection.size())) {</span>
-<span class="nc" id="L272">        int newId = 0;</span>
+<span class="pc bpc" id="L263" title="2 of 4 branches missed.">      if ((minId &gt; 0) || ((1 + maxId - minId) != tokenCollection.size())) {</span>
+<span class="nc" id="L264">        int newId = 0;</span>
         // create translation
-<span class="nc bnc" id="L274" title="All 2 branches missed.">        for (Integer i : tokenCollection.keySet()) {</span>
-<span class="nc" id="L275">          translation.put(i, newId);</span>
-<span class="nc" id="L276">          newId++;</span>
-<span class="nc" id="L277">        }</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        for (Integer i : tokenCollection.keySet()) {</span>
+<span class="nc" id="L267">          translation.put(i, newId);</span>
+<span class="nc" id="L268">          newId++;</span>
+<span class="nc" id="L269">        }</span>
         // translate objects
-<span class="nc bnc" id="L279" title="All 2 branches missed.">        for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
-<span class="nc" id="L280">          token = entry.getValue();</span>
-<span class="nc" id="L281">          parentId = token.getParentId();</span>
-<span class="nc" id="L282">          token.setId(translation.get(entry.getKey()));</span>
-<span class="nc bnc" id="L283" title="All 2 branches missed.">          if (parentId != null) {</span>
-<span class="nc" id="L284">            token.setParentId(translation.get(parentId));</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
+<span class="nc" id="L272">          token = entry.getValue();</span>
+<span class="nc" id="L273">          parentId = token.getParentId();</span>
+<span class="nc" id="L274">          token.setId(translation.get(entry.getKey()));</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">          if (parentId != null) {</span>
+<span class="nc" id="L276">            token.setParentId(translation.get(parentId));</span>
           }
-<span class="nc" id="L286">        }</span>
+<span class="nc" id="L278">        }</span>
         // new tokenCollection
-<span class="nc" id="L288">        Iterator&lt;Map.Entry&lt;Integer, MtasToken&gt;&gt; iter = tokenCollection</span>
-<span class="nc" id="L289">            .entrySet().iterator();</span>
-<span class="nc bnc" id="L290" title="All 2 branches missed.">        while (iter.hasNext()) {</span>
-<span class="nc" id="L291">          Map.Entry&lt;Integer, MtasToken&gt; entry = iter.next();</span>
-<span class="nc" id="L292">          newTokenCollection.put(translation.get(entry.getKey()),</span>
-<span class="nc" id="L293">              entry.getValue());</span>
-<span class="nc" id="L294">          iter.remove();</span>
-<span class="nc" id="L295">        }</span>
-<span class="nc" id="L296">        tokenCollection = newTokenCollection;</span>
+<span class="nc" id="L280">        Iterator&lt;Map.Entry&lt;Integer, MtasToken&gt;&gt; iter = tokenCollection</span>
+<span class="nc" id="L281">            .entrySet().iterator();</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">        while (iter.hasNext()) {</span>
+<span class="nc" id="L283">          Map.Entry&lt;Integer, MtasToken&gt; entry = iter.next();</span>
+<span class="nc" id="L284">          newTokenCollection.put(translation.get(entry.getKey()),</span>
+<span class="nc" id="L285">              entry.getValue());</span>
+<span class="nc" id="L286">          iter.remove();</span>
+<span class="nc" id="L287">        }</span>
+<span class="nc" id="L288">        tokenCollection = newTokenCollection;</span>
       }
     }
-<span class="fc" id="L299">  }</span>
+<span class="fc" id="L291">  }</span>
 
   /**
    * Check token collection index.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   private void checkTokenCollectionIndex() throws MtasParserException {
-<span class="fc bfc" id="L308" title="All 2 branches covered.">    if (tokenCollectionIndex.size() != tokenCollection.size()) {</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">    if (tokenCollectionIndex.size() != tokenCollection.size()) {</span>
       MtasToken token;
-<span class="fc" id="L310">      Integer maxId = null, minId = null;</span>
-<span class="fc" id="L311">      tokenCollectionIndex.clear();</span>
-<span class="fc bfc" id="L312" title="All 2 branches covered.">      for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
-<span class="fc" id="L313">        token = entry.getValue();</span>
-<span class="fc bfc" id="L314" title="All 2 branches covered.">        maxId = ((maxId == null) ? entry.getKey()</span>
-<span class="fc" id="L315">            : Math.max(maxId, entry.getKey()));</span>
-<span class="fc bfc" id="L316" title="All 2 branches covered.">        minId = ((minId == null) ? entry.getKey()</span>
-<span class="fc" id="L317">            : Math.min(minId, entry.getKey()));</span>
-<span class="pc bpc" id="L318" title="1 of 2 branches missed.">        if (token.getId() == null) {</span>
-<span class="nc" id="L319">          throw new MtasParserException(</span>
-<span class="nc" id="L320">              &quot;no id for token (&quot; + token.getValue() + &quot;)&quot;);</span>
-<span class="pc bpc" id="L321" title="1 of 2 branches missed.">        } else if ((token.getPositionStart() == null)</span>
-<span class="pc bpc" id="L322" title="1 of 2 branches missed.">            || (token.getPositionEnd() == null)) {</span>
-<span class="nc" id="L323">          throw new MtasParserException(&quot;no position for token with id &quot;</span>
-<span class="nc" id="L324">              + token.getId() + &quot; (&quot; + token.getValue() + &quot;)&quot;);</span>
-<span class="pc bpc" id="L325" title="2 of 4 branches missed.">        } else if (token.getValue() == null || (token.getValue().equals(&quot;&quot;))) {</span>
+<span class="fc" id="L301">      Integer maxId = null;</span>
+<span class="fc" id="L302">      Integer minId = null;</span>
+<span class="fc" id="L303">      tokenCollectionIndex.clear();</span>
+<span class="fc bfc" id="L304" title="All 2 branches covered.">      for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
+<span class="fc" id="L305">        token = entry.getValue();</span>
+<span class="fc bfc" id="L306" title="All 2 branches covered.">        maxId = ((maxId == null) ? entry.getKey()</span>
+<span class="fc" id="L307">            : Math.max(maxId, entry.getKey()));</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">        minId = ((minId == null) ? entry.getKey()</span>
+<span class="fc" id="L309">            : Math.min(minId, entry.getKey()));</span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">        if (token.getId() == null) {</span>
+<span class="nc" id="L311">          throw new MtasParserException(</span>
+<span class="nc" id="L312">              &quot;no id for token (&quot; + token.getValue() + &quot;)&quot;);</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">        } else if ((token.getPositionStart() == null)</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            || (token.getPositionEnd() == null)) {</span>
+<span class="nc" id="L315">          throw new MtasParserException(&quot;no position for token with id &quot;</span>
+<span class="nc" id="L316">              + token.getId() + &quot; (&quot; + token.getValue() + &quot;)&quot;);</span>
+<span class="pc bpc" id="L317" title="2 of 4 branches missed.">        } else if (token.getValue() == null || (token.getValue().equals(&quot;&quot;))) {</span>
+<span class="nc" id="L318">          throw new MtasParserException(</span>
+<span class="nc" id="L319">              &quot;no value for token with id &quot; + token.getId());</span>
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">        } else if (token.getPrefix() == null</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">            || (token.getPrefix().equals(&quot;&quot;))) {</span>
+<span class="nc" id="L322">          throw new MtasParserException(</span>
+<span class="nc" id="L323">              &quot;no prefix for token with id &quot; + token.getId());</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">        } else if ((token.getParentId() != null)</span>
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">            &amp;&amp; !tokenCollection.containsKey(token.getParentId())) {</span>
 <span class="nc" id="L326">          throw new MtasParserException(</span>
-<span class="nc" id="L327">              &quot;no value for token with id &quot; + token.getId());</span>
-<span class="pc bpc" id="L328" title="1 of 2 branches missed.">        } else if (token.getPrefix() == null</span>
-<span class="pc bpc" id="L329" title="1 of 2 branches missed.">            || (token.getPrefix().equals(&quot;&quot;))) {</span>
-<span class="nc" id="L330">          throw new MtasParserException(</span>
-<span class="nc" id="L331">              &quot;no prefix for token with id &quot; + token.getId());</span>
-<span class="fc bfc" id="L332" title="All 2 branches covered.">        } else if ((token.getParentId() != null)</span>
-<span class="pc bpc" id="L333" title="1 of 2 branches missed.">            &amp;&amp; !tokenCollection.containsKey(token.getParentId())) {</span>
-<span class="nc" id="L334">          throw new MtasParserException(</span>
-<span class="nc" id="L335">              &quot;missing parentId for token with id &quot; + token.getId());</span>
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">        } else if ((token.getOffsetStart() == null)</span>
-<span class="pc bpc" id="L337" title="1 of 2 branches missed.">            || (token.getOffsetEnd() == null)) {</span>
-<span class="nc" id="L338">          throw new MtasParserException(&quot;missing offset for token with id &quot;</span>
-<span class="nc" id="L339">              + token.getId() + &quot; (&quot; + token.getValue() + &quot;)&quot;);</span>
+<span class="nc" id="L327">              &quot;missing parentId for token with id &quot; + token.getId());</span>
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">        } else if ((token.getOffsetStart() == null)</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">            || (token.getOffsetEnd() == null)) {</span>
+<span class="nc" id="L330">          throw new MtasParserException(&quot;missing offset for token with id &quot;</span>
+<span class="nc" id="L331">              + token.getId() + &quot; (&quot; + token.getValue() + &quot;)&quot;);</span>
         }
-<span class="fc" id="L341">        tokenCollectionIndex.add(entry.getKey());</span>
-<span class="fc" id="L342">      }</span>
-<span class="pc bpc" id="L343" title="1 of 2 branches missed.">      if ((tokenCollection.size() &gt; 0)</span>
-<span class="pc bpc" id="L344" title="2 of 4 branches missed.">          &amp;&amp; ((minId &gt; 0) || ((1 + maxId - minId) != tokenCollection.size()))) {</span>
-<span class="nc" id="L345">        throw new MtasParserException(&quot;missing ids&quot;);</span>
+<span class="fc" id="L333">        tokenCollectionIndex.add(entry.getKey());</span>
+<span class="fc" id="L334">      }</span>
+<span class="pc bpc" id="L335" title="1 of 2 branches missed.">      if ((tokenCollection.size() &gt; 0)</span>
+<span class="pc bpc" id="L336" title="2 of 4 branches missed.">          &amp;&amp; ((minId &gt; 0) || ((1 + maxId - minId) != tokenCollection.size()))) {</span>
+<span class="nc" id="L337">        throw new MtasParserException(&quot;missing ids&quot;);</span>
       }
-<span class="fc" id="L347">      Collections.sort(tokenCollectionIndex, getCompByName());</span>
+<span class="fc" id="L339">      Collections.sort(tokenCollectionIndex, getCompByName());</span>
     }
-<span class="fc" id="L349">  }</span>
+<span class="fc" id="L341">  }</span>
 
   /**
    * Gets the comp by name.
@@ -354,43 +346,42 @@ public class MtasTokenCollection {
    * @return the comp by name
    */
   public Comparator&lt;Integer&gt; getCompByName() {
-<span class="pc bpc" id="L357" title="1 of 2 branches missed.">    Comparator&lt;Integer&gt; comp = new Comparator&lt;Integer&gt;() {</span>
+<span class="pc bpc" id="L349" title="1 of 2 branches missed.">    return new Comparator&lt;Integer&gt;() {</span>
       @Override
       public int compare(Integer t1, Integer t2) {
-<span class="fc" id="L360">        Integer p1 = tokenCollection.get(t1).getPositionStart();</span>
-<span class="fc" id="L361">        Integer p2 = tokenCollection.get(t2).getPositionStart();</span>
-<span class="pc bpc" id="L362" title="2 of 4 branches missed.">        assert p1 != null : &quot;no position for &quot;</span>
-<span class="nc" id="L363">            + tokenCollection.get(t1).getValue();</span>
-<span class="pc bpc" id="L364" title="2 of 4 branches missed.">        assert p2 != null : &quot;no position for &quot;</span>
-<span class="nc" id="L365">            + tokenCollection.get(t2).getValue();</span>
-<span class="fc bfc" id="L366" title="All 2 branches covered.">        if (p1.equals(p2)) {</span>
-<span class="fc" id="L367">          Integer o1 = tokenCollection.get(t1).getOffsetStart();</span>
-<span class="fc" id="L368">          Integer o2 = tokenCollection.get(t2).getOffsetStart();</span>
-<span class="pc bpc" id="L369" title="2 of 4 branches missed.">          if (o1 != null &amp;&amp; o2 != null) {</span>
-<span class="pc bpc" id="L370" title="1 of 2 branches missed.">            if (o1.equals(o2)) {</span>
-<span class="fc" id="L371">              return tokenCollection.get(t1).getValue().toString()</span>
-<span class="fc" id="L372">                  .compareTo(tokenCollection.get(t2).getValue().toString());</span>
+<span class="fc" id="L352">        Integer p1 = tokenCollection.get(t1).getPositionStart();</span>
+<span class="fc" id="L353">        Integer p2 = tokenCollection.get(t2).getPositionStart();</span>
+<span class="pc bpc" id="L354" title="2 of 4 branches missed.">        assert p1 != null : &quot;no position for &quot;</span>
+<span class="nc" id="L355">            + tokenCollection.get(t1);</span>
+<span class="pc bpc" id="L356" title="2 of 4 branches missed.">        assert p2 != null : &quot;no position for &quot;</span>
+<span class="nc" id="L357">            + tokenCollection.get(t2);</span>
+<span class="fc bfc" id="L358" title="All 2 branches covered.">        if (p1.equals(p2)) {</span>
+<span class="fc" id="L359">          Integer o1 = tokenCollection.get(t1).getOffsetStart();</span>
+<span class="fc" id="L360">          Integer o2 = tokenCollection.get(t2).getOffsetStart();</span>
+<span class="pc bpc" id="L361" title="2 of 4 branches missed.">          if (o1 != null &amp;&amp; o2 != null) {</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">            if (o1.equals(o2)) {</span>
+<span class="fc" id="L363">              return tokenCollection.get(t1).getValue()</span>
+<span class="fc" id="L364">                  .compareTo(tokenCollection.get(t2).getValue());</span>
             } else {
-<span class="nc" id="L374">              return o1.compareTo(o2);</span>
+<span class="nc" id="L366">              return o1.compareTo(o2);</span>
             }
           } else {
-<span class="nc" id="L377">            return tokenCollection.get(t1).getValue().toString()</span>
-<span class="nc" id="L378">                .compareTo(tokenCollection.get(t2).getValue().toString());</span>
+<span class="nc" id="L369">            return tokenCollection.get(t1).getValue()</span>
+<span class="nc" id="L370">                .compareTo(tokenCollection.get(t2).getValue());</span>
           }
         }
-<span class="fc" id="L381">        return p1.compareTo(p2);</span>
+<span class="fc" id="L373">        return p1.compareTo(p2);</span>
       }
     };
-<span class="fc" id="L384">    return comp;</span>
   }
 
   /**
    * Clear.
    */
   private void clear() {
-<span class="fc" id="L391">    tokenCollectionIndex.clear();</span>
-<span class="fc" id="L392">    tokenCollection.clear();</span>
-<span class="fc" id="L393">  }</span>
+<span class="fc" id="L382">    tokenCollectionIndex.clear();</span>
+<span class="fc" id="L383">    tokenCollection.clear();</span>
+<span class="fc" id="L384">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

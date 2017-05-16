@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasUpdateRequestProcessorFactory.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.update.processor</a> &gt; <span class="el_source">MtasUpdateRequestProcessorFactory.java</span></div><h1>MtasUpdateRequestProcessorFactory.java</h1><pre class="source lang-java linenums">package mtas.solr.update.processor;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasUpdateRequestProcessorFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.update.processor</a> &gt; <span class="el_source">MtasUpdateRequestProcessorFactory.java</span></div><h1>MtasUpdateRequestProcessorFactory.java</h1><pre class="source lang-java linenums">package mtas.solr.update.processor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -44,8 +44,8 @@ import mtas.solr.schema.MtasPreAnalyzedField;
 <span class="fc" id="L44">public class MtasUpdateRequestProcessorFactory</span>
     extends UpdateRequestProcessorFactory {
 
-  /** The log. */
-<span class="fc" id="L48">  private static Log log = LogFactory</span>
+  /** The Constant log. */
+<span class="fc" id="L48">  private static final Log log = LogFactory</span>
 <span class="fc" id="L49">      .getLog(MtasUpdateRequestProcessorFactory.class);</span>
 
   /** The config. */
@@ -67,187 +67,185 @@ import mtas.solr.schema.MtasPreAnalyzedField;
   /**
    * Inits the.
    *
-   * @param req
-   *          the req
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param req the req
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   private void init(SolrQueryRequest req) throws IOException {
-<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (config == null) {</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    if (config == null) {</span>
       // initialise
-<span class="fc" id="L79">      config = new MtasUpdateRequestProcessorConfig();</span>
+<span class="fc" id="L77">      config = new MtasUpdateRequestProcessorConfig();</span>
       // required info
-<span class="fc" id="L81">      Map&lt;String, FieldType&gt; fieldTypes = req.getSchema().getFieldTypes();</span>
-<span class="fc" id="L82">      Map&lt;String, SchemaField&gt; fields = req.getSchema().getFields();</span>
-<span class="fc" id="L83">      SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()</span>
-<span class="fc" id="L84">          .getResourceLoader();</span>
+<span class="fc" id="L79">      Map&lt;String, FieldType&gt; fieldTypes = req.getSchema().getFieldTypes();</span>
+<span class="fc" id="L80">      Map&lt;String, SchemaField&gt; fields = req.getSchema().getFields();</span>
+<span class="fc" id="L81">      SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()</span>
+<span class="fc" id="L82">          .getResourceLoader();</span>
       // check fieldTypes
       // for (String name : fieldTypes.keySet()) {
-<span class="fc bfc" id="L87" title="All 2 branches covered.">      for (Entry&lt;String, FieldType&gt; entry : fieldTypes.entrySet()) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">      for (Entry&lt;String, FieldType&gt; entry : fieldTypes.entrySet()) {</span>
         // only for MtasPreAnalyzedField
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (entry.getValue() instanceof MtasPreAnalyzedField) {</span>
-<span class="nc" id="L90">          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) entry.getValue();</span>
-<span class="nc" id="L91">          config.fieldTypeDefaultConfiguration.put(entry.getKey(),</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (entry.getValue() instanceof MtasPreAnalyzedField) {</span>
+<span class="nc" id="L88">          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) entry.getValue();</span>
+<span class="nc" id="L89">          config.fieldTypeDefaultConfiguration.put(entry.getKey(),</span>
               mpaf.defaultConfiguration);
-<span class="nc" id="L93">          config.fieldTypeConfigurationFromField.put(entry.getKey(),</span>
+<span class="nc" id="L91">          config.fieldTypeConfigurationFromField.put(entry.getKey(),</span>
               mpaf.configurationFromField);
-<span class="nc" id="L95">          config.fieldTypeNumberOfTokensField.put(entry.getKey(),</span>
+<span class="nc" id="L93">          config.fieldTypeNumberOfTokensField.put(entry.getKey(),</span>
               mpaf.setNumberOfTokens);
-<span class="nc" id="L97">          config.fieldTypeNumberOfPositionsField.put(entry.getKey(),</span>
+<span class="nc" id="L95">          config.fieldTypeNumberOfPositionsField.put(entry.getKey(),</span>
               mpaf.setNumberOfPositions);
-<span class="nc" id="L99">          config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);</span>
-<span class="nc" id="L100">          config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);</span>
-<span class="nc bnc" id="L101" title="All 2 branches missed.">          if (mpaf.followIndexAnalyzer == null</span>
-<span class="nc bnc" id="L102" title="All 2 branches missed.">              || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {</span>
-<span class="nc" id="L103">            throw new IOException(</span>
-<span class="nc" id="L104">                entry.getKey() + &quot; can't follow &quot; + mpaf.followIndexAnalyzer);</span>
+<span class="nc" id="L97">          config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);</span>
+<span class="nc" id="L98">          config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">          if (mpaf.followIndexAnalyzer == null</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">              || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {</span>
+<span class="nc" id="L101">            throw new IOException(</span>
+<span class="nc" id="L102">                entry.getKey() + &quot; can't follow &quot; + mpaf.followIndexAnalyzer);</span>
           } else {
-<span class="nc" id="L106">            FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);</span>
-<span class="nc" id="L107">            SimpleOrderedMap&lt;?&gt; analyzer = null;</span>
-<span class="nc" id="L108">            Object tmpObj1 = fieldType.getNamedPropertyValues(false)</span>
-<span class="nc" id="L109">                .get(FieldType.INDEX_ANALYZER);</span>
-<span class="nc bnc" id="L110" title="All 4 branches missed.">            if (tmpObj1 != null &amp;&amp; tmpObj1 instanceof SimpleOrderedMap) {</span>
-<span class="nc" id="L111">              analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj1;</span>
+<span class="nc" id="L104">            FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);</span>
+<span class="nc" id="L105">            SimpleOrderedMap&lt;?&gt; analyzer = null;</span>
+<span class="nc" id="L106">            Object tmpObj1 = fieldType.getNamedPropertyValues(false)</span>
+<span class="nc" id="L107">                .get(FieldType.INDEX_ANALYZER);</span>
+<span class="nc bnc" id="L108" title="All 4 branches missed.">            if (tmpObj1 != null &amp;&amp; tmpObj1 instanceof SimpleOrderedMap) {</span>
+<span class="nc" id="L109">              analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj1;</span>
             }
-<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (analyzer == null) {</span>
-<span class="nc" id="L114">              Object tmpObj2 = fieldType.getNamedPropertyValues(false)</span>
-<span class="nc" id="L115">                  .get(FieldType.ANALYZER);</span>
-<span class="nc bnc" id="L116" title="All 4 branches missed.">              if (tmpObj2 != null &amp;&amp; tmpObj2 instanceof SimpleOrderedMap) {</span>
-<span class="nc" id="L117">                analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj2;</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            if (analyzer == null) {</span>
+<span class="nc" id="L112">              Object tmpObj2 = fieldType.getNamedPropertyValues(false)</span>
+<span class="nc" id="L113">                  .get(FieldType.ANALYZER);</span>
+<span class="nc bnc" id="L114" title="All 4 branches missed.">              if (tmpObj2 != null &amp;&amp; tmpObj2 instanceof SimpleOrderedMap) {</span>
+<span class="nc" id="L115">                analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj2;</span>
               }
             }
-<span class="nc bnc" id="L120" title="All 2 branches missed.">            if (analyzer == null) {</span>
-<span class="nc" id="L121">              throw new IOException(&quot;no analyzer&quot;);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">            if (analyzer == null) {</span>
+<span class="nc" id="L119">              throw new IOException(&quot;no analyzer&quot;);</span>
             } else {
               // charfilters
-<span class="nc" id="L124">              ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt; listCharFilters = null;</span>
-<span class="nc" id="L125">              SimpleOrderedMap&lt;Object&gt; configTokenizer = null;</span>
+<span class="nc" id="L122">              ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt; listCharFilters = null;</span>
+<span class="nc" id="L123">              SimpleOrderedMap&lt;Object&gt; configTokenizer = null;</span>
               try {
-<span class="nc" id="L127">                listCharFilters = (ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt;) analyzer</span>
-<span class="nc" id="L128">                    .findRecursive(FieldType.CHAR_FILTERS);</span>
+<span class="nc" id="L125">                listCharFilters = (ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt;) analyzer</span>
+<span class="nc" id="L126">                    .findRecursive(FieldType.CHAR_FILTERS);</span>
                 ;
-<span class="nc" id="L130">                configTokenizer = (SimpleOrderedMap&lt;Object&gt;) analyzer</span>
-<span class="nc" id="L131">                    .findRecursive(FieldType.TOKENIZER);</span>
-<span class="nc" id="L132">              } catch (ClassCastException e) {</span>
-<span class="nc" id="L133">                throw new IOException(</span>
+<span class="nc" id="L128">                configTokenizer = (SimpleOrderedMap&lt;Object&gt;) analyzer</span>
+<span class="nc" id="L129">                    .findRecursive(FieldType.TOKENIZER);</span>
+<span class="nc" id="L130">              } catch (ClassCastException e) {</span>
+<span class="nc" id="L131">                throw new IOException(</span>
                     &quot;could not cast charFilters and/or tokenizer from analyzer&quot;,
                     e);
-<span class="nc" id="L136">              }</span>
-<span class="nc bnc" id="L137" title="All 4 branches missed.">              if (listCharFilters != null &amp;&amp; !listCharFilters.isEmpty()) {</span>
-<span class="nc" id="L138">                CharFilterFactory[] charFilterFactories = new CharFilterFactory[listCharFilters</span>
-<span class="nc" id="L139">                    .size()];</span>
-<span class="nc" id="L140">                int number = 0;</span>
-<span class="nc bnc" id="L141" title="All 2 branches missed.">                for (SimpleOrderedMap&lt;Object&gt; configCharFilter : listCharFilters) {</span>
-<span class="nc" id="L142">                  String className = null;</span>
-<span class="nc" id="L143">                  Map&lt;String, String&gt; args = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L144">                  Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; it = configCharFilter</span>
-<span class="nc" id="L145">                      .iterator();</span>
+<span class="nc" id="L134">              }</span>
+<span class="nc bnc" id="L135" title="All 4 branches missed.">              if (listCharFilters != null &amp;&amp; !listCharFilters.isEmpty()) {</span>
+<span class="nc" id="L136">                CharFilterFactory[] charFilterFactories = new CharFilterFactory[listCharFilters</span>
+<span class="nc" id="L137">                    .size()];</span>
+<span class="nc" id="L138">                int number = 0;</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">                for (SimpleOrderedMap&lt;Object&gt; configCharFilter : listCharFilters) {</span>
+<span class="nc" id="L140">                  String className = null;</span>
+<span class="nc" id="L141">                  Map&lt;String, String&gt; args = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L142">                  Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; it = configCharFilter</span>
+<span class="nc" id="L143">                      .iterator();</span>
                   // get className and args
-<span class="nc bnc" id="L147" title="All 2 branches missed.">                  while (it.hasNext()) {</span>
-<span class="nc" id="L148">                    Map.Entry&lt;String, Object&gt; obj = it.next();</span>
-<span class="nc bnc" id="L149" title="All 2 branches missed.">                    if (obj.getValue() instanceof String) {</span>
-<span class="nc bnc" id="L150" title="All 2 branches missed.">                      if (obj.getKey().equals(FieldType.CLASS_NAME)) {</span>
-<span class="nc" id="L151">                        className = (String) obj.getValue();</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">                  while (it.hasNext()) {</span>
+<span class="nc" id="L146">                    Map.Entry&lt;String, Object&gt; obj = it.next();</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">                    if (obj.getValue() instanceof String) {</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">                      if (obj.getKey().equals(FieldType.CLASS_NAME)) {</span>
+<span class="nc" id="L149">                        className = (String) obj.getValue();</span>
                       } else {
-<span class="nc" id="L153">                        args.put(obj.getKey(), (String) obj.getValue());</span>
+<span class="nc" id="L151">                        args.put(obj.getKey(), (String) obj.getValue());</span>
                       }
                     }
-<span class="nc" id="L156">                  }</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">                  if (className != null) {</span>
+<span class="nc" id="L154">                  }</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                  if (className != null) {</span>
                     try {
-<span class="nc" id="L159">                      Class&lt;?&gt; cls = Class.forName((String) className);</span>
-<span class="nc bnc" id="L160" title="All 2 branches missed.">                      if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {</span>
-<span class="nc" id="L161">                        Class&lt;?&gt;[] types = { Map.class,</span>
+<span class="nc" id="L157">                      Class&lt;?&gt; cls = Class.forName((String) className);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">                      if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {</span>
+<span class="nc" id="L159">                        Class&lt;?&gt;[] types = { Map.class,</span>
                             SolrResourceLoader.class };
-<span class="nc" id="L163">                        Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
-<span class="nc" id="L164">                        Object cff = cnstr.newInstance(args, resourceLoader);</span>
-<span class="nc bnc" id="L165" title="All 2 branches missed.">                        if (cff instanceof MtasCharFilterFactory) {</span>
-<span class="nc" id="L166">                          charFilterFactories[number] = (MtasCharFilterFactory) cff;</span>
-<span class="nc" id="L167">                          number++;</span>
+<span class="nc" id="L161">                        Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
+<span class="nc" id="L162">                        Object cff = cnstr.newInstance(args, resourceLoader);</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">                        if (cff instanceof MtasCharFilterFactory) {</span>
+<span class="nc" id="L164">                          charFilterFactories[number] = (MtasCharFilterFactory) cff;</span>
+<span class="nc" id="L165">                          number++;</span>
                         } else {
-<span class="nc" id="L169">                          throw new IOException(</span>
+<span class="nc" id="L167">                          throw new IOException(</span>
                               className + &quot; is no MtasCharFilterFactory&quot;);
                         }
-<span class="nc" id="L172">                      } else {</span>
-<span class="nc" id="L173">                        Class&lt;?&gt;[] types = { Map.class };</span>
-<span class="nc" id="L174">                        Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
-<span class="nc" id="L175">                        Object cff = cnstr.newInstance(args);</span>
-<span class="nc bnc" id="L176" title="All 2 branches missed.">                        if (cff instanceof CharFilterFactory) {</span>
-<span class="nc" id="L177">                          charFilterFactories[number] = (CharFilterFactory) cff;</span>
-<span class="nc" id="L178">                          number++;</span>
+<span class="nc" id="L170">                      } else {</span>
+<span class="nc" id="L171">                        Class&lt;?&gt;[] types = { Map.class };</span>
+<span class="nc" id="L172">                        Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
+<span class="nc" id="L173">                        Object cff = cnstr.newInstance(args);</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                        if (cff instanceof CharFilterFactory) {</span>
+<span class="nc" id="L175">                          charFilterFactories[number] = (CharFilterFactory) cff;</span>
+<span class="nc" id="L176">                          number++;</span>
                         } else {
-<span class="nc" id="L180">                          throw new IOException(</span>
+<span class="nc" id="L178">                          throw new IOException(</span>
                               className + &quot; is no CharFilterFactory&quot;);
                         }
                       }
-<span class="nc" id="L184">                    } catch (ClassNotFoundException | InstantiationException</span>
+<span class="nc" id="L182">                    } catch (ClassNotFoundException | InstantiationException</span>
                         | IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException | NoSuchMethodException e) {
-<span class="nc" id="L187">                      throw new IOException(e);</span>
-<span class="nc" id="L188">                    }</span>
+<span class="nc" id="L185">                      throw new IOException(e);</span>
+<span class="nc" id="L186">                    }</span>
                   } else {
-<span class="nc" id="L190">                    throw new IOException(&quot;no className&quot;);</span>
+<span class="nc" id="L188">                    throw new IOException(&quot;no className&quot;);</span>
                   }
-<span class="nc" id="L192">                }</span>
-<span class="nc" id="L193">                config.fieldTypeCharFilterFactories.put(entry.getKey(),</span>
+<span class="nc" id="L190">                }</span>
+<span class="nc" id="L191">                config.fieldTypeCharFilterFactories.put(entry.getKey(),</span>
                     charFilterFactories);
-<span class="nc" id="L195">              } else {</span>
-<span class="nc" id="L196">                config.fieldTypeCharFilterFactories.put(entry.getKey(), null);</span>
+<span class="nc" id="L193">              } else {</span>
+<span class="nc" id="L194">                config.fieldTypeCharFilterFactories.put(entry.getKey(), null);</span>
               }
-<span class="nc bnc" id="L198" title="All 2 branches missed.">              if (configTokenizer != null) {</span>
-<span class="nc" id="L199">                String className = null;</span>
-<span class="nc" id="L200">                Map&lt;String, String&gt; args = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L201">                Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; it = configTokenizer</span>
-<span class="nc" id="L202">                    .iterator();</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">              if (configTokenizer != null) {</span>
+<span class="nc" id="L197">                String className = null;</span>
+<span class="nc" id="L198">                Map&lt;String, String&gt; args = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L199">                Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; it = configTokenizer</span>
+<span class="nc" id="L200">                    .iterator();</span>
                 // get className and args
-<span class="nc bnc" id="L204" title="All 2 branches missed.">                while (it.hasNext()) {</span>
-<span class="nc" id="L205">                  Map.Entry&lt;String, Object&gt; obj = it.next();</span>
-<span class="nc bnc" id="L206" title="All 2 branches missed.">                  if (obj.getValue() instanceof String) {</span>
-<span class="nc bnc" id="L207" title="All 2 branches missed.">                    if (obj.getKey().equals(FieldType.CLASS_NAME)) {</span>
-<span class="nc" id="L208">                      className = (String) obj.getValue();</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">                while (it.hasNext()) {</span>
+<span class="nc" id="L203">                  Map.Entry&lt;String, Object&gt; obj = it.next();</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">                  if (obj.getValue() instanceof String) {</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">                    if (obj.getKey().equals(FieldType.CLASS_NAME)) {</span>
+<span class="nc" id="L206">                      className = (String) obj.getValue();</span>
                     } else {
-<span class="nc" id="L210">                      args.put(obj.getKey(), (String) obj.getValue());</span>
+<span class="nc" id="L208">                      args.put(obj.getKey(), (String) obj.getValue());</span>
                     }
                   }
-<span class="nc" id="L213">                }</span>
-<span class="nc bnc" id="L214" title="All 2 branches missed.">                if (className != null) {</span>
+<span class="nc" id="L211">                }</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">                if (className != null) {</span>
                   try {
-<span class="nc" id="L216">                    Class&lt;?&gt; cls = Class.forName((String) className);</span>
-<span class="nc" id="L217">                    Class&lt;?&gt;[] types = { Map.class, SolrResourceLoader.class };</span>
-<span class="nc" id="L218">                    Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
-<span class="nc" id="L219">                    Object cff = cnstr.newInstance(args, resourceLoader);</span>
-<span class="nc bnc" id="L220" title="All 2 branches missed.">                    if (cff instanceof MtasTokenizerFactory) {</span>
-<span class="nc" id="L221">                      config.fieldTypeTokenizerFactory.put(entry.getKey(),</span>
+<span class="nc" id="L214">                    Class&lt;?&gt; cls = Class.forName((String) className);</span>
+<span class="nc" id="L215">                    Class&lt;?&gt;[] types = { Map.class, SolrResourceLoader.class };</span>
+<span class="nc" id="L216">                    Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
+<span class="nc" id="L217">                    Object cff = cnstr.newInstance(args, resourceLoader);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">                    if (cff instanceof MtasTokenizerFactory) {</span>
+<span class="nc" id="L219">                      config.fieldTypeTokenizerFactory.put(entry.getKey(),</span>
                           (MtasTokenizerFactory) cff);
                     } else {
-<span class="nc" id="L224">                      throw new IOException(</span>
+<span class="nc" id="L222">                      throw new IOException(</span>
                           className + &quot; is no MtasTokenizerFactory&quot;);
                     }
-<span class="nc" id="L227">                  } catch (ClassNotFoundException | InstantiationException</span>
+<span class="nc" id="L225">                  } catch (ClassNotFoundException | InstantiationException</span>
                       | IllegalAccessException | IllegalArgumentException
                       | InvocationTargetException | NoSuchMethodException e) {
-<span class="nc" id="L230">                    throw new IOException(e);</span>
-<span class="nc" id="L231">                  }</span>
+<span class="nc" id="L228">                    throw new IOException(e);</span>
+<span class="nc" id="L229">                  }</span>
                 } else {
-<span class="nc" id="L233">                  throw new IOException(&quot;no className&quot;);</span>
+<span class="nc" id="L231">                  throw new IOException(&quot;no className&quot;);</span>
                 }
               }
 
             }
           }
         }
-<span class="fc" id="L240">      }</span>
-<span class="fc bfc" id="L241" title="All 2 branches covered.">      for (Entry&lt;String, SchemaField&gt; entry : fields.entrySet()) {</span>
-<span class="pc bpc" id="L242" title="1 of 2 branches missed.">        if (entry.getValue().getType() != null</span>
+<span class="fc" id="L238">      }</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">      for (Entry&lt;String, SchemaField&gt; entry : fields.entrySet()) {</span>
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">        if (entry.getValue().getType() != null</span>
             &amp;&amp; config.fieldTypeTokenizerFactory
-<span class="pc bpc" id="L244" title="1 of 2 branches missed.">                .containsKey(entry.getValue().getType().getTypeName())) {</span>
-<span class="nc" id="L245">          config.fieldMapping.put(entry.getKey(),</span>
-<span class="nc" id="L246">              entry.getValue().getType().getTypeName());</span>
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">                .containsKey(entry.getValue().getType().getTypeName())) {</span>
+<span class="nc" id="L243">          config.fieldMapping.put(entry.getKey(),</span>
+<span class="nc" id="L244">              entry.getValue().getType().getTypeName());</span>
         }
-<span class="fc" id="L248">      }</span>
+<span class="fc" id="L246">      }</span>
     }
-<span class="fc" id="L250">  }</span>
+<span class="fc" id="L248">  }</span>
 
   /*
    * (non-Javadoc)
@@ -262,11 +260,11 @@ import mtas.solr.schema.MtasPreAnalyzedField;
   public UpdateRequestProcessor getInstance(SolrQueryRequest req,
       SolrQueryResponse rsp, UpdateRequestProcessor next) {
     try {
-<span class="fc" id="L265">      init(req);</span>
-<span class="nc" id="L266">    } catch (IOException e) {</span>
-<span class="nc" id="L267">      log.error(e);</span>
-<span class="fc" id="L268">    }</span>
-<span class="fc" id="L269">    return new MtasUpdateRequestProcessor(next, config);</span>
+<span class="fc" id="L263">      init(req);</span>
+<span class="nc" id="L264">    } catch (IOException e) {</span>
+<span class="nc" id="L265">      log.error(e);</span>
+<span class="fc" id="L266">    }</span>
+<span class="fc" id="L267">    return new MtasUpdateRequestProcessor(next, config);</span>
   }
 
 }
@@ -274,173 +272,173 @@ import mtas.solr.schema.MtasPreAnalyzedField;
 class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
   /** The log. */
-<span class="fc" id="L277">  private static Log log = LogFactory.getLog(MtasUpdateRequestProcessor.class);</span>
+<span class="fc" id="L275">  private static Log log = LogFactory.getLog(MtasUpdateRequestProcessor.class);</span>
 
   private MtasUpdateRequestProcessorConfig config;
 
   public MtasUpdateRequestProcessor(UpdateRequestProcessor next,
       MtasUpdateRequestProcessorConfig config) {
-<span class="fc" id="L283">    super(next);</span>
-<span class="fc" id="L284">    this.config = config;</span>
-<span class="fc" id="L285">  }</span>
+<span class="fc" id="L281">    super(next);</span>
+<span class="fc" id="L282">    this.config = config;</span>
+<span class="fc" id="L283">  }</span>
 
   @Override
   public void processAdd(AddUpdateCommand cmd) throws IOException {
-<span class="pc bpc" id="L289" title="2 of 4 branches missed.">    if (config != null &amp;&amp; config.fieldMapping.size() &gt; 0) {</span>
+<span class="pc bpc" id="L287" title="2 of 4 branches missed.">    if (config != null &amp;&amp; config.fieldMapping.size() &gt; 0) {</span>
       // get document
-<span class="nc" id="L291">      SolrInputDocument doc = cmd.getSolrInputDocument();</span>
+<span class="nc" id="L289">      SolrInputDocument doc = cmd.getSolrInputDocument();</span>
       // loop over configurations
-<span class="nc bnc" id="L293" title="All 2 branches missed.">      for (String field : config.fieldMapping.keySet()) {</span>
-<span class="nc" id="L294">        SolrInputField originalValue = doc.get(field);</span>
-<span class="nc" id="L295">        String fieldType = config.fieldMapping.get(field);</span>
-<span class="nc" id="L296">        CharFilterFactory[] charFilterFactories = config.fieldTypeCharFilterFactories</span>
-<span class="nc" id="L297">            .get(fieldType);</span>
-<span class="nc" id="L298">        MtasTokenizerFactory tokenizerFactory = config.fieldTypeTokenizerFactory</span>
-<span class="nc" id="L299">            .get(config.fieldMapping.get(field));</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">      for (String field : config.fieldMapping.keySet()) {</span>
+<span class="nc" id="L292">        SolrInputField originalValue = doc.get(field);</span>
+<span class="nc" id="L293">        String fieldType = config.fieldMapping.get(field);</span>
+<span class="nc" id="L294">        CharFilterFactory[] charFilterFactories = config.fieldTypeCharFilterFactories</span>
+<span class="nc" id="L295">            .get(fieldType);</span>
+<span class="nc" id="L296">        MtasTokenizerFactory tokenizerFactory = config.fieldTypeTokenizerFactory</span>
+<span class="nc" id="L297">            .get(config.fieldMapping.get(field));</span>
         MtasUpdateRequestProcessorSizeReader sizeReader;
-<span class="nc bnc" id="L301" title="All 2 branches missed.">        if (originalValue != null</span>
-<span class="nc bnc" id="L302" title="All 2 branches missed.">            &amp;&amp; originalValue.getValue() instanceof String) {</span>
-<span class="nc" id="L303">          MtasUpdateRequestProcessorResultWriter result = null;</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (originalValue != null</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">            &amp;&amp; originalValue.getValue() instanceof String) {</span>
+<span class="nc" id="L301">          MtasUpdateRequestProcessorResultWriter result = null;</span>
           try {
-<span class="nc" id="L305">            String storedValue = (String) originalValue.getValue();</span>
+<span class="nc" id="L303">            String storedValue = (String) originalValue.getValue();</span>
             // create reader
-<span class="nc" id="L307">            Reader reader = new StringReader(storedValue);</span>
+<span class="nc" id="L305">            Reader reader = new StringReader(storedValue);</span>
             // configuration
-<span class="nc" id="L309">            String configuration = config.fieldTypeDefaultConfiguration</span>
-<span class="nc" id="L310">                .get(fieldType);</span>
-<span class="nc bnc" id="L311" title="All 2 branches missed.">            if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {</span>
-<span class="nc" id="L312">              Object obj = doc.getFieldValue(</span>
-<span class="nc" id="L313">                  config.fieldTypeConfigurationFromField.get(fieldType));</span>
-<span class="nc bnc" id="L314" title="All 2 branches missed.">              if (obj != null) {</span>
-<span class="nc" id="L315">                configuration = obj.toString();</span>
+<span class="nc" id="L307">            String configuration = config.fieldTypeDefaultConfiguration</span>
+<span class="nc" id="L308">                .get(fieldType);</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">            if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {</span>
+<span class="nc" id="L310">              Object obj = doc.getFieldValue(</span>
+<span class="nc" id="L311">                  config.fieldTypeConfigurationFromField.get(fieldType));</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">              if (obj != null) {</span>
+<span class="nc" id="L313">                configuration = obj.toString();</span>
               }
             }
             // charFilterFactories
-<span class="nc bnc" id="L319" title="All 2 branches missed.">            if (charFilterFactories != null) {</span>
-<span class="nc bnc" id="L320" title="All 2 branches missed.">              for (CharFilterFactory charFilterFactory : charFilterFactories) {</span>
-<span class="nc bnc" id="L321" title="All 2 branches missed.">                if (charFilterFactory instanceof MtasCharFilterFactory) {</span>
-<span class="nc" id="L322">                  reader = ((MtasCharFilterFactory) charFilterFactory)</span>
-<span class="nc" id="L323">                      .create(reader, configuration);</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">            if (charFilterFactories != null) {</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">              for (CharFilterFactory charFilterFactory : charFilterFactories) {</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">                if (charFilterFactory instanceof MtasCharFilterFactory) {</span>
+<span class="nc" id="L320">                  reader = ((MtasCharFilterFactory) charFilterFactory)</span>
+<span class="nc" id="L321">                      .create(reader, configuration);</span>
                 } else {
-<span class="nc" id="L325">                  reader = charFilterFactory.create(reader);</span>
+<span class="nc" id="L323">                  reader = charFilterFactory.create(reader);</span>
                 }
-<span class="nc bnc" id="L327" title="All 2 branches missed.">                if (reader == null) {</span>
-<span class="nc" id="L328">                  throw new IOException(</span>
-<span class="nc" id="L329">                      &quot;charFilter &quot; + charFilterFactory.getClass().getName()</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                if (reader == null) {</span>
+<span class="nc" id="L326">                  throw new IOException(</span>
+<span class="nc" id="L327">                      &quot;charFilter &quot; + charFilterFactory.getClass().getName()</span>
                           + &quot; returns null&quot;);
                 }
               }
             }
 
-<span class="nc" id="L335">            sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);</span>
+<span class="nc" id="L333">            sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);</span>
 
             // tokenizerFactory
-<span class="nc" id="L338">            result = new MtasUpdateRequestProcessorResultWriter(storedValue);</span>
-<span class="nc" id="L339">            int numberOfPositions = 0;</span>
-<span class="nc" id="L340">            int numberOfTokens = 0;            </span>
+<span class="nc" id="L336">            result = new MtasUpdateRequestProcessorResultWriter(storedValue);</span>
+<span class="nc" id="L337">            int numberOfPositions = 0;</span>
+<span class="nc" id="L338">            int numberOfTokens = 0;</span>
             try {
-<span class="nc" id="L342">              MtasTokenizer tokenizer = tokenizerFactory.create(configuration);</span>
-<span class="nc" id="L343">              tokenizer.setReader(sizeReader);</span>
-<span class="nc" id="L344">              tokenizer.reset();</span>
+<span class="nc" id="L340">              MtasTokenizer tokenizer = tokenizerFactory.create(configuration);</span>
+<span class="nc" id="L341">              tokenizer.setReader(sizeReader);</span>
+<span class="nc" id="L342">              tokenizer.reset();</span>
               // attributes
-<span class="nc" id="L346">              CharTermAttribute termAttribute = tokenizer</span>
-<span class="nc" id="L347">                  .getAttribute(CharTermAttribute.class);</span>
-<span class="nc" id="L348">              OffsetAttribute offsetAttribute = tokenizer</span>
-<span class="nc" id="L349">                  .getAttribute(OffsetAttribute.class);</span>
-<span class="nc" id="L350">              PositionIncrementAttribute positionIncrementAttribute = tokenizer</span>
-<span class="nc" id="L351">                  .getAttribute(PositionIncrementAttribute.class);</span>
-<span class="nc" id="L352">              PayloadAttribute payloadAttribute = tokenizer</span>
-<span class="nc" id="L353">                  .getAttribute(PayloadAttribute.class);</span>
-<span class="nc" id="L354">              FlagsAttribute flagsAttribute = tokenizer</span>
-<span class="nc" id="L355">                  .getAttribute(FlagsAttribute.class);</span>
+<span class="nc" id="L344">              CharTermAttribute termAttribute = tokenizer</span>
+<span class="nc" id="L345">                  .getAttribute(CharTermAttribute.class);</span>
+<span class="nc" id="L346">              OffsetAttribute offsetAttribute = tokenizer</span>
+<span class="nc" id="L347">                  .getAttribute(OffsetAttribute.class);</span>
+<span class="nc" id="L348">              PositionIncrementAttribute positionIncrementAttribute = tokenizer</span>
+<span class="nc" id="L349">                  .getAttribute(PositionIncrementAttribute.class);</span>
+<span class="nc" id="L350">              PayloadAttribute payloadAttribute = tokenizer</span>
+<span class="nc" id="L351">                  .getAttribute(PayloadAttribute.class);</span>
+<span class="nc" id="L352">              FlagsAttribute flagsAttribute = tokenizer</span>
+<span class="nc" id="L353">                  .getAttribute(FlagsAttribute.class);</span>
 
-<span class="nc bnc" id="L357" title="All 2 branches missed.">              while (tokenizer.incrementToken()) {</span>
-<span class="nc" id="L358">                String term = null;</span>
-<span class="nc" id="L359">                Integer offsetStart = null;</span>
-<span class="nc" id="L360">                Integer offsetEnd = null;</span>
-<span class="nc" id="L361">                Integer posIncr = null;</span>
-<span class="nc" id="L362">                Integer flags = null;</span>
-<span class="nc" id="L363">                BytesRef payload = null;</span>
-<span class="nc bnc" id="L364" title="All 2 branches missed.">                if (termAttribute != null) {</span>
-<span class="nc" id="L365">                  term = termAttribute.toString();</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">              while (tokenizer.incrementToken()) {</span>
+<span class="nc" id="L356">                String term = null;</span>
+<span class="nc" id="L357">                Integer offsetStart = null;</span>
+<span class="nc" id="L358">                Integer offsetEnd = null;</span>
+<span class="nc" id="L359">                Integer posIncr = null;</span>
+<span class="nc" id="L360">                Integer flags = null;</span>
+<span class="nc" id="L361">                BytesRef payload = null;</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">                if (termAttribute != null) {</span>
+<span class="nc" id="L363">                  term = termAttribute.toString();</span>
                 }
-<span class="nc bnc" id="L367" title="All 2 branches missed.">                if (offsetAttribute != null) {</span>
-<span class="nc" id="L368">                  offsetStart = offsetAttribute.startOffset();</span>
-<span class="nc" id="L369">                  offsetEnd = offsetAttribute.endOffset();</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">                if (offsetAttribute != null) {</span>
+<span class="nc" id="L366">                  offsetStart = offsetAttribute.startOffset();</span>
+<span class="nc" id="L367">                  offsetEnd = offsetAttribute.endOffset();</span>
                 }
-<span class="nc bnc" id="L371" title="All 2 branches missed.">                if (positionIncrementAttribute != null) {</span>
-<span class="nc" id="L372">                  posIncr = positionIncrementAttribute.getPositionIncrement();</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">                if (positionIncrementAttribute != null) {</span>
+<span class="nc" id="L370">                  posIncr = positionIncrementAttribute.getPositionIncrement();</span>
                 } else {
-<span class="nc" id="L374">                  posIncr = 0;</span>
+<span class="nc" id="L372">                  posIncr = 0;</span>
                 }
-<span class="nc bnc" id="L376" title="All 2 branches missed.">                if (payloadAttribute != null) {</span>
-<span class="nc" id="L377">                  payload = payloadAttribute.getPayload();</span>
+<span class="nc bnc" id="L374" title="All 2 branches missed.">                if (payloadAttribute != null) {</span>
+<span class="nc" id="L375">                  payload = payloadAttribute.getPayload();</span>
                 }
-<span class="nc bnc" id="L379" title="All 2 branches missed.">                if (flagsAttribute != null) {</span>
-<span class="nc" id="L380">                  flags = flagsAttribute.getFlags();</span>
+<span class="nc bnc" id="L377" title="All 2 branches missed.">                if (flagsAttribute != null) {</span>
+<span class="nc" id="L378">                  flags = flagsAttribute.getFlags();</span>
                 }
-<span class="nc" id="L382">                numberOfTokens++;</span>
-<span class="nc" id="L383">                numberOfPositions += posIncr;</span>
-<span class="nc" id="L384">                result.addItem(term, offsetStart, offsetEnd, posIncr, payload,</span>
+<span class="nc" id="L380">                numberOfTokens++;</span>
+<span class="nc" id="L381">                numberOfPositions += posIncr;</span>
+<span class="nc" id="L382">                result.addItem(term, offsetStart, offsetEnd, posIncr, payload,</span>
                     flags);
                 // System.out.print(term+&quot; &quot;);
-<span class="nc" id="L387">              }</span>
+<span class="nc" id="L385">              }</span>
 
               // update field
-<span class="nc" id="L390">              doc.remove(field);</span>
-<span class="nc bnc" id="L391" title="All 2 branches missed.">              if (result.getTokenNumber() &gt; 0) {</span>
-<span class="nc" id="L392">                doc.addField(field, result.getFileName());</span>
+<span class="nc" id="L388">              doc.remove(field);</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">              if (result.getTokenNumber() &gt; 0) {</span>
+<span class="nc" id="L390">                doc.addField(field, result.getFileName());</span>
               }
             } finally {
-<span class="nc" id="L395">              result.close();</span>
-<span class="nc" id="L396">            }</span>
+<span class="nc" id="L393">              result.close();</span>
+<span class="nc" id="L394">            }</span>
             // update size
-<span class="nc" id="L398">            setFields(doc, config.fieldTypeSizeField.get(fieldType),</span>
-<span class="nc" id="L399">                sizeReader.getTotalReadSize());</span>
+<span class="nc" id="L396">            setFields(doc, config.fieldTypeSizeField.get(fieldType),</span>
+<span class="nc" id="L397">                sizeReader.getTotalReadSize());</span>
             // update numberOfPositions
-<span class="nc" id="L401">            setFields(doc,</span>
-<span class="nc" id="L402">                config.fieldTypeNumberOfPositionsField.get(fieldType),</span>
-<span class="nc" id="L403">                numberOfPositions);</span>
+<span class="nc" id="L399">            setFields(doc,</span>
+<span class="nc" id="L400">                config.fieldTypeNumberOfPositionsField.get(fieldType),</span>
+<span class="nc" id="L401">                numberOfPositions);</span>
             // update numberOfTokens
-<span class="nc" id="L405">            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),</span>
-<span class="nc" id="L406">                numberOfTokens);</span>
-<span class="nc" id="L407">          } catch (IOException e) {</span>
-<span class="nc" id="L408">            log.info(e);</span>
+<span class="nc" id="L403">            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),</span>
+<span class="nc" id="L404">                numberOfTokens);</span>
+<span class="nc" id="L405">          } catch (IOException e) {</span>
+<span class="nc" id="L406">            log.info(e);</span>
             // update error
-<span class="nc" id="L410">            doc.addField(config.fieldTypeErrorField.get(fieldType),</span>
-<span class="nc" id="L411">                e.getMessage());</span>
+<span class="nc" id="L408">            doc.addField(config.fieldTypeErrorField.get(fieldType),</span>
+<span class="nc" id="L409">                e.getMessage());</span>
             // update size
-<span class="nc" id="L413">            setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);</span>
+<span class="nc" id="L411">            setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);</span>
             // update numberOfPositions
-<span class="nc" id="L415">            setFields(doc,</span>
-<span class="nc" id="L416">                config.fieldTypeNumberOfPositionsField.get(fieldType), 0);</span>
+<span class="nc" id="L413">            setFields(doc,</span>
+<span class="nc" id="L414">                config.fieldTypeNumberOfPositionsField.get(fieldType), 0);</span>
             // update numberOfTokens
-<span class="nc" id="L418">            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),</span>
-<span class="nc" id="L419">                0);</span>
-<span class="nc bnc" id="L420" title="All 2 branches missed.">            if (result != null) {</span>
-<span class="nc" id="L421">              result.forceCloseAndDelete();</span>
-<span class="nc" id="L422">              doc.remove(field);</span>
+<span class="nc" id="L416">            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),</span>
+<span class="nc" id="L417">                0);</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">            if (result != null) {</span>
+<span class="nc" id="L419">              result.forceCloseAndDelete();</span>
+<span class="nc" id="L420">              doc.remove(field);</span>
             }
-<span class="nc" id="L424">          }</span>
+<span class="nc" id="L422">          }</span>
         }
-<span class="nc" id="L426">      }</span>
+<span class="nc" id="L424">      }</span>
 
     }
     // pass it up the chain
-<span class="fc" id="L430">    super.processAdd(cmd);</span>
-<span class="fc" id="L431">  }</span>
+<span class="fc" id="L428">    super.processAdd(cmd);</span>
+<span class="fc" id="L429">  }</span>
 
   private void setFields(SolrInputDocument doc, String fieldNames,
       Object value) {
-<span class="nc bnc" id="L435" title="All 2 branches missed.">    if (fieldNames != null) {</span>
-<span class="nc" id="L436">      String[] tmpFields = fieldNames.split(&quot;,&quot;);</span>
-<span class="nc bnc" id="L437" title="All 2 branches missed.">      for (int i = 0; i &lt; tmpFields.length; i++) {</span>
-<span class="nc bnc" id="L438" title="All 2 branches missed.">        if (!tmpFields[i].trim().isEmpty()) {</span>
-<span class="nc" id="L439">          doc.addField(tmpFields[i].trim(), value);</span>
+<span class="nc bnc" id="L433" title="All 2 branches missed.">    if (fieldNames != null) {</span>
+<span class="nc" id="L434">      String[] tmpFields = fieldNames.split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L435" title="All 2 branches missed.">      for (int i = 0; i &lt; tmpFields.length; i++) {</span>
+<span class="nc bnc" id="L436" title="All 2 branches missed.">        if (!tmpFields[i].trim().isEmpty()) {</span>
+<span class="nc" id="L437">          doc.addField(tmpFields[i].trim(), value);</span>
         }
       }
     }
-<span class="nc" id="L443">  }</span>
+<span class="nc" id="L441">  }</span>
 
 }
 
@@ -456,17 +454,17 @@ class MtasUpdateRequestProcessorConfig {
   HashMap&lt;String, String&gt; fieldTypeSizeField;
   HashMap&lt;String, String&gt; fieldTypeErrorField;
 
-<span class="fc" id="L459">  MtasUpdateRequestProcessorConfig() {</span>
-<span class="fc" id="L460">    fieldMapping = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L461">    fieldTypeCharFilterFactories = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L462">    fieldTypeTokenizerFactory = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L463">    fieldTypeDefaultConfiguration = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L464">    fieldTypeConfigurationFromField = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L465">    fieldTypeNumberOfTokensField = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L466">    fieldTypeNumberOfPositionsField = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L467">    fieldTypeSizeField = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L468">    fieldTypeErrorField = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L469">  }</span>
+<span class="fc" id="L457">  MtasUpdateRequestProcessorConfig() {</span>
+<span class="fc" id="L458">    fieldMapping = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L459">    fieldTypeCharFilterFactories = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L460">    fieldTypeTokenizerFactory = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L461">    fieldTypeDefaultConfiguration = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L462">    fieldTypeConfigurationFromField = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L463">    fieldTypeNumberOfTokensField = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L464">    fieldTypeNumberOfPositionsField = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L465">    fieldTypeSizeField = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L466">    fieldTypeErrorField = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L467">  }</span>
 
 }
 
@@ -475,24 +473,24 @@ class MtasUpdateRequestProcessorSizeReader extends Reader {
   Reader reader;
   long totalReadSize;
 
-<span class="nc" id="L478">  public MtasUpdateRequestProcessorSizeReader(Reader reader) {</span>
-<span class="nc" id="L479">    this.reader = reader;</span>
-<span class="nc" id="L480">    totalReadSize = 0;</span>
-<span class="nc" id="L481">  }</span>
+<span class="nc" id="L476">  public MtasUpdateRequestProcessorSizeReader(Reader reader) {</span>
+<span class="nc" id="L477">    this.reader = reader;</span>
+<span class="nc" id="L478">    totalReadSize = 0;</span>
+<span class="nc" id="L479">  }</span>
 
   public int read(char[] cbuf, int off, int len) throws IOException {
-<span class="nc" id="L484">    int read = reader.read(cbuf, off, len);</span>
-<span class="nc" id="L485">    totalReadSize += read;</span>
-<span class="nc" id="L486">    return read;</span>
+<span class="nc" id="L482">    int read = reader.read(cbuf, off, len);</span>
+<span class="nc" id="L483">    totalReadSize += read;</span>
+<span class="nc" id="L484">    return read;</span>
   }
 
   public void close() throws IOException {
-<span class="nc" id="L490">    reader.close();</span>
-<span class="nc" id="L491">  }</span>
+<span class="nc" id="L488">    reader.close();</span>
+<span class="nc" id="L489">  }</span>
 
   public long getTotalReadSize() {
-<span class="nc" id="L494">    return totalReadSize;</span>
+<span class="nc" id="L492">    return totalReadSize;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

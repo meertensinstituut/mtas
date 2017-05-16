@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasTerms.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasTerms.java</span></div><h1>MtasTerms.java</h1><pre class="source lang-java linenums">package mtas.codec;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasTerms.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasTerms.java</span></div><h1>MtasTerms.java</h1><pre class="source lang-java linenums">package mtas.codec;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,22 +28,18 @@ public class MtasTerms extends Terms {
   /**
    * Instantiates a new mtas terms.
    *
-   * @param terms
-   *          the terms
-   * @param indexInputList
-   *          the index input list
-   * @param indexInputOffsetList
-   *          the index input offset list
-   * @param version
-   *          the version
+   * @param terms the terms
+   * @param indexInputList the index input list
+   * @param indexInputOffsetList the index input offset list
+   * @param version the version
    */
   public MtasTerms(Terms terms, HashMap&lt;String, IndexInput&gt; indexInputList,
-<span class="fc" id="L41">      HashMap&lt;String, Long&gt; indexInputOffsetList, int version) {</span>
-<span class="fc" id="L42">    delegateTerms = terms;</span>
-<span class="fc" id="L43">    this.indexInputList = indexInputList;</span>
-<span class="fc" id="L44">    this.indexInputOffsetList = indexInputOffsetList;</span>
-<span class="fc" id="L45">    this.version = version;</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L37">      HashMap&lt;String, Long&gt; indexInputOffsetList, int version) {</span>
+<span class="fc" id="L38">    delegateTerms = terms;</span>
+<span class="fc" id="L39">    this.indexInputList = indexInputList;</span>
+<span class="fc" id="L40">    this.indexInputOffsetList = indexInputOffsetList;</span>
+<span class="fc" id="L41">    this.version = version;</span>
+<span class="fc" id="L42">  }</span>
 
   /*
    * (non-Javadoc)
@@ -52,10 +48,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public TermsEnum iterator() throws IOException {
-<span class="pc bpc" id="L55" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L56">      return delegateTerms.iterator();</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L52">      return delegateTerms.iterator();</span>
     } else {
-<span class="nc" id="L58">      return TermsEnum.EMPTY;</span>
+<span class="nc" id="L54">      return TermsEnum.EMPTY;</span>
     }
   }
 
@@ -66,10 +62,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public long size() throws IOException {
-<span class="pc bpc" id="L69" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L70">      return delegateTerms.size();</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L66">      return delegateTerms.size();</span>
     } else {
-<span class="nc" id="L72">      return -1;</span>
+<span class="nc" id="L68">      return -1;</span>
     }
   }
 
@@ -80,10 +76,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public long getSumTotalTermFreq() throws IOException {
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L84">      return delegateTerms.getSumTotalTermFreq();</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L80">      return delegateTerms.getSumTotalTermFreq();</span>
     } else {
-<span class="nc" id="L86">      return -1;</span>
+<span class="nc" id="L82">      return -1;</span>
     }
   }
 
@@ -94,10 +90,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public long getSumDocFreq() throws IOException {
-<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L98">      return delegateTerms.getSumDocFreq();</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L94">      return delegateTerms.getSumDocFreq();</span>
     } else {
-<span class="nc" id="L100">      return -1;</span>
+<span class="nc" id="L96">      return -1;</span>
     }
   }
 
@@ -108,10 +104,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public int getDocCount() throws IOException {
-<span class="pc bpc" id="L111" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L112">      return delegateTerms.getDocCount();</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L108">      return delegateTerms.getDocCount();</span>
     } else {
-<span class="nc" id="L114">      return -1;</span>
+<span class="nc" id="L110">      return -1;</span>
     }
   }
 
@@ -122,10 +118,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public boolean hasFreqs() {
-<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L126">      return delegateTerms.hasFreqs();</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L122">      return delegateTerms.hasFreqs();</span>
     } else {
-<span class="nc" id="L128">      return false;</span>
+<span class="nc" id="L124">      return false;</span>
     }
   }
 
@@ -136,10 +132,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public boolean hasOffsets() {
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L140">      return delegateTerms.hasOffsets();</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L136">      return delegateTerms.hasOffsets();</span>
     } else {
-<span class="nc" id="L142">      return false;</span>
+<span class="nc" id="L138">      return false;</span>
     }
   }
 
@@ -150,10 +146,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public boolean hasPositions() {
-<span class="pc bpc" id="L153" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L154">      return delegateTerms.hasPositions();</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L150">      return delegateTerms.hasPositions();</span>
     } else {
-<span class="nc" id="L156">      return false;</span>
+<span class="nc" id="L152">      return false;</span>
     }
   }
 
@@ -164,10 +160,10 @@ public class MtasTerms extends Terms {
    */
   @Override
   public boolean hasPayloads() {
-<span class="pc bpc" id="L167" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
-<span class="fc" id="L168">      return delegateTerms.hasPayloads();</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">    if (delegateTerms != null) {</span>
+<span class="fc" id="L164">      return delegateTerms.hasPayloads();</span>
     } else {
-<span class="nc" id="L170">      return false;</span>
+<span class="nc" id="L166">      return false;</span>
     }
   }
 
@@ -177,7 +173,7 @@ public class MtasTerms extends Terms {
    * @return the version
    */
   public int getVersion() {
-<span class="fc" id="L180">    return version;</span>
+<span class="fc" id="L176">    return version;</span>
   }
 
   /**
@@ -186,11 +182,11 @@ public class MtasTerms extends Terms {
    * @return the index input list
    */
   public HashMap&lt;String, IndexInput&gt; getIndexInputList() {
-<span class="fc" id="L189">    HashMap&lt;String, IndexInput&gt; clonedIndexInputList = new HashMap&lt;String, IndexInput&gt;();</span>
-<span class="fc bfc" id="L190" title="All 2 branches covered.">    for (Entry&lt;String, IndexInput&gt; entry : indexInputList.entrySet()) {</span>
-<span class="fc" id="L191">      clonedIndexInputList.put(entry.getKey(), entry.getValue().clone());</span>
-<span class="fc" id="L192">    }</span>
-<span class="fc" id="L193">    return clonedIndexInputList;</span>
+<span class="fc" id="L185">    HashMap&lt;String, IndexInput&gt; clonedIndexInputList = new HashMap&lt;String, IndexInput&gt;();</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">    for (Entry&lt;String, IndexInput&gt; entry : indexInputList.entrySet()) {</span>
+<span class="fc" id="L187">      clonedIndexInputList.put(entry.getKey(), entry.getValue().clone());</span>
+<span class="fc" id="L188">    }</span>
+<span class="fc" id="L189">    return clonedIndexInputList;</span>
   }
 
   /**
@@ -199,8 +195,8 @@ public class MtasTerms extends Terms {
    * @return the index input offset list
    */
   public HashMap&lt;String, Long&gt; getIndexInputOffsetList() {
-<span class="fc" id="L202">    return indexInputOffsetList;</span>
+<span class="fc" id="L198">    return indexInputOffsetList;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

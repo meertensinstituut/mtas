@@ -1,23 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataItem.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataItem.java</span></div><h1>MtasDataItem.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasDataItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataItem.java</span></div><h1>MtasDataItem.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The Class MtasDataItem.
  *
- * @param &lt;T1&gt;
- *          the generic type
- * @param &lt;T2&gt;
- *          the generic type
+ * @param &lt;T1&gt; the generic type
+ * @param &lt;T2&gt; the generic type
  */
 public abstract class MtasDataItem&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2 extends Number &amp; Comparable&lt;T2&gt;&gt;
     implements Serializable, Comparable&lt;MtasDataItem&lt;T1, T2&gt;&gt; {
 
+  /** The log. */
+<span class="fc" id="L21">  private static Log log = LogFactory.getLog(MtasDataItem.class);</span>
+  
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
@@ -25,17 +27,19 @@ public abstract class MtasDataItem&lt;T1 extends Number &amp; Comparable&lt;T1&g
   protected MtasDataCollector&lt;?, ?&gt; sub;
 
   /** The stats items. */
-  protected Set&lt;String&gt; statsItems;
+  private Set&lt;String&gt; statsItems;
 
-  /** The sort direction. */
+  /** The sort type. */
   protected String sortType;
+  
+  /** The sort direction. */
   protected String sortDirection;
 
   /** The error number. */
   protected int errorNumber;
 
   /** The error list. */
-  protected Map&lt;String, Integer&gt; errorList;
+  private Map&lt;String, Integer&gt; errorList;
 
   /** The comparable sort value. */
   protected MtasDataItemNumberComparator&lt;?&gt; comparableSortValue;
@@ -49,53 +53,42 @@ public abstract class MtasDataItem&lt;T1 extends Number &amp; Comparable&lt;T1&g
   /**
    * Instantiates a new mtas data item.
    *
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItem(MtasDataCollector&lt;?, ?&gt; sub, Set&lt;String&gt; statsItems,
       String sortType, String sortDirection, int errorNumber,
-<span class="fc" id="L69">      Map&lt;String, Integer&gt; errorList, int sourceNumber) {</span>
-<span class="fc" id="L70">    this.sub = sub;</span>
-<span class="fc" id="L71">    this.statsItems = statsItems;</span>
-<span class="fc" id="L72">    this.sortType = sortType;</span>
-<span class="fc" id="L73">    this.sortDirection = sortDirection;</span>
-<span class="fc" id="L74">    this.errorNumber = errorNumber;</span>
-<span class="fc" id="L75">    this.errorList = errorList;</span>
-<span class="fc" id="L76">    this.sourceNumber = sourceNumber;</span>
-<span class="fc" id="L77">    this.comparableSortValue = null;</span>
-<span class="fc" id="L78">    this.recomputeComparableSortValue = true;</span>
-<span class="fc" id="L79">  }</span>
+<span class="fc" id="L66">      Map&lt;String, Integer&gt; errorList, int sourceNumber) {</span>
+<span class="fc" id="L67">    this.sub = sub;</span>
+<span class="fc" id="L68">    this.statsItems = statsItems;</span>
+<span class="fc" id="L69">    this.sortType = sortType;</span>
+<span class="fc" id="L70">    this.sortDirection = sortDirection;</span>
+<span class="fc" id="L71">    this.errorNumber = errorNumber;</span>
+<span class="fc" id="L72">    this.errorList = errorList;</span>
+<span class="fc" id="L73">    this.sourceNumber = sourceNumber;</span>
+<span class="fc" id="L74">    this.comparableSortValue = null;</span>
+<span class="fc" id="L75">    this.recomputeComparableSortValue = true;</span>
+<span class="fc" id="L76">  }</span>
 
   /**
    * Adds the.
    *
-   * @param newItem
-   *          the new item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param newItem the new item
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract void add(MtasDataItem&lt;T1, T2&gt; newItem) throws IOException;
 
   /**
    * Rewrite.
    *
-   * @param showDebugInfo
-   *          the show debug info
+   * @param showDebugInfo the show debug info
    * @return the map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract Map&lt;String, Object&gt; rewrite(boolean showDebugInfo)
       throws IOException;
@@ -105,75 +98,93 @@ public abstract class MtasDataItem&lt;T1 extends Number &amp; Comparable&lt;T1&g
    *
    * @return the sub
    */
-  public MtasDataCollector&lt;?, ?&gt; getSub() {
-<span class="nc" id="L109">    return sub;</span>
+  public MtasDataCollector getSub() {
+<span class="nc" id="L102">    return sub;</span>
   }
 
   /**
    * Gets the compare value type.
    *
    * @return the compare value type
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   protected abstract int getCompareValueType() throws IOException;
+  
+  /**
+   * Gets the stats items.
+   *
+   * @return the stats items
+   */
+  protected final Set&lt;String&gt; getStatsItems() {
+<span class="fc" id="L119">    return statsItems;</span>
+  }
 
+  /**
+   * Gets the error list.
+   *
+   * @return the error list
+   */
+  protected final Map&lt;String, Integer&gt; getErrorList() {
+<span class="nc" id="L128">    return errorList;</span>
+  }
+  
   /**
    * Compute comparable value.
    */
   private void computeComparableValue() {
-<span class="fc" id="L125">    recomputeComparableSortValue = false;</span>
+<span class="fc" id="L135">    recomputeComparableSortValue = false;</span>
     try {
-<span class="fc" id="L127">      int type = getCompareValueType();</span>
-<span class="pc bpc" id="L128" title="3 of 4 branches missed.">      switch (type) {</span>
+<span class="fc" id="L137">      int type = getCompareValueType();</span>
+<span class="pc bpc" id="L138" title="3 of 4 branches missed.">      switch (type) {</span>
       case 0:
-<span class="nc" id="L130">        comparableSortValue = getCompareValue0();</span>
-<span class="nc" id="L131">        break;</span>
+<span class="nc" id="L140">        comparableSortValue = getCompareValue0();</span>
+<span class="nc" id="L141">        break;</span>
       case 1:
-<span class="fc" id="L133">        comparableSortValue = getCompareValue1();</span>
-<span class="fc" id="L134">        break;</span>
+<span class="fc" id="L143">        comparableSortValue = getCompareValue1();</span>
+<span class="fc" id="L144">        break;</span>
       case 2:
-<span class="nc" id="L136">        comparableSortValue = getCompareValue2();</span>
-<span class="nc" id="L137">        break;</span>
+<span class="nc" id="L146">        comparableSortValue = getCompareValue2();</span>
+<span class="nc" id="L147">        break;</span>
       default:
-<span class="nc" id="L139">        comparableSortValue = null;</span>
+<span class="nc" id="L149">        comparableSortValue = null;</span>
         break;
       }
-<span class="nc" id="L142">    } catch (IOException e) {</span>
-<span class="nc" id="L143">      comparableSortValue = null;</span>
-<span class="fc" id="L144">    }</span>
-<span class="fc" id="L145">  }</span>
+<span class="fc" id="L152">    } catch (IOException e) {</span>
+<span class="fc" id="L153">      log.debug(e);</span>
+<span class="fc" id="L154">      comparableSortValue = null;</span>
+<span class="fc" id="L155">    }</span>
+<span class="fc" id="L156">  }</span>
 
   /**
    * Gets the comparable value.
    *
    * @return the comparable value
    */
-  protected final MtasDataItemNumberComparator&lt;?&gt; getComparableValue() {
-<span class="fc bfc" id="L153" title="All 2 branches covered.">    if (recomputeComparableSortValue) {</span>
-<span class="fc" id="L154">      computeComparableValue();</span>
+  protected final MtasDataItemNumberComparator getComparableValue() {
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (recomputeComparableSortValue) {</span>
+<span class="fc" id="L165">      computeComparableValue();</span>
     }
-<span class="fc" id="L156">    return comparableSortValue;</span>
+<span class="fc" id="L167">    return comparableSortValue;</span>
   }
 
   /**
-   * Gets the compare value0.
+   * Gets the compare value 0.
    *
-   * @return the compare value0
+   * @return the compare value 0
    */
   protected abstract MtasDataItemNumberComparator&lt;Long&gt; getCompareValue0();
 
   /**
-   * Gets the compare value1.
+   * Gets the compare value 1.
    *
-   * @return the compare value1
+   * @return the compare value 1
    */
   protected abstract MtasDataItemNumberComparator&lt;T1&gt; getCompareValue1();
 
   /**
-   * Gets the compare value2.
+   * Gets the compare value 2.
    *
-   * @return the compare value2
+   * @return the compare value 2
    */
   protected abstract MtasDataItemNumberComparator&lt;T2&gt; getCompareValue2();
 
@@ -185,4 +196,4 @@ public abstract class MtasDataItem&lt;T1 extends Number &amp; Comparable&lt;T1&g
    */
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

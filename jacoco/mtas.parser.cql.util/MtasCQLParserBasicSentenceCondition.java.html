@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasCQLParserBasicSentenceCondition.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.cql.util</a> &gt; <span class="el_source">MtasCQLParserBasicSentenceCondition.java</span></div><h1>MtasCQLParserBasicSentenceCondition.java</h1><pre class="source lang-java linenums">package mtas.parser.cql.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasCQLParserBasicSentenceCondition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.cql.util</a> &gt; <span class="el_source">MtasCQLParserBasicSentenceCondition.java</span></div><h1>MtasCQLParserBasicSentenceCondition.java</h1><pre class="source lang-java linenums">package mtas.parser.cql.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,82 +17,87 @@ import mtas.search.spans.util.MtasSpanQuery;
   /** The part list. */
   private List&lt;MtasCQLParserBasicSentencePartCondition&gt; partList;
 
+  /** The minimum occurence. */
+  private int minimumOccurence;
+  
   /** The maximum occurence. */
-  private int minimumOccurence, maximumOccurence;
+  private int maximumOccurence;
 
-  /** The optional parts. */
-  private boolean simplified, optional;
+  /** The simplified. */
+  private boolean simplified;
+  
+  /** The optional. */
+  private boolean optional;
 
+  /** The ignore clause. */
   private MtasSpanQuery ignoreClause;
   
+  /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
   
   /**
-   * Instantiates a new mtas cql parser basic sentence condition.
+   * Instantiates a new mtas CQL parser basic sentence condition.
+   *
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
    */
-<span class="fc" id="L33">  public MtasCQLParserBasicSentenceCondition(MtasSpanQuery ignore, Integer maximumIgnoreLength) {</span>
-<span class="fc" id="L34">    partList = new ArrayList&lt;MtasCQLParserBasicSentencePartCondition&gt;();</span>
-<span class="fc" id="L35">    minimumOccurence = 1;</span>
-<span class="fc" id="L36">    maximumOccurence = 1;</span>
-<span class="fc" id="L37">    optional = false;</span>
-<span class="fc" id="L38">    simplified = false;</span>
-<span class="fc" id="L39">    this.ignoreClause = ignore;</span>
-<span class="fc" id="L40">    this.maximumIgnoreLength = maximumIgnoreLength;</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L44">  public MtasCQLParserBasicSentenceCondition(MtasSpanQuery ignore, Integer maximumIgnoreLength) {</span>
+<span class="fc" id="L45">    partList = new ArrayList&lt;MtasCQLParserBasicSentencePartCondition&gt;();</span>
+<span class="fc" id="L46">    minimumOccurence = 1;</span>
+<span class="fc" id="L47">    maximumOccurence = 1;</span>
+<span class="fc" id="L48">    optional = false;</span>
+<span class="fc" id="L49">    simplified = false;</span>
+<span class="fc" id="L50">    this.ignoreClause = ignore;</span>
+<span class="fc" id="L51">    this.maximumIgnoreLength = maximumIgnoreLength;</span>
+<span class="fc" id="L52">  }</span>
 
   /**
    * Adds the word.
    *
-   * @param w
-   *          the w
-   * @throws ParseException
-   *           the parse exception
+   * @param w the w
+   * @throws ParseException the parse exception
    */
   public void addWord(MtasCQLParserWordFullCondition w) throws ParseException {
-<span class="pc bpc" id="L52" title="1 of 2 branches missed.">    assert w.getCondition()</span>
-<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        .not() == false : &quot;condition word should be positive in sentence definition&quot;;</span>
-<span class="pc bpc" id="L54" title="1 of 2 branches missed.">    if (!simplified) {</span>
-<span class="fc" id="L55">      partList.add(w);</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">    assert w.getCondition()</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        .not() == false : &quot;condition word should be positive in sentence definition&quot;;</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    if (!simplified) {</span>
+<span class="fc" id="L64">      partList.add(w);</span>
     } else {
-<span class="nc" id="L57">      throw new ParseException(&quot;already simplified&quot;);</span>
+<span class="nc" id="L66">      throw new ParseException(&quot;already simplified&quot;);</span>
     }
-<span class="fc" id="L59">  }</span>
+<span class="fc" id="L68">  }</span>
 
   /**
    * Adds the group.
    *
-   * @param w
-   *          the w
-   * @throws ParseException
-   *           the parse exception
+   * @param g the g
+   * @throws ParseException the parse exception
    */
   public void addGroup(MtasCQLParserGroupFullCondition g)
       throws ParseException {
-<span class="pc bpc" id="L71" title="1 of 2 branches missed.">    if (!simplified) {</span>
-<span class="fc" id="L72">      partList.add(g);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">    if (!simplified) {</span>
+<span class="fc" id="L79">      partList.add(g);</span>
     } else {
-<span class="nc" id="L74">      throw new ParseException(&quot;already simplified&quot;);</span>
+<span class="nc" id="L81">      throw new ParseException(&quot;already simplified&quot;);</span>
     }
-<span class="fc" id="L76">  }</span>
+<span class="fc" id="L83">  }</span>
 
   /**
    * Adds the basic sentence.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @param s the s
+   * @throws ParseException the parse exception
    */
   public void addBasicSentence(MtasCQLParserBasicSentenceCondition s)
       throws ParseException {
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">    if (!simplified) {</span>
-<span class="fc" id="L89">      List&lt;MtasCQLParserBasicSentencePartCondition&gt; newWordList = s</span>
-<span class="fc" id="L90">          .getPartList();</span>
-<span class="fc" id="L91">      partList.addAll(newWordList);</span>
-<span class="fc" id="L92">    } else {</span>
-<span class="nc" id="L93">      throw new ParseException(&quot;already simplified&quot;);</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    if (!simplified) {</span>
+<span class="fc" id="L94">      List&lt;MtasCQLParserBasicSentencePartCondition&gt; newWordList = s</span>
+<span class="fc" id="L95">          .getPartList();</span>
+<span class="fc" id="L96">      partList.addAll(newWordList);</span>
+<span class="fc" id="L97">    } else {</span>
+<span class="nc" id="L98">      throw new ParseException(&quot;already simplified&quot;);</span>
     }
-<span class="fc" id="L95">  }</span>
+<span class="fc" id="L100">  }</span>
 
   /**
    * Gets the minimum occurence.
@@ -100,7 +105,7 @@ import mtas.search.spans.util.MtasSpanQuery;
    * @return the minimum occurence
    */
   public int getMinimumOccurence() {
-<span class="nc" id="L103">    return minimumOccurence;</span>
+<span class="nc" id="L108">    return minimumOccurence;</span>
   }
 
   /**
@@ -109,33 +114,30 @@ import mtas.search.spans.util.MtasSpanQuery;
    * @return the maximum occurence
    */
   public int getMaximumOccurence() {
-<span class="nc" id="L112">    return maximumOccurence;</span>
+<span class="nc" id="L117">    return maximumOccurence;</span>
   }
 
   /**
    * Sets the occurence.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
-   * @throws ParseException
-   *           the parse exception
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
-<span class="pc bpc" id="L126" title="1 of 2 branches missed.">    if (!simplified) {</span>
-<span class="pc bpc" id="L127" title="3 of 6 branches missed.">      if ((min &lt; 0) || (min &gt; max) || (max &lt; 1)) {</span>
-<span class="nc" id="L128">        throw new ParseException(&quot;Illegal number {&quot; + min + &quot;,&quot; + max + &quot;}&quot;);</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">    if (!simplified) {</span>
+<span class="pc bpc" id="L129" title="3 of 6 branches missed.">      if ((min &lt; 0) || (min &gt; max) || (max &lt; 1)) {</span>
+<span class="nc" id="L130">        throw new ParseException(&quot;Illegal number {&quot; + min + &quot;,&quot; + max + &quot;}&quot;);</span>
       }
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">      if (min == 0) {</span>
-<span class="nc" id="L131">        optional = true;</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">      if (min == 0) {</span>
+<span class="nc" id="L133">        optional = true;</span>
       }
-<span class="fc" id="L133">      minimumOccurence = Math.max(1, min);</span>
-<span class="fc" id="L134">      maximumOccurence = max;</span>
+<span class="fc" id="L135">      minimumOccurence = Math.max(1, min);</span>
+<span class="fc" id="L136">      maximumOccurence = max;</span>
     } else {
-<span class="nc" id="L136">      throw new ParseException(&quot;already simplified&quot;);</span>
+<span class="nc" id="L138">      throw new ParseException(&quot;already simplified&quot;);</span>
     }
-<span class="fc" id="L138">  }</span>
+<span class="fc" id="L140">  }</span>
 
   /**
    * Checks if is optional.
@@ -143,17 +145,15 @@ import mtas.search.spans.util.MtasSpanQuery;
    * @return true, if is optional
    */
   public boolean isOptional() {
-<span class="fc" id="L146">    return optional;</span>
+<span class="fc" id="L148">    return optional;</span>
   }
 
 
   /**
    * Sets the optional.
    *
-   * @param status
-   *          the new optional
-   * @throws ParseException
-   *           the parse exception
+   * @param status the new optional
+   * @throws ParseException the parse exception
    */
   public void setOptional(boolean status) throws ParseException {
 <span class="fc" id="L159">    optional = status;</span>
@@ -162,26 +162,26 @@ import mtas.search.spans.util.MtasSpanQuery;
   /**
    * Simplify.
    *
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public void simplify() throws ParseException {
-<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (!simplified) {</span>
-<span class="fc" id="L170">      simplified = true;</span>
-<span class="fc" id="L171">      boolean optionalParts = true;</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">    if (!simplified) {</span>
+<span class="fc" id="L169">      simplified = true;</span>
+<span class="fc" id="L170">      boolean optionalParts = true;</span>
       List&lt;MtasCQLParserBasicSentencePartCondition&gt; newPartList;
-<span class="fc" id="L173">      MtasCQLParserBasicSentencePartCondition lastPart = null;</span>
-<span class="fc" id="L174">      newPartList = new ArrayList&lt;MtasCQLParserBasicSentencePartCondition&gt;();</span>
+<span class="fc" id="L172">      MtasCQLParserBasicSentencePartCondition lastPart = null;</span>
+<span class="fc" id="L173">      newPartList = new ArrayList&lt;MtasCQLParserBasicSentencePartCondition&gt;();</span>
       // try and merge equal basicSentencePart (word/group) conditions
-<span class="fc bfc" id="L176" title="All 2 branches covered.">      for (MtasCQLParserBasicSentencePartCondition part : partList) {</span>
-<span class="fc bfc" id="L177" title="All 4 branches covered.">        if ((lastPart == null) || !lastPart.equals(part)) {</span>
-<span class="fc" id="L178">          lastPart = part;</span>
-<span class="fc" id="L179">          newPartList.add(part);</span>
-<span class="fc bfc" id="L180" title="All 2 branches covered.">          if (!part.isOptional()) {</span>
-<span class="fc" id="L181">            optionalParts = false;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">      for (MtasCQLParserBasicSentencePartCondition part : partList) {</span>
+<span class="fc bfc" id="L176" title="All 4 branches covered.">        if ((lastPart == null) || !lastPart.equals(part)) {</span>
+<span class="fc" id="L177">          lastPart = part;</span>
+<span class="fc" id="L178">          newPartList.add(part);</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">          if (!part.isOptional()) {</span>
+<span class="fc" id="L180">            optionalParts = false;</span>
           }
         } else {
-          int newMinimumOccurence, newMaximumOccurence;
+          int newMinimumOccurence;
+          int newMaximumOccurence;
 <span class="fc bfc" id="L185" title="All 4 branches covered.">          if (!lastPart.isOptional() &amp;&amp; !part.isOptional()) {</span>
 <span class="fc" id="L186">            newMinimumOccurence = lastPart.getMinimumOccurence()</span>
 <span class="fc" id="L187">                + part.getMinimumOccurence();</span>
@@ -251,43 +251,42 @@ import mtas.search.spans.util.MtasSpanQuery;
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public MtasSpanQuery getQuery() throws ParseException {
-<span class="fc" id="L258">    simplify();</span>
-<span class="fc" id="L259">    MtasSpanSequenceItem currentQuery = null;</span>
-<span class="fc" id="L260">    List&lt;MtasSpanSequenceItem&gt; currentQueryList = null;</span>
-<span class="fc bfc" id="L261" title="All 2 branches covered.">    for (MtasCQLParserBasicSentencePartCondition part : partList) {</span>
+<span class="fc" id="L257">    simplify();</span>
+<span class="fc" id="L258">    MtasSpanSequenceItem currentQuery = null;</span>
+<span class="fc" id="L259">    List&lt;MtasSpanSequenceItem&gt; currentQueryList = null;</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">    for (MtasCQLParserBasicSentencePartCondition part : partList) {</span>
       // start list
-<span class="fc bfc" id="L263" title="All 2 branches covered.">      if (currentQuery != null) {</span>
-<span class="fc" id="L264">        currentQueryList = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
-<span class="fc" id="L265">        currentQueryList.add(currentQuery);</span>
-<span class="fc" id="L266">        currentQuery = null;</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">      if (currentQuery != null) {</span>
+<span class="fc" id="L263">        currentQueryList = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
+<span class="fc" id="L264">        currentQueryList.add(currentQuery);</span>
+<span class="fc" id="L265">        currentQuery = null;</span>
       }
-<span class="fc bfc" id="L268" title="All 2 branches covered.">      if (part.getMaximumOccurence() &gt; 1) {</span>
-<span class="fc" id="L269">        MtasSpanQuery q = new MtasSpanRecurrenceQuery(part.getQuery(),</span>
-<span class="fc" id="L270">            part.getMinimumOccurence(), part.getMaximumOccurence(), ignoreClause, maximumIgnoreLength);</span>
-<span class="fc" id="L271">        currentQuery = new MtasSpanSequenceItem(q, part.isOptional());</span>
-<span class="fc" id="L272">      } else {</span>
-<span class="fc" id="L273">        currentQuery = new MtasSpanSequenceItem(part.getQuery(),</span>
-<span class="fc" id="L274">            part.isOptional());</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">      if (part.getMaximumOccurence() &gt; 1) {</span>
+<span class="fc" id="L268">        MtasSpanQuery q = new MtasSpanRecurrenceQuery(part.getQuery(),</span>
+<span class="fc" id="L269">            part.getMinimumOccurence(), part.getMaximumOccurence(), ignoreClause, maximumIgnoreLength);</span>
+<span class="fc" id="L270">        currentQuery = new MtasSpanSequenceItem(q, part.isOptional());</span>
+<span class="fc" id="L271">      } else {</span>
+<span class="fc" id="L272">        currentQuery = new MtasSpanSequenceItem(part.getQuery(),</span>
+<span class="fc" id="L273">            part.isOptional());</span>
       }
       // add to list, if it exists
-<span class="fc bfc" id="L277" title="All 2 branches covered.">      if (currentQueryList != null) {</span>
-<span class="fc" id="L278">        currentQueryList.add(currentQuery);</span>
-<span class="fc" id="L279">        currentQuery = null;</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">      if (currentQueryList != null) {</span>
+<span class="fc" id="L277">        currentQueryList.add(currentQuery);</span>
+<span class="fc" id="L278">        currentQuery = null;</span>
       }
-<span class="fc" id="L281">    }</span>
-<span class="fc bfc" id="L282" title="All 2 branches covered.">    if (currentQueryList != null) {</span>
-<span class="fc" id="L283">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
-<span class="pc bpc" id="L284" title="1 of 2 branches missed.">    } else if (currentQuery.isOptional()) {</span>
-<span class="nc" id="L285">      currentQueryList = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
-<span class="nc" id="L286">      currentQueryList.add(currentQuery);</span>
-<span class="nc" id="L287">      currentQuery = null;</span>
-<span class="nc" id="L288">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
+<span class="fc" id="L280">    }</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">    if (currentQueryList != null) {</span>
+<span class="fc" id="L282">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">    } else if (currentQuery.isOptional()) {</span>
+<span class="nc" id="L284">      currentQueryList = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
+<span class="nc" id="L285">      currentQueryList.add(currentQuery);</span>
+<span class="nc" id="L286">      currentQuery = null;</span>
+<span class="nc" id="L287">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
     } else {
-<span class="fc" id="L290">      return currentQuery.getQuery();</span>
+<span class="fc" id="L289">      return currentQuery.getQuery();</span>
     }
   }
 
@@ -298,24 +297,24 @@ import mtas.search.spans.util.MtasSpanQuery;
    */
   @Override
   public String toString() {
-<span class="nc" id="L301">    StringBuilder text = new StringBuilder(&quot;BASIC SENTENCE&quot;);</span>
-<span class="nc bnc" id="L302" title="All 2 branches missed.">    if (optional) {</span>
-<span class="nc" id="L303">      text.append(&quot; OPTIONAL&quot;);</span>
+<span class="nc" id="L300">    StringBuilder text = new StringBuilder(&quot;BASIC SENTENCE&quot;);</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">    if (optional) {</span>
+<span class="nc" id="L302">      text.append(&quot; OPTIONAL&quot;);</span>
     }
-<span class="nc" id="L305">    text.append(&quot;\n&quot;);</span>
-<span class="nc bnc" id="L306" title="All 2 branches missed.">    if (simplified) {</span>
+<span class="nc" id="L304">    text.append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">    if (simplified) {</span>
       try {
-<span class="nc" id="L308">        text.append(&quot;- Query: &quot; + getQuery().toString(getQuery().getField()));</span>
-<span class="nc" id="L309">      } catch (ParseException e) {</span>
-<span class="nc" id="L310">        text.append(&quot;- Query: &quot; + e.getMessage());</span>
-<span class="nc" id="L311">      }</span>
+<span class="nc" id="L307">        text.append(&quot;- Query: &quot; + getQuery().toString(getQuery().getField()));</span>
+<span class="nc" id="L308">      } catch (ParseException e) {</span>
+<span class="nc" id="L309">        text.append(&quot;- Query: &quot; + e.getMessage());</span>
+<span class="nc" id="L310">      }</span>
     } else {
-<span class="nc bnc" id="L313" title="All 2 branches missed.">      for (MtasCQLParserBasicSentencePartCondition word : partList) {</span>
-<span class="nc" id="L314">        text.append(word.toString(&quot;  - &quot;, &quot;   &quot;));</span>
-<span class="nc" id="L315">      }</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">      for (MtasCQLParserBasicSentencePartCondition word : partList) {</span>
+<span class="nc" id="L313">        text.append(word.toString(&quot;  - &quot;, &quot;   &quot;));</span>
+<span class="nc" id="L314">      }</span>
     }
-<span class="nc" id="L317">    return text.toString();</span>
+<span class="nc" id="L316">    return text.toString();</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

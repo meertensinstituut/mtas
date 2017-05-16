@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasFunctionParserFunction.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.function.util</a> &gt; <span class="el_source">MtasFunctionParserFunction.java</span></div><h1>MtasFunctionParserFunction.java</h1><pre class="source lang-java linenums">package mtas.parser.function.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasFunctionParserFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.function.util</a> &gt; <span class="el_source">MtasFunctionParserFunction.java</span></div><h1>MtasFunctionParserFunction.java</h1><pre class="source lang-java linenums">package mtas.parser.function.util;
 
 import java.io.IOException;
 import java.util.HashSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import mtas.codec.util.CodecUtil;
 import mtas.parser.function.ParseException;
@@ -9,7 +12,10 @@ import mtas.parser.function.ParseException;
 /**
  * The Class MtasFunctionParserFunction.
  */
-<span class="fc" id="L12">public abstract class MtasFunctionParserFunction {</span>
+<span class="fc" id="L15">public abstract class MtasFunctionParserFunction {</span>
+  
+  /** The log. */
+<span class="fc" id="L18">  private static Log log = LogFactory.getLog(MtasFunctionParserFunction.class);</span>
 
   /** The parser doubles. */
   protected MtasFunctionParserFunction[] parserDoubles;
@@ -24,88 +30,81 @@ import mtas.parser.function.ParseException;
   protected long[] constantLongs;
 
   /** The data type. */
-<span class="fc" id="L27">  protected String dataType = null;</span>
+<span class="fc" id="L33">  protected String dataType = null;</span>
 
   /** The sum rule. */
-<span class="fc" id="L30">  protected boolean sumRule = false;</span>
+<span class="fc" id="L36">  protected boolean sumRule = false;</span>
 
   /** The need positions. */
-<span class="fc" id="L33">  protected boolean needPositions = false;</span>
+<span class="fc" id="L39">  protected boolean needPositions = false;</span>
 
   /** The degree. */
-<span class="fc" id="L36">  protected Integer degree = null;</span>
+<span class="fc" id="L42">  protected Integer degree = null;</span>
 
   /** The need argument. */
-<span class="fc" id="L39">  protected HashSet&lt;Integer&gt; needArgument = new HashSet&lt;Integer&gt;();</span>
+<span class="fc" id="L45">  protected HashSet&lt;Integer&gt; needArgument = new HashSet&lt;Integer&gt;();</span>
 
   /** The defined. */
-<span class="fc" id="L42">  private boolean defined = false;</span>
+<span class="fc" id="L48">  private boolean defined = false;</span>
 
   /**
    * Gets the response.
    *
-   * @param args
-   *          the args
-   * @param n
-   *          the n
+   * @param args the args
+   * @param n the n
    * @return the response
    */
   public final MtasFunctionParserFunctionResponse getResponse(long[] args,
       long n) {
-<span class="fc bfc" id="L55" title="All 2 branches covered.">    if (dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    if (dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
       try {
-<span class="fc" id="L57">        long l = getValueLong(args, n);</span>
-<span class="fc" id="L58">        return new MtasFunctionParserFunctionResponseLong(l, true);</span>
-<span class="nc" id="L59">      } catch (IOException e) {</span>
-<span class="nc" id="L60">        return new MtasFunctionParserFunctionResponseLong(0, false);</span>
+<span class="fc" id="L61">        long l = getValueLong(args, n);</span>
+<span class="fc" id="L62">        return new MtasFunctionParserFunctionResponseLong(l, true);</span>
+<span class="nc" id="L63">      } catch (IOException e) {</span>
+<span class="nc" id="L64">        log.debug(e);</span>
+<span class="nc" id="L65">        return new MtasFunctionParserFunctionResponseLong(0, false);</span>
       }
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    } else if (dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    } else if (dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
       try {
-<span class="fc" id="L64">        double d = getValueDouble(args, n);</span>
-<span class="fc" id="L65">        return new MtasFunctionParserFunctionResponseDouble(d, true);</span>
-<span class="fc" id="L66">      } catch (IOException e) {</span>
-<span class="fc" id="L67">        return new MtasFunctionParserFunctionResponseDouble(0, false);</span>
+<span class="fc" id="L69">        double d = getValueDouble(args, n);</span>
+<span class="fc" id="L70">        return new MtasFunctionParserFunctionResponseDouble(d, true);</span>
+<span class="fc" id="L71">      } catch (IOException e) {</span>
+<span class="fc" id="L72">        log.debug(e);</span>
+<span class="fc" id="L73">        return new MtasFunctionParserFunctionResponseDouble(0, false);</span>
       }
     } else {
-<span class="nc" id="L70">      return null;</span>
+<span class="nc" id="L76">      return null;</span>
     }
   }
 
   /**
    * Gets the value double.
    *
-   * @param args
-   *          the args
-   * @param n
-   *          the n
+   * @param args the args
+   * @param n the n
    * @return the value double
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract double getValueDouble(long[] args, long n) throws IOException;
 
   /**
    * Gets the value long.
    *
-   * @param args
-   *          the args
-   * @param n
-   *          the n
+   * @param args the args
+   * @param n the n
    * @return the value long
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract long getValueLong(long[] args, long n) throws IOException;
 
   /**
    * Close.
    *
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public void close() throws ParseException {
-<span class="fc" id="L107">    defined = true;</span>
-<span class="fc" id="L108">  }</span>
+<span class="fc" id="L106">    defined = true;</span>
+<span class="fc" id="L107">  }</span>
 
   /**
    * Gets the type.
@@ -113,7 +112,7 @@ import mtas.parser.function.ParseException;
    * @return the type
    */
   public final String getType() {
-<span class="fc" id="L116">    return dataType;</span>
+<span class="fc" id="L115">    return dataType;</span>
   }
 
   /**
@@ -122,7 +121,7 @@ import mtas.parser.function.ParseException;
    * @return the boolean
    */
   public final Boolean sumRule() {
-<span class="fc" id="L125">    return sumRule;</span>
+<span class="fc" id="L124">    return sumRule;</span>
   }
 
   /**
@@ -131,18 +130,17 @@ import mtas.parser.function.ParseException;
    * @return the boolean
    */
   public final Boolean needPositions() {
-<span class="fc" id="L134">    return needPositions;</span>
+<span class="fc" id="L133">    return needPositions;</span>
   }
 
   /**
    * Need argument.
    *
-   * @param i
-   *          the i
+   * @param i the i
    * @return the boolean
    */
   public final Boolean needArgument(int i) {
-<span class="nc" id="L145">    return needArgument.contains(i);</span>
+<span class="nc" id="L143">    return needArgument.contains(i);</span>
   }
 
   /**
@@ -151,11 +149,11 @@ import mtas.parser.function.ParseException;
    * @return the int
    */
   public final int needArgumentsNumber() {
-<span class="fc" id="L154">    int number = 0;</span>
-<span class="fc bfc" id="L155" title="All 2 branches covered.">    for (int i : needArgument) {</span>
-<span class="fc" id="L156">      number = Math.max(number, (i + 1));</span>
-<span class="fc" id="L157">    }</span>
-<span class="fc" id="L158">    return number;</span>
+<span class="fc" id="L152">    int number = 0;</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    for (int i : needArgument) {</span>
+<span class="fc" id="L154">      number = Math.max(number, (i + 1));</span>
+<span class="fc" id="L155">    }</span>
+<span class="fc" id="L156">    return number;</span>
   }
 
   /**
@@ -164,7 +162,7 @@ import mtas.parser.function.ParseException;
    * @return the hash set
    */
   public final HashSet&lt;Integer&gt; needArgument() {
-<span class="fc" id="L167">    return needArgument;</span>
+<span class="fc" id="L165">    return needArgument;</span>
   }
 
   /**
@@ -173,8 +171,8 @@ import mtas.parser.function.ParseException;
    * @return true, if successful
    */
   protected final boolean defined() {
-<span class="fc" id="L176">    return defined;</span>
+<span class="fc" id="L174">    return defined;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

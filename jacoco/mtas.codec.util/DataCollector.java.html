@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DataCollector.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">DataCollector.java</span></div><h1>DataCollector.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">DataCollector.java</span></div><h1>DataCollector.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.codec.util.collector.MtasDataDoubleAdvanced;
@@ -15,46 +14,42 @@ import mtas.codec.util.collector.MtasDataLongFull;
 /**
  * The Class DataCollector.
  */
-<span class="nc" id="L18">public class DataCollector {</span>
+public class DataCollector {
 
-  /** The collector type list. */
-  public final static String COLLECTOR_TYPE_LIST = &quot;list&quot;;
+  /** The Constant COLLECTOR_TYPE_LIST. */
+  public static final String COLLECTOR_TYPE_LIST = &quot;list&quot;;
 
-  /** The collector type data. */
-  public final static String COLLECTOR_TYPE_DATA = &quot;data&quot;;
+  /** The Constant COLLECTOR_TYPE_DATA. */
+  public static final String COLLECTOR_TYPE_DATA = &quot;data&quot;;
+  
+  /**
+   * Instantiates a new data collector.
+   */
+<span class="nc" id="L28">  private DataCollector() {</span>
+    //don't do anything
+<span class="nc" id="L30">  }</span>
 
   /**
    * Gets the collector.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsType
-   *          the stats type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
    * @return the collector
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasDataCollector&lt;?, ?&gt; getCollector(String collectorType,
-      String dataType, String statsType, Set&lt;String&gt; statsItems,
+      String dataType, String statsType, SortedSet&lt;String&gt; statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String segmentRegistration, String boundary) throws IOException {
-<span class="fc" id="L57">    return getCollector(collectorType, dataType, statsType, statsItems,</span>
+<span class="fc" id="L52">    return getCollector(collectorType, dataType, statsType, statsItems,</span>
         sortType, sortDirection, start, number, null, null, null, null, null,
         null, null, null, segmentRegistration, boundary);
   }
@@ -62,97 +57,78 @@ import mtas.codec.util.collector.MtasDataLongFull;
   /**
    * Gets the collector.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsType
-   *          the stats type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
    * @return the collector
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasDataCollector&lt;?, ?&gt; getCollector(String collectorType,
-      String dataType, String statsType, Set&lt;String&gt; statsItems,
+      String dataType, String statsType, SortedSet&lt;String&gt; statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      Set&lt;String&gt;[] subStatsItems, String[] subSortTypes,
+      SortedSet&lt;String&gt;[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
-<span class="pc bpc" id="L112" title="2 of 4 branches missed.">    if (dataType != null &amp;&amp; dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
-<span class="fc bfc" id="L113" title="All 2 branches covered.">      if (statsType.equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="fc" id="L114">        return new MtasDataLongBasic(collectorType, statsItems, sortType,</span>
+<span class="pc bpc" id="L88" title="2 of 4 branches missed.">    if (dataType != null &amp;&amp; dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">      if (statsType.equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="fc" id="L90">        return new MtasDataLongBasic(collectorType, statsItems, sortType,</span>
             sortDirection, start, number, subCollectorTypes, subDataTypes,
             subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
             subStart, subNumber, segmentRegistration, boundary);
-<span class="fc bfc" id="L118" title="All 2 branches covered.">      } else if (statsType.equals(CodecUtil.STATS_ADVANCED)) {</span>
-<span class="fc" id="L119">        return new MtasDataLongAdvanced(collectorType, statsItems, sortType,</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">      } else if (statsType.equals(CodecUtil.STATS_ADVANCED)) {</span>
+<span class="fc" id="L95">        return new MtasDataLongAdvanced(collectorType, statsItems, sortType,</span>
             sortDirection, start, number, subCollectorTypes, subDataTypes,
             subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
             subStart, subNumber, segmentRegistration, boundary);
-<span class="pc bpc" id="L123" title="1 of 2 branches missed.">      } else if (statsType.equals(CodecUtil.STATS_FULL)) {</span>
-<span class="fc" id="L124">        return new MtasDataLongFull(collectorType, statsItems, sortType,</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">      } else if (statsType.equals(CodecUtil.STATS_FULL)) {</span>
+<span class="fc" id="L100">        return new MtasDataLongFull(collectorType, statsItems, sortType,</span>
             sortDirection, start, number, subCollectorTypes, subDataTypes,
             subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
             subStart, subNumber, segmentRegistration, boundary);
       } else {
-<span class="nc" id="L129">        throw new IOException(&quot;unknown statsType &quot; + statsType);</span>
+<span class="nc" id="L105">        throw new IOException(&quot;unknown statsType &quot; + statsType);</span>
       }
-<span class="nc bnc" id="L131" title="All 2 branches missed.">    } else if (dataType != null</span>
-<span class="nc bnc" id="L132" title="All 2 branches missed.">        &amp;&amp; dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
-<span class="nc bnc" id="L133" title="All 2 branches missed.">      if (statsType.equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="nc" id="L134">        return new MtasDataDoubleBasic(collectorType, statsItems, sortType,</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">    } else if (dataType != null</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        &amp;&amp; dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">      if (statsType.equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="nc" id="L110">        return new MtasDataDoubleBasic(collectorType, statsItems, sortType,</span>
             sortDirection, start, number, subCollectorTypes, subDataTypes,
             subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
             subStart, subNumber, segmentRegistration, boundary);
-<span class="nc bnc" id="L138" title="All 2 branches missed.">      } else if (statsType.equals(CodecUtil.STATS_ADVANCED)) {</span>
-<span class="nc" id="L139">        return new MtasDataDoubleAdvanced(collectorType, statsItems, sortType,</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">      } else if (statsType.equals(CodecUtil.STATS_ADVANCED)) {</span>
+<span class="nc" id="L115">        return new MtasDataDoubleAdvanced(collectorType, statsItems, sortType,</span>
             sortDirection, start, number, subCollectorTypes, subDataTypes,
             subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
             subStart, subNumber, segmentRegistration, boundary);
-<span class="nc bnc" id="L143" title="All 2 branches missed.">      } else if (statsType.equals(CodecUtil.STATS_FULL)) {</span>
-<span class="nc" id="L144">        return new MtasDataDoubleFull(collectorType, statsItems, sortType,</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">      } else if (statsType.equals(CodecUtil.STATS_FULL)) {</span>
+<span class="nc" id="L120">        return new MtasDataDoubleFull(collectorType, statsItems, sortType,</span>
             sortDirection, start, number, subCollectorTypes, subDataTypes,
             subStatsTypes, subStatsItems, subSortTypes, subSortDirections,
             subStart, subNumber, segmentRegistration, boundary);
       } else {
-<span class="nc" id="L149">        throw new IOException(&quot;unknown statsType &quot; + statsType);</span>
+<span class="nc" id="L125">        throw new IOException(&quot;unknown statsType &quot; + statsType);</span>
       }
     } else {
-<span class="nc" id="L152">      throw new IOException(&quot;unknown dataType &quot; + dataType);</span>
+<span class="nc" id="L128">      throw new IOException(&quot;unknown dataType &quot; + dataType);</span>
     }
   }
 
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

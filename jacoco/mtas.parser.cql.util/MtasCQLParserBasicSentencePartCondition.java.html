@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasCQLParserBasicSentencePartCondition.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.cql.util</a> &gt; <span class="el_source">MtasCQLParserBasicSentencePartCondition.java</span></div><h1>MtasCQLParserBasicSentencePartCondition.java</h1><pre class="source lang-java linenums">package mtas.parser.cql.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasCQLParserBasicSentencePartCondition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.cql.util</a> &gt; <span class="el_source">MtasCQLParserBasicSentencePartCondition.java</span></div><h1>MtasCQLParserBasicSentencePartCondition.java</h1><pre class="source lang-java linenums">package mtas.parser.cql.util;
 
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.util.MtasSpanQuery;
@@ -8,18 +8,23 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 <span class="fc" id="L9">public abstract class MtasCQLParserBasicSentencePartCondition {</span>
 
+  /** The minimum occurence. */
+  protected int minimumOccurence;
+  
   /** The maximum occurence. */
-  protected int minimumOccurence, maximumOccurence;
+  protected int maximumOccurence;
 
+  /** The optional. */
+  protected boolean optional;
+  
   /** The not. */
-  protected boolean optional, not;
+  protected boolean not;
 
   /**
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public abstract MtasSpanQuery getQuery() throws ParseException;
 
@@ -29,7 +34,7 @@ import mtas.search.spans.util.MtasSpanQuery;
    * @return the minimum occurence
    */
   public int getMinimumOccurence() {
-<span class="fc" id="L32">    return minimumOccurence;</span>
+<span class="fc" id="L37">    return minimumOccurence;</span>
   }
 
   /**
@@ -38,29 +43,26 @@ import mtas.search.spans.util.MtasSpanQuery;
    * @return the maximum occurence
    */
   public int getMaximumOccurence() {
-<span class="fc" id="L41">    return maximumOccurence;</span>
+<span class="fc" id="L46">    return maximumOccurence;</span>
   }
 
   /**
    * Sets the occurence.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
-   * @throws ParseException
-   *           the parse exception
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
-<span class="pc bpc" id="L55" title="3 of 6 branches missed.">    if ((min &lt; 0) || (min &gt; max) || (max &lt; 1)) {</span>
-<span class="nc" id="L56">      throw new ParseException(&quot;Illegal number {&quot; + min + &quot;,&quot; + max + &quot;}&quot;);</span>
+<span class="pc bpc" id="L57" title="3 of 6 branches missed.">    if ((min &lt; 0) || (min &gt; max) || (max &lt; 1)) {</span>
+<span class="nc" id="L58">      throw new ParseException(&quot;Illegal number {&quot; + min + &quot;,&quot; + max + &quot;}&quot;);</span>
     }
-<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (min == 0) {</span>
-<span class="fc" id="L59">      optional = true;</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (min == 0) {</span>
+<span class="fc" id="L61">      optional = true;</span>
     }
-<span class="fc" id="L61">    minimumOccurence = Math.max(1, min);</span>
-<span class="fc" id="L62">    maximumOccurence = max;</span>
-<span class="fc" id="L63">  }</span>
+<span class="fc" id="L63">    minimumOccurence = Math.max(1, min);</span>
+<span class="fc" id="L64">    maximumOccurence = max;</span>
+<span class="fc" id="L65">  }</span>
 
   /**
    * Checks if is optional.
@@ -68,18 +70,17 @@ import mtas.search.spans.util.MtasSpanQuery;
    * @return true, if is optional
    */
   public boolean isOptional() {
-<span class="fc" id="L71">    return optional;</span>
+<span class="fc" id="L73">    return optional;</span>
   }
 
   /**
    * Sets the optional.
    *
-   * @param status
-   *          the new optional
+   * @param status the new optional
    */
   public void setOptional(boolean status) {
-<span class="fc" id="L81">    optional = status;</span>
-<span class="fc" id="L82">  }</span>
+<span class="fc" id="L82">    optional = status;</span>
+<span class="fc" id="L83">  }</span>
 
   /*
    * (non-Javadoc)
@@ -88,40 +89,38 @@ import mtas.search.spans.util.MtasSpanQuery;
    */
   @Override
   public String toString() {
-<span class="nc" id="L91">    return toString(&quot;&quot;, &quot;&quot;);</span>
+<span class="nc" id="L92">    return toString(&quot;&quot;, &quot;&quot;);</span>
   }
 
   /**
    * To string.
    *
-   * @param firstIndent
-   *          the first indent
-   * @param indent
-   *          the indent
+   * @param firstIndent the first indent
+   * @param indent the indent
    * @return the string
    */
   public String toString(String firstIndent, String indent) {
-<span class="nc" id="L104">    String text = &quot;&quot;;</span>
-<span class="nc" id="L105">    text += firstIndent + &quot;PART&quot;;</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">    if (optional) {</span>
-<span class="nc" id="L107">      text += &quot; OPTIONAL&quot;;</span>
+<span class="nc" id="L103">    String text = &quot;&quot;;</span>
+<span class="nc" id="L104">    text += firstIndent + &quot;PART&quot;;</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">    if (optional) {</span>
+<span class="nc" id="L106">      text += &quot; OPTIONAL&quot;;</span>
     }
-<span class="nc bnc" id="L109" title="All 4 branches missed.">    if ((minimumOccurence &gt; 1) || (minimumOccurence != maximumOccurence)) {</span>
-<span class="nc bnc" id="L110" title="All 2 branches missed.">      if (minimumOccurence != maximumOccurence) {</span>
-<span class="nc" id="L111">        text += &quot; {&quot; + minimumOccurence + &quot;,&quot; + maximumOccurence + &quot;}&quot;;</span>
+<span class="nc bnc" id="L108" title="All 4 branches missed.">    if ((minimumOccurence &gt; 1) || (minimumOccurence != maximumOccurence)) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">      if (minimumOccurence != maximumOccurence) {</span>
+<span class="nc" id="L110">        text += &quot; {&quot; + minimumOccurence + &quot;,&quot; + maximumOccurence + &quot;}&quot;;</span>
       } else {
-<span class="nc" id="L113">        text += &quot; {&quot; + minimumOccurence + &quot;}&quot;;</span>
+<span class="nc" id="L112">        text += &quot; {&quot; + minimumOccurence + &quot;}&quot;;</span>
       }
     }
     try {
-<span class="nc" id="L117">      text += &quot;\n&quot; + indent + &quot;- Query: &quot;</span>
-<span class="nc" id="L118">          + getQuery().toString(getQuery().getField());</span>
-<span class="nc" id="L119">    } catch (ParseException e) {</span>
-<span class="nc" id="L120">      text += &quot;\n&quot; + indent + &quot;- Query: &quot; + e.getMessage();</span>
-<span class="nc" id="L121">    }</span>
-<span class="nc" id="L122">    text += &quot;\n&quot;;</span>
-<span class="nc" id="L123">    return text;</span>
+<span class="nc" id="L116">      text += &quot;\n&quot; + indent + &quot;- Query: &quot;</span>
+<span class="nc" id="L117">          + getQuery().toString(getQuery().getField());</span>
+<span class="nc" id="L118">    } catch (ParseException e) {</span>
+<span class="nc" id="L119">      text += &quot;\n&quot; + indent + &quot;- Query: &quot; + e.getMessage();</span>
+<span class="nc" id="L120">    }</span>
+<span class="nc" id="L121">    text += &quot;\n&quot;;</span>
+<span class="nc" id="L122">    return text;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasStartSpans.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasStartSpans.java</span></div><h1>MtasStartSpans.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasStartSpans.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasStartSpans.java</span></div><h1>MtasStartSpans.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
 
 import java.io.IOException;
 
@@ -16,13 +16,12 @@ public class MtasStartSpans extends Spans {
   /**
    * Instantiates a new mtas start spans.
    *
-   * @param spans
-   *          the spans
+   * @param spans the spans
    */
   public MtasStartSpans(Spans spans) {
-<span class="nc" id="L23">    super();</span>
-<span class="nc" id="L24">    this.spans = spans;</span>
-<span class="nc" id="L25">  }</span>
+<span class="nc" id="L22">    super();</span>
+<span class="nc" id="L23">    this.spans = spans;</span>
+<span class="nc" id="L24">  }</span>
 
   /*
    * (non-Javadoc)
@@ -31,7 +30,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int nextStartPosition() throws IOException {
-<span class="nc bnc" id="L34" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_POSITIONS : spans.nextStartPosition();</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_POSITIONS : spans.nextStartPosition();</span>
   }
 
   /*
@@ -41,7 +40,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int startPosition() {
-<span class="nc bnc" id="L44" title="All 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
   }
 
   /*
@@ -51,7 +50,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int endPosition() {
-<span class="nc bnc" id="L54" title="All 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
   }
 
   /*
@@ -61,7 +60,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int width() {
-<span class="nc" id="L64">    return 0;</span>
+<span class="nc" id="L63">    return 0;</span>
   }
 
   /*
@@ -73,10 +72,10 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-<span class="nc bnc" id="L76" title="All 2 branches missed.">    if (spans != null) {</span>
-<span class="nc" id="L77">      spans.collect(collector);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">    if (spans != null) {</span>
+<span class="nc" id="L76">      spans.collect(collector);</span>
     }
-<span class="nc" id="L79">  }</span>
+<span class="nc" id="L78">  }</span>
 
   /*
    * (non-Javadoc)
@@ -85,7 +84,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int docID() {
-<span class="nc bnc" id="L88" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.docID();</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.docID();</span>
   }
 
   /*
@@ -95,7 +94,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="nc bnc" id="L98" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.nextDoc();</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.nextDoc();</span>
   }
 
   /*
@@ -105,7 +104,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="nc bnc" id="L108" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.advance(target);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.advance(target);</span>
   }
 
   /*
@@ -115,7 +114,7 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public long cost() {
-<span class="nc bnc" id="L118" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
   }
 
   /*
@@ -125,8 +124,8 @@ public class MtasStartSpans extends Spans {
    */
   @Override
   public float positionsCost() {
-<span class="nc bnc" id="L128" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

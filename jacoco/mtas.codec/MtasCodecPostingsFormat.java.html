@@ -1,7 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasCodecPostingsFormat.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasCodecPostingsFormat.java</span></div><h1>MtasCodecPostingsFormat.java</h1><pre class="source lang-java linenums">package mtas.codec;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasCodecPostingsFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec</a> &gt; <span class="el_source">MtasCodecPostingsFormat.java</span></div><h1>MtasCodecPostingsFormat.java</h1><pre class="source lang-java linenums">package mtas.codec;
 
 import java.io.IOException;
+
+import mtas.analysis.MtasTokenizer;
 import mtas.analysis.token.MtasTokenString;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.FieldsProducer;
@@ -15,6 +20,9 @@ import org.apache.lucene.util.BytesRef;
  * The Class MtasCodecPostingsFormat.
  */
 public class MtasCodecPostingsFormat extends PostingsFormat {
+
+  /** The Constant log. */
+<span class="fc" id="L25">  private static final Log log = LogFactory.getLog(MtasCodecPostingsFormat.class);</span>
 
   /** The Constant VERSION_START. */
   public static final int VERSION_START = 3;
@@ -110,17 +118,17 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   public static final String MTAS_INDEX_TERM_PREFIX_POSITION_EXTENSION = &quot;mtas.index.term.prefix.position&quot;;
 
   /** The delegate codec name. */
-<span class="fc" id="L113">  private String delegateCodecName = null;</span>
+<span class="fc" id="L121">  private String delegateCodecName = null;</span>
 
   /** The delegate postings format. */
-<span class="fc" id="L116">  private PostingsFormat delegatePostingsFormat = null;</span>
+<span class="fc" id="L124">  private PostingsFormat delegatePostingsFormat = null;</span>
 
   /**
    * Instantiates a new mtas codec postings format.
    */
   public MtasCodecPostingsFormat() {
-<span class="fc" id="L122">    this(MtasCodec.MTAS_CODEC_NAME);</span>
-<span class="fc" id="L123">  }</span>
+<span class="fc" id="L130">    this(MtasCodec.MTAS_CODEC_NAME);</span>
+<span class="fc" id="L131">  }</span>
 
   /**
    * Instantiates a new mtas codec postings format.
@@ -128,23 +136,23 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
    * @param delegate the delegate
    */
   public MtasCodecPostingsFormat(PostingsFormat delegate) {
-<span class="fc" id="L131">    super(MtasCodec.MTAS_CODEC_NAME);</span>
-<span class="fc" id="L132">    delegateCodecName = delegate.getName();</span>
-<span class="fc" id="L133">    delegatePostingsFormat = delegate;</span>
+<span class="fc" id="L139">    super(MtasCodec.MTAS_CODEC_NAME);</span>
+<span class="fc" id="L140">    delegateCodecName = delegate.getName();</span>
+<span class="fc" id="L141">    delegatePostingsFormat = delegate;</span>
     // preload to prevent NoClassDefFoundErrors
     try {
-<span class="fc" id="L136">      Class.forName(&quot;mtas.codec.payload.MtasPayloadDecoder&quot;);</span>
-<span class="fc" id="L137">      Class.forName(&quot;mtas.codec.payload.MtasBitInputStream&quot;);</span>
-<span class="fc" id="L138">      Class.forName(&quot;mtas.analysis.token.MtasPosition&quot;);</span>
-<span class="fc" id="L139">      Class.forName(&quot;mtas.analysis.token.MtasOffset&quot;);</span>
-<span class="fc" id="L140">      Class.forName(&quot;mtas.codec.tree.MtasRBTree&quot;);</span>
-<span class="fc" id="L141">      Class.forName(&quot;mtas.codec.MtasTerms&quot;);</span>
-<span class="fc" id="L142">      Class.forName(&quot;mtas.codec.util.CodecInfo&quot;);</span>
-<span class="fc" id="L143">      Class.forName(&quot;mtas.codec.tree.MtasTreeNodeId&quot;);</span>
-<span class="nc" id="L144">    } catch (ClassNotFoundException e) {</span>
-<span class="nc" id="L145">      e.printStackTrace();</span>
-<span class="fc" id="L146">    }</span>
-<span class="fc" id="L147">  }</span>
+<span class="fc" id="L144">      Class.forName(&quot;mtas.codec.payload.MtasPayloadDecoder&quot;);</span>
+<span class="fc" id="L145">      Class.forName(&quot;mtas.codec.payload.MtasBitInputStream&quot;);</span>
+<span class="fc" id="L146">      Class.forName(&quot;mtas.analysis.token.MtasPosition&quot;);</span>
+<span class="fc" id="L147">      Class.forName(&quot;mtas.analysis.token.MtasOffset&quot;);</span>
+<span class="fc" id="L148">      Class.forName(&quot;mtas.codec.tree.MtasRBTree&quot;);</span>
+<span class="fc" id="L149">      Class.forName(&quot;mtas.codec.MtasTerms&quot;);</span>
+<span class="fc" id="L150">      Class.forName(&quot;mtas.codec.util.CodecInfo&quot;);</span>
+<span class="fc" id="L151">      Class.forName(&quot;mtas.codec.tree.MtasTreeNodeId&quot;);</span>
+<span class="nc" id="L152">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L153">      log.error(e);</span>
+<span class="fc" id="L154">    }</span>
+<span class="fc" id="L155">  }</span>
 
   /**
    * Instantiates a new mtas codec postings format.
@@ -152,23 +160,23 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
    * @param codecName the codec name
    */
   public MtasCodecPostingsFormat(String codecName) {
-<span class="fc" id="L155">    super(codecName);</span>
-<span class="fc" id="L156">    delegateCodecName = codecName;</span>
-<span class="fc" id="L157">    delegatePostingsFormat = null;</span>
+<span class="fc" id="L163">    super(codecName);</span>
+<span class="fc" id="L164">    delegateCodecName = codecName;</span>
+<span class="fc" id="L165">    delegatePostingsFormat = null;</span>
     // preload to prevent NoClassDefFoundErrors
     try {
-<span class="fc" id="L160">      Class.forName(&quot;mtas.codec.payload.MtasPayloadDecoder&quot;);</span>
-<span class="fc" id="L161">      Class.forName(&quot;mtas.codec.payload.MtasBitInputStream&quot;);</span>
-<span class="fc" id="L162">      Class.forName(&quot;mtas.analysis.token.MtasPosition&quot;);</span>
-<span class="fc" id="L163">      Class.forName(&quot;mtas.analysis.token.MtasOffset&quot;);</span>
-<span class="fc" id="L164">      Class.forName(&quot;mtas.codec.tree.MtasRBTree&quot;);</span>
-<span class="fc" id="L165">      Class.forName(&quot;mtas.codec.MtasTerms&quot;);</span>
-<span class="fc" id="L166">      Class.forName(&quot;mtas.codec.util.CodecInfo&quot;);</span>
-<span class="fc" id="L167">      Class.forName(&quot;mtas.codec.tree.MtasTreeNodeId&quot;);</span>
-<span class="nc" id="L168">    } catch (ClassNotFoundException e) {</span>
-<span class="nc" id="L169">      e.printStackTrace();</span>
-<span class="fc" id="L170">    }</span>
-<span class="fc" id="L171">  }</span>
+<span class="fc" id="L168">      Class.forName(&quot;mtas.codec.payload.MtasPayloadDecoder&quot;);</span>
+<span class="fc" id="L169">      Class.forName(&quot;mtas.codec.payload.MtasBitInputStream&quot;);</span>
+<span class="fc" id="L170">      Class.forName(&quot;mtas.analysis.token.MtasPosition&quot;);</span>
+<span class="fc" id="L171">      Class.forName(&quot;mtas.analysis.token.MtasOffset&quot;);</span>
+<span class="fc" id="L172">      Class.forName(&quot;mtas.codec.tree.MtasRBTree&quot;);</span>
+<span class="fc" id="L173">      Class.forName(&quot;mtas.codec.MtasTerms&quot;);</span>
+<span class="fc" id="L174">      Class.forName(&quot;mtas.codec.util.CodecInfo&quot;);</span>
+<span class="fc" id="L175">      Class.forName(&quot;mtas.codec.tree.MtasTreeNodeId&quot;);</span>
+<span class="nc" id="L176">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L177">      log.error(e);</span>
+<span class="fc" id="L178">    }</span>
+<span class="fc" id="L179">  }</span>
 
   /*
    * (non-Javadoc)
@@ -180,7 +188,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   @Override
   public final FieldsProducer fieldsProducer(SegmentReadState state)
       throws IOException {
-<span class="fc" id="L183">    return new MtasFieldsProducer(state, getName());</span>
+<span class="fc" id="L191">    return new MtasFieldsProducer(state, getName());</span>
   }
 
   /*
@@ -193,13 +201,13 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
   @Override
   public final FieldsConsumer fieldsConsumer(SegmentWriteState state)
       throws IOException {
-<span class="fc bfc" id="L196" title="All 2 branches covered.">    if (delegatePostingsFormat != null) {</span>
-<span class="fc" id="L197">      return new MtasFieldsConsumer(</span>
-<span class="fc" id="L198">          delegatePostingsFormat.fieldsConsumer(state), state, getName(),</span>
-<span class="fc" id="L199">          delegatePostingsFormat.getName());</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">    if (delegatePostingsFormat != null) {</span>
+<span class="fc" id="L205">      return new MtasFieldsConsumer(</span>
+<span class="fc" id="L206">          delegatePostingsFormat.fieldsConsumer(state), state, getName(),</span>
+<span class="fc" id="L207">          delegatePostingsFormat.getName());</span>
     } else {
-<span class="fc" id="L201">      PostingsFormat pf = Codec.forName(delegateCodecName).postingsFormat();</span>
-<span class="fc" id="L202">      return pf.fieldsConsumer(state);</span>
+<span class="fc" id="L209">      PostingsFormat pf = Codec.forName(delegateCodecName).postingsFormat();</span>
+<span class="fc" id="L210">      return pf.fieldsConsumer(state);</span>
     }
   }
 
@@ -212,65 +220,65 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
    * @return the token
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static MtasTokenString getToken(IndexInput inObject,
-      IndexInput inTerm, Long ref) throws IOException {
-<span class="fc" id="L217">    MtasTokenString token = null;</span>
+  public static MtasTokenString getToken(IndexInput inObject, IndexInput inTerm,
+      Long ref) throws IOException {
+<span class="fc" id="L225">    MtasTokenString token = null;</span>
     try {
-<span class="fc" id="L219">      inObject.seek(ref);</span>
-<span class="fc" id="L220">      token = new MtasTokenString(null, &quot;&quot;);</span>
-<span class="fc" id="L221">      token.setId(inObject.readVInt());</span>
-<span class="fc" id="L222">      token.setTokenRef(ref);</span>
-<span class="fc" id="L223">      int objectFlags = inObject.readVInt();</span>
-<span class="fc" id="L224">      int[] positions = null;</span>
-<span class="fc bfc" id="L225" title="All 2 branches covered.">      if ((objectFlags &amp; MTAS_OBJECT_HAS_PARENT) == MTAS_OBJECT_HAS_PARENT) {</span>
-<span class="fc" id="L226">        int parentId = inObject.readVInt();</span>
-<span class="fc" id="L227">        token.setParentId(parentId);</span>
+<span class="fc" id="L227">      inObject.seek(ref);</span>
+<span class="fc" id="L228">      token = new MtasTokenString(null, &quot;&quot;);</span>
+<span class="fc" id="L229">      token.setId(inObject.readVInt());</span>
+<span class="fc" id="L230">      token.setTokenRef(ref);</span>
+<span class="fc" id="L231">      int objectFlags = inObject.readVInt();</span>
+<span class="fc" id="L232">      int[] positions = null;</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">      if ((objectFlags &amp; MTAS_OBJECT_HAS_PARENT) == MTAS_OBJECT_HAS_PARENT) {</span>
+<span class="fc" id="L234">        int parentId = inObject.readVInt();</span>
+<span class="fc" id="L235">        token.setParentId(parentId);</span>
       }
-<span class="fc bfc" id="L229" title="All 2 branches covered.">      if ((objectFlags</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">      if ((objectFlags</span>
           &amp; MTAS_OBJECT_HAS_POSITION_RANGE) == MTAS_OBJECT_HAS_POSITION_RANGE) {
-<span class="fc" id="L231">        int positionStart = inObject.readVInt();</span>
-<span class="fc" id="L232">        int positionEnd = positionStart + inObject.readVInt();</span>
-<span class="fc" id="L233">        token.addPositionRange(positionStart, positionEnd);</span>
-<span class="fc bfc" id="L234" title="All 2 branches covered.">      } else if ((objectFlags</span>
+<span class="fc" id="L239">        int positionStart = inObject.readVInt();</span>
+<span class="fc" id="L240">        int positionEnd = positionStart + inObject.readVInt();</span>
+<span class="fc" id="L241">        token.addPositionRange(positionStart, positionEnd);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">      } else if ((objectFlags</span>
           &amp; MTAS_OBJECT_HAS_POSITION_SET) == MTAS_OBJECT_HAS_POSITION_SET) {
-<span class="fc" id="L236">        int size = inObject.readVInt();</span>
-<span class="fc" id="L237">        int tmpPrevious = 0;</span>
-<span class="fc" id="L238">        positions = new int[size];</span>
-<span class="fc bfc" id="L239" title="All 2 branches covered.">        for (int t = 0; t &lt; size; t++) {</span>
-<span class="fc" id="L240">          int position = tmpPrevious + inObject.readVInt();</span>
-<span class="fc" id="L241">          tmpPrevious = position;</span>
-<span class="fc" id="L242">          positions[t] = position;</span>
+<span class="fc" id="L244">        int size = inObject.readVInt();</span>
+<span class="fc" id="L245">        int tmpPrevious = 0;</span>
+<span class="fc" id="L246">        positions = new int[size];</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">        for (int t = 0; t &lt; size; t++) {</span>
+<span class="fc" id="L248">          int position = tmpPrevious + inObject.readVInt();</span>
+<span class="fc" id="L249">          tmpPrevious = position;</span>
+<span class="fc" id="L250">          positions[t] = position;</span>
         }
-<span class="fc" id="L244">        token.addPositions(positions);</span>
-<span class="fc" id="L245">      } else {</span>
-<span class="fc" id="L246">        int position = inObject.readVInt();</span>
-<span class="fc" id="L247">        token.addPosition(position);</span>
+<span class="fc" id="L252">        token.addPositions(positions);</span>
+<span class="fc" id="L253">      } else {</span>
+<span class="fc" id="L254">        int position = inObject.readVInt();</span>
+<span class="fc" id="L255">        token.addPosition(position);</span>
       }
-<span class="pc bpc" id="L249" title="1 of 2 branches missed.">      if ((objectFlags &amp; MTAS_OBJECT_HAS_OFFSET) == MTAS_OBJECT_HAS_OFFSET) {</span>
-<span class="nc" id="L250">        int offsetStart = inObject.readVInt();</span>
-<span class="nc" id="L251">        int offsetEnd = offsetStart + inObject.readVInt();</span>
-<span class="nc" id="L252">        token.setOffset(offsetStart, offsetEnd);</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">      if ((objectFlags &amp; MTAS_OBJECT_HAS_OFFSET) == MTAS_OBJECT_HAS_OFFSET) {</span>
+<span class="nc" id="L258">        int offsetStart = inObject.readVInt();</span>
+<span class="nc" id="L259">        int offsetEnd = offsetStart + inObject.readVInt();</span>
+<span class="nc" id="L260">        token.setOffset(offsetStart, offsetEnd);</span>
       }
-<span class="pc bpc" id="L254" title="1 of 2 branches missed.">      if ((objectFlags</span>
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">      if ((objectFlags</span>
           &amp; MTAS_OBJECT_HAS_REALOFFSET) == MTAS_OBJECT_HAS_REALOFFSET) {
-<span class="nc" id="L256">        int realOffsetStart = inObject.readVInt();</span>
-<span class="nc" id="L257">        int realOffsetEnd = realOffsetStart + inObject.readVInt();</span>
-<span class="nc" id="L258">        token.setRealOffset(realOffsetStart, realOffsetEnd);</span>
+<span class="nc" id="L264">        int realOffsetStart = inObject.readVInt();</span>
+<span class="nc" id="L265">        int realOffsetEnd = realOffsetStart + inObject.readVInt();</span>
+<span class="nc" id="L266">        token.setRealOffset(realOffsetStart, realOffsetEnd);</span>
       }
-<span class="pc bpc" id="L260" title="1 of 2 branches missed.">      if ((objectFlags &amp; MTAS_OBJECT_HAS_PAYLOAD) == MTAS_OBJECT_HAS_PAYLOAD) {</span>
-<span class="nc" id="L261">        int length = inObject.readVInt();</span>
-<span class="nc" id="L262">        byte[] mtasPayload = new byte[length];</span>
-<span class="nc" id="L263">        inObject.readBytes(mtasPayload, 0, length);</span>
-<span class="nc" id="L264">        token.setPayload(new BytesRef(mtasPayload));</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">      if ((objectFlags &amp; MTAS_OBJECT_HAS_PAYLOAD) == MTAS_OBJECT_HAS_PAYLOAD) {</span>
+<span class="nc" id="L269">        int length = inObject.readVInt();</span>
+<span class="nc" id="L270">        byte[] mtasPayload = new byte[length];</span>
+<span class="nc" id="L271">        inObject.readBytes(mtasPayload, 0, length);</span>
+<span class="nc" id="L272">        token.setPayload(new BytesRef(mtasPayload));</span>
       }
-<span class="fc" id="L266">      Long termRef = inObject.readVLong();</span>
-<span class="fc" id="L267">      inTerm.seek(termRef);</span>
-<span class="fc" id="L268">      token.setTermRef(termRef);</span>
-<span class="fc" id="L269">      token.setValue(inTerm.readString());</span>
-<span class="nc" id="L270">    } catch (Exception e) {</span>
-<span class="nc" id="L271">      throw new IOException(e.getMessage());</span>
-<span class="fc" id="L272">    }</span>
-<span class="fc" id="L273">    return token;</span>
+<span class="fc" id="L274">      Long termRef = inObject.readVLong();</span>
+<span class="fc" id="L275">      inTerm.seek(termRef);</span>
+<span class="fc" id="L276">      token.setTermRef(termRef);</span>
+<span class="fc" id="L277">      token.setValue(inTerm.readString());</span>
+<span class="nc" id="L278">    } catch (Exception e) {</span>
+<span class="nc" id="L279">      throw new IOException(e);</span>
+<span class="fc" id="L280">    }</span>
+<span class="fc" id="L281">    return token;</span>
   }
 
   /**
@@ -283,12 +291,12 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
    */
   public static String getTerm(IndexInput inTerm, Long ref) throws IOException {
     try {
-<span class="fc" id="L286">      inTerm.seek(ref);</span>
-<span class="fc" id="L287">      return inTerm.readString();</span>
-<span class="nc" id="L288">    } catch (Exception e) {</span>
-<span class="nc" id="L289">      throw new IOException(e.getMessage());</span>
+<span class="fc" id="L294">      inTerm.seek(ref);</span>
+<span class="fc" id="L295">      return inTerm.readString();</span>
+<span class="nc" id="L296">    } catch (Exception e) {</span>
+<span class="nc" id="L297">      throw new IOException(e);</span>
     }
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

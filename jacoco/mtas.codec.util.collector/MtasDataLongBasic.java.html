@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataLongBasic.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataLongBasic.java</span></div><h1>MtasDataLongBasic.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasDataLongBasic.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataLongBasic.java</span></div><h1>MtasDataLongBasic.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
+
 import org.apache.commons.lang.ArrayUtils;
 import mtas.codec.util.CodecUtil;
 
@@ -18,52 +18,35 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   /**
    * Instantiates a new mtas data long basic.
    *
-   * @param collectorType
-   *          the collector type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param collectorType the collector type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasDataLongBasic(String collectorType, Set&lt;String&gt; statsItems,
+  public MtasDataLongBasic(String collectorType, SortedSet&lt;String&gt; statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      Set&lt;String&gt;[] subStatsItems, String[] subSortTypes,
+      SortedSet&lt;String&gt;[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
-<span class="fc" id="L62">    super(collectorType, CodecUtil.DATA_TYPE_LONG, statsItems, sortType,</span>
+<span class="fc" id="L45">    super(collectorType, CodecUtil.DATA_TYPE_LONG, statsItems, sortType,</span>
         sortDirection, start, number, subCollectorTypes, subDataTypes,
         subStatsTypes, subStatsItems, subSortTypes, subSortDirections, subStart,
         subNumber, new MtasDataLongOperations(), segmentRegistration, boundary);
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L49">  }</span>
 
   /*
    * (non-Javadoc)
@@ -72,12 +55,13 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
    */
   @Override
   protected MtasDataItemLongBasic getItem(int i) {
-<span class="pc bpc" id="L75" title="2 of 4 branches missed.">    if (i &gt;= 0 &amp;&amp; i &lt; size) {</span>
-<span class="fc" id="L76">      return new MtasDataItemLongBasic(basicValueSumList[i], basicValueNList[i],</span>
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">          hasSub() ? subCollectorListNextLevel[i] : null, statsItems, sortType,</span>
-          sortDirection, errorNumber[i], errorList[i], sourceNumberList[i]);
+<span class="pc bpc" id="L58" title="2 of 4 branches missed.">    if (i &gt;= 0 &amp;&amp; i &lt; size) {</span>
+<span class="fc" id="L59">      return new MtasDataItemLongBasic(basicValueSumList[i], basicValueNList[i],</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">          hasSub() ? subCollectorListNextLevel[i] : null, getStatsItems(),</span>
+          sortType, sortDirection, errorNumber[i], errorList[i],
+          sourceNumberList[i]);
     } else {
-<span class="nc" id="L80">      return null;</span>
+<span class="nc" id="L64">      return null;</span>
     }
   }
 
@@ -89,9 +73,9 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(long valueSum, long valueN)
       throws IOException {
-<span class="fc" id="L92">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
-<span class="fc" id="L93">    setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);</span>
-<span class="fc" id="L94">    return dataCollector;</span>
+<span class="fc" id="L76">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
+<span class="fc" id="L77">    setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);</span>
+<span class="fc" id="L78">    return dataCollector;</span>
   }
 
   /*
@@ -102,10 +86,10 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(long[] values, int number)
       throws IOException {
-<span class="fc" id="L105">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
-<span class="fc" id="L106">    setValue(newCurrentPosition, ArrayUtils.toObject(values), number,</span>
+<span class="fc" id="L89">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
+<span class="fc" id="L90">    setValue(newCurrentPosition, ArrayUtils.toObject(values), number,</span>
         newCurrentExisting);
-<span class="fc" id="L108">    return dataCollector;</span>
+<span class="fc" id="L92">    return dataCollector;</span>
   }
 
   /*
@@ -116,10 +100,10 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(double valueSum, long valueN)
       throws IOException {
-<span class="nc" id="L119">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
-<span class="nc" id="L120">    setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(), valueN,</span>
+<span class="nc" id="L103">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
+<span class="nc" id="L104">    setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(), valueN,</span>
         newCurrentExisting);
-<span class="nc" id="L122">    return dataCollector;</span>
+<span class="nc" id="L106">    return dataCollector;</span>
   }
 
   /*
@@ -130,12 +114,12 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(double[] values, int number)
       throws IOException {
-<span class="nc" id="L133">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
-<span class="nc" id="L134">    Long[] newValues = new Long[number];</span>
-<span class="nc bnc" id="L135" title="All 2 branches missed.">    for (int i = 0; i &lt; values.length; i++)</span>
-<span class="nc" id="L136">      newValues[i] = Double.valueOf(values[i]).longValue();</span>
-<span class="nc" id="L137">    setValue(newCurrentPosition, newValues, number, newCurrentExisting);</span>
-<span class="nc" id="L138">    return dataCollector;</span>
+<span class="nc" id="L117">    MtasDataCollector&lt;?, ?&gt; dataCollector = add(false);</span>
+<span class="nc" id="L118">    Long[] newValues = new Long[number];</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">    for (int i = 0; i &lt; values.length; i++)</span>
+<span class="nc" id="L120">      newValues[i] = Double.valueOf(values[i]).longValue();</span>
+<span class="nc" id="L121">    setValue(newCurrentPosition, newValues, number, newCurrentExisting);</span>
+<span class="nc" id="L122">    return dataCollector;</span>
   }
 
   /*
@@ -148,12 +132,12 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(String key, long valueSum, long valueN)
       throws IOException {
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    if (key != null) {</span>
-<span class="fc" id="L152">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
-<span class="fc" id="L153">      setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);</span>
-<span class="fc" id="L154">      return subCollector;</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (key != null) {</span>
+<span class="fc" id="L136">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
+<span class="fc" id="L137">      setValue(newCurrentPosition, valueSum, valueN, newCurrentExisting);</span>
+<span class="fc" id="L138">      return subCollector;</span>
     } else {
-<span class="nc" id="L156">      return null;</span>
+<span class="nc" id="L140">      return null;</span>
     }
   }
 
@@ -167,13 +151,13 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(String key, long[] values, int number)
       throws IOException {
-<span class="nc bnc" id="L170" title="All 2 branches missed.">    if (key != null) {</span>
-<span class="nc" id="L171">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
-<span class="nc" id="L172">      setValue(newCurrentPosition, ArrayUtils.toObject(values), number,</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">    if (key != null) {</span>
+<span class="nc" id="L155">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
+<span class="nc" id="L156">      setValue(newCurrentPosition, ArrayUtils.toObject(values), number,</span>
           newCurrentExisting);
-<span class="nc" id="L174">      return subCollector;</span>
+<span class="nc" id="L158">      return subCollector;</span>
     } else {
-<span class="nc" id="L176">      return null;</span>
+<span class="nc" id="L160">      return null;</span>
     }
   }
 
@@ -187,13 +171,13 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(String key, double valueSum, long valueN)
       throws IOException {
-<span class="nc bnc" id="L190" title="All 2 branches missed.">    if (key != null) {</span>
-<span class="nc" id="L191">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
-<span class="nc" id="L192">      setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(), valueN,</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">    if (key != null) {</span>
+<span class="nc" id="L175">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
+<span class="nc" id="L176">      setValue(newCurrentPosition, Double.valueOf(valueSum).longValue(), valueN,</span>
           newCurrentExisting);
-<span class="nc" id="L194">      return subCollector;</span>
+<span class="nc" id="L178">      return subCollector;</span>
     } else {
-<span class="nc" id="L196">      return null;</span>
+<span class="nc" id="L180">      return null;</span>
     }
   }
 
@@ -207,15 +191,15 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   public MtasDataCollector&lt;?, ?&gt; add(String key, double[] values, int number)
       throws IOException {
-<span class="nc bnc" id="L210" title="All 2 branches missed.">    if (key != null) {</span>
-<span class="nc" id="L211">      Long[] newValues = new Long[number];</span>
-<span class="nc bnc" id="L212" title="All 2 branches missed.">      for (int i = 0; i &lt; values.length; i++)</span>
-<span class="nc" id="L213">        newValues[i] = Double.valueOf(values[i]).longValue();</span>
-<span class="nc" id="L214">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
-<span class="nc" id="L215">      setValue(newCurrentPosition, newValues, number, newCurrentExisting);</span>
-<span class="nc" id="L216">      return subCollector;</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">    if (key != null) {</span>
+<span class="nc" id="L195">      Long[] newValues = new Long[number];</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">      for (int i = 0; i &lt; values.length; i++)</span>
+<span class="nc" id="L197">        newValues[i] = Double.valueOf(values[i]).longValue();</span>
+<span class="nc" id="L198">      MtasDataCollector&lt;?, ?&gt; subCollector = add(key, false);</span>
+<span class="nc" id="L199">      setValue(newCurrentPosition, newValues, number, newCurrentExisting);</span>
+<span class="nc" id="L200">      return subCollector;</span>
     } else {
-<span class="nc" id="L218">      return null;</span>
+<span class="nc" id="L202">      return null;</span>
     }
   }
 
@@ -229,14 +213,14 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   protected boolean compareWithBoundary(Long value, Long boundary)
       throws IOException {
-<span class="pc bpc" id="L232" title="1 of 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
-<span class="pc bpc" id="L233" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
-<span class="nc bnc" id="L234" title="All 2 branches missed.">      return value &lt;= boundary;</span>
-<span class="pc bpc" id="L235" title="1 of 2 branches missed.">    } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
-<span class="nc bnc" id="L236" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
-<span class="fc bfc" id="L237" title="All 2 branches covered.">      return value &gt;= boundary;</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">      return value &lt;= boundary;</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">    } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">      return value &gt;= boundary;</span>
     } else {
-<span class="nc" id="L239">      throw new IOException(</span>
+<span class="nc" id="L223">      throw new IOException(</span>
           &quot;can't compare for segmentRegistration &quot; + segmentRegistration);
     }
   }
@@ -251,14 +235,14 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   protected Long lastForComputingSegment(Long value, Long boundary)
       throws IOException {
-<span class="pc bpc" id="L254" title="1 of 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
-<span class="pc bpc" id="L255" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
-<span class="nc" id="L256">      return Math.max(value, boundary);</span>
-<span class="pc bpc" id="L257" title="1 of 2 branches missed.">    } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
-<span class="nc bnc" id="L258" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
-<span class="fc" id="L259">      return Math.min(value, boundary);</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L239" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
+<span class="fc" id="L240">      return Math.max(value, boundary);</span>
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">    } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="fc" id="L243">      return Math.min(value, boundary);</span>
     } else {
-<span class="nc" id="L261">      throw new IOException(</span>
+<span class="nc" id="L245">      throw new IOException(</span>
           &quot;can't compute last for segmentRegistration &quot; + segmentRegistration);
     }
   }
@@ -272,14 +256,14 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
    */
   @Override
   protected Long lastForComputingSegment() throws IOException {
-<span class="pc bpc" id="L275" title="1 of 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
-<span class="pc bpc" id="L276" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
-<span class="nc" id="L277">      return Collections.max(segmentValueTopList);</span>
-<span class="pc bpc" id="L278" title="1 of 2 branches missed.">    } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
-<span class="nc bnc" id="L279" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
-<span class="fc" id="L280">      return Collections.min(segmentValueTopList);</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {</span>
+<span class="fc" id="L261">      return Collections.max(segmentValueTopList);</span>
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">    } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="fc" id="L264">      return Collections.min(segmentValueTopList);</span>
     } else {
-<span class="nc" id="L282">      throw new IOException(</span>
+<span class="nc" id="L266">      throw new IOException(</span>
           &quot;can't compute last for segmentRegistration &quot; + segmentRegistration);
     }
   }
@@ -294,29 +278,29 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   protected Long boundaryForSegmentComputing(String segmentName)
       throws IOException {
-<span class="pc bpc" id="L297" title="1 of 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
-<span class="pc bpc" id="L298" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
-<span class="fc" id="L299">      Long boundary = boundaryForSegment(segmentName);</span>
-<span class="pc bpc" id="L300" title="1 of 2 branches missed.">      if (boundary == null) {</span>
-<span class="nc" id="L301">        return null;</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
+<span class="fc" id="L283">      Long boundary = boundaryForSegment(segmentName);</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">      if (boundary == null) {</span>
+<span class="nc" id="L285">        return null;</span>
       } else {
-<span class="pc bpc" id="L303" title="1 of 2 branches missed.">        if (segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
-<span class="fc" id="L304">          long correctionBoundary = 0;</span>
-<span class="fc bfc" id="L305" title="All 2 branches covered.">          for (String otherSegmentName : segmentValueTopListLast.keySet()) {</span>
-<span class="fc bfc" id="L306" title="All 2 branches covered.">            if (!otherSegmentName.equals(segmentName)) {</span>
-<span class="fc" id="L307">              Long otherBoundary = segmentValuesBoundary.get(otherSegmentName);</span>
-<span class="pc bpc" id="L308" title="1 of 2 branches missed.">              if (otherBoundary != null) {</span>
-<span class="fc" id="L309">                correctionBoundary += Math.max(0, otherBoundary - boundary);</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">        if (segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
+<span class="fc" id="L288">          long correctionBoundary = 0;</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">          for (String otherSegmentName : segmentValueTopListLast.keySet()) {</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">            if (!otherSegmentName.equals(segmentName)) {</span>
+<span class="fc" id="L291">              Long otherBoundary = segmentValuesBoundary.get(otherSegmentName);</span>
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">              if (otherBoundary != null) {</span>
+<span class="fc" id="L293">                correctionBoundary += Math.max(0, otherBoundary - boundary);</span>
               }
             }
-<span class="fc" id="L312">          }</span>
-<span class="fc" id="L313">          return boundary + correctionBoundary;</span>
+<span class="fc" id="L296">          }</span>
+<span class="fc" id="L297">          return boundary + correctionBoundary;</span>
         } else {
-<span class="nc" id="L315">          return boundary;</span>
+<span class="fc" id="L299">          return boundary;</span>
         }
       }
     } else {
-<span class="nc" id="L319">      throw new IOException(&quot;can't compute boundary for segmentRegistration &quot;</span>
+<span class="nc" id="L303">      throw new IOException(&quot;can't compute boundary for segmentRegistration &quot;</span>
           + segmentRegistration);
     }
   }
@@ -328,23 +312,18 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
    */
   @Override
   protected Long boundaryForSegment(String segmentName) throws IOException {
-<span class="pc bpc" id="L331" title="1 of 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
-<span class="pc bpc" id="L332" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
-<span class="fc" id="L333">      Long thisLast = segmentValueTopListLast.get(segmentName);</span>
-<span class="pc bpc" id="L334" title="1 of 2 branches missed.">      if (thisLast == null) {</span>
-<span class="nc" id="L335">        return null;</span>
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">      } else if (segmentRegistration.equals(SEGMENT_SORT_ASC)) {</span>
-<span class="nc" id="L337">        Long boundary = thisLast * segmentNumber;</span>
-<span class="nc" id="L338">        return boundary;</span>
-<span class="pc bpc" id="L339" title="1 of 2 branches missed.">      } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
-<span class="fc" id="L340">        Long boundary = Math.floorDiv(thisLast, segmentNumber);</span>
-<span class="fc" id="L341">        return boundary;</span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">    if (segmentRegistration.equals(SEGMENT_SORT_ASC)</span>
+<span class="pc bpc" id="L316" title="1 of 2 branches missed.">        || segmentRegistration.equals(SEGMENT_SORT_DESC)) {</span>
+<span class="fc" id="L317">      Long thisLast = segmentValueTopListLast.get(segmentName);</span>
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">      if (thisLast == null) {</span>
+<span class="nc" id="L319">        return null;</span>
+<span class="fc bfc" id="L320" title="All 2 branches covered.">      } else if (segmentRegistration.equals(SEGMENT_SORT_ASC)) {</span>
+<span class="fc" id="L321">        return thisLast * segmentNumber;</span>
       } else {
-        // should not happen
-<span class="nc" id="L344">        return null;</span>
+<span class="fc" id="L323">        return Math.floorDiv(thisLast, segmentNumber);</span>
       }
     } else {
-<span class="nc" id="L347">      throw new IOException(&quot;can't compute boundary for segmentRegistration &quot;</span>
+<span class="nc" id="L326">      throw new IOException(&quot;can't compute boundary for segmentRegistration &quot;</span>
           + segmentRegistration);
     }
   }
@@ -359,15 +338,15 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
   @Override
   protected Long stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException {
-<span class="nc bnc" id="L362" title="All 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)</span>
-<span class="nc bnc" id="L363" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
-<span class="nc bnc" id="L364" title="All 2 branches missed.">      if (segmentNumber == null) {</span>
-<span class="nc" id="L365">        return Long.valueOf(boundary);</span>
+<span class="nc bnc" id="L341" title="All 2 branches missed.">    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">      if (segmentNumber == null) {</span>
+<span class="nc" id="L344">        return Long.valueOf(boundary);</span>
       } else {
-<span class="nc" id="L367">        return Math.floorDiv(Long.parseLong(boundary), segmentNumber);</span>
+<span class="nc" id="L346">        return Math.floorDiv(Long.parseLong(boundary), segmentNumber);</span>
       }
     } else {
-<span class="nc" id="L370">      throw new IOException(</span>
+<span class="nc" id="L349">      throw new IOException(</span>
           &quot;not available for segmentRegistration &quot; + segmentRegistration);
     }
   }
@@ -381,12 +360,12 @@ public class MtasDataLongBasic extends MtasDataBasic&lt;Long, Double&gt; {
    */
   @Override
   public boolean validateSegmentBoundary(Object o) throws IOException {
-<span class="nc bnc" id="L384" title="All 2 branches missed.">    if (o instanceof Long) {</span>
-<span class="nc" id="L385">      return validateWithSegmentBoundary((Long) o);</span>
+<span class="nc bnc" id="L363" title="All 2 branches missed.">    if (o instanceof Long) {</span>
+<span class="nc" id="L364">      return validateWithSegmentBoundary((Long) o);</span>
     } else {
-<span class="nc" id="L387">      throw new IOException(&quot;incorrect type &quot;);</span>
+<span class="nc" id="L366">      throw new IOException(&quot;incorrect type &quot;);</span>
     }
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

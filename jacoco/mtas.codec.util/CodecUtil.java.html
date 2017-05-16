@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CodecUtil.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">CodecUtil.java</span></div><h1>CodecUtil.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodecUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">CodecUtil.java</span></div><h1>CodecUtil.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ import org.apache.lucene.search.spans.SpanWeight;
 /**
  * The Class CodecUtil.
  */
-<span class="nc" id="L28">public class CodecUtil {</span>
+public class CodecUtil {
 
   /** The Constant STATS_TYPE_GEOMETRICMEAN. */
   public static final String STATS_TYPE_GEOMETRICMEAN = &quot;geometricmean&quot;;
@@ -88,11 +89,11 @@ import org.apache.lucene.search.spans.SpanWeight;
   public static final String SORT_DESC = &quot;desc&quot;;
 
   /** The Constant STATS_FUNCTIONS. */
-<span class="fc" id="L91">  private static final List&lt;String&gt; STATS_FUNCTIONS = Arrays</span>
-<span class="fc" id="L92">      .asList(STATS_FUNCTION_DISTRIBUTION);</span>
+<span class="fc" id="L92">  private static final List&lt;String&gt; STATS_FUNCTIONS = Arrays</span>
+<span class="fc" id="L93">      .asList(STATS_FUNCTION_DISTRIBUTION);</span>
 
   /** The Constant STATS_TYPES. */
-<span class="fc" id="L95">  private final static List&lt;String&gt; STATS_TYPES = Arrays.asList(</span>
+<span class="fc" id="L96">  private static final List&lt;String&gt; STATS_TYPES = Arrays.asList(</span>
       STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_KURTOSIS, STATS_TYPE_MAX,
       STATS_TYPE_MEAN, STATS_TYPE_MIN, STATS_TYPE_N, STATS_TYPE_MEDIAN,
       STATS_TYPE_POPULATIONVARIANCE, STATS_TYPE_QUADRATICMEAN,
@@ -100,19 +101,19 @@ import org.apache.lucene.search.spans.SpanWeight;
       STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS, STATS_TYPE_VARIANCE);
 
   /** The Constant STATS_BASIC_TYPES. */
-<span class="fc" id="L103">  private final static List&lt;String&gt; STATS_BASIC_TYPES = Arrays</span>
-<span class="fc" id="L104">      .asList(STATS_TYPE_N, STATS_TYPE_SUM, STATS_TYPE_MEAN);</span>
+<span class="fc" id="L104">  private static final List&lt;String&gt; STATS_BASIC_TYPES = Arrays</span>
+<span class="fc" id="L105">      .asList(STATS_TYPE_N, STATS_TYPE_SUM, STATS_TYPE_MEAN);</span>
 
   /** The Constant STATS_ADVANCED_TYPES. */
-<span class="fc" id="L107">  private static final List&lt;String&gt; STATS_ADVANCED_TYPES = Arrays.asList(</span>
+<span class="fc" id="L108">  private static final List&lt;String&gt; STATS_ADVANCED_TYPES = Arrays.asList(</span>
       STATS_TYPE_MAX, STATS_TYPE_MIN, STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS,
       STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_STANDARDDEVIATION,
       STATS_TYPE_VARIANCE, STATS_TYPE_POPULATIONVARIANCE,
       STATS_TYPE_QUADRATICMEAN);
 
   /** The Constant STATS_FULL_TYPES. */
-<span class="fc" id="L114">  private static final List&lt;String&gt; STATS_FULL_TYPES = Arrays</span>
-<span class="fc" id="L115">      .asList(STATS_TYPE_KURTOSIS, STATS_TYPE_MEDIAN, STATS_TYPE_SKEWNESS);</span>
+<span class="fc" id="L115">  private static final List&lt;String&gt; STATS_FULL_TYPES = Arrays</span>
+<span class="fc" id="L116">      .asList(STATS_TYPE_KURTOSIS, STATS_TYPE_MEDIAN, STATS_TYPE_SKEWNESS);</span>
 
   /** The Constant STATS_BASIC. */
   public static final String STATS_BASIC = &quot;basic&quot;;
@@ -130,37 +131,41 @@ import org.apache.lucene.search.spans.SpanWeight;
   public static final String DATA_TYPE_DOUBLE = &quot;double&quot;;
 
   /** The fp stats items. */
-<span class="fc" id="L133">  private static Pattern fpStatsItems = Pattern</span>
-<span class="fc" id="L134">      .compile(&quot;(([^\\(,]+)(\\([^\\)]*\\))?)&quot;);</span>
+<span class="fc" id="L134">  private static Pattern fpStatsItems = Pattern</span>
+<span class="fc" id="L135">      .compile(&quot;(([^\\(,]+)(\\([^\\)]*\\))?)&quot;);</span>
 
   /** The fp stats function items. */
-<span class="fc" id="L137">  private static Pattern fpStatsFunctionItems = Pattern</span>
-<span class="fc" id="L138">      .compile(&quot;(([^\\(,]+)(\\(([^\\)]*)\\)))&quot;);</span>
+<span class="fc" id="L138">  private static Pattern fpStatsFunctionItems = Pattern</span>
+<span class="fc" id="L139">      .compile(&quot;(([^\\(,]+)(\\(([^\\)]*)\\)))&quot;);</span>
 
+  /**
+   * Instantiates a new codec util.
+   */
+<span class="nc" id="L144">  private CodecUtil() {</span>
+    //don't do anything
+<span class="nc" id="L146">  }</span>
+  
   /**
    * Checks if is single position prefix.
    *
-   * @param fieldInfo
-   *          the field info
-   * @param prefix
-   *          the prefix
+   * @param fieldInfo the field info
+   * @param prefix the prefix
    * @return true, if is single position prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static boolean isSinglePositionPrefix(FieldInfo fieldInfo,
       String prefix) throws IOException {
-<span class="pc bpc" id="L153" title="1 of 2 branches missed.">    if (fieldInfo == null) {</span>
-<span class="nc" id="L154">      throw new IOException(&quot;no fieldInfo&quot;);</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">    if (fieldInfo == null) {</span>
+<span class="nc" id="L159">      throw new IOException(&quot;no fieldInfo&quot;);</span>
     } else {
-<span class="fc" id="L156">      String info = fieldInfo.getAttribute(</span>
+<span class="fc" id="L161">      String info = fieldInfo.getAttribute(</span>
           MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
-<span class="pc bpc" id="L158" title="1 of 2 branches missed.">      if (info == null) {</span>
-<span class="nc" id="L159">        throw new IOException(&quot;no &quot;</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">      if (info == null) {</span>
+<span class="nc" id="L164">        throw new IOException(&quot;no &quot;</span>
             + MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
       } else {
-<span class="fc" id="L162">        return Arrays.asList(info.split(Pattern.quote(MtasToken.DELIMITER)))</span>
-<span class="fc" id="L163">            .contains(prefix);</span>
+<span class="fc" id="L167">        return Arrays.asList(info.split(Pattern.quote(MtasToken.DELIMITER)))</span>
+<span class="fc" id="L168">            .contains(prefix);</span>
       }
     }
   }
@@ -168,92 +173,87 @@ import org.apache.lucene.search.spans.SpanWeight;
   /**
    * Term value.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the string
    */
   public static String termValue(String term) {
-<span class="nc" id="L176">    int i = term.indexOf(MtasToken.DELIMITER);</span>
-<span class="nc" id="L177">    String value = null;</span>
-<span class="nc bnc" id="L178" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
-<span class="nc" id="L179">      value = term.substring((i + MtasToken.DELIMITER.length()));</span>
-<span class="nc bnc" id="L180" title="All 2 branches missed.">      value = (value.length() &gt; 0) ? value : null;</span>
+<span class="nc" id="L180">    int i = term.indexOf(MtasToken.DELIMITER);</span>
+<span class="nc" id="L181">    String value = null;</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="nc" id="L183">      value = term.substring((i + MtasToken.DELIMITER.length()));</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">      value = (value.length() &gt; 0) ? value : null;</span>
     }
-<span class="nc bnc" id="L182" title="All 2 branches missed.">    return (value == null) ? null : value.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">    return (value == null) ? null : value.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
   }
 
   /**
    * Term prefix.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the string
    */
   public static String termPrefix(String term) {
-<span class="nc" id="L193">    int i = term.indexOf(MtasToken.DELIMITER);</span>
-<span class="nc" id="L194">    String prefix = term;</span>
-<span class="nc bnc" id="L195" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
-<span class="nc" id="L196">      prefix = term.substring(0, i);</span>
+<span class="nc" id="L196">    int i = term.indexOf(MtasToken.DELIMITER);</span>
+<span class="nc" id="L197">    String prefix = term;</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="nc" id="L199">      prefix = term.substring(0, i);</span>
     }
-<span class="nc" id="L198">    return prefix.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+<span class="nc" id="L201">    return prefix.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
   }
 
   /**
    * Term prefix value.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the string
    */
   public static String termPrefixValue(String term) {
-<span class="nc bnc" id="L209" title="All 2 branches missed.">    return (term == null) ? null : term.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">    return (term == null) ? null : term.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
   }
 
   /**
-   * Collect.
+   * Collect field.
    *
-   * @param field
-   *          the field
-   * @param searcher
-   *          the searcher
-   * @param rawReader
-   *          the raw reader
-   * @param fullDocList
-   *          the full doc list
-   * @param fullDocSet
-   *          the full doc set
-   * @param fieldStats
-   *          the field stats
-   * @throws IllegalAccessException
-   *           the illegal access exception
-   * @throws IllegalArgumentException
-   *           the illegal argument exception
-   * @throws InvocationTargetException
-   *           the invocation target exception
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param searcher the searcher
+   * @param rawReader the raw reader
+   * @param fullDocList the full doc list
+   * @param fullDocSet the full doc set
+   * @param fieldStats the field stats
+   * @throws IllegalAccessException the illegal access exception
+   * @throws IllegalArgumentException the illegal argument exception
+   * @throws InvocationTargetException the invocation target exception
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void collectField(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList&lt;Integer&gt; fullDocList,
       ArrayList&lt;Integer&gt; fullDocSet, ComponentField fieldStats)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
-<span class="pc bpc" id="L241" title="1 of 2 branches missed.">    if (fieldStats != null) {</span>
-<span class="fc" id="L242">      IndexReader reader = searcher.getIndexReader();</span>
-<span class="fc" id="L243">      HashMap&lt;MtasSpanQuery, SpanWeight&gt; spansQueryWeight = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">    if (fieldStats != null) {</span>
+<span class="fc" id="L234">      IndexReader reader = searcher.getIndexReader();</span>
+<span class="fc" id="L235">      HashMap&lt;MtasSpanQuery, SpanWeight&gt; spansQueryWeight = new HashMap&lt;&gt;();</span>
       // only if spanQueryList is not empty
-<span class="fc bfc" id="L245" title="All 2 branches covered.">      if (fieldStats.spanQueryList.size() &gt; 0) {</span>
-<span class="fc bfc" id="L246" title="All 2 branches covered.">        for (MtasSpanQuery sq : fieldStats.spanQueryList) {</span>
-<span class="fc" id="L247">          spansQueryWeight.put(sq, ((MtasSpanQuery) sq.rewrite(reader))</span>
-<span class="fc" id="L248">              .createWeight(searcher, false));</span>
-<span class="fc" id="L249">        }</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">      if (fieldStats.spanQueryList.size() &gt; 0) {</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">        for (MtasSpanQuery sq : fieldStats.spanQueryList) {</span>
+<span class="fc" id="L239">          spansQueryWeight.put(sq, ((MtasSpanQuery) sq.rewrite(reader))</span>
+<span class="fc" id="L240">              .createWeight(searcher, false));</span>
+<span class="fc" id="L241">        }</span>
       }
       // collect
-<span class="fc" id="L252">      CodecCollector.collectField(field, searcher, reader, rawReader,</span>
+<span class="fc" id="L244">      CodecCollector.collectField(field, searcher, reader, rawReader,</span>
           fullDocList, fullDocSet, fieldStats, spansQueryWeight);
     }
-<span class="fc" id="L255">  }</span>
+<span class="fc" id="L247">  }</span>
 
+  /**
+   * Collect join.
+   *
+   * @param reader the reader
+   * @param fullDocSet the full doc set
+   * @param joinInfo the join info
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public static void collectJoin(IndexReader reader,
       ArrayList&lt;Integer&gt; fullDocSet, ComponentJoin joinInfo)
       throws IOException {
@@ -265,95 +265,96 @@ import org.apache.lucene.search.spans.SpanWeight;
   /**
    * Creates the stats items.
    *
-   * @param statsType
-   *          the stats type
-   * @return the tree set
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param statsType the stats type
+   * @return the sorted set
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  static TreeSet&lt;String&gt; createStatsItems(String statsType) throws IOException {
-<span class="fc" id="L275">    TreeSet&lt;String&gt; statsItems = new TreeSet&lt;String&gt;();</span>
-<span class="fc" id="L276">    TreeSet&lt;String&gt; functionItems = new TreeSet&lt;String&gt;();</span>
-<span class="pc bpc" id="L277" title="1 of 2 branches missed.">    if (statsType != null) {</span>
-<span class="fc" id="L278">      Matcher m = fpStatsItems.matcher(statsType.trim());</span>
-<span class="fc bfc" id="L279" title="All 2 branches covered.">      while (m.find()) {</span>
-<span class="fc" id="L280">        String tmpStatsItem = m.group(2).trim();</span>
-<span class="fc bfc" id="L281" title="All 2 branches covered.">        if (STATS_TYPES.contains(tmpStatsItem)) {</span>
-<span class="fc" id="L282">          statsItems.add(tmpStatsItem);</span>
-<span class="pc bpc" id="L283" title="1 of 2 branches missed.">        } else if (tmpStatsItem.equals(STATS_TYPE_ALL)) {</span>
-<span class="fc bfc" id="L284" title="All 2 branches covered.">          for (String type : STATS_TYPES) {</span>
-<span class="fc" id="L285">            statsItems.add(type);</span>
-<span class="fc" id="L286">          }</span>
-<span class="nc bnc" id="L287" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
-<span class="nc bnc" id="L288" title="All 2 branches missed.">          if (m.group(3) == null) {</span>
-<span class="nc" id="L289">            throw new IOException(&quot;'&quot; + tmpStatsItem + &quot;' should be called as '&quot;</span>
+  static SortedSet&lt;String&gt; createStatsItems(String statsType) throws IOException {
+<span class="fc" id="L273">    SortedSet&lt;String&gt; statsItems = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L274">    SortedSet&lt;String&gt; functionItems = new TreeSet&lt;&gt;();</span>
+<span class="pc bpc" id="L275" title="1 of 2 branches missed.">    if (statsType != null) {</span>
+<span class="fc" id="L276">      Matcher m = fpStatsItems.matcher(statsType.trim());</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">      while (m.find()) {</span>
+<span class="fc" id="L278">        String tmpStatsItem = m.group(2).trim();</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">        if (STATS_TYPES.contains(tmpStatsItem)) {</span>
+<span class="fc" id="L280">          statsItems.add(tmpStatsItem);</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        } else if (tmpStatsItem.equals(STATS_TYPE_ALL)) {</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">          for (String type : STATS_TYPES) {</span>
+<span class="fc" id="L283">            statsItems.add(type);</span>
+<span class="fc" id="L284">          }</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">          if (m.group(3) == null) {</span>
+<span class="nc" id="L287">            throw new IOException(&quot;'&quot; + tmpStatsItem + &quot;' should be called as '&quot;</span>
                 + tmpStatsItem + &quot;()' with an optional argument&quot;);
           } else {
-<span class="nc" id="L292">            functionItems.add(m.group(1).trim());</span>
+<span class="nc" id="L290">            functionItems.add(m.group(1).trim());</span>
           }
         } else {
-<span class="nc" id="L295">          throw new IOException(&quot;unknown statsType '&quot; + tmpStatsItem + &quot;'&quot;);</span>
+<span class="nc" id="L293">          throw new IOException(&quot;unknown statsType '&quot; + tmpStatsItem + &quot;'&quot;);</span>
         }
-<span class="fc" id="L297">      }</span>
+<span class="fc" id="L295">      }</span>
     }
-<span class="pc bpc" id="L299" title="3 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
-<span class="nc" id="L300">      statsItems.add(STATS_TYPE_SUM);</span>
-<span class="nc" id="L301">      statsItems.add(STATS_TYPE_N);</span>
-<span class="nc" id="L302">      statsItems.add(STATS_TYPE_MEAN);</span>
+<span class="pc bpc" id="L297" title="3 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
+<span class="nc" id="L298">      statsItems.add(STATS_TYPE_SUM);</span>
+<span class="nc" id="L299">      statsItems.add(STATS_TYPE_N);</span>
+<span class="nc" id="L300">      statsItems.add(STATS_TYPE_MEAN);</span>
     }
-<span class="pc bpc" id="L304" title="1 of 2 branches missed.">    if (functionItems.size() &gt; 0) {</span>
-<span class="nc" id="L305">      statsItems.addAll(functionItems);</span>
+<span class="pc bpc" id="L302" title="1 of 2 branches missed.">    if (functionItems.size() &gt; 0) {</span>
+<span class="nc" id="L303">      statsItems.addAll(functionItems);</span>
     }
-<span class="fc" id="L307">    return statsItems;</span>
+<span class="fc" id="L305">    return statsItems;</span>
   }
 
   /**
    * Creates the stats type.
    *
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param functionParser
-   *          the function parser
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param functionParser the function parser
    * @return the string
    */
   static String createStatsType(Set&lt;String&gt; statsItems, String sortType,
       MtasFunctionParserFunction functionParser) {
-<span class="fc" id="L323">    String statsType = STATS_BASIC;</span>
-<span class="fc bfc" id="L324" title="All 2 branches covered.">    for (String statsItem : statsItems) {</span>
-<span class="fc bfc" id="L325" title="All 2 branches covered.">      if (STATS_FULL_TYPES.contains(statsItem)) {</span>
-<span class="fc" id="L326">        statsType = STATS_FULL;</span>
-<span class="fc" id="L327">        break;</span>
-<span class="fc bfc" id="L328" title="All 2 branches covered.">      } else if (STATS_ADVANCED_TYPES.contains(statsItem)) {</span>
-<span class="fc" id="L329">        statsType = STATS_ADVANCED;</span>
-<span class="fc bfc" id="L330" title="All 2 branches covered.">      } else if (statsType != STATS_ADVANCED</span>
-<span class="pc bpc" id="L331" title="1 of 2 branches missed.">          &amp;&amp; STATS_BASIC_TYPES.contains(statsItem)) {</span>
-<span class="fc" id="L332">        statsType = STATS_BASIC;</span>
+<span class="fc" id="L318">    String statsType = STATS_BASIC;</span>
+<span class="fc bfc" id="L319" title="All 2 branches covered.">    for (String statsItem : statsItems) {</span>
+<span class="fc bfc" id="L320" title="All 2 branches covered.">      if (STATS_FULL_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L321">        statsType = STATS_FULL;</span>
+<span class="fc" id="L322">        break;</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">      } else if (STATS_ADVANCED_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L324">        statsType = STATS_ADVANCED;</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">      } else if (statsType != STATS_ADVANCED</span>
+<span class="pc bpc" id="L326" title="1 of 2 branches missed.">          &amp;&amp; STATS_BASIC_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L327">        statsType = STATS_BASIC;</span>
       } else {
-<span class="fc" id="L334">        Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());</span>
-<span class="pc bpc" id="L335" title="1 of 2 branches missed.">        if (m.find()) {</span>
-<span class="nc bnc" id="L336" title="All 2 branches missed.">          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {</span>
-<span class="nc" id="L337">            statsType = STATS_FULL;</span>
-<span class="nc" id="L338">            break;</span>
+<span class="fc" id="L329">        Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());</span>
+<span class="pc bpc" id="L330" title="1 of 2 branches missed.">        if (m.find()) {</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {</span>
+<span class="nc" id="L332">            statsType = STATS_FULL;</span>
+<span class="nc" id="L333">            break;</span>
           }
         }
       }
-<span class="fc" id="L342">    }</span>
-<span class="pc bpc" id="L343" title="1 of 4 branches missed.">    if (sortType != null &amp;&amp; STATS_TYPES.contains(sortType)) {</span>
-<span class="pc bpc" id="L344" title="1 of 2 branches missed.">      if (STATS_FULL_TYPES.contains(sortType)) {</span>
-<span class="nc" id="L345">        statsType = STATS_FULL;</span>
-<span class="pc bpc" id="L346" title="1 of 2 branches missed.">      } else if (STATS_ADVANCED_TYPES.contains(sortType)) {</span>
-<span class="nc bnc" id="L347" title="All 4 branches missed.">        statsType = (statsType == null || statsType != STATS_FULL)</span>
+<span class="fc" id="L337">    }</span>
+<span class="fc bfc" id="L338" title="All 4 branches covered.">    if (sortType != null &amp;&amp; STATS_TYPES.contains(sortType)) {</span>
+<span class="pc bpc" id="L339" title="1 of 2 branches missed.">      if (STATS_FULL_TYPES.contains(sortType)) {</span>
+<span class="nc" id="L340">        statsType = STATS_FULL;</span>
+<span class="pc bpc" id="L341" title="1 of 2 branches missed.">      } else if (STATS_ADVANCED_TYPES.contains(sortType)) {</span>
+<span class="nc bnc" id="L342" title="All 4 branches missed.">        statsType = (statsType == null || statsType != STATS_FULL)</span>
             ? STATS_ADVANCED : statsType;
       } 
     }
-<span class="fc" id="L351">    return statsType;</span>
+<span class="fc" id="L346">    return statsType;</span>
   }
   
+  /**
+   * Checks if is stats type.
+   *
+   * @param type the type
+   * @return true, if is stats type
+   */
   public static boolean isStatsType(String type) {
-<span class="fc" id="L355">    return STATS_TYPES.contains(type);</span>
+<span class="fc" id="L356">    return STATS_TYPES.contains(type);</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

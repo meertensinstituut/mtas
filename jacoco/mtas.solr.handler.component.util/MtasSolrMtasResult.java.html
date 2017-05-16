@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSolrMtasResult.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.handler.component.util</a> &gt; <span class="el_source">MtasSolrMtasResult.java</span></div><h1>MtasSolrMtasResult.java</h1><pre class="source lang-java linenums">package mtas.solr.handler.component.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSolrMtasResult.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.handler.component.util</a> &gt; <span class="el_source">MtasSolrMtasResult.java</span></div><h1>MtasSolrMtasResult.java</h1><pre class="source lang-java linenums">package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -15,237 +16,232 @@ import mtas.codec.util.collector.MtasDataCollectorResult;
 import mtas.codec.util.collector.MtasDataItem;
 
 /**
- * The Class MtasSolrResult.
+ * The Class MtasSolrMtasResult.
  */
 public class MtasSolrMtasResult implements Serializable {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The stats type. */
+  /** The data type. */
   public String dataType;
+  
+  /** The stats type. */
   public String statsType;
 
   /** The stats items. */
-  public Set&lt;String&gt; statsItems;
+  public SortedSet&lt;String&gt; statsItems;
 
-  /** The sort direction. */
+  /** The sort type. */
   public String sortType;
+  
+  /** The sort direction. */
   public String sortDirection;
 
-  /** The number. */
+  /** The start. */
   public Integer start;
+  
+  /** The number. */
   public Integer number;
 
   /** The data collector. */
-<span class="fc" id="L41">  public MtasDataCollector&lt;?, ?&gt; dataCollector = null;</span>
+<span class="fc" id="L48">  public MtasDataCollector&lt;?, ?&gt; dataCollector = null;</span>
 
   /** The function data. */
   public Map&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData;
 
-  /** The sub stats type. */
+  /** The sub data type. */
   private String[] subDataType;
+  
+  /** The sub stats type. */
   private String[] subStatsType;
 
   /** The sub stats items. */
-  private Set&lt;String&gt;[] subStatsItems;
+  private SortedSet&lt;String&gt;[] subStatsItems;
 
-  /** The sub sort direction. */
+  /** The sub sort type. */
   private String[] subSortType;
+  
+  /** The sub sort direction. */
   private String[] subSortDirection;
 
-  /** The sub number. */
+  /** The sub start. */
   private Integer[] subStart;
+  
+  /** The sub number. */
   private Integer[] subNumber;
 
   /**
-   * Instantiates a new mtas solr result.
+   * Instantiates a new mtas solr mtas result.
    *
-   * @param dataCollector
-   *          the data collector
-   * @param dataType
-   *          the data type
-   * @param statsType
-   *          the stats type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param functionData
-   *          the function data
+   * @param dataCollector the data collector
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param functionData the function data
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public MtasSolrMtasResult(MtasDataCollector&lt;?, ?&gt; dataCollector,
-      String[] dataType, String[] statsType, Set&lt;String&gt;[] statsItems,
+      String[] dataType, String[] statsType, SortedSet&lt;String&gt;[] statsItems,
       String[] sortType, String[] sortDirection, Integer[] start,
       Integer[] number,
-<span class="fc" id="L88">      Map&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData) {</span>
-<span class="fc" id="L89">    this.dataCollector = dataCollector;</span>
-<span class="fc" id="L90">    this.functionData = functionData;</span>
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">    this.dataType = (dataType == null) ? null : dataType[0];</span>
-<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    this.statsType = (statsType == null) ? null : statsType[0];</span>
-<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    this.statsItems = (statsItems == null) ? null : statsItems[0];</span>
-<span class="pc bpc" id="L94" title="1 of 2 branches missed.">    this.sortType = (sortType == null) ? null : sortType[0];</span>
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    this.sortDirection = (sortDirection == null) ? null : sortDirection[0];</span>
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    this.start = (start == null) ? null : start[0];</span>
-<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    this.number = (number == null) ? null : number[0];</span>
-<span class="fc" id="L98">    this.subStart = null;</span>
-<span class="fc" id="L99">    this.subNumber = null;</span>
-<span class="pc bpc" id="L100" title="2 of 4 branches missed.">    if ((dataType != null) &amp;&amp; (dataType.length &gt; 1)) {</span>
-<span class="nc" id="L101">      subDataType = new String[dataType.length - 1];</span>
-<span class="nc" id="L102">      subStatsType = new String[dataType.length - 1];</span>
-<span class="nc" id="L103">      subStatsItems = new TreeSet[dataType.length - 1];</span>
-<span class="nc" id="L104">      subSortType = new String[dataType.length - 1];</span>
-<span class="nc" id="L105">      subSortDirection = new String[dataType.length - 1];</span>
-<span class="nc" id="L106">      System.arraycopy(dataType, 1, subDataType, 0, dataType.length - 1);</span>
-<span class="nc" id="L107">      System.arraycopy(statsType, 1, subStatsType, 0, dataType.length - 1);</span>
-<span class="nc" id="L108">      System.arraycopy(statsItems, 1, subStatsItems, 0, dataType.length - 1);</span>
-<span class="nc" id="L109">      System.arraycopy(sortType, 1, subSortType, 0, dataType.length - 1);</span>
-<span class="nc" id="L110">      System.arraycopy(sortDirection, 1, subSortDirection, 0,</span>
+<span class="fc" id="L92">      Map&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData) {</span>
+<span class="fc" id="L93">    this.dataCollector = dataCollector;</span>
+<span class="fc" id="L94">    this.functionData = functionData;</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    this.dataType = (dataType == null) ? null : dataType[0];</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    this.statsType = (statsType == null) ? null : statsType[0];</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    this.statsItems = (statsItems == null) ? null : statsItems[0];</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    this.sortType = (sortType == null) ? null : sortType[0];</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    this.sortDirection = (sortDirection == null) ? null : sortDirection[0];</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    this.start = (start == null) ? null : start[0];</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    this.number = (number == null) ? null : number[0];</span>
+<span class="fc" id="L102">    this.subStart = null;</span>
+<span class="fc" id="L103">    this.subNumber = null;</span>
+<span class="pc bpc" id="L104" title="2 of 4 branches missed.">    if ((dataType != null) &amp;&amp; (dataType.length &gt; 1)) {</span>
+<span class="nc" id="L105">      subDataType = new String[dataType.length - 1];</span>
+<span class="nc" id="L106">      subStatsType = new String[dataType.length - 1];</span>
+<span class="nc" id="L107">      subStatsItems = new TreeSet[dataType.length - 1];</span>
+<span class="nc" id="L108">      subSortType = new String[dataType.length - 1];</span>
+<span class="nc" id="L109">      subSortDirection = new String[dataType.length - 1];</span>
+<span class="nc" id="L110">      System.arraycopy(dataType, 1, subDataType, 0, dataType.length - 1);</span>
+<span class="nc" id="L111">      System.arraycopy(statsType, 1, subStatsType, 0, dataType.length - 1);</span>
+<span class="nc" id="L112">      System.arraycopy(statsItems, 1, subStatsItems, 0, dataType.length - 1);</span>
+<span class="nc" id="L113">      System.arraycopy(sortType, 1, subSortType, 0, dataType.length - 1);</span>
+<span class="nc" id="L114">      System.arraycopy(sortDirection, 1, subSortDirection, 0,</span>
           dataType.length - 1);
     } else {
-<span class="fc" id="L113">      subDataType = null;</span>
-<span class="fc" id="L114">      subStatsType = null;</span>
-<span class="fc" id="L115">      subStatsItems = null;</span>
-<span class="fc" id="L116">      subSortType = null;</span>
-<span class="fc" id="L117">      subSortDirection = null;</span>
+<span class="fc" id="L117">      subDataType = null;</span>
+<span class="fc" id="L118">      subStatsType = null;</span>
+<span class="fc" id="L119">      subStatsItems = null;</span>
+<span class="fc" id="L120">      subSortType = null;</span>
+<span class="fc" id="L121">      subSortDirection = null;</span>
     }
-<span class="fc" id="L119">  }</span>
+<span class="fc" id="L123">  }</span>
 
   /**
-   * Instantiates a new mtas solr result.
+   * Instantiates a new mtas solr mtas result.
    *
-   * @param dataCollector
-   *          the data collector
-   * @param dataType
-   *          the data type
-   * @param statsType
-   *          the stats type
-   * @param statsItems
-   *          the stats items
-   * @param functionData
-   *          the function data
+   * @param dataCollector the data collector
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param functionData the function data
    */
   @SuppressWarnings(&quot;unchecked&quot;)
-  public MtasSolrMtasResult(MtasDataCollector&lt;?, ?&gt; dataCollector, String dataType,
-      String statsType, Set&lt;String&gt; statsItems,
+  public MtasSolrMtasResult(MtasDataCollector&lt;?, ?&gt; dataCollector,
+      String dataType, String statsType, SortedSet&lt;String&gt; statsItems,
       Map&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData) {
-<span class="fc" id="L139">    this(dataCollector, new String[] { dataType }, new String[] { statsType },</span>
-        new Set[] { statsItems }, new String[] { null },
-<span class="fc" id="L141">        new String[] { null }, new Integer[] { 0 }, new Integer[] { 1 },</span>
+<span class="fc" id="L138">    this(dataCollector, new String[] { dataType }, new String[] { statsType },</span>
+        new SortedSet[] { statsItems }, new String[] { null },
+<span class="fc" id="L140">        new String[] { null }, new Integer[] { 0 }, new Integer[] { 1 },</span>
         functionData);
-<span class="fc" id="L143">  }</span>
+<span class="fc" id="L142">  }</span>
 
   /**
    * Merge.
    *
-   * @param newItem
-   *          the new item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param newItem the new item
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  void merge(MtasSolrMtasResult newItem) throws IOException {
-<span class="fc" id="L154">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map = new HashMap&lt;&gt;();</span>
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    if(newItem.dataCollector.withTotal()) {</span>
-<span class="nc" id="L156">      dataCollector.setWithTotal();</span>
+  void merge(MtasSolrMtasResult newItem) throws IOException { 
+<span class="fc" id="L151">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">    if (newItem.dataCollector.withTotal()) {</span>
+<span class="fc" id="L153">      dataCollector.setWithTotal();</span>
     }
-<span class="fc" id="L158">    dataCollector.merge(newItem.dataCollector, map, true);</span>
-<span class="fc bfc" id="L159" title="All 2 branches covered.">    if (newItem.functionData != null) {</span>
-<span class="pc bpc" id="L160" title="1 of 2 branches missed.">      if (functionData == null) {</span>
-<span class="nc" id="L161">        functionData = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L155">    dataCollector.merge(newItem.dataCollector, map, true);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (newItem.functionData != null) {</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">      if (functionData == null) {</span>
+<span class="nc" id="L158">        functionData = new HashMap&lt;&gt;();</span>
       }
-<span class="fc bfc" id="L163" title="All 2 branches covered.">      for (MtasDataCollector&lt;?, ?&gt; keyCollector : newItem.functionData</span>
-<span class="fc" id="L164">          .keySet()) {</span>
-<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if (map.containsKey(keyCollector)) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">      for (MtasDataCollector&lt;?, ?&gt; keyCollector : newItem.functionData</span>
+<span class="fc" id="L161">          .keySet()) {</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        if (map.containsKey(keyCollector)) {</span>
           // compute mapped key
-<span class="fc" id="L167">          MtasDataCollector&lt;?, ?&gt; newKeyCollector = keyCollector;</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">          while (map.containsKey(newKeyCollector)) {</span>
-<span class="fc" id="L169">            newKeyCollector = map.get(keyCollector);</span>
+<span class="fc" id="L164">          MtasDataCollector&lt;?, ?&gt; newKeyCollector = keyCollector;</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">          while (map.containsKey(newKeyCollector)) {</span>
+<span class="fc" id="L166">            newKeyCollector = map.get(keyCollector);</span>
           }
-<span class="pc bpc" id="L171" title="1 of 2 branches missed.">          if (functionData.containsKey(newKeyCollector)) {</span>
-<span class="fc" id="L172">            HashMap&lt;String, MtasSolrMtasResult&gt; tmpList = functionData</span>
-<span class="fc" id="L173">                .get(newKeyCollector);</span>
-<span class="pc bpc" id="L174" title="1 of 2 branches missed.">            for (String functionKey : newItem.functionData.get(keyCollector)</span>
-<span class="fc" id="L175">                .keySet()) {</span>
-<span class="nc bnc" id="L176" title="All 2 branches missed.">              if (tmpList.containsKey(functionKey)) {</span>
-<span class="nc" id="L177">                tmpList.get(functionKey).merge(</span>
-<span class="nc" id="L178">                    newItem.functionData.get(keyCollector).get(functionKey));</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">          if (functionData.containsKey(newKeyCollector)) {</span>
+<span class="fc" id="L169">            HashMap&lt;String, MtasSolrMtasResult&gt; tmpList = functionData</span>
+<span class="fc" id="L170">                .get(newKeyCollector);</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">            for (String functionKey : newItem.functionData.get(keyCollector)</span>
+<span class="fc" id="L172">                .keySet()) {</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">              if (tmpList.containsKey(functionKey)) {</span>
+<span class="nc" id="L174">                tmpList.get(functionKey).merge(</span>
+<span class="nc" id="L175">                    newItem.functionData.get(keyCollector).get(functionKey));</span>
               } else {
-<span class="nc" id="L180">                tmpList.put(functionKey,</span>
-<span class="nc" id="L181">                    newItem.functionData.get(keyCollector).get(functionKey));</span>
+<span class="nc" id="L177">                tmpList.put(functionKey,</span>
+<span class="nc" id="L178">                    newItem.functionData.get(keyCollector).get(functionKey));</span>
               }
-<span class="nc" id="L183">            }</span>
-<span class="fc" id="L184">          } else {</span>
-<span class="nc" id="L185">            functionData.put(newKeyCollector,</span>
-<span class="nc" id="L186">                newItem.functionData.get(keyCollector));</span>
+<span class="nc" id="L180">            }</span>
+<span class="fc" id="L181">          } else {</span>
+<span class="nc" id="L182">            functionData.put(newKeyCollector,</span>
+<span class="nc" id="L183">                newItem.functionData.get(keyCollector));</span>
           }
         }
-<span class="fc" id="L189">      }</span>
+<span class="fc" id="L186">      }</span>
     }
-<span class="fc" id="L191">  }</span>
+<span class="fc" id="L188">  }</span>
 
   /**
    * Gets the data.
    *
-   * @param showDebugInfo
-   *          the show debug info
+   * @param showDebugInfo the show debug info
    * @return the data
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   NamedList&lt;Object&gt; getData(boolean showDebugInfo) throws IOException {
-<span class="fc" id="L203">    if (dataCollector.getCollectorType()</span>
-<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="fc" id="L205">      NamedList&lt;Object&gt; mtasResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L198">    if (dataCollector.getCollectorType()</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="fc" id="L200">      NamedList&lt;Object&gt; mtasResponse = new SimpleOrderedMap&lt;&gt;();</span>
       // functions
-<span class="fc" id="L207">      Map&lt;String, NamedList&lt;Object&gt;&gt; functionList = new HashMap&lt;&gt;();</span>
-<span class="pc bpc" id="L208" title="1 of 4 branches missed.">      if (functionData != null &amp;&amp; functionData.containsKey(dataCollector)) {</span>
-<span class="fc" id="L209">        HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = functionData</span>
-<span class="fc" id="L210">            .get(dataCollector);</span>
-<span class="pc bpc" id="L211" title="1 of 2 branches missed.">        for (Entry &lt;String, MtasSolrMtasResult&gt; entry : functionDataItem.entrySet()) {</span>
-<span class="nc" id="L212">          MtasSolrMtasResult functionResult = entry.getValue();</span>
-<span class="nc" id="L213">          if (functionResult.dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L214" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L215">            NamedList&lt;Object&gt; functionData = functionResult</span>
-<span class="nc" id="L216">                .getData(showDebugInfo);</span>
-<span class="nc" id="L217">            functionList.put(entry.getKey(), functionData);</span>
-<span class="nc" id="L218">          } else {</span>
-<span class="nc" id="L219">            throw new IOException(&quot;unexpected function collectorType &quot;</span>
-<span class="nc" id="L220">                + functionResult.dataCollector.getCollectorType());</span>
+<span class="fc" id="L202">      Map&lt;String, NamedList&lt;Object&gt;&gt; functionList = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L203" title="1 of 4 branches missed.">      if (functionData != null &amp;&amp; functionData.containsKey(dataCollector)) {</span>
+<span class="fc" id="L204">        HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = functionData</span>
+<span class="fc" id="L205">            .get(dataCollector);</span>
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">        for (Entry&lt;String, MtasSolrMtasResult&gt; entry : functionDataItem</span>
+<span class="fc" id="L207">            .entrySet()) {</span>
+<span class="nc" id="L208">          MtasSolrMtasResult functionResult = entry.getValue();</span>
+<span class="nc" id="L209">          if (functionResult.dataCollector.getCollectorType()</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L211">            NamedList&lt;Object&gt; functionData = functionResult</span>
+<span class="nc" id="L212">                .getData(showDebugInfo);</span>
+<span class="nc" id="L213">            functionList.put(entry.getKey(), functionData);</span>
+<span class="nc" id="L214">          } else {</span>
+<span class="nc" id="L215">            throw new IOException(&quot;unexpected function collectorType &quot;</span>
+<span class="nc" id="L216">                + functionResult.dataCollector.getCollectorType());</span>
           }
-<span class="nc" id="L222">        }</span>
+<span class="nc" id="L218">        }</span>
       }
       // main result
-<span class="fc" id="L225">      MtasDataItem&lt;?, ?&gt; dataItem = dataCollector.getResult().getData();</span>
-<span class="pc bpc" id="L226" title="1 of 2 branches missed.">      if (dataItem != null) {</span>
-<span class="fc" id="L227">        mtasResponse.addAll(dataItem.rewrite(showDebugInfo));</span>
-<span class="pc bpc" id="L228" title="1 of 2 branches missed.">        if (functionList.size() &gt; 0) {</span>
-<span class="nc" id="L229">          mtasResponse.add(&quot;functions&quot;, functionList);</span>
+<span class="fc" id="L221">      MtasDataItem&lt;?, ?&gt; dataItem = dataCollector.getResult().getData();</span>
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">      if (dataItem != null) {</span>
+<span class="fc" id="L223">        mtasResponse.addAll(dataItem.rewrite(showDebugInfo));</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">        if (functionList.size() &gt; 0) {</span>
+<span class="nc" id="L225">          mtasResponse.add(&quot;functions&quot;, functionList);</span>
         }
-<span class="pc bpc" id="L231" title="3 of 4 branches missed.">        if ((subDataType != null) &amp;&amp; (dataItem.getSub() != null)) {</span>
-<span class="nc" id="L232">          MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(), subDataType,</span>
-              subStatsType, subStatsItems, subSortType, subSortDirection,
-              subStart, subNumber, functionData);
-<span class="nc" id="L235">          if (dataItem.getSub().getCollectorType()</span>
-<span class="nc bnc" id="L236" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="pc bpc" id="L227" title="3 of 4 branches missed.">        if ((subDataType != null) &amp;&amp; (dataItem.getSub() != null)) {</span>
+<span class="nc" id="L228">          MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(),</span>
+              subDataType, subStatsType, subStatsItems, subSortType,
+              subSortDirection, subStart, subNumber, functionData);
+<span class="nc" id="L231">          if (dataItem.getSub().getCollectorType()</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L233">            mtasResponse.add(dataItem.getSub().getCollectorType(),</span>
+<span class="nc" id="L234">                css.getNamedList(showDebugInfo));</span>
+<span class="nc" id="L235">          } else if (dataItem.getSub().getCollectorType()</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
 <span class="nc" id="L237">            mtasResponse.add(dataItem.getSub().getCollectorType(),</span>
-<span class="nc" id="L238">                css.getNamedList(showDebugInfo));</span>
-<span class="nc" id="L239">          } else if (dataItem.getSub().getCollectorType()</span>
-<span class="nc bnc" id="L240" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L241">            mtasResponse.add(dataItem.getSub().getCollectorType(),</span>
-<span class="nc" id="L242">                css.getData(showDebugInfo));</span>
+<span class="nc" id="L238">                css.getData(showDebugInfo));</span>
           }
         }
-      }      
-<span class="fc" id="L246">      return mtasResponse;</span>
+      }
+<span class="fc" id="L242">      return mtasResponse;</span>
     } else {
-<span class="nc" id="L248">      throw new IOException(</span>
+<span class="nc" id="L244">      throw new IOException(</span>
           &quot;only allowed for &quot; + DataCollector.COLLECTOR_TYPE_DATA);
     }
   }
@@ -254,15 +250,14 @@ public class MtasSolrMtasResult implements Serializable {
    * Gets the key list.
    *
    * @return the key list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public Set&lt;String&gt; getKeyList() throws IOException {
-<span class="nc" id="L261">    if (dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L262" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L263">      return dataCollector.getResult().getComparatorList().keySet();</span>
+<span class="fc" id="L256">    if (dataCollector.getCollectorType()</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="fc" id="L258">      return dataCollector.getResult().getComparatorList().keySet();</span>
     } else {
-<span class="nc" id="L265">      throw new IOException(</span>
+<span class="nc" id="L260">      throw new IOException(</span>
           &quot;only allowed for &quot; + DataCollector.COLLECTOR_TYPE_LIST);
     }
   }
@@ -271,15 +266,14 @@ public class MtasSolrMtasResult implements Serializable {
    * Gets the full key list.
    *
    * @return the full key list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public Set&lt;String&gt; getFullKeyList() throws IOException {
-<span class="nc" id="L278">    if (dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L279" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L280">      return dataCollector.getKeyList();</span>
+<span class="nc" id="L272">    if (dataCollector.getCollectorType()</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L274">      return dataCollector.getKeyList();</span>
     } else {
-<span class="nc" id="L282">      throw new IOException(</span>
+<span class="nc" id="L276">      throw new IOException(</span>
           &quot;only allowed for &quot; + DataCollector.COLLECTOR_TYPE_LIST);
     }
   }
@@ -287,78 +281,77 @@ public class MtasSolrMtasResult implements Serializable {
   /**
    * Gets the named list.
    *
-   * @param showDebugInfo
-   *          the show debug info
+   * @param showDebugInfo the show debug info
    * @return the named list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   NamedList&lt;Object&gt; getNamedList(boolean showDebugInfo) throws IOException {
-<span class="nc" id="L297">    if (dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L298" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L299">      SimpleOrderedMap&lt;Object&gt; mtasResponseList = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L289">    if (dataCollector.getCollectorType()</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="fc" id="L291">      SimpleOrderedMap&lt;Object&gt; mtasResponseList = new SimpleOrderedMap&lt;&gt;();</span>
       // functions
-<span class="nc" id="L301">      Map&lt;String, SimpleOrderedMap&lt;Object&gt;&gt; functionList = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L302" title="All 4 branches missed.">      if (functionData != null &amp;&amp; functionData.containsKey(dataCollector)) {</span>
-<span class="nc" id="L303">        HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = functionData</span>
-<span class="nc" id="L304">            .get(dataCollector);</span>
-<span class="nc bnc" id="L305" title="All 2 branches missed.">        for (Entry&lt;String, MtasSolrMtasResult&gt; entry : functionDataItem.entrySet()) {</span>
-<span class="nc" id="L306">          MtasSolrMtasResult functionResult = entry.getValue();</span>
-<span class="nc" id="L307">          if (functionResult.dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L308" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L309">            NamedList&lt;Object&gt; functionNamedList = functionResult</span>
-<span class="nc" id="L310">                .getNamedList(showDebugInfo);</span>
-<span class="nc bnc" id="L311" title="All 2 branches missed.">            for (int i = 0; i &lt; functionNamedList.size(); i++) {</span>
-<span class="nc bnc" id="L312" title="All 2 branches missed.">              if (functionList.containsKey(functionNamedList.getName(i))) {</span>
-<span class="nc" id="L313">                SimpleOrderedMap&lt;Object&gt; tmpMap = functionList</span>
-<span class="nc" id="L314">                    .get(functionNamedList.getName(i));</span>
-<span class="nc" id="L315">                tmpMap.add(entry.getKey(), functionNamedList.getVal(i));</span>
-<span class="nc" id="L316">              } else {</span>
-<span class="nc" id="L317">                SimpleOrderedMap&lt;Object&gt; tmpMap = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L318">                tmpMap.add(entry.getKey(), functionNamedList.getVal(i));</span>
-<span class="nc" id="L319">                functionList.put(functionNamedList.getName(i), tmpMap);</span>
+<span class="fc" id="L293">      Map&lt;String, SimpleOrderedMap&lt;Object&gt;&gt; functionList = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L294" title="2 of 4 branches missed.">      if (functionData != null &amp;&amp; functionData.containsKey(dataCollector)) {</span>
+<span class="fc" id="L295">        HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = functionData</span>
+<span class="fc" id="L296">            .get(dataCollector);</span>
+<span class="pc bpc" id="L297" title="1 of 2 branches missed.">        for (Entry&lt;String, MtasSolrMtasResult&gt; entry : functionDataItem</span>
+<span class="fc" id="L298">            .entrySet()) {</span>
+<span class="nc" id="L299">          MtasSolrMtasResult functionResult = entry.getValue();</span>
+<span class="nc" id="L300">          if (functionResult.dataCollector.getCollectorType()</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L302">            NamedList&lt;Object&gt; functionNamedList = functionResult</span>
+<span class="nc" id="L303">                .getNamedList(showDebugInfo);</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">            for (int i = 0; i &lt; functionNamedList.size(); i++) {</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">              if (functionList.containsKey(functionNamedList.getName(i))) {</span>
+<span class="nc" id="L306">                SimpleOrderedMap&lt;Object&gt; tmpMap = functionList</span>
+<span class="nc" id="L307">                    .get(functionNamedList.getName(i));</span>
+<span class="nc" id="L308">                tmpMap.add(entry.getKey(), functionNamedList.getVal(i));</span>
+<span class="nc" id="L309">              } else {</span>
+<span class="nc" id="L310">                SimpleOrderedMap&lt;Object&gt; tmpMap = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L311">                tmpMap.add(entry.getKey(), functionNamedList.getVal(i));</span>
+<span class="nc" id="L312">                functionList.put(functionNamedList.getName(i), tmpMap);</span>
               }
             }
-<span class="nc" id="L322">          } else {</span>
-<span class="nc" id="L323">            throw new IOException(&quot;unexpected function collectorType &quot;</span>
-<span class="nc" id="L324">                + functionResult.dataCollector.getCollectorType());</span>
+<span class="nc" id="L315">          } else {</span>
+<span class="nc" id="L316">            throw new IOException(&quot;unexpected function collectorType &quot;</span>
+<span class="nc" id="L317">                + functionResult.dataCollector.getCollectorType());</span>
           }
-<span class="nc" id="L326">        }</span>
+<span class="nc" id="L319">        }</span>
       }
       // main result
-<span class="nc" id="L329">      Map&lt;String, ?&gt; dataList = dataCollector.getResult().getList();</span>
-<span class="nc bnc" id="L330" title="All 2 branches missed.">      for (Entry&lt;String, ?&gt; entry : dataList.entrySet()) {</span>
-<span class="nc" id="L331">        SimpleOrderedMap&lt;Object&gt; mtasResponseListItem = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L332">        MtasDataItem&lt;?, ?&gt; dataItem = (MtasDataItem&lt;?, ?&gt;) entry.getValue();</span>
-<span class="nc" id="L333">        mtasResponseListItem.addAll(dataItem.rewrite(showDebugInfo));</span>
-<span class="nc bnc" id="L334" title="All 2 branches missed.">        if (functionList.containsKey(entry.getKey())) {</span>
-<span class="nc" id="L335">          mtasResponseListItem.add(&quot;functions&quot;,</span>
-<span class="nc" id="L336">              functionList.get(entry.getKey()));</span>
+<span class="fc" id="L322">      Map&lt;String, ?&gt; dataList = dataCollector.getResult().getList();</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">      for (Entry&lt;String, ?&gt; entry : dataList.entrySet()) {</span>
+<span class="fc" id="L324">        SimpleOrderedMap&lt;Object&gt; mtasResponseListItem = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L325">        MtasDataItem&lt;?, ?&gt; dataItem = (MtasDataItem&lt;?, ?&gt;) entry.getValue();</span>
+<span class="fc" id="L326">        mtasResponseListItem.addAll(dataItem.rewrite(showDebugInfo));</span>
+<span class="pc bpc" id="L327" title="1 of 2 branches missed.">        if (functionList.containsKey(entry.getKey())) {</span>
+<span class="nc" id="L328">          mtasResponseListItem.add(&quot;functions&quot;,</span>
+<span class="nc" id="L329">              functionList.get(entry.getKey()));</span>
         }
-<span class="nc bnc" id="L338" title="All 4 branches missed.">        if ((subDataType != null) &amp;&amp; (dataItem.getSub() != null)) {</span>
-<span class="nc" id="L339">          MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(),</span>
+<span class="pc bpc" id="L331" title="3 of 4 branches missed.">        if ((subDataType != null) &amp;&amp; (dataItem.getSub() != null)) {</span>
+<span class="nc" id="L332">          MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(),</span>
               subDataType, subStatsType, subStatsItems, subSortType,
               subSortDirection, subStart, subNumber, functionData);
-<span class="nc" id="L342">          if (dataItem.getSub().getCollectorType()</span>
-<span class="nc bnc" id="L343" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc bnc" id="L344" title="All 2 branches missed.">            if (css.dataCollector.withTotal()) {</span>
-<span class="nc" id="L345">              mtasResponseListItem.add(</span>
+<span class="nc" id="L335">          if (dataItem.getSub().getCollectorType()</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">            if (css.dataCollector.withTotal()) {</span>
+<span class="nc" id="L338">              mtasResponseListItem.add(</span>
                   DataCollector.COLLECTOR_TYPE_LIST + &quot;Total&quot;,
-<span class="nc" id="L347">                  css.dataCollector.getSize());</span>
+<span class="nc" id="L340">                  css.dataCollector.getSize());</span>
             }
-<span class="nc" id="L349">            mtasResponseListItem.add(DataCollector.COLLECTOR_TYPE_LIST,</span>
-<span class="nc" id="L350">                css.getNamedList(showDebugInfo));</span>
-<span class="nc" id="L351">          } else if (dataItem.getSub().getCollectorType()</span>
-<span class="nc bnc" id="L352" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L353">            mtasResponseListItem.add(DataCollector.COLLECTOR_TYPE_DATA,</span>
-<span class="nc" id="L354">                css.getData(showDebugInfo));</span>
+<span class="nc" id="L342">            mtasResponseListItem.add(DataCollector.COLLECTOR_TYPE_LIST,</span>
+<span class="nc" id="L343">                css.getNamedList(showDebugInfo));</span>
+<span class="nc" id="L344">          } else if (dataItem.getSub().getCollectorType()</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">              .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L346">            mtasResponseListItem.add(DataCollector.COLLECTOR_TYPE_DATA,</span>
+<span class="nc" id="L347">                css.getData(showDebugInfo));</span>
           }
         }
-<span class="nc" id="L357">        mtasResponseList.add(entry.getKey(), mtasResponseListItem);</span>
-<span class="nc" id="L358">      }</span>
-<span class="nc" id="L359">      return mtasResponseList;</span>
+<span class="fc" id="L350">        mtasResponseList.add(entry.getKey(), mtasResponseListItem);</span>
+<span class="fc" id="L351">      }</span>
+<span class="fc" id="L352">      return mtasResponseList;</span>
     } else {
-<span class="nc" id="L361">      throw new IOException(</span>
+<span class="nc" id="L354">      throw new IOException(</span>
           &quot;only allowed for &quot; + DataCollector.COLLECTOR_TYPE_LIST);
     }
   }
@@ -370,16 +363,16 @@ public class MtasSolrMtasResult implements Serializable {
    */
   @Override
   public String toString() {
-<span class="nc" id="L373">    if (dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L374" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L375">      return &quot;MtasSolrResult(data-&quot; + hashCode() + &quot;)&quot;;</span>
+<span class="nc" id="L366">    if (dataCollector.getCollectorType()</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L368">      return this.getClass().getSimpleName()+&quot;(data-&quot; + hashCode() + &quot;)&quot;;</span>
     }
-<span class="nc" id="L377">    if (dataCollector.getCollectorType()</span>
-<span class="nc bnc" id="L378" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L379">      return &quot;MtasSolrResult(list(&quot; + dataCollector.getSize() + &quot;)-&quot;</span>
-<span class="nc" id="L380">          + hashCode() + &quot;)&quot;;</span>
+<span class="nc" id="L370">    if (dataCollector.getCollectorType()</span>
+<span class="nc bnc" id="L371" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L372">      return this.getClass().getSimpleName()+&quot;(list(&quot; + dataCollector.getSize() + &quot;)-&quot;</span>
+<span class="nc" id="L373">          + hashCode() + &quot;)&quot;;</span>
     } else {
-<span class="nc" id="L382">      return &quot;MtasSolrResult: unknown&quot;;</span>
+<span class="nc" id="L375">      return this.getClass().getSimpleName()+&quot;: unknown&quot;;</span>
     }
   }
 
@@ -387,12 +380,11 @@ public class MtasSolrMtasResult implements Serializable {
    * Gets the result.
    *
    * @return the result
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataCollectorResult getResult() throws IOException {
-<span class="nc" id="L394">    return dataCollector.getResult();</span>
+<span class="fc" id="L386">    return dataCollector.getResult();</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

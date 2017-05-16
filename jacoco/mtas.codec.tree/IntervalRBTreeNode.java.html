@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>IntervalRBTreeNode.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">IntervalRBTreeNode.java</span></div><h1>IntervalRBTreeNode.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IntervalRBTreeNode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">IntervalRBTreeNode.java</span></div><h1>IntervalRBTreeNode.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
 
 /**
  * The Class IntervalRBTreeNode.
  *
- * @param &lt;T&gt;
- *          the generic type
+ * @param &lt;T&gt; the generic type
  */
 public class IntervalRBTreeNode&lt;T&gt;
     extends IntervalTreeNode&lt;T, IntervalRBTreeNode&lt;T&gt;&gt; {
@@ -23,22 +22,18 @@ public class IntervalRBTreeNode&lt;T&gt;
 
   // node with start and end position
   /**
-   * Instantiates a new interval rb tree node.
+   * Instantiates a new interval RB tree node.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param color
-   *          the color
-   * @param n
-   *          the n
+   * @param left the left
+   * @param right the right
+   * @param color the color
+   * @param n the n
    */
   public IntervalRBTreeNode(int left, int right, int color, int n) {
-<span class="fc" id="L38">    super(left, right);</span>
-<span class="fc" id="L39">    this.color = color;</span>
-<span class="fc" id="L40">    this.n = n;</span>
-<span class="fc" id="L41">  }</span>
+<span class="fc" id="L33">    super(left, right);</span>
+<span class="fc" id="L34">    this.color = color;</span>
+<span class="fc" id="L35">    this.n = n;</span>
+<span class="fc" id="L36">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

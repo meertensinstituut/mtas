@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasScoreProvider.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.queries</a> &gt; <span class="el_source">MtasScoreProvider.java</span></div><h1>MtasScoreProvider.java</h1><pre class="source lang-java linenums">package mtas.queries;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasScoreProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.queries</a> &gt; <span class="el_source">MtasScoreProvider.java</span></div><h1>MtasScoreProvider.java</h1><pre class="source lang-java linenums">package mtas.queries;
 
 import java.io.IOException;
 
@@ -13,13 +13,12 @@ public class MtasScoreProvider extends CustomScoreProvider {
   /**
    * Instantiates a new mtas score provider.
    *
-   * @param context
-   *          the context
+   * @param context the context
    */
   public MtasScoreProvider(LeafReaderContext context) {
-<span class="nc" id="L20">    super(context);</span>
+<span class="nc" id="L19">    super(context);</span>
 
-<span class="nc" id="L22">  }</span>
+<span class="nc" id="L21">  }</span>
 
   /*
    * (non-Javadoc)
@@ -29,9 +28,9 @@ public class MtasScoreProvider extends CustomScoreProvider {
    */
   @Override
   public float customScore(int doc, float subQueryScore, float valSrcScore) {
-<span class="nc" id="L32">    System.out.println(&quot;* Init MTAS scorerprovider doc &quot; + doc + &quot; - &quot;</span>
+<span class="nc" id="L31">    System.out.println(&quot;* Init MTAS scorerprovider doc &quot; + doc + &quot; - &quot;</span>
         + subQueryScore + &quot; - &quot; + valSrcScore);
-<span class="nc" id="L34">    return (float) 3.0;</span>
+<span class="nc" id="L33">    return (float) 3.0;</span>
   }
 
   /*
@@ -43,15 +42,15 @@ public class MtasScoreProvider extends CustomScoreProvider {
   @Override
   public float customScore(int doc, float subQueryScore, float valSrcScores[])
       throws IOException {
-<span class="nc" id="L46">    System.out.print(&quot;** Init MTAS scorerprovider doc &quot; + doc + &quot; - &quot;</span>
+<span class="nc" id="L45">    System.out.print(&quot;** Init MTAS scorerprovider doc &quot; + doc + &quot; - &quot;</span>
         + subQueryScore + &quot; - &quot;);
-<span class="nc" id="L48">    System.out.print(valSrcScores.length + &quot;:&quot;);</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">    for (int i = 0; i &lt; valSrcScores.length; i++) {</span>
-<span class="nc" id="L50">      System.out.print(valSrcScores[i] + &quot;,&quot;);</span>
+<span class="nc" id="L47">    System.out.print(valSrcScores.length + &quot;:&quot;);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">    for (int i = 0; i &lt; valSrcScores.length; i++) {</span>
+<span class="nc" id="L49">      System.out.print(valSrcScores[i] + &quot;,&quot;);</span>
     }
-<span class="nc" id="L52">    System.out.println(&quot; voor veld &quot;);</span>
-<span class="nc" id="L53">    return (float) 4.0;</span>
+<span class="nc" id="L51">    System.out.println(&quot; voor veld &quot;);</span>
+<span class="nc" id="L52">    return (float) 4.0;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

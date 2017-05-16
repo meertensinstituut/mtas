@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasDataBasic.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataBasic.java</span></div><h1>MtasDataBasic.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasDataBasic.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.collector</a> &gt; <span class="el_source">MtasDataBasic.java</span></div><h1>MtasDataBasic.java</h1><pre class="source lang-java linenums">package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
+
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
 
@@ -21,16 +23,16 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
   private static final long serialVersionUID = 1L;
 
   /** The basic value sum list. */
-<span class="fc" id="L24">  protected T1[] basicValueSumList = null;</span>
+<span class="fc" id="L26">  protected T1[] basicValueSumList = null;</span>
 
-  /** The basic value n list. */
-<span class="fc" id="L27">  protected long[] basicValueNList = null;</span>
+  /** The basic value N list. */
+<span class="fc" id="L29">  protected long[] basicValueNList = null;</span>
 
   /** The new basic value sum list. */
-<span class="fc" id="L30">  protected transient T1[] newBasicValueSumList = null;</span>
+<span class="fc" id="L32">  protected transient T1[] newBasicValueSumList = null;</span>
 
-  /** The new basic value n list. */
-<span class="fc" id="L33">  protected transient long[] newBasicValueNList = null;</span>
+  /** The new basic value N list. */
+<span class="fc" id="L35">  protected transient long[] newBasicValueNList = null;</span>
 
   /** The operations. */
   protected MtasDataOperations&lt;T1, T2&gt; operations;
@@ -59,19 +61,19 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataBasic(String collectorType, String dataType,
-      Set&lt;String&gt; statsItems, String sortType, String sortDirection,
+      SortedSet&lt;String&gt; statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
       String[] subDataTypes, String[] subStatsTypes,
-      Set&lt;String&gt;[] subStatsItems, String[] subSortTypes,
+      SortedSet&lt;String&gt;[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       MtasDataOperations&lt;T1, T2&gt; operations, String segmentRegistration,
       String boundary) throws IOException {
-<span class="fc" id="L69">    super(collectorType, dataType, CodecUtil.STATS_BASIC, statsItems, sortType,</span>
+<span class="fc" id="L71">    super(collectorType, dataType, CodecUtil.STATS_BASIC, statsItems, sortType,</span>
         sortDirection, start, number, subCollectorTypes, subDataTypes,
         subStatsTypes, subStatsItems, subSortTypes, subSortDirections, subStart,
         subNumber, segmentRegistration, boundary);
-<span class="fc" id="L73">    this.operations = operations;</span>
-<span class="fc" id="L74">  }</span>
+<span class="fc" id="L75">    this.operations = operations;</span>
+<span class="fc" id="L76">  }</span>
 
   /*
    * (non-Javadoc)
@@ -81,9 +83,9 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   public final void error(String error) throws IOException {
-<span class="nc" id="L84">    add(false);</span>
-<span class="nc" id="L85">    setError(newCurrentPosition, error, newCurrentExisting);</span>
-<span class="nc" id="L86">  }</span>
+<span class="nc" id="L86">    add(false);</span>
+<span class="nc" id="L87">    setError(newCurrentPosition, error, newCurrentExisting);</span>
+<span class="nc" id="L88">  }</span>
 
   /*
    * (non-Javadoc)
@@ -94,11 +96,11 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   public final void error(String key, String error) throws IOException {
-<span class="nc bnc" id="L97" title="All 2 branches missed.">    if (key != null) {</span>
-<span class="nc" id="L98">      add(key, false);</span>
-<span class="nc" id="L99">      setError(newCurrentPosition, error, newCurrentExisting);      </span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    if (key != null) {</span>
+<span class="nc" id="L100">      add(key, false);</span>
+<span class="nc" id="L101">      setError(newCurrentPosition, error, newCurrentExisting);      </span>
     }
-<span class="nc" id="L101">  }</span>
+<span class="nc" id="L103">  }</span>
 
   /**
    * Sets the error.
@@ -109,40 +111,40 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
-<span class="nc bnc" id="L112" title="All 2 branches missed.">    if (!currentExisting) {</span>
-<span class="nc" id="L113">      newBasicValueSumList[newPosition] = operations.getZero1();</span>
-<span class="nc" id="L114">      newBasicValueNList[newPosition] = 0;</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">    if (!currentExisting) {</span>
+<span class="nc" id="L115">      newBasicValueSumList[newPosition] = operations.getZero1();</span>
+<span class="nc" id="L116">      newBasicValueNList[newPosition] = 0;</span>
     }
-<span class="nc" id="L116">    newErrorNumber[newPosition]++;</span>
-<span class="nc bnc" id="L117" title="All 2 branches missed.">    if (newErrorList[newPosition].containsKey(error)) {</span>
-<span class="nc" id="L118">      newErrorList[newPosition].put(error,</span>
-<span class="nc" id="L119">          newErrorList[newPosition].get(error) + 1);</span>
+<span class="nc" id="L118">    newErrorNumber[newPosition]++;</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">    if (newErrorList[newPosition].containsKey(error)) {</span>
+<span class="nc" id="L120">      newErrorList[newPosition].put(error,</span>
+<span class="nc" id="L121">          newErrorList[newPosition].get(error) + 1);</span>
     } else {
-<span class="nc" id="L121">      newErrorList[newPosition].put(error, 1);</span>
+<span class="nc" id="L123">      newErrorList[newPosition].put(error, 1);</span>
     }
-<span class="nc" id="L123">  }</span>
+<span class="nc" id="L125">  }</span>
 
   /**
    * Sets the value.
    *
    * @param newPosition the new position
    * @param valueSum the value sum
-   * @param valueN the value n
+   * @param valueN the value N
    * @param currentExisting the current existing
    */
   protected void setValue(int newPosition, T1 valueSum, long valueN,
       boolean currentExisting) {
-<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (valueN &gt; 0) {</span>
-<span class="fc bfc" id="L136" title="All 2 branches covered.">      if (currentExisting) {</span>
-<span class="fc" id="L137">        newBasicValueSumList[newPosition] = operations</span>
-<span class="fc" id="L138">            .add11(newBasicValueSumList[newPosition], valueSum);</span>
-<span class="fc" id="L139">        newBasicValueNList[newPosition] += valueN;</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    if (valueN &gt; 0) {</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">      if (currentExisting) {</span>
+<span class="fc" id="L139">        newBasicValueSumList[newPosition] = operations</span>
+<span class="fc" id="L140">            .add11(newBasicValueSumList[newPosition], valueSum);</span>
+<span class="fc" id="L141">        newBasicValueNList[newPosition] += valueN;</span>
       } else {
-<span class="fc" id="L141">        newBasicValueSumList[newPosition] = valueSum;</span>
-<span class="fc" id="L142">        newBasicValueNList[newPosition] = valueN;</span>
+<span class="fc" id="L143">        newBasicValueSumList[newPosition] = valueSum;</span>
+<span class="fc" id="L144">        newBasicValueNList[newPosition] = valueN;</span>
       }
     }
-<span class="fc" id="L145">  }</span>
+<span class="fc" id="L147">  }</span>
 
   /**
    * Sets the value.
@@ -154,21 +156,21 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
-<span class="pc bpc" id="L157" title="1 of 2 branches missed.">    if (number &gt; 0) {</span>
-<span class="fc" id="L158">      T1 valueSum = null;</span>
-<span class="fc bfc" id="L159" title="All 2 branches covered.">      for (int i = 0; i &lt; number; i++) {</span>
-<span class="fc bfc" id="L160" title="All 2 branches covered.">        valueSum = (i == 0) ? values[i] : operations.add11(valueSum, values[i]);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">    if (number &gt; 0) {</span>
+<span class="fc" id="L160">      T1 valueSum = null;</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">      for (int i = 0; i &lt; number; i++) {</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        valueSum = (i == 0) ? values[i] : operations.add11(valueSum, values[i]);</span>
       }
-<span class="fc bfc" id="L162" title="All 2 branches covered.">      if (currentExisting) {</span>
-<span class="fc" id="L163">        newBasicValueSumList[newPosition] = operations</span>
-<span class="fc" id="L164">            .add11(newBasicValueSumList[newPosition], valueSum);</span>
-<span class="fc" id="L165">        newBasicValueNList[newPosition] += number;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">      if (currentExisting) {</span>
+<span class="fc" id="L165">        newBasicValueSumList[newPosition] = operations</span>
+<span class="fc" id="L166">            .add11(newBasicValueSumList[newPosition], valueSum);</span>
+<span class="fc" id="L167">        newBasicValueNList[newPosition] += number;</span>
       } else {
-<span class="fc" id="L167">        newBasicValueSumList[newPosition] = valueSum;</span>
-<span class="fc" id="L168">        newBasicValueNList[newPosition] = number;</span>
+<span class="fc" id="L169">        newBasicValueSumList[newPosition] = valueSum;</span>
+<span class="fc" id="L170">        newBasicValueNList[newPosition] = number;</span>
       }
     }
-<span class="fc" id="L171">  }</span>
+<span class="fc" id="L173">  }</span>
 
   /*
    * (non-Javadoc)
@@ -178,42 +180,43 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
   @Override
   protected final void increaseNewListSize() throws IOException {
     // register old situation
-<span class="fc" id="L181">    int tmpOldSize = newKeyList.length;</span>
-<span class="fc" id="L182">    int tmpNewPosition = newPosition;</span>
+<span class="fc" id="L183">    int tmpOldSize = newKeyList.length;</span>
+<span class="fc" id="L184">    int tmpNewPosition = newPosition;</span>
     // increase
-<span class="fc" id="L184">    super.increaseNewListSize();</span>
+<span class="fc" id="L186">    super.increaseNewListSize();</span>
     // reconstruct
-<span class="fc" id="L186">    T1[] tmpNewBasicValueList = newBasicValueSumList;</span>
-<span class="fc" id="L187">    long[] tmpNewBasicValueNList = newBasicValueNList;</span>
-<span class="fc" id="L188">    newBasicValueSumList = operations.createVector1(newSize);</span>
-<span class="fc" id="L189">    newBasicValueNList = new long[newSize];</span>
-<span class="fc" id="L190">    newPosition = tmpNewPosition;</span>
-<span class="fc" id="L191">    System.arraycopy(tmpNewBasicValueList, 0, newBasicValueSumList, 0,</span>
+<span class="fc" id="L188">    T1[] tmpNewBasicValueList = newBasicValueSumList;</span>
+<span class="fc" id="L189">    long[] tmpNewBasicValueNList = newBasicValueNList;</span>
+<span class="fc" id="L190">    newBasicValueSumList = operations.createVector1(newSize);</span>
+<span class="fc" id="L191">    newBasicValueNList = new long[newSize];</span>
+<span class="fc" id="L192">    newPosition = tmpNewPosition;</span>
+<span class="fc" id="L193">    System.arraycopy(tmpNewBasicValueList, 0, newBasicValueSumList, 0,</span>
         tmpOldSize);
-<span class="fc" id="L193">    System.arraycopy(tmpNewBasicValueNList, 0, newBasicValueNList, 0,</span>
+<span class="fc" id="L195">    System.arraycopy(tmpNewBasicValueNList, 0, newBasicValueNList, 0,</span>
         tmpOldSize);
-<span class="fc" id="L195">  }</span>
+<span class="fc" id="L197">  }</span>
 
   /* (non-Javadoc)
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
+  @Override
   public void reduceToSegmentKeys() {
-<span class="pc bpc" id="L201" title="2 of 4 branches missed.">    if (segmentRegistration != null &amp;&amp; size &gt; 0) {</span>
-<span class="fc" id="L202">      int sizeCopy = size;</span>
-<span class="fc" id="L203">      String[] keyListCopy = keyList.clone();</span>
-<span class="fc" id="L204">      T1[] basicValueSumListCopy = basicValueSumList.clone();</span>
-<span class="fc" id="L205">      long[] basicValueNListCopy = basicValueNList.clone();</span>
-<span class="fc" id="L206">      size = 0;</span>
-<span class="fc bfc" id="L207" title="All 2 branches covered.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
-<span class="fc bfc" id="L208" title="All 2 branches covered.">        if (segmentKeys.contains(keyListCopy[i])) {</span>
-<span class="fc" id="L209">          keyList[size] = keyListCopy[i];</span>
-<span class="fc" id="L210">          basicValueSumList[size] = basicValueSumListCopy[i];</span>
-<span class="fc" id="L211">          basicValueNList[size] = basicValueNListCopy[i];</span>
-<span class="fc" id="L212">          size++;</span>
+<span class="pc bpc" id="L204" title="2 of 4 branches missed.">    if (segmentRegistration != null &amp;&amp; size &gt; 0) {</span>
+<span class="fc" id="L205">      int sizeCopy = size;</span>
+<span class="fc" id="L206">      String[] keyListCopy = keyList.clone();</span>
+<span class="fc" id="L207">      T1[] basicValueSumListCopy = basicValueSumList.clone();</span>
+<span class="fc" id="L208">      long[] basicValueNListCopy = basicValueNList.clone();</span>
+<span class="fc" id="L209">      size = 0;</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">        if (segmentKeys.contains(keyListCopy[i])) {</span>
+<span class="fc" id="L212">          keyList[size] = keyListCopy[i];</span>
+<span class="fc" id="L213">          basicValueSumList[size] = basicValueSumListCopy[i];</span>
+<span class="fc" id="L214">          basicValueNList[size] = basicValueNListCopy[i];</span>
+<span class="fc" id="L215">          size++;</span>
         }
       }
     }
-<span class="fc" id="L216">  }</span>
+<span class="fc" id="L219">  }</span>
 
   /*
    * (non-Javadoc)
@@ -223,34 +226,34 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void reduceToKeys(Set&lt;String&gt; keys) {
-<span class="pc bpc" id="L226" title="1 of 2 branches missed.">    if (size &gt; 0) {</span>
-<span class="fc" id="L227">      int sizeCopy = size;</span>
-<span class="fc" id="L228">      String[] keyListCopy = keyList.clone();</span>
-<span class="fc" id="L229">      int[] errorNumberCopy = errorNumber.clone();</span>
-<span class="fc" id="L230">      HashMap&lt;String, Integer&gt;[] errorListCopy = errorList.clone();</span>
-<span class="fc" id="L231">      int[] sourceNumberListCopy = sourceNumberList.clone();</span>
-<span class="fc" id="L232">      T1[] basicValueSumListCopy = basicValueSumList.clone();</span>
-<span class="fc" id="L233">      long[] basicValueNListCopy = basicValueNList.clone();</span>
-<span class="fc" id="L234">      keyList = new String[keys.size()];</span>
-<span class="fc" id="L235">      errorNumber = new int[keys.size()];</span>
-<span class="fc" id="L236">      errorList = new HashMap[keys.size()];</span>
-<span class="fc" id="L237">      sourceNumberList = new int[keys.size()];</span>
-<span class="fc" id="L238">      basicValueSumList = operations.createVector1(keys.size());</span>
-<span class="fc" id="L239">      basicValueNList = new long[keys.size()];</span>
-<span class="fc" id="L240">      size = 0;</span>
-<span class="fc bfc" id="L241" title="All 2 branches covered.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
-<span class="fc bfc" id="L242" title="All 2 branches covered.">        if (keys.contains(keyListCopy[i])) {</span>
-<span class="fc" id="L243">          keyList[size] = keyListCopy[i];</span>
-<span class="fc" id="L244">          errorNumber[size] = errorNumberCopy[i];</span>
-<span class="fc" id="L245">          errorList[size] = errorListCopy[i];</span>
-<span class="fc" id="L246">          sourceNumberList[size] = sourceNumberListCopy[i];</span>
-<span class="fc" id="L247">          basicValueSumList[size] = basicValueSumListCopy[i];</span>
-<span class="fc" id="L248">          basicValueNList[size] = basicValueNListCopy[i];</span>
-<span class="fc" id="L249">          size++;</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">    if (size &gt; 0) {</span>
+<span class="fc" id="L230">      int sizeCopy = size;</span>
+<span class="fc" id="L231">      String[] keyListCopy = keyList.clone();</span>
+<span class="fc" id="L232">      int[] errorNumberCopy = errorNumber.clone();</span>
+<span class="fc" id="L233">      HashMap&lt;String, Integer&gt;[] errorListCopy = errorList.clone();</span>
+<span class="fc" id="L234">      int[] sourceNumberListCopy = sourceNumberList.clone();</span>
+<span class="fc" id="L235">      T1[] basicValueSumListCopy = basicValueSumList.clone();</span>
+<span class="fc" id="L236">      long[] basicValueNListCopy = basicValueNList.clone();</span>
+<span class="fc" id="L237">      keyList = new String[keys.size()];</span>
+<span class="fc" id="L238">      errorNumber = new int[keys.size()];</span>
+<span class="fc" id="L239">      errorList = new HashMap[keys.size()];</span>
+<span class="fc" id="L240">      sourceNumberList = new int[keys.size()];</span>
+<span class="fc" id="L241">      basicValueSumList = operations.createVector1(keys.size());</span>
+<span class="fc" id="L242">      basicValueNList = new long[keys.size()];</span>
+<span class="fc" id="L243">      size = 0;</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">      for (int i = 0; i &lt; sizeCopy; i++) {</span>
+<span class="fc bfc" id="L245" title="All 2 branches covered.">        if (keys.contains(keyListCopy[i])) {</span>
+<span class="fc" id="L246">          keyList[size] = keyListCopy[i];</span>
+<span class="fc" id="L247">          errorNumber[size] = errorNumberCopy[i];</span>
+<span class="fc" id="L248">          errorList[size] = errorListCopy[i];</span>
+<span class="fc" id="L249">          sourceNumberList[size] = sourceNumberListCopy[i];</span>
+<span class="fc" id="L250">          basicValueSumList[size] = basicValueSumListCopy[i];</span>
+<span class="fc" id="L251">          basicValueNList[size] = basicValueNListCopy[i];</span>
+<span class="fc" id="L252">          size++;</span>
         }
       }
     }
-<span class="fc" id="L253">  }</span>
+<span class="fc" id="L256">  }</span>
 
   /*
    * (non-Javadoc)
@@ -259,9 +262,9 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   protected void copyToNew(int position, int newPosition) {
-<span class="fc" id="L262">    newBasicValueSumList[newPosition] = basicValueSumList[position];</span>
-<span class="fc" id="L263">    newBasicValueNList[newPosition] = basicValueNList[position];</span>
-<span class="fc" id="L264">  }</span>
+<span class="fc" id="L265">    newBasicValueSumList[newPosition] = basicValueSumList[position];</span>
+<span class="fc" id="L266">    newBasicValueNList[newPosition] = basicValueNList[position];</span>
+<span class="fc" id="L267">  }</span>
 
   /*
    * (non-Javadoc)
@@ -270,9 +273,9 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   protected void copyFromNew() {
-<span class="fc" id="L273">    basicValueSumList = newBasicValueSumList;</span>
-<span class="fc" id="L274">    basicValueNList = newBasicValueNList;</span>
-<span class="fc" id="L275">  }</span>
+<span class="fc" id="L276">    basicValueSumList = newBasicValueSumList;</span>
+<span class="fc" id="L277">    basicValueNList = newBasicValueNList;</span>
+<span class="fc" id="L278">  }</span>
 
   /*
    * (non-Javadoc)
@@ -281,25 +284,25 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   protected void remapData(int[][] mapping) throws IOException {
-<span class="fc" id="L284">    super.remapData(mapping);</span>
-<span class="fc" id="L285">    T1[] originalBasicValueSumList = basicValueSumList.clone();</span>
-<span class="fc" id="L286">    long[] originalBasicValueNList = basicValueNList.clone();</span>
-<span class="fc" id="L287">    basicValueSumList = operations.createVector1(mapping.length);</span>
-<span class="fc" id="L288">    basicValueNList = new long[mapping.length];</span>
-<span class="fc bfc" id="L289" title="All 2 branches covered.">    for (int i = 0; i &lt; mapping.length; i++) {</span>
-<span class="fc bfc" id="L290" title="All 2 branches covered.">      for (int j = 0; j &lt; mapping[i].length; j++) {</span>
-<span class="fc bfc" id="L291" title="All 2 branches covered.">        if (j == 0) {</span>
-<span class="fc" id="L292">          setValue(i, originalBasicValueSumList[mapping[i][j]],</span>
+<span class="fc" id="L287">    super.remapData(mapping);</span>
+<span class="fc" id="L288">    T1[] originalBasicValueSumList = basicValueSumList.clone();</span>
+<span class="fc" id="L289">    long[] originalBasicValueNList = basicValueNList.clone();</span>
+<span class="fc" id="L290">    basicValueSumList = operations.createVector1(mapping.length);</span>
+<span class="fc" id="L291">    basicValueNList = new long[mapping.length];</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">    for (int i = 0; i &lt; mapping.length; i++) {</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">      for (int j = 0; j &lt; mapping[i].length; j++) {</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        if (j == 0) {</span>
+<span class="fc" id="L295">          setValue(i, originalBasicValueSumList[mapping[i][j]],</span>
               originalBasicValueNList[mapping[i][j]], false);
         } else {
-<span class="fc" id="L295">          setValue(i, originalBasicValueSumList[mapping[i][j]],</span>
+<span class="fc" id="L298">          setValue(i, originalBasicValueSumList[mapping[i][j]],</span>
               originalBasicValueNList[mapping[i][j]], true);
         }
       }
     }
-<span class="fc" id="L300">    basicValueSumList = newBasicValueSumList;</span>
-<span class="fc" id="L301">    basicValueNList = newBasicValueNList;</span>
-<span class="fc" id="L302">  }</span>
+<span class="fc" id="L303">    basicValueSumList = newBasicValueSumList;</span>
+<span class="fc" id="L304">    basicValueNList = newBasicValueNList;</span>
+<span class="fc" id="L305">  }</span>
 
   /*
    * (non-Javadoc)
@@ -309,57 +312,57 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   public void merge(MtasDataCollector&lt;?, ?&gt; newDataCollector,
-      HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map,
+      Map&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map,
       boolean increaseSourceNumber) throws IOException {
-<span class="nc" id="L314">    closeNewList();</span>
-<span class="nc bnc" id="L315" title="All 2 branches missed.">    if (!collectorType.equals(newDataCollector.getCollectorType())</span>
-<span class="nc bnc" id="L316" title="All 2 branches missed.">        || !dataType.equals(newDataCollector.getDataType())</span>
-<span class="nc bnc" id="L317" title="All 4 branches missed.">        || !statsType.equals(newDataCollector.getStatsType())</span>
+<span class="nc" id="L317">    closeNewList();</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">    if (!collectorType.equals(newDataCollector.getCollectorType())</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">        || !dataType.equals(newDataCollector.getDataType())</span>
+<span class="nc bnc" id="L320" title="All 4 branches missed.">        || !statsType.equals(newDataCollector.getStatsType())</span>
         || !(newDataCollector instanceof MtasDataBasic)) {
-<span class="nc" id="L319">      throw new IOException(&quot;cannot merge different dataCollectors&quot;);</span>
+<span class="nc" id="L322">      throw new IOException(&quot;cannot merge different dataCollectors&quot;);</span>
     } else {      
-<span class="nc" id="L321">      segmentRegistration = null;</span>
+<span class="nc" id="L324">      segmentRegistration = null;</span>
       @SuppressWarnings(&quot;unchecked&quot;)
-<span class="nc" id="L323">      MtasDataBasic&lt;T1, T2&gt; newMtasDataBasic = (MtasDataBasic&lt;T1, T2&gt;) newDataCollector;</span>
-<span class="nc" id="L324">      newMtasDataBasic.closeNewList();</span>
-<span class="nc" id="L325">      initNewList(newMtasDataBasic.getSize());</span>
-<span class="nc bnc" id="L326" title="All 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L327">        map.put(newDataCollector, this);</span>
-<span class="nc bnc" id="L328" title="All 2 branches missed.">        for (int i = 0; i &lt; newMtasDataBasic.getSize(); i++) {</span>
-<span class="nc" id="L329">          MtasDataCollector&lt;?, ?&gt;[] subCollectors = new MtasDataCollector[1];</span>
-<span class="nc" id="L330">          subCollectors[0] = add(newMtasDataBasic.keyList[i],</span>
+<span class="nc" id="L326">      MtasDataBasic&lt;T1, T2&gt; newMtasDataBasic = (MtasDataBasic&lt;T1, T2&gt;) newDataCollector;</span>
+<span class="nc" id="L327">      newMtasDataBasic.closeNewList();</span>
+<span class="nc" id="L328">      initNewList(newMtasDataBasic.getSize());</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L330">        map.put(newDataCollector, this);</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">        for (int i = 0; i &lt; newMtasDataBasic.getSize(); i++) {</span>
+<span class="nc" id="L332">          MtasDataCollector&lt;?, ?&gt;[] subCollectors = new MtasDataCollector[1];</span>
+<span class="nc" id="L333">          subCollectors[0] = add(newMtasDataBasic.keyList[i],</span>
               increaseSourceNumber);
-<span class="nc" id="L332">          setError(newCurrentPosition, newMtasDataBasic.errorNumber[i],</span>
+<span class="nc" id="L335">          setError(newCurrentPosition, newMtasDataBasic.errorNumber[i],</span>
               newMtasDataBasic.errorList[i], newCurrentExisting);
-<span class="nc" id="L334">          setValue(newCurrentPosition, newMtasDataBasic.basicValueSumList[i],</span>
+<span class="nc" id="L337">          setValue(newCurrentPosition, newMtasDataBasic.basicValueSumList[i],</span>
               newMtasDataBasic.basicValueNList[i], newCurrentExisting);
-<span class="nc bnc" id="L336" title="All 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataBasic.hasSub()) {</span>
+<span class="nc bnc" id="L339" title="All 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataBasic.hasSub()) {</span>
             // single key implies exactly one subCollector if hasSub
-<span class="nc" id="L338">            subCollectors[0].merge(</span>
+<span class="nc" id="L341">            subCollectors[0].merge(</span>
                 newMtasDataBasic.subCollectorListNextLevel[i], map,
                 increaseSourceNumber);
           }
-        }
-<span class="nc" id="L343">        closeNewList();</span>
-<span class="nc bnc" id="L344" title="All 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L345">        map.put(newDataCollector, this);</span>
-<span class="nc bnc" id="L346" title="All 2 branches missed.">        if (newMtasDataBasic.getSize() &gt; 0) {</span>
-<span class="nc" id="L347">          MtasDataCollector&lt;?, ?&gt; subCollector = add(increaseSourceNumber);</span>
-<span class="nc" id="L348">          setError(newCurrentPosition, newMtasDataBasic.errorNumber[0],</span>
+        } 
+<span class="nc" id="L346">        closeNewList();</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L348">        map.put(newDataCollector, this);</span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">        if (newMtasDataBasic.getSize() &gt; 0) {</span>
+<span class="nc" id="L350">          MtasDataCollector&lt;?, ?&gt; subCollector = add(increaseSourceNumber);</span>
+<span class="nc" id="L351">          setError(newCurrentPosition, newMtasDataBasic.errorNumber[0],</span>
               newMtasDataBasic.errorList[0], newCurrentExisting);
-<span class="nc" id="L350">          setValue(newCurrentPosition, newMtasDataBasic.basicValueSumList[0],</span>
+<span class="nc" id="L353">          setValue(newCurrentPosition, newMtasDataBasic.basicValueSumList[0],</span>
               newMtasDataBasic.basicValueNList[0], newCurrentExisting);
-<span class="nc bnc" id="L352" title="All 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataBasic.hasSub()) {</span>
-<span class="nc" id="L353">            subCollector.merge(newMtasDataBasic.subCollectorNextLevel, map,</span>
+<span class="nc bnc" id="L355" title="All 4 branches missed.">          if (hasSub() &amp;&amp; newMtasDataBasic.hasSub()) {</span>
+<span class="nc" id="L356">            subCollector.merge(newMtasDataBasic.subCollectorNextLevel, map,</span>
                 increaseSourceNumber);
           }
         }
-<span class="nc" id="L357">        closeNewList();</span>
+<span class="nc" id="L360">        closeNewList();</span>
       } else {
-<span class="nc" id="L359">        throw new IOException(&quot;cannot merge &quot; + collectorType);</span>
+<span class="nc" id="L362">        throw new IOException(&quot;cannot merge &quot; + collectorType);</span>
       }
     }
-<span class="nc" id="L362">  }</span>
+<span class="nc" id="L365">  }</span>
 
   /*
    * (non-Javadoc)
@@ -368,9 +371,9 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    */
   @Override
   public final void initNewList(int maxNumberOfTerms) throws IOException {
-<span class="fc" id="L371">    super.initNewList(maxNumberOfTerms);</span>
-<span class="fc" id="L372">    initNewListBasic(maxNumberOfTerms);</span>
-<span class="fc" id="L373">  }</span>
+<span class="fc" id="L374">    super.initNewList(maxNumberOfTerms);</span>
+<span class="fc" id="L375">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L376">  }</span>
 
   /*
    * (non-Javadoc)
@@ -381,9 +384,9 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
   @Override
   public final void initNewList(int maxNumberOfTerms, String segmentName,
       int segmentNumber, String boundary) throws IOException {
-<span class="fc" id="L384">    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);</span>
-<span class="fc" id="L385">    initNewListBasic(maxNumberOfTerms);</span>
-<span class="fc" id="L386">  }</span>
+<span class="fc" id="L387">    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);</span>
+<span class="fc" id="L388">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L389">  }</span>
 
   /**
    * Inits the new list basic.
@@ -391,9 +394,9 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
    * @param maxNumberOfTerms the max number of terms
    */
   private void initNewListBasic(int maxNumberOfTerms) {
-<span class="fc" id="L394">    newBasicValueSumList = operations.createVector1(newSize);</span>
-<span class="fc" id="L395">    newBasicValueNList = new long[newSize];</span>
-<span class="fc" id="L396">  }</span>
+<span class="fc" id="L397">    newBasicValueSumList = operations.createVector1(newSize);</span>
+<span class="fc" id="L398">    newBasicValueNList = new long[newSize];</span>
+<span class="fc" id="L399">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

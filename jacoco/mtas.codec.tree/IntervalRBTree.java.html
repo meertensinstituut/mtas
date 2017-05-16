@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>IntervalRBTree.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">IntervalRBTree.java</span></div><h1>IntervalRBTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IntervalRBTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">IntervalRBTree.java</span></div><h1>IntervalRBTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,35 +8,33 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 /**
  * The Class IntervalRBTree.
  *
- * @param &lt;T&gt;
- *          the generic type
+ * @param &lt;T&gt; the generic type
  */
-<span class="pc bpc" id="L14" title="1 of 2 branches missed.">public class IntervalRBTree&lt;T&gt; extends IntervalTree&lt;T, IntervalRBTreeNode&lt;T&gt;&gt; {</span>
+<span class="pc bpc" id="L13" title="1 of 2 branches missed.">public class IntervalRBTree&lt;T&gt; extends IntervalTree&lt;T, IntervalRBTreeNode&lt;T&gt;&gt; {</span>
 
   /** The index. */
   private final HashMap&lt;String, IntervalRBTreeNode&lt;T&gt;&gt; index;
 
   /**
-   * Instantiates a new interval rb tree.
+   * Instantiates a new interval RB tree.
    */
   public IntervalRBTree() {
-<span class="fc" id="L23">    super();</span>
-<span class="fc" id="L24">    index = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L25">  }</span>
+<span class="fc" id="L22">    super();</span>
+<span class="fc" id="L23">    index = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L24">  }</span>
 
   /**
-   * Instantiates a new interval rb tree.
+   * Instantiates a new interval RB tree.
    *
-   * @param positionsHits
-   *          the positions hits
+   * @param positionsHits the positions hits
    */
   public IntervalRBTree(ArrayList&lt;IntervalTreeNodeData&lt;T&gt;&gt; positionsHits) {
-<span class="fc" id="L34">    this();</span>
-<span class="fc bfc" id="L35" title="All 2 branches covered.">    for (IntervalTreeNodeData&lt;T&gt; positionsHit : positionsHits) {</span>
-<span class="fc" id="L36">      addRange(positionsHit.start, positionsHit.end, positionsHit.list);</span>
-<span class="fc" id="L37">    }</span>
-<span class="fc" id="L38">    close();</span>
-<span class="fc" id="L39">  }</span>
+<span class="fc" id="L32">    this();</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">    for (IntervalTreeNodeData&lt;T&gt; positionsHit : positionsHits) {</span>
+<span class="fc" id="L34">      addRange(positionsHit.start, positionsHit.end, positionsHit.list);</span>
+<span class="fc" id="L35">    }</span>
+<span class="fc" id="L36">    close();</span>
+<span class="fc" id="L37">  }</span>
 
   /*
    * (non-Javadoc)
@@ -45,14 +43,14 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
    */
   @Override
   final protected void addRangeEmpty(int left, int right) {
-<span class="nc" id="L48">    String key = left + &quot;_&quot; + right;</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
+<span class="nc" id="L46">    String key = left + &quot;_&quot; + right;</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
       // do nothing (empty...)
     } else {
-<span class="nc" id="L52">      root = addRange(root, left, right, null);</span>
-<span class="nc" id="L53">      root.color = IntervalRBTreeNode.BLACK;</span>
+<span class="nc" id="L50">      root = addRange(root, left, right, null);</span>
+<span class="nc" id="L51">      root.color = IntervalRBTreeNode.BLACK;</span>
     }
-<span class="nc" id="L55">  }</span>
+<span class="nc" id="L53">  }</span>
 
   /*
    * (non-Javadoc)
@@ -62,8 +60,8 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
   @Override
   final protected void addSinglePoint(int position,
       ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list) {
-<span class="nc" id="L65">    addRange(position, position, list);</span>
-<span class="nc" id="L66">  }</span>
+<span class="nc" id="L63">    addRange(position, position, list);</span>
+<span class="nc" id="L64">  }</span>
 
   /*
    * (non-Javadoc)
@@ -73,182 +71,171 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
   @Override
   final protected void addRange(int left, int right,
       ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list) {
-<span class="fc" id="L76">    String key = left + &quot;_&quot; + right;</span>
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">    if (index.containsKey(key)) {</span>
-<span class="nc" id="L78">      index.get(key).addList(list);</span>
+<span class="fc" id="L74">    String key = left + &quot;_&quot; + right;</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if (index.containsKey(key)) {</span>
+<span class="nc" id="L76">      index.get(key).addList(list);</span>
     } else {
-<span class="fc" id="L80">      root = addRange(root, left, right, list);</span>
-<span class="fc" id="L81">      root.color = IntervalRBTreeNode.BLACK;</span>
+<span class="fc" id="L78">      root = addRange(root, left, right, list);</span>
+<span class="fc" id="L79">      root.color = IntervalRBTreeNode.BLACK;</span>
     }
-<span class="fc" id="L83">  }</span>
+<span class="fc" id="L81">  }</span>
 
   /**
    * Adds the range.
    *
-   * @param n
-   *          the n
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param list
-   *          the list
-   * @return the interval rb tree node
+   * @param n the n
+   * @param left the left
+   * @param right the right
+   * @param list the list
+   * @return the interval RB tree node
    */
   private IntervalRBTreeNode&lt;T&gt; addRange(IntervalRBTreeNode&lt;T&gt; n, Integer left,
       Integer right, ArrayList&lt;MtasTreeHit&lt;T&gt;&gt; list) {
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    if (n == null) {</span>
-<span class="fc" id="L101">      String key = left.toString() + &quot;_&quot; + right.toString();</span>
-<span class="fc" id="L102">      n = new IntervalRBTreeNode&lt;T&gt;(left, right, IntervalRBTreeNode.RED, 1);</span>
-<span class="fc" id="L103">      n.addList(list);</span>
-<span class="fc" id="L104">      index.put(key, n);</span>
-<span class="fc" id="L105">    } else {</span>
-<span class="pc bpc" id="L106" title="1 of 2 branches missed.">      if (left &lt;= n.left) {</span>
-<span class="nc" id="L107">        n.leftChild = addRange(n.leftChild, left, right, list);</span>
-<span class="nc" id="L108">        updateMaxMin(n, n.leftChild);</span>
+<span class="fc" id="L94">    IntervalRBTreeNode&lt;T&gt; localN = n;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (localN == null) {</span>
+<span class="fc" id="L96">      String key = left.toString() + &quot;_&quot; + right.toString();</span>
+<span class="fc" id="L97">      localN = new IntervalRBTreeNode&lt;&gt;(left, right, IntervalRBTreeNode.RED, 1);</span>
+<span class="fc" id="L98">      localN.addList(list);      </span>
+<span class="fc" id="L99">      index.put(key, localN);</span>
+<span class="fc" id="L100">    } else {</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">      if (left &lt;= localN.left) {</span>
+<span class="nc" id="L102">        localN.leftChild = addRange(localN.leftChild, left, right, list);</span>
+<span class="nc" id="L103">        updateMaxMin(localN, localN.leftChild);</span>
       } else {
-<span class="fc" id="L110">        n.rightChild = addRange(n.rightChild, left, right, list);</span>
-<span class="fc" id="L111">        updateMaxMin(n, n.rightChild);</span>
+<span class="fc" id="L105">        localN.rightChild = addRange(localN.rightChild, left, right, list);</span>
+<span class="fc" id="L106">        updateMaxMin(localN, localN.rightChild);</span>
       }
-<span class="fc bfc" id="L113" title="All 4 branches covered.">      if (isRed(n.rightChild) &amp;&amp; !isRed(n.leftChild)) {</span>
-<span class="fc" id="L114">        n = rotateLeft(n);</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">      if (isRed(localN.rightChild) &amp;&amp; !isRed(localN.leftChild)) {</span>
+<span class="fc" id="L109">        localN = rotateLeft(localN);</span>
       }
-<span class="pc bpc" id="L116" title="1 of 4 branches missed.">      if (isRed(n.leftChild) &amp;&amp; isRed(n.leftChild.leftChild)) {</span>
-<span class="nc" id="L117">        n = rotateRight(n);</span>
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">      if (isRed(localN.leftChild) &amp;&amp; isRed(localN.leftChild.leftChild)) {</span>
+<span class="nc" id="L112">        localN = rotateRight(localN);</span>
       }
-<span class="fc bfc" id="L119" title="All 4 branches covered.">      if (isRed(n.leftChild) &amp;&amp; isRed(n.rightChild)) {</span>
-<span class="fc" id="L120">        flipColors(n);</span>
+<span class="fc bfc" id="L114" title="All 4 branches covered.">      if (isRed(localN.leftChild) &amp;&amp; isRed(localN.rightChild)) {</span>
+<span class="fc" id="L115">        flipColors(localN);</span>
       }
-<span class="fc" id="L122">      n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
-    }
-<span class="fc" id="L124">    return n;</span>
+<span class="fc" id="L117">      localN.n = size(localN.leftChild) + size(localN.rightChild) + 1;      </span>
+    }    
+<span class="fc" id="L119">    return localN;</span>
   }
 
   /**
    * Update max min.
    *
-   * @param n
-   *          the n
-   * @param c
-   *          the c
+   * @param n the n
+   * @param c the c
    */
   private void updateMaxMin(IntervalRBTreeNode&lt;T&gt; n, IntervalRBTreeNode&lt;T&gt; c) {
-<span class="pc bpc" id="L136" title="1 of 2 branches missed.">    if (c != null) {</span>
-<span class="pc bpc" id="L137" title="1 of 2 branches missed.">      if (n.max &lt; c.max) {</span>
-<span class="fc" id="L138">        n.max = c.max;</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">    if (c != null) {</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">      if (n.max &lt; c.max) {</span>
+<span class="fc" id="L131">        n.max = c.max;</span>
       }
-<span class="pc bpc" id="L140" title="1 of 2 branches missed.">      if (n.min &gt; c.min) {</span>
-<span class="nc" id="L141">        n.min = c.min;</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">      if (n.min &gt; c.min) {</span>
+<span class="nc" id="L134">        n.min = c.min;</span>
       }
     }
-<span class="fc" id="L144">  }</span>
+<span class="fc" id="L137">  }</span>
 
   // make a left-leaning link lean to the right
   /**
    * Rotate right.
    *
-   * @param n
-   *          the n
-   * @return the interval rb tree node
+   * @param n the n
+   * @return the interval RB tree node
    */
   private IntervalRBTreeNode&lt;T&gt; rotateRight(IntervalRBTreeNode&lt;T&gt; n) {
-<span class="nc bnc" id="L155" title="All 6 branches missed.">    assert (n != null) &amp;&amp; isRed(n.leftChild);</span>
-<span class="nc" id="L156">    IntervalRBTreeNode&lt;T&gt; x = n.leftChild;</span>
-<span class="nc" id="L157">    n.leftChild = x.rightChild;</span>
-<span class="nc" id="L158">    x.rightChild = n;</span>
-<span class="nc" id="L159">    x.color = x.rightChild.color;</span>
-<span class="nc" id="L160">    x.rightChild.color = IntervalRBTreeNode.RED;</span>
-<span class="nc" id="L161">    x.n = n.n;</span>
-<span class="nc" id="L162">    n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
-<span class="nc" id="L163">    setMaxMin(n);</span>
-<span class="nc" id="L164">    setMaxMin(x);</span>
-<span class="nc" id="L165">    return x;</span>
+<span class="nc bnc" id="L147" title="All 6 branches missed.">    assert (n != null) &amp;&amp; isRed(n.leftChild);</span>
+<span class="nc" id="L148">    IntervalRBTreeNode&lt;T&gt; x = n.leftChild;</span>
+<span class="nc" id="L149">    n.leftChild = x.rightChild;</span>
+<span class="nc" id="L150">    x.rightChild = n;</span>
+<span class="nc" id="L151">    x.color = x.rightChild.color;</span>
+<span class="nc" id="L152">    x.rightChild.color = IntervalRBTreeNode.RED;</span>
+<span class="nc" id="L153">    x.n = n.n;</span>
+<span class="nc" id="L154">    n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
+<span class="nc" id="L155">    setMaxMin(n);</span>
+<span class="nc" id="L156">    setMaxMin(x);</span>
+<span class="nc" id="L157">    return x;</span>
   }
 
   // make a right-leaning link lean to the left
   /**
    * Rotate left.
    *
-   * @param n
-   *          the n
-   * @return the interval rb tree node
+   * @param n the n
+   * @return the interval RB tree node
    */
   private IntervalRBTreeNode&lt;T&gt; rotateLeft(IntervalRBTreeNode&lt;T&gt; n) {
-<span class="pc bpc" id="L177" title="3 of 6 branches missed.">    assert (n != null) &amp;&amp; isRed(n.rightChild);</span>
-<span class="fc" id="L178">    IntervalRBTreeNode&lt;T&gt; x = n.rightChild;</span>
-<span class="fc" id="L179">    n.rightChild = x.leftChild;</span>
-<span class="fc" id="L180">    x.leftChild = n;</span>
-<span class="fc" id="L181">    x.color = x.leftChild.color;</span>
-<span class="fc" id="L182">    x.leftChild.color = IntervalRBTreeNode.RED;</span>
-<span class="fc" id="L183">    x.n = n.n;</span>
-<span class="fc" id="L184">    n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
-<span class="fc" id="L185">    setMaxMin(n);</span>
-<span class="fc" id="L186">    setMaxMin(x);</span>
-<span class="fc" id="L187">    return x;</span>
+<span class="pc bpc" id="L168" title="3 of 6 branches missed.">    assert (n != null) &amp;&amp; isRed(n.rightChild);</span>
+<span class="fc" id="L169">    IntervalRBTreeNode&lt;T&gt; x = n.rightChild;</span>
+<span class="fc" id="L170">    n.rightChild = x.leftChild;</span>
+<span class="fc" id="L171">    x.leftChild = n;</span>
+<span class="fc" id="L172">    x.color = x.leftChild.color;</span>
+<span class="fc" id="L173">    x.leftChild.color = IntervalRBTreeNode.RED;</span>
+<span class="fc" id="L174">    x.n = n.n;</span>
+<span class="fc" id="L175">    n.n = size(n.leftChild) + size(n.rightChild) + 1;</span>
+<span class="fc" id="L176">    setMaxMin(n);</span>
+<span class="fc" id="L177">    setMaxMin(x);</span>
+<span class="fc" id="L178">    return x;</span>
   }
 
   // flip the colors of a node and its two children
   /**
    * Flip colors.
    *
-   * @param n
-   *          the n
+   * @param n the n
    */
   private void flipColors(IntervalRBTreeNode&lt;T&gt; n) {
     // n must have opposite color of its two children
-<span class="pc bpc" id="L199" title="4 of 8 branches missed.">    assert (n != null) &amp;&amp; (n.leftChild != null) &amp;&amp; (n.rightChild != null);</span>
-<span class="pc bpc" id="L200" title="4 of 8 branches missed.">    assert (!isRed(n) &amp;&amp; isRed(n.leftChild) &amp;&amp; isRed(n.rightChild))</span>
-<span class="nc bnc" id="L201" title="All 6 branches missed.">        || (isRed(n) &amp;&amp; !isRed(n.leftChild) &amp;&amp; !isRed(n.rightChild));</span>
-<span class="fc" id="L202">    n.color ^= 1;</span>
-<span class="fc" id="L203">    n.leftChild.color ^= 1;</span>
-<span class="fc" id="L204">    n.rightChild.color ^= 1;</span>
-<span class="fc" id="L205">  }</span>
+<span class="pc bpc" id="L189" title="4 of 8 branches missed.">    assert (n != null) &amp;&amp; (n.leftChild != null) &amp;&amp; (n.rightChild != null);</span>
+<span class="pc bpc" id="L190" title="4 of 8 branches missed.">    assert (!isRed(n) &amp;&amp; isRed(n.leftChild) &amp;&amp; isRed(n.rightChild))</span>
+<span class="nc bnc" id="L191" title="All 6 branches missed.">        || (isRed(n) &amp;&amp; !isRed(n.leftChild) &amp;&amp; !isRed(n.rightChild));</span>
+<span class="fc" id="L192">    n.color ^= 1;</span>
+<span class="fc" id="L193">    n.leftChild.color ^= 1;</span>
+<span class="fc" id="L194">    n.rightChild.color ^= 1;</span>
+<span class="fc" id="L195">  }</span>
 
   /**
    * Checks if is red.
    *
-   * @param n
-   *          the n
+   * @param n the n
    * @return true, if is red
    */
   private boolean isRed(IntervalRBTreeNode&lt;T&gt; n) {
-<span class="fc bfc" id="L215" title="All 2 branches covered.">    if (n == null) {</span>
-<span class="fc" id="L216">      return false;</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">    if (n == null) {</span>
+<span class="fc" id="L205">      return false;</span>
     }
-<span class="fc bfc" id="L218" title="All 2 branches covered.">    return n.color == IntervalRBTreeNode.RED;</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    return n.color == IntervalRBTreeNode.RED;</span>
   }
 
   /**
    * Size.
    *
-   * @param n
-   *          the n
+   * @param n the n
    * @return the int
    */
   private int size(IntervalRBTreeNode&lt;T&gt; n) {
-<span class="fc bfc" id="L229" title="All 2 branches covered.">    if (n == null)</span>
-<span class="fc" id="L230">      return 0;</span>
-<span class="fc" id="L231">    return n.n;</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">    if (n == null)</span>
+<span class="fc" id="L218">      return 0;</span>
+<span class="fc" id="L219">    return n.n;</span>
   }
 
   /**
    * Sets the max min.
    *
-   * @param n
-   *          the new max min
+   * @param n the new max min
    */
   private void setMaxMin(IntervalRBTreeNode&lt;T&gt; n) {
-<span class="fc" id="L241">    n.min = n.left;</span>
-<span class="fc" id="L242">    n.max = n.right;</span>
-<span class="fc bfc" id="L243" title="All 2 branches covered.">    if (n.leftChild != null) {</span>
-<span class="fc" id="L244">      n.min = Math.min(n.min, n.leftChild.min);</span>
-<span class="fc" id="L245">      n.max = Math.max(n.max, n.leftChild.max);</span>
+<span class="fc" id="L228">    n.min = n.left;</span>
+<span class="fc" id="L229">    n.max = n.right;</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">    if (n.leftChild != null) {</span>
+<span class="fc" id="L231">      n.min = Math.min(n.min, n.leftChild.min);</span>
+<span class="fc" id="L232">      n.max = Math.max(n.max, n.leftChild.max);</span>
     }
-<span class="fc bfc" id="L247" title="All 2 branches covered.">    if (n.rightChild != null) {</span>
-<span class="fc" id="L248">      n.min = Math.min(n.min, n.rightChild.min);</span>
-<span class="fc" id="L249">      n.max = Math.max(n.max, n.rightChild.max);</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">    if (n.rightChild != null) {</span>
+<span class="fc" id="L235">      n.min = Math.min(n.min, n.rightChild.min);</span>
+<span class="fc" id="L236">      n.max = Math.max(n.max, n.rightChild.max);</span>
     }
-<span class="fc" id="L251">  }</span>
+<span class="fc" id="L238">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

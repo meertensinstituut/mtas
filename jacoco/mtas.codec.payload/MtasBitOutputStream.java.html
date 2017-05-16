@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasBitOutputStream.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.payload</a> &gt; <span class="el_source">MtasBitOutputStream.java</span></div><h1>MtasBitOutputStream.java</h1><pre class="source lang-java linenums">package mtas.codec.payload;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasBitOutputStream.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.payload</a> &gt; <span class="el_source">MtasBitOutputStream.java</span></div><h1>MtasBitOutputStream.java</h1><pre class="source lang-java linenums">package mtas.codec.payload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,91 +18,82 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
    * Instantiates a new mtas bit output stream.
    */
 <span class="fc" id="L20">  public MtasBitOutputStream() {</span>
-<span class="fc" id="L21">  }</span>
+    // do nothing
+<span class="fc" id="L22">  }</span>
 
   /**
    * Write bit.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeBit(int value) throws IOException {
-<span class="fc" id="L32">    writeBit(value, 1);</span>
-<span class="fc" id="L33">  }</span>
+<span class="fc" id="L31">    writeBit(value, 1);</span>
+<span class="fc" id="L32">  }</span>
 
   /**
    * Write bit.
    *
-   * @param value
-   *          the value
-   * @param number
-   *          the number
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @param number the number
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeBit(int value, int number) throws IOException {
-<span class="fc bfc" id="L46" title="All 2 branches covered.">    while (number &gt; 0) {</span>
-<span class="fc" id="L47">      number--;</span>
-<span class="fc" id="L48">      bitBuffer |= ((value &amp; 1) &lt;&lt; bitCount++);</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">      if (bitCount == 8) {</span>
-<span class="fc" id="L50">        createByte();</span>
+<span class="fc" id="L42">    int localNumber = number;</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    while (localNumber &gt; 0) {</span>
+<span class="fc" id="L44">      localNumber--;</span>
+<span class="fc" id="L45">      bitBuffer |= ((value &amp; 1) &lt;&lt; bitCount++);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">      if (bitCount == 8) {</span>
+<span class="fc" id="L47">        createByte();</span>
       }
     }
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L50">  }</span>
 
   /**
    * Write elias gamma coding integer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeEliasGammaCodingInteger(int value) throws IOException {
-<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    if (value &gt;= 0) {</span>
-<span class="fc" id="L65">      writeEliasGammaCodingPositiveInteger(2 * value + 1);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    if (value &gt;= 0) {</span>
+<span class="fc" id="L60">      writeEliasGammaCodingPositiveInteger(2 * value + 1);</span>
     } else {
-<span class="nc" id="L67">      writeEliasGammaCodingPositiveInteger(-2 * value);</span>
+<span class="nc" id="L62">      writeEliasGammaCodingPositiveInteger(-2 * value);</span>
     }
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L64">  }</span>
 
   /**
    * Write elias gamma coding non negative integer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeEliasGammaCodingNonNegativeInteger(int value)
       throws IOException {
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">    if (value &gt;= 0) {</span>
-<span class="fc" id="L82">      writeEliasGammaCodingPositiveInteger(value + 1);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">    if (value &gt;= 0) {</span>
+<span class="fc" id="L75">      writeEliasGammaCodingPositiveInteger(value + 1);</span>
     }
-<span class="fc" id="L84">  }</span>
+<span class="fc" id="L77">  }</span>
 
   /**
    * Write elias gamma coding positive integer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeEliasGammaCodingPositiveInteger(int value)
       throws IOException {
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (value &gt; 0) {</span>
-<span class="fc bfc" id="L97" title="All 2 branches covered.">      if (value == 1) {</span>
-<span class="fc" id="L98">        writeBit(1);</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    if (value &gt; 0) {</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">      if (value == 1) {</span>
+<span class="fc" id="L89">        writeBit(1);</span>
       } else {
-<span class="fc" id="L100">        writeBit(0);</span>
-<span class="fc" id="L101">        writeEliasGammaCodingPositiveInteger(value / 2);</span>
-<span class="fc" id="L102">        writeBit(value % 2);</span>
+<span class="fc" id="L91">        writeBit(0);</span>
+<span class="fc" id="L92">        writeEliasGammaCodingPositiveInteger(value / 2);</span>
+<span class="fc" id="L93">        writeBit(value % 2);</span>
       }
     }
-<span class="fc" id="L105">  }</span>
+<span class="fc" id="L96">  }</span>
 
   /*
    * (non-Javadoc)
@@ -111,22 +102,21 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
    */
   @Override
   public void close() throws IOException {
-<span class="nc" id="L114">    createByte();</span>
-<span class="nc" id="L115">    super.close();</span>
-<span class="nc" id="L116">  }</span>
+<span class="nc" id="L105">    createByte();</span>
+<span class="nc" id="L106">    super.close();</span>
+<span class="nc" id="L107">  }</span>
 
   /**
    * Creates the byte.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void createByte() throws IOException {
-<span class="fc bfc" id="L125" title="All 2 branches covered.">    if (bitCount &gt; 0) {</span>
-<span class="fc" id="L126">      bitCount = 0;</span>
-<span class="fc" id="L127">      write(bitBuffer);</span>
-<span class="fc" id="L128">      bitBuffer = 0;</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">    if (bitCount &gt; 0) {</span>
+<span class="fc" id="L116">      bitCount = 0;</span>
+<span class="fc" id="L117">      write(bitBuffer);</span>
+<span class="fc" id="L118">      bitBuffer = 0;</span>
     }
-<span class="fc" id="L130">  }</span>
+<span class="fc" id="L120">  }</span>
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

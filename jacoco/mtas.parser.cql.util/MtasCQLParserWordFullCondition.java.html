@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasCQLParserWordFullCondition.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.cql.util</a> &gt; <span class="el_source">MtasCQLParserWordFullCondition.java</span></div><h1>MtasCQLParserWordFullCondition.java</h1><pre class="source lang-java linenums">package mtas.parser.cql.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasCQLParserWordFullCondition.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.parser.cql.util</a> &gt; <span class="el_source">MtasCQLParserWordFullCondition.java</span></div><h1>MtasCQLParserWordFullCondition.java</h1><pre class="source lang-java linenums">package mtas.parser.cql.util;
 
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanMatchAllQuery;
@@ -18,24 +18,23 @@ public class MtasCQLParserWordFullCondition
   private MtasCQLParserWordCondition wordCondition;
 
   /**
-   * Instantiates a new mtas cql parser word full condition.
+   * Instantiates a new mtas CQL parser word full condition.
    *
-   * @param condition
-   *          the condition
+   * @param condition the condition
    */
-<span class="fc" id="L26">  public MtasCQLParserWordFullCondition(MtasCQLParserWordCondition condition) {</span>
-<span class="fc" id="L27">    minimumOccurence = 1;</span>
-<span class="fc" id="L28">    maximumOccurence = 1;</span>
-<span class="fc" id="L29">    optional = false;</span>
-<span class="fc" id="L30">    condition.simplify();</span>
-<span class="pc bpc" id="L31" title="1 of 2 branches missed.">    if (condition.not()) {</span>
-<span class="nc" id="L32">      not = true;</span>
-<span class="nc" id="L33">      condition.swapNot();</span>
+<span class="fc" id="L25">  public MtasCQLParserWordFullCondition(MtasCQLParserWordCondition condition) {</span>
+<span class="fc" id="L26">    minimumOccurence = 1;</span>
+<span class="fc" id="L27">    maximumOccurence = 1;</span>
+<span class="fc" id="L28">    optional = false;</span>
+<span class="fc" id="L29">    condition.simplify();</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">    if (condition.not()) {</span>
+<span class="nc" id="L31">      not = true;</span>
+<span class="nc" id="L32">      condition.swapNot();</span>
     } else {
-<span class="fc" id="L35">      not = false;</span>
+<span class="fc" id="L34">      not = false;</span>
     }
-<span class="fc" id="L37">    wordCondition = condition;</span>
-<span class="fc" id="L38">  }</span>
+<span class="fc" id="L36">    wordCondition = condition;</span>
+<span class="fc" id="L37">  }</span>
 
   /**
    * Gets the condition.
@@ -43,7 +42,7 @@ public class MtasCQLParserWordFullCondition
    * @return the condition
    */
   public MtasCQLParserWordCondition getCondition() {
-<span class="fc" id="L46">    return wordCondition;</span>
+<span class="fc" id="L45">    return wordCondition;</span>
   }
 
   /**
@@ -52,7 +51,7 @@ public class MtasCQLParserWordFullCondition
    * @return true, if is empty
    */
   public boolean isEmpty() {
-<span class="nc" id="L55">    return wordCondition.isEmpty();</span>
+<span class="nc" id="L54">    return wordCondition.isEmpty();</span>
   }
 
   /*
@@ -63,33 +62,34 @@ public class MtasCQLParserWordFullCondition
    */
   @Override
   public MtasSpanQuery getQuery() throws ParseException {
-<span class="fc" id="L66">    MtasSpanQuery q = null;</span>
+<span class="fc" id="L65">    MtasSpanQuery q = null;</span>
     // match any word (try to avoid...)
-<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (wordCondition.isEmpty()) {</span>
-<span class="fc" id="L69">      q = new MtasSpanMatchAllQuery(wordCondition.field());</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (wordCondition.isEmpty()) {</span>
+<span class="fc" id="L68">      q = new MtasSpanMatchAllQuery(wordCondition.field());</span>
       // only positive queries
-<span class="fc bfc" id="L71" title="All 2 branches covered.">    } else if (wordCondition.isSimplePositive()) {</span>
-<span class="fc bfc" id="L72" title="All 2 branches covered.">      if (wordCondition.isSingle()) {</span>
-<span class="fc" id="L73">        q = wordCondition.getPositiveQuery(0);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    } else if (wordCondition.isSimplePositive()) {</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">      if (wordCondition.isSingle()) {</span>
+<span class="fc" id="L72">        q = wordCondition.getPositiveQuery(0);</span>
       } else {
-<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {</span>
-<span class="fc" id="L76">          q = new MtasSpanAndQuery(wordCondition.getPositiveQuery()</span>
-<span class="fc" id="L77">              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));</span>
-<span class="fc" id="L78">        } else if (wordCondition.type()</span>
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">            .equals(MtasCQLParserWordCondition.TYPE_OR)) {</span>
-<span class="fc" id="L80">          q = new MtasSpanOrQuery(wordCondition.getPositiveQuery()</span>
-<span class="fc" id="L81">              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {</span>
+<span class="fc" id="L75">          q = new MtasSpanAndQuery(wordCondition.getPositiveQuery()</span>
+<span class="fc" id="L76">              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));</span>
+<span class="fc" id="L77">        } else if (wordCondition.type()</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">            .equals(MtasCQLParserWordCondition.TYPE_OR)) {</span>
+<span class="fc" id="L79">          q = new MtasSpanOrQuery(wordCondition.getPositiveQuery()</span>
+<span class="fc" id="L80">              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));</span>
         } else {
-<span class="nc" id="L83">          throw new ParseException(&quot;unknown type &quot; + wordCondition.type());</span>
+<span class="nc" id="L82">          throw new ParseException(&quot;unknown type &quot; + wordCondition.type());</span>
         }
       }
       // only negative queries
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    } else if (wordCondition.isSimpleNegative()) {</span>
-<span class="nc" id="L88">      throw new ParseException(&quot;shouldn't be simple negative&quot;);</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    } else if (wordCondition.isSimpleNegative()) {</span>
+<span class="nc" id="L87">      throw new ParseException(&quot;shouldn't be simple negative&quot;);</span>
       // both positive and negative queries
     } else {
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">      if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {</span>
-        MtasSpanQuery qPositive, qNegative;
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">      if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {</span>
+        MtasSpanQuery qPositive;
+        MtasSpanQuery qNegative;
 <span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (wordCondition.getPositiveQuery().size() == 1) {</span>
 <span class="fc" id="L94">          qPositive = wordCondition.getPositiveQuery(0);</span>
         } else {
@@ -105,29 +105,30 @@ public class MtasCQLParserWordFullCondition
 <span class="fc" id="L105">        q = new MtasSpanNotQuery(qPositive, qNegative);</span>
 <span class="pc" id="L106">      } else if (wordCondition.type()</span>
 <span class="nc bnc" id="L107" title="All 2 branches missed.">          .equals(MtasCQLParserWordCondition.TYPE_OR)) {</span>
-        MtasSpanQuery qPositive, qNegative;
-<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (wordCondition.getPositiveQuery().size() == 1) {</span>
-<span class="nc" id="L110">          qPositive = wordCondition.getPositiveQuery(0);</span>
+        MtasSpanQuery qPositive;
+        MtasSpanQuery qNegative;
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (wordCondition.getPositiveQuery().size() == 1) {</span>
+<span class="nc" id="L111">          qPositive = wordCondition.getPositiveQuery(0);</span>
         } else {
-<span class="nc" id="L112">          qPositive = new MtasSpanOrQuery(wordCondition.getPositiveQuery()</span>
-<span class="nc" id="L113">              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));</span>
+<span class="nc" id="L113">          qPositive = new MtasSpanOrQuery(wordCondition.getPositiveQuery()</span>
+<span class="nc" id="L114">              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));</span>
         }
-<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (wordCondition.getNegativeQuery().size() == 1) {</span>
-<span class="nc" id="L116">          qNegative = wordCondition.getNegativeQuery(0);</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (wordCondition.getNegativeQuery().size() == 1) {</span>
+<span class="nc" id="L117">          qNegative = wordCondition.getNegativeQuery(0);</span>
         } else {
-<span class="nc" id="L118">          qNegative = new MtasSpanAndQuery(wordCondition.getNegativeQuery()</span>
-<span class="nc" id="L119">              .toArray(new MtasSpanQuery[wordCondition.getNegativeQuery().size()]));</span>
+<span class="nc" id="L119">          qNegative = new MtasSpanAndQuery(wordCondition.getNegativeQuery()</span>
+<span class="nc" id="L120">              .toArray(new MtasSpanQuery[wordCondition.getNegativeQuery().size()]));</span>
         }
-<span class="nc" id="L121">        q = new MtasSpanNotQuery(qPositive, qNegative);</span>
-<span class="nc" id="L122">      } else {</span>
-<span class="nc" id="L123">        throw new ParseException(&quot;unknown type &quot; + wordCondition.type());</span>
+<span class="nc" id="L122">        q = new MtasSpanNotQuery(qPositive, qNegative);</span>
+<span class="nc" id="L123">      } else {</span>
+<span class="nc" id="L124">        throw new ParseException(&quot;unknown type &quot; + wordCondition.type());</span>
       }
     }
-<span class="pc bpc" id="L126" title="1 of 2 branches missed.">    if (not) {</span>
-<span class="nc" id="L127">      MtasSpanQuery qPositive = new MtasSpanMatchAllQuery(wordCondition.field());</span>
-<span class="nc" id="L128">      q = new MtasSpanNotQuery(qPositive, q);</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">    if (not) {</span>
+<span class="nc" id="L128">      MtasSpanQuery qPositive = new MtasSpanMatchAllQuery(wordCondition.field());</span>
+<span class="nc" id="L129">      q = new MtasSpanNotQuery(qPositive, q);</span>
     }
-<span class="fc" id="L130">    return q;</span>
+<span class="fc" id="L131">    return q;</span>
   }
 
   /*
@@ -137,26 +138,29 @@ public class MtasCQLParserWordFullCondition
    */
   @Override
   public boolean equals(Object object) {
-<span class="pc bpc" id="L140" title="1 of 2 branches missed.">    if (object == null)</span>
-<span class="nc" id="L141">      return false;</span>
-<span class="fc bfc" id="L142" title="All 2 branches covered.">    if (object instanceof MtasCQLParserWordFullCondition) {</span>
-<span class="fc" id="L143">      MtasCQLParserWordFullCondition word = (MtasCQLParserWordFullCondition) object;</span>
-<span class="fc bfc" id="L144" title="All 2 branches covered.">      if (!wordCondition.equals(word.wordCondition))</span>
-<span class="fc" id="L145">        return false;</span>
-<span class="pc bpc" id="L146" title="1 of 2 branches missed.">      if (not != word.not)</span>
-<span class="nc" id="L147">        return false;</span>
-<span class="fc" id="L148">      return true;</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">    if (object == null)</span>
+<span class="nc" id="L142">      return false;</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">    if (object instanceof MtasCQLParserWordFullCondition) {</span>
+<span class="fc" id="L144">      MtasCQLParserWordFullCondition word = (MtasCQLParserWordFullCondition) object;</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">      if (!wordCondition.equals(word.wordCondition))</span>
+<span class="fc" id="L146">        return false;</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">      if (not != word.not)</span>
+<span class="nc" id="L148">        return false;</span>
+<span class="fc" id="L149">      return true;</span>
     } else {
-<span class="fc" id="L150">      return false;</span>
+<span class="fc" id="L151">      return false;</span>
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
-<span class="nc" id="L156">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L157">    h = (h * 7) ^ wordCondition.hashCode();</span>
-<span class="nc" id="L158">    return h;</span>
+<span class="nc" id="L160">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L161">    h = (h * 7) ^ wordCondition.hashCode();</span>
+<span class="nc" id="L162">    return h;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

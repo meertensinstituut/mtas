@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasBufferedReader.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasBufferedReader.java</span></div><h1>MtasBufferedReader.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasBufferedReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasBufferedReader.java</span></div><h1>MtasBufferedReader.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -21,43 +21,43 @@ public class MtasBufferedReader extends Reader {
   /** The cb. */
   private char cb[];
 
+  /** The n chars. */
+  private int nChars;
+  
   /** The next char. */
-  private int nChars, nextChar;
+  private int nextChar;
 
   /** The previous buffer size. */
   private int previousBufferSize;
 
-  /** The skip lf. */
-<span class="nc" id="L31">  private boolean skipLF = false;</span>
+  /** The skip LF. */
+<span class="nc" id="L34">  private boolean skipLF = false;</span>
 
   /** The default char buffer size. */
-<span class="nc" id="L34">  private static int defaultCharBufferSize = 8192;</span>
+<span class="nc" id="L37">  private static int defaultCharBufferSize = 8192;</span>
 
   /** The default expected line length. */
-<span class="nc" id="L37">  private static int defaultExpectedLineLength = 80;</span>
+<span class="nc" id="L40">  private static int defaultExpectedLineLength = 80;</span>
 
   /**
    * Instantiates a new mtas buffered reader.
    *
-   * @param in
-   *          the in
-   * @param sz
-   *          the sz
+   * @param in the in
+   * @param sz the sz
    */
   public MtasBufferedReader(Reader in, int sz) {
-<span class="nc" id="L48">    super(in);</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">    if (sz &lt;= 0)</span>
-<span class="nc" id="L50">      throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);</span>
-<span class="nc" id="L51">    this.in = in;</span>
-<span class="nc" id="L52">    cb = new char[sz];</span>
-<span class="nc" id="L53">    nextChar = nChars = 0;</span>
-<span class="nc" id="L54">  }</span>
+<span class="nc" id="L49">    super(in);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">    if (sz &lt;= 0)</span>
+<span class="nc" id="L51">      throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);</span>
+<span class="nc" id="L52">    this.in = in;</span>
+<span class="nc" id="L53">    cb = new char[sz];</span>
+<span class="nc" id="L54">    nextChar = nChars = 0;</span>
+<span class="nc" id="L55">  }</span>
 
   /**
    * Instantiates a new mtas buffered reader.
    *
-   * @param in
-   *          the in
+   * @param in the in
    */
   public MtasBufferedReader(Reader in) {
 <span class="nc" id="L63">    this(in, defaultCharBufferSize);</span>
@@ -66,31 +66,29 @@ public class MtasBufferedReader extends Reader {
   /**
    * Ensure open.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void ensureOpen() throws IOException {
-<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (in == null)</span>
-<span class="nc" id="L74">      throw new IOException(&quot;Stream closed&quot;);</span>
-<span class="nc" id="L75">  }</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">    if (in == null)</span>
+<span class="nc" id="L73">      throw new IOException(&quot;Stream closed&quot;);</span>
+<span class="nc" id="L74">  }</span>
 
   /**
    * Fill.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void fill() throws IOException {
     int n;
-<span class="nc" id="L85">    previousBufferSize += nChars;</span>
+<span class="nc" id="L83">    previousBufferSize += nChars;</span>
     do {
-<span class="nc" id="L87">      n = in.read(cb, 0, cb.length);</span>
-<span class="nc bnc" id="L88" title="All 2 branches missed.">    } while (n == 0);</span>
-<span class="nc bnc" id="L89" title="All 2 branches missed.">    if (n &gt; 0) {</span>
-<span class="nc" id="L90">      nChars = n;</span>
-<span class="nc" id="L91">      nextChar = 0;</span>
+<span class="nc" id="L85">      n = in.read(cb, 0, cb.length);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">    } while (n == 0);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    if (n &gt; 0) {</span>
+<span class="nc" id="L88">      nChars = n;</span>
+<span class="nc" id="L89">      nextChar = 0;</span>
     }
-<span class="nc" id="L93">  }</span>
+<span class="nc" id="L91">  }</span>
 
   /*
    * (non-Javadoc)
@@ -99,68 +97,64 @@ public class MtasBufferedReader extends Reader {
    */
   @Override
   public int read() throws IOException {
-<span class="nc" id="L102">    synchronized (lock) {</span>
-<span class="nc" id="L103">      ensureOpen();</span>
+<span class="nc" id="L100">    synchronized (lock) {</span>
+<span class="nc" id="L101">      ensureOpen();</span>
       for (;;) {
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (nextChar &gt;= nChars) {</span>
-<span class="nc" id="L106">          fill();</span>
-<span class="nc bnc" id="L107" title="All 2 branches missed.">          if (nextChar &gt;= nChars)</span>
-<span class="nc" id="L108">            return -1;</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (nextChar &gt;= nChars) {</span>
+<span class="nc" id="L104">          fill();</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">          if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L106">            return -1;</span>
         }
-<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (skipLF) {</span>
-<span class="nc" id="L111">          skipLF = false;</span>
-<span class="nc bnc" id="L112" title="All 2 branches missed.">          if (cb[nextChar] == '\n') {</span>
-<span class="nc" id="L113">            nextChar++;</span>
-<span class="nc" id="L114">            continue;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (skipLF) {</span>
+<span class="nc" id="L109">          skipLF = false;</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">          if (cb[nextChar] == '\n') {</span>
+<span class="nc" id="L111">            nextChar++;</span>
+<span class="nc" id="L112">            continue;</span>
           }
         }
-<span class="nc" id="L117">        return cb[nextChar++];</span>
+<span class="nc" id="L115">        return cb[nextChar++];</span>
       }
-<span class="nc" id="L119">    }</span>
+<span class="nc" id="L117">    }</span>
   }
 
   /**
-   * Read1.
+   * Read 1.
    *
-   * @param cbuf
-   *          the cbuf
-   * @param off
-   *          the off
-   * @param len
-   *          the len
+   * @param cbuf the cbuf
+   * @param off the off
+   * @param len the len
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private int read1(char[] cbuf, int off, int len) throws IOException {
-<span class="nc bnc" id="L136" title="All 2 branches missed.">    if (nextChar &gt;= nChars) {</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">    if (nextChar &gt;= nChars) {</span>
       /*
        * If the requested length is at least as large as the buffer, and if
        * there is no mark/reset activity, and if line feeds are not being
        * skipped, do not bother to copy the characters into the local buffer. In
        * this way buffered streams will cascade harmlessly.
        */
-<span class="nc bnc" id="L143" title="All 4 branches missed.">      if (len &gt;= cb.length &amp;&amp; !skipLF) {</span>
-<span class="nc" id="L144">        return in.read(cbuf, off, len);</span>
+<span class="nc bnc" id="L137" title="All 4 branches missed.">      if (len &gt;= cb.length &amp;&amp; !skipLF) {</span>
+<span class="nc" id="L138">        return in.read(cbuf, off, len);</span>
       }
-<span class="nc" id="L146">      fill();</span>
+<span class="nc" id="L140">      fill();</span>
     }
-<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (nextChar &gt;= nChars)</span>
-<span class="nc" id="L149">      return -1;</span>
-<span class="nc bnc" id="L150" title="All 2 branches missed.">    if (skipLF) {</span>
-<span class="nc" id="L151">      skipLF = false;</span>
-<span class="nc bnc" id="L152" title="All 2 branches missed.">      if (cb[nextChar] == '\n') {</span>
-<span class="nc" id="L153">        nextChar++;</span>
-<span class="nc bnc" id="L154" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
-<span class="nc" id="L155">          fill();</span>
-<span class="nc bnc" id="L156" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
-<span class="nc" id="L157">          return -1;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">    if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L143">      return -1;</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">    if (skipLF) {</span>
+<span class="nc" id="L145">      skipLF = false;</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">      if (cb[nextChar] == '\n') {</span>
+<span class="nc" id="L147">        nextChar++;</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L149">          fill();</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L151">          return -1;</span>
       }
     }
-<span class="nc" id="L160">    int n = Math.min(len, nChars - nextChar);</span>
-<span class="nc" id="L161">    System.arraycopy(cb, nextChar, cbuf, off, n);</span>
-<span class="nc" id="L162">    nextChar += n;</span>
-<span class="nc" id="L163">    return n;</span>
+<span class="nc" id="L154">    int n = Math.min(len, nChars - nextChar);</span>
+<span class="nc" id="L155">    System.arraycopy(cb, nextChar, cbuf, off, n);</span>
+<span class="nc" id="L156">    nextChar += n;</span>
+<span class="nc" id="L157">    return n;</span>
   }
 
   /*
@@ -170,107 +164,104 @@ public class MtasBufferedReader extends Reader {
    */
   @Override
   public int read(char cbuf[], int off, int len) throws IOException {
-<span class="nc" id="L173">    synchronized (lock) {</span>
-<span class="nc" id="L174">      ensureOpen();</span>
-<span class="nc bnc" id="L175" title="All 10 branches missed.">      if ((off &lt; 0) || (off &gt; cbuf.length) || (len &lt; 0)</span>
+<span class="nc" id="L167">    synchronized (lock) {</span>
+<span class="nc" id="L168">      ensureOpen();</span>
+<span class="nc bnc" id="L169" title="All 10 branches missed.">      if ((off &lt; 0) || (off &gt; cbuf.length) || (len &lt; 0)</span>
           || ((off + len) &gt; cbuf.length) || ((off + len) &lt; 0)) {
-<span class="nc" id="L177">        throw new IndexOutOfBoundsException();</span>
-<span class="nc bnc" id="L178" title="All 2 branches missed.">      } else if (len == 0) {</span>
-<span class="nc" id="L179">        return 0;</span>
+<span class="nc" id="L171">        throw new IndexOutOfBoundsException();</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">      } else if (len == 0) {</span>
+<span class="nc" id="L173">        return 0;</span>
       }
 
-<span class="nc" id="L182">      int n = read1(cbuf, off, len);</span>
-<span class="nc bnc" id="L183" title="All 2 branches missed.">      if (n &lt;= 0)</span>
-<span class="nc" id="L184">        return n;</span>
-<span class="nc bnc" id="L185" title="All 4 branches missed.">      while ((n &lt; len) &amp;&amp; in.ready()) {</span>
-<span class="nc" id="L186">        int n1 = read1(cbuf, off + n, len - n);</span>
-<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (n1 &lt;= 0)</span>
-<span class="nc" id="L188">          break;</span>
-<span class="nc" id="L189">        n += n1;</span>
-<span class="nc" id="L190">      }</span>
-<span class="nc" id="L191">      return n;</span>
-<span class="nc" id="L192">    }</span>
+<span class="nc" id="L176">      int n = read1(cbuf, off, len);</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">      if (n &lt;= 0)</span>
+<span class="nc" id="L178">        return n;</span>
+<span class="nc bnc" id="L179" title="All 4 branches missed.">      while ((n &lt; len) &amp;&amp; in.ready()) {</span>
+<span class="nc" id="L180">        int n1 = read1(cbuf, off + n, len - n);</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (n1 &lt;= 0)</span>
+<span class="nc" id="L182">          break;</span>
+<span class="nc" id="L183">        n += n1;</span>
+<span class="nc" id="L184">      }</span>
+<span class="nc" id="L185">      return n;</span>
+<span class="nc" id="L186">    }</span>
   }
 
   /**
    * Read line.
    *
-   * @param ignoreLF
-   *          the ignore lf
+   * @param ignoreLF the ignore LF
    * @return the string
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   String readLine(boolean ignoreLF) throws IOException {
-<span class="nc" id="L205">    StringBuffer s = null;</span>
+<span class="nc" id="L197">    StringBuffer s = null;</span>
     int startChar;
 
-<span class="nc" id="L208">    synchronized (lock) {</span>
-<span class="nc" id="L209">      ensureOpen();</span>
-<span class="nc bnc" id="L210" title="All 4 branches missed.">      boolean omitLF = ignoreLF || skipLF;</span>
+<span class="nc" id="L200">    synchronized (lock) {</span>
+<span class="nc" id="L201">      ensureOpen();</span>
+<span class="nc bnc" id="L202" title="All 4 branches missed.">      boolean omitLF = ignoreLF || skipLF;</span>
 
       for (;;) {
 
-<span class="nc bnc" id="L214" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
-<span class="nc" id="L215">          fill();</span>
-<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (nextChar &gt;= nChars) { /* EOF */</span>
-<span class="nc bnc" id="L217" title="All 4 branches missed.">          if (s != null &amp;&amp; s.length() &gt; 0)</span>
-<span class="nc" id="L218">            return s.toString();</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L207">          fill();</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (nextChar &gt;= nChars) { /* EOF */</span>
+<span class="nc bnc" id="L209" title="All 4 branches missed.">          if (s != null &amp;&amp; s.length() &gt; 0)</span>
+<span class="nc" id="L210">            return s.toString();</span>
           else
-<span class="nc" id="L220">            return null;</span>
+<span class="nc" id="L212">            return null;</span>
         }
-<span class="nc" id="L222">        boolean eol = false;</span>
-<span class="nc" id="L223">        char c = 0;</span>
+<span class="nc" id="L214">        boolean eol = false;</span>
+<span class="nc" id="L215">        char c = 0;</span>
         int i;
 
         /* Skip a leftover '\n', if necessary */
-<span class="nc bnc" id="L227" title="All 4 branches missed.">        if (omitLF &amp;&amp; (cb[nextChar] == '\n'))</span>
-<span class="nc" id="L228">          nextChar++;</span>
-<span class="nc" id="L229">        skipLF = false;</span>
-<span class="nc" id="L230">        omitLF = false;</span>
+<span class="nc bnc" id="L219" title="All 4 branches missed.">        if (omitLF &amp;&amp; (cb[nextChar] == '\n'))</span>
+<span class="nc" id="L220">          nextChar++;</span>
+<span class="nc" id="L221">        skipLF = false;</span>
+<span class="nc" id="L222">        omitLF = false;</span>
 
-<span class="nc bnc" id="L232" title="All 2 branches missed.">        charLoop: for (i = nextChar; i &lt; nChars; i++) {</span>
-<span class="nc" id="L233">          c = cb[i];</span>
-<span class="nc bnc" id="L234" title="All 4 branches missed.">          if ((c == '\n') || (c == '\r')) {</span>
-<span class="nc" id="L235">            eol = true;</span>
-<span class="nc" id="L236">            break charLoop;</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        charLoop: for (i = nextChar; i &lt; nChars; i++) {</span>
+<span class="nc" id="L225">          c = cb[i];</span>
+<span class="nc bnc" id="L226" title="All 4 branches missed.">          if ((c == '\n') || (c == '\r')) {</span>
+<span class="nc" id="L227">            eol = true;</span>
+<span class="nc" id="L228">            break charLoop;</span>
           }
         }
 
-<span class="nc" id="L240">        startChar = nextChar;</span>
-<span class="nc" id="L241">        nextChar = i;</span>
+<span class="nc" id="L232">        startChar = nextChar;</span>
+<span class="nc" id="L233">        nextChar = i;</span>
 
-<span class="nc bnc" id="L243" title="All 2 branches missed.">        if (eol) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        if (eol) {</span>
           String str;
-<span class="nc bnc" id="L245" title="All 2 branches missed.">          if (s == null) {</span>
-<span class="nc" id="L246">            str = new String(cb, startChar, i - startChar);</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">          if (s == null) {</span>
+<span class="nc" id="L238">            str = new String(cb, startChar, i - startChar);</span>
           } else {
-<span class="nc" id="L248">            s.append(cb, startChar, i - startChar);</span>
-<span class="nc" id="L249">            str = s.toString();</span>
+<span class="nc" id="L240">            s.append(cb, startChar, i - startChar);</span>
+<span class="nc" id="L241">            str = s.toString();</span>
           }
-<span class="nc" id="L251">          nextChar++;</span>
-<span class="nc bnc" id="L252" title="All 2 branches missed.">          if (c == '\r') {</span>
-<span class="nc" id="L253">            skipLF = true;</span>
+<span class="nc" id="L243">          nextChar++;</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">          if (c == '\r') {</span>
+<span class="nc" id="L245">            skipLF = true;</span>
           }
-<span class="nc" id="L255">          return str;</span>
+<span class="nc" id="L247">          return str;</span>
         }
 
-<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (s == null)</span>
-<span class="nc" id="L259">          s = new StringBuffer(defaultExpectedLineLength);</span>
-<span class="nc" id="L260">        s.append(cb, startChar, i - startChar);</span>
-<span class="nc" id="L261">      }</span>
-<span class="nc" id="L262">    }</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        if (s == null)</span>
+<span class="nc" id="L251">          s = new StringBuffer(defaultExpectedLineLength);</span>
+<span class="nc" id="L252">        s.append(cb, startChar, i - startChar);</span>
+<span class="nc" id="L253">      }</span>
+<span class="nc" id="L254">    }</span>
   }
 
   /**
    * Read line.
    *
    * @return the string
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public String readLine() throws IOException {
-<span class="nc" id="L273">    return readLine(false);</span>
+<span class="nc" id="L264">    return readLine(false);</span>
   }
 
   /**
@@ -279,7 +270,7 @@ public class MtasBufferedReader extends Reader {
    * @return the position
    */
   public int getPosition() {
-<span class="nc" id="L282">    return previousBufferSize + nextChar;</span>
+<span class="nc" id="L273">    return previousBufferSize + nextChar;</span>
   }
 
   /*
@@ -289,35 +280,35 @@ public class MtasBufferedReader extends Reader {
    */
   @Override
   public long skip(long n) throws IOException {
-<span class="nc bnc" id="L292" title="All 2 branches missed.">    if (n &lt; 0L) {</span>
-<span class="nc" id="L293">      throw new IllegalArgumentException(&quot;skip value is negative&quot;);</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">    if (n &lt; 0L) {</span>
+<span class="nc" id="L284">      throw new IllegalArgumentException(&quot;skip value is negative&quot;);</span>
     }
-<span class="nc" id="L295">    synchronized (lock) {</span>
-<span class="nc" id="L296">      ensureOpen();</span>
-<span class="nc" id="L297">      long r = n;</span>
-<span class="nc bnc" id="L298" title="All 2 branches missed.">      while (r &gt; 0) {</span>
-<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
-<span class="nc" id="L300">          fill();</span>
-<span class="nc bnc" id="L301" title="All 2 branches missed.">        if (nextChar &gt;= nChars) /* EOF */</span>
-<span class="nc" id="L302">          break;</span>
-<span class="nc bnc" id="L303" title="All 2 branches missed.">        if (skipLF) {</span>
-<span class="nc" id="L304">          skipLF = false;</span>
-<span class="nc bnc" id="L305" title="All 2 branches missed.">          if (cb[nextChar] == '\n') {</span>
-<span class="nc" id="L306">            nextChar++;</span>
+<span class="nc" id="L286">    synchronized (lock) {</span>
+<span class="nc" id="L287">      ensureOpen();</span>
+<span class="nc" id="L288">      long r = n;</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">      while (r &gt; 0) {</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        if (nextChar &gt;= nChars)</span>
+<span class="nc" id="L291">          fill();</span>
+<span class="nc bnc" id="L292" title="All 2 branches missed.">        if (nextChar &gt;= nChars) /* EOF */</span>
+<span class="nc" id="L293">          break;</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        if (skipLF) {</span>
+<span class="nc" id="L295">          skipLF = false;</span>
+<span class="nc bnc" id="L296" title="All 2 branches missed.">          if (cb[nextChar] == '\n') {</span>
+<span class="nc" id="L297">            nextChar++;</span>
           }
         }
-<span class="nc" id="L309">        long d = nChars - nextChar;</span>
-<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (r &lt;= d) {</span>
-<span class="nc" id="L311">          nextChar += r;</span>
-<span class="nc" id="L312">          r = 0;</span>
-<span class="nc" id="L313">          break;</span>
+<span class="nc" id="L300">        long d = (long) nChars - nextChar;</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">        if (r &lt;= d) {</span>
+<span class="nc" id="L302">          nextChar += r;</span>
+<span class="nc" id="L303">          r = 0;</span>
+<span class="nc" id="L304">          break;</span>
         } else {
-<span class="nc" id="L315">          r -= d;</span>
-<span class="nc" id="L316">          nextChar = nChars;</span>
+<span class="nc" id="L306">          r -= d;</span>
+<span class="nc" id="L307">          nextChar = nChars;</span>
         }
-<span class="nc" id="L318">      }</span>
-<span class="nc" id="L319">      return n - r;</span>
-<span class="nc" id="L320">    }</span>
+<span class="nc" id="L309">      }</span>
+<span class="nc" id="L310">      return n - r;</span>
+<span class="nc" id="L311">    }</span>
   }
 
   /*
@@ -327,29 +318,29 @@ public class MtasBufferedReader extends Reader {
    */
   @Override
   public boolean ready() throws IOException {
-<span class="nc" id="L330">    synchronized (lock) {</span>
-<span class="nc" id="L331">      ensureOpen();</span>
+<span class="nc" id="L321">    synchronized (lock) {</span>
+<span class="nc" id="L322">      ensureOpen();</span>
 
       /*
        * If newline needs to be skipped and the next char to be read is a
        * newline character, then just skip it right away.
        */
-<span class="nc bnc" id="L337" title="All 2 branches missed.">      if (skipLF) {</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">      if (skipLF) {</span>
         /*
          * Note that in.ready() will return true if and only if the next read on
          * the stream will not block.
          */
-<span class="nc bnc" id="L342" title="All 4 branches missed.">        if (nextChar &gt;= nChars &amp;&amp; in.ready()) {</span>
-<span class="nc" id="L343">          fill();</span>
+<span class="nc bnc" id="L333" title="All 4 branches missed.">        if (nextChar &gt;= nChars &amp;&amp; in.ready()) {</span>
+<span class="nc" id="L334">          fill();</span>
         }
-<span class="nc bnc" id="L345" title="All 2 branches missed.">        if (nextChar &lt; nChars) {</span>
-<span class="nc bnc" id="L346" title="All 2 branches missed.">          if (cb[nextChar] == '\n')</span>
-<span class="nc" id="L347">            nextChar++;</span>
-<span class="nc" id="L348">          skipLF = false;</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">        if (nextChar &lt; nChars) {</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">          if (cb[nextChar] == '\n')</span>
+<span class="nc" id="L338">            nextChar++;</span>
+<span class="nc" id="L339">          skipLF = false;</span>
         }
       }
-<span class="nc bnc" id="L351" title="All 4 branches missed.">      return (nextChar &lt; nChars) || in.ready();</span>
-<span class="nc" id="L352">    }</span>
+<span class="nc bnc" id="L342" title="All 4 branches missed.">      return (nextChar &lt; nChars) || in.ready();</span>
+<span class="nc" id="L343">    }</span>
   }
 
   /*
@@ -359,12 +350,12 @@ public class MtasBufferedReader extends Reader {
    */
   @Override
   public void reset() throws IOException {
-<span class="nc" id="L362">    synchronized (lock) {</span>
-<span class="nc" id="L363">      ensureOpen();</span>
-<span class="nc" id="L364">      nextChar = -1;</span>
-<span class="nc" id="L365">      previousBufferSize = 0;</span>
-<span class="nc" id="L366">    }</span>
-<span class="nc" id="L367">  }</span>
+<span class="nc" id="L353">    synchronized (lock) {</span>
+<span class="nc" id="L354">      ensureOpen();</span>
+<span class="nc" id="L355">      nextChar = -1;</span>
+<span class="nc" id="L356">      previousBufferSize = 0;</span>
+<span class="nc" id="L357">    }</span>
+<span class="nc" id="L358">  }</span>
 
   /*
    * (non-Javadoc)
@@ -373,17 +364,17 @@ public class MtasBufferedReader extends Reader {
    */
   @Override
   public void close() throws IOException {
-<span class="nc" id="L376">    synchronized (lock) {</span>
-<span class="nc bnc" id="L377" title="All 2 branches missed.">      if (in == null)</span>
-<span class="nc" id="L378">        return;</span>
+<span class="nc" id="L367">    synchronized (lock) {</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">      if (in == null)</span>
+<span class="nc" id="L369">        return;</span>
       try {
-<span class="nc" id="L380">        in.close();</span>
+<span class="nc" id="L371">        in.close();</span>
       } finally {
-<span class="nc" id="L382">        in = null;</span>
-<span class="nc" id="L383">        cb = null;</span>
-<span class="nc" id="L384">      }</span>
-<span class="nc" id="L385">    }</span>
-<span class="nc" id="L386">  }</span>
+<span class="nc" id="L373">        in = null;</span>
+<span class="nc" id="L374">        cb = null;</span>
+<span class="nc" id="L375">      }</span>
+<span class="nc" id="L376">    }</span>
+<span class="nc" id="L377">  }</span>
 
   /**
    * Lines.
@@ -391,36 +382,36 @@ public class MtasBufferedReader extends Reader {
    * @return the stream
    */
   public Stream&lt;String&gt; lines() {
-<span class="nc" id="L394">    Iterator&lt;String&gt; iter = new Iterator&lt;String&gt;() {</span>
-<span class="nc" id="L395">      String nextLine = null;</span>
+<span class="nc" id="L385">    Iterator&lt;String&gt; iter = new Iterator&lt;String&gt;() {</span>
+<span class="nc" id="L386">      String nextLine = null;</span>
 
       @Override
       public boolean hasNext() {
-<span class="nc bnc" id="L399" title="All 2 branches missed.">        if (nextLine != null) {</span>
-<span class="nc" id="L400">          return true;</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">        if (nextLine != null) {</span>
+<span class="nc" id="L391">          return true;</span>
         } else {
           try {
-<span class="nc" id="L403">            nextLine = readLine();</span>
-<span class="nc bnc" id="L404" title="All 2 branches missed.">            return (nextLine != null);</span>
-<span class="nc" id="L405">          } catch (IOException e) {</span>
-<span class="nc" id="L406">            throw new UncheckedIOException(e);</span>
+<span class="nc" id="L394">            nextLine = readLine();</span>
+<span class="nc bnc" id="L395" title="All 2 branches missed.">            return (nextLine != null);</span>
+<span class="nc" id="L396">          } catch (IOException e) {</span>
+<span class="nc" id="L397">            throw new UncheckedIOException(e);</span>
           }
         }
       }
 
       @Override
       public String next() {
-<span class="nc bnc" id="L413" title="All 4 branches missed.">        if (nextLine != null || hasNext()) {</span>
-<span class="nc" id="L414">          String line = nextLine;</span>
-<span class="nc" id="L415">          nextLine = null;</span>
-<span class="nc" id="L416">          return line;</span>
+<span class="nc bnc" id="L404" title="All 4 branches missed.">        if (nextLine != null || hasNext()) {</span>
+<span class="nc" id="L405">          String line = nextLine;</span>
+<span class="nc" id="L406">          nextLine = null;</span>
+<span class="nc" id="L407">          return line;</span>
         } else {
-<span class="nc" id="L418">          throw new NoSuchElementException();</span>
+<span class="nc" id="L409">          throw new NoSuchElementException();</span>
         }
       }
     };
-<span class="nc" id="L422">    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter,</span>
+<span class="nc" id="L413">    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter,</span>
         Spliterator.ORDERED | Spliterator.NONNULL), false);
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

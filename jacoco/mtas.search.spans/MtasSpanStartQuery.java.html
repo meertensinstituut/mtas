@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanStartQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanStartQuery.java</span></div><h1>MtasSpanStartQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSpanStartQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanStartQuery.java</span></div><h1>MtasSpanStartQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,19 +20,18 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public class MtasSpanStartQuery extends MtasSpanQuery {
 
-  /** The query. */
+  /** The clause. */
   private MtasSpanQuery clause;
 
   /**
    * Instantiates a new mtas span start query.
    *
-   * @param query
-   *          the query
+   * @param query the query
    */
   public MtasSpanStartQuery(MtasSpanQuery query) {
-<span class="fc" id="L33">    super(0, 0);</span>
-<span class="fc" id="L34">    clause = query;</span>
-<span class="fc" id="L35">  }</span>
+<span class="fc" id="L32">    super(0, 0);</span>
+<span class="fc" id="L33">    clause = query;</span>
+<span class="fc" id="L34">  }</span>
 
   /*
    * (non-Javadoc)
@@ -42,13 +41,13 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L45">    MtasSpanQuery newClause = clause.rewrite(reader);</span>
-<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (newClause != clause) {</span>
-<span class="fc" id="L47">      return new MtasSpanStartQuery(newClause).rewrite(reader);</span>
-<span class="pc bpc" id="L48" title="3 of 4 branches missed.">    } else if(newClause.getMaximumWidth()!=null &amp;&amp; newClause.getMaximumWidth()==0) {</span>
-<span class="nc" id="L49">      return newClause;</span>
+<span class="fc" id="L44">    MtasSpanQuery newClause = clause.rewrite(reader);</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">    if (newClause != clause) {</span>
+<span class="fc" id="L46">      return new MtasSpanStartQuery(newClause).rewrite(reader);</span>
+<span class="pc bpc" id="L47" title="3 of 4 branches missed.">    } else if(newClause.getMaximumWidth()!=null &amp;&amp; newClause.getMaximumWidth()==0) {</span>
+<span class="nc" id="L48">      return newClause;</span>
     } else {
-<span class="fc" id="L51">      return super.rewrite(reader);</span>
+<span class="fc" id="L50">      return super.rewrite(reader);</span>
     }
   }
 
@@ -60,11 +59,11 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L63">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L64">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
-<span class="nc" id="L65">    buffer.append(clause.toString(field));</span>
-<span class="nc" id="L66">    buffer.append(&quot;])&quot;);</span>
-<span class="nc" id="L67">    return buffer.toString();</span>
+<span class="nc" id="L62">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L63">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc" id="L64">    buffer.append(clause.toString(field));</span>
+<span class="nc" id="L65">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L66">    return buffer.toString();</span>
   }
 
   /*
@@ -74,7 +73,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public String getField() {
-<span class="fc" id="L77">    return clause.getField();</span>
+<span class="fc" id="L76">    return clause.getField();</span>
   }
 
   /*
@@ -87,9 +86,9 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
-<span class="fc" id="L90">    SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))</span>
-<span class="fc" id="L91">        .createWeight(searcher, needsScores);</span>
-<span class="fc" id="L92">    return new SpanTermWeight(spanWeight, searcher);</span>
+<span class="fc" id="L89">    SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))</span>
+<span class="fc" id="L90">        .createWeight(searcher, needsScores);</span>
+<span class="fc" id="L91">    return new SpanTermWeight(spanWeight, searcher);</span>
   }
 
   /**
@@ -103,18 +102,15 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span term weight.
      *
-     * @param spanWeight
-     *          the span weight
-     * @param searcher
-     *          the searcher
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param spanWeight the span weight
+     * @param searcher the searcher
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(SpanWeight spanWeight, IndexSearcher searcher)
-<span class="fc" id="L114">        throws IOException {</span>
-<span class="fc" id="L115">      super(MtasSpanStartQuery.this, searcher, null);</span>
-<span class="fc" id="L116">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L117">    }</span>
+<span class="fc" id="L110">        throws IOException {</span>
+<span class="fc" id="L111">      super(MtasSpanStartQuery.this, searcher, null);</span>
+<span class="fc" id="L112">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L113">    }</span>
 
     /*
      * (non-Javadoc)
@@ -125,8 +121,8 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L128">      spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L129">    }</span>
+<span class="nc" id="L124">      spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L125">    }</span>
 
     /*
      * (non-Javadoc)
@@ -139,7 +135,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
-<span class="fc" id="L142">      return new MtasSpanStartSpans(spanWeight.getSpans(ctx, requiredPostings));</span>
+<span class="fc" id="L138">      return new MtasSpanStartSpans(spanWeight.getSpans(ctx, requiredPostings));</span>
     }
 
     /*
@@ -149,8 +145,8 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L152">      spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L153">    }</span>
+<span class="nc" id="L148">      spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L149">    }</span>
 
   }
 
@@ -161,14 +157,14 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L165">      return true;</span>
-<span class="pc bpc" id="L166" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L167">      return false;</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L169">      return false;</span>
-<span class="fc" id="L170">    final MtasSpanStartQuery that = (MtasSpanStartQuery) obj;</span>
-<span class="fc" id="L171">    return clause.equals(that.clause);</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L161">      return true;</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L163">      return false;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L165">      return false;</span>
+<span class="fc" id="L166">    final MtasSpanStartQuery that = (MtasSpanStartQuery) obj;</span>
+<span class="fc" id="L167">    return clause.equals(that.clause);</span>
   }
 
   /*
@@ -178,10 +174,10 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L181">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L182">    h = (h * 7) ^ clause.hashCode();</span>
-<span class="nc" id="L183">    return h;</span>
+<span class="nc" id="L177">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L178">    h = (h * 7) ^ clause.hashCode();</span>
+<span class="nc" id="L179">    return h;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

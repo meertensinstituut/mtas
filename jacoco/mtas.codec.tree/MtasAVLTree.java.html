@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasAVLTree.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">MtasAVLTree.java</span></div><h1>MtasAVLTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasAVLTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.tree</a> &gt; <span class="el_source">MtasAVLTree.java</span></div><h1>MtasAVLTree.java</h1><pre class="source lang-java linenums">package mtas.codec.tree;
 
 import java.util.HashMap;
 import mtas.codec.tree.MtasTree;
@@ -13,17 +13,15 @@ public class MtasAVLTree extends MtasTree&lt;MtasAVLTreeNode&gt; {
   private final HashMap&lt;String, MtasAVLTreeNode&gt; index;
 
   /**
-   * Instantiates a new mtas avl tree.
+   * Instantiates a new mtas AVL tree.
    *
-   * @param singlePoint
-   *          the single point
-   * @param storePrefixId
-   *          the store prefix id
+   * @param singlePoint the single point
+   * @param storePrefixId the store prefix id
    */
   public MtasAVLTree(boolean singlePoint, boolean storePrefixId) {
-<span class="nc" id="L24">    super(singlePoint, storePrefixId);</span>
-<span class="nc" id="L25">    index = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L26">  }</span>
+<span class="nc" id="L22">    super(singlePoint, storePrefixId);</span>
+<span class="nc" id="L23">    index = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L24">  }</span>
 
   /*
    * (non-Javadoc)
@@ -33,13 +31,13 @@ public class MtasAVLTree extends MtasTree&lt;MtasAVLTreeNode&gt; {
   @Override
   final protected void addRangeEmpty(int left, int right, int additionalId,
       long additionalRef) {
-<span class="nc" id="L36">    String key = left + &quot;_&quot; + right;</span>
-<span class="nc bnc" id="L37" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
+<span class="nc" id="L34">    String key = left + &quot;_&quot; + right;</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
       // do nothing (empty...)
     } else {
-<span class="nc" id="L40">      addRange(left, right, additionalId, additionalRef, null, null);</span>
+<span class="nc" id="L38">      addRange(left, right, additionalId, additionalRef, null, null);</span>
     }
-<span class="nc" id="L42">  }</span>
+<span class="nc" id="L40">  }</span>
 
   /*
    * (non-Javadoc)
@@ -50,8 +48,8 @@ public class MtasAVLTree extends MtasTree&lt;MtasAVLTreeNode&gt; {
   @Override
   final protected void addSinglePoint(int position, int additionalId,
       long additionalRef, Integer id, Long ref) {
-<span class="nc" id="L53">    addRange(position, position, additionalId, additionalRef, id, ref);</span>
-<span class="nc" id="L54">  }</span>
+<span class="nc" id="L51">    addRange(position, position, additionalId, additionalRef, id, ref);</span>
+<span class="nc" id="L52">  }</span>
 
   /*
    * (non-Javadoc)
@@ -62,211 +60,202 @@ public class MtasAVLTree extends MtasTree&lt;MtasAVLTreeNode&gt; {
   @Override
   final protected void addRange(int left, int right, int additionalId,
       long additionalRef, Integer id, Long ref) {
-<span class="nc" id="L65">    String key = left + &quot;_&quot; + right;</span>
-<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
-<span class="nc" id="L67">      index.get(key).addIdAndRef(id, ref, additionalId, additionalRef);</span>
-<span class="nc" id="L68">      return;</span>
+<span class="nc" id="L63">    String key = left + &quot;_&quot; + right;</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
+<span class="nc" id="L65">      index.get(key).addIdAndRef(id, ref, additionalId, additionalRef);</span>
+<span class="nc" id="L66">      return;</span>
     }
-<span class="nc bnc" id="L70" title="All 2 branches missed.">    if (root == null) {</span>
-<span class="nc" id="L71">      root = new MtasAVLTreeNode(left, right, null);</span>
-<span class="nc" id="L72">      root.addIdAndRef(id, ref, additionalId, additionalRef);</span>
-<span class="nc" id="L73">      index.put(key, root);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    if (root == null) {</span>
+<span class="nc" id="L69">      root = new MtasAVLTreeNode(left, right, null);</span>
+<span class="nc" id="L70">      root.addIdAndRef(id, ref, additionalId, additionalRef);</span>
+<span class="nc" id="L71">      index.put(key, root);</span>
     } else {
-<span class="nc" id="L75">      MtasAVLTreeNode n = root;</span>
+<span class="nc" id="L73">      MtasAVLTreeNode n = root;</span>
       MtasAVLTreeNode parent;
       while (true) {
-<span class="nc" id="L78">        parent = n;</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">        boolean goLeft = n.left &gt; left;</span>
-<span class="nc bnc" id="L80" title="All 2 branches missed.">        n = goLeft ? n.leftChild : n.rightChild;</span>
-<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (n == null) {</span>
-<span class="nc bnc" id="L82" title="All 2 branches missed.">          if (goLeft) {</span>
-<span class="nc" id="L83">            parent.leftChild = new MtasAVLTreeNode(left, right, parent);</span>
-<span class="nc" id="L84">            updateMax(parent, parent.leftChild.max);</span>
-<span class="nc" id="L85">            parent.leftChild.addIdAndRef(id, ref, additionalId, additionalRef);</span>
-<span class="nc" id="L86">            index.put(key, parent.leftChild);</span>
+<span class="nc" id="L76">        parent = n;</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        boolean goLeft = n.left &gt; left;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        n = goLeft ? n.leftChild : n.rightChild;</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (n == null) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">          if (goLeft) {</span>
+<span class="nc" id="L81">            parent.leftChild = new MtasAVLTreeNode(left, right, parent);</span>
+<span class="nc" id="L82">            updateMax(parent, parent.leftChild.max);</span>
+<span class="nc" id="L83">            parent.leftChild.addIdAndRef(id, ref, additionalId, additionalRef);</span>
+<span class="nc" id="L84">            index.put(key, parent.leftChild);</span>
           } else {
-<span class="nc" id="L88">            parent.rightChild = new MtasAVLTreeNode(left, right, parent);</span>
-<span class="nc" id="L89">            updateMax(parent, parent.rightChild.max);</span>
-<span class="nc" id="L90">            parent.rightChild.addIdAndRef(id, ref, additionalId, additionalRef);</span>
-<span class="nc" id="L91">            index.put(key, parent.rightChild);</span>
+<span class="nc" id="L86">            parent.rightChild = new MtasAVLTreeNode(left, right, parent);</span>
+<span class="nc" id="L87">            updateMax(parent, parent.rightChild.max);</span>
+<span class="nc" id="L88">            parent.rightChild.addIdAndRef(id, ref, additionalId, additionalRef);</span>
+<span class="nc" id="L89">            index.put(key, parent.rightChild);</span>
           }
-<span class="nc" id="L93">          rebalance(parent);</span>
-<span class="nc" id="L94">          break;</span>
+<span class="nc" id="L91">          rebalance(parent);</span>
+<span class="nc" id="L92">          break;</span>
         }
-<span class="nc" id="L96">      }</span>
+<span class="nc" id="L94">      }</span>
     }
 
-<span class="nc" id="L99">  }</span>
+<span class="nc" id="L97">  }</span>
 
   /**
    * Update max.
    *
-   * @param n
-   *          the n
-   * @param max
-   *          the max
+   * @param n the n
+   * @param max the max
    */
   private void updateMax(MtasAVLTreeNode n, int max) {
-<span class="nc bnc" id="L110" title="All 2 branches missed.">    if (n != null) {</span>
-<span class="nc bnc" id="L111" title="All 2 branches missed.">      if (n.max &lt; max) {</span>
-<span class="nc" id="L112">        n.max = max;</span>
-<span class="nc" id="L113">        updateMax(n.parent, max);</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">    if (n != null) {</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">      if (n.max &lt; max) {</span>
+<span class="nc" id="L108">        n.max = max;</span>
+<span class="nc" id="L109">        updateMax(n.parent, max);</span>
       }
     }
-<span class="nc" id="L116">  }</span>
+<span class="nc" id="L112">  }</span>
 
   /**
    * Rebalance.
    *
-   * @param n
-   *          the n
+   * @param n the n
    */
   private void rebalance(MtasAVLTreeNode n) {
-<span class="nc" id="L125">    setBalance(n);</span>
-<span class="nc bnc" id="L126" title="All 2 branches missed.">    if (n.balance == -2) {</span>
-<span class="nc bnc" id="L127" title="All 2 branches missed.">      if (height(n.leftChild.leftChild) &gt;= height(n.leftChild.rightChild)) {</span>
-<span class="nc" id="L128">        n = rotateRight(n);</span>
+<span class="nc" id="L120">    MtasAVLTreeNode localN = n;</span>
+<span class="nc" id="L121">    setBalance(localN);</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">    if (localN.balance == -2) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">      if (height(localN.leftChild.leftChild) &gt;= height(localN.leftChild.rightChild)) {</span>
+<span class="nc" id="L124">        localN = rotateRight(localN);</span>
       } else {
-<span class="nc" id="L130">        n = rotateLeftThenRight(n);</span>
+<span class="nc" id="L126">        localN = rotateLeftThenRight(localN);</span>
       }
-<span class="nc bnc" id="L132" title="All 2 branches missed.">    } else if (n.balance == 2) {</span>
-<span class="nc bnc" id="L133" title="All 2 branches missed.">      if (height(n.rightChild.rightChild) &gt;= height(n.rightChild.leftChild)) {</span>
-<span class="nc" id="L134">        n = rotateLeft(n);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">    } else if (localN.balance == 2) {</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">      if (height(localN.rightChild.rightChild) &gt;= height(localN.rightChild.leftChild)) {</span>
+<span class="nc" id="L130">        localN = rotateLeft(localN);</span>
       } else {
-<span class="nc" id="L136">        n = rotateRightThenLeft(n);</span>
+<span class="nc" id="L132">        localN = rotateRightThenLeft(localN);</span>
       }
     }
-<span class="nc bnc" id="L139" title="All 2 branches missed.">    if (n.parent != null) {</span>
-<span class="nc" id="L140">      rebalance(n.parent);</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">    if (localN.parent != null) {</span>
+<span class="nc" id="L136">      rebalance(localN.parent);</span>
     } else {
-<span class="nc" id="L142">      root = n;</span>
+<span class="nc" id="L138">      root = localN;</span>
     }
-<span class="nc" id="L144">  }</span>
+<span class="nc" id="L140">  }</span>
 
   /**
    * Rotate left.
    *
-   * @param a
-   *          the a
-   * @return the mtas avl tree node
+   * @param a the a
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateLeft(MtasAVLTreeNode a) {
-<span class="nc" id="L154">    MtasAVLTreeNode b = a.rightChild;</span>
-<span class="nc" id="L155">    b.parent = a.parent;</span>
-<span class="nc" id="L156">    a.rightChild = b.leftChild;</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">    if (a.rightChild != null) {</span>
-<span class="nc" id="L158">      a.rightChild.parent = a;</span>
+<span class="nc" id="L149">    MtasAVLTreeNode b = a.rightChild;</span>
+<span class="nc" id="L150">    b.parent = a.parent;</span>
+<span class="nc" id="L151">    a.rightChild = b.leftChild;</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">    if (a.rightChild != null) {</span>
+<span class="nc" id="L153">      a.rightChild.parent = a;</span>
     }
-<span class="nc" id="L160">    b.leftChild = a;</span>
-<span class="nc" id="L161">    a.parent = b;</span>
-<span class="nc bnc" id="L162" title="All 2 branches missed.">    if (b.parent != null) {</span>
-<span class="nc bnc" id="L163" title="All 4 branches missed.">      if ((b.parent.rightChild != null) &amp;&amp; b.parent.rightChild.equals(a)) {</span>
-<span class="nc" id="L164">        b.parent.rightChild = b;</span>
+<span class="nc" id="L155">    b.leftChild = a;</span>
+<span class="nc" id="L156">    a.parent = b;</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">    if (b.parent != null) {</span>
+<span class="nc bnc" id="L158" title="All 4 branches missed.">      if ((b.parent.rightChild != null) &amp;&amp; b.parent.rightChild.equals(a)) {</span>
+<span class="nc" id="L159">        b.parent.rightChild = b;</span>
       } else {
-<span class="nc" id="L166">        b.parent.leftChild = b;</span>
+<span class="nc" id="L161">        b.parent.leftChild = b;</span>
       }
     }
-<span class="nc" id="L169">    setMax(a);</span>
-<span class="nc" id="L170">    setMax(b);</span>
-<span class="nc" id="L171">    setBalance(a, b);</span>
-<span class="nc" id="L172">    return b;</span>
+<span class="nc" id="L164">    setMax(a);</span>
+<span class="nc" id="L165">    setMax(b);</span>
+<span class="nc" id="L166">    setBalance(a, b);</span>
+<span class="nc" id="L167">    return b;</span>
   }
 
   /**
    * Rotate right.
    *
-   * @param a
-   *          the a
-   * @return the mtas avl tree node
+   * @param a the a
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateRight(MtasAVLTreeNode a) {
-<span class="nc" id="L183">    MtasAVLTreeNode b = a.leftChild;</span>
-<span class="nc" id="L184">    b.parent = a.parent;</span>
-<span class="nc" id="L185">    a.leftChild = b.rightChild;</span>
-<span class="nc bnc" id="L186" title="All 2 branches missed.">    if (a.leftChild != null) {</span>
-<span class="nc" id="L187">      a.leftChild.parent = a;</span>
+<span class="nc" id="L177">    MtasAVLTreeNode b = a.leftChild;</span>
+<span class="nc" id="L178">    b.parent = a.parent;</span>
+<span class="nc" id="L179">    a.leftChild = b.rightChild;</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">    if (a.leftChild != null) {</span>
+<span class="nc" id="L181">      a.leftChild.parent = a;</span>
     }
-<span class="nc" id="L189">    b.rightChild = a;</span>
-<span class="nc" id="L190">    a.parent = b;</span>
-<span class="nc bnc" id="L191" title="All 2 branches missed.">    if (b.parent != null) {</span>
-<span class="nc bnc" id="L192" title="All 4 branches missed.">      if ((b.parent.rightChild != null) &amp;&amp; b.parent.rightChild.equals(a)) {</span>
-<span class="nc" id="L193">        b.parent.rightChild = b;</span>
+<span class="nc" id="L183">    b.rightChild = a;</span>
+<span class="nc" id="L184">    a.parent = b;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">    if (b.parent != null) {</span>
+<span class="nc bnc" id="L186" title="All 4 branches missed.">      if ((b.parent.rightChild != null) &amp;&amp; b.parent.rightChild.equals(a)) {</span>
+<span class="nc" id="L187">        b.parent.rightChild = b;</span>
       } else {
-<span class="nc" id="L195">        b.parent.leftChild = b;</span>
+<span class="nc" id="L189">        b.parent.leftChild = b;</span>
       }
     }
-<span class="nc" id="L198">    setMax(a);</span>
-<span class="nc" id="L199">    setMax(b);</span>
-<span class="nc" id="L200">    setBalance(a, b);</span>
-<span class="nc" id="L201">    return b;</span>
+<span class="nc" id="L192">    setMax(a);</span>
+<span class="nc" id="L193">    setMax(b);</span>
+<span class="nc" id="L194">    setBalance(a, b);</span>
+<span class="nc" id="L195">    return b;</span>
   }
 
   /**
    * Rotate left then right.
    *
-   * @param n
-   *          the n
-   * @return the mtas avl tree node
+   * @param n the n
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateLeftThenRight(MtasAVLTreeNode n) {
-<span class="nc" id="L212">    n.leftChild = rotateLeft(n.leftChild);</span>
-<span class="nc" id="L213">    return rotateRight(n);</span>
+<span class="nc" id="L205">    n.leftChild = rotateLeft(n.leftChild);</span>
+<span class="nc" id="L206">    return rotateRight(n);</span>
   }
 
   /**
    * Rotate right then left.
    *
-   * @param n
-   *          the n
-   * @return the mtas avl tree node
+   * @param n the n
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateRightThenLeft(MtasAVLTreeNode n) {
-<span class="nc" id="L224">    n.rightChild = rotateRight(n.rightChild);</span>
-<span class="nc" id="L225">    return rotateLeft(n);</span>
+<span class="nc" id="L216">    n.rightChild = rotateRight(n.rightChild);</span>
+<span class="nc" id="L217">    return rotateLeft(n);</span>
   }
 
   /**
    * Height.
    *
-   * @param n
-   *          the n
+   * @param n the n
    * @return the int
    */
   private int height(MtasAVLTreeNode n) {
-<span class="nc bnc" id="L236" title="All 2 branches missed.">    if (n == null) {</span>
-<span class="nc" id="L237">      return -1;</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">    if (n == null) {</span>
+<span class="nc" id="L228">      return -1;</span>
     } else {
-<span class="nc" id="L239">      return 1 + Math.max(height(n.leftChild), height(n.rightChild));</span>
+<span class="nc" id="L230">      return 1 + Math.max(height(n.leftChild), height(n.rightChild));</span>
     }
   }
 
   /**
    * Sets the balance.
    *
-   * @param nodes
-   *          the new balance
+   * @param nodes the new balance
    */
   private void setBalance(MtasAVLTreeNode... nodes) {
-<span class="nc bnc" id="L250" title="All 2 branches missed.">    for (MtasAVLTreeNode n : nodes) {</span>
-<span class="nc" id="L251">      n.balance = height(n.rightChild) - height(n.leftChild);</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">    for (MtasAVLTreeNode n : nodes) {</span>
+<span class="nc" id="L241">      n.balance = height(n.rightChild) - height(n.leftChild);</span>
     }
-<span class="nc" id="L253">  }</span>
+<span class="nc" id="L243">  }</span>
 
   /**
    * Sets the max.
    *
-   * @param n
-   *          the new max
+   * @param n the new max
    */
   private void setMax(MtasAVLTreeNode n) {
-<span class="nc" id="L262">    n.max = n.right;</span>
-<span class="nc bnc" id="L263" title="All 2 branches missed.">    if (n.leftChild != null) {</span>
-<span class="nc" id="L264">      n.max = Math.max(n.max, n.leftChild.max);</span>
+<span class="nc" id="L251">    n.max = n.right;</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">    if (n.leftChild != null) {</span>
+<span class="nc" id="L253">      n.max = Math.max(n.max, n.leftChild.max);</span>
     }
-<span class="nc bnc" id="L266" title="All 2 branches missed.">    if (n.rightChild != null) {</span>
-<span class="nc" id="L267">      n.max = Math.max(n.max, n.rightChild.max);</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">    if (n.rightChild != null) {</span>
+<span class="nc" id="L256">      n.max = Math.max(n.max, n.rightChild.max);</span>
     }
-<span class="nc" id="L269">  }</span>
+<span class="nc" id="L258">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

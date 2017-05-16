@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasSpanQuery.java</span></div><h1>MtasSpanQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSpanQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasSpanQuery.java</span></div><h1>MtasSpanQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
 
 import java.io.IOException;
 
@@ -8,55 +8,105 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import mtas.search.spans.MtasSpanMatchNoneQuery;
 
+/**
+ * The Class MtasSpanQuery.
+ */
 public abstract class MtasSpanQuery extends SpanQuery {
 
+  /** The span width. */
   private Integer minimumSpanWidth, maximumSpanWidth, spanWidth;
+  
+  /** The single position query. */
   private boolean singlePositionQuery;
   
+  /**
+   * Instantiates a new mtas span query.
+   *
+   * @param minimum the minimum
+   * @param maximum the maximum
+   */
   public MtasSpanQuery(Integer minimum, Integer maximum) {
-<span class="fc" id="L17">    super();</span>
-<span class="fc" id="L18">    initialize(minimum, maximum);</span>
-<span class="fc" id="L19">  }</span>
-
-  public void setWidth(Integer minimum, Integer maximum) {
-<span class="fc" id="L22">    initialize(minimum, maximum);</span>
-<span class="fc" id="L23">  }</span>
-
-  private void initialize(Integer minimum, Integer maximum) {
-<span class="fc" id="L26">    minimumSpanWidth = minimum;</span>
-<span class="fc" id="L27">    maximumSpanWidth = maximum;</span>
-<span class="fc bfc" id="L28" title="All 6 branches covered.">    spanWidth = (minimum != null &amp;&amp; maximum != null &amp;&amp; minimum.equals(maximum))</span>
-        ? minimum : null;
-<span class="fc bfc" id="L30" title="All 4 branches covered.">    singlePositionQuery = spanWidth != null &amp;&amp; spanWidth.equals(1);   </span>
+<span class="fc" id="L29">    super();</span>
+<span class="fc" id="L30">    initialize(minimum, maximum);</span>
 <span class="fc" id="L31">  }</span>
 
+  /**
+   * Sets the width.
+   *
+   * @param minimum the minimum
+   * @param maximum the maximum
+   */
+  public void setWidth(Integer minimum, Integer maximum) {
+<span class="fc" id="L40">    initialize(minimum, maximum);</span>
+<span class="fc" id="L41">  }</span>
+
+  /**
+   * Initialize.
+   *
+   * @param minimum the minimum
+   * @param maximum the maximum
+   */
+  private void initialize(Integer minimum, Integer maximum) {
+<span class="fc" id="L50">    minimumSpanWidth = minimum;</span>
+<span class="fc" id="L51">    maximumSpanWidth = maximum;</span>
+<span class="fc bfc" id="L52" title="All 6 branches covered.">    spanWidth = (minimum != null &amp;&amp; maximum != null &amp;&amp; minimum.equals(maximum))</span>
+        ? minimum : null;
+<span class="fc bfc" id="L54" title="All 4 branches covered.">    singlePositionQuery = spanWidth != null &amp;&amp; spanWidth.equals(1);   </span>
+<span class="fc" id="L55">  }</span>
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public abstract SpanWeight createWeight(IndexSearcher searcher,
       boolean needsScores) throws IOException;
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
+   */
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L38">    MtasSpanQuery newClause = this;</span>
-<span class="pc bpc" id="L39" title="1 of 6 branches missed.">    if(minimumSpanWidth!=null &amp;&amp; maximumSpanWidth!=null &amp;&amp; minimumSpanWidth&gt;maximumSpanWidth) {</span>
-<span class="nc" id="L40">      newClause = new MtasSpanMatchNoneQuery(this.getField());</span>
+<span class="fc" id="L68">    MtasSpanQuery newClause = this;</span>
+<span class="pc bpc" id="L69" title="1 of 6 branches missed.">    if(minimumSpanWidth!=null &amp;&amp; maximumSpanWidth!=null &amp;&amp; minimumSpanWidth&gt;maximumSpanWidth) {</span>
+<span class="nc" id="L70">      newClause = new MtasSpanMatchNoneQuery(this.getField());</span>
     } 
-<span class="pc bpc" id="L42" title="1 of 2 branches missed.">    return (newClause!=this)?newClause:this;</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    return (newClause!=this)?newClause:this;</span>
   }
 
+  /**
+   * Gets the width.
+   *
+   * @return the width
+   */
   public Integer getWidth() {
-<span class="nc" id="L46">    return spanWidth;</span>
+<span class="nc" id="L81">    return spanWidth;</span>
   }
 
+  /**
+   * Gets the minimum width.
+   *
+   * @return the minimum width
+   */
   public Integer getMinimumWidth() {
-<span class="fc" id="L50">    return minimumSpanWidth;</span>
+<span class="fc" id="L90">    return minimumSpanWidth;</span>
   }
 
+  /**
+   * Gets the maximum width.
+   *
+   * @return the maximum width
+   */
   public Integer getMaximumWidth() {
-<span class="fc" id="L54">    return maximumSpanWidth;</span>
+<span class="fc" id="L99">    return maximumSpanWidth;</span>
   }
   
+  /**
+   * Checks if is single position query.
+   *
+   * @return true, if is single position query
+   */
   public boolean isSinglePositionQuery() {
-<span class="fc" id="L58">    return singlePositionQuery;</span>
+<span class="fc" id="L108">    return singlePositionQuery;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

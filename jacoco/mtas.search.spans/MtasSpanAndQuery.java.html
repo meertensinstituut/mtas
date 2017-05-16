@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanAndQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanAndQuery.java</span></div><h1>MtasSpanAndQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSpanAndQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanAndQuery.java</span></div><h1>MtasSpanAndQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -17,14 +17,14 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanNearQuery baseQuery;
+  
+  /** The clauses. */
   private HashSet&lt;MtasSpanQuery&gt; clauses;
 
   /**
    * Instantiates a new mtas span and query.
    *
-   * @param clauses
-   *          the clauses
-   * @throws IOException
+   * @param initialClauses the initial clauses
    */
   public MtasSpanAndQuery(MtasSpanQuery... initialClauses) {
 <span class="fc" id="L30">    super(null, null);</span>
@@ -78,66 +78,69 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
 <span class="fc" id="L78">    return baseQuery.createWeight(searcher, needsScores);</span>
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    if (clauses.size() &gt; 1) {</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    if (clauses.size() &gt; 1) {</span>
       // rewrite, count MtasSpanMatchAllQuery and check for
       // MtasSpanMatchNoneQuery
-<span class="fc" id="L86">      MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];</span>
-<span class="fc" id="L87">      MtasSpanQuery[] oldClauses = clauses</span>
-<span class="fc" id="L88">          .toArray(new MtasSpanQuery[clauses.size()]);</span>
-<span class="fc" id="L89">      int singlePositionQueries = 0;</span>
-<span class="fc" id="L90">      int matchAllSinglePositionQueries = 0;</span>
-<span class="fc" id="L91">      boolean actuallyRewritten = false;</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">      for (int i = 0; i &lt; oldClauses.length; i++) {</span>
-<span class="fc" id="L93">        newClauses[i] = oldClauses[i].rewrite(reader);</span>
-<span class="fc bfc" id="L94" title="All 2 branches covered.">        actuallyRewritten |= !oldClauses[i].equals(newClauses[i]);</span>
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (newClauses[i] instanceof MtasSpanMatchNoneQuery) {</span>
-<span class="nc" id="L96">          return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);</span>
+<span class="fc" id="L89">      MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.size()];</span>
+<span class="fc" id="L90">      MtasSpanQuery[] oldClauses = clauses</span>
+<span class="fc" id="L91">          .toArray(new MtasSpanQuery[clauses.size()]);</span>
+<span class="fc" id="L92">      int singlePositionQueries = 0;</span>
+<span class="fc" id="L93">      int matchAllSinglePositionQueries = 0;</span>
+<span class="fc" id="L94">      boolean actuallyRewritten = false;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">      for (int i = 0; i &lt; oldClauses.length; i++) {</span>
+<span class="fc" id="L96">        newClauses[i] = oldClauses[i].rewrite(reader);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        actuallyRewritten |= !oldClauses[i].equals(newClauses[i]);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (newClauses[i] instanceof MtasSpanMatchNoneQuery) {</span>
+<span class="nc" id="L99">          return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);</span>
         } else {
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">          if (newClauses[i].isSinglePositionQuery()) {</span>
-<span class="fc" id="L99">            singlePositionQueries++;</span>
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">            if (newClauses[i] instanceof MtasSpanMatchAllQuery) {</span>
-<span class="nc" id="L101">              matchAllSinglePositionQueries++;</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">          if (newClauses[i].isSinglePositionQuery()) {</span>
+<span class="fc" id="L102">            singlePositionQueries++;</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (newClauses[i] instanceof MtasSpanMatchAllQuery) {</span>
+<span class="nc" id="L104">              matchAllSinglePositionQueries++;</span>
             }
           }
         }
       }
       // filter clauses
-<span class="pc bpc" id="L107" title="1 of 2 branches missed.">      if (matchAllSinglePositionQueries &gt; 0) {</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">      if (matchAllSinglePositionQueries &gt; 0) {</span>
         // compute new number of clauses
-<span class="nc" id="L109">        int newNumber = newClauses.length - matchAllSinglePositionQueries;</span>
-<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (matchAllSinglePositionQueries == singlePositionQueries) {</span>
-<span class="nc" id="L111">          newNumber++;</span>
+<span class="nc" id="L112">        int newNumber = newClauses.length - matchAllSinglePositionQueries;</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (matchAllSinglePositionQueries == singlePositionQueries) {</span>
+<span class="nc" id="L114">          newNumber++;</span>
         }
-<span class="nc" id="L113">        MtasSpanQuery[] newFilteredClauses = new MtasSpanQuery[newNumber];</span>
-<span class="nc" id="L114">        int j = 0;</span>
-<span class="nc bnc" id="L115" title="All 2 branches missed.">        for (int i = 0; i &lt; newClauses.length; i++) {</span>
-<span class="nc bnc" id="L116" title="All 4 branches missed.">          if (!(newClauses[i].isSinglePositionQuery()</span>
+<span class="nc" id="L116">        MtasSpanQuery[] newFilteredClauses = new MtasSpanQuery[newNumber];</span>
+<span class="nc" id="L117">        int j = 0;</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        for (int i = 0; i &lt; newClauses.length; i++) {</span>
+<span class="nc bnc" id="L119" title="All 4 branches missed.">          if (!(newClauses[i].isSinglePositionQuery()</span>
               &amp;&amp; (newClauses[i] instanceof MtasSpanMatchAllQuery))) {
-<span class="nc" id="L118">            newFilteredClauses[j] = newClauses[i];</span>
-<span class="nc" id="L119">            j++;</span>
-<span class="nc bnc" id="L120" title="All 2 branches missed.">          } else if (matchAllSinglePositionQueries == singlePositionQueries) {</span>
 <span class="nc" id="L121">            newFilteredClauses[j] = newClauses[i];</span>
 <span class="nc" id="L122">            j++;</span>
-<span class="nc" id="L123">            singlePositionQueries++; // only match this condition once</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">          } else if (matchAllSinglePositionQueries == singlePositionQueries) {</span>
+<span class="nc" id="L124">            newFilteredClauses[j] = newClauses[i];</span>
+<span class="nc" id="L125">            j++;</span>
+<span class="nc" id="L126">            singlePositionQueries++; // only match this condition once</span>
           }
         }
-<span class="nc" id="L126">        newClauses = newFilteredClauses;</span>
+<span class="nc" id="L129">        newClauses = newFilteredClauses;</span>
       }
-<span class="pc bpc" id="L128" title="1 of 2 branches missed.">      if (newClauses.length == 0) {</span>
-<span class="nc" id="L129">        return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);</span>
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">      } else if (newClauses.length == 1) {</span>
-<span class="nc" id="L131">        return newClauses[0].rewrite(reader);</span>
-<span class="pc bpc" id="L132" title="1 of 4 branches missed.">      } else if (actuallyRewritten || newClauses.length != clauses.size()) {</span>
-<span class="fc" id="L133">        return new MtasSpanAndQuery(newClauses).rewrite(reader);</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">      if (newClauses.length == 0) {</span>
+<span class="nc" id="L132">        return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">      } else if (newClauses.length == 1) {</span>
+<span class="nc" id="L134">        return newClauses[0].rewrite(reader);</span>
+<span class="pc bpc" id="L135" title="1 of 4 branches missed.">      } else if (actuallyRewritten || newClauses.length != clauses.size()) {</span>
+<span class="fc" id="L136">        return new MtasSpanAndQuery(newClauses).rewrite(reader);</span>
       } else {
-<span class="fc" id="L135">        return super.rewrite(reader);</span>
+<span class="fc" id="L138">        return super.rewrite(reader);</span>
       }
-<span class="nc bnc" id="L137" title="All 2 branches missed.">    } else if (clauses.size() == 1) {</span>
-<span class="nc" id="L138">      return clauses.iterator().next().rewrite(reader);</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">    } else if (clauses.size() == 1) {</span>
+<span class="nc" id="L141">      return clauses.iterator().next().rewrite(reader);</span>
     } else {
-<span class="nc" id="L140">      return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);</span>
+<span class="nc" id="L143">      return (new MtasSpanMatchNoneQuery(this.getField())).rewrite(reader);</span>
     }
   }
 
@@ -149,7 +152,7 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L152">    return baseQuery.toString(field);</span>
+<span class="nc" id="L155">    return baseQuery.toString(field);</span>
   }
 
   /*
@@ -159,14 +162,14 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L163">      return true;</span>
-<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L165">      return false;</span>
-<span class="pc bpc" id="L166" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L167">      return false;</span>
-<span class="fc" id="L168">    final MtasSpanAndQuery that = (MtasSpanAndQuery) obj;</span>
-<span class="fc" id="L169">    return baseQuery.equals(that.baseQuery);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L166">      return true;</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L168">      return false;</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L170">      return false;</span>
+<span class="fc" id="L171">    final MtasSpanAndQuery that = (MtasSpanAndQuery) obj;</span>
+<span class="fc" id="L172">    return baseQuery.equals(that.baseQuery);</span>
   }
 
   /*
@@ -176,10 +179,10 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L179">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L180">    h = (h * 7) ^ clauses.hashCode();</span>
-<span class="fc" id="L181">    return h;</span>
+<span class="fc" id="L182">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L183">    h = (h * 7) ^ clauses.hashCode();</span>
+<span class="fc" id="L184">    return h;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MtasSpanTermQuery.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanTermQuery.java</span></div><h1>MtasSpanTermQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSpanTermQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans</a> &gt; <span class="el_source">MtasSpanTermQuery.java</span></div><h1>MtasSpanTermQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans;
 
 import java.io.IOException;
 import mtas.search.spans.util.MtasSpanQuery;
@@ -61,9 +61,12 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
 <span class="fc" id="L61">    return baseQuery.createWeight(searcher, needsScores);</span>
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L66">    return super.rewrite(reader);</span>
+<span class="fc" id="L69">    return super.rewrite(reader);</span>
   }
 
   /*
@@ -74,7 +77,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L77">    return baseQuery.toString(field);</span>
+<span class="nc" id="L80">    return baseQuery.toString(field);</span>
   }
 
   /*
@@ -84,14 +87,14 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L88">      return true;</span>
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L90">      return false;</span>
-<span class="fc bfc" id="L91" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L92">      return false;</span>
-<span class="fc" id="L93">    MtasSpanTermQuery other = (MtasSpanTermQuery) obj;</span>
-<span class="fc" id="L94">    return baseQuery.equals(other.baseQuery);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L91">      return true;</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L93">      return false;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L95">      return false;</span>
+<span class="fc" id="L96">    MtasSpanTermQuery other = (MtasSpanTermQuery) obj;</span>
+<span class="fc" id="L97">    return baseQuery.equals(other.baseQuery);</span>
   }
 
   /* (non-Javadoc)
@@ -99,7 +102,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public String getField() {
-<span class="fc" id="L102">    return baseQuery.getField();</span>
+<span class="fc" id="L105">    return baseQuery.getField();</span>
   }
 
   /* (non-Javadoc)
@@ -107,8 +110,8 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L110">    return baseQuery.hashCode();</span>
+<span class="fc" id="L113">    return baseQuery.hashCode();</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
