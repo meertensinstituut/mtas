@@ -14,8 +14,11 @@ public class MtasCQLParserSentencePartCondition {
   /** The first basic sentence. */
   private MtasCQLParserBasicSentenceCondition firstBasicSentence = null;
 
+  /** The first minimum occurence. */
+  private int firstMinimumOccurence;
+  
   /** The first maximum occurence. */
-  private int firstMinimumOccurence, firstMaximumOccurence;
+  private int firstMaximumOccurence;
 
   /** The first optional. */
   private boolean firstOptional;
@@ -29,15 +32,18 @@ public class MtasCQLParserSentencePartCondition {
   /** The full condition. */
   private MtasCQLParserSentenceCondition fullCondition = null;
 
+  /** The ignore clause. */
   private MtasSpanQuery ignoreClause;
   
+  /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
   
   /**
-   * Instantiates a new mtas cql parser sentence part condition.
+   * Instantiates a new mtas CQL parser sentence part condition.
    *
-   * @param bs
-   *          the bs
+   * @param bs the bs
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasCQLParserSentencePartCondition(
       MtasCQLParserBasicSentenceCondition bs, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
@@ -50,10 +56,11 @@ public class MtasCQLParserSentencePartCondition {
   }
 
   /**
-   * Instantiates a new mtas cql parser sentence part condition.
+   * Instantiates a new mtas CQL parser sentence part condition.
    *
-   * @param s
-   *          the s
+   * @param s the s
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasCQLParserSentencePartCondition(MtasCQLParserSentenceCondition s, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     firstMinimumOccurence = 1;
@@ -69,12 +76,9 @@ public class MtasCQLParserSentencePartCondition {
   /**
    * Sets the first occurence.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
-   * @throws ParseException
-   *           the parse exception
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
    */
   public void setFirstOccurence(int min, int max) throws ParseException {
     if (fullCondition == null) {
@@ -94,10 +98,8 @@ public class MtasCQLParserSentencePartCondition {
   /**
    * Sets the first optional.
    *
-   * @param status
-   *          the new first optional
-   * @throws ParseException
-   *           the parse exception
+   * @param status the new first optional
+   * @throws ParseException the parse exception
    */
   public void setFirstOptional(boolean status) throws ParseException {
     if (fullCondition == null) {
@@ -110,10 +112,8 @@ public class MtasCQLParserSentencePartCondition {
   /**
    * Sets the or.
    *
-   * @param status
-   *          the new or
-   * @throws ParseException
-   *           the parse exception
+   * @param status the new or
+   * @throws ParseException the parse exception
    */
   public void setOr(boolean status) throws ParseException {
     if (fullCondition == null) {
@@ -126,10 +126,8 @@ public class MtasCQLParserSentencePartCondition {
   /**
    * Sets the second part.
    *
-   * @param sp
-   *          the new second part
-   * @throws ParseException
-   *           the parse exception
+   * @param sp the new second part
+   * @throws ParseException the parse exception
    */
   public void setSecondPart(MtasCQLParserSentencePartCondition sp)
       throws ParseException {
@@ -143,9 +141,8 @@ public class MtasCQLParserSentencePartCondition {
   /**
    * Creates the full sentence.
    *
-   * @return the mtas cql parser sentence condition
-   * @throws ParseException
-   *           the parse exception
+   * @return the mtas CQL parser sentence condition
+   * @throws ParseException the parse exception
    */
   public MtasCQLParserSentenceCondition createFullSentence()
       throws ParseException {

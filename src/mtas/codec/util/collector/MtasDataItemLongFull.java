@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.ArrayUtils;
@@ -24,22 +23,14 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
   /**
    * Instantiates a new mtas data item long full.
    *
-   * @param value
-   *          the value
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param value the value
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItemLongFull(long[] value, MtasDataCollector<?, ?> sub,
       Set<String> statsItems, String sortType, String sortDirection,
@@ -58,7 +49,9 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
   @Override
   protected HashMap<String, Object> getDistribution(String argument) {
     HashMap<String, Object> result = new LinkedHashMap<>();
-    Long start = null, end = null, step = null;
+    Long start = null;
+    Long end = null;
+    Long step = null;
     Integer number = null;
     if (argument != null) {
       Matcher m = fpArgument.matcher(argument);
@@ -230,6 +223,9 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     return this.getClass().getSimpleName() + "[" + fullValues.length + "]";
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -244,6 +240,9 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     return (c1!=null&&c2!=null&&c1.equals(c2));    
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

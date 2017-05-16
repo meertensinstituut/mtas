@@ -22,14 +22,35 @@ import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.search.spans.MtasSpanMatchNoneSpans;
 
+/**
+ * The Class MtasSpanMaximumExpandQuery.
+ */
 public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
 
+  /** The query. */
   MtasSpanQuery query;
+  
+  /** The minimum left. */
   int minimumLeft;
+  
+  /** The maximum left. */
   int maximumLeft;
+  
+  /** The minimum right. */
   int minimumRight;
+  
+  /** The maximum right. */
   int maximumRight;
 
+  /**
+   * Instantiates a new mtas span maximum expand query.
+   *
+   * @param query the query
+   * @param minimumLeft the minimum left
+   * @param maximumLeft the maximum left
+   * @param minimumRight the minimum right
+   * @param maximumRight the maximum right
+   */
   public MtasSpanMaximumExpandQuery(MtasSpanQuery query, int minimumLeft,
       int maximumLeft, int minimumRight, int maximumRight) {
     super(null, null);
@@ -53,6 +74,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     setWidth(minimum, maximum);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -64,11 +88,17 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() {
     return query.getField();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -77,6 +107,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -95,6 +128,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     return isEqual;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = Integer.rotateLeft(classHash(), 1);
@@ -109,6 +145,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     return h;
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQuery = query.rewrite(reader);
@@ -122,9 +161,22 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
     }
   }
 
+  /**
+   * The Class MtasMaximumExpandWeight.
+   */
   private class MtasMaximumExpandWeight extends SpanWeight {
+    
+    /** The sub weight. */
     SpanWeight subWeight;
 
+    /**
+     * Instantiates a new mtas maximum expand weight.
+     *
+     * @param subWeight the sub weight
+     * @param searcher the searcher
+     * @param needsScores the needs scores
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MtasMaximumExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
         boolean needsScores) throws IOException {
       super(MtasSpanMaximumExpandQuery.this, searcher,
@@ -132,11 +184,17 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
       this.subWeight = subWeight;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.Map)
+     */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       subWeight.extractTermContexts(contexts);
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
     @Override
     public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
@@ -179,6 +237,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
       }
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
     @Override
     public void extractTerms(Set<Term> terms) {
       subWeight.extractTerms(terms);
@@ -186,16 +247,39 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
 
   }
 
+  /**
+   * The Class MtasMaximumExpandSpans.
+   */
   private class MtasMaximumExpandSpans extends Spans {
 
+    /** The sub spans. */
     Spans subSpans;
+    
+    /** The min position. */
     int minPosition;
+    
+    /** The max position. */
     int maxPosition;
+    
+    /** The field. */
     String field;
+    
+    /** The mtas codec info. */
     CodecInfo mtasCodecInfo;
+    
+    /** The start position. */
     int startPosition;
+    
+    /** The end position. */
     int endPosition;
 
+    /**
+     * Instantiates a new mtas maximum expand spans.
+     *
+     * @param mtasCodecInfo the mtas codec info
+     * @param field the field
+     * @param subSpans the sub spans
+     */
     public MtasMaximumExpandSpans(CodecInfo mtasCodecInfo, String field,
         Spans subSpans) {
       super();
@@ -208,6 +292,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
       this.endPosition = -1;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+     */
     @Override
     public int nextStartPosition() throws IOException {
       int basicStartPosition;
@@ -229,43 +316,67 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
       return NO_MORE_POSITIONS;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#startPosition()
+     */
     @Override
     public int startPosition() {
       return startPosition;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#endPosition()
+     */
     @Override
     public int endPosition() {
       return endPosition;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#width()
+     */
     @Override
     public int width() {
       return endPosition-startPosition;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+     */
     @Override
     public void collect(SpanCollector collector) throws IOException {
       subSpans.collect(collector);
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+     */
     @Override
     public final TwoPhaseIterator asTwoPhaseIterator() {
       // return subSpans.asTwoPhaseIterator();
       return null;
     }
     
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.spans.Spans#positionsCost()
+     */
     @Override
     public float positionsCost() {
       //return subSpans.positionsCost();
       return 0;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.DocIdSetIterator#docID()
+     */
     @Override
     public int docID() {
       return subSpans.docID();
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+     */
     @Override
     public int nextDoc() throws IOException {
       int docId = subSpans.nextDoc();
@@ -287,6 +398,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
       return docId;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+     */
     @Override
     public int advance(int target) throws IOException {
       int docId = subSpans.advance(target);
@@ -308,6 +422,9 @@ public class MtasSpanMaximumExpandQuery extends MtasSpanQuery {
       return docId;
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.lucene.search.DocIdSetIterator#cost()
+     */
     @Override
     public long cost() {
       return subSpans!=null?subSpans.cost():0;

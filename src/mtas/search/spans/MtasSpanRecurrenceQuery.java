@@ -20,7 +20,7 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
 
-  /** The clause. */
+  /** The query. */
   private MtasSpanQuery query;
 
   /** The minimum recurrence. */
@@ -29,7 +29,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
   /** The maximum recurrence. */
   private int maximumRecurrence;
 
-  /** The ignore clause. */
+  /** The ignore query. */
   private MtasSpanQuery ignoreQuery;
 
   /** The maximum ignore length. */
@@ -41,16 +41,11 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span recurrence query.
    *
-   * @param query
-   *          the clause
-   * @param minimumRecurrence
-   *          the minimum recurrence
-   * @param maximumRecurrence
-   *          the maximum recurrence
-   * @param ignoreQuery
-   *          the ignore
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
+   * @param query the query
+   * @param minimumRecurrence the minimum recurrence
+   * @param maximumRecurrence the maximum recurrence
+   * @param ignoreQuery the ignore query
+   * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasSpanRecurrenceQuery(MtasSpanQuery query, int minimumRecurrence,
       int maximumRecurrence, MtasSpanQuery ignoreQuery,
@@ -79,30 +74,56 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
   }
 
   /**
-   * Gets the clause.
+   * Gets the query.
    *
-   * @return the clause
+   * @return the query
    */
   public MtasSpanQuery getQuery() {
     return query;
   }
 
+  /**
+   * Gets the ignore query.
+   *
+   * @return the ignore query
+   */
   public MtasSpanQuery getIgnoreQuery() {
     return ignoreQuery;
   }
 
+  /**
+   * Gets the maximum ignore length.
+   *
+   * @return the maximum ignore length
+   */
   public Integer getMaximumIgnoreLength() {
     return maximumIgnoreLength;
   }
 
+  /**
+   * Gets the minimum recurrence.
+   *
+   * @return the minimum recurrence
+   */
   public int getMinimumRecurrence() {
     return minimumRecurrence;
   }
 
+  /**
+   * Gets the maximum recurrence.
+   *
+   * @return the maximum recurrence
+   */
   public int getMaximumRecurrence() {
     return maximumRecurrence;
   }
 
+  /**
+   * Sets the recurrence.
+   *
+   * @param minimumRecurrence the minimum recurrence
+   * @param maximumRecurrence the maximum recurrence
+   */
   public void setRecurrence(int minimumRecurrence, int maximumRecurrence) {
     if (minimumRecurrence > maximumRecurrence) {
       throw new IllegalArgumentException(
@@ -269,18 +290,12 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span recurrence weight.
      *
-     * @param subWeight
-     *          the sub weight
-     * @param ignoreWeight
-     *          the ignore weight
-     * @param maximumIgnoreLength
-     *          the maximum ignore length
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param subWeight the sub weight
+     * @param ignoreWeight the ignore weight
+     * @param maximumIgnoreLength the maximum ignore length
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanRecurrenceWeight(SpanWeight subWeight, SpanWeight ignoreWeight,
         Integer maximumIgnoreLength, IndexSearcher searcher,

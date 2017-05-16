@@ -6,15 +6,16 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 /**
  * The Class IntervalTree.
  *
- * @param <T>
- *          the generic type
- * @param <N>
- *          the number type
+ * @param <T> the generic type
+ * @param <N> the number type
  */
 abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
 
+  /** The root. */
+  protected N root;
+
   /** The current. */
-  protected N root, current;
+  protected N current;
 
   /**
    * Instantiates a new interval tree.
@@ -38,10 +39,8 @@ abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
   /**
    * Adds the single point.
    *
-   * @param position
-   *          the position
-   * @param list
-   *          the list
+   * @param position the position
+   * @param list the list
    */
   abstract protected void addSinglePoint(int position,
       ArrayList<MtasTreeHit<T>> list);
@@ -49,12 +48,9 @@ abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
   /**
    * Adds the range.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param list
-   *          the list
+   * @param left the left
+   * @param right the right
+   * @param list the list
    */
   abstract protected void addRange(int left, int right,
       ArrayList<MtasTreeHit<T>> list);
@@ -62,41 +58,42 @@ abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
   /**
    * Adds the range empty.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
+   * @param left the left
+   * @param right the right
    */
   abstract protected void addRangeEmpty(int left, int right);
 
-  /**
-   * Prints the balance.
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
    */
-  final public void printBalance() {
-    printBalance(1, root);
+  @Override
+  public String toString() {
+    return printBalance(1, root);
   }
 
   /**
    * Prints the balance.
    *
-   * @param p
-   *          the p
-   * @param n
-   *          the n
+   * @param p the p
+   * @param n the n
+   * @return the string
    */
-  final private void printBalance(Integer p, N n) {
+  final private String printBalance(Integer p, N n) {
+    StringBuilder text = new StringBuilder();
     if (n != null) {
-      printBalance((p + 1), n.leftChild);
-      System.out.print(String.format("%" + (3 * p) + "s", ""));
+      text.append(printBalance((p + 1), n.leftChild));
+      String format = "%" + (3 * p) + "s";
+      text.append(String.format(format, ""));
       if (n.left == n.right) {
-        System.out.println(
-            "[" + n.left + "] (" + n.max + ") : " + n.lists.size() + " lists");
+        text.append("[" + n.left + "] (" + n.max + ") : " + n.lists.size()
+            + " lists\n");
       } else {
-        System.out.println("[" + n.left + "-" + n.right + "] (" + n.max + ") : "
-            + n.lists.size() + " lists");
+        text.append("[" + n.left + "-" + n.right + "] (" + n.max + ") : "
+            + n.lists.size() + " lists\n");
       }
-      printBalance((p + 1), n.rightChild);
+      text.append(printBalance((p + 1), n.rightChild));
     }
+    return text.toString();
   }
 
   /**
@@ -120,8 +117,7 @@ abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
   /**
    * Sets the current.
    *
-   * @param node
-   *          the new current
+   * @param node the new current
    */
   final public void setCurrent(N node) {
     current = node;

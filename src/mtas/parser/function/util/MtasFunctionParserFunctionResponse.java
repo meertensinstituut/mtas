@@ -11,8 +11,7 @@ abstract public class MtasFunctionParserFunctionResponse {
   /**
    * Instantiates a new mtas function parser function response.
    *
-   * @param s
-   *          the s
+   * @param s the s
    */
   protected MtasFunctionParserFunctionResponse(boolean s) {
     defined = s;

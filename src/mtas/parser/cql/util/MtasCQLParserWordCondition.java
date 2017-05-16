@@ -14,14 +14,17 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public class MtasCQLParserWordCondition {
 
-  /** The type and. */
-  public final static String TYPE_AND = "and";
+  /** The Constant TYPE_AND. */
+  public static final String TYPE_AND = "and";
 
-  /** The type or. */
-  public final static String TYPE_OR = "or";
+  /** The Constant TYPE_OR. */
+  public static final String TYPE_OR = "or";
 
+  /** The positive query list. */
+  private List<MtasSpanQuery> positiveQueryList;
+  
   /** The negative query list. */
-  private List<MtasSpanQuery> positiveQueryList, negativeQueryList;
+  private List<MtasSpanQuery> negativeQueryList;
 
   /** The condition list. */
   private List<MtasCQLParserWordCondition> conditionList;
@@ -39,12 +42,10 @@ public class MtasCQLParserWordCondition {
   private String field;
 
   /**
-   * Instantiates a new mtas cql parser word condition.
+   * Instantiates a new mtas CQL parser word condition.
    *
-   * @param field
-   *          the field
-   * @param type
-   *          the type
+   * @param field the field
+   * @param type the type
    */
   public MtasCQLParserWordCondition(String field, String type) {
     this.field = field;
@@ -94,8 +95,7 @@ public class MtasCQLParserWordCondition {
   /**
    * Adds the positive query.
    *
-   * @param q
-   *          the q
+   * @param q the q
    */
   public void addPositiveQuery(MtasSpanQuery q) {
     positiveQueryList.add(q);
@@ -104,8 +104,7 @@ public class MtasCQLParserWordCondition {
   /**
    * Adds the negative query.
    *
-   * @param q
-   *          the q
+   * @param q the q
    */
   public void addNegativeQuery(MtasSpanQuery q) {
     negativeQueryList.add(q);
@@ -123,8 +122,7 @@ public class MtasCQLParserWordCondition {
   /**
    * Gets the positive query.
    *
-   * @param index
-   *          the index
+   * @param index the index
    * @return the positive query
    */
   public MtasSpanQuery getPositiveQuery(int index) {
@@ -147,8 +145,7 @@ public class MtasCQLParserWordCondition {
   /**
    * Gets the negative query.
    *
-   * @param index
-   *          the index
+   * @param index the index
    * @return the negative query
    */
   public MtasSpanQuery getNegativeQuery(int index) {
@@ -162,8 +159,7 @@ public class MtasCQLParserWordCondition {
   /**
    * Adds the condition.
    *
-   * @param c
-   *          the c
+   * @param c the c
    */
   public void addCondition(MtasCQLParserWordCondition c) {
     conditionList.add(c);
@@ -375,10 +371,8 @@ public class MtasCQLParserWordCondition {
   /**
    * To string.
    *
-   * @param firstIndent
-   *          the first indent
-   * @param indent
-   *          the indent
+   * @param firstIndent the first indent
+   * @param indent the indent
    * @return the string
    */
   public String toString(String firstIndent, String indent) {
@@ -468,6 +462,9 @@ public class MtasCQLParserWordCondition {
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

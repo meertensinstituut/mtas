@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -324,8 +326,8 @@ import org.apache.lucene.util.IOUtils;
  */
 public class MtasFieldsConsumer extends FieldsConsumer {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasFieldsConsumer.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasFieldsConsumer.class);
 
   /** The delegate fields consumer. */
   private FieldsConsumer delegateFieldsConsumer;
@@ -360,39 +362,61 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /** The token stats number. */
   Integer tokenStatsNumber;
 
-  /** The mtas tmp docs chained file name. */
+  /** The mtas tmp field file name. */
   private String mtasTmpFieldFileName;
+  
+  /** The mtas tmp object file name. */
   private String mtasTmpObjectFileName;
+  
+  /** The mtas tmp docs file name. */
   private String mtasTmpDocsFileName;
+  
+  /** The mtas tmp doc file name. */
   private String mtasTmpDocFileName;
+  
+  /** The mtas tmp docs chained file name. */
   private String mtasTmpDocsChainedFileName;
 
-  /** The mtas index object parent file name. */
+  /** The mtas object file name. */
   private String mtasObjectFileName;
+  
+  /** The mtas term file name. */
   private String mtasTermFileName;
+  
+  /** The mtas index field file name. */
   private String mtasIndexFieldFileName;
+  
+  /** The mtas prefix file name. */
   private String mtasPrefixFileName;
+  
+  /** The mtas doc file name. */
   private String mtasDocFileName;
+  
+  /** The mtas index doc id file name. */
   private String mtasIndexDocIdFileName;
+  
+  /** The mtas index object id file name. */
   private String mtasIndexObjectIdFileName;
+  
+  /** The mtas index object position file name. */
   private String mtasIndexObjectPositionFileName;
+  
+  /** The mtas index object parent file name. */
   private String mtasIndexObjectParentFileName;
 
-  /** The delegate postings format name. */
+  /** The name. */
   private String name;
+  
+  /** The delegate postings format name. */
   private String delegatePostingsFormatName;
 
   /**
    * Instantiates a new mtas fields consumer.
    *
-   * @param fieldsConsumer
-   *          the fields consumer
-   * @param state
-   *          the state
-   * @param name
-   *          the name
-   * @param delegatePostingsFormatName
-   *          the delegate postings format name
+   * @param fieldsConsumer the fields consumer
+   * @param state the state
+   * @param name the name
+   * @param delegatePostingsFormatName the delegate postings format name
    */
   public MtasFieldsConsumer(FieldsConsumer fieldsConsumer,
       SegmentWriteState state, String name, String delegatePostingsFormatName) {
@@ -443,14 +467,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param outPrefix
-   *          the out prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param prefix the prefix
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void registerPrefix(String field, String prefix,
       IndexOutput outPrefix) throws IOException {
@@ -469,20 +489,11 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix intersection.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param tmp
-   *          the tmp
-   * @param docId
-   *          the doc id
-   * @param start
-   *          the start
-   * @param end
-   *          the end
-   * @param docFieldAdministration
-   *          the doc field administration
+   * @param field the field
+   * @param prefix the prefix
+   * @param start the start
+   * @param end the end
+   * @param docFieldAdministration the doc field administration
    */
   private void registerPrefixIntersection(String field, String prefix,
       int start, int end,
@@ -516,14 +527,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix stats single position value.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param outPrefix
-   *          the out prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param prefix the prefix
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void registerPrefixStatsSinglePositionValue(String field,
       String prefix, IndexOutput outPrefix) throws IOException {
@@ -537,14 +544,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix stats range position value.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param outPrefix
-   *          the out prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param prefix the prefix
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void registerPrefixStatsRangePositionValue(String field, String prefix,
       IndexOutput outPrefix) throws IOException {
@@ -557,14 +560,10 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Register prefix stats set position value.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param outPrefix
-   *          the out prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param prefix the prefix
+   * @param outPrefix the out prefix
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void registerPrefixStatsSetPositionValue(String field, String prefix,
       IndexOutput outPrefix) throws IOException {
@@ -578,8 +577,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Inits the prefix stats field.
    *
-   * @param field
-   *          the field
+   * @param field the field
    */
   private void initPrefixStatsField(String field) {
     if (!singlePositionPrefix.containsKey(field)) {
@@ -596,8 +594,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats single position prefix attribute.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefix stats single position prefix attribute
    */
   public String getPrefixStatsSinglePositionPrefixAttribute(String field) {
@@ -608,8 +605,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats multiple position prefix attribute.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefix stats multiple position prefix attribute
    */
   public String getPrefixStatsMultiplePositionPrefixAttribute(String field) {
@@ -620,8 +616,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats set position prefix attribute.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefix stats set position prefix attribute
    */
   public String getPrefixStatsSetPositionPrefixAttribute(String field) {
@@ -632,8 +627,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Gets the prefix stats intersection prefix attribute.
    *
-   * @param field
-   *          the field
+   * @param field the field
    * @return the prefix stats intersection prefix attribute
    */
   public String getPrefixStatsIntersectionPrefixAttribute(String field) {
@@ -689,10 +683,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Write.
    *
-   * @param fieldInfos
-   *          the field infos
-   * @param fields
-   *          the fields
+   * @param fieldInfos the field infos
+   * @param fields the fields
    */
   private void write(FieldInfos fieldInfos, Fields fields) {
     IndexOutput outField;
@@ -715,11 +707,11 @@ public class MtasFieldsConsumer extends FieldsConsumer {
     prefixReferenceIndex = new HashMap<>();
     prefixIdIndex = new HashMap<>();
     // temporary temporary index in memory for doc
-    TreeMap<Integer, Long> memoryIndexTemporaryObject = new TreeMap<>();
+    SortedMap<Integer, Long> memoryIndexTemporaryObject = new TreeMap<>();
     // create (backwards) chained new temporary index docs
-    TreeMap<Integer, Long> memoryTmpDocChainList = new TreeMap<>();
+    SortedMap<Integer, Long> memoryTmpDocChainList = new TreeMap<>();
     // list of objectIds and references to objects
-    TreeMap<Integer, Long> memoryIndexDocList = new TreeMap<>();
+    SortedMap<Integer, Long> memoryIndexDocList = new TreeMap<>();
 
     try {
       // create file tmpDoc
@@ -1222,8 +1214,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
               }
               ref = objectRefApproxOffset + mtasId * objectRefApproxQuotient
                   + refCorrection;
-              MtasTokenString token = MtasCodecPostingsFormat
-                  .getToken(inObject, inTerm, ref);
+              MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,
+                  inTerm, ref);
               String prefix = token.getPrefix();
               registerPrefixIntersection(field, prefix,
                   token.getPositionStart(), token.getPositionEnd(),
@@ -1343,23 +1335,15 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Creates the object and register prefix.
    *
-   * @param field
-   *          the field
-   * @param out
-   *          the out
-   * @param term
-   *          the term
-   * @param termRef
-   *          the term ref
-   * @param startPosition
-   *          the start position
-   * @param payload
-   *          the payload
-   * @param outPrefix
-   *          the out prefix
+   * @param field the field
+   * @param out the out
+   * @param term the term
+   * @param termRef the term ref
+   * @param startPosition the start position
+   * @param payload the payload
+   * @param outPrefix the out prefix
    * @return the integer
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
@@ -1371,27 +1355,17 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Creates the object and register prefix.
    *
-   * @param field
-   *          the field
-   * @param out
-   *          the out
-   * @param term
-   *          the term
-   * @param termRef
-   *          the term ref
-   * @param startPosition
-   *          the start position
-   * @param payload
-   *          the payload
-   * @param startOffset
-   *          the start offset
-   * @param endOffset
-   *          the end offset
-   * @param outPrefix
-   *          the out prefix
+   * @param field the field
+   * @param out the out
+   * @param term the term
+   * @param termRef the term ref
+   * @param startPosition the start position
+   * @param payload the payload
+   * @param startOffset the start offset
+   * @param endOffset the end offset
+   * @param outPrefix the out prefix
    * @return the integer
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Integer createObjectAndRegisterPrefix(String field, IndexOutput out,
       BytesRef term, Long termRef, int startPosition, BytesRef payload,
@@ -1506,15 +1480,11 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Store tree.
    *
-   * @param tree
-   *          the tree
-   * @param out
-   *          the out
-   * @param refApproxOffset
-   *          the ref approx offset
+   * @param tree the tree
+   * @param out the out
+   * @param refApproxOffset the ref approx offset
    * @return the long
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Long storeTree(MtasTree<?> tree, IndexOutput out,
       long refApproxOffset) throws IOException {
@@ -1525,44 +1495,37 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Store tree.
    *
-   * @param node
-   *          the node
-   * @param isSinglePoint
-   *          the is single point
-   * @param storeAdditionalInformation
-   *          the store additional information
-   * @param out
-   *          the out
-   * @param nodeRefApproxOffset
-   *          the node ref approx offset
-   * @param refApproxOffset
-   *          the ref approx offset
+   * @param node the node
+   * @param isSinglePoint the is single point
+   * @param storeAdditionalInformation the store additional information
+   * @param out the out
+   * @param nodeRefApproxOffset the node ref approx offset
+   * @param refApproxOffset the ref approx offset
    * @return the long
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Long storeTree(MtasTreeNode<?> node, boolean isSinglePoint,
       boolean storeAdditionalInformation, IndexOutput out,
       Long nodeRefApproxOffset, long refApproxOffset) throws IOException {
-
+    Long localNodeRefApproxOffset = nodeRefApproxOffset; 
     if (node != null) {
       Boolean isRoot = false;
-      if (nodeRefApproxOffset == null) {
-        nodeRefApproxOffset = out.getFilePointer();
+      if (localNodeRefApproxOffset == null) {
+        localNodeRefApproxOffset = out.getFilePointer();
         isRoot = true;
       }
       Long fpIndexObjectPositionLeftChild;
       Long fpIndexObjectPositionRightChild;
       if (node.leftChild != null) {
         fpIndexObjectPositionLeftChild = storeTree(node.leftChild,
-            isSinglePoint, storeAdditionalInformation, out, nodeRefApproxOffset,
+            isSinglePoint, storeAdditionalInformation, out, localNodeRefApproxOffset,
             refApproxOffset);
       } else {
         fpIndexObjectPositionLeftChild = (long) 0; // tmp
       }
       if (node.rightChild != null) {
         fpIndexObjectPositionRightChild = storeTree(node.rightChild,
-            isSinglePoint, storeAdditionalInformation, out, nodeRefApproxOffset,
+            isSinglePoint, storeAdditionalInformation, out, localNodeRefApproxOffset,
             refApproxOffset);
       } else {
         fpIndexObjectPositionRightChild = (long) 0; // tmp
@@ -1575,9 +1538,9 @@ public class MtasFieldsConsumer extends FieldsConsumer {
         fpIndexObjectPositionRightChild = fpIndexObjectPosition;
       }
       if (isRoot) {
-        assert nodeRefApproxOffset >= 0 : "nodeRefApproxOffset < 0 : "
-            + nodeRefApproxOffset;
-        out.writeVLong(nodeRefApproxOffset);
+        assert localNodeRefApproxOffset >= 0 : "nodeRefApproxOffset < 0 : "
+            + localNodeRefApproxOffset;
+        out.writeVLong(localNodeRefApproxOffset);
         byte flag = 0;
         if (isSinglePoint) {
           flag |= MtasTree.SINGLE_POSITION_TREE;
@@ -1593,12 +1556,12 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       out.writeVInt(node.right);
       assert node.max >= 0 : "node.max < 0 : " + node.max;
       out.writeVInt(node.max);
-      assert fpIndexObjectPositionLeftChild >= nodeRefApproxOffset : "fpIndexObjectPositionLeftChild<nodeRefApproxOffset : "
-          + fpIndexObjectPositionLeftChild + " and " + nodeRefApproxOffset;
-      out.writeVLong((fpIndexObjectPositionLeftChild - nodeRefApproxOffset));
-      assert fpIndexObjectPositionRightChild >= nodeRefApproxOffset : "fpIndexObjectPositionRightChild<nodeRefApproxOffset"
-          + fpIndexObjectPositionRightChild + " and " + nodeRefApproxOffset;
-      out.writeVLong((fpIndexObjectPositionRightChild - nodeRefApproxOffset));
+      assert fpIndexObjectPositionLeftChild >= localNodeRefApproxOffset : "fpIndexObjectPositionLeftChild<nodeRefApproxOffset : "
+          + fpIndexObjectPositionLeftChild + " and " + localNodeRefApproxOffset;
+      out.writeVLong((fpIndexObjectPositionLeftChild - localNodeRefApproxOffset));
+      assert fpIndexObjectPositionRightChild >= localNodeRefApproxOffset : "fpIndexObjectPositionRightChild<nodeRefApproxOffset"
+          + fpIndexObjectPositionRightChild + " and " + localNodeRefApproxOffset;
+      out.writeVLong((fpIndexObjectPositionRightChild - localNodeRefApproxOffset));
       if (!isSinglePoint) {
         out.writeVInt(node.ids.size());
       }
@@ -1637,10 +1600,8 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Token stats add.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
+   * @param min the min
+   * @param max the max
    */
   private void tokenStatsAdd(int min, int max) {
     tokenStatsNumber++;
@@ -1659,16 +1620,11 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   /**
    * Copy object and update stats.
    *
-   * @param id
-   *          the id
-   * @param in
-   *          the in
-   * @param inRef
-   *          the in ref
-   * @param out
-   *          the out
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param id the id
+   * @param in the in
+   * @param inRef the in ref
+   * @param out the out
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void copyObjectAndUpdateStats(int id, IndexInput in, Long inRef,
       IndexOutput out) throws IOException {
@@ -1696,7 +1652,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
         & MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
       int size = in.readVInt();
       out.writeVInt(size);
-      TreeSet<Integer> list = new TreeSet<>();
+      SortedSet<Integer> list = new TreeSet<>();
       int previousPosition = 0;
       for (int t = 0; t < size; t++) {
         int pos = in.readVInt();

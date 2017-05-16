@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import mtas.analysis.MtasTokenizer;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
@@ -30,6 +29,7 @@ import mtas.solr.handler.component.util.MtasSolrComponentList;
 import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
 import mtas.solr.handler.component.util.MtasSolrComponentStats;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
+import mtas.solr.handler.component.util.MtasSolrMtasResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +38,7 @@ import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.handler.component.ShardResponse;
 import org.apache.solr.search.DocList;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
@@ -47,15 +48,22 @@ import org.apache.solr.search.SolrIndexSearcher;
  */
 public class MtasSolrSearchComponent extends SearchComponent {
 
+  /** The log. */
   private static Log log = LogFactory.getLog(MtasSolrSearchComponent.class);
 
-  
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
+  /** The Constant CONFIG_JOIN_CACHE_DIRECTORY. */
   public static final String CONFIG_JOIN_CACHE_DIRECTORY = "joinCacheDirectory";
+
+  /** The Constant CONFIG_JOIN_LIFETIME. */
   public static final String CONFIG_JOIN_LIFETIME = "joinLifetime";
+
+  /** The Constant CONFIG_JOIN_MAXIMUM_NUMBER. */
   public static final String CONFIG_JOIN_MAXIMUM_NUMBER = "joinMaximumNumber";
+
+  /** The Constant CONFIG_JOIN_MAXIMUM_OVERFLOW. */
   public static final String CONFIG_JOIN_MAXIMUM_OVERFLOW = "joinMaximumOverflow";
 
   /** The Constant PARAM_MTAS. */
@@ -126,10 +134,19 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The search document. */
   private MtasSolrComponentDocument searchDocument;
 
+  /** The search join. */
   private MtasSolrComponentJoin searchJoin;
 
+  /** The join cache. */
   private MtasSolrJoinCache joinCache = null;
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.solr.handler.component.SearchComponent#init(org.apache.solr.
+   * common.util.NamedList)
+   */
   @Override
   public void init(NamedList args) {
     super.init(args);
@@ -158,13 +175,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
     if (args.get(CONFIG_JOIN_MAXIMUM_NUMBER) != null
         && args.get(CONFIG_JOIN_MAXIMUM_NUMBER) instanceof Integer) {
-      joinMaximumNumber = (Integer) args.get(CONFIG_JOIN_MAXIMUM_NUMBER);      
+      joinMaximumNumber = (Integer) args.get(CONFIG_JOIN_MAXIMUM_NUMBER);
     }
     if (args.get(CONFIG_JOIN_MAXIMUM_OVERFLOW) != null
         && args.get(CONFIG_JOIN_MAXIMUM_OVERFLOW) instanceof Integer) {
       joinMaximumNumber = (Integer) args.get(CONFIG_JOIN_MAXIMUM_OVERFLOW);
     }
-    joinCache = new MtasSolrJoinCache(joinCacheDirectory, joinLifetime, joinMaximumNumber, joinMaximumOverflow);    
+    joinCache = new MtasSolrJoinCache(joinCacheDirectory, joinLifetime,
+        joinMaximumNumber, joinMaximumOverflow);
   }
 
   /*
@@ -196,10 +214,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
-    // System.out.println(System.nanoTime()+" - "+Thread.currentThread().getId()
-    // + " - "
-    // + rb.req.getParams().getBool("isShard", false) + " PREPARE " + rb.stage
-    // + " " + rb.req.getParamString());    
+    //System.out
+    //    .println(System.nanoTime() + " - " + Thread.currentThread().getId()
+    //        + " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
+    //        + rb.stage + " " + rb.req.getParamString());
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
       mtasSolrResultMerge = new MtasSolrResultMerge();
       ComponentFields mtasFields = new ComponentFields();
@@ -261,10 +279,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void process(ResponseBuilder rb) throws IOException {
-    // System.out
-    // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false) + " PROCESS "
-    // + rb.stage + " " + rb.req.getParamString());
+     //System.out
+     //.println(System.nanoTime() + " - " + Thread.currentThread().getId()
+     //+ " - " + rb.req.getParams().getBool("isShard", false) + " PROCESS "
+     //+ rb.stage + " " + rb.req.getParamString());
     ComponentFields mtasFields = getMtasFields(rb);
     if (mtasFields != null) {
       DocSet docSet = rb.getResults().docSet;
@@ -299,7 +317,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           } catch (IllegalAccessException | IllegalArgumentException
               | InvocationTargetException e) {
             log.error(e);
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
           }
         }
         CodecUtil.collectJoin(searcher.getRawReader(), docSetList,
@@ -446,8 +464,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
                 for (ComponentSpan span : mtasFields.list
                     .get(field).statsSpanList) {
                   if (rb.req.getParams().getBool("isShard", false)) {
-                    mtasStatsSpansResponses
-                        .add(searchStats.create(span, true));
+                    mtasStatsSpansResponses.add(searchStats.create(span, true));
                   } else {
                     mtasStatsSpansResponses
                         .add(searchStats.create(span, false));
@@ -478,9 +495,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
   @Override
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-    // System.out.println(Thread.currentThread().getId() + " - "
-    // + rb.req.getParams().getBool("isShard", false) + " MODIFY REQUEST "
-    // + rb.stage + " " + rb.req.getParamString());
+    //System.out.println(Thread.currentThread().getId() + " - "
+    //+ rb.req.getParams().getBool("isShard", false) + " MODIFY REQUEST "
+    //+ rb.stage + " " + rb.req.getParamString());
     if (sreq.params.getBool(PARAM_MTAS, false)) {
       if (sreq.params.getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
         searchStats.modifyRequest(rb, who, sreq);
@@ -524,10 +541,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
-    // System.out
-    // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false)
-    // + " HANDLERESPONSES " + rb.stage + " " + rb.req.getParamString());
+     //System.out
+     //.println(System.nanoTime() + " - " + Thread.currentThread().getId()
+     //+ " - " + rb.req.getParams().getBool("isShard", false)
+     //+ " HANDLERESPONSES " + rb.stage + " " + rb.req.getParamString());
   }
 
   /*
@@ -539,10 +556,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void finishStage(ResponseBuilder rb) {
-    // System.out
-    // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false)
-    // + " FINISHRESPONSES " + rb.stage + " " + rb.req.getParamString());
+    //System.out
+    //.println(System.nanoTime() + " - " + Thread.currentThread().getId()
+    //+ " - " + rb.req.getParams().getBool("isShard", false)
+    //+ " FINISHRESPONSES " + rb.stage + " " + rb.req.getParamString());
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
       if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,
           false)) {
@@ -593,12 +610,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public int distributedProcess(ResponseBuilder rb) throws IOException {
-    // System.out.println(Thread.currentThread().getId() + " - "
+    // System.out.println(System.nanoTime() + " - " + Thread.currentThread().getId() + " - "
     // + rb.req.getParams().getBool("isShard", false) + " DISTIRBUTEDPROCESS "
     // + rb.stage + " " + rb.req.getParamString());
     // distributed processes
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-      if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP || rb.stage == STAGE_TERMVECTOR_MISSING_KEY || rb.stage == STAGE_TERMVECTOR_FINISH) {
+      if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP
+          || rb.stage == STAGE_TERMVECTOR_MISSING_KEY
+          || rb.stage == STAGE_TERMVECTOR_FINISH) {
         ComponentFields mtasFields = getMtasFields(rb);
         searchTermvector.distributedProcess(rb, mtasFields);
       } else if (rb.stage == STAGE_LIST) {

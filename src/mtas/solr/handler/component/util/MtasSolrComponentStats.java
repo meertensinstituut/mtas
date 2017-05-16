@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,8 +36,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentStats
     implements MtasSolrComponent<ComponentStats> {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasSolrComponentStats.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentStats.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -155,8 +154,13 @@ public class MtasSolrComponentStats
     this.searchComponent = searchComponent;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -718,8 +722,14 @@ public class MtasSolrComponentStats
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -825,8 +835,12 @@ public class MtasSolrComponentStats
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   @Override
   public SimpleOrderedMap<Object> create(ComponentStats response,
@@ -918,7 +932,7 @@ public class MtasSolrComponentStats
             new MtasSolrMtasResult(function.dataCollector,
                 new String[] { function.dataType },
                 new String[] { function.statsType },
-                new TreeSet[] { function.statsItems }, new String[] { null },
+                new SortedSet[] { function.statsItems }, new String[] { null },
                 new String[] { null }, new Integer[] { 0 },
                 new Integer[] { Integer.MAX_VALUE }, null));
       }
@@ -934,8 +948,12 @@ public class MtasSolrComponentStats
     return mtasSpanResponse;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -964,8 +982,13 @@ public class MtasSolrComponentStats
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)

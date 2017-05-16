@@ -13,8 +13,7 @@ public class MtasFunctionParserFunctionDefault
   /**
    * Instantiates a new mtas function parser function default.
    *
-   * @param numberOfArguments
-   *          the number of arguments
+   * @param numberOfArguments the number of arguments
    */
   public MtasFunctionParserFunctionDefault(int numberOfArguments) {
     this.dataType = CodecUtil.DATA_TYPE_LONG;

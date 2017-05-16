@@ -13,12 +13,10 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   private final HashMap<String, MtasAVLTreeNode> index;
 
   /**
-   * Instantiates a new mtas avl tree.
+   * Instantiates a new mtas AVL tree.
    *
-   * @param singlePoint
-   *          the single point
-   * @param storePrefixId
-   *          the store prefix id
+   * @param singlePoint the single point
+   * @param storePrefixId the store prefix id
    */
   public MtasAVLTree(boolean singlePoint, boolean storePrefixId) {
     super(singlePoint, storePrefixId);
@@ -101,10 +99,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Update max.
    *
-   * @param n
-   *          the n
-   * @param max
-   *          the max
+   * @param n the n
+   * @param max the max
    */
   private void updateMax(MtasAVLTreeNode n, int max) {
     if (n != null) {
@@ -118,37 +114,36 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rebalance.
    *
-   * @param n
-   *          the n
+   * @param n the n
    */
   private void rebalance(MtasAVLTreeNode n) {
-    setBalance(n);
-    if (n.balance == -2) {
-      if (height(n.leftChild.leftChild) >= height(n.leftChild.rightChild)) {
-        n = rotateRight(n);
+    MtasAVLTreeNode localN = n;
+    setBalance(localN);
+    if (localN.balance == -2) {
+      if (height(localN.leftChild.leftChild) >= height(localN.leftChild.rightChild)) {
+        localN = rotateRight(localN);
       } else {
-        n = rotateLeftThenRight(n);
+        localN = rotateLeftThenRight(localN);
       }
-    } else if (n.balance == 2) {
-      if (height(n.rightChild.rightChild) >= height(n.rightChild.leftChild)) {
-        n = rotateLeft(n);
+    } else if (localN.balance == 2) {
+      if (height(localN.rightChild.rightChild) >= height(localN.rightChild.leftChild)) {
+        localN = rotateLeft(localN);
       } else {
-        n = rotateRightThenLeft(n);
+        localN = rotateRightThenLeft(localN);
       }
     }
-    if (n.parent != null) {
-      rebalance(n.parent);
+    if (localN.parent != null) {
+      rebalance(localN.parent);
     } else {
-      root = n;
+      root = localN;
     }
   }
 
   /**
    * Rotate left.
    *
-   * @param a
-   *          the a
-   * @return the mtas avl tree node
+   * @param a the a
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateLeft(MtasAVLTreeNode a) {
     MtasAVLTreeNode b = a.rightChild;
@@ -175,9 +170,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate right.
    *
-   * @param a
-   *          the a
-   * @return the mtas avl tree node
+   * @param a the a
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateRight(MtasAVLTreeNode a) {
     MtasAVLTreeNode b = a.leftChild;
@@ -204,9 +198,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate left then right.
    *
-   * @param n
-   *          the n
-   * @return the mtas avl tree node
+   * @param n the n
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateLeftThenRight(MtasAVLTreeNode n) {
     n.leftChild = rotateLeft(n.leftChild);
@@ -216,9 +209,8 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Rotate right then left.
    *
-   * @param n
-   *          the n
-   * @return the mtas avl tree node
+   * @param n the n
+   * @return the mtas AVL tree node
    */
   private MtasAVLTreeNode rotateRightThenLeft(MtasAVLTreeNode n) {
     n.rightChild = rotateRight(n.rightChild);
@@ -228,8 +220,7 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Height.
    *
-   * @param n
-   *          the n
+   * @param n the n
    * @return the int
    */
   private int height(MtasAVLTreeNode n) {
@@ -243,8 +234,7 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Sets the balance.
    *
-   * @param nodes
-   *          the new balance
+   * @param nodes the new balance
    */
   private void setBalance(MtasAVLTreeNode... nodes) {
     for (MtasAVLTreeNode n : nodes) {
@@ -255,8 +245,7 @@ public class MtasAVLTree extends MtasTree<MtasAVLTreeNode> {
   /**
    * Sets the max.
    *
-   * @param n
-   *          the new max
+   * @param n the new max
    */
   private void setMax(MtasAVLTreeNode n) {
     n.max = n.right;

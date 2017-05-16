@@ -36,10 +36,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span unique position.
    *
-   * @param mtasSpanUniquePositionQuery
-   *          the mtas span unique position query
-   * @param spans
-   *          the spans
+   * @param spans the spans
    */
   public MtasSpanUniquePosition(Spans spans) {
     super();
@@ -177,8 +174,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    * To match doc.
    *
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   int toMatchDoc() throws IOException {
     while (true) {
@@ -195,8 +191,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    * Collect span.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
@@ -216,8 +211,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    * Find matches.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
@@ -274,10 +268,8 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
     /**
      * Instantiates a new match.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
@@ -320,6 +312,9 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
           && endPosition == that.endPosition;
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
       int h = this.getClass().getSimpleName().hashCode();

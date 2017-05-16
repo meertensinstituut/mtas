@@ -5,8 +5,7 @@ import java.util.HashMap;
 /**
  * The Class MtasTreeNode.
  *
- * @param <N>
- *          the number type
+ * @param <N> the number type
  */
 abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
 
@@ -32,10 +31,8 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
   /**
    * Instantiates a new mtas tree node.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
+   * @param left the left
+   * @param right the right
    */
   public MtasTreeNode(int left, int right) {
     this.left = left;
@@ -48,14 +45,10 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
   /**
    * Adds the id and ref.
    *
-   * @param id
-   *          the id
-   * @param ref
-   *          the ref
-   * @param additionalId
-   *          the additional id
-   * @param additionalRef
-   *          the additional ref
+   * @param id the id
+   * @param ref the ref
+   * @param additionalId the additional id
+   * @param additionalRef the additional ref
    */
   final public void addIdAndRef(Integer id, Long ref, int additionalId,
       long additionalRef) {

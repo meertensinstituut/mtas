@@ -7,10 +7,8 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 /**
  * The Class IntervalTreeNode.
  *
- * @param <T>
- *          the generic type
- * @param <N>
- *          the number type
+ * @param <T> the generic type
+ * @param <N> the number type
  */
 abstract public class IntervalTreeNode<T, N extends IntervalTreeNode<T, N>> {
 
@@ -39,10 +37,8 @@ abstract public class IntervalTreeNode<T, N extends IntervalTreeNode<T, N>> {
   /**
    * Instantiates a new interval tree node.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
+   * @param left the left
+   * @param right the right
    */
   public IntervalTreeNode(int left, int right) {
     this.left = left;
@@ -56,8 +52,7 @@ abstract public class IntervalTreeNode<T, N extends IntervalTreeNode<T, N>> {
   /**
    * Adds the list.
    *
-   * @param list
-   *          the list
+   * @param list the list
    */
   final public void addList(ArrayList<MtasTreeHit<T>> list) {
     if (list != null) {

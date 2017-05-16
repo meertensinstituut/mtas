@@ -1,7 +1,12 @@
 package mtas.codec;
 
 import java.io.IOException;
+
+import mtas.analysis.MtasTokenizer;
 import mtas.analysis.token.MtasTokenString;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.FieldsConsumer;
 import org.apache.lucene.codecs.FieldsProducer;
@@ -15,6 +20,9 @@ import org.apache.lucene.util.BytesRef;
  * The Class MtasCodecPostingsFormat.
  */
 public class MtasCodecPostingsFormat extends PostingsFormat {
+
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasCodecPostingsFormat.class);
 
   /** The Constant VERSION_START. */
   public static final int VERSION_START = 3;
@@ -142,7 +150,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       Class.forName("mtas.codec.util.CodecInfo");
       Class.forName("mtas.codec.tree.MtasTreeNodeId");
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error(e);
     }
   }
 
@@ -166,7 +174,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       Class.forName("mtas.codec.util.CodecInfo");
       Class.forName("mtas.codec.tree.MtasTreeNodeId");
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error(e);
     }
   }
 
@@ -212,8 +220,8 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
    * @return the token
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static MtasTokenString getToken(IndexInput inObject,
-      IndexInput inTerm, Long ref) throws IOException {
+  public static MtasTokenString getToken(IndexInput inObject, IndexInput inTerm,
+      Long ref) throws IOException {
     MtasTokenString token = null;
     try {
       inObject.seek(ref);
@@ -268,7 +276,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       token.setTermRef(termRef);
       token.setValue(inTerm.readString());
     } catch (Exception e) {
-      throw new IOException(e.getMessage());
+      throw new IOException(e);
     }
     return token;
   }
@@ -286,7 +294,7 @@ public class MtasCodecPostingsFormat extends PostingsFormat {
       inTerm.seek(ref);
       return inTerm.readString();
     } catch (Exception e) {
-      throw new IOException(e.getMessage());
+      throw new IOException(e);
     }
   }
 

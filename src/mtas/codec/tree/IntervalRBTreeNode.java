@@ -3,8 +3,7 @@ package mtas.codec.tree;
 /**
  * The Class IntervalRBTreeNode.
  *
- * @param <T>
- *          the generic type
+ * @param <T> the generic type
  */
 public class IntervalRBTreeNode<T>
     extends IntervalTreeNode<T, IntervalRBTreeNode<T>> {
@@ -23,16 +22,12 @@ public class IntervalRBTreeNode<T>
 
   // node with start and end position
   /**
-   * Instantiates a new interval rb tree node.
+   * Instantiates a new interval RB tree node.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param color
-   *          the color
-   * @param n
-   *          the n
+   * @param left the left
+   * @param right the right
+   * @param color the color
+   * @param n the n
    */
   public IntervalRBTreeNode(int left, int right, int color, int n) {
     super(left, right);

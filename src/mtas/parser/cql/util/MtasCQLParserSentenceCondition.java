@@ -23,23 +23,34 @@ public class MtasCQLParserSentenceCondition {
   /** The basic sentence. */
   private MtasCQLParserBasicSentenceCondition basicSentence = null;
 
+  /** The minimum occurence. */
+  private int minimumOccurence;
+  
   /** The maximum occurence. */
-  private int minimumOccurence, maximumOccurence;
+  private int maximumOccurence;
 
-  /** The optional parts. */
-  private boolean basic, simplified, optional;
+  /** The basic. */
+  private boolean basic;
+  
+  /** The simplified. */
+  private boolean simplified;
+  
+  /** The optional. */
+  private boolean optional;
 
+  /** The ignore. */
   private MtasSpanQuery ignore;
 
+  /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
 
   /**
-   * Instantiates a new mtas cql parser sentence condition.
+   * Instantiates a new mtas CQL parser sentence condition.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @param s the s
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
+   * @throws ParseException the parse exception
    */
   public MtasCQLParserSentenceCondition(MtasCQLParserBasicSentenceCondition s,
       MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
@@ -55,12 +66,12 @@ public class MtasCQLParserSentenceCondition {
   }
 
   /**
-   * Instantiates a new mtas cql parser sentence condition.
+   * Instantiates a new mtas CQL parser sentence condition.
    *
-   * @param sp
-   *          the sp
-   * @throws ParseException
-   *           the parse exception
+   * @param sp the sp
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
+   * @throws ParseException the parse exception
    */
   public MtasCQLParserSentenceCondition(MtasCQLParserSentenceCondition sp,
       MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
@@ -78,10 +89,8 @@ public class MtasCQLParserSentenceCondition {
   /**
    * Adds the basic sentence to end latest sequence.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @param s the s
+   * @throws ParseException the parse exception
    */
   public void addBasicSentenceToEndLatestSequence(
       MtasCQLParserBasicSentenceCondition s) throws ParseException {
@@ -106,12 +115,10 @@ public class MtasCQLParserSentenceCondition {
   }
 
   /**
-   * Adds the basic sentence as option.
+   * Adds the sentence to end latest sequence.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @param s the s
+   * @throws ParseException the parse exception
    */
   // public void addBasicSentenceAsOption(MtasCQLParserBasicSentenceCondition s)
   // throws ParseException {
@@ -250,10 +257,8 @@ public class MtasCQLParserSentenceCondition {
   /**
    * Adds the sentence as first option.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @param s the s
+   * @throws ParseException the parse exception
    */
   public void addSentenceAsFirstOption(MtasCQLParserSentenceCondition s)
       throws ParseException {
@@ -299,12 +304,9 @@ public class MtasCQLParserSentenceCondition {
   }
 
   /**
-   * Adds the sentence as option.
+   * Checks if is basic.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @return true, if is basic
    */
   // public void addSentenceAsOption(MtasCQLParserSentenceCondition s)
   // throws ParseException {
@@ -367,8 +369,7 @@ public class MtasCQLParserSentenceCondition {
   /**
    * Simplify.
    *
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public void simplify() throws ParseException {
     if (!simplified) {
@@ -399,10 +400,8 @@ public class MtasCQLParserSentenceCondition {
   /**
    * Simplify sequence.
    *
-   * @param sequence
-   *          the sequence
-   * @throws ParseException
-   *           the parse exception
+   * @param sequence the sequence
+   * @throws ParseException the parse exception
    */
   private void simplifySequence(List<MtasCQLParserSentenceCondition> sequence)
       throws ParseException {
@@ -496,12 +495,9 @@ public class MtasCQLParserSentenceCondition {
   /**
    * Sets the occurence.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
-   * @throws ParseException
-   *           the parse exception
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
     if ((min < 0) || (min > max) || (max < 1)) {
@@ -524,11 +520,9 @@ public class MtasCQLParserSentenceCondition {
   }
 
   /**
-   * Checks for optional parts.
+   * Sets the optional.
    *
-   * @return true, if successful
-   * @throws ParseException
-   *           the parse exception
+   * @param status the new optional
    */
   // public boolean hasOptionalParts() throws ParseException {
   // if (simplified) {
@@ -551,11 +545,9 @@ public class MtasCQLParserSentenceCondition {
   /**
    * Creates the query.
    *
-   * @param sentenceSequence
-   *          the sentence sequence
-   * @return the span query
-   * @throws ParseException
-   *           the parse exception
+   * @param sentenceSequence the sentence sequence
+   * @return the mtas span query
+   * @throws ParseException the parse exception
    */
   private MtasSpanQuery createQuery(
       List<MtasCQLParserSentenceCondition> sentenceSequence)
@@ -587,8 +579,7 @@ public class MtasCQLParserSentenceCondition {
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public MtasSpanQuery getQuery() throws ParseException {
     simplify();
@@ -640,10 +631,8 @@ public class MtasCQLParserSentenceCondition {
   /**
    * To string.
    *
-   * @param firstIndent
-   *          the first indent
-   * @param indent
-   *          the indent
+   * @param firstIndent the first indent
+   * @param indent the indent
    * @return the string
    */
   public String toString(String firstIndent, String indent) {

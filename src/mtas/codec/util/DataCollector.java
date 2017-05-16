@@ -1,8 +1,7 @@
 package mtas.codec.util;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.codec.util.collector.MtasDataDoubleAdvanced;
@@ -17,41 +16,37 @@ import mtas.codec.util.collector.MtasDataLongFull;
  */
 public class DataCollector {
 
-  /** The collector type list. */
-  public final static String COLLECTOR_TYPE_LIST = "list";
+  /** The Constant COLLECTOR_TYPE_LIST. */
+  public static final String COLLECTOR_TYPE_LIST = "list";
 
-  /** The collector type data. */
-  public final static String COLLECTOR_TYPE_DATA = "data";
+  /** The Constant COLLECTOR_TYPE_DATA. */
+  public static final String COLLECTOR_TYPE_DATA = "data";
+  
+  /**
+   * Instantiates a new data collector.
+   */
+  private DataCollector() {
+    //don't do anything
+  }
 
   /**
    * Gets the collector.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsType
-   *          the stats type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
    * @return the collector
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasDataCollector<?, ?> getCollector(String collectorType,
-      String dataType, String statsType, Set<String> statsItems,
+      String dataType, String statsType, SortedSet<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String segmentRegistration, String boundary) throws IOException {
     return getCollector(collectorType, dataType, statsType, statsItems,
@@ -62,51 +57,32 @@ public class DataCollector {
   /**
    * Gets the collector.
    *
-   * @param collectorType
-   *          the collector type
-   * @param dataType
-   *          the data type
-   * @param statsType
-   *          the stats type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
+   * @param collectorType the collector type
+   * @param dataType the data type
+   * @param statsType the stats type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
    * @return the collector
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasDataCollector<?, ?> getCollector(String collectorType,
-      String dataType, String statsType, Set<String> statsItems,
+      String dataType, String statsType, SortedSet<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      Set<String>[] subStatsItems, String[] subSortTypes,
+      SortedSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
     if (dataType != null && dataType.equals(CodecUtil.DATA_TYPE_LONG)) {

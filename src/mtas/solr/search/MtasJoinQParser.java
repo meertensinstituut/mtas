@@ -2,21 +2,20 @@ package mtas.solr.search;
 
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.params.SolrParams;
-import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.SyntaxError;
 
 /**
- * The Class MtasCQLQParser.
+ * The Class MtasJoinQParser.
  */
 public class MtasJoinQParser extends QParser {
 
-  /** The mtas join qparser url. */
-  public final static String MTAS_JOIN_QPARSER_URL = "url";
+  /** The Constant MTAS_JOIN_QPARSER_URL. */
+  public static final String MTAS_JOIN_QPARSER_URL = "url";
 
-  /** The mtas cql qparser request. */
-  public final static String MTAS_JOIN_QPARSER_REQUEST = "request";
+  /** The Constant MTAS_JOIN_QPARSER_REQUEST. */
+  public static final String MTAS_JOIN_QPARSER_REQUEST = "request";
 
   /** The url. */
   String url = null;
@@ -25,16 +24,12 @@ public class MtasJoinQParser extends QParser {
   String request = null;
 
   /**
-   * Instantiates a new mtas cqlq parser.
+   * Instantiates a new mtas join Q parser.
    *
-   * @param qstr
-   *          the qstr
-   * @param localParams
-   *          the local params
-   * @param params
-   *          the params
-   * @param req
-   *          the req
+   * @param qstr the qstr
+   * @param localParams the local params
+   * @param params the params
+   * @param req the req
    */
   public MtasJoinQParser(String qstr, SolrParams localParams, SolrParams params,
       SolrQueryRequest req) {

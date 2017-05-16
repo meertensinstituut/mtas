@@ -12,16 +12,14 @@ public class MtasCQLParserDefaultPrefixCondition
     extends MtasCQLParserWordCondition {
 
   /**
-   * Instantiates a new mtas cql parser default prefix condition.
+   * Instantiates a new mtas CQL parser default prefix condition.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param value
-   *          the value
-   * @throws ParseException
-   *           the parse exception
+   * @param field the field
+   * @param prefix the prefix
+   * @param value the value
+   * @param variables the variables
+   * @param usedVariables the used variables
+   * @throws ParseException the parse exception
    */
   public MtasCQLParserDefaultPrefixCondition(String field, String prefix,
       String value, HashMap<String, String[] > variables, HashSet<String> usedVariables) throws ParseException {

@@ -29,19 +29,25 @@ public class MtasIgnoreItem {
   /** The maximum ignore length. */
   int maximumIgnoreLength;
   
-  /** The base list. */
+  /** The base start position list. */
   HashMap<Integer, HashSet<Integer>> baseStartPositionList;
+  
+  /** The base end position list. */
   HashMap<Integer, HashSet<Integer>> baseEndPositionList;
   
-  /** The full list. */
+  /** The full end position list. */
   HashMap<Integer, HashSet<Integer>> fullEndPositionList;
   
-  /** The max base end position. */
+  /** The min base start position. */
   HashMap<Integer, Integer> minBaseStartPosition;
+  
+  /** The max base end position. */
   HashMap<Integer, Integer> maxBaseEndPosition;
   
-  /** The max full end position. */
+  /** The min full start position. */
   HashMap<Integer, Integer> minFullStartPosition;
+
+/** The max full end position. */
 HashMap<Integer, Integer> maxFullEndPosition;
   
   /**
@@ -96,11 +102,11 @@ HashMap<Integer, Integer> maxFullEndPosition;
   }
 
   /**
-   * Gets the max size.
+   * Gets the min start position.
    *
    * @param docId the doc id
    * @param position the position
-   * @return the max size
+   * @return the min start position
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public int getMinStartPosition(int docId, int position) throws IOException {
@@ -121,6 +127,14 @@ HashMap<Integer, Integer> maxFullEndPosition;
     }
   }
   
+  /**
+   * Gets the max end position.
+   *
+   * @param docId the doc id
+   * @param position the position
+   * @return the max end position
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public int getMaxEndPosition(int docId, int position) throws IOException {
     if (ignoreSpans != null && docId == currentDocId) {
       if (position < minimumPosition) {
@@ -139,11 +153,11 @@ HashMap<Integer, Integer> maxFullEndPosition;
   }
 
   /**
-   * Gets the full list.
+   * Gets the full end position list.
    *
    * @param docId the doc id
    * @param position the position
-   * @return the full list
+   * @return the full end position list
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public HashSet<Integer> getFullEndPositionList(int docId, int position)
@@ -161,6 +175,12 @@ HashMap<Integer, Integer> maxFullEndPosition;
     }
   }
   
+  /**
+   * Compute full start position minimum.
+   *
+   * @param position the position
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void computeFullStartPositionMinimum(int position) throws IOException {
     if (ignoreSpans != null && !minFullStartPosition.containsKey(position)) {
       HashSet<Integer> list = baseStartPositionList.get(position);
@@ -187,7 +207,7 @@ HashMap<Integer, Integer> maxFullEndPosition;
   }  
 
   /**
-   * Compute full list.
+   * Compute full end position list.
    *
    * @param position the position
    * @throws IOException Signals that an I/O exception has occurred.

@@ -22,7 +22,7 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
   Term term;
 
   /**
-   * Instantiates a new mtas cql parser word position query.
+   * Instantiates a new mtas CQL parser word position query.
    *
    * @param field the field
    * @param position the position
@@ -34,7 +34,7 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
   }
 
   /**
-   * Instantiates a new mtas cql parser word position query.
+   * Instantiates a new mtas CQL parser word position query.
    *
    * @param field the field
    * @param start the start

@@ -17,8 +17,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
   /**
    * Instantiates a new mtas bit input stream.
    *
-   * @param buf
-   *          the buf
+   * @param buf the buf
    */
   public MtasBitInputStream(byte[] buf) {
     super(buf);
@@ -28,8 +27,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
    * Read bit.
    *
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public int readBit() throws IOException {
     if (bitCount == 0) {
@@ -50,14 +48,16 @@ public class MtasBitInputStream extends ByteArrayInputStream {
    * Read remaining bytes.
    *
    * @return the byte[]
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public byte[] readRemainingBytes() throws IOException {
     if (this.available() > 0) {
       byte[] b = new byte[this.available()];
-      read(b);
-      return b;
+      if(read(b)>=0) {
+        return b;
+      } else {
+        throw new IOException("returned negative number of remaining bytes");
+      }
     } else {
       throw new IOException("no more bytes");
     }
@@ -67,8 +67,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
    * Read elias gamma coding integer.
    *
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public int readEliasGammaCodingInteger() throws IOException {
     int value = readEliasGammaCodingPositiveInteger();
@@ -83,8 +82,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
    * Read elias gamma coding non negative integer.
    *
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public int readEliasGammaCodingNonNegativeInteger() throws IOException {
     int value = readEliasGammaCodingPositiveInteger();
@@ -95,8 +93,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
    * Read elias gamma coding positive integer.
    *
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public int readEliasGammaCodingPositiveInteger() throws IOException {
     int value;

@@ -3,6 +3,7 @@ package mtas.codec.tree;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import mtas.analysis.token.MtasPosition;
 import mtas.analysis.token.MtasToken;
@@ -10,8 +11,7 @@ import mtas.analysis.token.MtasToken;
 /**
  * The Class MtasTree.
  *
- * @param <N>
- *          the number type
+ * @param <N> the number type
  */
 abstract public class MtasTree<N extends MtasTreeNode<N>> {
 
@@ -36,10 +36,8 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Instantiates a new mtas tree.
    *
-   * @param singlePoint
-   *          the single point
-   * @param storePrefixAndTermRef
-   *          the store prefix and term ref
+   * @param singlePoint the single point
+   * @param storePrefixAndTermRef the store prefix and term ref
    */
   public MtasTree(boolean singlePoint, boolean storePrefixAndTermRef) {
     root = null;
@@ -51,10 +49,8 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the id from doc.
    *
-   * @param docId
-   *          the doc id
-   * @param reference
-   *          the reference
+   * @param docId the doc id
+   * @param reference the reference
    */
   final public void addIdFromDoc(Integer docId, Long reference) {
     if (!closed && (docId != null)) {
@@ -65,15 +61,10 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the parent from token.
    *
-   * @param <T>
-   *          the generic type
-   * @param token
-   *          the token
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param token the token
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  final public void addParentFromToken(MtasToken token)
-      throws IOException {
+  final public void addParentFromToken(MtasToken token) throws IOException {
     if (!closed && (token != null)) {
       if (token.checkParentId()) {
         addSinglePoint(token.getParentId(), token.getPrefixId(),
@@ -85,12 +76,8 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the position and object from token.
    *
-   * @param <T>
-   *          the generic type
-   * @param token
-   *          the token
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param token the token
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   final public void addPositionAndObjectFromToken(MtasToken token)
       throws IOException {
@@ -104,14 +91,9 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the position from token.
    *
-   * @param <T>
-   *          the generic type
-   * @param token
-   *          the token
-   * @param ref
-   *          the ref
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param token the token
+   * @param ref the ref
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   final private void addPositionFromToken(MtasToken token, Long ref)
       throws IOException {
@@ -125,7 +107,7 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
             token.getTermRef(), token.getId(), ref);
       } else if (token.checkPositionType(MtasPosition.POSITION_SET)) {
         // split set into minimum number of single points and ranges
-        TreeMap<Integer, Integer> list = new TreeMap<Integer, Integer>();
+        SortedMap<Integer, Integer> list = new TreeMap<>();
         int[] positions = token.getPositions();
         Integer lastPoint = null;
         Integer startPoint = null;
@@ -171,16 +153,11 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the single point.
    *
-   * @param position
-   *          the position
-   * @param additionalId
-   *          the additional id
-   * @param additionalRef
-   *          the additional ref
-   * @param id
-   *          the id
-   * @param ref
-   *          the ref
+   * @param position the position
+   * @param additionalId the additional id
+   * @param additionalRef the additional ref
+   * @param id the id
+   * @param ref the ref
    */
   abstract protected void addSinglePoint(int position, int additionalId,
       long additionalRef, Integer id, Long ref);
@@ -188,18 +165,12 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the range.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param additionalId
-   *          the additional id
-   * @param additionalRef
-   *          the additional ref
-   * @param id
-   *          the id
-   * @param ref
-   *          the ref
+   * @param left the left
+   * @param right the right
+   * @param additionalId the additional id
+   * @param additionalRef the additional ref
+   * @param id the id
+   * @param ref the ref
    */
   abstract protected void addRange(int left, int right, int additionalId,
       long additionalRef, Integer id, Long ref);
@@ -207,14 +178,10 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Adds the range empty.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param additionalId
-   *          the additional id
-   * @param additionalRef
-   *          the additional ref
+   * @param left the left
+   * @param right the right
+   * @param additionalId the additional id
+   * @param additionalRef the additional ref
    */
   abstract protected void addRangeEmpty(int left, int right, int additionalId,
       long additionalRef);
@@ -247,15 +214,14 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   /**
    * Prints the balance.
    *
-   * @param p
-   *          the p
-   * @param n
-   *          the n
+   * @param p the p
+   * @param n the n
    */
   final private void printBalance(Integer p, N n) {
     if (n != null) {
       printBalance((p + 1), n.leftChild);
-      System.out.print(String.format("%" + (3 * p) + "s", ""));
+      String format = "%" + (3 * p) + "s";
+      System.out.print(String.format(format, ""));
       if (n.left == n.right) {
         System.out.println(
             "[" + n.left + "] (" + n.max + ") : " + n.ids.size() + " tokens");

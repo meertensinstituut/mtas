@@ -18,10 +18,9 @@ public class MtasCQLParserWordFullCondition
   private MtasCQLParserWordCondition wordCondition;
 
   /**
-   * Instantiates a new mtas cql parser word full condition.
+   * Instantiates a new mtas CQL parser word full condition.
    *
-   * @param condition
-   *          the condition
+   * @param condition the condition
    */
   public MtasCQLParserWordFullCondition(MtasCQLParserWordCondition condition) {
     minimumOccurence = 1;
@@ -89,7 +88,8 @@ public class MtasCQLParserWordFullCondition
       // both positive and negative queries
     } else {
       if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {
-        MtasSpanQuery qPositive, qNegative;
+        MtasSpanQuery qPositive;
+        MtasSpanQuery qNegative;
         if (wordCondition.getPositiveQuery().size() == 1) {
           qPositive = wordCondition.getPositiveQuery(0);
         } else {
@@ -105,7 +105,8 @@ public class MtasCQLParserWordFullCondition
         q = new MtasSpanNotQuery(qPositive, qNegative);
       } else if (wordCondition.type()
           .equals(MtasCQLParserWordCondition.TYPE_OR)) {
-        MtasSpanQuery qPositive, qNegative;
+        MtasSpanQuery qPositive;
+        MtasSpanQuery qNegative;
         if (wordCondition.getPositiveQuery().size() == 1) {
           qPositive = wordCondition.getPositiveQuery(0);
         } else {
@@ -151,6 +152,9 @@ public class MtasCQLParserWordFullCondition
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

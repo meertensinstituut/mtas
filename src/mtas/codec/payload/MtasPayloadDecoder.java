@@ -1,6 +1,7 @@
 package mtas.codec.payload;
 
 import java.io.IOException;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import mtas.analysis.token.MtasOffset;
@@ -21,7 +22,7 @@ public class MtasPayloadDecoder {
   private int mtasStartPosition;
 
   /** The mtas positions. */
-  private TreeSet<Integer> mtasPositions;
+  private SortedSet<Integer> mtasPositions;
 
   /** The mtas id. */
   private Integer mtasId = null;
@@ -52,12 +53,9 @@ public class MtasPayloadDecoder {
   /**
    * Inits the.
    *
-   * @param startPosition
-   *          the start position
-   * @param payload
-   *          the payload
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param startPosition the start position
+   * @param payload the payload
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void init(int startPosition, byte[] payload) throws IOException {
     byteStream = new MtasBitInputStream(payload);

@@ -74,6 +74,11 @@ public class MtasSpanSequenceItem {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -82,6 +87,15 @@ public class MtasSpanSequenceItem {
     return h;
   }
 
+  /**
+   * Rewrite.
+   *
+   * @param reader
+   *          the reader
+   * @return the mtas span sequence item
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
   public MtasSpanSequenceItem rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);
     if (!newSpanQuery.equals(spanQuery)) {
@@ -91,12 +105,30 @@ public class MtasSpanSequenceItem {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     return "[" + spanQuery.toString() + " - "
         + (optional ? "OPTIONAL" : "NOT OPTIONAL") + "]";
   }
 
+  /**
+   * Merge.
+   *
+   * @param item1
+   *          the item 1
+   * @param item2
+   *          the item 2
+   * @param ignoreQuery
+   *          the ignore query
+   * @param maximumIgnoreLength
+   *          the maximum ignore length
+   * @return the mtas span sequence item
+   */
   public static MtasSpanSequenceItem merge(MtasSpanSequenceItem item1,
       MtasSpanSequenceItem item2, MtasSpanQuery ignoreQuery,
       Integer maximumIgnoreLength) {
@@ -116,15 +148,20 @@ public class MtasSpanSequenceItem {
           if (rq1.getQuery().equals(rq2.getQuery())) {
             // equal ignoreQuery settings
             boolean checkCondition;
-            checkCondition = ignoreQuery != null;
-            checkCondition &= rq1.getIgnoreQuery() != null;
-            checkCondition &= ignoreQuery.equals(rq1.getIgnoreQuery());
-            checkCondition &= maximumIgnoreLength
-                .equals(rq1.getMaximumIgnoreLength());
-            checkCondition &= rq2.getIgnoreQuery() != null;
-            checkCondition &= ignoreQuery.equals(rq2.getIgnoreQuery());
-            checkCondition &= maximumIgnoreLength
-                .equals(rq2.getMaximumIgnoreLength());
+            checkCondition = ignoreQuery != null
+                && rq1.getIgnoreQuery() != null;
+            checkCondition = checkCondition
+                ? ignoreQuery.equals(rq1.getIgnoreQuery()) : false;
+            checkCondition = checkCondition
+                ? maximumIgnoreLength.equals(rq1.getMaximumIgnoreLength())
+                : false;
+            checkCondition = checkCondition ? rq2.getIgnoreQuery() != null
+                : false;
+            checkCondition = checkCondition
+                ? ignoreQuery.equals(rq2.getIgnoreQuery()) : false;
+            checkCondition = checkCondition
+                ? maximumIgnoreLength.equals(rq2.getMaximumIgnoreLength())
+                : false;
             if (checkCondition) {
               // at least one optional
               if (item1.optional || item2.optional) {

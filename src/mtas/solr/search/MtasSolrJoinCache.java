@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,20 +28,52 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.util.Base64;
 
+/**
+ * The Class MtasSolrJoinCache.
+ */
 public class MtasSolrJoinCache {
 
-  private static Log log = LogFactory.getLog(MtasSolrJoinCache.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrJoinCache.class);
+  
+  /** The Constant DEFAULT_LIFETIME. */
   private static final long DEFAULT_LIFETIME = 86400;
+  
+  /** The Constant DEFAULT_MAXIMUM_NUMBER. */
   private static final int DEFAULT_MAXIMUM_NUMBER = 1000;
+  
+  /** The Constant DEFAULT_MAXIMUM_OVERFLOW. */
   private static final int DEFAULT_MAXIMUM_OVERFLOW = 10;
+  
+  /** The administration. */
   private HashMap<MtasSolrJoinCacheItem, String> administration;
+  
+  /** The index. */
   private HashMap<String, MtasSolrJoinCacheItem> index;
+  
+  /** The expiration. */
   private HashMap<String, Long> expiration;
+  
+  /** The join cache path. */
   private Path joinCachePath;
+  
+  /** The life time. */
   private long lifeTime;
+  
+  /** The maximum number. */
   private int maximumNumber;
+  
+  /** The maximum overflow. */
   private int maximumOverflow;
 
+  /**
+   * Instantiates a new mtas solr join cache.
+   *
+   * @param cacheDirectory the cache directory
+   * @param lifeTime the life time
+   * @param maximumNumber the maximum number
+   * @param maximumOverflow the maximum overflow
+   */
   public MtasSolrJoinCache(String cacheDirectory, Long lifeTime,
       Integer maximumNumber, Integer maximumOverflow) {
     joinCachePath = null;
@@ -74,12 +105,29 @@ public class MtasSolrJoinCache {
     expiration = new HashMap<>();
   }
 
+  /**
+   * Creates the.
+   *
+   * @param url the url
+   * @param request the request
+   * @param data the data
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public String create(String url, String request, Serializable data)
       throws IOException {
     MtasSolrJoinCacheItem item = new MtasSolrJoinCacheItem(url, request, null);
     return create(item, data);
   }
 
+  /**
+   * Creates the.
+   *
+   * @param item the item
+   * @param data the data
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private String create(MtasSolrJoinCacheItem item, Serializable data)
       throws IOException {
     // initialisation
@@ -114,6 +162,14 @@ public class MtasSolrJoinCache {
     }
   }
 
+  /**
+   * Gets the.
+   *
+   * @param url the url
+   * @param request the request
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public Object get(String url, String request) throws IOException {
     MtasSolrJoinCacheItem item = new MtasSolrJoinCacheItem(url, request, null);
     if (administration.containsKey(item)) {
@@ -123,6 +179,13 @@ public class MtasSolrJoinCache {
     }
   }
 
+  /**
+   * Gets the.
+   *
+   * @param key the key
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public Object get(String key) throws IOException {
     if (index.containsKey(key)) {
       return get(index.get(key));
@@ -131,6 +194,13 @@ public class MtasSolrJoinCache {
     }
   }
 
+  /**
+   * Gets the.
+   *
+   * @param item the item
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private Object get(MtasSolrJoinCacheItem item) throws IOException {
     Date date = clear();
     if (administration.containsKey(item)) {
@@ -151,7 +221,7 @@ public class MtasSolrJoinCache {
           log.error("couldn't get " + key, e);
         }
       } else {
-        if(item.data!=null) {
+        if (item.data != null) {
           return decode(item.data);
         } else {
           return null;
@@ -163,6 +233,11 @@ public class MtasSolrJoinCache {
     return null;
   }
 
+  /**
+   * Delete.
+   *
+   * @param item the item
+   */
   private void delete(MtasSolrJoinCacheItem item) {
     if (administration.containsKey(item)) {
       String key = administration.remove(item);
@@ -175,6 +250,11 @@ public class MtasSolrJoinCache {
     }
   }
 
+  /**
+   * Clear.
+   *
+   * @return the date
+   */
   private Date clear() {
     Date date = new Date();
     Long timestamp = date.getTime();
@@ -213,6 +293,13 @@ public class MtasSolrJoinCache {
     return date;
   }
 
+  /**
+   * Encode.
+   *
+   * @param o the o
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private String encode(Serializable o) throws IOException {
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     ObjectOutputStream objectOutputStream;
@@ -223,6 +310,13 @@ public class MtasSolrJoinCache {
     return Base64.byteArrayToBase64(byteArray);
   }
 
+  /**
+   * Decode.
+   *
+   * @param s the s
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private Object decode(String s) throws IOException {
     byte[] bytes = Base64.base64ToByteArray(s);
     ObjectInputStream objectInputStream;

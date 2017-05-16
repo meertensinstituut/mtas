@@ -10,7 +10,7 @@ import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
- * The Class MtasSpanMatchAll.
+ * The Class MtasSpanMatchAllSpans.
  */
 public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
 
@@ -25,12 +25,10 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
   private CodecInfo mtasCodecInfo;
 
   /**
-   * Instantiates a new mtas span match all.
+   * Instantiates a new mtas span match all spans.
    *
-   * @param mtasCodecInfo
-   *          the mtas codec info
-   * @param field
-   *          the field
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
    */
   public MtasSpanMatchAllSpans(CodecInfo mtasCodecInfo, String field) {
     super();

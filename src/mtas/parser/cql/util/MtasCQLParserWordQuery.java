@@ -42,7 +42,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
   public static final String MTAS_CQL_VARIABLE_QUERY = "variable";
 
   /**
-   * Instantiates a new mtas cql parser word query.
+   * Instantiates a new mtas CQL parser word query.
    *
    * @param field the field
    * @param prefix the prefix
@@ -56,7 +56,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
   }
 
   /**
-   * Instantiates a new mtas cql parser word query.
+   * Instantiates a new mtas CQL parser word query.
    *
    * @param field the field
    * @param prefix the prefix
@@ -72,7 +72,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
   }
 
   /**
-   * Instantiates a new mtas cql parser word query.
+   * Instantiates a new mtas CQL parser word query.
    *
    * @param field the field
    * @param prefix the prefix

@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -27,41 +27,87 @@ public class MtasSolrBase {
     if (response == null) {
       log.error("no (valid); response");
     } else {
-      NamedList<Object> mtasResponse = (NamedList<Object>) response.get("mtas");
-      if (mtasResponse == null
-          || !(mtasResponse.get("stats") instanceof NamedList)) {
-        log.error("no (valid) mtas response");
-      } else {
-        NamedList<Object> mtasStatsResponse = (NamedList<Object>) mtasResponse
-            .get("stats");
-        if (mtasStatsResponse == null
-            || !(mtasStatsResponse.get(type) instanceof ArrayList)) {
-          log.error("no (valid) mtas stats response");
+      Object mtasResponseRaw = response.get("mtas");
+      if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
+        NamedList<Object> mtasResponse = (NamedList) response.get("mtas");
+        Object mtasStatsResponseRaw = mtasResponse.get("stats");
+        if (mtasStatsResponseRaw != null
+            && mtasStatsResponseRaw instanceof NamedList) {
+          NamedList<Object> mtasStatsResponse = (NamedList) mtasStatsResponseRaw;
+          Object mtasStatsTypeResponseRaw = mtasStatsResponse.get(type);
+          if (mtasStatsTypeResponseRaw != null
+              && mtasStatsTypeResponseRaw instanceof List) {
+            List<NamedList> mtasStatsTypeResponse = (List) mtasStatsResponse
+                .get(type);
+            if (mtasStatsTypeResponse.isEmpty()) {
+              log.error("no (valid) mtas stats " + type + " response");
+            } else {
+              NamedList<Object> item = null;
+              for (NamedList<Object> mtasStatsSpansResponseItem : mtasStatsTypeResponse) {
+                if (mtasStatsSpansResponseItem.get("key") != null
+                    && (mtasStatsSpansResponseItem.get("key") instanceof String)
+                    && mtasStatsSpansResponseItem.get("key").equals(key)) {
+                  item = mtasStatsSpansResponseItem;
+                  break;
+                }
+              }
+              assertFalse("no item with key " + key, item == null);
+              assertFalse("no variable " + name,
+                  item != null && item.get(name) == null);
+              if (item != null && item.get(name) instanceof Long) {
+                return (Long) item.get(name);
+              } else if (item != null) {
+                return (Double) item.get(name);
+              }
+            }
+          } else {
+            log.error("unexpected " + mtasStatsTypeResponseRaw);
+          }
         } else {
-          ArrayList<NamedList> mtasStatsTypeResponse = (ArrayList<NamedList>) mtasStatsResponse
-              .get(type);
-          if (mtasStatsTypeResponse == null || mtasStatsTypeResponse.isEmpty()) {
-            log.error("no (valid) mtas stats " + type + " response");
+          log.error("unexpected " + mtasStatsResponseRaw);
+        }
+      } else {
+        log.error("unexpected " + mtasResponseRaw);
+      }
+    }
+    return null;
+  }
+
+  public static List<NamedList> getFromMtasTermvector(
+      NamedList<Object> response, String key) {
+    if (response == null) {
+      log.error("no (valid); response");
+    } else {
+      Object mtasResponseRaw = response.get("mtas");
+      if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
+        NamedList<Object> mtasResponse = (NamedList) response.get("mtas");
+        Object mtasTermvectorResponseRaw = mtasResponse.get("termvector");
+        if (mtasTermvectorResponseRaw != null
+            && mtasTermvectorResponseRaw instanceof List) {
+          List<NamedList> mtasTermvectorResponse = (List) mtasTermvectorResponseRaw;
+          if (mtasTermvectorResponse.isEmpty()) {
+            log.error("no (valid) mtas termvector response");
           } else {
             NamedList<Object> item = null;
-            for (NamedList<Object> mtasStatsSpansResponseItem : mtasStatsTypeResponse) {
-              if (mtasStatsSpansResponseItem.get("key") != null
-                  && (mtasStatsSpansResponseItem.get("key") instanceof String)
-                  && mtasStatsSpansResponseItem.get("key").equals(key)) {
-                item = mtasStatsSpansResponseItem;
+            for (NamedList<Object> mtasTermvectorResponseItem : mtasTermvectorResponse) {
+              if (mtasTermvectorResponseItem.get("key") != null
+                  && (mtasTermvectorResponseItem.get("key") instanceof String)
+                  && mtasTermvectorResponseItem.get("key").equals(key)) {
+                item = mtasTermvectorResponseItem;
                 break;
               }
             }
             assertFalse("no item with key " + key, item == null);
-            assertFalse("no variable " + name,
-                item != null && item.get(name) == null);
-            if (item != null && item.get(name) instanceof Long) {
-              return (Long) item.get(name);
-            } else if (item != null) {
-              return (Double) item.get(name);
-            } 
+            if (item.get("list") != null
+                && (item.get("list") instanceof List)) {
+              return (List<NamedList>) item.get("list");
+            }
           }
+        } else {
+          log.error("unexpected " + mtasTermvectorResponseRaw);
         }
+      } else {
+        log.error("unexpected " + mtasResponseRaw);
       }
     }
     return null;

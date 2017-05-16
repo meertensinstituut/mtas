@@ -37,7 +37,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
   /** The single position. */
   private boolean singlePosition;
 
-  /** The term. */
+  /** The local term. */
   private Term localTerm;
 
   /**
@@ -270,6 +270,9 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     return other.localTerm.equals(localTerm) && (other.singlePosition == singlePosition);
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanTermQuery#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

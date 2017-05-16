@@ -17,25 +17,53 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanWithinQuery baseQuery;
-  private MtasSpanQuery smallQuery, bigQuery;
-  private int leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMaximum,
-      rightBoundaryMinimum;
+  
+  /** The small query. */
+  private MtasSpanQuery smallQuery;
+  
+  /** The big query. */
+  private MtasSpanQuery bigQuery;
+  
+  /** The left boundary minimum. */
+  private int leftBoundaryMinimum;
+  
+  /** The left boundary maximum. */
+  private int leftBoundaryMaximum;
+  
+  /** The right boundary maximum. */
+  private int rightBoundaryMaximum;
+  
+  /** The right boundary minimum. */
+  private int rightBoundaryMinimum;
+  
+  /** The auto adjust big query. */
   private boolean autoAdjustBigQuery;
+  
+  /** The field. */
   String field;
 
   /**
    * Instantiates a new mtas span within query.
    *
-   * @param q1
-   *          the q1
-   * @param q2
-   *          the q2
+   * @param q1 the q 1
+   * @param q2 the q 2
    */
 
   public MtasSpanWithinQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     this(q1, q2, 0, 0, 0, 0, true);
   }
 
+  /**
+   * Instantiates a new mtas span within query.
+   *
+   * @param q1 the q 1
+   * @param q2 the q 2
+   * @param leftMinimum the left minimum
+   * @param leftMaximum the left maximum
+   * @param rightMinimum the right minimum
+   * @param rightMaximum the right maximum
+   * @param adjustBigQuery the adjust big query
+   */
   public MtasSpanWithinQuery(MtasSpanQuery q1, MtasSpanQuery q2,
       int leftMinimum, int leftMaximum, int rightMinimum, int rightMaximum,
       boolean adjustBigQuery) {
@@ -54,9 +82,9 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     rightBoundaryMinimum = rightMinimum;
     rightBoundaryMaximum = rightMaximum;
     autoAdjustBigQuery = adjustBigQuery;
-    if (bigQuery!=null && bigQuery.getField() != null) {
+    if (bigQuery != null && bigQuery.getField() != null) {
       field = bigQuery.getField();
-    } else if (smallQuery!=null && smallQuery.getField() != null) {
+    } else if (smallQuery != null && smallQuery.getField() != null) {
       field = smallQuery.getField();
     } else {
       field = null;
@@ -125,8 +153,10 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
         if (sequenceQuery.getIgnoreQuery() == null) {
           List<MtasSpanSequenceItem> items = sequenceQuery.getItems();
           List<MtasSpanSequenceItem> newItems = new ArrayList<MtasSpanSequenceItem>();
-          int newLeftBoundaryMinimum = 0, newLeftBoundaryMaximum = 0,
-              newRightBoundaryMinimum = 0, newRightBoundaryMaximum = 0;
+          int newLeftBoundaryMinimum = 0;
+          int newLeftBoundaryMaximum = 0;
+          int newRightBoundaryMinimum = 0;
+          int newRightBoundaryMaximum = 0;
           for (int i = 0; i < items.size(); i++) {
             // first item
             if (i == 0) {

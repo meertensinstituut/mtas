@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -15,13 +14,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.search.highlight.DefaultEncoder;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -63,8 +60,8 @@ public class MtasSolrTestSearchConsistency {
 
       // add
       server.add("collection1", solrDocuments.get(1));
-      server.add("collection1", solrDocuments.get(2));
       server.commit("collection1");
+      server.add("collection1", solrDocuments.get(2));
       server.add("collection1", solrDocuments.get(3));
       server.commit("collection1");
 
@@ -83,7 +80,7 @@ public class MtasSolrTestSearchConsistency {
   private static void initializeDirectory(Path dataPath,
       List<String> collections) throws IOException {
     solrPath = Files.createTempDirectory("junitSolr");
-    // create and fill    
+    // create and fill
     Files.copy(dataPath.resolve("conf").resolve("solr.xml"),
         solrPath.resolve("solr.xml"));
     // create collection(s)
@@ -166,11 +163,10 @@ public class MtasSolrTestSearchConsistency {
     } catch (SolrServerException e) {
       throw new IOException(e.getMessage(), e);
     }
-
   }
 
   @org.junit.Test
-  public void mtasRequestHandler() throws IOException {
+  public void mtasRequestHandlerStats() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     params.set("q", "*:*");
     params.set("mtas", "true");
@@ -199,4 +195,73 @@ public class MtasSolrTestSearchConsistency {
             "sum"));
   }
 
+  @org.junit.Test
+  public void mtasRequestHandlerTermvector() throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();    
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.termvector", "true");
+    params.set("mtas.termvector.0.field", "mtas");
+    params.set("mtas.termvector.0.prefix", "t_lc");
+    params.set("mtas.termvector.0.key", "tv");
+    params.set("mtas.termvector.0.sort.type", "sum");
+    params.set("mtas.termvector.0.sort.direction", "asc");
+    params.set("mtas.termvector.0.type", "n,sum");       
+    //create full
+    params.set("mtas.termvector.0.full", true);    
+    params.set("mtas.termvector.0.number", Integer.MAX_VALUE);    
+    SolrRequest<?> requestFull = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> responseFull;
+    try {
+      responseFull = server.request(requestFull, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    params.remove("mtas.termvector.0.full");
+    params.remove("mtas.termvector.0.number");
+    //create tests
+    for(int number=1; number<=1000; number*=10) {
+      params.set("mtas.termvector.0.number", number);        
+      SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+      NamedList<Object> response;
+      try {
+        response = server.request(request, "collection1");
+      } catch (SolrServerException e) {
+        throw new IOException(e);
+      }
+      createTermvectorAssertions(response, responseFull, "tv", new String[]{"n","sum"});
+      params.remove("mtas.termvector.0.number");
+    }
+  }
+
+  private static void createTermvectorAssertions(NamedList<Object> response1,
+      NamedList<Object> response2, String key, String[] names) {
+    List<NamedList> list1 = MtasSolrBase.getFromMtasTermvector(response1, key);
+    List<NamedList> list2 = MtasSolrBase.getFromMtasTermvector(response2, key);
+    assertFalse("list should be defined", list1 == null || list2 == null);
+    if (list1 != null && list2 != null) {      
+      assertFalse("first list should not be longer", list1.size()>list2.size());
+      assertFalse("list should not be empty", list1.isEmpty());
+      for (int i = 0; i < list1.size(); i++) {
+        Object key1 = list1.get(i).get("key");
+        Object key2 = list2.get(i).get("key");
+        assertFalse("key should be provided", (key1 == null) || (key2 == null));
+        assertFalse("key should be string",
+            !(key1 instanceof String) || !(key2 instanceof String));
+        assertEquals(
+            "element " + i + " should be equal: " + key1 + " - " + key2, key1,
+            key2);
+        for (int j = 0; j < names.length; j++) {
+          Object value1 = list1.get(i).get(names[j]);
+          Object value2 = list2.get(i).get(names[j]);
+          assertFalse(names[j] + " should be provided",
+              (value1 == null) || (value2 == null));
+          assertEquals(
+              names[j] + " should be equal: " + value1 + " - " + value2, value1,
+              value2);
+        }
+      }
+    }
+  }
 }

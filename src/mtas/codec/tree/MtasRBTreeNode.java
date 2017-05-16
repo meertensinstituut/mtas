@@ -21,16 +21,12 @@ public class MtasRBTreeNode extends MtasTreeNode<MtasRBTreeNode> {
 
   // node with start and end position
   /**
-   * Instantiates a new mtas rb tree node.
+   * Instantiates a new mtas RB tree node.
    *
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param color
-   *          the color
-   * @param n
-   *          the n
+   * @param left the left
+   * @param right the right
+   * @param color the color
+   * @param n the n
    */
   public MtasRBTreeNode(int left, int right, int color, int n) {
     super(left, right);

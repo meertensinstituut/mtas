@@ -1,7 +1,5 @@
 package mtas.codec.tree;
 
-import mtas.search.spans.MtasSpanMatchAllQuery;
-
 /**
  * The Class MtasTreeNodeId.
  */
@@ -19,12 +17,9 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
   /**
    * Instantiates a new mtas tree node id.
    *
-   * @param ref
-   *          the ref
-   * @param additionalId
-   *          the additional id
-   * @param additionalRef
-   *          the additional ref
+   * @param ref the ref
+   * @param additionalId the additional id
+   * @param additionalRef the additional ref
    */
   public MtasTreeNodeId(long ref, int additionalId, long additionalRef) {
     this.ref = ref;
@@ -42,6 +37,9 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
     return ref.compareTo(o.ref);
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -55,6 +53,9 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
         && additionalRef == that.additionalRef;
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

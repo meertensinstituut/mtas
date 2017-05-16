@@ -14,8 +14,7 @@ public class MtasScoreQuery extends CustomScoreQuery {
   /**
    * Instantiates a new mtas score query.
    *
-   * @param subQuery
-   *          the sub query
+   * @param subQuery the sub query
    */
   public MtasScoreQuery(Query subQuery) {
     super(subQuery);
@@ -25,10 +24,8 @@ public class MtasScoreQuery extends CustomScoreQuery {
   /**
    * Instantiates a new mtas score query.
    *
-   * @param subQuery
-   *          the sub query
-   * @param scoringQuery
-   *          the scoring query
+   * @param subQuery the sub query
+   * @param scoringQuery the scoring query
    */
   public MtasScoreQuery(Query subQuery, FunctionQuery scoringQuery) {
     super(subQuery, scoringQuery);
@@ -38,10 +35,8 @@ public class MtasScoreQuery extends CustomScoreQuery {
   /**
    * Instantiates a new mtas score query.
    *
-   * @param subQuery
-   *          the sub query
-   * @param scoringQueries
-   *          the scoring queries
+   * @param subQuery the sub query
+   * @param scoringQueries the scoring queries
    */
   public MtasScoreQuery(Query subQuery, FunctionQuery... scoringQueries) {
     super(subQuery, scoringQueries);

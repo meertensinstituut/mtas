@@ -1028,7 +1028,6 @@ private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap < Str
         else
         {
           MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_OR);
-          Term term = new Term(field, prefix.image + MtasToken.DELIMITER + value.image);
           MtasSpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, variableString(value.image), MtasCQLParserWordQuery.MTAS_CQL_VARIABLE_QUERY, variables, usedVariables);
           if (negation != null)
           {
@@ -1056,7 +1055,6 @@ private MtasCQLParserWordCondition wordAtomCondition(String field, HashMap < Str
         else
         {
           MtasCQLParserWordCondition condition = new MtasCQLParserWordCondition(field, MtasCQLParserWordCondition.TYPE_AND);
-          Term term = new Term(field, prefix.image + MtasToken.DELIMITER + unquoteString(value.image));
           MtasSpanQuery q = new MtasCQLParserWordQuery(field, prefix.image, unquoteString(value.image), MtasCQLParserWordQuery.MTAS_CQL_REGEXP_QUERY, variables, usedVariables);
           if (negation != null)
           {

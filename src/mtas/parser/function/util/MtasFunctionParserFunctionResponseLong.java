@@ -20,10 +20,8 @@ public class MtasFunctionParserFunctionResponseLong
   /**
    * Instantiates a new mtas function parser function response long.
    *
-   * @param l
-   *          the l
-   * @param s
-   *          the s
+   * @param l the l
+   * @param s the s
    */
   public MtasFunctionParserFunctionResponseLong(long l, boolean s) {
     super(s);
@@ -34,8 +32,7 @@ public class MtasFunctionParserFunctionResponseLong
    * Gets the value.
    *
    * @return the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public long getValue() throws IOException {
     if (defined) {
@@ -73,6 +70,9 @@ public class MtasFunctionParserFunctionResponseLong
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

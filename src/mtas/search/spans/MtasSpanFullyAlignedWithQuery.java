@@ -25,17 +25,17 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   /** The field. */
   private String field;
 
-  /** The q 2. */
+  /** The q 1. */
   private SpanQuery q1;
+  
+  /** The q 2. */
   private SpanQuery q2;
 
   /**
    * Instantiates a new mtas span fully aligned with query.
    *
-   * @param q1
-   *          the q 1
-   * @param q2
-   *          the q 2
+   * @param q1 the q 1
+   * @param q2 the q 2
    */
   public MtasSpanFullyAlignedWithQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
@@ -93,8 +93,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   /**
    * Gets the term contexts.
    *
-   * @param items
-   *          the items
+   * @param items the items
    * @return the term contexts
    */
   protected Map<Term, TermContext> getTermContexts(
@@ -202,27 +201,24 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   }
 
   /**
-   * The Class SpanIntersectingWeight.
+   * The Class SpanFullyAlignedWithWeight.
    */
   protected class SpanFullyAlignedWithWeight extends SpanWeight {
 
-    /** The w 2. */
+    /** The w 1. */
     MtasSpanFullyAlignedWithQueryWeight w1;
+    
+    /** The w 2. */
     MtasSpanFullyAlignedWithQueryWeight w2;
 
     /**
-     * Instantiates a new span intersecting weight.
+     * Instantiates a new span fully aligned with weight.
      *
-     * @param w1
-     *          the w 1
-     * @param w2
-     *          the w 2
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param w1 the w 1
+     * @param w2 the w 2
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanFullyAlignedWithWeight(MtasSpanFullyAlignedWithQueryWeight w1,
         MtasSpanFullyAlignedWithQueryWeight w2, IndexSearcher searcher,
@@ -282,7 +278,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   }
 
   /**
-   * The Class MtasSpanIntersectingQuerySpans.
+   * The Class MtasSpanFullyAlignedWithQuerySpans.
    */
   protected class MtasSpanFullyAlignedWithQuerySpans {
 
@@ -290,10 +286,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     public Spans spans;
 
     /**
-     * Instantiates a new mtas span intersecting query spans.
+     * Instantiates a new mtas span fully aligned with query spans.
      *
-     * @param spans
-     *          the spans
+     * @param spans the spans
      */
     public MtasSpanFullyAlignedWithQuerySpans(Spans spans) {
       this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
@@ -302,7 +297,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   }
 
   /**
-   * The Class MtasSpanIntersectingQueryWeight.
+   * The Class MtasSpanFullyAlignedWithQueryWeight.
    */
   private static class MtasSpanFullyAlignedWithQueryWeight {
 
@@ -310,10 +305,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     public SpanWeight spanWeight;
 
     /**
-     * Instantiates a new mtas span intersecting query weight.
+     * Instantiates a new mtas span fully aligned with query weight.
      *
-     * @param spanWeight
-     *          the span weight
+     * @param spanWeight the span weight
      */
     public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;

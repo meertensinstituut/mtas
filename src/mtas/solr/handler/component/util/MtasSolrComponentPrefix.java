@@ -3,7 +3,7 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +25,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentPrefix
     implements MtasSolrComponent<ComponentPrefix> {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasSolrComponentPrefix.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentPrefix.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -214,9 +214,9 @@ public class MtasSolrComponentPrefix
       // MtasSolrResultUtil.rewrite(list);
       if (list != null) {
         for (NamedList<?> item : list) {
-          TreeSet<String> singlePosition = (TreeSet<String>) item
+          SortedSet<String> singlePosition = (SortedSet<String>) item
               .get("singlePosition");
-          TreeSet<String> multiplePosition = (TreeSet<String>) item
+          SortedSet<String> multiplePosition = (SortedSet<String>) item
               .get("multiplePosition");
           if (singlePosition != null && multiplePosition != null) {
             for (String prefix : multiplePosition) {

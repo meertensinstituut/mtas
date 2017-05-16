@@ -29,16 +29,17 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
   /** The field. */
   private String field;
 
+  /** The start. */
+  private int start;
+  
   /** The end. */
-  private int start, end;
+  private int end;
 
   /**
    * Instantiates a new mtas span position query.
    *
-   * @param field
-   *          the field
-   * @param position
-   *          the position
+   * @param field the field
+   * @param position the position
    */
   public MtasSpanPositionQuery(String field, int position) {
     this(field, position, position);
@@ -47,12 +48,9 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span position query.
    *
-   * @param field
-   *          the field
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param field the field
+   * @param start the start
+   * @param end the end
    */
   public MtasSpanPositionQuery(String field, int start, int end) {
     super(1,1);
@@ -84,6 +82,9 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
     return new SpanAllWeight(searcher, null);
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return super.rewrite(reader);
@@ -97,12 +98,9 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span all weight.
      *
-     * @param searcher
-     *          the searcher
-     * @param termContexts
-     *          the term contexts
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param searcher the searcher
+     * @param termContexts the term contexts
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanAllWeight(IndexSearcher searcher,
         Map<Term, TermContext> termContexts) throws IOException {
@@ -118,6 +116,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
+      //don't do anything
     }
 
     /*
@@ -172,6 +171,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set<Term> terms) {
+      //don't do anything
     }
 
     /*

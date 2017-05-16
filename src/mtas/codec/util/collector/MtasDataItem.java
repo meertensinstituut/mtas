@@ -2,22 +2,24 @@ package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The Class MtasDataItem.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     implements Serializable, Comparable<MtasDataItem<T1, T2>> {
 
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasDataItem.class);
+  
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
@@ -25,17 +27,19 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   protected MtasDataCollector<?, ?> sub;
 
   /** The stats items. */
-  protected Set<String> statsItems;
+  private Set<String> statsItems;
 
-  /** The sort direction. */
+  /** The sort type. */
   protected String sortType;
+  
+  /** The sort direction. */
   protected String sortDirection;
 
   /** The error number. */
   protected int errorNumber;
 
   /** The error list. */
-  protected Map<String, Integer> errorList;
+  private Map<String, Integer> errorList;
 
   /** The comparable sort value. */
   protected MtasDataItemNumberComparator<?> comparableSortValue;
@@ -49,20 +53,13 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   /**
    * Instantiates a new mtas data item.
    *
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItem(MtasDataCollector<?, ?> sub, Set<String> statsItems,
       String sortType, String sortDirection, int errorNumber,
@@ -81,21 +78,17 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   /**
    * Adds the.
    *
-   * @param newItem
-   *          the new item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param newItem the new item
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract void add(MtasDataItem<T1, T2> newItem) throws IOException;
 
   /**
    * Rewrite.
    *
-   * @param showDebugInfo
-   *          the show debug info
+   * @param showDebugInfo the show debug info
    * @return the map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public abstract Map<String, Object> rewrite(boolean showDebugInfo)
       throws IOException;
@@ -105,7 +98,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    *
    * @return the sub
    */
-  public MtasDataCollector<?, ?> getSub() {
+  public MtasDataCollector getSub() {
     return sub;
   }
 
@@ -113,11 +106,28 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    * Gets the compare value type.
    *
    * @return the compare value type
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   protected abstract int getCompareValueType() throws IOException;
+  
+  /**
+   * Gets the stats items.
+   *
+   * @return the stats items
+   */
+  protected final Set<String> getStatsItems() {
+    return statsItems;
+  }
 
+  /**
+   * Gets the error list.
+   *
+   * @return the error list
+   */
+  protected final Map<String, Integer> getErrorList() {
+    return errorList;
+  }
+  
   /**
    * Compute comparable value.
    */
@@ -140,6 +150,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
         break;
       }
     } catch (IOException e) {
+      log.debug(e);
       comparableSortValue = null;
     }
   }
@@ -149,7 +160,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    *
    * @return the comparable value
    */
-  protected final MtasDataItemNumberComparator<?> getComparableValue() {
+  protected final MtasDataItemNumberComparator getComparableValue() {
     if (recomputeComparableSortValue) {
       computeComparableValue();
     }
@@ -157,23 +168,23 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   }
 
   /**
-   * Gets the compare value0.
+   * Gets the compare value 0.
    *
-   * @return the compare value0
+   * @return the compare value 0
    */
   protected abstract MtasDataItemNumberComparator<Long> getCompareValue0();
 
   /**
-   * Gets the compare value1.
+   * Gets the compare value 1.
    *
-   * @return the compare value1
+   * @return the compare value 1
    */
   protected abstract MtasDataItemNumberComparator<T1> getCompareValue1();
 
   /**
-   * Gets the compare value2.
+   * Gets the compare value 2.
    *
-   * @return the compare value2
+   * @return the compare value 2
    */
   protected abstract MtasDataItemNumberComparator<T2> getCompareValue2();
 

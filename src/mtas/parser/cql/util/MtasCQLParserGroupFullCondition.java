@@ -11,14 +11,14 @@ import mtas.search.spans.util.MtasSpanQuery;
 public class MtasCQLParserGroupFullCondition
     extends MtasCQLParserBasicSentencePartCondition {
 
-  /** The group full. */
-  public final static String GROUP_FULL = "full";
+  /** The Constant GROUP_FULL. */
+  public static final String GROUP_FULL = "full";
 
-  /** The group start. */
-  public final static String GROUP_START = "start";
+  /** The Constant GROUP_START. */
+  public static final String GROUP_START = "start";
 
-  /** The group end. */
-  public final static String GROUP_END = "end";
+  /** The Constant GROUP_END. */
+  public static final String GROUP_END = "end";
 
   /** The group condition. */
   private MtasCQLParserGroupCondition groupCondition;
@@ -27,12 +27,10 @@ public class MtasCQLParserGroupFullCondition
   private String type;
 
   /**
-   * Instantiates a new mtas cql parser group full condition.
+   * Instantiates a new mtas CQL parser group full condition.
    *
-   * @param condition
-   *          the condition
-   * @param type
-   *          the type
+   * @param condition the condition
+   * @param type the type
    */
   public MtasCQLParserGroupFullCondition(MtasCQLParserGroupCondition condition,
       String type) {
@@ -157,6 +155,9 @@ public class MtasCQLParserGroupFullCondition
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

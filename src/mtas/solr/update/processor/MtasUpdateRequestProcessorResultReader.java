@@ -16,8 +16,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
-  /** The log. */
-  private static Log log = LogFactory
+  /** The Constant log. */
+  private static final Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorResultReader.class);
 
   /** The stored string value. */

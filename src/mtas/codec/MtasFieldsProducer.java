@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.codecs.CodecUtil;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.codecs.PostingsFormat;
@@ -20,10 +22,15 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
 
+import mtas.analysis.MtasTokenizer;
+
 /**
  * The Class MtasFieldsProducer.
  */
 public class MtasFieldsProducer extends FieldsProducer {
+
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasFieldsProducer.class);
 
   /** The delegate fields producer. */
   private FieldsProducer delegateFieldsProducer;
@@ -85,6 +92,7 @@ public class MtasFieldsProducer extends FieldsProducer {
               version, version),
           postingsFormatName);
     } catch (IndexFormatTooOldException e) {
+      log.debug(e);
       throw new IOException(
           "This MTAS doesn't support your index version, please upgrade");
     }
@@ -107,15 +115,16 @@ public class MtasFieldsProducer extends FieldsProducer {
     if (indexInputList.get(name) != null) {
       indexInputList.get(name).close();
     }
-    if (postingsFormatName == null) {
-      postingsFormatName = in.readString();
-    } else if (!in.readString().equals(postingsFormatName)) {
+    String localPostingsFormatName = postingsFormatName;
+    if (localPostingsFormatName == null) {
+      localPostingsFormatName = in.readString();
+    } else if (!in.readString().equals(localPostingsFormatName)) {
       throw new IOException(
-          "delegate codec " + name + " doesn't equal " + postingsFormatName);
+          "delegate codec " + name + " doesn't equal " + localPostingsFormatName);
     }
     indexInputList.put(name, in);
     indexInputOffsetList.put(name, in.getFilePointer());
-    return postingsFormatName;
+    return localPostingsFormatName;
   }
 
   /*
@@ -136,7 +145,7 @@ public class MtasFieldsProducer extends FieldsProducer {
   @Override
   public void close() throws IOException {
     delegateFieldsProducer.close();
-    for(Entry<String,IndexInput> entry : indexInputList.entrySet()) {
+    for (Entry<String, IndexInput> entry : indexInputList.entrySet()) {
       entry.getValue().close();
     }
   }
@@ -225,11 +234,7 @@ public class MtasFieldsProducer extends FieldsProducer {
     String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,
         state.segmentSuffix, extension);
     IndexInput object;
-    try {
-      object = state.directory.openInput(fileName, state.context);
-    } catch (IOException e) {
-      throw new IOException(e.getMessage());
-    }
+    object = state.directory.openInput(fileName, state.context);
     int minVersion = (minimum == null) ? MtasCodecPostingsFormat.VERSION_START
         : minimum.intValue();
     int maxVersion = (maximum == null) ? MtasCodecPostingsFormat.VERSION_CURRENT
@@ -239,6 +244,7 @@ public class MtasFieldsProducer extends FieldsProducer {
           state.segmentInfo.getId(), state.segmentSuffix);
     } catch (IndexFormatTooOldException e) {
       object.close();
+      log.debug(e);
       throw new IndexFormatTooOldException(e.getMessage(), e.getVersion(),
           e.getMinVersion(), e.getMaxVersion());
     }

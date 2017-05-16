@@ -12,7 +12,7 @@ import mtas.analysis.util.MtasConfiguration;
 final public class MtasTEIParser extends MtasXMLParser {
 
   /**
-   * Instantiates a new mtas tei parser.
+   * Instantiates a new mtas TEI parser.
    *
    * @param config the config
    */

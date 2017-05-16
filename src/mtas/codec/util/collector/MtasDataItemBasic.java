@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -13,10 +12,8 @@ import mtas.codec.util.CodecUtil;
 /**
  * The Class MtasDataItemBasic.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataItem<T1, T2> implements Serializable {
@@ -27,7 +24,7 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
   /** The value sum. */
   protected T1 valueSum;
 
-  /** The value n. */
+  /** The value N. */
   protected Long valueN;
 
   /** The operations. */
@@ -36,26 +33,16 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
   /**
    * Instantiates a new mtas data item basic.
    *
-   * @param valueSum
-   *          the value sum
-   * @param valueN
-   *          the value n
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param operations
-   *          the operations
-   * @param sourceNumber
-   *          the source number
+   * @param valueSum the value sum
+   * @param valueN the value N
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param operations the operations
+   * @param sourceNumber the source number
    */
   public MtasDataItemBasic(T1 valueSum, long valueN,
       MtasDataCollector<?, ?> sub, Set<String> statsItems, String sortType,
@@ -93,8 +80,8 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
    */
   @Override
   public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
-    Map<String, Object> response = new HashMap<String, Object>();
-    for (String statsItem : statsItems) {
+    Map<String, Object> response = new HashMap<>();
+    for (String statsItem : getStatsItems()) {
       if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
         response.put(statsItem, valueSum);
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_N)) {
@@ -107,7 +94,7 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
     }
     if (errorNumber > 0) {
       Map<String, Object> errorResponse = new HashMap<String, Object>();
-      for (Entry<String, Integer> entry : errorList.entrySet()) {
+      for (Entry<String, Integer> entry : getErrorList().entrySet()) {
         errorResponse.put(entry.getKey(), entry.getValue());
       }
       response.put("errorNumber", errorNumber);
@@ -123,8 +110,7 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
   /**
    * Gets the value.
    *
-   * @param statsType
-   *          the stats type
+   * @param statsType the stats type
    * @return the value
    */
   protected T2 getValue(String statsType) {

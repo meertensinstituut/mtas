@@ -21,10 +21,8 @@ public class MtasFunctionParserFunctionResponseDouble
   /**
    * Instantiates a new mtas function parser function response double.
    *
-   * @param d
-   *          the d
-   * @param s
-   *          the s
+   * @param d the d
+   * @param s the s
    */
   public MtasFunctionParserFunctionResponseDouble(double d, boolean s) {
     super(s);
@@ -35,8 +33,7 @@ public class MtasFunctionParserFunctionResponseDouble
    * Gets the value.
    *
    * @return the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public double getValue() throws IOException {
     if (defined) {
@@ -74,6 +71,9 @@ public class MtasFunctionParserFunctionResponseDouble
     }
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

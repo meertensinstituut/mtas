@@ -3,8 +3,10 @@ package mtas.codec.util.collector;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
+
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
 
@@ -23,13 +25,13 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /** The basic value sum list. */
   protected T1[] basicValueSumList = null;
 
-  /** The basic value n list. */
+  /** The basic value N list. */
   protected long[] basicValueNList = null;
 
   /** The new basic value sum list. */
   protected transient T1[] newBasicValueSumList = null;
 
-  /** The new basic value n list. */
+  /** The new basic value N list. */
   protected transient long[] newBasicValueNList = null;
 
   /** The operations. */
@@ -59,10 +61,10 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataBasic(String collectorType, String dataType,
-      Set<String> statsItems, String sortType, String sortDirection,
+      SortedSet<String> statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
       String[] subDataTypes, String[] subStatsTypes,
-      Set<String>[] subStatsItems, String[] subSortTypes,
+      SortedSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       MtasDataOperations<T1, T2> operations, String segmentRegistration,
       String boundary) throws IOException {
@@ -127,7 +129,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
    *
    * @param newPosition the new position
    * @param valueSum the value sum
-   * @param valueN the value n
+   * @param valueN the value N
    * @param currentExisting the current existing
    */
   protected void setValue(int newPosition, T1 valueSum, long valueN,
@@ -197,6 +199,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   /* (non-Javadoc)
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
+  @Override
   public void reduceToSegmentKeys() {
     if (segmentRegistration != null && size > 0) {
       int sizeCopy = size;
@@ -309,7 +312,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
    */
   @Override
   public void merge(MtasDataCollector<?, ?> newDataCollector,
-      HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
+      Map<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
       boolean increaseSourceNumber) throws IOException {
     closeNewList();
     if (!collectorType.equals(newDataCollector.getCollectorType())
@@ -339,7 +342,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
                 newMtasDataBasic.subCollectorListNextLevel[i], map,
                 increaseSourceNumber);
           }
-        }
+        } 
         closeNewList();
       } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
         map.put(newDataCollector, this);

@@ -8,7 +8,7 @@ import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpans;
 
 /**
- * The Class MtasStartSpans.
+ * The Class MtasSpanStartSpans.
  */
 public class MtasSpanStartSpans extends Spans implements MtasSpans {
 
@@ -16,10 +16,9 @@ public class MtasSpanStartSpans extends Spans implements MtasSpans {
   Spans spans;
 
   /**
-   * Instantiates a new mtas start spans.
+   * Instantiates a new mtas span start spans.
    *
-   * @param spans
-   *          the spans
+   * @param spans the spans
    */
   public MtasSpanStartSpans(Spans spans) {
     super();

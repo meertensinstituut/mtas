@@ -20,14 +20,13 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public class MtasSpanStartQuery extends MtasSpanQuery {
 
-  /** The query. */
+  /** The clause. */
   private MtasSpanQuery clause;
 
   /**
    * Instantiates a new mtas span start query.
    *
-   * @param query
-   *          the query
+   * @param query the query
    */
   public MtasSpanStartQuery(MtasSpanQuery query) {
     super(0, 0);
@@ -103,12 +102,9 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span term weight.
      *
-     * @param spanWeight
-     *          the span weight
-     * @param searcher
-     *          the searcher
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param spanWeight the span weight
+     * @param searcher the searcher
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(SpanWeight spanWeight, IndexSearcher searcher)
         throws IOException {

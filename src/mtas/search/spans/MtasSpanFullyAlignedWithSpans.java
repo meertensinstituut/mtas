@@ -9,36 +9,43 @@ import mtas.search.spans.MtasSpanFullyAlignedWithQuery.MtasSpanFullyAlignedWithQ
 import mtas.search.spans.util.MtasSpans;
 
 /**
- * The Class MtasSpanIntersectingSpans.
+ * The Class MtasSpanFullyAlignedWithSpans.
  */
 public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
 
-  /** The spans2. */
+  /** The spans 1. */
   private MtasSpanFullyAlignedWithQuerySpans spans1;
+  
+  /** The spans 2. */
   private MtasSpanFullyAlignedWithQuerySpans spans2;
 
-  /** The last spans2 end position. */
+  /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
+  
+  /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
+  
+  /** The previous spans 2 start position. */
   private int previousSpans2StartPosition;
+  
+  /** The previous spans 2 end positions. */
   private HashSet<Integer> previousSpans2EndPositions;
 
-  /** The no more positions. */
+  /** The called next start position. */
   private boolean calledNextStartPosition;
+  
+  /** The no more positions. */
   private boolean noMorePositions;
 
   /** The doc id. */
   private int docId;
 
   /**
-   * Instantiates a new mtas span intersecting spans.
+   * Instantiates a new mtas span fully aligned with spans.
    *
-   * @param mtasSpanFullyAlignedWithQuery
-   *          the mtas span intersecting query
-   * @param spans1
-   *          the spans1
-   * @param spans2
-   *          the spans2
+   * @param mtasSpanFullyAlignedWithQuery the mtas span fully aligned with query
+   * @param spans1 the spans 1
+   * @param spans2 the spans 2
    */
   public MtasSpanFullyAlignedWithSpans(
       MtasSpanFullyAlignedWithQuery mtasSpanFullyAlignedWithQuery,
@@ -215,8 +222,7 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -248,8 +254,7 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    * Go to next start position.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition, nextSpans1EndPosition;

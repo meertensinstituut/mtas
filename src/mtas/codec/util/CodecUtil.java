@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,7 +93,7 @@ public class CodecUtil {
       .asList(STATS_FUNCTION_DISTRIBUTION);
 
   /** The Constant STATS_TYPES. */
-  private final static List<String> STATS_TYPES = Arrays.asList(
+  private static final List<String> STATS_TYPES = Arrays.asList(
       STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_KURTOSIS, STATS_TYPE_MAX,
       STATS_TYPE_MEAN, STATS_TYPE_MIN, STATS_TYPE_N, STATS_TYPE_MEDIAN,
       STATS_TYPE_POPULATIONVARIANCE, STATS_TYPE_QUADRATICMEAN,
@@ -100,7 +101,7 @@ public class CodecUtil {
       STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS, STATS_TYPE_VARIANCE);
 
   /** The Constant STATS_BASIC_TYPES. */
-  private final static List<String> STATS_BASIC_TYPES = Arrays
+  private static final List<String> STATS_BASIC_TYPES = Arrays
       .asList(STATS_TYPE_N, STATS_TYPE_SUM, STATS_TYPE_MEAN);
 
   /** The Constant STATS_ADVANCED_TYPES. */
@@ -138,15 +139,19 @@ public class CodecUtil {
       .compile("(([^\\(,]+)(\\(([^\\)]*)\\)))");
 
   /**
+   * Instantiates a new codec util.
+   */
+  private CodecUtil() {
+    //don't do anything
+  }
+  
+  /**
    * Checks if is single position prefix.
    *
-   * @param fieldInfo
-   *          the field info
-   * @param prefix
-   *          the prefix
+   * @param fieldInfo the field info
+   * @param prefix the prefix
    * @return true, if is single position prefix
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static boolean isSinglePositionPrefix(FieldInfo fieldInfo,
       String prefix) throws IOException {
@@ -168,8 +173,7 @@ public class CodecUtil {
   /**
    * Term value.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the string
    */
   public static String termValue(String term) {
@@ -185,8 +189,7 @@ public class CodecUtil {
   /**
    * Term prefix.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the string
    */
   public static String termPrefix(String term) {
@@ -201,8 +204,7 @@ public class CodecUtil {
   /**
    * Term prefix value.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the string
    */
   public static String termPrefixValue(String term) {
@@ -210,28 +212,18 @@ public class CodecUtil {
   }
 
   /**
-   * Collect.
+   * Collect field.
    *
-   * @param field
-   *          the field
-   * @param searcher
-   *          the searcher
-   * @param rawReader
-   *          the raw reader
-   * @param fullDocList
-   *          the full doc list
-   * @param fullDocSet
-   *          the full doc set
-   * @param fieldStats
-   *          the field stats
-   * @throws IllegalAccessException
-   *           the illegal access exception
-   * @throws IllegalArgumentException
-   *           the illegal argument exception
-   * @throws InvocationTargetException
-   *           the invocation target exception
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param field the field
+   * @param searcher the searcher
+   * @param rawReader the raw reader
+   * @param fullDocList the full doc list
+   * @param fullDocSet the full doc set
+   * @param fieldStats the field stats
+   * @throws IllegalAccessException the illegal access exception
+   * @throws IllegalArgumentException the illegal argument exception
+   * @throws InvocationTargetException the invocation target exception
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void collectField(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList<Integer> fullDocList,
@@ -254,6 +246,14 @@ public class CodecUtil {
     }
   }
 
+  /**
+   * Collect join.
+   *
+   * @param reader the reader
+   * @param fullDocSet the full doc set
+   * @param joinInfo the join info
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public static void collectJoin(IndexReader reader,
       ArrayList<Integer> fullDocSet, ComponentJoin joinInfo)
       throws IOException {
@@ -265,15 +265,13 @@ public class CodecUtil {
   /**
    * Creates the stats items.
    *
-   * @param statsType
-   *          the stats type
-   * @return the tree set
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param statsType the stats type
+   * @return the sorted set
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  static TreeSet<String> createStatsItems(String statsType) throws IOException {
-    TreeSet<String> statsItems = new TreeSet<String>();
-    TreeSet<String> functionItems = new TreeSet<String>();
+  static SortedSet<String> createStatsItems(String statsType) throws IOException {
+    SortedSet<String> statsItems = new TreeSet<>();
+    SortedSet<String> functionItems = new TreeSet<>();
     if (statsType != null) {
       Matcher m = fpStatsItems.matcher(statsType.trim());
       while (m.find()) {
@@ -310,12 +308,9 @@ public class CodecUtil {
   /**
    * Creates the stats type.
    *
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param functionParser
-   *          the function parser
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param functionParser the function parser
    * @return the string
    */
   static String createStatsType(Set<String> statsItems, String sortType,
@@ -351,6 +346,12 @@ public class CodecUtil {
     return statsType;
   }
   
+  /**
+   * Checks if is stats type.
+   *
+   * @param type the type
+   * @return true, if is stats type
+   */
   public static boolean isStatsType(String type) {
     return STATS_TYPES.contains(type);
   }

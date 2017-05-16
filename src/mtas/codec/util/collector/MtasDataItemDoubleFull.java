@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.ArrayUtils;
@@ -24,22 +23,14 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
   /**
    * Instantiates a new mtas data item double full.
    *
-   * @param value
-   *          the value
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param value the value
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItemDoubleFull(double[] value, MtasDataCollector<?, ?> sub,
       Set<String> statsItems, String sortType, String sortDirection,
@@ -51,8 +42,7 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
   /**
    * Gets the number of decimals.
    *
-   * @param ds
-   *          the ds
+   * @param ds the ds
    * @return the number of decimals
    */
   private int getNumberOfDecimals(String ds) {
@@ -73,8 +63,11 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
   @Override
   protected HashMap<String, Object> getDistribution(String argument) {
     HashMap<String, Object> result = new LinkedHashMap<String, Object>();
-    Double start = null, end = null, step = null;
-    Integer d = null, number = null;
+    Double start = null;
+    Double end = null;
+    Double step = null;
+    Integer d = null;
+    Integer number = null;
     if (argument != null) {
       Matcher m = fpArgument.matcher(argument);
       // get settings
@@ -162,13 +155,19 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
         list[i]++;
       }
     }
-    Double l, r;
-    String ls, rs;
+    Double l;
+    Double r;
+    String ls;
+    String lsFormat;
+    String rs;
+    String rsFormat;
     for (int i = 0; i < number; i++) {
       l = start + i * step;
       r = Math.min(end, l + step);
-      ls = String.format("%." + d + "f", l);
-      rs = String.format("%." + d + "f", r);
+      lsFormat = "%." + d + "f";
+      ls = String.format(lsFormat, l);
+      rsFormat = "%." + d + "f";
+      rs = String.format(rsFormat, r);
       String key = "[" + ls + "," + rs
           + ((i == (number - 1) && r >= tmpEnd && l <= tmpEnd) ? "]" : ")");
       result.put(key, list[i]);
@@ -259,6 +258,9 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
     return this.getClass().getSimpleName() + "[" + fullValues.length + "]";
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -273,6 +275,9 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
     return (c1!=null&&c2!=null&&c1.equals(c2));    
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

@@ -17,14 +17,14 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanNearQuery baseQuery;
+  
+  /** The clauses. */
   private HashSet<MtasSpanQuery> clauses;
 
   /**
    * Instantiates a new mtas span and query.
    *
-   * @param clauses
-   *          the clauses
-   * @throws IOException
+   * @param initialClauses the initial clauses
    */
   public MtasSpanAndQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
@@ -78,6 +78,9 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
     return baseQuery.createWeight(searcher, needsScores);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     if (clauses.size() > 1) {

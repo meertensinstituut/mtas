@@ -8,18 +8,23 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public abstract class MtasCQLParserBasicSentencePartCondition {
 
+  /** The minimum occurence. */
+  protected int minimumOccurence;
+  
   /** The maximum occurence. */
-  protected int minimumOccurence, maximumOccurence;
+  protected int maximumOccurence;
 
+  /** The optional. */
+  protected boolean optional;
+  
   /** The not. */
-  protected boolean optional, not;
+  protected boolean not;
 
   /**
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public abstract MtasSpanQuery getQuery() throws ParseException;
 
@@ -44,12 +49,9 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
   /**
    * Sets the occurence.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
-   * @throws ParseException
-   *           the parse exception
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
     if ((min < 0) || (min > max) || (max < 1)) {
@@ -74,8 +76,7 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
   /**
    * Sets the optional.
    *
-   * @param status
-   *          the new optional
+   * @param status the new optional
    */
   public void setOptional(boolean status) {
     optional = status;
@@ -94,10 +95,8 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
   /**
    * To string.
    *
-   * @param firstIndent
-   *          the first indent
-   * @param indent
-   *          the indent
+   * @param firstIndent the first indent
+   * @param indent the indent
    * @return the string
    */
   public String toString(String firstIndent, String indent) {

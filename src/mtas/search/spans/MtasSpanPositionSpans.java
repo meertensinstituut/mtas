@@ -10,7 +10,7 @@ import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
- * The Class MtasSpanPosition.
+ * The Class MtasSpanPositionSpans.
  */
 public class MtasSpanPositionSpans extends Spans implements MtasSpans {
 
@@ -25,16 +25,12 @@ public class MtasSpanPositionSpans extends Spans implements MtasSpans {
   private CodecInfo mtasCodecInfo;
 
   /**
-   * Instantiates a new mtas span position.
+   * Instantiates a new mtas span position spans.
    *
-   * @param mtasCodecInfo
-   *          the mtas codec info
-   * @param field
-   *          the field
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
+   * @param start the start
+   * @param end the end
    */
   public MtasSpanPositionSpans(CodecInfo mtasCodecInfo, String field, int start,
       int end) {

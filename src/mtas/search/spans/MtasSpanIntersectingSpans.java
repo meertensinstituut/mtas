@@ -12,13 +12,13 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
 
-  /** The spans2. */
+  /** The spans 2. */
   private MtasSpanIntersectingQuerySpans spans1, spans2;
 
   /** The no more positions. */
   private boolean calledNextStartPosition, noMorePositions;
 
-  /** The last spans2 end position. */
+  /** The last spans 2 end position. */
   private int lastSpans2StartPosition, lastSpans2EndPosition;
 
   /** The doc id. */
@@ -28,8 +28,8 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
    * Instantiates a new mtas span intersecting spans.
    *
    * @param mtasSpanIntersectingQuery the mtas span intersecting query
-   * @param spans1 the spans1
-   * @param spans2 the spans2
+   * @param spans1 the spans 1
+   * @param spans2 the spans 2
    */
   public MtasSpanIntersectingSpans(
       MtasSpanIntersectingQuery mtasSpanIntersectingQuery,

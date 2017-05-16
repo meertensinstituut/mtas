@@ -20,10 +20,10 @@ import mtas.analysis.util.MtasParserException;
 public class MtasTokenCollection {
 
   /** The token collection. */
-  private HashMap<Integer, MtasToken> tokenCollection = new HashMap<Integer, MtasToken>();
+  private HashMap<Integer, MtasToken> tokenCollection = new HashMap<>();
 
   /** The token collection index. */
-  private ArrayList<Integer> tokenCollectionIndex = new ArrayList<Integer>();
+  private ArrayList<Integer> tokenCollectionIndex = new ArrayList<>();
 
   /**
    * Instantiates a new mtas token collection.
@@ -35,8 +35,7 @@ public class MtasTokenCollection {
   /**
    * Adds the.
    *
-   * @param token
-   *          the token
+   * @param token the token
    * @return the integer
    */
   public Integer add(MtasToken token) {
@@ -48,8 +47,7 @@ public class MtasTokenCollection {
   /**
    * Gets the.
    *
-   * @param id
-   *          the id
+   * @param id the id
    * @return the mtas token
    */
   public MtasToken get(Integer id) {
@@ -60,12 +58,11 @@ public class MtasTokenCollection {
    * Iterator.
    *
    * @return the iterator
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public Iterator<MtasToken> iterator() throws MtasParserException {
     checkTokenCollectionIndex();
-    Iterator<MtasToken> it = new Iterator<MtasToken>() {
+    return new Iterator<MtasToken>() {
 
       private Iterator<Integer> indexIterator = tokenCollectionIndex.iterator();
 
@@ -84,14 +81,12 @@ public class MtasTokenCollection {
         throw new UnsupportedOperationException();
       }
     };
-    return it;
   }
 
   /**
    * Prints the.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public void print() throws MtasParserException {
     Iterator<MtasToken> it = this.iterator();
@@ -105,8 +100,7 @@ public class MtasTokenCollection {
    * Gets the list.
    *
    * @return the list
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public String[][] getList() throws MtasParserException {
     String[][] result = new String[(tokenCollection.size() + 1)][];
@@ -167,12 +161,9 @@ public class MtasTokenCollection {
   /**
    * Check.
    *
-   * @param autoRepair
-   *          the auto repair
-   * @param makeUnique
-   *          the make unique
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @param autoRepair the auto repair
+   * @param makeUnique the make unique
+   * @throws MtasParserException the mtas parser exception
    */
   public void check(Boolean autoRepair, Boolean makeUnique)
       throws MtasParserException {
@@ -199,7 +190,7 @@ public class MtasTokenCollection {
    * Make unique.
    */
   private void makeUnique() {
-    HashMap<String, ArrayList<MtasToken>> currentPositionTokens = new HashMap<String, ArrayList<MtasToken>>();
+    HashMap<String, ArrayList<MtasToken>> currentPositionTokens = new HashMap<>();
     ArrayList<MtasToken> currentValueTokens;
     int currentStartPosition = -1;
     MtasToken currentToken = null;
@@ -227,24 +218,25 @@ public class MtasTokenCollection {
    * Auto repair.
    */
   private void autoRepair() {
-    ArrayList<Integer> trash = new ArrayList<Integer>();
-    HashMap<Integer, Integer> translation = new HashMap<Integer, Integer>();
-    HashMap<Integer, MtasToken> newTokenCollection = new HashMap<Integer, MtasToken>();
-    Integer parentId, maxId = null, minId = null;
+    ArrayList<Integer> trash = new ArrayList<>();
+    HashMap<Integer, Integer> translation = new HashMap<>();
+    HashMap<Integer, MtasToken> newTokenCollection = new HashMap<>();
+    Integer parentId;
+    Integer maxId = null;
+    Integer minId = null;
     MtasToken token;
     // check id, position and value
     for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
       token = entry.getValue();
-      if (token.getId() == null) {
+      boolean putInTrash;
+      putInTrash = token.getId() == null;
+      putInTrash |= (token.getPositionStart() == null)
+          || (token.getPositionEnd() == null);
+      putInTrash |= token.getValue() == null || (token.getValue().isEmpty());
+      putInTrash |= token.getPrefix() == null || (token.getPrefix().isEmpty());          
+      if (putInTrash) {
         trash.add(entry.getKey());
-      } else if ((token.getPositionStart() == null)
-          || (token.getPositionEnd() == null)) {
-        trash.add(entry.getKey());
-      } else if (token.getValue() == null || (token.getValue().isEmpty())) {
-        trash.add(entry.getKey());
-      } else if (token.getPrefix() == null || (token.getPrefix().isEmpty())) {
-        trash.add(entry.getKey());
-      }
+      } 
     }
     // check parentId
     for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
@@ -256,7 +248,7 @@ public class MtasTokenCollection {
       }
     }
     // empty bin
-    if (trash.size() > 0) {
+    if (!trash.isEmpty()) {
       for (Integer i : trash) {
         tokenCollection.remove(i);
       }
@@ -301,13 +293,13 @@ public class MtasTokenCollection {
   /**
    * Check token collection index.
    *
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   private void checkTokenCollectionIndex() throws MtasParserException {
     if (tokenCollectionIndex.size() != tokenCollection.size()) {
       MtasToken token;
-      Integer maxId = null, minId = null;
+      Integer maxId = null;
+      Integer minId = null;
       tokenCollectionIndex.clear();
       for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
         token = entry.getValue();
@@ -354,34 +346,33 @@ public class MtasTokenCollection {
    * @return the comp by name
    */
   public Comparator<Integer> getCompByName() {
-    Comparator<Integer> comp = new Comparator<Integer>() {
+    return new Comparator<Integer>() {
       @Override
       public int compare(Integer t1, Integer t2) {
         Integer p1 = tokenCollection.get(t1).getPositionStart();
         Integer p2 = tokenCollection.get(t2).getPositionStart();
         assert p1 != null : "no position for "
-            + tokenCollection.get(t1).getValue();
+            + tokenCollection.get(t1);
         assert p2 != null : "no position for "
-            + tokenCollection.get(t2).getValue();
+            + tokenCollection.get(t2);
         if (p1.equals(p2)) {
           Integer o1 = tokenCollection.get(t1).getOffsetStart();
           Integer o2 = tokenCollection.get(t2).getOffsetStart();
           if (o1 != null && o2 != null) {
             if (o1.equals(o2)) {
-              return tokenCollection.get(t1).getValue().toString()
-                  .compareTo(tokenCollection.get(t2).getValue().toString());
+              return tokenCollection.get(t1).getValue()
+                  .compareTo(tokenCollection.get(t2).getValue());
             } else {
               return o1.compareTo(o2);
             }
           } else {
-            return tokenCollection.get(t1).getValue().toString()
-                .compareTo(tokenCollection.get(t2).getValue().toString());
+            return tokenCollection.get(t1).getValue()
+                .compareTo(tokenCollection.get(t2).getValue());
           }
         }
         return p1.compareTo(p2);
       }
     };
-    return comp;
   }
 
   /**

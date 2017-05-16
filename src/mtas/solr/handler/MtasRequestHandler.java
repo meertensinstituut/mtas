@@ -29,34 +29,35 @@ import mtas.analysis.util.MtasParserException;
  */
 public class MtasRequestHandler extends RequestHandlerBase {
 
+  /** The log. */
   private static Log log = LogFactory.getLog(MtasRequestHandler.class);
 
-  /** The error. */
-  private final static String ERROR = "error";
+  /** The Constant ERROR. */
+  private static final String ERROR = "error";
 
-  /** The action config files. */
-  private final static String ACTION_CONFIG_FILES = "files";
+  /** The Constant ACTION_CONFIG_FILES. */
+  private static final String ACTION_CONFIG_FILES = "files";
 
-  /** The action config file. */
-  private final static String ACTION_CONFIG_FILE = "file";
+  /** The Constant ACTION_CONFIG_FILE. */
+  private static final String ACTION_CONFIG_FILE = "file";
 
-  /** The action mapping. */
-  private final static String ACTION_MAPPING = "mapping";
+  /** The Constant ACTION_MAPPING. */
+  private static final String ACTION_MAPPING = "mapping";
 
-  /** The param action. */
-  private final static String PARAM_ACTION = "action";
+  /** The Constant PARAM_ACTION. */
+  private static final String PARAM_ACTION = "action";
 
-  /** The param config file. */
-  private final static String PARAM_CONFIG_FILE = "file";
+  /** The Constant PARAM_CONFIG_FILE. */
+  private static final String PARAM_CONFIG_FILE = "file";
 
-  /** The param mapping configuration. */
-  private final static String PARAM_MAPPING_CONFIGURATION = "configuration";
+  /** The Constant PARAM_MAPPING_CONFIGURATION. */
+  private static final String PARAM_MAPPING_CONFIGURATION = "configuration";
 
-  /** The param mapping document. */
-  private final static String PARAM_MAPPING_DOCUMENT = "document";
+  /** The Constant PARAM_MAPPING_DOCUMENT. */
+  private static final String PARAM_MAPPING_DOCUMENT = "document";
 
-  /** The param mapping document url. */
-  private final static String PARAM_MAPPING_DOCUMENT_URL = "url";
+  /** The Constant PARAM_MAPPING_DOCUMENT_URL. */
+  private static final String PARAM_MAPPING_DOCUMENT_URL = "url";
 
   /*
    * (non-Javadoc)
@@ -145,10 +146,8 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Gets the files.
    *
-   * @param dir
-   *          the dir
-   * @param subDir
-   *          the sub dir
+   * @param dir the dir
+   * @param subDir the sub dir
    * @return the files
    */
   private ArrayList<String> getFiles(String dir, String subDir) {
@@ -180,13 +179,11 @@ public class MtasRequestHandler extends RequestHandlerBase {
   }
 
   /**
-   * Gets the params from json.
+   * Gets the params from JSON.
    *
-   * @param params
-   *          the params
-   * @param json
-   *          the json
-   * @return the params from json
+   * @param params the params
+   * @param json the json
+   * @return the params from JSON
    */
   @SuppressWarnings("unchecked")
   private static void getParamsFromJSON(Map<String, String> params,

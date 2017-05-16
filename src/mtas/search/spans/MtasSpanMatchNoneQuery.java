@@ -29,8 +29,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span match none query.
    *
-   * @param field
-   *          the field
+   * @param field the field
    */
   public MtasSpanMatchNoneQuery(String field) {
     super(null,null);
@@ -60,6 +59,9 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
     return new SpanNoneWeight(searcher, null);
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return super.rewrite(reader);
@@ -73,12 +75,9 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span none weight.
      *
-     * @param searcher
-     *          the searcher
-     * @param termContexts
-     *          the term contexts
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param searcher the searcher
+     * @param termContexts the term contexts
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanNoneWeight(IndexSearcher searcher,
         Map<Term, TermContext> termContexts) throws IOException {
@@ -94,6 +93,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
+      //don't do anything
     }
 
     /*
@@ -138,6 +138,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set<Term> terms) {
+      //don't do anything
     }
 
     /*

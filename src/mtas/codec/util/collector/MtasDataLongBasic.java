@@ -2,8 +2,8 @@ package mtas.codec.util.collector;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
+
 import org.apache.commons.lang.ArrayUtils;
 import mtas.codec.util.CodecUtil;
 
@@ -18,45 +18,28 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
   /**
    * Instantiates a new mtas data long basic.
    *
-   * @param collectorType
-   *          the collector type
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @param subCollectorTypes
-   *          the sub collector types
-   * @param subDataTypes
-   *          the sub data types
-   * @param subStatsTypes
-   *          the sub stats types
-   * @param subStatsItems
-   *          the sub stats items
-   * @param subSortTypes
-   *          the sub sort types
-   * @param subSortDirections
-   *          the sub sort directions
-   * @param subStart
-   *          the sub start
-   * @param subNumber
-   *          the sub number
-   * @param segmentRegistration
-   *          the segment registration
-   * @param boundary
-   *          the boundary
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param collectorType the collector type
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param start the start
+   * @param number the number
+   * @param subCollectorTypes the sub collector types
+   * @param subDataTypes the sub data types
+   * @param subStatsTypes the sub stats types
+   * @param subStatsItems the sub stats items
+   * @param subSortTypes the sub sort types
+   * @param subSortDirections the sub sort directions
+   * @param subStart the sub start
+   * @param subNumber the sub number
+   * @param segmentRegistration the segment registration
+   * @param boundary the boundary
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasDataLongBasic(String collectorType, Set<String> statsItems,
+  public MtasDataLongBasic(String collectorType, SortedSet<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
-      Set<String>[] subStatsItems, String[] subSortTypes,
+      SortedSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
     super(collectorType, CodecUtil.DATA_TYPE_LONG, statsItems, sortType,
@@ -74,8 +57,9 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
   protected MtasDataItemLongBasic getItem(int i) {
     if (i >= 0 && i < size) {
       return new MtasDataItemLongBasic(basicValueSumList[i], basicValueNList[i],
-          hasSub() ? subCollectorListNextLevel[i] : null, statsItems, sortType,
-          sortDirection, errorNumber[i], errorList[i], sourceNumberList[i]);
+          hasSub() ? subCollectorListNextLevel[i] : null, getStatsItems(),
+          sortType, sortDirection, errorNumber[i], errorList[i],
+          sourceNumberList[i]);
     } else {
       return null;
     }
@@ -334,14 +318,9 @@ public class MtasDataLongBasic extends MtasDataBasic<Long, Double> {
       if (thisLast == null) {
         return null;
       } else if (segmentRegistration.equals(SEGMENT_SORT_ASC)) {
-        Long boundary = thisLast * segmentNumber;
-        return boundary;
-      } else if (segmentRegistration.equals(SEGMENT_SORT_DESC)) {
-        Long boundary = Math.floorDiv(thisLast, segmentNumber);
-        return boundary;
+        return thisLast * segmentNumber;
       } else {
-        // should not happen
-        return null;
+        return Math.floorDiv(thisLast, segmentNumber);
       }
     } else {
       throw new IOException("can't compute boundary for segmentRegistration "

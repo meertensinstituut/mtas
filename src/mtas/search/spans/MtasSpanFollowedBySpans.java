@@ -9,23 +9,40 @@ import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.MtasSpanFollowedByQuery.MtasSpanFollowedByQuerySpans;
 import mtas.search.spans.util.MtasSpans;
 
+/**
+ * The Class MtasSpanFollowedBySpans.
+ */
 public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
 
-  /** The spans2. */
+  /** The spans 1. */
   private MtasSpanFollowedByQuerySpans spans1;
+  
+  /** The spans 2. */
   private MtasSpanFollowedByQuerySpans spans2;
 
+  /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
+  
+  /** The previous spans 2 start positions. */
   private HashSet<Integer> previousSpans2StartPositions;
 
 
-  /** The no more positions. */
+  /** The called next start position. */
   private boolean calledNextStartPosition;
+  
+  /** The no more positions. */
   private boolean noMorePositions;
 
   /** The doc id. */
   private int docId;
 
+  /**
+   * Instantiates a new mtas span followed by spans.
+   *
+   * @param mtasSpanFollowedByQuery the mtas span followed by query
+   * @param spans1 the spans 1
+   * @param spans2 the spans 2
+   */
   public MtasSpanFollowedBySpans(
       MtasSpanFollowedByQuery mtasSpanFollowedByQuery,
       MtasSpanFollowedByQuerySpans spans1,
@@ -37,12 +54,18 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     previousSpans2StartPositions = new HashSet<>();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans1.spans.collect(collector);
     spans2.spans.collect(collector);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
   @Override
   public int endPosition() {
     return calledNextStartPosition
@@ -50,6 +73,9 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
         : -1;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
   @Override
   public int nextStartPosition() throws IOException {
     // no document
@@ -75,12 +101,18 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
   @Override
   public float positionsCost() {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
   @Override
   public int startPosition() {
     return calledNextStartPosition
@@ -88,12 +120,18 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
         : -1;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
   @Override
   public int width() {
     return calledNextStartPosition ? (noMorePositions ? 0
         : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
   @Override
   public int advance(int target) throws IOException {
     reset();
@@ -138,16 +176,25 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
   @Override
   public long cost() {
     return 0;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
   @Override
   public int docID() {
     return docId;
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
   @Override
   public int nextDoc() throws IOException {
     reset();
@@ -156,6 +203,12 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     return docId;
   }
 
+  /**
+   * Go to next doc.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
       return true;
@@ -182,6 +235,12 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     }
   }
 
+  /**
+   * Go to next start position.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition;
     int nextSpans1EndPosition;
@@ -221,6 +280,9 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     return false;
   }
 
+  /**
+   * Reset.
+   */
   private void reset() {
     calledNextStartPosition = false;
     noMorePositions = false;

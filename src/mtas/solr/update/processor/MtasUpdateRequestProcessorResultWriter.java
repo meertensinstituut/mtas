@@ -15,8 +15,8 @@ import org.apache.lucene.util.BytesRef;
  */
 public class MtasUpdateRequestProcessorResultWriter implements Closeable {
 
-  /** The log. */
-  private static Log log = LogFactory
+  /** The Constant log. */
+  private static final Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorResultWriter.class);
 
   /** The object output stream. */

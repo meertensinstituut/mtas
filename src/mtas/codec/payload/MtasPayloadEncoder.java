@@ -27,33 +27,31 @@ public class MtasPayloadEncoder {
   /** The encoding flags. */
   private int encodingFlags;
 
-  /** The encode payload. */
-  public final static int ENCODE_PAYLOAD = 1;
+  /** The Constant ENCODE_PAYLOAD. */
+  public static final int ENCODE_PAYLOAD = 1;
 
-  /** The encode offset. */
-  public final static int ENCODE_OFFSET = 2;
+  /** The Constant ENCODE_OFFSET. */
+  public static final int ENCODE_OFFSET = 2;
 
-  /** The encode realoffset. */
-  public final static int ENCODE_REALOFFSET = 4;
+  /** The Constant ENCODE_REALOFFSET. */
+  public static final int ENCODE_REALOFFSET = 4;
 
-  /** The encode parent. */
-  public final static int ENCODE_PARENT = 8;
+  /** The Constant ENCODE_PARENT. */
+  public static final int ENCODE_PARENT = 8;
 
-  /** The encode default. */
-  public final static int ENCODE_DEFAULT = ENCODE_PAYLOAD | ENCODE_OFFSET
+  /** The Constant ENCODE_DEFAULT. */
+  public static final int ENCODE_DEFAULT = ENCODE_PAYLOAD | ENCODE_OFFSET
       | ENCODE_PARENT;
 
-  /** The encode all. */
-  public final static int ENCODE_ALL = ENCODE_PAYLOAD | ENCODE_OFFSET
+  /** The Constant ENCODE_ALL. */
+  public static final int ENCODE_ALL = ENCODE_PAYLOAD | ENCODE_OFFSET
       | ENCODE_REALOFFSET | ENCODE_PARENT;
 
   /**
    * Instantiates a new mtas payload encoder.
    *
-   * @param token
-   *          the token
-   * @param flags
-   *          the flags
+   * @param token the token
+   * @param flags the flags
    */
   public MtasPayloadEncoder(MtasToken token, int flags) {
     mtasToken = token;
@@ -64,8 +62,7 @@ public class MtasPayloadEncoder {
   /**
    * Instantiates a new mtas payload encoder.
    *
-   * @param token
-   *          the token
+   * @param token the token
    */
   public MtasPayloadEncoder(MtasToken token) {
     this(token, ENCODE_DEFAULT);
@@ -75,8 +72,7 @@ public class MtasPayloadEncoder {
    * Gets the payload.
    *
    * @return the payload
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public BytesRef getPayload() throws IOException {
 

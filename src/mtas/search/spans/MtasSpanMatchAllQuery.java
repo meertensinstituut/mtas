@@ -8,6 +8,9 @@ import java.util.Set;
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexReaderContext;
@@ -25,6 +28,9 @@ import org.apache.lucene.search.spans.Spans;
  * The Class MtasSpanMatchAllQuery.
  */
 public class MtasSpanMatchAllQuery extends MtasSpanQuery {
+
+  /** The log. */
+  private static Log log = LogFactory.getLog(MtasSpanMatchAllQuery.class);
 
   /** The field. */
   private String field;
@@ -63,8 +69,11 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     return new SpanAllWeight(searcher, null);
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -107,6 +116,7 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
         try {
           contexts.put(term, TermContext.build(topContext, term));
         } catch (IOException e) {
+          log.debug(e);
           // fail
         }
       }
@@ -165,6 +175,7 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set<Term> terms) {
+      // don't do anything
     }
 
     /*

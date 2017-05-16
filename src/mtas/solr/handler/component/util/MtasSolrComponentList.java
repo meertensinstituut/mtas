@@ -3,8 +3,10 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
@@ -32,7 +34,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
 
-  private static Log log = LogFactory.getLog(MtasSolrComponentList.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentList.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -55,6 +58,8 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
 
   /** The Constant NAME_MTAS_LIST_QUERY_IGNORE. */
   public static final String NAME_MTAS_LIST_QUERY_IGNORE = "query.ignore";
+  
+  /** The Constant NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH. */
   public static final String NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumIgnoreLength";
 
   /** The Constant NAME_MTAS_LIST_QUERY_VARIABLE. */
@@ -90,22 +95,14 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
   /**
    * Instantiates a new mtas solr component list.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentList(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -268,15 +265,8 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
     }
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -348,13 +338,8 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb,
@@ -499,12 +484,8 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param list
-   *          the list
-   * @return the simple ordered map
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentList list, Boolean encode) {
     SimpleOrderedMap<Object> mtasListResponse = new SimpleOrderedMap<>();
@@ -530,9 +511,9 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
           mtasListItemResponse.add("startPosition", hit.startPosition);
           mtasListItemResponse.add("endPosition", hit.endPosition);
 
-          TreeMap<Integer, ArrayList<ArrayList<String>>> hitData = new TreeMap<>();
-          TreeMap<Integer, ArrayList<ArrayList<String>>> leftData = null;
-          TreeMap<Integer, ArrayList<ArrayList<String>>> rightData = null;
+          SortedMap<Integer, List<List<String>>> hitData = new TreeMap<>();
+          SortedMap<Integer, List<List<String>>> leftData = null;
+          SortedMap<Integer, List<List<String>>> rightData = null;
           if (list.left > 0) {
             leftData = new TreeMap<>();
           }
@@ -542,10 +523,10 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
           for (int position = Math.max(0,
               hit.startPosition - list.left); position <= (hit.endPosition
                   + list.right); position++) {
-            ArrayList<ArrayList<String>> hitDataItem = new ArrayList<>();
+            List<List<String>> hitDataItem = new ArrayList<>();
             if (hit.hits.containsKey(position)) {
               for (String term : hit.hits.get(position)) {
-                ArrayList<String> hitDataSubItem = new ArrayList<>();
+                List<String> hitDataSubItem = new ArrayList<>();
                 hitDataSubItem.add(CodecUtil.termPrefix(term));
                 hitDataSubItem.add(CodecUtil.termValue(term));
                 hitDataItem.add(hitDataSubItem);
@@ -636,11 +617,8 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
     return mtasListResponse;
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb
-   *          the rb
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)

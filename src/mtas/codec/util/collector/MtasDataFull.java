@@ -3,8 +3,9 @@ package mtas.codec.util.collector;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
@@ -21,8 +22,11 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
+  /** The full value list. */
+  protected T1[][] fullValueList = null;
+  
   /** The new full value list. */
-  protected T1[][] fullValueList = null, newFullValueList = null;
+  protected T1[][] newFullValueList = null;
 
   /** The operations. */
   protected MtasDataOperations<T1, T2> operations;
@@ -51,10 +55,10 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataFull(String collectorType, String dataType,
-      Set<String> statsItems, String sortType, String sortDirection,
+      SortedSet<String> statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
       String[] subDataTypes, String[] subStatsTypes,
-      Set<String>[] subStatsItems, String[] subSortTypes,
+      SortedSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       MtasDataOperations<T1, T2> operations, String segmentRegistration,
       String boundary) throws IOException {
@@ -135,6 +139,7 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   /* (non-Javadoc)
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
+  @Override
   public void reduceToSegmentKeys() {
     if (segmentRegistration != null && size > 0) {
       int sizeCopy = size;
@@ -273,7 +278,7 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
    */
   @Override
   public void merge(MtasDataCollector<?, ?> newDataCollector,
-      HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
+      Map<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
       boolean increaseSourceNumber) throws IOException {
     closeNewList();
     if (!collectorType.equals(newDataCollector.getCollectorType())

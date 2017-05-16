@@ -35,8 +35,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentFacet
     implements MtasSolrComponent<ComponentFacet> {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasSolrComponentFacet.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentFacet.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -126,8 +126,7 @@ public class MtasSolrComponentFacet
   /**
    * Instantiates a new mtas solr component facet.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentFacet(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -648,10 +647,8 @@ public class MtasSolrComponentFacet
   /**
    * Gets the field type.
    *
-   * @param schema
-   *          the schema
-   * @param field
-   *          the field
+   * @param schema the schema
+   * @param field the field
    * @return the field type
    */
   private String getFieldType(IndexSchema schema, String field) {
@@ -675,8 +672,7 @@ public class MtasSolrComponentFacet
   /**
    * Gets the positive integer.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -690,8 +686,7 @@ public class MtasSolrComponentFacet
   /**
    * Gets the double.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the double
    */
   private Double getDouble(String number) {

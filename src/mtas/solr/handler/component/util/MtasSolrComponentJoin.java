@@ -14,7 +14,6 @@ import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 
-import mtas.codec.util.CodecComponent.BasicComponent;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentJoin;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
@@ -25,8 +24,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 @SuppressWarnings("deprecation")
 public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasSolrComponentJoin.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentJoin.class);
 
   /** The Constant PARAM_MTAS_JOIN. */
   public static final String PARAM_MTAS_JOIN = MtasSolrSearchComponent.PARAM_MTAS
@@ -43,12 +42,8 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
   public MtasSolrComponentJoin(MtasSolrSearchComponent searchComponent) {
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -64,12 +59,8 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
 
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb the rb
-   * @param who the who
-   * @param sreq the sreq
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -89,13 +80,8 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param join the join
-   * @param encode the encode
-   * @return the object
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentJoin join, Boolean encode) throws IOException {
     MtasSolrJoinResult data = new MtasSolrJoinResult(join);
@@ -108,10 +94,8 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
     return mtasJoinResponse;
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb the rb
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -142,12 +126,8 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
     }
   }
 
-  /**
-   * Distributed process.
-   *
-   * @param rb the rb
-   * @param mtasFields the mtas fields
-   * @throws IOException Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)

@@ -9,8 +9,6 @@ import java.util.Iterator;
 
 import mtas.parser.cql.MtasCQLParser;
 import mtas.search.spans.util.MtasSpanQuery;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Query;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.request.SolrQueryRequest;
@@ -22,29 +20,32 @@ import org.apache.solr.search.SyntaxError;
  */
 public class MtasCQLQParser extends QParser {
 
-  /** The mtas cql qparser field. */
+  /** The Constant MTAS_CQL_QPARSER_FIELD. */
   public static final String MTAS_CQL_QPARSER_FIELD = "field";
 
-  /** The mtas cql qparser query. */
+  /** The Constant MTAS_CQL_QPARSER_QUERY. */
   public static final String MTAS_CQL_QPARSER_QUERY = "query";
 
-  /** The mtas cql qparser query. */
+  /** The Constant MTAS_CQL_QPARSER_IGNORE. */
   public static final String MTAS_CQL_QPARSER_IGNORE = "ignore";
 
+  /** The Constant MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH. */
   public static final String MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
 
   
-  /** The mtas cql qparser default prefix. */
+  /** The Constant MTAS_CQL_QPARSER_PREFIX. */
   public static final String MTAS_CQL_QPARSER_PREFIX = "prefix";
 
   /** The field. */
   String field = null;
 
-  /** The query. */
+  /** The cql. */
   String cql = null;
   
+  /** The ignore query. */
   String ignoreQuery = null;
   
+  /** The maximum ignore length. */
   Integer maximumIgnoreLength = null;
 
   /** The default prefix. */
@@ -54,7 +55,7 @@ public class MtasCQLQParser extends QParser {
   HashMap<String, String[]> variables = null;
 
   /**
-   * Instantiates a new mtas cqlq parser.
+   * Instantiates a new mtas CQLQ parser.
    *
    * @param qstr the qstr
    * @param localParams the local params

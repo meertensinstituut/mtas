@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -14,10 +16,8 @@ import mtas.codec.util.DataCollector;
 /**
  * The Class MtasDataCollectorResult.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     implements Serializable {
@@ -26,41 +26,42 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
   private static final long serialVersionUID = 1L;
 
   /** The list. */
-  SortedMap<String, MtasDataItem<T1, T2>> list;
+  private SortedMap<String, MtasDataItem<T1, T2>> list;
 
   /** The item. */
-  MtasDataItem<T1, T2> item;
+  private MtasDataItem<T1, T2> item;
 
+  /** The sort type. */
+  private String sortType;
+  
+  /** The sort direction. */
+  private String sortDirection;
+  
   /** The collector type. */
-  String sortType, sortDirection, collectorType;
+  private String collectorType;
 
   /** The last sort value. */
-  @SuppressWarnings("rawtypes")
-  MtasDataItemNumberComparator lastSortValue;
+  private MtasDataItemNumberComparator lastSortValue;
 
+  /** The start key. */
+  String startKey;
+  
   /** The end key. */
-  String startKey, endKey;
+  String endKey;
 
   /**
    * Instantiates a new mtas data collector result.
    *
-   * @param collectorType
-   *          the collector type
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param basicList
-   *          the basic list
-   * @param start
-   *          the start
-   * @param number
-   *          the number
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param collectorType the collector type
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param basicList the basic list
+   * @param start the start
+   * @param number the number
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataCollectorResult(String collectorType, String sortType,
-      String sortDirection, TreeMap<String, MtasDataItem<T1, T2>> basicList,
+      String sortDirection, NavigableMap<String, MtasDataItem<T1, T2>> basicList,
       Integer start, Integer number) throws IOException {
     this(collectorType, sortType, sortDirection);
     if (sortType == null || sortType.equals(CodecUtil.SORT_TERM)) {
@@ -80,7 +81,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
           return compare == 0 ? k1.compareTo(k2) : compare;
         }
       };
-      SortedMap<String, MtasDataItem<T1, T2>> sortedByValues = new TreeMap<String, MtasDataItem<T1, T2>>(
+      SortedMap<String, MtasDataItem<T1, T2>> sortedByValues = new TreeMap<>(
           valueComparator);
       sortedByValues.putAll(basicList);
       list = sortedByValues;
@@ -131,10 +132,8 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
   /**
    * Instantiates a new mtas data collector result.
    *
-   * @param collectorType
-   *          the collector type
-   * @param item
-   *          the item
+   * @param collectorType the collector type
+   * @param item the item
    */
   public MtasDataCollectorResult(String collectorType,
       MtasDataItem<T1, T2> item) {
@@ -145,12 +144,9 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
   /**
    * Instantiates a new mtas data collector result.
    *
-   * @param collectorType
-   *          the collector type
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
+   * @param collectorType the collector type
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
    */
   public MtasDataCollectorResult(String collectorType, String sortType,
       String sortDirection) {
@@ -166,8 +162,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
    * Gets the list.
    *
    * @return the list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public final SortedMap<String, MtasDataItem<T1, T2>> getList()
       throws IOException {
@@ -177,11 +172,9 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
   /**
    * Gets the list.
    *
-   * @param reduce
-   *          the reduce
+   * @param reduce the reduce
    * @return the list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public final SortedMap<String, MtasDataItem<T1, T2>> getList(boolean reduce)
       throws IOException {
@@ -200,14 +193,13 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
    * Gets the comparator list.
    *
    * @return the comparator list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("rawtypes")
-  public final LinkedHashMap<String, MtasDataItemNumberComparator> getComparatorList()
+  public final Map<String, MtasDataItemNumberComparator> getComparatorList()
       throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-      LinkedHashMap<String, MtasDataItemNumberComparator> comparatorList = new LinkedHashMap<String, MtasDataItemNumberComparator>();
+      LinkedHashMap<String, MtasDataItemNumberComparator> comparatorList = new LinkedHashMap<>();
       for (Entry<String, MtasDataItem<T1,T2>> entry: list.entrySet()) {
         comparatorList.put(entry.getKey(), entry.getValue().getComparableValue());
       }
@@ -231,8 +223,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
    * Gets the data.
    *
    * @return the data
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public final MtasDataItem<T1, T2> getData() throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
@@ -242,6 +233,9 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     StringBuilder buffer = new StringBuilder();

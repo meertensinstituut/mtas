@@ -61,6 +61,9 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
     return baseQuery.createWeight(searcher, needsScores);
   }
   
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return super.rewrite(reader);

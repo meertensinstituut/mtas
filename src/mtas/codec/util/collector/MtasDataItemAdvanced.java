@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -13,10 +12,8 @@ import mtas.codec.util.CodecUtil;
 /**
  * The Class MtasDataItemAdvanced.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataItem<T1, T2> implements Serializable {
@@ -39,7 +36,7 @@ abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 exten
   /** The value max. */
   protected T1 valueMax;
 
-  /** The value n. */
+  /** The value N. */
   protected Long valueN;
 
   /** The operations. */
@@ -48,34 +45,20 @@ abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 exten
   /**
    * Instantiates a new mtas data item advanced.
    *
-   * @param valueSum
-   *          the value sum
-   * @param valueSumOfLogs
-   *          the value sum of logs
-   * @param valueSumOfSquares
-   *          the value sum of squares
-   * @param valueMin
-   *          the value min
-   * @param valueMax
-   *          the value max
-   * @param valueN
-   *          the value n
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param operations
-   *          the operations
-   * @param sourceNumber
-   *          the source number
+   * @param valueSum the value sum
+   * @param valueSumOfLogs the value sum of logs
+   * @param valueSumOfSquares the value sum of squares
+   * @param valueMin the value min
+   * @param valueMax the value max
+   * @param valueN the value N
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param operations the operations
+   * @param sourceNumber the source number
    */
   public MtasDataItemAdvanced(T1 valueSum, T2 valueSumOfLogs,
       T1 valueSumOfSquares, T1 valueMin, T1 valueMax, Long valueN,
@@ -124,8 +107,8 @@ abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 exten
    */
   @Override
   public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
-    Map<String, Object> response = new HashMap<String, Object>();
-    for (String statsItem : statsItems) {
+    Map<String, Object> response = new HashMap<>();
+    for (String statsItem : getStatsItems()) {
       if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
         response.put(statsItem, valueSum);
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_N)) {
@@ -155,8 +138,8 @@ abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 exten
       }
     }
     if (errorNumber > 0) {
-      Map<String, Object> errorResponse = new HashMap<String, Object>();
-      for (Entry<String, Integer> entry : errorList.entrySet()) {
+      Map<String, Object> errorResponse = new HashMap<>();
+      for (Entry<String, Integer> entry : getErrorList().entrySet()) {
         errorResponse.put(entry.getKey(), entry.getValue());
       }
       response.put("errorNumber", errorNumber);
@@ -172,8 +155,7 @@ abstract class MtasDataItemAdvanced<T1 extends Number & Comparable<T1>, T2 exten
   /**
    * Gets the value.
    *
-   * @param statsType
-   *          the stats type
+   * @param statsType the stats type
    * @return the value
    */
   protected T2 getValue(String statsType) {

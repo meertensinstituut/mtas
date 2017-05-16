@@ -13,6 +13,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.util.ResourceLoader;
 
 /**
@@ -20,29 +22,32 @@ import org.apache.lucene.analysis.util.ResourceLoader;
  */
 public class MtasConfiguration {
 
-  /** The configurations mtas. */
-  public final static String CONFIGURATIONS_MTAS = "mtas";
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasConfiguration.class);
 
-  /** The configurations configurations. */
-  public final static String CONFIGURATIONS_CONFIGURATIONS = "configurations";
+  /** The Constant CONFIGURATIONS_MTAS. */
+  public static final String CONFIGURATIONS_MTAS = "mtas";
 
-  /** The configurations configuration. */
-  public final static String CONFIGURATIONS_CONFIGURATION = "configuration";
+  /** The Constant CONFIGURATIONS_CONFIGURATIONS. */
+  public static final String CONFIGURATIONS_CONFIGURATIONS = "configurations";
 
-  /** The configurations configuration name. */
-  public final static String CONFIGURATIONS_CONFIGURATION_NAME = "name";
+  /** The Constant CONFIGURATIONS_CONFIGURATION. */
+  public static final String CONFIGURATIONS_CONFIGURATION = "configuration";
 
-  /** The tokenizer configuration file. */
-  public final static String TOKENIZER_CONFIGURATION_FILE = "file";
+  /** The Constant CONFIGURATIONS_CONFIGURATION_NAME. */
+  public static final String CONFIGURATIONS_CONFIGURATION_NAME = "name";
 
-  /** The charfilter configuration type. */
-  public final static String CHARFILTER_CONFIGURATION_TYPE = "type";
+  /** The Constant TOKENIZER_CONFIGURATION_FILE. */
+  public static final String TOKENIZER_CONFIGURATION_FILE = "file";
 
-  /** The charfilter configuration prefix. */
-  public final static String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
+  /** The Constant CHARFILTER_CONFIGURATION_TYPE. */
+  public static final String CHARFILTER_CONFIGURATION_TYPE = "type";
 
-  /** The charfilter configuration postfix. */
-  public final static String CHARFILTER_CONFIGURATION_POSTFIX = "postfix";
+  /** The Constant CHARFILTER_CONFIGURATION_PREFIX. */
+  public static final String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
+
+  /** The Constant CHARFILTER_CONFIGURATION_POSTFIX. */
+  public static final String CHARFILTER_CONFIGURATION_POSTFIX = "postfix";
 
   /** The name. */
   public String name;
@@ -69,15 +74,11 @@ public class MtasConfiguration {
   /**
    * Read configurations.
    *
-   * @param resourceLoader
-   *          the resource loader
-   * @param configFile
-   *          the config file
-   * @param className
-   *          the class name
+   * @param resourceLoader the resource loader
+   * @param configFile the config file
+   * @param className the class name
    * @return the hash map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private static HashMap<String, HashMap<String, String>> readConfigurations(
       ResourceLoader resourceLoader, String configFile, String className)
@@ -184,7 +185,7 @@ public class MtasConfiguration {
         streamReader.close();
       }
     } catch (XMLStreamException e) {
-
+      log.debug(e);
     }
     return configs;
   }
@@ -192,13 +193,10 @@ public class MtasConfiguration {
   /**
    * Read mtas char filter configurations.
    *
-   * @param resourceLoader
-   *          the resource loader
-   * @param configFile
-   *          the config file
+   * @param resourceLoader the resource loader
+   * @param configFile the config file
    * @return the hash map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static HashMap<String, MtasConfiguration> readMtasCharFilterConfigurations(
       ResourceLoader resourceLoader, String configFile) throws IOException {
@@ -231,13 +229,10 @@ public class MtasConfiguration {
   /**
    * Read mtas tokenizer configurations.
    *
-   * @param resourceLoader
-   *          the resource loader
-   * @param configFile
-   *          the config file
+   * @param resourceLoader the resource loader
+   * @param configFile the config file
    * @return the hash map
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static HashMap<String, MtasConfiguration> readMtasTokenizerConfigurations(
       ResourceLoader resourceLoader, String configFile) throws IOException {
@@ -264,11 +259,9 @@ public class MtasConfiguration {
   /**
    * Read configuration.
    *
-   * @param reader
-   *          the reader
+   * @param reader the reader
    * @return the mtas configuration
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasConfiguration readConfiguration(InputStream reader)
       throws IOException {
@@ -331,7 +324,7 @@ public class MtasConfiguration {
         streamReader.close();
       }
     } catch (XMLStreamException e) {
-
+      log.debug(e);
     }
     return null;
   }

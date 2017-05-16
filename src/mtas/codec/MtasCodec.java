@@ -35,10 +35,8 @@ public class MtasCodec extends Codec {
   /**
    * Instantiates a new mtas codec.
    *
-   * @param name
-   *          the name
-   * @param delegate
-   *          the delegate
+   * @param name the name
+   * @param delegate the delegate
    */
   protected MtasCodec(String name, Codec delegate) {
     super(name);

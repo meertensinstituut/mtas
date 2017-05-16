@@ -16,8 +16,7 @@ public class MtasStartSpans extends Spans {
   /**
    * Instantiates a new mtas start spans.
    *
-   * @param spans
-   *          the spans
+   * @param spans the spans
    */
   public MtasStartSpans(Spans spans) {
     super();

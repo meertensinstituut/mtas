@@ -25,17 +25,17 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /** The field. */
   private String field;
 
-  /** The q2. */
+  /** The q 1. */
   private SpanQuery q1;
+  
+  /** The q 2. */
   private SpanQuery q2;
 
   /**
    * Instantiates a new mtas span intersecting query.
    *
-   * @param q1
-   *          the q1
-   * @param q2
-   *          the q2
+   * @param q1 the q 1
+   * @param q2 the q 2
    */
   public MtasSpanIntersectingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
@@ -93,8 +93,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /**
    * Gets the term contexts.
    *
-   * @param items
-   *          the items
+   * @param items the items
    * @return the term contexts
    */
   protected Map<Term, TermContext> getTermContexts(
@@ -195,23 +194,20 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
    */
   protected class SpanIntersectingWeight extends SpanWeight {
 
-    /** The w2. */
+    /** The w 1. */
     MtasSpanIntersectingQueryWeight w1;
+    
+    /** The w 2. */
     MtasSpanIntersectingQueryWeight w2;
 
     /**
      * Instantiates a new span intersecting weight.
      *
-     * @param w1
-     *          the w1
-     * @param w2
-     *          the w2
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param w1 the w 1
+     * @param w2 the w 2
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanIntersectingWeight(MtasSpanIntersectingQueryWeight w1,
         MtasSpanIntersectingQueryWeight w2, IndexSearcher searcher,
@@ -281,8 +277,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query spans.
      *
-     * @param spans
-     *          the spans
+     * @param spans the spans
      */
     public MtasSpanIntersectingQuerySpans(Spans spans) {
       this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
@@ -301,8 +296,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query weight.
      *
-     * @param spanWeight
-     *          the span weight
+     * @param spanWeight the span weight
      */
     public MtasSpanIntersectingQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;

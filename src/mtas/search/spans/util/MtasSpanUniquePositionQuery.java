@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import mtas.search.similarities.MtasSimScorer;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.similarities.Similarity.SimScorer;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
@@ -29,8 +26,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span unique position query.
    *
-   * @param clause
-   *          the clause
+   * @param clause the clause
    */
   public MtasSpanUniquePositionQuery(MtasSpanQuery clause) {
     super(clause.getMinimumWidth(), clause.getMaximumWidth());
@@ -100,6 +96,9 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newClause = clause.rewrite(reader);
@@ -136,14 +135,10 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     /**
      * Instantiates a new span unique position weight.
      *
-     * @param subWeight
-     *          the sub weight
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param subWeight the sub weight
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanUniquePositionWeight(SpanWeight subWeight,
         IndexSearcher searcher, Map<Term, TermContext> terms)

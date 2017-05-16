@@ -13,8 +13,7 @@ public class MtasScoreProvider extends CustomScoreProvider {
   /**
    * Instantiates a new mtas score provider.
    *
-   * @param context
-   *          the context
+   * @param context the context
    */
   public MtasScoreProvider(LeafReaderContext context) {
     super(context);

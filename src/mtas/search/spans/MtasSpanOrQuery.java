@@ -19,18 +19,19 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   /** The clauses. */
   private HashSet<MtasSpanQuery> clauses;
 
+  /** The base query. */
   private SpanQuery baseQuery;
 
   /**
    * Instantiates a new mtas span or query.
    *
-   * @param clauses
-   *          the clauses
+   * @param initialClauses the initial clauses
    */
   public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
-    Integer minimum = null, maximum = null;
-    clauses = new HashSet<MtasSpanQuery>();
+    Integer minimum = null;
+    Integer maximum = null;
+    clauses = new HashSet<>();
     for (MtasSpanQuery item : initialClauses) {
       if (!clauses.contains(item)) {
         minimum = clauses.isEmpty() ? item.getMinimumWidth()
@@ -47,17 +48,26 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
         clauses.toArray(new MtasSpanQuery[clauses.size()]));
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() {
     return baseQuery.getField();
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     if (clauses.size() > 1) {

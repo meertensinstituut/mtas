@@ -65,9 +65,9 @@ public class MtasSearchTestConsistency {
 
   private static Log log = LogFactory.getLog(MtasSearchTestConsistency.class);
   
-  private final static String FIELD_ID = "id";
-  private final static String FIELD_TITLE = "title";
-  private final static String FIELD_CONTENT = "content";
+  private static final String FIELD_ID = "id";
+  private static final String FIELD_TITLE = "title";
+  private static final String FIELD_CONTENT = "content";
 
   private static Directory directory;
 
@@ -775,7 +775,7 @@ public class MtasSearchTestConsistency {
             while (spans.nextStartPosition() != Spans.NO_MORE_POSITIONS) {
               queryResult.hits++;
               if (prefixes != null && !prefixes.isEmpty()) {
-                ArrayList<MtasTreeHit<String>> terms = mtasCodecInfo
+                List<MtasTreeHit<String>> terms = mtasCodecInfo
                     .getPositionedTermsByPrefixesAndPositionRange(field,
                         spans.docID(), prefixes, spans.startPosition(),
                         (spans.endPosition() - 1));

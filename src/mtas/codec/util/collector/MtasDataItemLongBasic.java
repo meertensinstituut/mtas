@@ -1,9 +1,7 @@
 package mtas.codec.util.collector;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import mtas.codec.util.CodecUtil;
 
 /**
@@ -17,24 +15,15 @@ class MtasDataItemLongBasic extends MtasDataItemBasic<Long, Double> {
   /**
    * Instantiates a new mtas data item long basic.
    *
-   * @param valueSum
-   *          the value sum
-   * @param valueN
-   *          the value n
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param valueSum the value sum
+   * @param valueN the value N
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItemLongBasic(Long valueSum, long valueN,
       MtasDataCollector<?, ?> sub, Set<String> statsItems, String sortType,
@@ -104,6 +93,9 @@ class MtasDataItemLongBasic extends MtasDataItemBasic<Long, Double> {
         + "]";
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -118,6 +110,9 @@ class MtasDataItemLongBasic extends MtasDataItemBasic<Long, Double> {
     return (c1!=null&&c2!=null&&c1.equals(c2));    
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

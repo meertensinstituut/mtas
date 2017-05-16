@@ -18,15 +18,26 @@ import org.apache.lucene.search.spans.Spans;
 
 import mtas.search.spans.util.MtasSpanQuery;
 
+/**
+ * The Class MtasSpanFollowedByQuery.
+ */
 public class MtasSpanFollowedByQuery extends MtasSpanQuery {
 
   /** The field. */
   private String field;
 
-  /** The q 2. */
+  /** The q 1. */
   private SpanQuery q1;
+  
+  /** The q 2. */
   private SpanQuery q2;
 
+  /**
+   * Instantiates a new mtas span followed by query.
+   *
+   * @param q1 the q 1
+   * @param q2 the q 2
+   */
   public MtasSpanFollowedByQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
@@ -53,6 +64,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     return field;
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
@@ -73,6 +87,12 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     }
   }
 
+  /**
+   * Gets the term contexts.
+   *
+   * @param items the items
+   * @return the term contexts
+   */
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanFollowedByQueryWeight> items) {
     List<SpanWeight> weights = new ArrayList<>();
@@ -82,6 +102,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     return getTermContexts(weights);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -101,6 +124,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -113,6 +139,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     return q1.equals(other.q1) && q2.equals(other.q2);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = Integer.rotateLeft(classHash(), 1);
@@ -122,6 +151,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     return h;
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
@@ -136,25 +168,25 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     }
   }
 
+  /**
+   * The Class SpanFollowedByWeight.
+   */
   protected class SpanFollowedByWeight extends SpanWeight {
 
-    /** The w 2. */
+    /** The w 1. */
     MtasSpanFollowedByQueryWeight w1;
+    
+    /** The w 2. */
     MtasSpanFollowedByQueryWeight w2;
 
     /**
-     * Instantiates a new span intersecting weight.
+     * Instantiates a new span followed by weight.
      *
-     * @param w1
-     *          the w 1
-     * @param w2
-     *          the w 2
-     * @param searcher
-     *          the searcher
-     * @param terms
-     *          the terms
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param w1 the w 1
+     * @param w2 the w 2
+     * @param searcher the searcher
+     * @param terms the terms
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanFollowedByWeight(MtasSpanFollowedByQueryWeight w1,
         MtasSpanFollowedByQueryWeight w2, IndexSearcher searcher,
@@ -213,7 +245,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   }
 
   /**
-   * The Class MtasSpanIntersectingQuerySpans.
+   * The Class MtasSpanFollowedByQuerySpans.
    */
   protected class MtasSpanFollowedByQuerySpans {
 
@@ -221,10 +253,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     public Spans spans;
 
     /**
-     * Instantiates a new mtas span intersecting query spans.
+     * Instantiates a new mtas span followed by query spans.
      *
-     * @param spans
-     *          the spans
+     * @param spans the spans
      */
     public MtasSpanFollowedByQuerySpans(Spans spans) {
       this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
@@ -233,7 +264,7 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   }
 
   /**
-   * The Class MtasSpanIntersectingQueryWeight.
+   * The Class MtasSpanFollowedByQueryWeight.
    */
   private static class MtasSpanFollowedByQueryWeight {
 
@@ -241,10 +272,9 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     public SpanWeight spanWeight;
 
     /**
-     * Instantiates a new mtas span intersecting query weight.
+     * Instantiates a new mtas span followed by query weight.
      *
-     * @param spanWeight
-     *          the span weight
+     * @param spanWeight the span weight
      */
     public MtasSpanFollowedByQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;

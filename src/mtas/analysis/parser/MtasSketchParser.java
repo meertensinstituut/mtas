@@ -2,17 +2,17 @@ package mtas.analysis.parser;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
@@ -27,11 +27,8 @@ import mtas.analysis.util.MtasParserException;
  */
 final public class MtasSketchParser extends MtasBasicParser {
 
-  /** The Constant MAPPING_TYPE_WORD_ANNOTATION. */
-  protected final static String MAPPING_TYPE_WORD_ANNOTATION = "wordAnnotation";
-
-  /** The autorepair. */
-  private Boolean autorepair = true;
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSketchParser.class);
 
   /** The word type. */
   private MtasParserType<MtasParserMapping<?>> wordType = null;
@@ -49,11 +46,12 @@ final public class MtasSketchParser extends MtasBasicParser {
    */
   public MtasSketchParser(MtasConfiguration config) {
     super(config);
+    autorepair = true;
     try {
       initParser();
       // System.out.print(printConfig());
     } catch (MtasConfigException e) {
-      e.printStackTrace();
+      log.error(e);
     }
   }
 
@@ -88,8 +86,10 @@ final public class MtasSketchParser extends MtasBasicParser {
                     && (nameMapping != null)) {
                   MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
                   m.processConfig(mapping);
-                  if (wordAnnotationTypes.containsKey(Integer.parseInt(nameMapping))) {
-                    wordAnnotationTypes.get(Integer.parseInt(nameMapping)).addItem(m);
+                  if (wordAnnotationTypes
+                      .containsKey(Integer.parseInt(nameMapping))) {
+                    wordAnnotationTypes.get(Integer.parseInt(nameMapping))
+                        .addItem(m);
                   } else {
                     MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
                         typeMapping, nameMapping, false);
@@ -141,7 +141,8 @@ final public class MtasSketchParser extends MtasBasicParser {
     MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
     try (MtasBufferedReader br = new MtasBufferedReader(reader)) {
       String line;
-      int currentOffset, previousOffset = br.getPosition();
+      int currentOffset;
+      int previousOffset = br.getPosition();
       MtasParserType tmpCurrentType;
       MtasParserObject currentObject;
       Pattern groupPattern = Pattern.compile("^<([^\\/>]+)\\/>$");
@@ -311,6 +312,7 @@ final public class MtasSketchParser extends MtasBasicParser {
         previousOffset = br.getPosition();
       }
     } catch (IOException e) {
+      log.debug(e);
       throw new MtasParserException(e.getMessage());
     }
     // update tokens with offset
@@ -377,7 +379,7 @@ final public class MtasSketchParser extends MtasBasicParser {
    */
   private class MtasSketchParserMappingWord
       extends MtasParserMapping<MtasSketchParserMappingWord> {
-    
+
     /**
      * Instantiates a new mtas sketch parser mapping word.
      */
@@ -389,7 +391,9 @@ final public class MtasSketchParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_WORD;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
      */
     @Override

@@ -18,8 +18,7 @@ public class MtasConfigException extends Exception {
   /**
    * Instantiates a new mtas config exception.
    *
-   * @param string
-   *          the string
+   * @param string the string
    */
   public MtasConfigException(String string) {
     super(string);

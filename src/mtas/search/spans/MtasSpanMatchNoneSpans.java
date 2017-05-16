@@ -8,7 +8,7 @@ import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpans;
 
 /**
- * The Class MtasSpanMatchNone.
+ * The Class MtasSpanMatchNoneSpans.
  */
 public class MtasSpanMatchNoneSpans extends Spans implements MtasSpans {
 
@@ -16,10 +16,9 @@ public class MtasSpanMatchNoneSpans extends Spans implements MtasSpans {
   private int currentStartPosition, currentEndPosition, docId;
 
   /**
-   * Instantiates a new mtas span match none.
+   * Instantiates a new mtas span match none spans.
    *
-   * @param field
-   *          the field
+   * @param field the field
    */
   public MtasSpanMatchNoneSpans(String field) {
     currentStartPosition = NO_MORE_POSITIONS;

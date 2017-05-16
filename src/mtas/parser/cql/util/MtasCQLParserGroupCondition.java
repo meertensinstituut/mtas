@@ -14,12 +14,10 @@ public class MtasCQLParserGroupCondition {
   private String field;
 
   /**
-   * Instantiates a new mtas cql parser group condition.
+   * Instantiates a new mtas CQL parser group condition.
    *
-   * @param field
-   *          the field
-   * @param condition
-   *          the condition
+   * @param field the field
+   * @param condition the condition
    */
   public MtasCQLParserGroupCondition(String field, MtasSpanQuery condition) {
     this.field = field;
@@ -59,6 +57,9 @@ public class MtasCQLParserGroupCondition {
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

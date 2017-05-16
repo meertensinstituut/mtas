@@ -1,19 +1,20 @@
 package mtas.analysis.token;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.payloads.PayloadHelper;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.automaton.Automaton;
@@ -25,11 +26,11 @@ import org.apache.lucene.util.automaton.TooComplexToDeterminizeException;
 
 /**
  * The Class MtasToken.
- *
- * @param <GenericType>
- *          the generic type
  */
 public abstract class MtasToken {
+
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasToken.class);
 
   /** The Constant DELIMITER. */
   public static final String DELIMITER = "\u0001";
@@ -87,10 +88,8 @@ public abstract class MtasToken {
   /**
    * Instantiates a new mtas token.
    *
-   * @param tokenId
-   *          the token id
-   * @param value
-   *          the value
+   * @param tokenId the token id
+   * @param value the value
    */
   protected MtasToken(Integer tokenId, String value) {
     this.tokenId = tokenId;
@@ -101,12 +100,9 @@ public abstract class MtasToken {
   /**
    * Instantiates a new mtas token.
    *
-   * @param tokenId
-   *          the token id
-   * @param value
-   *          the value
-   * @param position
-   *          the position
+   * @param tokenId the token id
+   * @param value the value
+   * @param position the position
    */
   protected MtasToken(Integer tokenId, String value, Integer position) {
     this(tokenId, value);
@@ -116,8 +112,7 @@ public abstract class MtasToken {
   /**
    * Sets the token ref.
    *
-   * @param ref
-   *          the new token ref
+   * @param ref the new token ref
    */
   final public void setTokenRef(Long ref) {
     tokenRef = ref;
@@ -135,8 +130,7 @@ public abstract class MtasToken {
   /**
    * Sets the term ref.
    *
-   * @param ref
-   *          the new term ref
+   * @param ref the new term ref
    */
   final public void setTermRef(Long ref) {
     termRef = ref;
@@ -154,8 +148,7 @@ public abstract class MtasToken {
   /**
    * Sets the prefix id.
    *
-   * @param id
-   *          the new prefix id
+   * @param id the new prefix id
    */
   final public void setPrefixId(int id) {
     prefixId = id;
@@ -165,8 +158,7 @@ public abstract class MtasToken {
    * Gets the prefix id.
    *
    * @return the prefix id
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   final public int getPrefixId() throws IOException {
     if (prefixId != null) {
@@ -179,8 +171,7 @@ public abstract class MtasToken {
   /**
    * Sets the id.
    *
-   * @param id
-   *          the new id
+   * @param id the new id
    */
   final public void setId(Integer id) {
     tokenId = id;
@@ -198,8 +189,7 @@ public abstract class MtasToken {
   /**
    * Sets the parent id.
    *
-   * @param id
-   *          the new parent id
+   * @param id the new parent id
    */
   final public void setParentId(Integer id) {
     tokenParentId = id;
@@ -217,8 +207,7 @@ public abstract class MtasToken {
   /**
    * Sets the provide parent id.
    *
-   * @param provide
-   *          the new provide parent id
+   * @param provide the new provide parent id
    */
   final public void setProvideParentId(Boolean provide) {
     provideParentId = provide;
@@ -252,8 +241,7 @@ public abstract class MtasToken {
   /**
    * Adds the position.
    *
-   * @param position
-   *          the position
+   * @param position the position
    */
   final public void addPosition(int position) {
     if (tokenPosition == null) {
@@ -266,10 +254,8 @@ public abstract class MtasToken {
   /**
    * Adds the position range.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   final public void addPositionRange(int start, int end) {
     if (tokenPosition == null) {
@@ -286,8 +272,7 @@ public abstract class MtasToken {
   /**
    * Adds the positions.
    *
-   * @param positions
-   *          the positions
+   * @param positions the positions
    */
   final public void addPositions(int[] positions) {
     if (positions != null && positions.length > 0) {
@@ -302,8 +287,7 @@ public abstract class MtasToken {
   /**
    * Adds the positions.
    *
-   * @param list
-   *          the list
+   * @param list the list
    */
   final public void addPositions(Set<Integer> list) {
     int[] positions = ArrayUtils
@@ -314,16 +298,15 @@ public abstract class MtasToken {
   /**
    * Check position type.
    *
-   * @param type
-   *          the type
+   * @param type the type
    * @return the boolean
    */
   final public Boolean checkPositionType(String type) {
-    if(tokenPosition==null) {
+    if (tokenPosition == null) {
       return false;
     } else {
       return tokenPosition.checkType(type);
-    }    
+    }
   }
 
   /**
@@ -396,10 +379,8 @@ public abstract class MtasToken {
   /**
    * Sets the offset.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   final public void setOffset(Integer start, Integer end) {
     if ((start == null) || (end == null)) {
@@ -414,10 +395,8 @@ public abstract class MtasToken {
   /**
    * Adds the offset.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   final public void addOffset(Integer start, Integer end) {
     if (tokenOffset == null) {
@@ -434,8 +413,7 @@ public abstract class MtasToken {
   /**
    * Sets the provide offset.
    *
-   * @param provide
-   *          the new provide offset
+   * @param provide the new provide offset
    */
   final public void setProvideOffset(Boolean provide) {
     provideOffset = provide;
@@ -444,10 +422,8 @@ public abstract class MtasToken {
   /**
    * Sets the real offset.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   final public void setRealOffset(Integer start, Integer end) {
     if ((start == null) || (end == null)) {
@@ -463,8 +439,7 @@ public abstract class MtasToken {
   /**
    * Sets the provide real offset.
    *
-   * @param provide
-   *          the new provide real offset
+   * @param provide the new provide real offset
    */
   final public void setProvideRealOffset(Boolean provide) {
     provideRealOffset = provide;
@@ -527,8 +502,7 @@ public abstract class MtasToken {
   /**
    * Sets the value.
    *
-   * @param value
-   *          the new value
+   * @param value the new value
    */
   public void setValue(String value) {
     tokenValue = value;
@@ -537,8 +511,7 @@ public abstract class MtasToken {
   /**
    * Gets the prefix from value.
    *
-   * @param value
-   *          the value
+   * @param value the value
    * @return the prefix from value
    */
   public static String getPrefixFromValue(String value) {
@@ -559,8 +532,7 @@ public abstract class MtasToken {
   /**
    * Gets the postfix from value.
    *
-   * @param value
-   *          the value
+   * @param value the value
    * @return the postfix from value
    */
   public static String getPostfixFromValue(String value) {
@@ -576,12 +548,12 @@ public abstract class MtasToken {
   /**
    * Gets the postfix from value.
    *
-   * @param term
-   *          the term
+   * @param term the term
    * @return the postfix from value
    */
   public static String getPostfixFromValue(BytesRef term) {
-    int i = term.offset, length = term.offset + term.length;
+    int i = term.offset;
+    int length = term.offset + term.length;
     byte[] postfix = new byte[length];
     while (i < length) {
       if ((term.bytes[i] & 0b10000000) == 0b00000000) {
@@ -647,7 +619,8 @@ public abstract class MtasToken {
         return "";
       }
     }
-    return new String(Arrays.copyOfRange(postfix, start, i), StandardCharsets.UTF_8);    
+    return new String(Arrays.copyOfRange(postfix, start, i),
+        StandardCharsets.UTF_8);
   }
 
   /**
@@ -706,8 +679,7 @@ public abstract class MtasToken {
   /**
    * Sets the payload.
    *
-   * @param payload
-   *          the new payload
+   * @param payload the new payload
    */
   public void setPayload(BytesRef payload) {
     tokenPayload = payload;
@@ -722,47 +694,61 @@ public abstract class MtasToken {
     return tokenPayload;
   }
 
-  public static HashMap<String, Automaton> createAutomatonMap(String prefix,
+  /**
+   * Creates the automaton map.
+   *
+   * @param prefix the prefix
+   * @param valueList the value list
+   * @param filter the filter
+   * @return the map
+   */
+  public static Map<String, Automaton> createAutomatonMap(String prefix,
       List<String> valueList, Boolean filter) {
-    HashMap<String, Automaton> automatonMap = new HashMap<String, Automaton>();
+    HashMap<String, Automaton> automatonMap = new HashMap<>();
     if (valueList != null) {
       for (String item : valueList) {
         if (filter) {
           item = item.replaceAll("([\\\"\\)\\(\\<\\>\\.\\@\\#\\]\\[\\{\\}])",
-              "\\\\\\1");
+              "\\\\$1");
         }
         automatonMap.put(item,
-            new RegExp(prefix + MtasToken.DELIMITER + item + "\u0000*").toAutomaton());
+            new RegExp(prefix + MtasToken.DELIMITER + item + "\u0000*")
+                .toAutomaton());
       }
     }
     return automatonMap;
   }
-  
-  public static HashMap<String, ByteRunAutomaton> byteRunAutomatonMap(HashMap<String, Automaton> automatonMap) {
-    HashMap<String, ByteRunAutomaton> byteRunAutomatonMap = new HashMap<String, ByteRunAutomaton>();
-    if(automatonMap!=null) {
-      for(Entry<String,Automaton> entry : automatonMap.entrySet()) {
-        byteRunAutomatonMap.put(entry.getKey(), new ByteRunAutomaton(entry.getValue()));
+
+  /**
+   * Byte run automaton map.
+   *
+   * @param automatonMap the automaton map
+   * @return the map
+   */
+  public static Map<String, ByteRunAutomaton> byteRunAutomatonMap(
+      Map<String, Automaton> automatonMap) {
+    HashMap<String, ByteRunAutomaton> byteRunAutomatonMap = new HashMap<>();
+    if (automatonMap != null) {
+      for (Entry<String, Automaton> entry : automatonMap.entrySet()) {
+        byteRunAutomatonMap.put(entry.getKey(),
+            new ByteRunAutomaton(entry.getValue()));
       }
     }
     return byteRunAutomatonMap;
   }
+
   /**
    * Creates the automata.
    *
-   * @param prefix
-   *          the prefix
-   * @param regexp
-   *          the regexp
-   * @param valueList
-   *          the value list
+   * @param prefix the prefix
+   * @param regexp the regexp
+   * @param automatonMap the automaton map
    * @return the list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static List<CompiledAutomaton> createAutomata(String prefix,
-      String regexp, HashMap<String, Automaton> automatonMap) throws IOException {
-    List<CompiledAutomaton> list = new ArrayList<CompiledAutomaton>();
+      String regexp, Map<String, Automaton> automatonMap) throws IOException {
+    List<CompiledAutomaton> list = new ArrayList<>();
     Automaton automatonRegexp = null;
     if (regexp != null) {
       RegExp re = new RegExp(prefix + MtasToken.DELIMITER + regexp + "\u0000*");
@@ -784,13 +770,14 @@ public abstract class MtasToken {
         Automaton automatonList = Operations.union(listAutomaton);
         Automaton automaton;
         if (automatonRegexp != null) {
-          automaton = Operations.intersection(automatonList, automatonRegexp);          
+          automaton = Operations.intersection(automatonList, automatonRegexp);
         } else {
           automaton = automatonList;
         }
         try {
           compiledAutomaton = new CompiledAutomaton(automaton);
         } catch (TooComplexToDeterminizeException e) {
+          log.debug(e);
           success = false;
           if (localStep > 1) {
             localStep /= 2;

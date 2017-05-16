@@ -13,12 +13,10 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   private final HashMap<String, MtasRBTreeNode> index;
 
   /**
-   * Instantiates a new mtas rb tree.
+   * Instantiates a new mtas RB tree.
    *
-   * @param singlePoint
-   *          the single point
-   * @param storePrefixId
-   *          the store prefix id
+   * @param singlePoint the single point
+   * @param storePrefixId the store prefix id
    */
   public MtasRBTree(boolean singlePoint, boolean storePrefixId) {
     super(singlePoint, storePrefixId);
@@ -76,60 +74,52 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Adds the range.
    *
-   * @param n
-   *          the n
-   * @param left
-   *          the left
-   * @param right
-   *          the right
-   * @param additionalId
-   *          the additional id
-   * @param additionalRef
-   *          the additional ref
-   * @param id
-   *          the id
-   * @param ref
-   *          the ref
-   * @return the mtas rb tree node
+   * @param n the n
+   * @param left the left
+   * @param right the right
+   * @param additionalId the additional id
+   * @param additionalRef the additional ref
+   * @param id the id
+   * @param ref the ref
+   * @return the mtas RB tree node
    */
   private MtasRBTreeNode addRange(MtasRBTreeNode n, Integer left, Integer right,
       int additionalId, long additionalRef, Integer id, Long ref) {
-    if (n == null) {
+    MtasRBTreeNode localN = n;
+    if (localN == null) {
       String key = left.toString() + "_" + right.toString();
-      n = new MtasRBTreeNode(left, right, MtasRBTreeNode.RED, 1);
-      n.addIdAndRef(id, ref, additionalId, additionalRef);
-      index.put(key, n);
+      localN = new MtasRBTreeNode(left, right, MtasRBTreeNode.RED, 1);
+      localN.addIdAndRef(id, ref, additionalId, additionalRef);
+      index.put(key, localN);
     } else {
-      if (left <= n.left) {
-        n.leftChild = addRange(n.leftChild, left, right, additionalId,
+      if (left <= localN.left) {
+        localN.leftChild = addRange(localN.leftChild, left, right, additionalId,
             additionalRef, id, ref);
-        updateMax(n, n.leftChild);
+        updateMax(localN, localN.leftChild);
       } else {
-        n.rightChild = addRange(n.rightChild, left, right, additionalId,
+        localN.rightChild = addRange(localN.rightChild, left, right, additionalId,
             additionalRef, id, ref);
-        updateMax(n, n.rightChild);
+        updateMax(localN, localN.rightChild);
       }
-      if (isRed(n.rightChild) && !isRed(n.leftChild)) {
-        n = rotateLeft(n);
+      if (isRed(localN.rightChild) && !isRed(localN.leftChild)) {
+        localN = rotateLeft(localN);
       }
-      if (isRed(n.leftChild) && isRed(n.leftChild.leftChild)) {
-        n = rotateRight(n);
+      if (isRed(localN.leftChild) && isRed(localN.leftChild.leftChild)) {
+        localN = rotateRight(localN);
       }
-      if (isRed(n.leftChild) && isRed(n.rightChild)) {
-        flipColors(n);
+      if (isRed(localN.leftChild) && isRed(localN.rightChild)) {
+        flipColors(localN);
       }
-      n.n = size(n.leftChild) + size(n.rightChild) + 1;
+      localN.n = size(localN.leftChild) + size(localN.rightChild) + 1;
     }
-    return n;
+    return localN;
   }
 
   /**
    * Update max.
    *
-   * @param n
-   *          the n
-   * @param c
-   *          the c
+   * @param n the n
+   * @param c the c
    */
   private void updateMax(MtasRBTreeNode n, MtasRBTreeNode c) {
     if (c != null) {
@@ -143,9 +133,8 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Rotate right.
    *
-   * @param n
-   *          the n
-   * @return the mtas rb tree node
+   * @param n the n
+   * @return the mtas RB tree node
    */
   private MtasRBTreeNode rotateRight(MtasRBTreeNode n) {
     assert (n != null) && isRed(n.leftChild);
@@ -165,9 +154,8 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Rotate left.
    *
-   * @param n
-   *          the n
-   * @return the mtas rb tree node
+   * @param n the n
+   * @return the mtas RB tree node
    */
   private MtasRBTreeNode rotateLeft(MtasRBTreeNode n) {
     assert (n != null) && isRed(n.rightChild);
@@ -187,8 +175,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Flip colors.
    *
-   * @param n
-   *          the n
+   * @param n the n
    */
   private void flipColors(MtasRBTreeNode n) {
     // n must have opposite color of its two children
@@ -203,8 +190,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Checks if is red.
    *
-   * @param n
-   *          the n
+   * @param n the n
    * @return true, if is red
    */
   private boolean isRed(MtasRBTreeNode n) {
@@ -217,8 +203,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Size.
    *
-   * @param n
-   *          the n
+   * @param n the n
    * @return the int
    */
   private int size(MtasRBTreeNode n) {
@@ -230,8 +215,7 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
   /**
    * Sets the max.
    *
-   * @param n
-   *          the new max
+   * @param n the new max
    */
   private void setMax(MtasRBTreeNode n) {
     n.max = n.right;

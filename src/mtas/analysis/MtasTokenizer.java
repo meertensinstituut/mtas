@@ -31,8 +31,8 @@ import org.apache.lucene.util.AttributeFactory;
 
 public final class MtasTokenizer extends Tokenizer {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasTokenizer.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasTokenizer.class);
 
   /** The Constant CONFIGURATION_MTAS. */
   public static final String CONFIGURATION_MTAS = "mtas";
@@ -160,10 +160,8 @@ public final class MtasTokenizer extends Tokenizer {
       constructTokenCollection(input);
       tokenCollectionIterator = tokenCollection.iterator();
     } catch (MtasConfigException | MtasParserException e) {
-      log.debug(e);
       tokenCollectionIterator = null;
-      throw new IOException(
-          e.getClass().getSimpleName() + ": " + e.getMessage());
+      throw new IOException(e);
     }
   }
 

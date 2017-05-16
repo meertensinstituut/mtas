@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -15,10 +14,8 @@ import mtas.codec.util.CodecUtil;
 /**
  * The Class MtasDataItemFull.
  *
- * @param <T1>
- *          the generic type
- * @param <T2>
- *          the generic type
+ * @param <T1> the generic type
+ * @param <T2> the generic type
  */
 abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataItem<T1, T2> implements Serializable {
@@ -42,24 +39,15 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Instantiates a new mtas data item full.
    *
-   * @param value
-   *          the value
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param operations
-   *          the operations
-   * @param sourceNumber
-   *          the source number
+   * @param value the value
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param operations the operations
+   * @param sourceNumber the source number
    */
   public MtasDataItemFull(T1[] value, MtasDataCollector<?, ?> sub,
       Set<String> statsItems, String sortType, String sortDirection,
@@ -108,8 +96,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
   /**
    * Gets the distribution.
    *
-   * @param arguments
-   *          the arguments
+   * @param arguments the arguments
    * @return the distribution
    */
   abstract protected HashMap<String, Object> getDistribution(String arguments);
@@ -122,8 +109,8 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
   @Override
   public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     createStats();
-    Map<String, Object> response = new HashMap<String, Object>();
-    for (String statsItem : statsItems) {
+    Map<String, Object> response = new HashMap<>();
+    for (String statsItem : getStatsItems()) {
       if (statsItem.equals(CodecUtil.STATS_TYPE_SUM)) {
         response.put(statsItem, stats.getSum());
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_N)) {
@@ -167,7 +154,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     }
     if (errorNumber > 0) {
       Map<String, Object> errorResponse = new HashMap<String, Object>();
-      for (Entry<String, Integer> entry : errorList.entrySet()) {
+      for (Entry<String, Integer> entry : getErrorList().entrySet()) {
         errorResponse.put(entry.getKey(), entry.getValue());
       }
       response.put("errorNumber", errorNumber);

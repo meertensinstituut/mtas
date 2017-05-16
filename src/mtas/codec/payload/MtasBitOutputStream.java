@@ -18,15 +18,14 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
    * Instantiates a new mtas bit output stream.
    */
   public MtasBitOutputStream() {
+    // do nothing
   }
 
   /**
    * Write bit.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeBit(int value) throws IOException {
     writeBit(value, 1);
@@ -35,16 +34,14 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
   /**
    * Write bit.
    *
-   * @param value
-   *          the value
-   * @param number
-   *          the number
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @param number the number
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeBit(int value, int number) throws IOException {
-    while (number > 0) {
-      number--;
+    int localNumber = number;
+    while (localNumber > 0) {
+      localNumber--;
       bitBuffer |= ((value & 1) << bitCount++);
       if (bitCount == 8) {
         createByte();
@@ -55,10 +52,8 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
   /**
    * Write elias gamma coding integer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeEliasGammaCodingInteger(int value) throws IOException {
     if (value >= 0) {
@@ -71,10 +66,8 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
   /**
    * Write elias gamma coding non negative integer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeEliasGammaCodingNonNegativeInteger(int value)
       throws IOException {
@@ -86,10 +79,8 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
   /**
    * Write elias gamma coding positive integer.
    *
-   * @param value
-   *          the value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param value the value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void writeEliasGammaCodingPositiveInteger(int value)
       throws IOException {
@@ -118,8 +109,7 @@ public class MtasBitOutputStream extends ByteArrayOutputStream {
   /**
    * Creates the byte.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public void createByte() throws IOException {
     if (bitCount > 0) {

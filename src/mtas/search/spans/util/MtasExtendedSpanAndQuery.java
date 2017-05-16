@@ -10,8 +10,8 @@ import org.apache.lucene.search.spans.SpanQuery;
  */
 public class MtasExtendedSpanAndQuery extends SpanNearQuery {
 
-  /** The clauses. */
-  private HashSet<SpanQuery> clauses;
+  /** The local clauses. */
+  private HashSet<SpanQuery> localClauses;
 
   /**
    * Instantiates a new mtas extended span and query.
@@ -20,9 +20,9 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
    */
   public MtasExtendedSpanAndQuery(SpanQuery... clauses) {
     super(clauses, -1 * (clauses.length - 1), false);
-    this.clauses = new HashSet<SpanQuery>();
+    this.localClauses = new HashSet<>();
     for (SpanQuery clause : clauses) {
-      this.clauses.add(clause);
+      this.localClauses.add(clause);
     }
   }
 
@@ -36,7 +36,7 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
     buffer.append(this.getClass().getSimpleName() + "([");
-    Iterator<SpanQuery> i = clauses.iterator();
+    Iterator<SpanQuery> i = localClauses.iterator();
     while (i.hasNext()) {
       SpanQuery clause = i.next();
       buffer.append(clause.toString(field));
@@ -62,7 +62,7 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
     if (getClass() != obj.getClass())
       return false;
     final MtasExtendedSpanAndQuery that = (MtasExtendedSpanAndQuery) obj;    
-    return clauses.equals(that.clauses);
+    return localClauses.equals(that.localClauses);
   }
 
   /*

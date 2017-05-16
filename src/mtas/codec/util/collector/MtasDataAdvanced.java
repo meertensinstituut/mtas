@@ -3,8 +3,9 @@ package mtas.codec.util.collector;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.DataCollector;
@@ -21,25 +22,41 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
+  /** The advanced value sum list. */
+  protected T1[] advancedValueSumList = null;
+  
   /** The new advanced value sum list. */
-  protected T1[] advancedValueSumList = null, newAdvancedValueSumList = null;
+  protected T1[] newAdvancedValueSumList = null;
 
+  /** The advanced value max list. */
+  protected T1[] advancedValueMaxList = null;
+  
   /** The new advanced value max list. */
-  protected T1[] advancedValueMaxList = null, newAdvancedValueMaxList = null;
+  protected T1[] newAdvancedValueMaxList = null;
 
+  /** The advanced value min list. */
+  protected T1[] advancedValueMinList = null;
+  
   /** The new advanced value min list. */
-  protected T1[] advancedValueMinList = null, newAdvancedValueMinList = null;
+  protected T1[] newAdvancedValueMinList = null;
 
+  /** The advanced value sum of squares list. */
+  protected T1[] advancedValueSumOfSquaresList = null;
+  
   /** The new advanced value sum of squares list. */
-  protected T1[] advancedValueSumOfSquaresList = null,
-      newAdvancedValueSumOfSquaresList = null;
+  protected T1[] newAdvancedValueSumOfSquaresList = null;
 
+  /** The advanced value sum of logs list. */
+  protected T2[] advancedValueSumOfLogsList = null;
+  
   /** The new advanced value sum of logs list. */
-  protected T2[] advancedValueSumOfLogsList = null,
-      newAdvancedValueSumOfLogsList = null;
+  protected T2[] newAdvancedValueSumOfLogsList = null;
 
-  /** The new advanced value n list. */
-  protected long[] advancedValueNList = null, newAdvancedValueNList = null;
+  /** The advanced value N list. */
+  protected long[] advancedValueNList = null;
+  
+  /** The new advanced value N list. */
+  protected long[] newAdvancedValueNList = null;
 
   /** The operations. */
   protected MtasDataOperations<T1, T2> operations;
@@ -68,10 +85,10 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataAdvanced(String collectorType, String dataType,
-      Set<String> statsItems, String sortType, String sortDirection,
+      SortedSet<String> statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
       String[] subDataTypes, String[] subStatsTypes,
-      Set<String>[] subStatsItems, String[] subSortTypes,
+      SortedSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       MtasDataOperations<T1, T2> operations, String segmentRegistration,
       String boundary) throws IOException {
@@ -105,7 +122,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   public final void error(String key, String error) throws IOException {
     if (key != null) {
       add(key, false);
-      setError(newCurrentPosition, error, newCurrentExisting);      
+      setError(newCurrentPosition, error, newCurrentExisting);
     }
   }
 
@@ -175,9 +192,12 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
         tmpOldSize);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
+  @Override
   public void reduceToSegmentKeys() {
     if (segmentRegistration != null && size > 0) {
       int sizeCopy = size;
@@ -326,7 +346,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
    * @param valueSumOfSquares the value sum of squares
    * @param valueMin the value min
    * @param valueMax the value max
-   * @param valueN the value n
+   * @param valueN the value N
    * @param currentExisting the current existing
    */
   private void setValue(int newPosition, T1 valueSum, T2 valueSumOfLogs,
@@ -413,7 +433,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
    */
   @Override
   public void merge(MtasDataCollector<?, ?> newDataCollector,
-      HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
+      Map<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
       boolean increaseSourceNumber) throws IOException {
     closeNewList();
     if (!collectorType.equals(newDataCollector.getCollectorType())

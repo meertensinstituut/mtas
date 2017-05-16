@@ -39,8 +39,7 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span prefix query.
    *
-   * @param term
-   *          the term
+   * @param term the term
    */
   public MtasSpanPrefixQuery(Term term) {
     this(term, true);
@@ -49,10 +48,8 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span prefix query.
    *
-   * @param term
-   *          the term
-   * @param singlePosition
-   *          the single position
+   * @param term the term
+   * @param singlePosition the single position
    */
   public MtasSpanPrefixQuery(Term term, boolean singlePosition) {
     super(singlePosition?1:null,singlePosition?1:null);    

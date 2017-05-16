@@ -1,6 +1,7 @@
 package mtas.analysis.token;
 
 import java.util.Arrays;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -10,14 +11,14 @@ import org.apache.commons.lang.ArrayUtils;
  */
 public class MtasPosition {
 
-  /** The position single. */
-  public final static String POSITION_SINGLE = "single";
+  /** The Constant POSITION_SINGLE. */
+  public static final String POSITION_SINGLE = "single";
 
-  /** The position range. */
-  public final static String POSITION_RANGE = "range";
+  /** The Constant POSITION_RANGE. */
+  public static final String POSITION_RANGE = "range";
 
-  /** The position set. */
-  public final static String POSITION_SET = "set";
+  /** The Constant POSITION_SET. */
+  public static final String POSITION_SET = "set";
 
   /** The mtas position type. */
   private String mtasPositionType;
@@ -34,8 +35,7 @@ public class MtasPosition {
   /**
    * Instantiates a new mtas position.
    *
-   * @param position
-   *          the position
+   * @param position the position
    */
   public MtasPosition(int position) {
     mtasPositionType = POSITION_SINGLE;
@@ -45,10 +45,8 @@ public class MtasPosition {
   /**
    * Instantiates a new mtas position.
    *
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param start the start
+   * @param end the end
    */
   public MtasPosition(int start, int end) {
     if (start == end) {
@@ -64,11 +62,10 @@ public class MtasPosition {
   /**
    * Instantiates a new mtas position.
    *
-   * @param positions
-   *          the positions
+   * @param positions the positions
    */
   public MtasPosition(int[] positions) {
-    TreeSet<Integer> list = new TreeSet<Integer>();
+    SortedSet<Integer> list = new TreeSet<>();
     for (int p : positions) {
       list.add(p);
     }
@@ -92,8 +89,7 @@ public class MtasPosition {
   /**
    * Check type.
    *
-   * @param type
-   *          the type
+   * @param type the type
    * @return the boolean
    */
   public Boolean checkType(String type) {
@@ -158,11 +154,10 @@ public class MtasPosition {
   /**
    * Adds the.
    *
-   * @param positions
-   *          the positions
+   * @param positions the positions
    */
   public void add(int[] positions) {
-    TreeSet<Integer> list = new TreeSet<Integer>();
+    SortedSet<Integer> list = new TreeSet<>();
     for (int p : positions) {
       list.add(p);
     }
@@ -195,8 +190,7 @@ public class MtasPosition {
   /**
    * Adds the.
    *
-   * @param position
-   *          the position
+   * @param position the position
    */
   public void add(int position) {
     if (mtasPositionType.equals(POSITION_SINGLE)) {
@@ -210,7 +204,7 @@ public class MtasPosition {
           mtasPositionStart = position;
         } else {
           mtasPositionType = POSITION_SET;
-          TreeSet<Integer> list = new TreeSet<Integer>();
+          SortedSet<Integer> list = new TreeSet<>();
           list.add(position);
           list.add(mtasPositionStart);
           mtasPositionList = ArrayUtils
@@ -220,7 +214,7 @@ public class MtasPosition {
         }
       }
     } else {
-      TreeSet<Integer> list = new TreeSet<Integer>();
+      SortedSet<Integer> list = new TreeSet<>();
       if (mtasPositionType.equals(POSITION_RANGE)) {
         mtasPositionType = POSITION_SET;
         for (int i = mtasPositionStart; i <= mtasPositionEnd; i++) {

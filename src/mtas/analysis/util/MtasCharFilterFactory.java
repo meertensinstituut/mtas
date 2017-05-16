@@ -1,5 +1,7 @@
 package mtas.analysis.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
@@ -16,26 +18,29 @@ import java.util.Map;
 public class MtasCharFilterFactory extends CharFilterFactory
     implements ResourceLoaderAware {
 
-  /** The argument type. */
-  public final static String ARGUMENT_TYPE = "type";
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasCharFilterFactory.class);
 
-  /** The argument prefix. */
-  public final static String ARGUMENT_PREFIX = "prefix";
+  /** The Constant ARGUMENT_TYPE. */
+  public static final String ARGUMENT_TYPE = "type";
 
-  /** The argument postfix. */
-  public final static String ARGUMENT_POSTFIX = "postfix";
+  /** The Constant ARGUMENT_PREFIX. */
+  public static final String ARGUMENT_PREFIX = "prefix";
 
-  /** The argument config. */
-  public final static String ARGUMENT_CONFIG = "config";
+  /** The Constant ARGUMENT_POSTFIX. */
+  public static final String ARGUMENT_POSTFIX = "postfix";
 
-  /** The argument default. */
-  public final static String ARGUMENT_DEFAULT = "default";
+  /** The Constant ARGUMENT_CONFIG. */
+  public static final String ARGUMENT_CONFIG = "config";
 
-  /** The value type url. */
-  public final static String VALUE_TYPE_URL = "url";
+  /** The Constant ARGUMENT_DEFAULT. */
+  public static final String ARGUMENT_DEFAULT = "default";
 
-  /** The value type file. */
-  public final static String VALUE_TYPE_FILE = "file";
+  /** The Constant VALUE_TYPE_URL. */
+  public static final String VALUE_TYPE_URL = "url";
+
+  /** The Constant VALUE_TYPE_FILE. */
+  public static final String VALUE_TYPE_FILE = "file";
 
   /** The config argument. */
   String configArgument;
@@ -48,7 +53,7 @@ public class MtasCharFilterFactory extends CharFilterFactory
 
   /** The prefix argument. */
   String prefixArgument;
-  
+
   /** The postfix argument. */
   String postfixArgument;
 
@@ -61,10 +66,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Instantiates a new mtas char filter factory.
    *
-   * @param args
-   *          the args
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param args the args
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasCharFilterFactory(Map<String, String> args) throws IOException {
     this(args, null);
@@ -73,12 +76,9 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Instantiates a new mtas char filter factory.
    *
-   * @param args
-   *          the args
-   * @param resourceLoader
-   *          the resource loader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param args the args
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasCharFilterFactory(Map<String, String> args,
       SolrResourceLoader resourceLoader) throws IOException {
@@ -110,10 +110,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Inits the.
    *
-   * @param resourceLoader
-   *          the resource loader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void init(ResourceLoader resourceLoader) throws IOException {
     if (config == null && configs == null) {
@@ -138,7 +136,7 @@ public class MtasCharFilterFactory extends CharFilterFactory
                   resourceLoader, configArgument);
             } catch (IOException e) {
               throw new IOException("problem loading configurations from "
-                  + configArgument + ": " + e.getMessage());
+                  + configArgument, e);
             }
           }
         }
@@ -158,6 +156,7 @@ public class MtasCharFilterFactory extends CharFilterFactory
     try {
       return create(input, configuration);
     } catch (IOException e) {
+      log.debug(e);
       return null;
     }
   }
@@ -165,13 +164,10 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Creates the.
    *
-   * @param input
-   *          the input
-   * @param configuration
-   *          the configuration
+   * @param input the input
+   * @param configuration the configuration
    * @return the reader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public Reader create(Reader input, String configuration) throws IOException {
     if (configs != null && configs.size() > 0) {
@@ -214,13 +210,10 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Creates the.
    *
-   * @param input
-   *          the input
-   * @param config
-   *          the config
+   * @param input the input
+   * @param config the config
    * @return the reader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public Reader create(Reader input, MtasConfiguration config)
       throws IOException {
@@ -230,21 +223,26 @@ public class MtasCharFilterFactory extends CharFilterFactory
       if (config.attributes.get(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)
           .equals(VALUE_TYPE_URL)) {
         try {
-          return fetchData.getUrl(config.attributes
-              .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX), config.attributes
-              .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));
+          return fetchData.getUrl(
+              config.attributes
+                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX),
+              config.attributes
+                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));
         } catch (MtasParserException e) {
+          log.debug(e);
           throw new IOException(e.getMessage());
         }
       } else if (config.attributes
           .get(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)
           .equals(VALUE_TYPE_FILE)) {
         try {
-          return fetchData.getFile(config.attributes
-              .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX), config.attributes
-              .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));
+          return fetchData.getFile(
+              config.attributes
+                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX),
+              config.attributes
+                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));
         } catch (MtasParserException e) {
-          throw new IOException(e.getMessage());
+          throw new IOException(e);
         }
       } else {
         return fetchData.getDefault();

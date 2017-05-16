@@ -21,13 +21,16 @@ public class MtasBufferedReader extends Reader {
   /** The cb. */
   private char cb[];
 
+  /** The n chars. */
+  private int nChars;
+  
   /** The next char. */
-  private int nChars, nextChar;
+  private int nextChar;
 
   /** The previous buffer size. */
   private int previousBufferSize;
 
-  /** The skip lf. */
+  /** The skip LF. */
   private boolean skipLF = false;
 
   /** The default char buffer size. */
@@ -39,10 +42,8 @@ public class MtasBufferedReader extends Reader {
   /**
    * Instantiates a new mtas buffered reader.
    *
-   * @param in
-   *          the in
-   * @param sz
-   *          the sz
+   * @param in the in
+   * @param sz the sz
    */
   public MtasBufferedReader(Reader in, int sz) {
     super(in);
@@ -56,8 +57,7 @@ public class MtasBufferedReader extends Reader {
   /**
    * Instantiates a new mtas buffered reader.
    *
-   * @param in
-   *          the in
+   * @param in the in
    */
   public MtasBufferedReader(Reader in) {
     this(in, defaultCharBufferSize);
@@ -66,8 +66,7 @@ public class MtasBufferedReader extends Reader {
   /**
    * Ensure open.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void ensureOpen() throws IOException {
     if (in == null)
@@ -77,8 +76,7 @@ public class MtasBufferedReader extends Reader {
   /**
    * Fill.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void fill() throws IOException {
     int n;
@@ -120,17 +118,13 @@ public class MtasBufferedReader extends Reader {
   }
 
   /**
-   * Read1.
+   * Read 1.
    *
-   * @param cbuf
-   *          the cbuf
-   * @param off
-   *          the off
-   * @param len
-   *          the len
+   * @param cbuf the cbuf
+   * @param off the off
+   * @param len the len
    * @return the int
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private int read1(char[] cbuf, int off, int len) throws IOException {
     if (nextChar >= nChars) {
@@ -195,11 +189,9 @@ public class MtasBufferedReader extends Reader {
   /**
    * Read line.
    *
-   * @param ignoreLF
-   *          the ignore lf
+   * @param ignoreLF the ignore LF
    * @return the string
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   String readLine(boolean ignoreLF) throws IOException {
     StringBuffer s = null;
@@ -266,8 +258,7 @@ public class MtasBufferedReader extends Reader {
    * Read line.
    *
    * @return the string
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public String readLine() throws IOException {
     return readLine(false);
@@ -306,7 +297,7 @@ public class MtasBufferedReader extends Reader {
             nextChar++;
           }
         }
-        long d = nChars - nextChar;
+        long d = (long) nChars - nextChar;
         if (r <= d) {
           nextChar += r;
           r = 0;

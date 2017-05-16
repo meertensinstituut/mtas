@@ -14,11 +14,16 @@ import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The Class MtasFetchData.
  */
 public class MtasFetchData {
+
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasFetchData.class);
 
   /** The reader. */
   Reader reader;
@@ -26,8 +31,7 @@ public class MtasFetchData {
   /**
    * Instantiates a new mtas fetch data.
    *
-   * @param input
-   *          the input
+   * @param input the input
    */
   public MtasFetchData(Reader input) {
     reader = input;
@@ -37,8 +41,7 @@ public class MtasFetchData {
    * Gets the string.
    *
    * @return the string
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   private String getString() throws MtasParserException {
     String text = null;
@@ -48,6 +51,7 @@ public class MtasFetchData {
       bufferedReader.close();
       return text;
     } catch (IOException e) {
+      log.debug(e);
       throw new MtasParserException("couldn't read text");
     }
   }
@@ -55,11 +59,10 @@ public class MtasFetchData {
   /**
    * Gets the url.
    *
-   * @param prefix
-   *          the prefix
+   * @param prefix the prefix
+   * @param postfix the postfix
    * @return the url
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public Reader getUrl(String prefix, String postfix)
       throws MtasParserException {
@@ -80,13 +83,15 @@ public class MtasFetchData {
           if (connection.getHeaderField("Content-Encoding") != null
               && connection.getHeaderField("Content-Encoding").equals("gzip")) {
             in = new BufferedReader(new InputStreamReader(
-                new GZIPInputStream(connection.getInputStream()), StandardCharsets.UTF_8));
+                new GZIPInputStream(connection.getInputStream()),
+                StandardCharsets.UTF_8));
           } else {
-            in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+            in = new BufferedReader(new InputStreamReader(
+                connection.getInputStream(), StandardCharsets.UTF_8));
           }
           return in;
         } catch (IOException ex) {
+          log.debug(ex);
           throw new MtasParserException("couldn't get " + url);
         }
       } else {
@@ -100,11 +105,10 @@ public class MtasFetchData {
   /**
    * Gets the file.
    *
-   * @param prefix
-   *          the prefix
+   * @param prefix the prefix
+   * @param postfix the postfix
    * @return the file
-   * @throws MtasParserException
-   *           the mtas parser exception
+   * @throws MtasParserException the mtas parser exception
    */
   public Reader getFile(String prefix, String postfix)
       throws MtasParserException {
@@ -121,11 +125,13 @@ public class MtasFetchData {
         in = new GZIPInputStream(new FileInputStream(file));
         return new InputStreamReader(in, StandardCharsets.UTF_8);
       } catch (IOException e1) {
+        log.debug(e1);
         try {
           String text = new String(Files.readAllBytes(Paths.get(file)),
               StandardCharsets.UTF_8);
           return new StringReader(text);
         } catch (IOException e2) {
+          log.debug(e2);
           throw new MtasParserException(e2.getMessage());
         }
       }

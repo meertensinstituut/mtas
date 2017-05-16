@@ -10,14 +10,29 @@ import org.apache.lucene.search.spans.SpanWeight;
 
 import mtas.search.spans.util.MtasSpanQuery;
 
+/**
+ * The Class MtasSpanNotQuery.
+ */
 public class MtasSpanNotQuery extends MtasSpanQuery {
+  
+  /** The field. */
   private String field;
   
   /** The base query. */
   private SpanNotQuery baseQuery;
   
-  private SpanQuery q1, q2;
+  /** The q 1. */
+  private SpanQuery q1;
+  
+  /** The q 2. */
+  private SpanQuery q2;
 
+  /**
+   * Instantiates a new mtas span not query.
+   *
+   * @param q1 the q 1
+   * @param q2 the q 2
+   */
   public MtasSpanNotQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1!=null?q1.getMinimumWidth():null, q2!=null?q2.getMaximumWidth():null);
     if (q1 != null && (field = q1.getField()) != null) {
@@ -34,17 +49,26 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
     baseQuery = new SpanNotQuery(q1, q2);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
   @Override
   public String getField() {
     return field;
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores);
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
@@ -56,11 +80,17 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
     }    
   }
   
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
   @Override
   public String toString(String field) {
     return baseQuery.toString(field);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -73,6 +103,9 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
     return baseQuery.equals(that.baseQuery);
   }
 
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
   @Override
   public int hashCode() {
     return baseQuery.hashCode();

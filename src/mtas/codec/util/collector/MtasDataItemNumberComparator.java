@@ -5,6 +5,11 @@ import java.io.Serializable;
 
 import mtas.codec.util.CodecUtil;
 
+/**
+ * The Class MtasDataItemNumberComparator.
+ *
+ * @param <T> the generic type
+ */
 public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>>
     implements Comparable<T>, Serializable, Cloneable {
 
@@ -14,13 +19,14 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
   /** The value. */
   T value;
 
+  /** The sort direction. */
   String sortDirection;
 
   /**
-   * Instantiates a new number comparator.
+   * Instantiates a new mtas data item number comparator.
    *
-   * @param value
-   *          the value
+   * @param value the value
+   * @param sortDirection the sort direction
    */
   public MtasDataItemNumberComparator(T value, String sortDirection) {
     this.value = value;
@@ -68,10 +74,8 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
   /**
    * Adds the.
    *
-   * @param newValue
-   *          the new value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param newValue the new value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void add(T newValue) throws IOException {
@@ -91,10 +95,8 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
   /**
    * Subtract.
    *
-   * @param newValue
-   *          the new value
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param newValue the new value
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   public void subtract(T newValue) throws IOException {
@@ -114,11 +116,9 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
   /**
    * Recompute boundary.
    *
-   * @param n
-   *          the n
-   * @return the number comparator
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param n the n
+   * @return the mtas data item number comparator
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataItemNumberComparator<T> recomputeBoundary(int n)
       throws IOException {
@@ -145,6 +145,9 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
     }
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -157,6 +160,9 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
     return value.equals(that.value);
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

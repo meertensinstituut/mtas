@@ -17,18 +17,29 @@ public class MtasCQLParserBasicSentenceCondition {
   /** The part list. */
   private List<MtasCQLParserBasicSentencePartCondition> partList;
 
+  /** The minimum occurence. */
+  private int minimumOccurence;
+  
   /** The maximum occurence. */
-  private int minimumOccurence, maximumOccurence;
+  private int maximumOccurence;
 
-  /** The optional parts. */
-  private boolean simplified, optional;
+  /** The simplified. */
+  private boolean simplified;
+  
+  /** The optional. */
+  private boolean optional;
 
+  /** The ignore clause. */
   private MtasSpanQuery ignoreClause;
   
+  /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
   
   /**
-   * Instantiates a new mtas cql parser basic sentence condition.
+   * Instantiates a new mtas CQL parser basic sentence condition.
+   *
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasCQLParserBasicSentenceCondition(MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     partList = new ArrayList<MtasCQLParserBasicSentencePartCondition>();
@@ -43,10 +54,8 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Adds the word.
    *
-   * @param w
-   *          the w
-   * @throws ParseException
-   *           the parse exception
+   * @param w the w
+   * @throws ParseException the parse exception
    */
   public void addWord(MtasCQLParserWordFullCondition w) throws ParseException {
     assert w.getCondition()
@@ -61,10 +70,8 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Adds the group.
    *
-   * @param w
-   *          the w
-   * @throws ParseException
-   *           the parse exception
+   * @param g the g
+   * @throws ParseException the parse exception
    */
   public void addGroup(MtasCQLParserGroupFullCondition g)
       throws ParseException {
@@ -78,10 +85,8 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Adds the basic sentence.
    *
-   * @param s
-   *          the s
-   * @throws ParseException
-   *           the parse exception
+   * @param s the s
+   * @throws ParseException the parse exception
    */
   public void addBasicSentence(MtasCQLParserBasicSentenceCondition s)
       throws ParseException {
@@ -115,12 +120,9 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Sets the occurence.
    *
-   * @param min
-   *          the min
-   * @param max
-   *          the max
-   * @throws ParseException
-   *           the parse exception
+   * @param min the min
+   * @param max the max
+   * @throws ParseException the parse exception
    */
   public void setOccurence(int min, int max) throws ParseException {
     if (!simplified) {
@@ -150,10 +152,8 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Sets the optional.
    *
-   * @param status
-   *          the new optional
-   * @throws ParseException
-   *           the parse exception
+   * @param status the new optional
+   * @throws ParseException the parse exception
    */
   public void setOptional(boolean status) throws ParseException {
     optional = status;
@@ -162,8 +162,7 @@ public class MtasCQLParserBasicSentenceCondition {
   /**
    * Simplify.
    *
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public void simplify() throws ParseException {
     if (!simplified) {
@@ -181,7 +180,8 @@ public class MtasCQLParserBasicSentenceCondition {
             optionalParts = false;
           }
         } else {
-          int newMinimumOccurence, newMaximumOccurence;
+          int newMinimumOccurence;
+          int newMaximumOccurence;
           if (!lastPart.isOptional() && !part.isOptional()) {
             newMinimumOccurence = lastPart.getMinimumOccurence()
                 + part.getMinimumOccurence();
@@ -251,8 +251,7 @@ public class MtasCQLParserBasicSentenceCondition {
    * Gets the query.
    *
    * @return the query
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   public MtasSpanQuery getQuery() throws ParseException {
     simplify();

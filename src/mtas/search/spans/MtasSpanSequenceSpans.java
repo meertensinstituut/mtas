@@ -28,10 +28,13 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
   /** The queue matches. */
   private List<Match> queueMatches;
 
-  /** The current position. */
+  /** The doc id. */
   private int docId;
+  
+  /** The current position. */
   private int currentPosition;
 
+  /** The cost. */
   private long cost;
 
   /** The current match. */
@@ -40,14 +43,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span sequence spans.
    *
-   * @param mtasSpanSequenceQuery
-   *          the mtas span sequence query
-   * @param setSequenceSpans
-   *          the set sequence spans
-   * @param ignoreSpans
-   *          the ignore spans
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
+   * @param setSequenceSpans the set sequence spans
+   * @param ignoreSpans the ignore spans
+   * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasSpanSequenceSpans(
       List<MtasSpanSequenceQuerySpans> setSequenceSpans, Spans ignoreSpans,
@@ -64,6 +62,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     computeCosts();
   }
 
+  /**
+   * Compute costs.
+   */
   private void computeCosts() {
     cost = Long.MAX_VALUE;
     for (QueueItem item : queueSpans) {
@@ -169,8 +170,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -279,11 +279,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
   /**
    * Advance to doc.
    *
-   * @param target
-   *          the target
+   * @param target the target
    * @return the integer
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Integer advanceToDoc(int target) throws IOException {
     if (docId == NO_MORE_DOCS || target <= docId) {
@@ -336,8 +334,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
    * Find matches.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean findMatches() throws IOException {
     Boolean status = _findMatches();
@@ -348,11 +345,10 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
   }
 
   /**
-   * _find matches.
+   * Find matches.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean _findMatches() throws IOException {
     // queue not empty
@@ -527,17 +523,13 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
   }
 
   /**
-   * _glue.
+   * Glue.
    *
-   * @param subMatchesQueue
-   *          the sub matches queue
-   * @param subMatchesOptional
-   *          the sub matches optional
-   * @param item
-   *          the item
+   * @param subMatchesQueue the sub matches queue
+   * @param subMatchesOptional the sub matches optional
+   * @param item the item
    * @return the list
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private List<Match> _glue(List<Match> subMatchesQueue,
       Boolean subMatchesOptional, QueueItem item) throws IOException {
@@ -673,18 +665,11 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
   /**
    * Fill queue.
    *
-   * @param item
-   *          the item
-   * @param minStartPosition
-   *          the min start position
-   * @param maxStartPosition
-   *          the max start position
-   * @param minEndPosition
-   *          the min end position
-   * @param adjustIgnore
-   *          the adjust ignore
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param item the item
+   * @param minStartPosition the min start position
+   * @param maxStartPosition the max start position
+   * @param minEndPosition the min end position
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void fillQueue(QueueItem item, Integer minStartPosition,
       Integer maxStartPosition, Integer minEndPosition) throws IOException {
@@ -755,14 +740,22 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
    */
   private static class QueueItem {
 
-    /** The filled position. */
+    /** The no more docs. */
     private boolean noMoreDocs;
+    
+    /** The no more positions. */
     private boolean noMorePositions;
+    
+    /** The filled position. */
     private boolean filledPosition;
 
-    /** The last retrieved position. */
+    /** The lowest position. */
     private Integer lowestPosition;
+    
+    /** The last filled position. */
     private Integer lastFilledPosition;
+    
+    /** The last retrieved position. */
     private Integer lastRetrievedPosition;
 
     /** The queue. */
@@ -774,8 +767,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     /**
      * Instantiates a new queue item.
      *
-     * @param sequenceSpans
-     *          the sequence spans
+     * @param sequenceSpans the sequence spans
      */
     QueueItem(MtasSpanSequenceQuerySpans sequenceSpans) {
       noMoreDocs = false;
@@ -799,10 +791,8 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     /**
      * Adds the.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     public void add(int startPosition, int endPosition) {
       if (!queue.keySet().contains(startPosition)) {
@@ -822,8 +812,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     /**
      * Del.
      *
-     * @param position
-     *          the position
+     * @param position the position
      */
     public void del(int position) {
       ArrayList<Integer> removePositions = new ArrayList<>();
@@ -866,10 +855,8 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
     /**
      * Instantiates a new match.
      *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
+     * @param startPosition the start position
+     * @param endPosition the end position
      */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
@@ -912,6 +899,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
           && endPosition == that.endPosition;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
       int h = this.getClass().getSimpleName().hashCode();

@@ -44,8 +44,8 @@ import mtas.solr.schema.MtasPreAnalyzedField;
 public class MtasUpdateRequestProcessorFactory
     extends UpdateRequestProcessorFactory {
 
-  /** The log. */
-  private static Log log = LogFactory
+  /** The Constant log. */
+  private static final Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorFactory.class);
 
   /** The config. */
@@ -67,10 +67,8 @@ public class MtasUpdateRequestProcessorFactory
   /**
    * Inits the.
    *
-   * @param req
-   *          the req
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param req the req
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {
@@ -337,7 +335,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             // tokenizerFactory
             result = new MtasUpdateRequestProcessorResultWriter(storedValue);
             int numberOfPositions = 0;
-            int numberOfTokens = 0;            
+            int numberOfTokens = 0;
             try {
               MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
               tokenizer.setReader(sizeReader);

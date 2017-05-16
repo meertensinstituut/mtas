@@ -11,8 +11,17 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
  */
 public class IntervalTreeNodeData<T> {
 
+  /** The start. */
+  public int start;
+
+  /** The end. */
+  public int end;
+
+  /** The hit start. */
+  public int hitStart;
+
   /** The hit end. */
-  public int start, end, hitStart, hitEnd;
+  public int hitEnd;
 
   /** The list. */
   public ArrayList<MtasTreeHit<T>> list;
@@ -33,7 +42,9 @@ public class IntervalTreeNodeData<T> {
     list = new ArrayList<MtasTreeHit<T>>();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   public String toString() {

@@ -3,7 +3,7 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +25,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentDocument
     implements MtasSolrComponent<ComponentDocument> {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasSolrComponentDocument.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentDocument.class);
 
   /** The Constant PARAM_MTAS_DOCUMENT. */
   public static final String PARAM_MTAS_DOCUMENT = MtasSolrSearchComponent.PARAM_MTAS
@@ -78,8 +78,13 @@ public class MtasSolrComponentDocument
     // do nothing for now
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -208,8 +213,12 @@ public class MtasSolrComponentDocument
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentDocument document,
       Boolean encode) throws IOException {
@@ -224,7 +233,7 @@ public class MtasSolrComponentDocument
         list = document.statsList.get(docId);
       }
       mtasDocumentItemResponse.add("stats", new MtasSolrMtasResult(stats,
-          stats.getDataType(), stats.getStatsType(), stats.statsItems, null));
+          stats.getDataType(), stats.getStatsType(), stats.getStatsItems(), null));
       mtasDocumentItemResponse.add("documentKey",
           document.uniqueKey.get(docId));
       if (list != null) {
@@ -233,12 +242,12 @@ public class MtasSolrComponentDocument
               new MtasSolrMtasResult(list,
                   new String[] { list.getDataType(), list.getDataType() },
                   new String[] { list.getStatsType(), list.getStatsType() },
-                  new Set[] { list.statsItems, list.statsItems },
+                  new SortedSet[] { list.getStatsItems(), list.getStatsItems() },
                   new String[] { null, null }, new String[] { null, null },
                   new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
         } else {
           mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
-              list.getDataType(), list.getStatsType(), list.statsItems, null));
+              list.getDataType(), list.getStatsType(), list.getStatsItems(), null));
         }
 
       }
@@ -250,8 +259,14 @@ public class MtasSolrComponentDocument
     return mtasDocumentResponse;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -276,8 +291,12 @@ public class MtasSolrComponentDocument
 
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
@@ -292,8 +311,13 @@ public class MtasSolrComponentDocument
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {

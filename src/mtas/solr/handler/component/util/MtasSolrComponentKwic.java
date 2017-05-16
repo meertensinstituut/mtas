@@ -3,8 +3,10 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.solr.common.util.NamedList;
@@ -83,8 +85,7 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Instantiates a new mtas solr component kwic.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentKwic(MtasSolrSearchComponent searchComponent) {
   }
@@ -92,8 +93,7 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
   /**
    * Gets the positive integer.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -104,15 +104,8 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     }
   }
 
-  /**
-   * Prepare.
-   *
-   * @param rb
-   *          the rb
-   * @param mtasFields
-   *          the mtas fields
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -271,12 +264,8 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param kwic
-   *          the kwic
-   * @return the simple ordered map
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentKwic kwic, Boolean encode) {
     SimpleOrderedMap<Object> mtasKwicResponse = new SimpleOrderedMap<>();
@@ -285,13 +274,13 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_HIT)) {
       for (int docId : kwic.hits.keySet()) {
         NamedList<Object> mtasKwicItemResponse = new SimpleOrderedMap<>();
-        ArrayList<KwicHit> list = kwic.hits.get(docId);
-        ArrayList<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<>();
+        List<KwicHit> list = kwic.hits.get(docId);
+        List<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<>();
         for (KwicHit h : list) {
           NamedList<Object> mtasKwicItemResponseItem = new SimpleOrderedMap<>();
-          TreeMap<Integer, ArrayList<ArrayList<String>>> hitData = new TreeMap<>();
-          TreeMap<Integer, ArrayList<ArrayList<String>>> leftData = null;
-          TreeMap<Integer, ArrayList<ArrayList<String>>> rightData = null;
+          SortedMap<Integer, List<List<String>>> hitData = new TreeMap<>();
+          SortedMap<Integer, List<List<String>>> leftData = null;
+          SortedMap<Integer, List<List<String>>> rightData = null;
           if (kwic.left > 0) {
             leftData = new TreeMap<>();
           }
@@ -302,9 +291,9 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
               h.startPosition - kwic.left); position <= (h.endPosition
                   + kwic.right); position++) {
             if (h.hits.containsKey(position)) {
-              ArrayList<ArrayList<String>> hitDataItem = new ArrayList<>();
+              List<List<String>> hitDataItem = new ArrayList<>();
               for (String term : h.hits.get(position)) {
-                ArrayList<String> hitDataSubItem = new ArrayList<>();
+                List<String> hitDataSubItem = new ArrayList<>();
                 hitDataSubItem.add(CodecUtil.termPrefix(term));
                 hitDataSubItem.add(CodecUtil.termValue(term));
                 hitDataItem.add(hitDataSubItem);
@@ -343,8 +332,8 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     } else if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_TOKEN)) {
       for (int docId : kwic.tokens.keySet()) {
         NamedList<Object> mtasKwicItemResponse = new SimpleOrderedMap<>();
-        ArrayList<KwicToken> list = kwic.tokens.get(docId);
-        ArrayList<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<>();
+        List<KwicToken> list = kwic.tokens.get(docId);
+        List<NamedList<Object>> mtasKwicItemResponseItems = new ArrayList<>();
         for (KwicToken k : list) {
           NamedList<Object> mtasKwicItemResponseItem = new SimpleOrderedMap<>();
           mtasKwicItemResponseItem.add("startPosition", k.startPosition);
@@ -406,15 +395,8 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     return mtasKwicResponse;
   }
 
-  /**
-   * Modify request.
-   *
-   * @param rb
-   *          the rb
-   * @param who
-   *          the who
-   * @param sreq
-   *          the sreq
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -456,11 +438,8 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     }
   }
 
-  /**
-   * Finish stage.
-   *
-   * @param rb
-   *          the rb
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
@@ -475,6 +454,9 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+   */
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // nothing to do

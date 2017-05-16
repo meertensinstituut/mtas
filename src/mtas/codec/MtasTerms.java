@@ -28,14 +28,10 @@ public class MtasTerms extends Terms {
   /**
    * Instantiates a new mtas terms.
    *
-   * @param terms
-   *          the terms
-   * @param indexInputList
-   *          the index input list
-   * @param indexInputOffsetList
-   *          the index input offset list
-   * @param version
-   *          the version
+   * @param terms the terms
+   * @param indexInputList the index input list
+   * @param indexInputOffsetList the index input offset list
+   * @param version the version
    */
   public MtasTerms(Terms terms, HashMap<String, IndexInput> indexInputList,
       HashMap<String, Long> indexInputOffsetList, int version) {

@@ -52,27 +52,25 @@ public class MtasFunctionParserFunctionBasic
   private ArrayList<Integer> tmpIdList = new ArrayList<>();
 
   /** The Constant BASIC_OPERATOR_ADD. */
-  public final static String BASIC_OPERATOR_ADD = "add";
+  public static final String BASIC_OPERATOR_ADD = "add";
 
   /** The Constant BASIC_OPERATOR_SUBTRACT. */
-  public final static String BASIC_OPERATOR_SUBTRACT = "subtract";
+  public static final String BASIC_OPERATOR_SUBTRACT = "subtract";
 
   /** The Constant BASIC_OPERATOR_MULTIPLY. */
-  public final static String BASIC_OPERATOR_MULTIPLY = "multiply";
+  public static final String BASIC_OPERATOR_MULTIPLY = "multiply";
 
   /** The Constant BASIC_OPERATOR_DIVIDE. */
-  public final static String BASIC_OPERATOR_DIVIDE = "divide";
+  public static final String BASIC_OPERATOR_DIVIDE = "divide";
 
   /** The Constant BASIC_OPERATOR_POWER. */
-  public final static String BASIC_OPERATOR_POWER = "power";
+  public static final String BASIC_OPERATOR_POWER = "power";
 
   /**
    * Instantiates a new mtas function parser function basic.
    *
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   public MtasFunctionParserFunctionBasic(MtasFunctionParserItem item)
       throws ParseException {
@@ -194,10 +192,8 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Adds the.
    *
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   public void add(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_ADD, item);
@@ -206,10 +202,8 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Subtract.
    *
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   public void subtract(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_SUBTRACT, item);
@@ -218,10 +212,8 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Multiply.
    *
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   public void multiply(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_MULTIPLY, item);
@@ -230,10 +222,8 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Divide.
    *
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   public void divide(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_DIVIDE, item);
@@ -242,10 +232,8 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Power.
    *
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   public void power(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_POWER, item);
@@ -254,12 +242,9 @@ public class MtasFunctionParserFunctionBasic
   /**
    * Basic.
    *
-   * @param operator
-   *          the operator
-   * @param item
-   *          the item
-   * @throws ParseException
-   *           the parse exception
+   * @param operator the operator
+   * @param item the item
+   * @throws ParseException the parse exception
    */
   private void basic(String operator, MtasFunctionParserItem item)
       throws ParseException {
@@ -763,7 +748,7 @@ public class MtasFunctionParserFunctionBasic
       }
       return sum;
     } catch (java.lang.ArithmeticException e) {
-      throw new IOException(e.getMessage());
+      throw new IOException(e);
     }
   }
 
@@ -802,10 +787,8 @@ public class MtasFunctionParserFunctionBasic
   /**
    * To string.
    *
-   * @param type
-   *          the type
-   * @param id
-   *          the id
+   * @param type the type
+   * @param id the id
    * @return the string
    */
   private String toString(String type, int id) {

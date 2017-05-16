@@ -35,12 +35,10 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   public static final String MTAS_CQL_WILDCARD_QUERY = "wildcard";
 
   /**
-   * Instantiates a new mtas cql parser group query.
+   * Instantiates a new mtas CQL parser group query.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
+   * @param field the field
+   * @param prefix the prefix
    */
   public MtasCQLParserGroupQuery(String field, String prefix) {
     super(null, null);
@@ -49,30 +47,23 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   }
 
   /**
-   * Instantiates a new mtas cql parser group query.
+   * Instantiates a new mtas CQL parser group query.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param value
-   *          the value
+   * @param field the field
+   * @param prefix the prefix
+   * @param value the value
    */
   public MtasCQLParserGroupQuery(String field, String prefix, String value) {
     this(field, prefix, value, MTAS_CQL_REGEXP_QUERY);
   }
 
   /**
-   * Instantiates a new mtas cql parser group query.
+   * Instantiates a new mtas CQL parser group query.
    *
-   * @param field
-   *          the field
-   * @param prefix
-   *          the prefix
-   * @param value
-   *          the value
-   * @param type
-   *          the type
+   * @param field the field
+   * @param prefix the prefix
+   * @param value the value
+   * @param type the type
    */
   public MtasCQLParserGroupQuery(String field, String prefix, String value,
       String type) {

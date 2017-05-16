@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.params.SolrParams;
@@ -30,8 +28,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentGroup
     implements MtasSolrComponent<ComponentGroup> {
 
-  /** The log. */
-  private static Log log = LogFactory.getLog(MtasSolrComponentGroup.class);
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrComponentGroup.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -459,7 +457,7 @@ public class MtasSolrComponentGroup
     mtasGroupResponse.add("key", group.key);
     MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,
         new String[] { group.dataType }, new String[] { group.statsType },
-        new TreeSet[] { group.statsItems }, new String[] { group.sortType },
+        new SortedSet[] { group.statsItems }, new String[] { group.sortType },
         new String[] { group.sortDirection }, new Integer[] { group.start },
         new Integer[] { group.number }, null);
     if (encode) {

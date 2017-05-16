@@ -1,9 +1,7 @@
 package mtas.codec.util.collector;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import mtas.codec.util.CodecUtil;
 
 /**
@@ -18,32 +16,19 @@ public class MtasDataItemDoubleAdvanced
   /**
    * Instantiates a new mtas data item double advanced.
    *
-   * @param valueSum
-   *          the value sum
-   * @param valueSumOfLogs
-   *          the value sum of logs
-   * @param valueSumOfSquares
-   *          the value sum of squares
-   * @param valueMin
-   *          the value min
-   * @param valueMax
-   *          the value max
-   * @param valueN
-   *          the value n
-   * @param sub
-   *          the sub
-   * @param statsItems
-   *          the stats items
-   * @param sortType
-   *          the sort type
-   * @param sortDirection
-   *          the sort direction
-   * @param errorNumber
-   *          the error number
-   * @param errorList
-   *          the error list
-   * @param sourceNumber
-   *          the source number
+   * @param valueSum the value sum
+   * @param valueSumOfLogs the value sum of logs
+   * @param valueSumOfSquares the value sum of squares
+   * @param valueMin the value min
+   * @param valueMax the value max
+   * @param valueN the value N
+   * @param sub the sub
+   * @param statsItems the stats items
+   * @param sortType the sort type
+   * @param sortDirection the sort direction
+   * @param errorNumber the error number
+   * @param errorList the error list
+   * @param sourceNumber the source number
    */
   public MtasDataItemDoubleAdvanced(Double valueSum, Double valueSumOfLogs,
       Double valueSumOfSquares, Double valueMin, Double valueMax, long valueN,
@@ -125,6 +110,9 @@ public class MtasDataItemDoubleAdvanced
         + "]";
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -139,6 +127,9 @@ public class MtasDataItemDoubleAdvanced
     return (c1!=null&&c2!=null&&c1.equals(c2));    
   }
   
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();

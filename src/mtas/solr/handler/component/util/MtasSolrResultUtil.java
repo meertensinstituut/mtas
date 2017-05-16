@@ -19,6 +19,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.Base64;
 import org.apache.solr.common.util.NamedList;
@@ -36,12 +38,22 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public class MtasSolrResultUtil {
 
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasSolrResultUtil.class);
+
   /** The Constant QUERY_TYPE_CQL. */
   public static final String QUERY_TYPE_CQL = "cql";
 
   /** The Constant patternKeyStartGrouphit. */
   public static final Pattern patternKeyStartGrouphit = Pattern
       .compile("^" + GroupHit.KEY_START);
+
+  /**
+   * Instantiates a new mtas solr result util.
+   */
+  private MtasSolrResultUtil() {
+    // do nothing
+  }
 
   /**
    * Rewrite.
@@ -57,7 +69,7 @@ public class MtasSolrResultUtil {
       } else if (al.get(i) instanceof ArrayList) {
         rewrite((ArrayList) al.get(i));
       }
-    }
+    }        
   }
 
   /**
@@ -67,7 +79,7 @@ public class MtasSolrResultUtil {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void rewrite(NamedList<Object> nl) throws IOException {
-    rewrite(nl, true);
+    rewrite(nl, true);    
   }
 
   /**
@@ -108,7 +120,7 @@ public class MtasSolrResultUtil {
                 mdi.rewrite(showDebugInfo);
                 nnl.setVal(j, mdi);
               }
-            }            
+            }
             //System.out.println("rewrite -- "+nnl);
             nl.setVal(i, rewriteToArray(nnl));
             //System.out.println("rewrite! "+nl.getVal(i));
@@ -247,7 +259,7 @@ public class MtasSolrResultUtil {
       byte[] byteArray = byteArrayOutputStream.toByteArray();
       return Base64.byteArrayToBase64(byteArray);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e);
       return null;
     }
   }
@@ -266,7 +278,7 @@ public class MtasSolrResultUtil {
           new ByteArrayInputStream(bytes));
       return objectInputStream.readObject();
     } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error(e);
       return null;
     }
   }
@@ -340,7 +352,7 @@ public class MtasSolrResultUtil {
    */
   public static SortedSet<String> getIdsFromParameters(SolrParams params,
       String prefix) {
-    SortedSet<String> ids = new TreeSet<String>();
+    SortedSet<String> ids = new TreeSet<>();
     Iterator<String> it = params.getParameterNamesIterator();
     Pattern pattern = Pattern
         .compile("^" + Pattern.quote(prefix) + "\\.([^\\.]+)(\\..*|$)");
@@ -393,13 +405,13 @@ public class MtasSolrResultUtil {
    * @param field the field
    * @param queryIgnore the query ignore
    * @param maximumIgnoreLength the maximum ignore length
-   * @return the span query
+   * @return the mtas span query
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static MtasSpanQuery constructQuery(String queryValue, String queryType,
-      String queryPrefix, HashMap<String, String[]> queryVariables,
-      String field, String queryIgnore, Integer maximumIgnoreLength)
-      throws IOException {
+  public static MtasSpanQuery constructQuery(String queryValue,
+      String queryType, String queryPrefix,
+      HashMap<String, String[]> queryVariables, String field,
+      String queryIgnore, Integer maximumIgnoreLength) throws IOException {
     if (queryType == null || queryType.isEmpty()) {
       throw new IOException("no (valid) type for query " + queryValue);
     } else if (queryValue == null || queryValue.isEmpty()) {
@@ -413,12 +425,12 @@ public class MtasSolrResultUtil {
         MtasCQLParser ip = new MtasCQLParser(queryIgnoreReader);
         try {
           ignore = ip.parse(field, null, null, null, null);
-        } catch (mtas.parser.cql.ParseException e) {
+        } catch (mtas.parser.cql.ParseException e) {          
           throw new IOException("couldn't parse " + queryType + " query "
-              + queryIgnore + " (" + e.getMessage() + ")");
+              + queryIgnore + " (" + e.getMessage() + ")", e);
         } catch (TokenMgrError e) {
           throw new IOException("couldn't parse " + queryType + " query "
-              + queryIgnore + " (" + e.getMessage() + ")");
+              + queryIgnore + " (" + e.getMessage() + ")", e);
         }
       } else {
         throw new IOException(
@@ -433,10 +445,10 @@ public class MtasSolrResultUtil {
             maximumIgnoreLength);
       } catch (mtas.parser.cql.ParseException e) {
         throw new IOException("couldn't parse " + queryType + " query "
-            + queryValue + " (" + e.getMessage() + ")");
+            + queryValue + " (" + e.getMessage() + ")", e);
       } catch (TokenMgrError e) {
         throw new IOException("couldn't parse " + queryType + " query "
-            + queryValue + " (" + e.getMessage() + ")");
+            + queryValue + " (" + e.getMessage() + ")", e);
       }
     } else {
       throw new IOException(

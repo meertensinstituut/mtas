@@ -16,7 +16,7 @@ final public class MtasElanParser extends MtasXMLParser {
    *
    * @param config the config
    */
-  public MtasElanParser(MtasConfiguration config) {
+  public MtasElanParser(MtasConfiguration config) { 
     super(config);
   }
 

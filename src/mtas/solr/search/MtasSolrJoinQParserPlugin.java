@@ -7,7 +7,7 @@ import org.apache.solr.search.QParser;
 import org.apache.solr.search.QParserPlugin;
 
 /**
- * The Class MtasSolrCQLQParserPlugin.
+ * The Class MtasSolrJoinQParserPlugin.
  */
 public class MtasSolrJoinQParserPlugin extends QParserPlugin {
 
@@ -20,6 +20,7 @@ public class MtasSolrJoinQParserPlugin extends QParserPlugin {
   @SuppressWarnings("rawtypes")
   @Override
   public void init(NamedList args) {
+    // don't do anything
   }
 
   /*
