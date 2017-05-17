@@ -240,7 +240,8 @@ abstract public class MtasParser {
       }
       for (String id : updateableIdsWithOffset) {
         if (idOffsets.containsKey(id)) {
-          if (idOffsets.get(id) == null) {
+          Integer[] currentOffset = idOffsets.get(id);
+          if (currentOffset == null || currentOffset.length==0) {
             idOffsets.put(id,
                 new Integer[] { objectOffsetStart, objectOffsetEnd });
           }
