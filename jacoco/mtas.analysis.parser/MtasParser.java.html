@@ -240,13 +240,14 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L240">      }</span>
 <span class="pc bpc" id="L241" title="1 of 2 branches missed.">      for (String id : updateableIdsWithOffset) {</span>
 <span class="nc bnc" id="L242" title="All 2 branches missed.">        if (idOffsets.containsKey(id)) {</span>
-<span class="nc bnc" id="L243" title="All 2 branches missed.">          if (idOffsets.get(id) == null) {</span>
-<span class="nc" id="L244">            idOffsets.put(id,</span>
+<span class="nc" id="L243">          Integer[] currentOffset = idOffsets.get(id);</span>
+<span class="nc bnc" id="L244" title="All 4 branches missed.">          if (currentOffset == null || currentOffset.length==0) {</span>
+<span class="nc" id="L245">            idOffsets.put(id,</span>
                 new Integer[] { objectOffsetStart, objectOffsetEnd });
           }
         }
-<span class="nc" id="L248">      }</span>
-<span class="fc" id="L249">    }</span>
+<span class="nc" id="L249">      }</span>
+<span class="fc" id="L250">    }</span>
 
     /**
      * Gets the attribute.
@@ -255,10 +256,10 @@ import mtas.analysis.util.MtasParserException;
      * @return the attribute
      */
     public String getAttribute(String name) {
-<span class="pc bpc" id="L258" title="1 of 2 branches missed.">      if (name != null) {</span>
-<span class="fc" id="L259">        return objectAttributes.get(name);</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">      if (name != null) {</span>
+<span class="fc" id="L260">        return objectAttributes.get(name);</span>
       } else {
-<span class="nc" id="L261">        return null;</span>
+<span class="nc" id="L262">        return null;</span>
       }
     }
 
@@ -268,7 +269,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the id
      */
     public String getId() {
-<span class="fc" id="L271">      return objectId;</span>
+<span class="fc" id="L272">      return objectId;</span>
     }
 
     /**
@@ -277,7 +278,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the type
      */
     MtasParserType getType() {
-<span class="fc" id="L280">      return objectType;</span>
+<span class="fc" id="L281">      return objectType;</span>
     }
 
     /**
@@ -286,8 +287,8 @@ import mtas.analysis.util.MtasParserException;
      * @param text the new text
      */
     public void setText(String text) {
-<span class="nc" id="L289">      objectText = text;</span>
-<span class="nc" id="L290">    }</span>
+<span class="nc" id="L290">      objectText = text;</span>
+<span class="nc" id="L291">    }</span>
 
     /**
      * Adds the text.
@@ -295,12 +296,12 @@ import mtas.analysis.util.MtasParserException;
      * @param text the text
      */
     public void addText(String text) {
-<span class="fc bfc" id="L298" title="All 2 branches covered.">      if (objectText == null) {</span>
-<span class="fc" id="L299">        objectText = text;</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">      if (objectText == null) {</span>
+<span class="fc" id="L300">        objectText = text;</span>
       } else {
-<span class="fc" id="L301">        objectText += text;</span>
+<span class="fc" id="L302">        objectText += text;</span>
       }
-<span class="fc" id="L303">    }</span>
+<span class="fc" id="L304">    }</span>
 
     /**
      * Gets the text.
@@ -308,7 +309,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the text
      */
     public String getText() {
-<span class="fc" id="L311">      return objectText;</span>
+<span class="fc" id="L312">      return objectText;</span>
     }
 
     /**
@@ -317,8 +318,8 @@ import mtas.analysis.util.MtasParserException;
      * @param i the new unknown ancestor number
      */
     public void setUnknownAncestorNumber(Integer i) {
-<span class="fc" id="L320">      objectUnknownAncestorNumber = i;</span>
-<span class="fc" id="L321">    }</span>
+<span class="fc" id="L321">      objectUnknownAncestorNumber = i;</span>
+<span class="fc" id="L322">    }</span>
 
     /**
      * Gets the unknown ancestor number.
@@ -326,7 +327,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the unknown ancestor number
      */
     public Integer getUnknownAncestorNumber() {
-<span class="fc" id="L329">      return objectUnknownAncestorNumber;</span>
+<span class="fc" id="L330">      return objectUnknownAncestorNumber;</span>
     }
 
     /**
@@ -335,8 +336,8 @@ import mtas.analysis.util.MtasParserException;
      * @param start the new real offset start
      */
     public void setRealOffsetStart(Integer start) {
-<span class="fc" id="L338">      objectRealOffsetStart = start;</span>
-<span class="fc" id="L339">    }</span>
+<span class="fc" id="L339">      objectRealOffsetStart = start;</span>
+<span class="fc" id="L340">    }</span>
 
     /**
      * Gets the real offset start.
@@ -344,7 +345,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the real offset start
      */
     public Integer getRealOffsetStart() {
-<span class="fc" id="L347">      return objectRealOffsetStart;</span>
+<span class="fc" id="L348">      return objectRealOffsetStart;</span>
     }
 
     /**
@@ -353,8 +354,8 @@ import mtas.analysis.util.MtasParserException;
      * @param end the new real offset end
      */
     public void setRealOffsetEnd(Integer end) {
-<span class="fc" id="L356">      objectRealOffsetEnd = end;</span>
-<span class="fc" id="L357">    }</span>
+<span class="fc" id="L357">      objectRealOffsetEnd = end;</span>
+<span class="fc" id="L358">    }</span>
 
     /**
      * Gets the real offset end.
@@ -362,7 +363,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the real offset end
      */
     public Integer getRealOffsetEnd() {
-<span class="fc" id="L365">      return objectRealOffsetEnd;</span>
+<span class="fc" id="L366">      return objectRealOffsetEnd;</span>
     }
 
     /**
@@ -371,8 +372,8 @@ import mtas.analysis.util.MtasParserException;
      * @param start the new offset start
      */
     public void setOffsetStart(Integer start) {
-<span class="fc" id="L374">      objectOffsetStart = start;</span>
-<span class="fc" id="L375">    }</span>
+<span class="fc" id="L375">      objectOffsetStart = start;</span>
+<span class="fc" id="L376">    }</span>
 
     /**
      * Adds the offset start.
@@ -380,11 +381,11 @@ import mtas.analysis.util.MtasParserException;
      * @param start the start
      */
     public void addOffsetStart(Integer start) {
-<span class="pc bpc" id="L383" title="1 of 4 branches missed.">      if ((start != null)</span>
-<span class="pc bpc" id="L384" title="1 of 2 branches missed.">          &amp;&amp; ((objectOffsetStart == null) || (start &lt; objectOffsetStart))) {</span>
-<span class="fc" id="L385">        objectOffsetStart = start;</span>
+<span class="pc bpc" id="L384" title="1 of 4 branches missed.">      if ((start != null)</span>
+<span class="pc bpc" id="L385" title="1 of 2 branches missed.">          &amp;&amp; ((objectOffsetStart == null) || (start &lt; objectOffsetStart))) {</span>
+<span class="fc" id="L386">        objectOffsetStart = start;</span>
       }
-<span class="fc" id="L387">    }</span>
+<span class="fc" id="L388">    }</span>
 
     /**
      * Adds the offset end.
@@ -392,11 +393,11 @@ import mtas.analysis.util.MtasParserException;
      * @param end the end
      */
     public void addOffsetEnd(Integer end) {
-<span class="pc bpc" id="L395" title="1 of 4 branches missed.">      if ((end != null)</span>
-<span class="pc bpc" id="L396" title="1 of 2 branches missed.">          &amp;&amp; ((objectOffsetEnd == null) || (end &gt; objectOffsetEnd))) {</span>
-<span class="fc" id="L397">        objectOffsetEnd = end;</span>
+<span class="pc bpc" id="L396" title="1 of 4 branches missed.">      if ((end != null)</span>
+<span class="pc bpc" id="L397" title="1 of 2 branches missed.">          &amp;&amp; ((objectOffsetEnd == null) || (end &gt; objectOffsetEnd))) {</span>
+<span class="fc" id="L398">        objectOffsetEnd = end;</span>
       }
-<span class="fc" id="L399">    }</span>
+<span class="fc" id="L400">    }</span>
 
     /**
      * Gets the offset start.
@@ -404,7 +405,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the offset start
      */
     public Integer getOffsetStart() {
-<span class="fc" id="L407">      return objectOffsetStart;</span>
+<span class="fc" id="L408">      return objectOffsetStart;</span>
     }
 
     /**
@@ -413,8 +414,8 @@ import mtas.analysis.util.MtasParserException;
      * @param end the new offset end
      */
     public void setOffsetEnd(Integer end) {
-<span class="fc" id="L416">      objectOffsetEnd = end;</span>
-<span class="fc" id="L417">    }</span>
+<span class="fc" id="L417">      objectOffsetEnd = end;</span>
+<span class="fc" id="L418">    }</span>
 
     /**
      * Gets the offset end.
@@ -422,7 +423,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the offset end
      */
     public Integer getOffsetEnd() {
-<span class="fc" id="L425">      return objectOffsetEnd;</span>
+<span class="fc" id="L426">      return objectOffsetEnd;</span>
     }
 
     /**
@@ -431,10 +432,10 @@ import mtas.analysis.util.MtasParserException;
      * @return the offset
      */
     public Integer[] getOffset() {
-<span class="fc bfc" id="L434" title="All 2 branches covered.">      if (objectOffsetStart != null) {</span>
-<span class="fc" id="L435">        return new Integer[] { objectOffsetStart, objectOffsetEnd };</span>
+<span class="fc bfc" id="L435" title="All 2 branches covered.">      if (objectOffsetStart != null) {</span>
+<span class="fc" id="L436">        return new Integer[] { objectOffsetStart, objectOffsetEnd };</span>
       } else {
-<span class="fc" id="L437">        return new Integer[0];</span>
+<span class="fc" id="L438">        return new Integer[0];</span>
       }
     }
 
@@ -444,8 +445,8 @@ import mtas.analysis.util.MtasParserException;
      * @param position the position
      */
     public void addPosition(Integer position) {
-<span class="fc" id="L447">      objectPositions.add(position);</span>
-<span class="fc" id="L448">    }</span>
+<span class="fc" id="L448">      objectPositions.add(position);</span>
+<span class="fc" id="L449">    }</span>
 
     /**
      * Adds the positions.
@@ -453,8 +454,8 @@ import mtas.analysis.util.MtasParserException;
      * @param positions the positions
      */
     public void addPositions(Set&lt;Integer&gt; positions) {
-<span class="fc" id="L456">      objectPositions.addAll(positions);</span>
-<span class="fc" id="L457">    }</span>
+<span class="fc" id="L457">      objectPositions.addAll(positions);</span>
+<span class="fc" id="L458">    }</span>
 
     /**
      * Gets the positions.
@@ -462,7 +463,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the positions
      */
     public SortedSet&lt;Integer&gt; getPositions() {
-<span class="fc" id="L465">      return objectPositions;</span>
+<span class="fc" id="L466">      return objectPositions;</span>
     }
 
     /**
@@ -471,10 +472,10 @@ import mtas.analysis.util.MtasParserException;
      * @param id the id
      */
     public void addRefId(String id) {
-<span class="pc bpc" id="L474" title="1 of 2 branches missed.">      if (id != null) {</span>
-<span class="fc" id="L475">        refIds.add(id);</span>
+<span class="pc bpc" id="L475" title="1 of 2 branches missed.">      if (id != null) {</span>
+<span class="fc" id="L476">        refIds.add(id);</span>
       }
-<span class="fc" id="L477">    }</span>
+<span class="fc" id="L478">    }</span>
 
     /**
      * Gets the ref ids.
@@ -482,7 +483,7 @@ import mtas.analysis.util.MtasParserException;
      * @return the ref ids
      */
     public Set&lt;String&gt; getRefIds() {
-<span class="fc" id="L485">      return refIds;</span>
+<span class="fc" id="L486">      return refIds;</span>
     }
 
     /**
@@ -492,8 +493,8 @@ import mtas.analysis.util.MtasParserException;
      * @param position the position
      */
     public void setReferredStartPosition(String id, Integer position) {
-<span class="nc" id="L495">      referredStartPosition.put(id, position);</span>
-<span class="nc" id="L496">    }</span>
+<span class="nc" id="L496">      referredStartPosition.put(id, position);</span>
+<span class="nc" id="L497">    }</span>
 
     /**
      * Sets the referred end position.
@@ -502,8 +503,8 @@ import mtas.analysis.util.MtasParserException;
      * @param position the position
      */
     public void setReferredEndPosition(String id, Integer position) {
-<span class="nc" id="L505">      referredEndPosition.put(id, position);</span>
-<span class="nc" id="L506">    }</span>
+<span class="nc" id="L506">      referredEndPosition.put(id, position);</span>
+<span class="nc" id="L507">    }</span>
 
     /**
      * Sets the referred start offset.
@@ -512,8 +513,8 @@ import mtas.analysis.util.MtasParserException;
      * @param offset the offset
      */
     public void setReferredStartOffset(String id, Integer offset) {
-<span class="nc" id="L515">      referredStartOffset.put(id, offset);</span>
-<span class="nc" id="L516">    }</span>
+<span class="nc" id="L516">      referredStartOffset.put(id, offset);</span>
+<span class="nc" id="L517">    }</span>
 
     /**
      * Sets the referred end offset.
@@ -522,18 +523,18 @@ import mtas.analysis.util.MtasParserException;
      * @param offset the offset
      */
     public void setReferredEndOffset(String id, Integer offset) {
-<span class="nc" id="L525">      referredEndOffset.put(id, offset);</span>
-<span class="nc" id="L526">    }</span>
+<span class="nc" id="L526">      referredEndOffset.put(id, offset);</span>
+<span class="nc" id="L527">    }</span>
 
     /**
      * Clear referred.
      */
     public void clearReferred() {
-<span class="nc" id="L532">      referredStartPosition.clear();</span>
-<span class="nc" id="L533">      referredEndPosition.clear();</span>
-<span class="nc" id="L534">      referredStartOffset.clear();</span>
-<span class="nc" id="L535">      referredEndOffset.clear();</span>
-<span class="nc" id="L536">    }</span>
+<span class="nc" id="L533">      referredStartPosition.clear();</span>
+<span class="nc" id="L534">      referredEndPosition.clear();</span>
+<span class="nc" id="L535">      referredStartOffset.clear();</span>
+<span class="nc" id="L536">      referredEndOffset.clear();</span>
+<span class="nc" id="L537">    }</span>
 
   }
 

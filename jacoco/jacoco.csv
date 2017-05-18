@@ -27,7 +27,7 @@ MTAS,mtas.analysis.parser,MtasBasicParser.MtasParserMapping,1498,1245,205,123,27
 MTAS,mtas.analysis.parser,MtasSketchParser.MtasSketchParserMappingGroup,21,0,0,0,8,0,2,0,2,0
 MTAS,mtas.analysis.parser,MtasBasicParser.MtasParserVariable,192,0,16,0,27,0,11,0,3,0
 MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingRelation,2,19,0,0,1,7,1,1,1,1
-MTAS,mtas.analysis.parser,MtasParser.MtasParserObject,129,308,17,19,31,83,21,35,8,30
+MTAS,mtas.analysis.parser,MtasParser.MtasParserObject,135,308,19,19,32,83,22,35,8,30
 MTAS,mtas.analysis.parser,MtasBasicParser.MtasParserVariableValue,9,0,0,0,4,0,1,0,1,0
 MTAS,mtas.analysis.parser,MtasSketchParser,1180,0,124,0,214,0,68,0,6,0
 MTAS,mtas.analysis.parser,MtasXMLParser,1290,1834,149,212,179,401,127,66,4,6
