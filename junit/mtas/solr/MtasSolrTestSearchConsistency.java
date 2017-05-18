@@ -210,7 +210,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.termvector.0.type", "n,sum");       
     //create full
     params.set("mtas.termvector.0.full", true);    
-    params.set("mtas.termvector.0.number", Integer.MAX_VALUE);    
+    params.set("mtas.termvector.0.number", -1);    
     SolrRequest<?> requestFull = new QueryRequest(params, METHOD.POST);
     NamedList<Object> responseFull;
     try {

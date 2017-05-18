@@ -262,7 +262,8 @@ public class MtasSolrTestDistributedSearchConsistency {
         COLLECTION_ALL_MULTIPLE_SEGMENTS, COLLECTION_DISTRIBUTED };
     for (String sort : new String[] { "term", "sum" }) {
       for (String direction : new String[] { "asc", "desc" }) {
-        for (int number : new Integer[]{1,2,3,4,5,6,7,8,9,10,20,100,1000}) {
+        for (int number : new Integer[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20,
+            100, 1000 }) {
           params.clear();
           params.set("q", "*:*");
           params.set("rows", 0);
