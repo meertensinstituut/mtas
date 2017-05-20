@@ -289,7 +289,7 @@ public class MtasSolrComponentStats
 <span class="fc bfc" id="L289" title="All 2 branches covered.">      for (String field : fields) {</span>
 <span class="pc bpc" id="L290" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
 <span class="nc" id="L291">          throw new IOException(&quot;no (valid) field in mtas stats tokens&quot;);</span>
-<span class="pc bpc" id="L292" title="1 of 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">        } else if (!mtasFields.list.containsKey(field)) {</span>
 <span class="fc" id="L293">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
@@ -510,8 +510,8 @@ public class MtasSolrComponentStats
               queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],
               fields[i], queryIgnores[i][j], maximumIgnoreLength);
           // minimize number of queries
-<span class="pc bpc" id="L513" title="1 of 2 branches missed.">          if (cf.spanQueryList.contains(q)) {</span>
-<span class="nc" id="L514">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
+<span class="fc bfc" id="L513" title="All 2 branches covered.">          if (cf.spanQueryList.contains(q)) {</span>
+<span class="fc" id="L514">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
           } else {
 <span class="fc" id="L516">            cf.spanQueryList.add(q);</span>
           }

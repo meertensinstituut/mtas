@@ -127,7 +127,7 @@ abstract class MtasDataItemBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;
    * @see mtas.codec.util.collector.MtasDataItem#getCompareValueType()
    */
   public final int getCompareValueType() throws IOException {
-<span class="pc bpc" id="L130" title="11 of 14 branches missed.">    switch (sortType) {</span>
+<span class="pc bpc" id="L130" title="9 of 14 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_N:
 <span class="nc" id="L132">      return 0;</span>
     case CodecUtil.STATS_TYPE_SUM:
@@ -135,7 +135,7 @@ abstract class MtasDataItemBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;
     case CodecUtil.STATS_TYPE_MEAN:
 <span class="nc" id="L136">      return 2;</span>
     default:
-<span class="nc" id="L138">      throw new IOException(&quot;sortType &quot; + sortType + &quot; not supported&quot;);</span>
+<span class="fc" id="L138">      throw new IOException(&quot;sortType &quot; + sortType + &quot; not supported&quot;);</span>
     }
   }
 

@@ -41,27 +41,27 @@ public class MtasUpdateRequestProcessorResultItem implements Serializable {
    * @param flags the flags
    */
   public MtasUpdateRequestProcessorResultItem(String term, Integer offsetStart,
-<span class="nc" id="L44">      Integer offsetEnd, Integer posIncr, BytesRef payload, Integer flags) {</span>
-<span class="nc" id="L45">    tokenTerm = term;</span>
-<span class="nc bnc" id="L46" title="All 4 branches missed.">    if (offsetStart != null &amp;&amp; offsetEnd != null) {</span>
-<span class="nc" id="L47">      tokenOffsetStart = offsetStart;</span>
-<span class="nc" id="L48">      tokenOffsetEnd = offsetEnd;</span>
+<span class="fc" id="L44">      Integer offsetEnd, Integer posIncr, BytesRef payload, Integer flags) {</span>
+<span class="fc" id="L45">    tokenTerm = term;</span>
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">    if (offsetStart != null &amp;&amp; offsetEnd != null) {</span>
+<span class="fc" id="L47">      tokenOffsetStart = offsetStart;</span>
+<span class="fc" id="L48">      tokenOffsetEnd = offsetEnd;</span>
     } else {
 <span class="nc" id="L50">      tokenOffsetStart = null;</span>
 <span class="nc" id="L51">      tokenOffsetEnd = null;</span>
     }
-<span class="nc bnc" id="L53" title="All 4 branches missed.">    if (posIncr != null &amp;&amp; posIncr != 1) {</span>
-<span class="nc" id="L54">      tokenPosIncr = posIncr;</span>
+<span class="pc bpc" id="L53" title="1 of 4 branches missed.">    if (posIncr != null &amp;&amp; posIncr != 1) {</span>
+<span class="fc" id="L54">      tokenPosIncr = posIncr;</span>
     } else {
-<span class="nc" id="L56">      tokenPosIncr = null;</span>
+<span class="fc" id="L56">      tokenPosIncr = null;</span>
     }
-<span class="nc bnc" id="L58" title="All 2 branches missed.">    if (payload != null) {</span>
-<span class="nc" id="L59">      tokenPayload = payload.bytes;</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (payload != null) {</span>
+<span class="fc" id="L59">      tokenPayload = payload.bytes;</span>
     } else {
 <span class="nc" id="L61">      tokenPayload = null;</span>
     }
-<span class="nc" id="L63">    tokenFlags = flags;</span>
-<span class="nc" id="L64">  }</span>
+<span class="fc" id="L63">    tokenFlags = flags;</span>
+<span class="fc" id="L64">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

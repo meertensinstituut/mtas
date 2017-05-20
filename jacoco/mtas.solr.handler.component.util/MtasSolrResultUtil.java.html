@@ -143,12 +143,12 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L143">        } else if (o.dataCollector.getCollectorType()</span>
 <span class="pc bpc" id="L144" title="1 of 2 branches missed.">            .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
 <span class="fc" id="L145">          NamedList&lt;Object&gt; nnl = o.getData(showDebugInfo);</span>
-<span class="pc bpc" id="L146" title="1 of 2 branches missed.">          if (nnl.size() &gt; 0) {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">          if (nnl.size() &gt; 0) {</span>
 <span class="fc" id="L147">            rewrite(nnl);</span>
 <span class="fc" id="L148">            collapseNamedList.put(nl.getName(i), nnl);</span>
 <span class="fc" id="L149">            nl.setVal(i, nnl);</span>
           } else {
-<span class="nc" id="L151">            nl.setVal(i, null);</span>
+<span class="fc" id="L151">            nl.setVal(i, null);</span>
           }
         }
       }

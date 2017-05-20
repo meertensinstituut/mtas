@@ -219,7 +219,7 @@ public class MtasSolrMtasResult implements Serializable {
       }
       // main result
 <span class="fc" id="L221">      MtasDataItem&lt;?, ?&gt; dataItem = dataCollector.getResult().getData();</span>
-<span class="pc bpc" id="L222" title="1 of 2 branches missed.">      if (dataItem != null) {</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">      if (dataItem != null) {</span>
 <span class="fc" id="L223">        mtasResponse.addAll(dataItem.rewrite(showDebugInfo));</span>
 <span class="pc bpc" id="L224" title="1 of 2 branches missed.">        if (functionList.size() &gt; 0) {</span>
 <span class="nc" id="L225">          mtasResponse.add(&quot;functions&quot;, functionList);</span>

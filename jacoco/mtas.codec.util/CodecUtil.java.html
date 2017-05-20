@@ -193,12 +193,12 @@ public class CodecUtil {
    * @return the string
    */
   public static String termPrefix(String term) {
-<span class="nc" id="L196">    int i = term.indexOf(MtasToken.DELIMITER);</span>
-<span class="nc" id="L197">    String prefix = term;</span>
-<span class="nc bnc" id="L198" title="All 2 branches missed.">    if (i &gt;= 0) {</span>
-<span class="nc" id="L199">      prefix = term.substring(0, i);</span>
+<span class="fc" id="L196">    int i = term.indexOf(MtasToken.DELIMITER);</span>
+<span class="fc" id="L197">    String prefix = term;</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="fc" id="L199">      prefix = term.substring(0, i);</span>
     }
-<span class="nc" id="L201">    return prefix.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
+<span class="fc" id="L201">    return prefix.replace(&quot;\u0000&quot;, &quot;&quot;);</span>
   }
 
   /**
@@ -272,7 +272,7 @@ public class CodecUtil {
   static SortedSet&lt;String&gt; createStatsItems(String statsType) throws IOException {
 <span class="fc" id="L273">    SortedSet&lt;String&gt; statsItems = new TreeSet&lt;&gt;();</span>
 <span class="fc" id="L274">    SortedSet&lt;String&gt; functionItems = new TreeSet&lt;&gt;();</span>
-<span class="pc bpc" id="L275" title="1 of 2 branches missed.">    if (statsType != null) {</span>
+<span class="fc bfc" id="L275" title="All 2 branches covered.">    if (statsType != null) {</span>
 <span class="fc" id="L276">      Matcher m = fpStatsItems.matcher(statsType.trim());</span>
 <span class="fc bfc" id="L277" title="All 2 branches covered.">      while (m.find()) {</span>
 <span class="fc" id="L278">        String tmpStatsItem = m.group(2).trim();</span>
@@ -294,10 +294,10 @@ public class CodecUtil {
         }
 <span class="fc" id="L295">      }</span>
     }
-<span class="pc bpc" id="L297" title="3 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
-<span class="nc" id="L298">      statsItems.add(STATS_TYPE_SUM);</span>
-<span class="nc" id="L299">      statsItems.add(STATS_TYPE_N);</span>
-<span class="nc" id="L300">      statsItems.add(STATS_TYPE_MEAN);</span>
+<span class="pc bpc" id="L297" title="1 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
+<span class="fc" id="L298">      statsItems.add(STATS_TYPE_SUM);</span>
+<span class="fc" id="L299">      statsItems.add(STATS_TYPE_N);</span>
+<span class="fc" id="L300">      statsItems.add(STATS_TYPE_MEAN);</span>
     }
 <span class="pc bpc" id="L302" title="1 of 2 branches missed.">    if (functionItems.size() &gt; 0) {</span>
 <span class="nc" id="L303">      statsItems.addAll(functionItems);</span>

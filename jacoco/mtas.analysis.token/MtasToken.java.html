@@ -707,7 +707,7 @@ public abstract class MtasToken {
 <span class="fc" id="L707">    HashMap&lt;String, Automaton&gt; automatonMap = new HashMap&lt;&gt;();</span>
 <span class="pc bpc" id="L708" title="1 of 2 branches missed.">    if (valueList != null) {</span>
 <span class="fc bfc" id="L709" title="All 2 branches covered.">      for (String item : valueList) {</span>
-<span class="pc bpc" id="L710" title="1 of 2 branches missed.">        if (filter) {</span>
+<span class="fc bfc" id="L710" title="All 2 branches covered.">        if (filter) {</span>
 <span class="fc" id="L711">          item = item.replaceAll(&quot;([\\\&quot;\\)\\(\\&lt;\\&gt;\\.\\@\\#\\]\\[\\{\\}])&quot;,</span>
               &quot;\\\\$1&quot;);
         }
@@ -750,9 +750,9 @@ public abstract class MtasToken {
       String regexp, Map&lt;String, Automaton&gt; automatonMap) throws IOException {
 <span class="fc" id="L751">    List&lt;CompiledAutomaton&gt; list = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L752">    Automaton automatonRegexp = null;</span>
-<span class="pc bpc" id="L753" title="1 of 2 branches missed.">    if (regexp != null) {</span>
-<span class="nc" id="L754">      RegExp re = new RegExp(prefix + MtasToken.DELIMITER + regexp + &quot;\u0000*&quot;);</span>
-<span class="nc" id="L755">      automatonRegexp = re.toAutomaton();</span>
+<span class="fc bfc" id="L753" title="All 2 branches covered.">    if (regexp != null) {</span>
+<span class="fc" id="L754">      RegExp re = new RegExp(prefix + MtasToken.DELIMITER + regexp + &quot;\u0000*&quot;);</span>
+<span class="fc" id="L755">      automatonRegexp = re.toAutomaton();</span>
     }
 <span class="fc" id="L757">    int step = 500;</span>
 <span class="fc" id="L758">    List&lt;String&gt; keyList = new ArrayList&lt;&gt;(automatonMap.keySet());</span>
@@ -769,8 +769,8 @@ public abstract class MtasToken {
         }
 <span class="fc" id="L770">        Automaton automatonList = Operations.union(listAutomaton);</span>
         Automaton automaton;
-<span class="pc bpc" id="L772" title="1 of 2 branches missed.">        if (automatonRegexp != null) {</span>
-<span class="nc" id="L773">          automaton = Operations.intersection(automatonList, automatonRegexp);</span>
+<span class="fc bfc" id="L772" title="All 2 branches covered.">        if (automatonRegexp != null) {</span>
+<span class="fc" id="L773">          automaton = Operations.intersection(automatonList, automatonRegexp);</span>
         } else {
 <span class="fc" id="L775">          automaton = automatonList;</span>
         }

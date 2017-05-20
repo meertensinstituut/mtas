@@ -1259,11 +1259,11 @@ public class CodecCollector {
                 }
               }
 <span class="fc bfc" id="L1261" title="All 2 branches covered.">              for (int docId : docSet) {</span>
-<span class="pc bpc" id="L1262" title="1 of 2 branches missed.">                if (positionsData == null) {</span>
+<span class="fc bfc" id="L1262" title="All 2 branches covered.">                if (positionsData == null) {</span>
 <span class="fc" id="L1263">                  positions = 0;</span>
                 } else {
-<span class="nc bnc" id="L1265" title="All 2 branches missed.">                  positions = (positionsData.get(docId) == null ? 0</span>
-<span class="nc" id="L1266">                      : positionsData.get(docId));</span>
+<span class="pc bpc" id="L1265" title="1 of 2 branches missed.">                  positions = (positionsData.get(docId) == null ? 0</span>
+<span class="fc" id="L1266">                      : positionsData.get(docId));</span>
                 }
 <span class="fc" id="L1268">                valueLong = span.parser.getValueLong(args.get(docId),</span>
                     positions);
@@ -2855,7 +2855,7 @@ public class CodecCollector {
 <span class="fc" id="L2855">            compiledAutomaton = new CompiledAutomaton(automaton);</span>
 <span class="fc" id="L2856">            listAutomata.add(compiledAutomaton);</span>
 <span class="fc" id="L2857">          } else {</span>
-<span class="pc bpc" id="L2858" title="1 of 2 branches missed.">            automatonMap = MtasToken.createAutomatonMap(termVector.prefix,</span>
+<span class="fc bfc" id="L2858" title="All 2 branches covered.">            automatonMap = MtasToken.createAutomatonMap(termVector.prefix,</span>
                 new ArrayList&lt;String&gt;(termVector.list),
 <span class="fc" id="L2860">                termVector.listRegexp ? false : true);</span>
 <span class="fc" id="L2861">            listAutomata = MtasToken.createAutomata(termVector.prefix,</span>
@@ -2870,16 +2870,16 @@ public class CodecCollector {
 <span class="fc" id="L2870">            ignoreByteRunAutomatonList</span>
 <span class="fc" id="L2871">                .add(new ByteRunAutomaton(re.toAutomaton()));</span>
           }
-<span class="pc bpc" id="L2873" title="1 of 2 branches missed.">          if (termVector.ignoreList != null) {</span>
-<span class="nc bnc" id="L2874" title="All 2 branches missed.">            if (ignoreByteRunAutomatonList == null) {</span>
+<span class="fc bfc" id="L2873" title="All 2 branches covered.">          if (termVector.ignoreList != null) {</span>
+<span class="pc bpc" id="L2874" title="1 of 2 branches missed.">            if (ignoreByteRunAutomatonList == null) {</span>
 <span class="nc" id="L2875">              ignoreByteRunAutomatonList = new ArrayList&lt;&gt;();</span>
             }
-<span class="nc bnc" id="L2877" title="All 2 branches missed.">            Map&lt;String, Automaton&gt; list = MtasToken.createAutomatonMap(</span>
+<span class="pc bpc" id="L2877" title="1 of 2 branches missed.">            Map&lt;String, Automaton&gt; list = MtasToken.createAutomatonMap(</span>
                 termVector.prefix, new ArrayList&lt;String&gt;(termVector.ignoreList),
-<span class="nc" id="L2879">                termVector.ignoreListRegexp ? false : true);</span>
-<span class="nc bnc" id="L2880" title="All 2 branches missed.">            for (Automaton automaton : list.values()) {</span>
-<span class="nc" id="L2881">              ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));</span>
-<span class="nc" id="L2882">            }</span>
+<span class="fc" id="L2879">                termVector.ignoreListRegexp ? false : true);</span>
+<span class="fc bfc" id="L2880" title="All 2 branches covered.">            for (Automaton automaton : list.values()) {</span>
+<span class="fc" id="L2881">              ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));</span>
+<span class="fc" id="L2882">            }</span>
           }
 
 <span class="fc bfc" id="L2885" title="All 2 branches covered.">          for (CompiledAutomaton compiledAutomaton : listAutomata) {</span>
@@ -2921,14 +2921,14 @@ public class CodecCollector {
 <span class="fc" id="L2921">                    acceptedTerm = true;</span>
 <span class="fc bfc" id="L2922" title="All 2 branches covered.">                    if (ignoreByteRunAutomatonList != null) {</span>
 <span class="fc bfc" id="L2923" title="All 2 branches covered.">                      for (ByteRunAutomaton ignoreByteRunAutomaton : ignoreByteRunAutomatonList) {</span>
-<span class="pc bpc" id="L2924" title="1 of 2 branches missed.">                        if (ignoreByteRunAutomaton.run(term.bytes, term.offset,</span>
+<span class="fc bfc" id="L2924" title="All 2 branches covered.">                        if (ignoreByteRunAutomaton.run(term.bytes, term.offset,</span>
                             term.length)) {
-<span class="nc" id="L2926">                          acceptedTerm = false;</span>
-<span class="nc" id="L2927">                          break;</span>
+<span class="fc" id="L2926">                          acceptedTerm = false;</span>
+<span class="fc" id="L2927">                          break;</span>
                         }
 <span class="fc" id="L2929">                      }</span>
                     }
-<span class="pc bpc" id="L2931" title="1 of 2 branches missed.">                    if (acceptedTerm) {</span>
+<span class="fc bfc" id="L2931" title="All 2 branches covered.">                    if (acceptedTerm) {</span>
 <span class="fc bfc" id="L2932" title="All 2 branches covered.">                      if (doBasic) {</span>
                         // compute numbers;
 <span class="fc" id="L2934">                        TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(</span>
@@ -3096,16 +3096,16 @@ public class CodecCollector {
 <span class="fc" id="L3096">          ignoreByteRunAutomatonList</span>
 <span class="fc" id="L3097">              .add(new ByteRunAutomaton(re.toAutomaton()));</span>
         }
-<span class="pc bpc" id="L3099" title="1 of 2 branches missed.">        if (termVector.ignoreList != null) {</span>
-<span class="nc bnc" id="L3100" title="All 2 branches missed.">          if (ignoreByteRunAutomatonList == null) {</span>
+<span class="fc bfc" id="L3099" title="All 2 branches covered.">        if (termVector.ignoreList != null) {</span>
+<span class="pc bpc" id="L3100" title="1 of 2 branches missed.">          if (ignoreByteRunAutomatonList == null) {</span>
 <span class="nc" id="L3101">            ignoreByteRunAutomatonList = new ArrayList&lt;&gt;();</span>
           }
-<span class="nc bnc" id="L3103" title="All 2 branches missed.">          Map&lt;String, Automaton&gt; list = MtasToken.createAutomatonMap(</span>
+<span class="pc bpc" id="L3103" title="1 of 2 branches missed.">          Map&lt;String, Automaton&gt; list = MtasToken.createAutomatonMap(</span>
               termVector.prefix, new ArrayList&lt;String&gt;(termVector.ignoreList),
-<span class="nc" id="L3105">              termVector.ignoreListRegexp ? false : true);</span>
-<span class="nc bnc" id="L3106" title="All 2 branches missed.">          for (Automaton automaton : list.values()) {</span>
-<span class="nc" id="L3107">            ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));</span>
-<span class="nc" id="L3108">          }</span>
+<span class="fc" id="L3105">              termVector.ignoreListRegexp ? false : true);</span>
+<span class="fc bfc" id="L3106" title="All 2 branches covered.">          for (Automaton automaton : list.values()) {</span>
+<span class="fc" id="L3107">            ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));</span>
+<span class="fc" id="L3108">          }</span>
         }
 <span class="fc bfc" id="L3110" title="All 4 branches covered.">        if (!termVector.full &amp;&amp; termVector.list == null) {</span>
 <span class="fc" id="L3111">          termsEnum = t.intersect(compiledAutomaton, null);</span>

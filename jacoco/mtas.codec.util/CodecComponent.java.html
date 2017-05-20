@@ -1419,9 +1419,9 @@ public class CodecComponent {
         }
       }
 <span class="fc" id="L1421">      this.ignoreRegexp = ignoreRegexp;</span>
-<span class="pc bpc" id="L1422" title="3 of 4 branches missed.">      if (ignoreList != null &amp;&amp; ignoreList.length &gt; 0) {</span>
-<span class="nc" id="L1423">        this.ignoreList = new HashSet(Arrays.asList(ignoreList));</span>
-<span class="nc bnc" id="L1424" title="All 2 branches missed.">        this.ignoreListRegexp = ignoreListRegexp != null ? ignoreListRegexp</span>
+<span class="pc bpc" id="L1422" title="1 of 4 branches missed.">      if (ignoreList != null &amp;&amp; ignoreList.length &gt; 0) {</span>
+<span class="fc" id="L1423">        this.ignoreList = new HashSet(Arrays.asList(ignoreList));</span>
+<span class="pc bpc" id="L1424" title="1 of 2 branches missed.">        this.ignoreListRegexp = ignoreListRegexp != null ? ignoreListRegexp</span>
             : false;
       } else {
 <span class="fc" id="L1427">        this.ignoreList = null;</span>

@@ -17,8 +17,8 @@ import org.apache.commons.logging.LogFactory;
 public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
   /** The Constant log. */
-<span class="nc" id="L20">  private static final Log log = LogFactory</span>
-<span class="nc" id="L21">      .getLog(MtasUpdateRequestProcessorResultReader.class);</span>
+<span class="fc" id="L20">  private static final Log log = LogFactory</span>
+<span class="fc" id="L21">      .getLog(MtasUpdateRequestProcessorResultReader.class);</span>
 
   /** The stored string value. */
   private String storedStringValue;
@@ -45,34 +45,34 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasUpdateRequestProcessorResultReader(String fileName)
-<span class="nc" id="L48">      throws IOException {</span>
-<span class="nc" id="L49">    file = null;</span>
-<span class="nc" id="L50">    fileInputStream = null;</span>
-<span class="nc" id="L51">    objectInputStream = null;</span>
-<span class="nc" id="L52">    closed = false;</span>
-<span class="nc" id="L53">    iterator = null;</span>
-<span class="nc bnc" id="L54" title="All 2 branches missed.">    if (fileName != null) {</span>
-<span class="nc" id="L55">      file = new File(fileName);</span>
-<span class="nc" id="L56">      fileInputStream = new FileInputStream(file);</span>
-<span class="nc" id="L57">      objectInputStream = new ObjectInputStream(fileInputStream);</span>
+<span class="fc" id="L48">      throws IOException {</span>
+<span class="fc" id="L49">    file = null;</span>
+<span class="fc" id="L50">    fileInputStream = null;</span>
+<span class="fc" id="L51">    objectInputStream = null;</span>
+<span class="fc" id="L52">    closed = false;</span>
+<span class="fc" id="L53">    iterator = null;</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">    if (fileName != null) {</span>
+<span class="fc" id="L55">      file = new File(fileName);</span>
+<span class="fc" id="L56">      fileInputStream = new FileInputStream(file);</span>
+<span class="fc" id="L57">      objectInputStream = new ObjectInputStream(fileInputStream);</span>
       try {
-<span class="nc" id="L59">        Object o = objectInputStream.readObject();</span>
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (o instanceof String) {</span>
-<span class="nc" id="L61">          storedStringValue = (String) o;</span>
+<span class="fc" id="L59">        Object o = objectInputStream.readObject();</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if (o instanceof String) {</span>
+<span class="fc" id="L61">          storedStringValue = (String) o;</span>
         } else {
 <span class="nc" id="L63">          throw new IOException(&quot;invalid tokenStream&quot;);</span>
         }
-<span class="nc" id="L65">        iterator = new Iterator&lt;MtasUpdateRequestProcessorResultItem&gt;() {</span>
-<span class="nc" id="L66">          MtasUpdateRequestProcessorResultItem next = null;</span>
+<span class="fc" id="L65">        iterator = new Iterator&lt;MtasUpdateRequestProcessorResultItem&gt;() {</span>
+<span class="fc" id="L66">          MtasUpdateRequestProcessorResultItem next = null;</span>
 
           @Override
           public boolean hasNext() {
-<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (!closed) {</span>
-<span class="nc bnc" id="L71" title="All 2 branches missed.">              if (next != null) {</span>
-<span class="nc" id="L72">                return true;</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">            if (!closed) {</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">              if (next != null) {</span>
+<span class="fc" id="L72">                return true;</span>
               } else {
-<span class="nc" id="L74">                next = getNext();</span>
-<span class="nc bnc" id="L75" title="All 2 branches missed.">                return next != null;</span>
+<span class="fc" id="L74">                next = getNext();                </span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">                return next != null;</span>
               }
             } else {
 <span class="nc" id="L78">              return false;</span>
@@ -81,12 +81,12 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
           @Override
           public MtasUpdateRequestProcessorResultItem next() {
-<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (!closed) {</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">            if (!closed) {</span>
               MtasUpdateRequestProcessorResultItem result;
-<span class="nc bnc" id="L86" title="All 2 branches missed.">              if (next != null) {</span>
-<span class="nc" id="L87">                result = next;</span>
-<span class="nc" id="L88">                next = null;</span>
-<span class="nc" id="L89">                return result;</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">              if (next != null) {</span>
+<span class="fc" id="L87">                result = next;</span>
+<span class="fc" id="L88">                next = null;</span>
+<span class="fc" id="L89">                return result;</span>
               } else {
 <span class="nc" id="L91">                next = getNext();</span>
 <span class="nc bnc" id="L92" title="All 2 branches missed.">                if (next != null) {</span>
@@ -103,20 +103,20 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
           }
 
           private MtasUpdateRequestProcessorResultItem getNext() {
-<span class="nc bnc" id="L106" title="All 2 branches missed.">            if (!closed) {</span>
-              try {
-<span class="nc" id="L108">                Object o = objectInputStream.readObject();</span>
-<span class="nc bnc" id="L109" title="All 2 branches missed.">                if (o instanceof MtasUpdateRequestProcessorResultItem) {</span>
-<span class="nc" id="L110">                  return (MtasUpdateRequestProcessorResultItem) o;</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">            if (!closed) {</span>
+              try {                
+<span class="fc" id="L108">                Object o = objectInputStream.readObject();</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">                if (o instanceof MtasUpdateRequestProcessorResultItem) {</span>
+<span class="fc" id="L110">                  return (MtasUpdateRequestProcessorResultItem) o;</span>
                 } else {
 <span class="nc" id="L112">                  forceClose();</span>
 <span class="nc" id="L113">                  return null;</span>
                 }
-<span class="nc" id="L115">              } catch (ClassNotFoundException | IOException e) {</span>
-<span class="nc" id="L116">                log.debug(e.getClass().getSimpleName()</span>
+<span class="fc" id="L115">              } catch (ClassNotFoundException | IOException e) {</span>
+<span class="fc" id="L116">                log.debug(e.getClass().getSimpleName()</span>
                     + &quot; while retrieving data from &quot; + fileName, e);
-<span class="nc" id="L118">                forceClose();</span>
-<span class="nc" id="L119">                return null;</span>
+<span class="fc" id="L118">                forceClose();</span>
+<span class="fc" id="L119">                return null;</span>
               }
             } else {
 <span class="nc" id="L122">              return null;</span>
@@ -133,10 +133,10 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 <span class="nc" id="L133">            + &quot; (&quot; + e.getMessage() + &quot;)&quot;, e);</span>
 <span class="nc" id="L134">        forceClose();</span>
 <span class="nc" id="L135">        throw new IOException(&quot;invalid tokenStream&quot;);</span>
-<span class="nc" id="L136">      }</span>
+<span class="fc" id="L136">      }</span>
     }
 
-<span class="nc" id="L139">  }</span>
+<span class="fc" id="L139">  }</span>
 
   /**
    * Gets the stored string value.
@@ -144,7 +144,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @return the stored string value
    */
   public String getStoredStringValue() {
-<span class="nc" id="L147">    return storedStringValue;</span>
+<span class="fc" id="L147">    return storedStringValue;</span>
   }
 
   /**
@@ -152,8 +152,8 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    *
    * @return the stored bin value
    */
-  public byte[] getStoredBinValue() {
-<span class="nc" id="L156">    return new byte[0];</span>
+  public byte[] getStoredBinValue() {    
+<span class="fc" id="L156">    return null;</span>
   }
 
   /**
@@ -162,7 +162,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @return the iterator
    */
   public Iterator&lt;MtasUpdateRequestProcessorResultItem&gt; getIterator() {
-<span class="nc" id="L165">    return iterator;</span>
+<span class="fc" id="L165">    return iterator;</span>
   }
 
   /*
@@ -179,19 +179,19 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * Force close.
    */
   private void forceClose() {
-<span class="nc bnc" id="L182" title="All 2 branches missed.">    if (file != null) {</span>
-<span class="nc bnc" id="L183" title="All 6 branches missed.">      if (file.exists() &amp;&amp; file.canWrite() &amp;&amp; !file.delete()) {</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (file != null) {</span>
+<span class="pc bpc" id="L183" title="3 of 6 branches missed.">      if (file.exists() &amp;&amp; file.canWrite() &amp;&amp; !file.delete()) {</span>
 <span class="nc" id="L184">        log.debug(&quot;couldn't delete &quot; + file.getName());</span>
       }
-<span class="nc" id="L186">      file = null;</span>
+<span class="fc" id="L186">      file = null;</span>
     }
     try {
-<span class="nc" id="L189">      objectInputStream.close();</span>
+<span class="fc" id="L189">      objectInputStream.close();</span>
 <span class="nc" id="L190">    } catch (IOException e) {</span>
 <span class="nc" id="L191">      log.debug(e);</span>
-<span class="nc" id="L192">    }</span>
-<span class="nc" id="L193">    closed = true;</span>
-<span class="nc" id="L194">  }</span>
+<span class="fc" id="L192">    }</span>
+<span class="fc" id="L193">    closed = true;</span>
+<span class="fc" id="L194">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

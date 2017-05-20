@@ -1429,10 +1429,10 @@ public abstract class MtasDataCollector&lt;T1 extends Number &amp; Comparable&lt
           }
         }
 <span class="pc bpc" id="L1431" title="1 of 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="pc bpc" id="L1432" title="1 of 2 branches missed.">        if (getSize() &gt; 0) {</span>
+<span class="fc bfc" id="L1432" title="All 2 branches covered.">        if (getSize() &gt; 0) {</span>
 <span class="fc" id="L1433">          result = new MtasDataCollectorResult&lt;&gt;(collectorType, getItem(0));</span>
         } else {
-<span class="nc" id="L1435">          result = new MtasDataCollectorResult&lt;&gt;(collectorType, sortType,</span>
+<span class="fc" id="L1435">          result = new MtasDataCollectorResult&lt;&gt;(collectorType, sortType,</span>
               sortDirection);
         }
       } else {

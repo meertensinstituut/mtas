@@ -16,8 +16,8 @@ import org.apache.lucene.util.BytesRef;
 public class MtasUpdateRequestProcessorResultWriter implements Closeable {
 
   /** The Constant log. */
-<span class="nc" id="L19">  private static final Log log = LogFactory</span>
-<span class="nc" id="L20">      .getLog(MtasUpdateRequestProcessorResultWriter.class);</span>
+<span class="fc" id="L19">  private static final Log log = LogFactory</span>
+<span class="fc" id="L20">      .getLog(MtasUpdateRequestProcessorResultWriter.class);</span>
 
   /** The object output stream. */
   private ObjectOutputStream objectOutputStream;
@@ -39,22 +39,22 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
    *
    * @param value the value
    */
-<span class="nc" id="L42">  public MtasUpdateRequestProcessorResultWriter(String value) {</span>
-<span class="nc" id="L43">    closed = false;</span>
-<span class="nc" id="L44">    tokenNumber = 0;</span>
-<span class="nc" id="L45">    file = null;</span>
-<span class="nc" id="L46">    fileOutputStream = null;</span>
-<span class="nc" id="L47">    objectOutputStream = null;</span>
+<span class="fc" id="L42">  public MtasUpdateRequestProcessorResultWriter(String value) {</span>
+<span class="fc" id="L43">    closed = false;</span>
+<span class="fc" id="L44">    tokenNumber = 0;</span>
+<span class="fc" id="L45">    file = null;</span>
+<span class="fc" id="L46">    fileOutputStream = null;</span>
+<span class="fc" id="L47">    objectOutputStream = null;</span>
     try {
-<span class="nc" id="L49">      file = File.createTempFile(&quot;MtasUpdateRequestProcessorResult&quot;, &quot;.data&quot;);</span>
-<span class="nc" id="L50">      fileOutputStream = new FileOutputStream(file);</span>
-<span class="nc" id="L51">      objectOutputStream = new ObjectOutputStream(fileOutputStream);</span>
-<span class="nc" id="L52">      objectOutputStream.writeObject(value);</span>
+<span class="fc" id="L49">      file = File.createTempFile(&quot;MtasUpdateRequestProcessorResult&quot;, &quot;.data&quot;);</span>
+<span class="fc" id="L50">      fileOutputStream = new FileOutputStream(file);</span>
+<span class="fc" id="L51">      objectOutputStream = new ObjectOutputStream(fileOutputStream);</span>
+<span class="fc" id="L52">      objectOutputStream.writeObject(value);</span>
 <span class="nc" id="L53">    } catch (IOException e) {</span>
 <span class="nc" id="L54">      forceCloseAndDelete();</span>
 <span class="nc" id="L55">      log.debug(e);</span>
-<span class="nc" id="L56">    }</span>
-<span class="nc" id="L57">  }</span>
+<span class="fc" id="L56">    }</span>
+<span class="fc" id="L57">  }</span>
 
   /**
    * Adds the item.
@@ -68,20 +68,20 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
    */
   public void addItem(String term, Integer offsetStart, Integer offsetEnd,
       Integer posIncr, BytesRef payload, Integer flags) {
-<span class="nc bnc" id="L71" title="All 2 branches missed.">    if (!closed) {</span>
-<span class="nc" id="L72">      tokenNumber++;</span>
-<span class="nc" id="L73">      MtasUpdateRequestProcessorResultItem item = new MtasUpdateRequestProcessorResultItem(</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc" id="L72">      tokenNumber++;</span>
+<span class="fc" id="L73">      MtasUpdateRequestProcessorResultItem item = new MtasUpdateRequestProcessorResultItem(</span>
           term, offsetStart, offsetEnd, posIncr, payload, flags);
       try {
-<span class="nc" id="L76">        objectOutputStream.writeObject(item);</span>
-<span class="nc" id="L77">        objectOutputStream.reset();</span>
-<span class="nc" id="L78">        objectOutputStream.flush();</span>
+<span class="fc" id="L76">        objectOutputStream.writeObject(item);</span>
+<span class="fc" id="L77">        objectOutputStream.reset();</span>
+<span class="fc" id="L78">        objectOutputStream.flush();</span>
 <span class="nc" id="L79">      } catch (IOException e) {</span>
 <span class="nc" id="L80">        forceCloseAndDelete();</span>
 <span class="nc" id="L81">        log.debug(e);</span>
-<span class="nc" id="L82">      }</span>
+<span class="fc" id="L82">      }</span>
     }
-<span class="nc" id="L84">  }</span>
+<span class="fc" id="L84">  }</span>
 
   /**
    * Gets the token number.
@@ -89,7 +89,7 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
    * @return the token number
    */
   public int getTokenNumber() {
-<span class="nc" id="L92">    return tokenNumber;</span>
+<span class="fc" id="L92">    return tokenNumber;</span>
   }
 
   /**
@@ -99,8 +99,8 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public String getFileName() throws IOException {
-<span class="nc bnc" id="L102" title="All 2 branches missed.">    if (file != null) {</span>
-<span class="nc" id="L103">      return file.getAbsolutePath();</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    if (file != null) {</span>
+<span class="fc" id="L103">      return file.getAbsolutePath();</span>
     } else {
 <span class="nc" id="L105">      throw new IOException(&quot;no file&quot;);</span>
     }
@@ -113,12 +113,12 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
    */
   @Override
   public void close() throws IOException {
-<span class="nc bnc" id="L116" title="All 2 branches missed.">    if (!closed) {</span>
-<span class="nc" id="L117">      objectOutputStream.close();</span>
-<span class="nc" id="L118">      fileOutputStream.close();</span>
-<span class="nc" id="L119">      closed = true;</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    if (!closed) {</span>
+<span class="fc" id="L117">      objectOutputStream.close();</span>
+<span class="fc" id="L118">      fileOutputStream.close();</span>
+<span class="fc" id="L119">      closed = true;</span>
     }
-<span class="nc" id="L121">  }</span>
+<span class="fc" id="L121">  }</span>
 
   /**
    * Force close and delete.
