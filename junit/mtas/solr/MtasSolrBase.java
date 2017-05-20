@@ -22,6 +22,44 @@ public class MtasSolrBase {
 
   private static Log log = LogFactory.getLog(MtasSolrBase.class);
 
+  public static Number getFromStats(NamedList<Object> response, String field, String name, boolean round) {
+    if (response == null) {
+      log.error("no (valid); response");
+    } else {
+      Object mtasStatsRaw = response.get("stats");
+      if (mtasStatsRaw != null && mtasStatsRaw instanceof NamedList) {
+        NamedList<Object> mtasStats = (NamedList) mtasStatsRaw;
+        Object mtasStatsFieldsRaw = mtasStats.get("stats_fields");
+        if (mtasStatsFieldsRaw != null
+            && mtasStatsFieldsRaw instanceof NamedList) {          
+          NamedList<Object> mtasStatsFields = (NamedList) mtasStatsFieldsRaw;
+          Object mtasStatsFieldsFieldRaw = mtasStatsFields.get(field);
+          if (mtasStatsFieldsFieldRaw != null
+              && mtasStatsFieldsFieldRaw instanceof NamedList) {
+            NamedList<Object> mtasStatsFieldsField = (NamedList) mtasStatsFieldsFieldRaw;
+            Object mtasStatsFieldsFieldNameRaw = mtasStatsFieldsField.get(name);
+            if(mtasStatsFieldsFieldNameRaw!=null && mtasStatsFieldsFieldNameRaw instanceof Number) {
+              if(round) {
+                return ((Number) mtasStatsFieldsFieldNameRaw).longValue();
+              } else {
+                return (Number) mtasStatsFieldsFieldNameRaw;
+              }
+            } else {
+              log.error("unexpected " + mtasStatsFieldsFieldNameRaw);
+            }
+          } else {
+            log.error("unexpected " + mtasStatsFieldsFieldRaw);
+          }                    
+        } else {
+          log.error("unexpected " + mtasStatsFieldsRaw);
+        }
+      } else {
+        log.error("unexpected " + mtasStatsRaw);
+      }
+    }
+    return null;
+  }
+  
   public static Number getFromMtasStats(NamedList<Object> response, String type,
       String key, String name) {
     if (response == null) {
@@ -29,7 +67,7 @@ public class MtasSolrBase {
     } else {
       Object mtasResponseRaw = response.get("mtas");
       if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
-        NamedList<Object> mtasResponse = (NamedList) response.get("mtas");
+        NamedList<Object> mtasResponse = (NamedList) mtasResponseRaw;
         Object mtasStatsResponseRaw = mtasResponse.get("stats");
         if (mtasStatsResponseRaw != null
             && mtasStatsResponseRaw instanceof NamedList) {
@@ -129,7 +167,7 @@ public class MtasSolrBase {
     return (directory.delete());
   }
 
-  public static Map<Integer, SolrInputDocument> createDocuments() {
+  public static Map<Integer, SolrInputDocument> createDocuments(boolean includeAdvanced) {
     Map<Integer, SolrInputDocument> solrDocuments = new HashMap<>();
     Path dataPath = Paths.get("junit").resolve("data");
     // data
@@ -139,13 +177,23 @@ public class MtasSolrBase {
     newDoc1.addField("text", "Een onaangenaam mens in de Haarlemmerhout");
     newDoc1.addField("mtas", dataPath.resolve("resources")
         .resolve("beets1.xml.gz").toFile().getAbsolutePath());
+    if(includeAdvanced) {
+      newDoc1.addField("source", "source1");
+      newDoc1.addField("mtasAdvanced", dataPath.resolve("resources")    
+        .resolve("beets1").toFile().getAbsolutePath());
+    }  
     solrDocuments.put(1, newDoc1);
     SolrInputDocument newDoc2 = new SolrInputDocument();
     newDoc2.addField("id", "2");
     newDoc2.addField("title", "Een oude kennis");
-    newDoc2.addField("text", "Een oude kennis");
+    newDoc2.addField("text", "Een oude kennis");    
     newDoc2.addField("mtas", dataPath.resolve("resources")
         .resolve("beets2.xml.gz").toFile().getAbsolutePath());
+    if(includeAdvanced) {
+      newDoc2.addField("source", "source2");
+      newDoc2.addField("mtasAdvanced", dataPath.resolve("resources")    
+        .resolve("beets2.xml").toFile().getAbsolutePath());
+    }  
     SolrInputDocument newDoc3 = new SolrInputDocument();
     solrDocuments.put(2, newDoc2);
     newDoc3.addField("id", "3");
@@ -153,6 +201,11 @@ public class MtasSolrBase {
     newDoc3.addField("text", "Varen en Rijden");
     newDoc3.addField("mtas", dataPath.resolve("resources")
         .resolve("beets3.xml.gz").toFile().getAbsolutePath());
+    if(includeAdvanced) {
+      newDoc3.addField("source", "source3");
+      newDoc3.addField("mtasAdvanced", dataPath.resolve("resources")    
+        .resolve("beets3.xml.gz").toFile().getAbsolutePath());
+    }  
     solrDocuments.put(3, newDoc3);
     return solrDocuments;
   }

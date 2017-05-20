@@ -14,8 +14,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +49,7 @@ public class MtasSolrTestSearchConsistency {
       Path dataPath = Paths.get("junit").resolve("data");
       // data
       Map<Integer, SolrInputDocument> solrDocuments = MtasSolrBase
-          .createDocuments();
+          .createDocuments(true);
 
       // create
       ArrayList<String> collections = new ArrayList<>(
@@ -104,6 +106,8 @@ public class MtasSolrTestSearchConsistency {
           .resolve(collectionName).resolve("conf").resolve("schema.xml"));
       Files.copy(dataPath.resolve("conf").resolve("folia.xml"), solrPath
           .resolve(collectionName).resolve("conf").resolve("folia.xml"));
+      Files.copy(dataPath.resolve("conf").resolve("mtas.xml"),
+          solrPath.resolve(collectionName).resolve("conf").resolve("mtas.xml"));
       // create core.properties
       solrFile = solrPath.resolve(collectionName).resolve("core.properties")
           .toFile();
@@ -196,8 +200,8 @@ public class MtasSolrTestSearchConsistency {
   }
 
   @org.junit.Test
-  public void mtasRequestHandlerTermvector() throws IOException {
-    ModifiableSolrParams params = new ModifiableSolrParams();    
+  public void mtasRequestHandlerTermvector1() throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();
     params.set("q", "*:*");
     params.set("rows", 0);
     params.set("mtas", "true");
@@ -207,10 +211,10 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.termvector.0.key", "tv");
     params.set("mtas.termvector.0.sort.type", "sum");
     params.set("mtas.termvector.0.sort.direction", "asc");
-    params.set("mtas.termvector.0.type", "n,sum");       
-    //create full
-    params.set("mtas.termvector.0.full", true);    
-    params.set("mtas.termvector.0.number", -1);    
+    params.set("mtas.termvector.0.type", "n,sum");
+    // create full
+    params.set("mtas.termvector.0.full", true);
+    params.set("mtas.termvector.0.number", -1);
     SolrRequest<?> requestFull = new QueryRequest(params, METHOD.POST);
     NamedList<Object> responseFull;
     try {
@@ -220,9 +224,9 @@ public class MtasSolrTestSearchConsistency {
     }
     params.remove("mtas.termvector.0.full");
     params.remove("mtas.termvector.0.number");
-    //create tests
-    for(int number=1; number<=1000; number*=10) {
-      params.set("mtas.termvector.0.number", number);        
+    // create tests
+    for (int number = 1; number <= 1000; number *= 10) {
+      params.set("mtas.termvector.0.number", number);
       SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
       NamedList<Object> response;
       try {
@@ -230,8 +234,176 @@ public class MtasSolrTestSearchConsistency {
       } catch (SolrServerException e) {
         throw new IOException(e);
       }
-      createTermvectorAssertions(response, responseFull, "tv", new String[]{"n","sum"});
+      createTermvectorAssertions(response, responseFull, "tv",
+          new String[] { "n", "sum" });
       params.remove("mtas.termvector.0.number");
+    }
+  }
+
+  @org.junit.Test
+  public void mtasRequestHandlerTermvector2() throws IOException {
+    String[] list = new String[] { "de", "het", "een", "not existing word just for testing" };
+    String[] types = new String[] { "n", "sum", "sumsq" };
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.termvector", "true");
+    params.set("mtas.termvector.0.field", "mtas");
+    params.set("mtas.termvector.0.prefix", "t_lc");
+    params.set("mtas.termvector.0.key", "tv");
+    params.set("mtas.termvector.0.type", String.join(",", types));
+    // create full
+    params.set("mtas.termvector.0.list", String.join(",", list));
+    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> response;
+    try {
+      response = server.request(request, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    List<NamedList> tv = MtasSolrBase.getFromMtasTermvector(response, "tv");
+    for (String key : list) {
+      params.clear();
+      params.set("q", "*:*");
+      params.set("rows", 0);
+      params.set("mtas", "true");
+      params.set("mtas.stats", "true");
+      params.set("mtas.stats.spans", "true");
+      params.set("mtas.stats.spans.0.field", "mtas");
+      params.set("mtas.stats.spans.0.key", "statsKey0");
+      params.set("mtas.stats.spans.0.minimum", 1);
+      params.set("mtas.stats.spans.0.query.0.type", "cql");
+      params.set("mtas.stats.spans.0.query.0.value", "[t_lc=\"" + key + "\"]");
+      params.set("mtas.stats.spans.0.type", String.join(",", types));      
+      params.set("mtas.stats.spans.1.field", "mtas");
+      params.set("mtas.stats.spans.1.key", "statsKey1");
+      params.set("mtas.stats.spans.1.minimum", 0);
+      params.set("mtas.stats.spans.1.query.0.type", "cql");
+      params.set("mtas.stats.spans.1.query.0.value", "[t_lc=\"" + key + "\"]");
+      params.set("mtas.stats.spans.1.type", String.join(",", types));
+      params.set("rows", "0");
+      SolrRequest<?> requestStats = new QueryRequest(params, METHOD.POST);
+      NamedList<Object> responseStats;
+      try {
+        responseStats = server.request(requestStats, "collection1");
+      } catch (SolrServerException e) {
+        throw new IOException(e);
+      }
+      NamedList<Object> tvItem = null;
+      for (NamedList<Object> item : tv) {
+        if (item.get("key").equals(key)) {
+          tvItem = item;
+          break;
+        }
+      }
+      if (tvItem == null) {
+        Object itemSum = MtasSolrBase.getFromMtasStats(responseStats,
+            "spans", "statsKey1", "sum");
+        assertFalse("No item in tv list for " + key+" but stats found", itemSum==null || ((Number) itemSum).longValue()!=0);
+      } else {
+        for (String type : types) {
+          Object itemValue = MtasSolrBase.getFromMtasStats(responseStats,
+              "spans", "statsKey0", type);
+          assertEquals("different " + type + " for " + key + ": " + itemValue
+              + " and " + tvItem.get(type), itemValue, tvItem.get(type));
+        }
+      }
+    }
+
+  }
+
+  @org.junit.Test
+  public void mtasRequestHandlerTermvector3() throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.termvector", "true");
+    params.set("mtas.termvector.0.field", "mtas");
+    params.set("mtas.termvector.0.prefix", "t_lc");
+    params.set("mtas.termvector.0.key", "tv");
+    params.set("mtas.termvector.0.regexp", "een[a-z]*");
+    params.set("mtas.termvector.0.ignoreRegexp", ".*d");
+    params.set("mtas.termvector.0.list", ".*g,.*l");
+    params.set("mtas.termvector.0.listRegexp", true);
+    params.set("mtas.termvector.0.ignoreList", ".*st.*,.*nm.*");
+    params.set("mtas.termvector.0.ignoreListRegexp", true);
+    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> response;
+    try {
+      response = server.request(request, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    List<NamedList> tv = MtasSolrBase.getFromMtasTermvector(response, "tv");
+    Set<String> keys = new HashSet<>();
+    for(NamedList<Object> item : tv) {
+      if(item!=null && item.get("key")!=null && item.get("key") instanceof String) {
+        keys.add((String) item.get("key")); 
+      }
+    }
+    //checks
+    assertFalse("no keys matching", keys.isEmpty());
+    for(String key : keys) {
+      assertFalse(key+" not matching regexp", !key.matches("een[a-z]*")); 
+      assertFalse(key+" matching ignoreRegexp", key.matches(".*d"));
+      assertFalse(key+" not matching list regexps", !key.matches("(.*g|.*l)")); 
+      assertFalse(key+" matching ignoreList regexps", key.matches("(.*st.*|.*nm.*)"));       
+    }
+  }
+  
+  @org.junit.Test
+  public void mtasSolrSchemaPreAnalyzedParserAndField() throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    params.set("q", "*:*");
+    params.set("stats", "true");
+    params.set("stats.field", "numberOfPositions");
+    params.set("mtas", "true");
+    params.set("mtas.stats", "true");
+    params.set("mtas.stats.spans", "true");
+    params.set("mtas.stats.spans.0.field", "mtas");
+    params.set("mtas.stats.spans.0.key", "statsKey");
+    params.set("mtas.stats.spans.0.query.0.type", "cql");
+    params.set("mtas.stats.spans.0.query.0.value", "[]");
+    params.set("mtas.stats.spans.0.type", "n,sum,sumsq");
+    params.set("mtas.stats.positions", "true");
+    params.set("mtas.stats.positions.0.field", "mtas");
+    params.set("mtas.stats.positions.0.key", "statsKey");
+    params.set("mtas.stats.positions.0.type", "n,sum,sumsq");
+    params.set("mtas.stats.tokens", "true");
+    params.set("mtas.stats.tokens.0.field", "mtas");
+    params.set("mtas.stats.tokens.0.key", "statsKey");
+    params.set("mtas.stats.tokens.0.type", "n,sum,sumsq");
+    params.set("rows", "0");
+    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> response1;
+    NamedList<Object> response2;
+    try {
+      response1 = server.request(request, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    params.remove("mtas.stats.spans.0.field");
+    params.remove("mtas.stats.positions.0.field");
+    params.remove("mtas.stats.tokens.0.field");
+    params.set("mtas.stats.spans.0.field", "mtasAdvanced");
+    params.set("mtas.stats.positions.0.field", "mtasAdvanced");
+    params.set("mtas.stats.tokens.0.field", "mtasAdvanced");
+    try {
+      response2 = server.request(request, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    assertEquals(
+        MtasSolrBase.getFromMtasStats(response1, "spans", "statsKey", "sum"),
+        MtasSolrBase.getFromStats(response1, "numberOfPositions", "sum", true));
+    for (String type : new String[] { "spans", "tokens", "positions" }) {
+      for (String stats : new String[] { "sum", "n", "sumsq" }) {
+        assertEquals(
+            MtasSolrBase.getFromMtasStats(response1, type, "statsKey", stats),
+            MtasSolrBase.getFromMtasStats(response2, type, "statsKey", stats));
+      }
     }
   }
 
@@ -240,8 +412,9 @@ public class MtasSolrTestSearchConsistency {
     List<NamedList> list1 = MtasSolrBase.getFromMtasTermvector(response1, key);
     List<NamedList> list2 = MtasSolrBase.getFromMtasTermvector(response2, key);
     assertFalse("list should be defined", list1 == null || list2 == null);
-    if (list1 != null && list2 != null) {      
-      assertFalse("first list should not be longer", list1.size()>list2.size());
+    if (list1 != null && list2 != null) {
+      assertFalse("first list should not be longer",
+          list1.size() > list2.size());
       assertFalse("list should not be empty", list1.isEmpty());
       for (int i = 0; i < list1.size(); i++) {
         Object key1 = list1.get(i).get("key");

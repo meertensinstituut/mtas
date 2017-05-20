@@ -69,7 +69,7 @@ public class MtasSolrTestDistributedSearchConsistency {
    */
   @org.junit.BeforeClass
   public static void setup() {
-    solrDocuments = MtasSolrBase.createDocuments();
+    solrDocuments = MtasSolrBase.createDocuments(false);
     createCloud();
   }
 
@@ -455,6 +455,7 @@ public class MtasSolrTestDistributedSearchConsistency {
         client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(2));
         client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(3));
         client.commit(COLLECTION_ALL_OPTIMIZED);
+        client.optimize(COLLECTION_ALL_OPTIMIZED);
         // collection2
         client.add(COLLECTION_ALL_MULTIPLE_SEGMENTS, solrDocuments.get(1));
         client.commit(COLLECTION_ALL_MULTIPLE_SEGMENTS);

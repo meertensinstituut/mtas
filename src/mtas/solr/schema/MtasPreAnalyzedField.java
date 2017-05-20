@@ -1,9 +1,15 @@
 package mtas.solr.schema;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
+import org.apache.lucene.index.IndexableField;
 import org.apache.solr.schema.IndexSchema;
+import org.apache.solr.schema.JsonPreAnalyzedParser;
 import org.apache.solr.schema.PreAnalyzedField;
+import org.apache.solr.schema.SchemaField;
 
 /**
  * The Class MtasPreAnalyzedField.
@@ -11,25 +17,28 @@ import org.apache.solr.schema.PreAnalyzedField;
 public class MtasPreAnalyzedField extends PreAnalyzedField {
 
   /** The follow index analyzer. */
-  private static String FOLLOW_INDEX_ANALYZER = "followIndexAnalyzer";
+  private final static String FOLLOW_INDEX_ANALYZER = "followIndexAnalyzer";
 
   /** The default configuration. */
-  private static String DEFAULT_CONFIGURATION = "defaultConfiguration";
+  private final static String DEFAULT_CONFIGURATION = "defaultConfiguration";
 
   /** The configuration from field. */
-  private static String CONFIGURATION_FROM_FIELD = "configurationFromField";
+  private final static String CONFIGURATION_FROM_FIELD = "configurationFromField";
 
   /** The set number of tokens. */
-  private static String SET_NUMBER_OF_TOKENS = "setNumberOfTokens";
+  private final static String SET_NUMBER_OF_TOKENS = "setNumberOfTokens";
 
   /** The set number of positions. */
-  private static String SET_NUMBER_OF_POSITIONS = "setNumberOfPositions";
+  private final static String SET_NUMBER_OF_POSITIONS = "setNumberOfPositions";
 
   /** The set size. */
-  private static String SET_SIZE = "setSize";
+  private final static String SET_SIZE = "setSize";
 
   /** The set error. */
-  private static String SET_ERROR = "setError";
+  private final static String SET_ERROR = "setError";
+
+  /** The set prefix. */
+  private final static String SET_PREFIX = "setPrefix";
 
   /** The follow index analyzer. */
   public String followIndexAnalyzer = null;
@@ -51,6 +60,9 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
 
   /** The set error. */
   public String setError = null;
+
+  /** The set prefix. */
+  public String setPrefix = null;
 
   /*
    * (non-Javadoc)
@@ -79,6 +91,7 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
     setNumberOfPositions = args.get(SET_NUMBER_OF_POSITIONS);
     setSize = args.get(SET_SIZE);
     setError = args.get(SET_ERROR);
+    setPrefix = args.get(SET_PREFIX);
     if (followIndexAnalyzer == null) {
       throw new RuntimeException("No " + FOLLOW_INDEX_ANALYZER
           + " for fieldType " + this.getTypeName());
@@ -88,8 +101,9 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
     args.remove(CONFIGURATION_FROM_FIELD);
     args.remove(SET_NUMBER_OF_TOKENS);
     args.remove(SET_NUMBER_OF_POSITIONS);
-    args.remove(SET_ERROR);
     args.remove(SET_SIZE);
+    args.remove(SET_ERROR);
+    args.remove(SET_PREFIX);
     super.setArgs(schema, args);
   }
 

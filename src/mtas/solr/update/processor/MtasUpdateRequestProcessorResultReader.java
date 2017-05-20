@@ -71,7 +71,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
               if (next != null) {
                 return true;
               } else {
-                next = getNext();
+                next = getNext();                
                 return next != null;
               }
             } else {
@@ -104,7 +104,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
           private MtasUpdateRequestProcessorResultItem getNext() {
             if (!closed) {
-              try {
+              try {                
                 Object o = objectInputStream.readObject();
                 if (o instanceof MtasUpdateRequestProcessorResultItem) {
                   return (MtasUpdateRequestProcessorResultItem) o;
@@ -152,8 +152,8 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    *
    * @return the stored bin value
    */
-  public byte[] getStoredBinValue() {
-    return new byte[0];
+  public byte[] getStoredBinValue() {    
+    return null;
   }
 
   /**

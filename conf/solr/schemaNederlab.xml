@@ -32,7 +32,9 @@
 		stored="true" />
 	<field name="NLCore_NLAdministrative_ingestTime" type="nederlab_date"
 		required="true" multiValued="false" indexed="true" stored="true" />
-	<field name="NLCore_NLAdministrative_expirationTime" type="nederlab_date"
+	<field name="NLCore_NLAdministrative_updateTime" type="nederlab_date"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLCore_NLAdministrative_expirationTime" type="nederlab_date"
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLCore_NLAdministrative_lastEditedBy" type="nederlab_string"
 		required="false" multiValued="false" indexed="true" stored="true" />
@@ -329,7 +331,9 @@
 		indexed="true" stored="true" />
 	<field name="NLContent_mtas_size" type="nederlab_int" indexed="true"
 		stored="true" />
-	<field name="NLContent_mtasSource" type="mtasSource_text"
+	<field name="NLContent_mtas_prefix" type="nederlab_string"
+    indexed="true" stored="true" multiValued="true" />
+  <field name="NLContent_mtasSource" type="mtasSource_text"
 		indexed="true" stored="true" />
 	<field name="NLContent_mtasSource_error" type="nederlab_string"
 		indexed="true" stored="true" />
@@ -514,7 +518,7 @@
 		configurationFromField="NLCore_NLAdministrative_sourceCollection"
 		setNumberOfTokens="NLContent_mtas_numberOfTokens"
 		setNumberOfPositions="NLContent_mtas_numberOfPositions" setSize="NLContent_mtas_size"
-		setError="NLContent_mtas_error" postingsFormat="MtasCodec">
+		setError="NLContent_mtas_error" setPrefix="NLContent_mtas_prefix" postingsFormat="MtasCodec">
 		<analyzer type="query">
 			<tokenizer class="solr.WhitespaceTokenizerFactory" />
 			<filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory"

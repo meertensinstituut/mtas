@@ -7,9 +7,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +38,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 import mtas.analysis.MtasTokenizer;
 import mtas.analysis.util.MtasCharFilterFactory;
 import mtas.analysis.util.MtasTokenizerFactory;
+import mtas.codec.util.CodecUtil;
 import mtas.solr.schema.MtasPreAnalyzedField;
 
 /**
@@ -96,6 +99,7 @@ public class MtasUpdateRequestProcessorFactory
               mpaf.setNumberOfPositions);
           config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);
           config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);
+          config.fieldTypePrefixField.put(entry.getKey(), mpaf.setPrefix);
           if (mpaf.followIndexAnalyzer == null
               || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {
             throw new IOException(
@@ -336,6 +340,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             result = new MtasUpdateRequestProcessorResultWriter(storedValue);
             int numberOfPositions = 0;
             int numberOfTokens = 0;
+            Set<String> prefixes = new HashSet<>();
             try {
               MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
               tokenizer.setReader(sizeReader);
@@ -361,6 +366,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 BytesRef payload = null;
                 if (termAttribute != null) {
                   term = termAttribute.toString();
+                  prefixes.add(CodecUtil.termPrefix(term));
                 }
                 if (offsetAttribute != null) {
                   offsetStart = offsetAttribute.startOffset();
@@ -402,6 +408,9 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             // update numberOfTokens
             setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
                 numberOfTokens);
+            // update prefixes
+            setFields(doc, config.fieldTypePrefixField.get(fieldType),
+                prefixes);
           } catch (IOException e) {
             log.info(e);
             // update error
@@ -415,6 +424,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             // update numberOfTokens
             setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
                 0);
+            // update prefixes
+            removeFields(doc, config.fieldTypePrefixField.get(fieldType));
             if (result != null) {
               result.forceCloseAndDelete();
               doc.remove(field);
@@ -426,6 +437,15 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
     }
     // pass it up the chain
     super.processAdd(cmd);
+  }
+
+  private void removeFields(SolrInputDocument doc, String fieldNames) {
+    if (fieldNames != null) {
+      String[] tmpFields = fieldNames.split(",");
+      for (int i = 0; i < tmpFields.length; i++) {
+        doc.removeField(tmpFields[i]);
+      }
+    }
   }
 
   private void setFields(SolrInputDocument doc, String fieldNames,
@@ -453,6 +473,7 @@ class MtasUpdateRequestProcessorConfig {
   HashMap<String, String> fieldTypeNumberOfPositionsField;
   HashMap<String, String> fieldTypeSizeField;
   HashMap<String, String> fieldTypeErrorField;
+  HashMap<String, String> fieldTypePrefixField;
 
   MtasUpdateRequestProcessorConfig() {
     fieldMapping = new HashMap<>();
@@ -464,6 +485,7 @@ class MtasUpdateRequestProcessorConfig {
     fieldTypeNumberOfPositionsField = new HashMap<>();
     fieldTypeSizeField = new HashMap<>();
     fieldTypeErrorField = new HashMap<>();
+    fieldTypePrefixField = new HashMap<>();
   }
 
 }

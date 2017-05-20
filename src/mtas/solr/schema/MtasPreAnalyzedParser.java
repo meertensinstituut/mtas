@@ -12,9 +12,13 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.util.Attribute;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.AttributeSource.State;
+import org.apache.solr.schema.SchemaField;
+import org.apache.solr.schema.PreAnalyzedField;
 import org.apache.solr.schema.PreAnalyzedField.ParseResult;
 import org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser;
 import mtas.solr.update.processor.MtasUpdateRequestProcessorResultItem;
@@ -38,7 +42,8 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
   @Override
   public ParseResult parse(Reader reader, AttributeSource parent)
       throws IOException {
-    ParseResult res = new ParseResult();
+    ParseResult res = new ParseResult();   
+    
     // get MtasUpdateRequestProcessorResult
     StringBuilder sb = new StringBuilder();
     char[] buf = new char[128];
@@ -46,17 +51,15 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
     while ((cnt = reader.read(buf)) > 0) {
       sb.append(buf, 0, cnt);
     }
-
     Iterator<MtasUpdateRequestProcessorResultItem> iterator;
-
+    
     try {
       MtasUpdateRequestProcessorResultReader result = new MtasUpdateRequestProcessorResultReader(
           sb.toString());
       iterator = result.getIterator();
       if (iterator != null && iterator.hasNext()) {
         res.str = result.getStoredStringValue();
-        res.bin = result.getStoredBinValue();
-        result.close();
+        res.bin = result.getStoredBinValue();      
       } else {
         res.str = null;
         res.bin = null;
@@ -90,12 +93,13 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
         }
         // capture state and add to result
         State state = parent.captureState();
-        res.states.add(state.clone());
+        res.states.add(state.clone());       
         // reset for reuse
         parent.clearAttributes();
       }
     } catch (IOException e) {
-      log.error(e);
+      //ignore
+      log.debug(e);           
     }
     return res;
   }
@@ -108,8 +112,10 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
    * (org.apache.lucene.document.Field)
    */
   @Override
-  public String toFormattedString(Field f) throws IOException {
+  public String toFormattedString(Field f) throws IOException {    
     return this.getClass().getName() + " " + f.name();
   }
+  
+  
 
 }
