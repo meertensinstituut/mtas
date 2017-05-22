@@ -209,13 +209,13 @@ public class CodecComponent {
      * @param key
      *          the key
      */
-<span class="nc" id="L212">    public ComponentPrefix(String key) {</span>
-<span class="nc" id="L213">      this.key = key;</span>
-<span class="nc" id="L214">      singlePositionList = new TreeSet&lt;&gt;();</span>
-<span class="nc" id="L215">      multiplePositionList = new TreeSet&lt;&gt;();</span>
-<span class="nc" id="L216">      setPositionList = new TreeSet&lt;&gt;();</span>
-<span class="nc" id="L217">      intersectingList = new TreeSet&lt;&gt;();</span>
-<span class="nc" id="L218">    }</span>
+<span class="fc" id="L212">    public ComponentPrefix(String key) {</span>
+<span class="fc" id="L213">      this.key = key;</span>
+<span class="fc" id="L214">      singlePositionList = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L215">      multiplePositionList = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L216">      setPositionList = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L217">      intersectingList = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L218">    }</span>
 
     /**
      * Adds the single position.
@@ -224,11 +224,11 @@ public class CodecComponent {
      *          the prefix
      */
     public void addSinglePosition(String prefix) {
-<span class="nc bnc" id="L227" title="All 4 branches missed.">      if (!prefix.trim().isEmpty() &amp;&amp; !singlePositionList.contains(prefix)</span>
-<span class="nc bnc" id="L228" title="All 2 branches missed.">          &amp;&amp; !multiplePositionList.contains(prefix)) {</span>
-<span class="nc" id="L229">        singlePositionList.add(prefix);</span>
+<span class="pc bpc" id="L227" title="1 of 4 branches missed.">      if (!prefix.trim().isEmpty() &amp;&amp; !singlePositionList.contains(prefix)</span>
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">          &amp;&amp; !multiplePositionList.contains(prefix)) {</span>
+<span class="fc" id="L229">        singlePositionList.add(prefix);</span>
       }
-<span class="nc" id="L231">    }</span>
+<span class="fc" id="L231">    }</span>
 
     /**
      * Adds the multiple position.
@@ -237,17 +237,17 @@ public class CodecComponent {
      *          the prefix
      */
     public void addMultiplePosition(String prefix) {
-<span class="nc bnc" id="L240" title="All 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
-<span class="nc bnc" id="L241" title="All 2 branches missed.">        if (!singlePositionList.contains(prefix)) {</span>
-<span class="nc bnc" id="L242" title="All 2 branches missed.">          if (!multiplePositionList.contains(prefix)) {</span>
-<span class="nc" id="L243">            multiplePositionList.add(prefix);</span>
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">        if (!singlePositionList.contains(prefix)) {</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">          if (!multiplePositionList.contains(prefix)) {</span>
+<span class="fc" id="L243">            multiplePositionList.add(prefix);</span>
           }
         } else {
 <span class="nc" id="L246">          singlePositionList.remove(prefix);</span>
 <span class="nc" id="L247">          multiplePositionList.add(prefix);</span>
         }
       }
-<span class="nc" id="L250">    }</span>
+<span class="fc" id="L250">    }</span>
 
     /**
      * Adds the set position.
@@ -256,17 +256,17 @@ public class CodecComponent {
      *          the prefix
      */
     public void addSetPosition(String prefix) {
-<span class="nc bnc" id="L259" title="All 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
-<span class="nc bnc" id="L260" title="All 2 branches missed.">        if (!singlePositionList.contains(prefix)) {</span>
-<span class="nc bnc" id="L261" title="All 2 branches missed.">          if (!setPositionList.contains(prefix)) {</span>
-<span class="nc" id="L262">            setPositionList.add(prefix);</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">        if (!singlePositionList.contains(prefix)) {</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">          if (!setPositionList.contains(prefix)) {</span>
+<span class="fc" id="L262">            setPositionList.add(prefix);</span>
           }
         } else {
 <span class="nc" id="L265">          singlePositionList.remove(prefix);</span>
 <span class="nc" id="L266">          setPositionList.add(prefix);</span>
         }
       }
-<span class="nc" id="L269">    }</span>
+<span class="fc" id="L269">    }</span>
 
     /**
      * Adds the intersecting.
@@ -275,10 +275,10 @@ public class CodecComponent {
      *          the prefix
      */
     public void addIntersecting(String prefix) {
-<span class="nc bnc" id="L278" title="All 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
-<span class="nc" id="L279">        intersectingList.add(prefix);</span>
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L279">        intersectingList.add(prefix);</span>
       }
-<span class="nc" id="L281">    }</span>
+<span class="fc" id="L281">    }</span>
 
   }
 

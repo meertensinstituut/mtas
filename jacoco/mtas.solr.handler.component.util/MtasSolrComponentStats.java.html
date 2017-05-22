@@ -426,42 +426,42 @@ public class MtasSolrComponentStats
                     + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
 <span class="fc" id="L428">            queryVariables[tmpCounter][tmpQCounter] = new HashMap&lt;&gt;();</span>
-<span class="pc bpc" id="L429" title="1 of 2 branches missed.">            if (!vIds.isEmpty()) {</span>
-<span class="nc" id="L430">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L431" title="All 2 branches missed.">              for (String vId : vIds) {</span>
-<span class="nc" id="L432">                String name = rb.req.getParams()</span>
-<span class="nc" id="L433">                    .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc bfc" id="L429" title="All 2 branches covered.">            if (!vIds.isEmpty()) {</span>
+<span class="fc" id="L430">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L431" title="All 2 branches covered.">              for (String vId : vIds) {</span>
+<span class="fc" id="L432">                String name = rb.req.getParams()</span>
+<span class="fc" id="L433">                    .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                         + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                         + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId
                         + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME,
                         null);
-<span class="nc bnc" id="L438" title="All 2 branches missed.">                if (name != null) {</span>
-<span class="nc bnc" id="L439" title="All 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
-<span class="nc" id="L440">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">                if (name != null) {</span>
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
+<span class="fc" id="L440">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
                   }
-<span class="nc" id="L442">                  String value = rb.req.getParams()</span>
-<span class="nc" id="L443">                      .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L442">                  String value = rb.req.getParams()</span>
+<span class="fc" id="L443">                      .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                           + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                           + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId
                           + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE,
                           null);
-<span class="nc bnc" id="L448" title="All 2 branches missed.">                  if (value != null) {</span>
-<span class="nc" id="L449">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L450">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
-<span class="nc bnc" id="L451" title="All 2 branches missed.">                    for (int i = 0; i &lt; subList.length; i++) {</span>
-<span class="nc" id="L452">                      list.add(</span>
-<span class="nc" id="L453">                          subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
+<span class="pc bpc" id="L448" title="1 of 2 branches missed.">                  if (value != null) {</span>
+<span class="fc" id="L449">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L450">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
+<span class="fc bfc" id="L451" title="All 2 branches covered.">                    for (int i = 0; i &lt; subList.length; i++) {</span>
+<span class="fc" id="L452">                      list.add(</span>
+<span class="fc" id="L453">                          subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
                     }
-<span class="nc" id="L455">                    tmpVariables.get(name).addAll(list);</span>
+<span class="fc" id="L455">                    tmpVariables.get(name).addAll(list);</span>
                   }
                 }
-<span class="nc" id="L458">              }</span>
-<span class="nc bnc" id="L459" title="All 2 branches missed.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
-<span class="nc" id="L460">                  .entrySet()) {</span>
-<span class="nc" id="L461">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
-<span class="nc" id="L462">                    entry.getValue()</span>
-<span class="nc" id="L463">                        .toArray(new String[entry.getValue().size()]));</span>
-<span class="nc" id="L464">              }</span>
+<span class="fc" id="L458">              }</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
+<span class="fc" id="L460">                  .entrySet()) {</span>
+<span class="fc" id="L461">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
+<span class="fc" id="L462">                    entry.getValue()</span>
+<span class="fc" id="L463">                        .toArray(new String[entry.getValue().size()]));</span>
+<span class="fc" id="L464">              }</span>
             }
 <span class="fc" id="L466">            tmpQCounter++;</span>
 <span class="fc" id="L467">          }</span>
@@ -733,59 +733,59 @@ public class MtasSolrComponentStats
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="pc bpc" id="L736" title="1 of 2 branches missed.">    if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+<span class="fc bfc" id="L736" title="All 2 branches covered.">    if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
       // do nothing
     } else {
       // remove stats for other requests
-<span class="nc" id="L740">      sreq.params.remove(PARAM_MTAS_STATS);</span>
-<span class="nc" id="L741">      sreq.params.remove(PARAM_MTAS_STATS_POSITIONS);</span>
-<span class="nc" id="L742">      Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="nc" id="L743">          .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
-<span class="nc bnc" id="L744" title="All 2 branches missed.">      for (String key : keys) {</span>
-<span class="nc" id="L745">        sreq.params.remove(</span>
+<span class="fc" id="L740">      sreq.params.remove(PARAM_MTAS_STATS);</span>
+<span class="fc" id="L741">      sreq.params.remove(PARAM_MTAS_STATS_POSITIONS);</span>
+<span class="fc" id="L742">      Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="fc" id="L743">          .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
+<span class="fc bfc" id="L744" title="All 2 branches covered.">      for (String key : keys) {</span>
+<span class="fc" id="L745">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_KEY);
-<span class="nc" id="L747">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L747">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_FIELD);
-<span class="nc" id="L749">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L749">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_TYPE);
-<span class="nc" id="L751">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L751">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_MAXIMUM);
-<span class="nc" id="L753">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L753">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_MINIMUM);
-<span class="nc" id="L755">      }</span>
-<span class="nc" id="L756">      sreq.params.remove(PARAM_MTAS_STATS_TOKENS);</span>
-<span class="nc" id="L757">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="fc" id="L755">      }</span>
+<span class="fc" id="L756">      sreq.params.remove(PARAM_MTAS_STATS_TOKENS);</span>
+<span class="fc" id="L757">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
           PARAM_MTAS_STATS_TOKENS);
-<span class="nc bnc" id="L759" title="All 2 branches missed.">      for (String key : keys) {</span>
-<span class="nc" id="L760">        sreq.params.remove(</span>
+<span class="fc bfc" id="L759" title="All 2 branches covered.">      for (String key : keys) {</span>
+<span class="fc" id="L760">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_KEY);
-<span class="nc" id="L762">        sreq.params.remove(</span>
+<span class="fc" id="L762">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD);
-<span class="nc" id="L764">        sreq.params.remove(</span>
+<span class="fc" id="L764">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE);
-<span class="nc" id="L766">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L766">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_TOKENS_MAXIMUM);
-<span class="nc" id="L768">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L768">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_TOKENS_MINIMUM);
-<span class="nc" id="L770">      }</span>
-<span class="nc" id="L771">      sreq.params.remove(PARAM_MTAS_STATS_SPANS);</span>
-<span class="nc" id="L772">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="fc" id="L770">      }</span>
+<span class="fc" id="L771">      sreq.params.remove(PARAM_MTAS_STATS_SPANS);</span>
+<span class="fc" id="L772">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
           PARAM_MTAS_STATS_SPANS);
-<span class="nc bnc" id="L774" title="All 2 branches missed.">      for (String key : keys) {</span>
-<span class="nc" id="L775">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc bfc" id="L774" title="All 2 branches covered.">      for (String key : keys) {</span>
+<span class="fc" id="L775">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_KEY);
-<span class="nc" id="L777">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L777">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_FIELD);
-<span class="nc" id="L779">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L779">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_TYPE);
-<span class="nc" id="L781">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L781">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_MAXIMUM);
-<span class="nc" id="L783">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L783">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_MINIMUM);
-<span class="nc" id="L785">        Set&lt;String&gt; subKeys = MtasSolrResultUtil</span>
-<span class="nc" id="L786">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
+<span class="fc" id="L785">        Set&lt;String&gt; subKeys = MtasSolrResultUtil</span>
+<span class="fc" id="L786">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
                 + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);
-<span class="nc bnc" id="L788" title="All 2 branches missed.">        for (String subKey : subKeys) {</span>
+<span class="pc bpc" id="L788" title="1 of 2 branches missed.">        for (String subKey : subKeys) {</span>
 <span class="nc" id="L789">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);
@@ -796,42 +796,42 @@ public class MtasSolrComponentStats
               + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);
 <span class="nc" id="L798">        }</span>
-<span class="nc" id="L799">        subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="fc" id="L799">        subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
             PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;
                 + NAME_MTAS_STATS_SPANS_QUERY);
-<span class="nc bnc" id="L802" title="All 2 branches missed.">        for (String subKey : subKeys) {</span>
-<span class="nc" id="L803">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc bfc" id="L802" title="All 2 branches covered.">        for (String subKey : subKeys) {</span>
+<span class="fc" id="L803">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE);
-<span class="nc" id="L806">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L806">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH);
-<span class="nc" id="L809">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L809">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);
-<span class="nc" id="L812">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L812">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);
-<span class="nc" id="L815">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L815">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);
-<span class="nc" id="L818">          Set&lt;String&gt; subSubKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L819">              rb.req.getParams(),</span>
+<span class="fc" id="L818">          Set&lt;String&gt; subSubKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="fc" id="L819">              rb.req.getParams(),</span>
               PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
-<span class="nc bnc" id="L823" title="All 2 branches missed.">          for (String subSubKey : subSubKeys) {</span>
-<span class="nc" id="L824">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc bfc" id="L823" title="All 2 branches covered.">          for (String subSubKey : subSubKeys) {</span>
+<span class="fc" id="L824">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                 + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey
                 + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);
-<span class="nc" id="L828">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L828">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                 + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey
                 + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);
-<span class="nc" id="L832">          }</span>
-<span class="nc" id="L833">        }</span>
-<span class="nc" id="L834">      }</span>
+<span class="fc" id="L832">          }</span>
+<span class="fc" id="L833">        }</span>
+<span class="fc" id="L834">      }</span>
     }
 <span class="fc" id="L836">  }</span>
 

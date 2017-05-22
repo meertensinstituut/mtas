@@ -111,7 +111,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    * @return the items
    */
   public List&lt;MtasSpanSequenceItem&gt; getItems() {
-<span class="nc" id="L114">    return items;</span>
+<span class="fc" id="L114">    return items;</span>
   }
 
   /**
@@ -120,7 +120,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    * @return the ignore query
    */
   public MtasSpanQuery getIgnoreQuery() {
-<span class="nc" id="L123">    return ignoreQuery;</span>
+<span class="fc" id="L123">    return ignoreQuery;</span>
   }
 
   /**
@@ -140,8 +140,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="pc bpc" id="L143" title="1 of 2 branches missed.">    if (items.size() == 1) {</span>
-<span class="nc" id="L144">      return items.get(0).getQuery().rewrite(reader);</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">    if (items.size() == 1) {</span>
+<span class="fc" id="L144">      return items.get(0).getQuery().rewrite(reader);</span>
     } else {
       MtasSpanSequenceItem newItem;
 <span class="fc" id="L147">      MtasSpanSequenceItem previousNewItem = null;</span>
@@ -223,8 +223,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
 <span class="fc" id="L223">      return true;</span>
 <span class="pc bpc" id="L224" title="1 of 2 branches missed.">    if (obj == null)</span>
 <span class="nc" id="L225">      return false;</span>
-<span class="pc bpc" id="L226" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L227">      return false;</span>
+<span class="fc bfc" id="L226" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L227">      return false;</span>
 <span class="fc" id="L228">    MtasSpanSequenceQuery other = (MtasSpanSequenceQuery) obj;</span>
 <span class="pc bpc" id="L229" title="7 of 12 branches missed.">    return field.equals(other.field) &amp;&amp; items.equals(other.items)</span>
         &amp;&amp; ((ignoreQuery == null &amp;&amp; other.ignoreQuery == null)

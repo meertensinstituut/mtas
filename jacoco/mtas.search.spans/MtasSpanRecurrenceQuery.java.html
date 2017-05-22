@@ -106,7 +106,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
    * @return the minimum recurrence
    */
   public int getMinimumRecurrence() {
-<span class="nc" id="L109">    return minimumRecurrence;</span>
+<span class="fc" id="L109">    return minimumRecurrence;</span>
   }
 
   /**
@@ -115,7 +115,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
    * @return the maximum recurrence
    */
   public int getMaximumRecurrence() {
-<span class="nc" id="L118">    return maximumRecurrence;</span>
+<span class="fc" id="L118">    return maximumRecurrence;</span>
   }
 
   /**
@@ -221,13 +221,13 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
 <span class="fc" id="L221">      return true;</span>
 <span class="pc bpc" id="L222" title="1 of 2 branches missed.">    if (obj == null)</span>
 <span class="nc" id="L223">      return false;</span>
-<span class="pc bpc" id="L224" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L225">      return false;</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L225">      return false;</span>
 <span class="fc" id="L226">    final MtasSpanRecurrenceQuery other = (MtasSpanRecurrenceQuery) obj;</span>
     boolean result;
 <span class="fc" id="L228">    result = query.equals(other.query);</span>
-<span class="pc bpc" id="L229" title="1 of 2 branches missed.">    result &amp;= minimumRecurrence == other.minimumRecurrence;</span>
-<span class="pc bpc" id="L230" title="1 of 2 branches missed.">    result &amp;= maximumRecurrence == other.maximumRecurrence;</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">    result &amp;= minimumRecurrence == other.minimumRecurrence;</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">    result &amp;= maximumRecurrence == other.maximumRecurrence;</span>
 <span class="fc bfc" id="L231" title="All 2 branches covered.">    if (result) {</span>
       boolean subResult;
 <span class="pc bpc" id="L233" title="2 of 4 branches missed.">      subResult = ignoreQuery == null &amp;&amp; other.ignoreQuery == null;</span>

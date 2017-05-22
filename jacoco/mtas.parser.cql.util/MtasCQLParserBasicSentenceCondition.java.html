@@ -232,8 +232,8 @@ import mtas.search.spans.util.MtasSpanQuery;
         }
 <span class="fc" id="L233">      }</span>
 <span class="fc" id="L234">      partList = newPartList;</span>
-<span class="pc bpc" id="L235" title="1 of 2 branches missed.">      if (optionalParts) {</span>
-<span class="nc" id="L236">        optional = true;</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">      if (optionalParts) {</span>
+<span class="fc" id="L236">        optional = true;</span>
       }
     }
 <span class="fc" id="L239">  }</span>
@@ -280,11 +280,11 @@ import mtas.search.spans.util.MtasSpanQuery;
 <span class="fc" id="L280">    }</span>
 <span class="fc bfc" id="L281" title="All 2 branches covered.">    if (currentQueryList != null) {</span>
 <span class="fc" id="L282">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
-<span class="pc bpc" id="L283" title="1 of 2 branches missed.">    } else if (currentQuery.isOptional()) {</span>
-<span class="nc" id="L284">      currentQueryList = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
-<span class="nc" id="L285">      currentQueryList.add(currentQuery);</span>
-<span class="nc" id="L286">      currentQuery = null;</span>
-<span class="nc" id="L287">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">    } else if (currentQuery.isOptional()) {</span>
+<span class="fc" id="L284">      currentQueryList = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
+<span class="fc" id="L285">      currentQueryList.add(currentQuery);</span>
+<span class="fc" id="L286">      currentQuery = null;</span>
+<span class="fc" id="L287">      return new MtasSpanSequenceQuery(currentQueryList, ignoreClause, maximumIgnoreLength);</span>
     } else {
 <span class="fc" id="L289">      return currentQuery.getQuery();</span>
     }

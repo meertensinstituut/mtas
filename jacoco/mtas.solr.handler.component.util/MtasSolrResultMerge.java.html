@@ -76,8 +76,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
           }
           // merge prefix
 <span class="fc" id="L78">          if (rb.req.getParams()</span>
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">              .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {</span>
-<span class="nc" id="L80">            mergeArrayList(sreq, mtasResponse, &quot;prefix&quot;, null, false);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">              .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {</span>
+<span class="fc" id="L80">            mergeArrayList(sreq, mtasResponse, &quot;prefix&quot;, null, false);</span>
           }
 <span class="fc bfc" id="L82" title="All 2 branches covered.">        } else if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_MISSING_KEY) {</span>
           // merge termvector
@@ -285,10 +285,10 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
    */
   private void mergeResponsesSortedSet(SortedSet&lt;Object&gt; originalList,
       SortedSet&lt;Object&gt; shardList) {
-<span class="nc bnc" id="L288" title="All 2 branches missed.">    for (Object item : shardList) {</span>
-<span class="nc" id="L289">      originalList.add(item);</span>
-<span class="nc" id="L290">    }</span>
-<span class="nc" id="L291">  }</span>
+<span class="fc bfc" id="L288" title="All 2 branches covered.">    for (Object item : shardList) {</span>
+<span class="fc" id="L289">      originalList.add(item);</span>
+<span class="fc" id="L290">    }</span>
+<span class="fc" id="L291">  }</span>
 
   /**
    * Merge responses array list.
@@ -375,8 +375,8 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 <span class="nc" id="L375">            mergeResponsesNamedList((NamedList&lt;Object&gt;) original,</span>
                 (NamedList&lt;Object&gt;) shardValue);
             // merge SortedSet
-<span class="pc bpc" id="L378" title="1 of 2 branches missed.">          } else if (original instanceof SortedSet&lt;?&gt;) {</span>
-<span class="nc" id="L379">            mergeResponsesSortedSet((SortedSet&lt;Object&gt;) original,</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">          } else if (original instanceof SortedSet&lt;?&gt;) {</span>
+<span class="fc" id="L379">            mergeResponsesSortedSet((SortedSet&lt;Object&gt;) original,</span>
                 (SortedSet&lt;Object&gt;) shardValue);
 <span class="fc bfc" id="L381" title="All 2 branches covered.">          } else if (original instanceof MtasSolrMtasResult) {</span>
 <span class="fc" id="L382">            MtasSolrMtasResult originalComponentResult = (MtasSolrMtasResult) original;</span>

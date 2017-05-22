@@ -361,7 +361,7 @@ public class MtasSolrComponentTermvector
         // compute keys
 <span class="fc" id="L362">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
 <span class="fc" id="L363">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR);</span>
-<span class="pc bpc" id="L364" title="1 of 2 branches missed.">        if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">        if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
 <span class="fc bfc" id="L365" title="All 2 branches covered.">          for (String key : keys) {</span>
 <span class="fc" id="L366">            String oldNumber = sreq.params.get(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key</span>
                 + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER);
@@ -379,30 +379,30 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L379">                String.valueOf(number));</span>
 <span class="fc" id="L380">          }</span>
         } else {
-<span class="nc" id="L382">          sreq.params.remove(PARAM_MTAS_TERMVECTOR);</span>
-<span class="nc bnc" id="L383" title="All 2 branches missed.">          for (String key : keys) {</span>
-<span class="nc" id="L384">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L382">          sreq.params.remove(PARAM_MTAS_TERMVECTOR);</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">          for (String key : keys) {</span>
+<span class="fc" id="L384">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_FIELD);
-<span class="nc" id="L386">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L386">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_KEY);
-<span class="nc" id="L388">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L388">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_PREFIX);
-<span class="nc" id="L390">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L390">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_REGEXP);
-<span class="nc" id="L392">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L392">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_FULL);
-<span class="nc" id="L394">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L394">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_SORT_TYPE);
-<span class="nc" id="L396">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L396">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_SORT_DIRECTION);
-<span class="nc" id="L398">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L398">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_NUMBER);
-<span class="nc" id="L400">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L400">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS);
-<span class="nc" id="L402">            Set&lt;String&gt; functionKeys = MtasSolrResultUtil</span>
-<span class="nc" id="L403">                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR</span>
+<span class="fc" id="L402">            Set&lt;String&gt; functionKeys = MtasSolrResultUtil</span>
+<span class="fc" id="L403">                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR</span>
                     + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION);
-<span class="nc bnc" id="L405" title="All 2 branches missed.">            for (String functionKey : functionKeys) {</span>
+<span class="pc bpc" id="L405" title="1 of 2 branches missed.">            for (String functionKey : functionKeys) {</span>
 <span class="nc" id="L406">              sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                   + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;
                   + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION);
@@ -413,19 +413,19 @@ public class MtasSolrComponentTermvector
                   + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;
                   + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE);
 <span class="nc" id="L415">            }</span>
-<span class="nc" id="L416">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L416">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_BOUNDARY);
-<span class="nc" id="L418">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L418">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_LIST);
-<span class="nc" id="L420">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L420">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_LIST_REGEXP);
-<span class="nc" id="L422">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L422">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP);
-<span class="nc" id="L424">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L424">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_IGNORE_LIST);
-<span class="nc" id="L426">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L426">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP);
-<span class="nc" id="L428">          }</span>
+<span class="fc" id="L428">          }</span>
         }
       }
     }

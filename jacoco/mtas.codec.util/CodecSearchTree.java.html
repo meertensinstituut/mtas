@@ -181,7 +181,7 @@ import org.apache.lucene.store.IndexInput;
       ArrayList&lt;MtasTreeItem&gt; checkList) throws IOException {
 <span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (startPosition &lt;= treeItem.max) {      </span>
       // match current node
-<span class="pc bpc" id="L184" title="1 of 4 branches missed.">      if ((endPosition &gt;= treeItem.left) &amp;&amp; (startPosition &lt;= treeItem.right)) {</span>
+<span class="fc bfc" id="L184" title="All 4 branches covered.">      if ((endPosition &gt;= treeItem.left) &amp;&amp; (startPosition &lt;= treeItem.right)) {</span>
 <span class="fc bfc" id="L185" title="All 2 branches covered.">        for (int i = 0; i &lt; treeItem.objectRefs.length; i++) {</span>
 <span class="pc bpc" id="L186" title="2 of 4 branches missed.">          list.add(new MtasTreeHit&lt;&gt;(treeItem.left, treeItem.right,</span>
               treeItem.objectRefs[i],
@@ -195,19 +195,19 @@ import org.apache.lucene.store.IndexInput;
 <span class="fc" id="L195">        MtasTreeItem treeItemLeft = getMtasTreeItem(treeItem.leftChild,</span>
             isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
             objectRefApproxOffset);
-<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        if (treeItemLeft.max &gt;= startPosition) {</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if (treeItemLeft.max &gt;= startPosition) {</span>
 <span class="fc" id="L199">          checkList.add(treeItemLeft);</span>
         }
       }
       // check rightChild
 <span class="fc bfc" id="L203" title="All 2 branches covered.">      if (treeItem.left &lt;= endPosition) {</span>
-<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (!treeItem.rightChild.equals(treeItem.ref)) {</span>
-<span class="nc" id="L205">          MtasTreeItem treeItemRight = getMtasTreeItem(treeItem.rightChild,</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">        if (!treeItem.rightChild.equals(treeItem.ref)) {</span>
+<span class="fc" id="L205">          MtasTreeItem treeItemRight = getMtasTreeItem(treeItem.rightChild,</span>
               isSinglePoint, isStoreAdditionalId, nodeRefApproxOffset, in,
               objectRefApproxOffset);
-<span class="nc bnc" id="L208" title="All 4 branches missed.">          if ((treeItemRight.left &gt;= endPosition)</span>
+<span class="pc bpc" id="L208" title="3 of 4 branches missed.">          if ((treeItemRight.left &gt;= endPosition)</span>
               || (treeItemRight.max &gt;= startPosition)) {
-<span class="nc" id="L210">            checkList.add(treeItemRight);</span>
+<span class="fc" id="L210">            checkList.add(treeItemRight);</span>
           }
         }
       }

@@ -98,8 +98,8 @@ import org.apache.lucene.search.spans.Spans;
    */
   @Override
   public int startPosition() {
-<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    if (currentMatch == null) {</span>
-<span class="nc" id="L102">      return -1;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">    if (currentMatch == null) {</span>
+<span class="fc" id="L102">      return -1;</span>
     } else {
 <span class="fc" id="L104">      return currentMatch.startPosition();</span>
     }
@@ -112,8 +112,8 @@ import org.apache.lucene.search.spans.Spans;
    */
   @Override
   public int endPosition() {
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    if (currentMatch == null) {</span>
-<span class="nc" id="L116">      return -1;</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">    if (currentMatch == null) {</span>
+<span class="fc" id="L116">      return -1;</span>
     } else {
 <span class="fc" id="L118">      return currentMatch.endPosition();</span>
     }
@@ -293,12 +293,12 @@ import org.apache.lucene.search.spans.Spans;
 <span class="pc bpc" id="L293" title="1 of 2 branches missed.">        if (item.sequenceSpans.spans != null) {</span>
 <span class="pc bpc" id="L294" title="1 of 2 branches missed.">          if (item.sequenceSpans.spans.docID() &lt; newDocId) {</span>
 <span class="fc" id="L295">            spanDocId = item.sequenceSpans.spans.advance(newDocId);</span>
-<span class="pc bpc" id="L296" title="1 of 2 branches missed.">            if (spanDocId.equals(NO_MORE_DOCS)) {</span>
-<span class="nc" id="L297">              item.noMoreDocs = true;</span>
-<span class="nc bnc" id="L298" title="All 2 branches missed.">              if (!item.sequenceSpans.optional) {</span>
+<span class="fc bfc" id="L296" title="All 2 branches covered.">            if (spanDocId.equals(NO_MORE_DOCS)) {</span>
+<span class="fc" id="L297">              item.noMoreDocs = true;</span>
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">              if (!item.sequenceSpans.optional) {</span>
                 // a not optional span has NO_MORE_DOCS: stop
-<span class="nc" id="L300">                docId = NO_MORE_DOCS;</span>
-<span class="nc" id="L301">                return null;</span>
+<span class="fc" id="L300">                docId = NO_MORE_DOCS;</span>
+<span class="fc" id="L301">                return null;</span>
               }
             } else {
 <span class="pc bpc" id="L304" title="3 of 4 branches missed.">              if (!spanDocId.equals(newDocId) &amp;&amp; !item.sequenceSpans.optional) {</span>
@@ -460,9 +460,9 @@ import org.apache.lucene.search.spans.Spans;
 <span class="fc bfc" id="L460" title="All 2 branches covered.">          if (item.sequenceSpans.optional) {</span>
             // update stats
 <span class="fc bfc" id="L462" title="All 2 branches covered.">            if (item.lowestPosition != null) {</span>
-<span class="pc bpc" id="L463" title="1 of 2 branches missed.">              minOptionalStartPosition = (minOptionalStartPosition == null)</span>
-<span class="pc" id="L464">                  ? item.lowestPosition</span>
-<span class="nc" id="L465">                  : Math.min(minOptionalStartPosition, item.lowestPosition);</span>
+<span class="fc bfc" id="L463" title="All 2 branches covered.">              minOptionalStartPosition = (minOptionalStartPosition == null)</span>
+<span class="fc" id="L464">                  ? item.lowestPosition</span>
+<span class="fc" id="L465">                  : Math.min(minOptionalStartPosition, item.lowestPosition);</span>
             }
             // for not optional spans
           } else {
@@ -625,7 +625,7 @@ import org.apache.lucene.search.spans.Spans;
 <span class="fc bfc" id="L625" title="All 2 branches covered.">            if (item.queue.containsKey(m.endPosition)) {</span>
 <span class="fc bfc" id="L626" title="All 2 branches covered.">              for (Integer endPosition : item.queue.get(m.endPosition)) {</span>
 <span class="fc" id="L627">                Match o = new Match(m.startPosition, endPosition);</span>
-<span class="pc bpc" id="L628" title="1 of 2 branches missed.">                if (!newSubMatchesQueue.contains(o)) {</span>
+<span class="fc bfc" id="L628" title="All 2 branches covered.">                if (!newSubMatchesQueue.contains(o)) {</span>
 <span class="fc" id="L629">                  newSubMatchesQueue.add(o);</span>
                 }
 <span class="fc" id="L631">              }</span>
@@ -650,7 +650,7 @@ import org.apache.lucene.search.spans.Spans;
 <span class="fc bfc" id="L650" title="All 2 branches covered.">            if (item.queue.containsKey(checkEndPosition)) {</span>
 <span class="fc bfc" id="L651" title="All 2 branches covered.">              for (Integer endPosition : item.queue.get(checkEndPosition)) {</span>
 <span class="fc" id="L652">                Match o = new Match(m.startPosition, endPosition);</span>
-<span class="pc bpc" id="L653" title="1 of 2 branches missed.">                if (!newSubMatchesQueue.contains(o)) {</span>
+<span class="fc bfc" id="L653" title="All 2 branches covered.">                if (!newSubMatchesQueue.contains(o)) {</span>
 <span class="fc" id="L654">                  newSubMatchesQueue.add(o);</span>
                 }
 <span class="fc" id="L656">              }</span>
@@ -895,7 +895,7 @@ import org.apache.lucene.search.spans.Spans;
 <span class="pc bpc" id="L895" title="1 of 2 branches missed.">      if (getClass() != obj.getClass())</span>
 <span class="nc" id="L896">        return false;</span>
 <span class="fc" id="L897">      final Match that = (Match) obj;</span>
-<span class="pc bpc" id="L898" title="2 of 4 branches missed.">      return startPosition == that.startPosition</span>
+<span class="pc bpc" id="L898" title="1 of 4 branches missed.">      return startPosition == that.startPosition</span>
           &amp;&amp; endPosition == that.endPosition;
     }
 
@@ -929,7 +929,7 @@ import org.apache.lucene.search.spans.Spans;
    */
   @Override
   public long cost() {
-<span class="nc" id="L932">    return cost;</span>
+<span class="fc" id="L932">    return cost;</span>
   }
 
   /*
@@ -939,7 +939,7 @@ import org.apache.lucene.search.spans.Spans;
    */
   @Override
   public float positionsCost() {
-<span class="nc" id="L942">    return 0;</span>
+<span class="fc" id="L942">    return 0;</span>
   }
 
 }

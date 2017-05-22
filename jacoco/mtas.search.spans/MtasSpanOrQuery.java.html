@@ -167,8 +167,8 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
 <span class="fc" id="L167">      return true;</span>
 <span class="pc bpc" id="L168" title="1 of 2 branches missed.">    if (obj == null)</span>
 <span class="nc" id="L169">      return false;</span>
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L171">      return false;</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L171">      return false;</span>
 <span class="fc" id="L172">    final MtasSpanOrQuery that = (MtasSpanOrQuery) obj;</span>
 <span class="fc" id="L173">    return clauses.equals(that.clauses);</span>
   }

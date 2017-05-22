@@ -138,7 +138,7 @@ public class CodecCollector {
       // compute relevant docSet/docList
 <span class="fc" id="L139">      List&lt;Integer&gt; docSet = null;</span>
 <span class="fc" id="L140">      List&lt;Integer&gt; docList = null;</span>
-<span class="pc bpc" id="L141" title="1 of 2 branches missed.">      if (fullDocSet != null) {</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">      if (fullDocSet != null) {</span>
 <span class="fc" id="L142">        docSet = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L143">        docSets.put(lrc.ord, docSet);</span>
 <span class="fc" id="L144">        Iterator&lt;Integer&gt; docSetIterator = fullDocSet.iterator();</span>
@@ -159,11 +159,11 @@ public class CodecCollector {
 <span class="fc" id="L159">        docList = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L160">        Iterator&lt;Integer&gt; docListIterator = fullDocList.iterator();</span>
 <span class="fc" id="L161">        Integer docListId = null;</span>
-<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        while (docListIterator.hasNext()) {</span>
-<span class="nc" id="L163">          docListId = docListIterator.next();</span>
-<span class="nc bnc" id="L164" title="All 2 branches missed.">          if ((docListId &gt;= lrc.docBase)</span>
-<span class="nc bnc" id="L165" title="All 2 branches missed.">              &amp;&amp; (docListId &lt; lrc.docBase + lrc.reader().maxDoc())) {</span>
-<span class="nc" id="L166">            docList.add(docListId);</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        while (docListIterator.hasNext()) {</span>
+<span class="fc" id="L163">          docListId = docListIterator.next();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">          if ((docListId &gt;= lrc.docBase)</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">              &amp;&amp; (docListId &lt; lrc.docBase + lrc.reader().maxDoc())) {</span>
+<span class="fc" id="L166">            docList.add(docListId);</span>
           }
         }
 <span class="fc" id="L169">        Collections.sort(docList);</span>
@@ -789,43 +789,43 @@ public class CodecCollector {
    */
   private static void collectPrefixes(FieldInfos fieldInfos, String field,
       ComponentField fieldInfo) throws IOException {
-<span class="pc bpc" id="L792" title="1 of 2 branches missed.">    if (fieldInfo.prefix != null) {</span>
-<span class="nc" id="L793">      FieldInfo fi = fieldInfos.fieldInfo(field);</span>
-<span class="nc bnc" id="L794" title="All 2 branches missed.">      if (fi != null) {</span>
-<span class="nc" id="L795">        String singlePositionPrefixes = fi.getAttribute(</span>
+<span class="fc bfc" id="L792" title="All 2 branches covered.">    if (fieldInfo.prefix != null) {</span>
+<span class="fc" id="L793">      FieldInfo fi = fieldInfos.fieldInfo(field);</span>
+<span class="pc bpc" id="L794" title="1 of 2 branches missed.">      if (fi != null) {</span>
+<span class="fc" id="L795">        String singlePositionPrefixes = fi.getAttribute(</span>
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
-<span class="nc" id="L797">        String multiplePositionPrefixes = fi.getAttribute(</span>
+<span class="fc" id="L797">        String multiplePositionPrefixes = fi.getAttribute(</span>
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_MULTIPLE_POSITION);
-<span class="nc" id="L799">        String setPositionPrefixes = fi.getAttribute(</span>
+<span class="fc" id="L799">        String setPositionPrefixes = fi.getAttribute(</span>
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SET_POSITION);
-<span class="nc" id="L801">        String intersectingPrefixes = fi.getAttribute(</span>
+<span class="fc" id="L801">        String intersectingPrefixes = fi.getAttribute(</span>
             MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_INTERSECTION);
-<span class="nc bnc" id="L803" title="All 2 branches missed.">        if (singlePositionPrefixes != null) {</span>
-<span class="nc" id="L804">          String[] prefixes = singlePositionPrefixes</span>
-<span class="nc" id="L805">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
-<span class="nc bnc" id="L806" title="All 2 branches missed.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
-<span class="nc" id="L807">            fieldInfo.prefix.addSinglePosition(prefixes[i]);</span>
+<span class="pc bpc" id="L803" title="1 of 2 branches missed.">        if (singlePositionPrefixes != null) {</span>
+<span class="fc" id="L804">          String[] prefixes = singlePositionPrefixes</span>
+<span class="fc" id="L805">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
+<span class="fc bfc" id="L806" title="All 2 branches covered.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
+<span class="fc" id="L807">            fieldInfo.prefix.addSinglePosition(prefixes[i]);</span>
           }
         }
-<span class="nc bnc" id="L810" title="All 2 branches missed.">        if (multiplePositionPrefixes != null) {</span>
-<span class="nc" id="L811">          String[] prefixes = multiplePositionPrefixes</span>
-<span class="nc" id="L812">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
-<span class="nc bnc" id="L813" title="All 2 branches missed.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
-<span class="nc" id="L814">            fieldInfo.prefix.addMultiplePosition(prefixes[i]);</span>
+<span class="pc bpc" id="L810" title="1 of 2 branches missed.">        if (multiplePositionPrefixes != null) {</span>
+<span class="fc" id="L811">          String[] prefixes = multiplePositionPrefixes</span>
+<span class="fc" id="L812">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
+<span class="fc bfc" id="L813" title="All 2 branches covered.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
+<span class="fc" id="L814">            fieldInfo.prefix.addMultiplePosition(prefixes[i]);</span>
           }
         }
-<span class="nc bnc" id="L817" title="All 2 branches missed.">        if (setPositionPrefixes != null) {</span>
-<span class="nc" id="L818">          String[] prefixes = setPositionPrefixes</span>
-<span class="nc" id="L819">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
-<span class="nc bnc" id="L820" title="All 2 branches missed.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
-<span class="nc" id="L821">            fieldInfo.prefix.addSetPosition(prefixes[i]);</span>
+<span class="pc bpc" id="L817" title="1 of 2 branches missed.">        if (setPositionPrefixes != null) {</span>
+<span class="fc" id="L818">          String[] prefixes = setPositionPrefixes</span>
+<span class="fc" id="L819">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
+<span class="fc bfc" id="L820" title="All 2 branches covered.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
+<span class="fc" id="L821">            fieldInfo.prefix.addSetPosition(prefixes[i]);</span>
           }
         }
-<span class="nc bnc" id="L824" title="All 2 branches missed.">        if (intersectingPrefixes != null) {</span>
-<span class="nc" id="L825">          String[] prefixes = intersectingPrefixes</span>
-<span class="nc" id="L826">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
-<span class="nc bnc" id="L827" title="All 2 branches missed.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
-<span class="nc" id="L828">            fieldInfo.prefix.addIntersecting(prefixes[i]);</span>
+<span class="pc bpc" id="L824" title="1 of 2 branches missed.">        if (intersectingPrefixes != null) {</span>
+<span class="fc" id="L825">          String[] prefixes = intersectingPrefixes</span>
+<span class="fc" id="L826">              .split(Pattern.quote(MtasToken.DELIMITER));</span>
+<span class="fc bfc" id="L827" title="All 2 branches covered.">          for (int i = 0; i &lt; prefixes.length; i++) {</span>
+<span class="fc" id="L828">            fieldInfo.prefix.addIntersecting(prefixes[i]);</span>
           }
         }
       }
