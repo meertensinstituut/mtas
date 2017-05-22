@@ -108,7 +108,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
 <span class="fc" id="L110">    MtasSpanQuery newBigQuery = bigQuery.rewrite(reader);</span>
-<span class="fc" id="L111">    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);</span>
+<span class="fc" id="L111">    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);      </span>
 
 <span class="pc bpc" id="L113" title="4 of 8 branches missed.">    if (newBigQuery == null || newBigQuery instanceof MtasSpanMatchNoneQuery</span>
         || newSmallQuery == null
@@ -234,12 +234,12 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
           }
         }
       }
-    }
-
+    }    
+    
 <span class="pc bpc" id="L239" title="1 of 4 branches missed.">    if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {</span>
 <span class="fc" id="L240">      return (new MtasSpanWithinQuery(newBigQuery, newSmallQuery,</span>
           leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
-<span class="fc" id="L242">          rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);</span>
+<span class="fc" id="L242">          rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);      </span>
 <span class="pc bpc" id="L243" title="1 of 2 branches missed.">    } else if (newBigQuery.equals(newSmallQuery)) {</span>
 <span class="nc" id="L244">      return newBigQuery;</span>
     } else {

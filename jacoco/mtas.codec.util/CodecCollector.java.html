@@ -1123,9 +1123,9 @@ public class CodecCollector {
 <span class="fc bfc" id="L1123" title="All 2 branches covered.">          for (int docId : docSet) {</span>
 <span class="fc" id="L1124">            tmpValue = tokensData.get(docId);</span>
 <span class="pc bpc" id="L1125" title="1 of 2 branches missed.">            value = tmpValue == null ? 0 : tmpValue.intValue();</span>
-<span class="pc bpc" id="L1126" title="4 of 6 branches missed.">            if (((token.minimumLong == null) || (value &gt;= token.minimumLong))</span>
+<span class="pc bpc" id="L1126" title="1 of 6 branches missed.">            if (((token.minimumLong == null) || (value &gt;= token.minimumLong))</span>
                 &amp;&amp; ((token.maximumLong == null)
-<span class="nc bnc" id="L1128" title="All 2 branches missed.">                    || (value &lt;= token.maximumLong))) {</span>
+<span class="pc bpc" id="L1128" title="1 of 2 branches missed.">                    || (value &lt;= token.maximumLong))) {</span>
 <span class="fc" id="L1129">              values[number] = value;</span>
 <span class="fc" id="L1130">              number++;</span>
             }

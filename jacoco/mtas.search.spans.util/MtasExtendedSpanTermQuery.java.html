@@ -8,6 +8,7 @@ import java.util.Set;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecUtil;
 import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -18,6 +19,7 @@ import org.apache.lucene.index.TermState;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.FilterSpans;
 import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
@@ -46,8 +48,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    * @param term the term
    */
   public MtasExtendedSpanTermQuery(Term term) {
-<span class="nc" id="L49">    this(term, true);</span>
-<span class="nc" id="L50">  }</span>
+<span class="nc" id="L51">    this(term, true);</span>
+<span class="nc" id="L52">  }</span>
 
   /**
    * Instantiates a new mtas extended span term query.
@@ -56,8 +58,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    * @param singlePosition the single position
    */
   private MtasExtendedSpanTermQuery(Term term, boolean singlePosition) {
-<span class="nc" id="L59">    this(new SpanTermQuery(term), singlePosition);</span>
-<span class="nc" id="L60">  }</span>
+<span class="nc" id="L61">    this(new SpanTermQuery(term), singlePosition);</span>
+<span class="nc" id="L62">  }</span>
 
   /**
    * Instantiates a new mtas extended span term query.
@@ -67,19 +69,19 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   public MtasExtendedSpanTermQuery(SpanTermQuery query,
       boolean singlePosition) {
-<span class="fc" id="L70">    super(query.getTerm());</span>
-<span class="fc" id="L71">    localTerm = query.getTerm();    </span>
-<span class="fc" id="L72">    this.singlePosition = singlePosition;</span>
-<span class="fc" id="L73">    int i = localTerm.text().indexOf(MtasToken.DELIMITER);</span>
-<span class="pc bpc" id="L74" title="1 of 2 branches missed.">    if (i &gt;= 0) {</span>
-<span class="fc" id="L75">      prefix = localTerm.text().substring(0, i);</span>
-<span class="fc" id="L76">      value = localTerm.text().substring((i + MtasToken.DELIMITER.length()));</span>
-<span class="fc bfc" id="L77" title="All 2 branches covered.">      value = (value.length() &gt; 0) ? value : null;</span>
+<span class="fc" id="L72">    super(query.getTerm());</span>
+<span class="fc" id="L73">    localTerm = query.getTerm();    </span>
+<span class="fc" id="L74">    this.singlePosition = singlePosition;</span>
+<span class="fc" id="L75">    int i = localTerm.text().indexOf(MtasToken.DELIMITER);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">    if (i &gt;= 0) {</span>
+<span class="fc" id="L77">      prefix = localTerm.text().substring(0, i);</span>
+<span class="fc" id="L78">      value = localTerm.text().substring((i + MtasToken.DELIMITER.length()));</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">      value = (value.length() &gt; 0) ? value : null;</span>
     } else {
-<span class="nc" id="L79">      prefix = localTerm.text();</span>
-<span class="nc" id="L80">      value = null;</span>
+<span class="nc" id="L81">      prefix = localTerm.text();</span>
+<span class="nc" id="L82">      value = null;</span>
     }
-<span class="fc" id="L82">  }</span>
+<span class="fc" id="L84">  }</span>
 
   /*
    * (non-Javadoc)
@@ -92,20 +94,21 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     final TermContext context;
-<span class="fc" id="L95">    final IndexReaderContext topContext = searcher.getTopReaderContext();</span>
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (termContext == null) {</span>
-<span class="fc" id="L97">      context = TermContext.build(topContext, localTerm);</span>
+<span class="fc" id="L97">    final IndexReaderContext topContext = searcher.getTopReaderContext();</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (termContext == null) {</span>
+<span class="fc" id="L99">      context = TermContext.build(topContext, localTerm);</span>
     } else {
-<span class="nc" id="L99">      context = termContext;</span>
+<span class="nc" id="L101">      context = termContext;</span>
     }
-<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    return new SpanTermWeight(context, searcher,</span>
-<span class="pc" id="L102">        needsScores ? Collections.singletonMap(localTerm, context) : null);</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    return new SpanTermWeight(context, searcher,</span>
+<span class="pc" id="L104">        needsScores ? Collections.singletonMap(localTerm, context) : null);</span>
   }
-
+  
+  
   /**
    * The Class SpanTermWeight.
    */
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">  public class SpanTermWeight extends SpanWeight {</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">  public class SpanTermWeight extends SpanWeight {</span>
 
     /** The term context. */
     final TermContext termContext;
@@ -119,11 +122,11 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(TermContext termContext, IndexSearcher searcher,
-<span class="fc" id="L122">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L123">      super(MtasExtendedSpanTermQuery.this, searcher, terms);</span>
-<span class="fc" id="L124">      this.termContext = termContext;</span>
-<span class="pc bpc" id="L125" title="2 of 4 branches missed.">      assert termContext != null : &quot;TermContext must not be null&quot;;</span>
-<span class="fc" id="L126">    }</span>
+<span class="fc" id="L125">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
+<span class="fc" id="L126">      super(MtasExtendedSpanTermQuery.this, searcher, terms);</span>
+<span class="fc" id="L127">      this.termContext = termContext;</span>
+<span class="pc bpc" id="L128" title="2 of 4 branches missed.">      assert termContext != null : &quot;TermContext must not be null&quot;;</span>
+<span class="fc" id="L129">    }</span>
 
     /*
      * (non-Javadoc)
@@ -132,8 +135,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L135">      terms.add(localTerm);</span>
-<span class="nc" id="L136">    }</span>
+<span class="nc" id="L138">      terms.add(localTerm);</span>
+<span class="nc" id="L139">    }</span>
 
     /*
      * (non-Javadoc)
@@ -144,8 +147,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="fc" id="L147">      contexts.put(localTerm, termContext);</span>
-<span class="fc" id="L148">    }</span>
+<span class="fc" id="L150">      contexts.put(localTerm, termContext);</span>
+<span class="fc" id="L151">    }</span>
 
     /*
      * (non-Javadoc)
@@ -158,77 +161,78 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     @Override
     public Spans getSpans(final LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-<span class="fc" id="L161">      final TermState state = termContext.get(context.ord);</span>
-<span class="fc bfc" id="L162" title="All 2 branches covered.">      if (state == null) { // term is not present in that reader</span>
-<span class="pc bpc" id="L163" title="2 of 4 branches missed.">        assert context.reader().docFreq(</span>
-<span class="fc" id="L164">            localTerm) == 0 : &quot;no termstate found but term exists in reader term=&quot;</span>
-<span class="nc" id="L165">                + localTerm;</span>
-<span class="fc" id="L166">        return null;</span>
+<span class="fc" id="L164">      final TermState state = termContext.get(context.ord);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">      if (state == null) { // term is not present in that reader</span>
+<span class="pc bpc" id="L166" title="2 of 4 branches missed.">        assert context.reader().docFreq(</span>
+<span class="fc" id="L167">            localTerm) == 0 : &quot;no termstate found but term exists in reader term=&quot;</span>
+<span class="nc" id="L168">                + localTerm;</span>
+<span class="fc" id="L169">        return null;</span>
       }
 
-<span class="fc" id="L169">      final Terms terms = context.reader().terms(localTerm.field());</span>
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">      if (terms == null)</span>
-<span class="nc" id="L171">        return null;</span>
-<span class="pc bpc" id="L172" title="1 of 2 branches missed.">      if (!terms.hasPositions())</span>
-<span class="nc" id="L173">        throw new IllegalStateException(&quot;field \&quot;&quot; + localTerm.field()</span>
+<span class="fc" id="L172">      final Terms terms = context.reader().terms(localTerm.field());</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">      if (terms == null) {</span>
+<span class="nc" id="L174">        return null;</span>
+      }  
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">      if (!terms.hasPositions())</span>
+<span class="nc" id="L177">        throw new IllegalStateException(&quot;field \&quot;&quot; + localTerm.field()</span>
             + &quot;\&quot; was indexed without position data; cannot run SpanTermQuery (term=&quot;
-<span class="nc" id="L175">            + localTerm.text() + &quot;)&quot;);</span>
+<span class="nc" id="L179">            + localTerm.text() + &quot;)&quot;);</span>
 
-<span class="fc" id="L177">      final TermsEnum termsEnum = terms.iterator();</span>
-<span class="fc" id="L178">      termsEnum.seekExact(localTerm.bytes(), state);</span>
+<span class="fc" id="L181">      final TermsEnum termsEnum = terms.iterator();</span>
+<span class="fc" id="L182">      termsEnum.seekExact(localTerm.bytes(), state);</span>
 
       final PostingsEnum postings;
       Spans matchSpans;
 
       try {
         // get leafreader
-<span class="fc" id="L185">        LeafReader r = context.reader();</span>
+<span class="fc" id="L189">        LeafReader r = context.reader();</span>
 
         // get delegate
-<span class="fc" id="L188">        Boolean hasMethod = true;</span>
-<span class="fc bfc" id="L189" title="All 2 branches covered.">        while (hasMethod) {</span>
-<span class="fc" id="L190">          hasMethod = false;</span>
-<span class="fc" id="L191">          Method[] methods = r.getClass().getMethods();</span>
-<span class="fc bfc" id="L192" title="All 2 branches covered.">          for (Method m : methods) {</span>
-<span class="fc bfc" id="L193" title="All 2 branches covered.">            if (m.getName().equals(&quot;getDelegate&quot;)) {</span>
-<span class="fc" id="L194">              hasMethod = true;</span>
-<span class="fc" id="L195">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
-<span class="fc" id="L196">              break;</span>
+<span class="fc" id="L192">        Boolean hasMethod = true;</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">        while (hasMethod) {</span>
+<span class="fc" id="L194">          hasMethod = false;</span>
+<span class="fc" id="L195">          Method[] methods = r.getClass().getMethods();</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">          for (Method m : methods) {</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">            if (m.getName().equals(&quot;getDelegate&quot;)) {</span>
+<span class="fc" id="L198">              hasMethod = true;</span>
+<span class="fc" id="L199">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="fc" id="L200">              break;</span>
             }
           }
-<span class="fc" id="L199">        }</span>
+<span class="fc" id="L203">        }</span>
 
-<span class="fc" id="L201">        FieldInfo fieldInfo = r.getFieldInfos().fieldInfo(field);</span>
+<span class="fc" id="L205">        FieldInfo fieldInfo = r.getFieldInfos().fieldInfo(field);</span>
 
-<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (CodecUtil.isSinglePositionPrefix(fieldInfo, prefix)) {</span>
-<span class="fc" id="L204">          postings = termsEnum.postings(null,</span>
-<span class="fc" id="L205">              requiredPostings.getRequiredPostings());</span>
-<span class="fc" id="L206">          matchSpans = new MtasExtendedTermSpans(postings, localTerm, true);</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (CodecUtil.isSinglePositionPrefix(fieldInfo, prefix)) {</span>
+<span class="fc" id="L208">          postings = termsEnum.postings(null,</span>
+<span class="fc" id="L209">              requiredPostings.getRequiredPostings());</span>
+<span class="fc" id="L210">          matchSpans = new MtasExtendedTermSpans(postings, localTerm, true);</span>
         } else {
-<span class="fc" id="L208">          postings = termsEnum.postings(null, requiredPostings</span>
-<span class="fc" id="L209">              .atLeast(Postings.PAYLOADS).getRequiredPostings());</span>
-<span class="fc" id="L210">          matchSpans = new MtasExtendedTermSpans(postings, localTerm, false);</span>
+<span class="fc" id="L212">          postings = termsEnum.postings(null, requiredPostings</span>
+<span class="fc" id="L213">              .atLeast(Postings.PAYLOADS).getRequiredPostings());</span>
+<span class="fc" id="L214">          matchSpans = new MtasExtendedTermSpans(postings, localTerm, false);</span>
         }
-<span class="fc bfc" id="L212" title="All 2 branches covered.">        if(singlePosition) {</span>
-<span class="pc bpc" id="L213" title="1 of 2 branches missed.">          return new FilterSpans(matchSpans) {</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">        if(singlePosition) {</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">          return new FilterSpans(matchSpans) {</span>
             @Override
             protected AcceptStatus accept(Spans candidate)
                 throws IOException {
-<span class="pc bpc" id="L217" title="2 of 4 branches missed.">              assert candidate.startPosition() != candidate.endPosition();</span>
-<span class="fc" id="L218">              if((candidate.endPosition()</span>
-<span class="pc bpc" id="L219" title="1 of 2 branches missed.">                  - candidate.startPosition()) == 1) {</span>
-<span class="fc" id="L220">                return AcceptStatus.YES;</span>
+<span class="pc bpc" id="L221" title="2 of 4 branches missed.">              assert candidate.startPosition() != candidate.endPosition();</span>
+<span class="fc" id="L222">              if((candidate.endPosition()</span>
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">                  - candidate.startPosition()) == 1) {</span>
+<span class="fc" id="L224">                return AcceptStatus.YES;</span>
               } else {
-<span class="nc" id="L222">                return AcceptStatus.NO;</span>
+<span class="nc" id="L226">                return AcceptStatus.NO;</span>
               }                           
             }
           };
         } else {
-<span class="fc" id="L227">          return matchSpans;</span>
+<span class="fc" id="L231">          return matchSpans;</span>
         }        
-<span class="nc" id="L229">      } catch (Exception e) {</span>
+<span class="nc" id="L233">      } catch (Exception e) {</span>
         // e.printStackTrace();
-<span class="nc" id="L231">        throw new IOException(&quot;Can't get reader: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L235">        throw new IOException(&quot;Can't get reader: &quot; + e.getMessage(), e);</span>
       }
 
     }
@@ -242,15 +246,15 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L245">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L246">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
-<span class="nc bnc" id="L247" title="All 2 branches missed.">    if (value == null) {</span>
-<span class="nc" id="L248">      buffer.append(field + &quot;:&quot; + prefix);</span>
+<span class="nc" id="L249">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L250">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L251" title="All 2 branches missed.">    if (value == null) {</span>
+<span class="nc" id="L252">      buffer.append(field + &quot;:&quot; + prefix);</span>
     } else {
-<span class="nc" id="L250">      buffer.append(field + &quot;:&quot; + prefix + &quot;=&quot; + value);</span>
+<span class="nc" id="L254">      buffer.append(field + &quot;:&quot; + prefix + &quot;=&quot; + value);</span>
     }
-<span class="nc" id="L252">    buffer.append(&quot;])&quot;);</span>
-<span class="nc" id="L253">    return buffer.toString();</span>
+<span class="nc" id="L256">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L257">    return buffer.toString();</span>
   }
 
   /*
@@ -260,14 +264,14 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="pc bpc" id="L263" title="1 of 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L264">      return true;</span>
-<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L266">      return false;</span>
-<span class="pc bpc" id="L267" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L268">      return false;</span>
-<span class="fc" id="L269">    MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;</span>
-<span class="pc bpc" id="L270" title="1 of 4 branches missed.">    return other.localTerm.equals(localTerm) &amp;&amp; (other.singlePosition == singlePosition);</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L268">      return true;</span>
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L270">      return false;</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L272">      return false;</span>
+<span class="fc" id="L273">    MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;</span>
+<span class="pc bpc" id="L274" title="1 of 4 branches missed.">    return other.localTerm.equals(localTerm) &amp;&amp; (other.singlePosition == singlePosition);</span>
   }
   
   /* (non-Javadoc)
@@ -275,12 +279,12 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L278">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L279">    h = (h * 5) ^ localTerm.hashCode();</span>
-<span class="fc bfc" id="L280" title="All 2 branches covered.">    if(singlePosition) {</span>
-<span class="fc" id="L281">      h+=1;</span>
+<span class="fc" id="L282">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L283">    h = (h * 5) ^ localTerm.hashCode();</span>
+<span class="fc bfc" id="L284" title="All 2 branches covered.">    if(singlePosition) {</span>
+<span class="fc" id="L285">      h+=1;</span>
     }
-<span class="fc" id="L283">    return h;</span>
+<span class="fc" id="L287">    return h;</span>
   }
 
 }

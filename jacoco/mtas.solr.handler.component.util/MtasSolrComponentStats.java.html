@@ -306,10 +306,10 @@ public class MtasSolrComponentStats
 <span class="fc" id="L306">        String key = keys[i];</span>
 <span class="pc bpc" id="L307" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
 <span class="fc" id="L308">            : types[i].trim();</span>
-<span class="pc bpc" id="L309" title="3 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
-<span class="pc" id="L310">            : Double.parseDouble(minima[i]);</span>
-<span class="pc bpc" id="L311" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
-<span class="pc" id="L312">            : Double.parseDouble(maxima[i]);</span>
+<span class="pc bpc" id="L309" title="1 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
+<span class="fc" id="L310">            : Double.parseDouble(minima[i]);</span>
+<span class="pc bpc" id="L311" title="1 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
+<span class="fc" id="L312">            : Double.parseDouble(maxima[i]);</span>
         try {
 <span class="fc" id="L314">          mtasFields.list.get(field).statsTokenList</span>
 <span class="fc" id="L315">              .add(new ComponentToken(key, minimum, maximum, type));</span>

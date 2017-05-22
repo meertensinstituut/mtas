@@ -1801,13 +1801,13 @@ public class CodecComponent {
 <span class="fc" id="L1801">      dataType = CodecUtil.DATA_TYPE_LONG;</span>
 <span class="fc" id="L1802">      this.statsItems = CodecUtil.createStatsItems(statsType);</span>
 <span class="fc" id="L1803">      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);</span>
-<span class="pc bpc" id="L1804" title="1 of 2 branches missed.">      if (minimumDouble != null) {</span>
-<span class="nc" id="L1805">        this.minimumLong = minimumDouble.longValue();</span>
+<span class="fc bfc" id="L1804" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
+<span class="fc" id="L1805">        this.minimumLong = minimumDouble.longValue();</span>
       } else {
 <span class="fc" id="L1807">        this.minimumLong = null;</span>
       }
-<span class="pc bpc" id="L1809" title="1 of 2 branches missed.">      if (maximumDouble != null) {</span>
-<span class="nc" id="L1810">        this.maximumLong = maximumDouble.longValue();</span>
+<span class="fc bfc" id="L1809" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
+<span class="fc" id="L1810">        this.maximumLong = maximumDouble.longValue();</span>
       } else {
 <span class="fc" id="L1812">        this.maximumLong = null;</span>
       }
