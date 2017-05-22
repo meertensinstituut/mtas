@@ -1,18 +1,23 @@
 package mtas.solr;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
+
+import junit.framework.Assert;
 
 public class MtasSolrBase {
 
@@ -151,6 +156,48 @@ public class MtasSolrBase {
     return null;
   }
 
+  public static Map<String, List<String>> getFromMtasPrefix(NamedList<Object> response, String key) {
+    if (response == null) {
+      log.error("no (valid); response");
+    } else {
+      Object mtasResponseRaw = response.get("mtas");
+      if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
+        NamedList<Object> mtasResponse = (NamedList) response.get("mtas");
+        Object mtasPrefixResponseRaw = mtasResponse.get("prefix");
+        if (mtasPrefixResponseRaw != null
+            && mtasPrefixResponseRaw instanceof List) {
+          List<NamedList> mtasPrefixResponse = (List) mtasPrefixResponseRaw;
+          if (mtasPrefixResponse.isEmpty()) {
+            log.error("no (valid) mtas prefix response");
+          } else {
+            NamedList<Object> item = null;
+            for (NamedList<Object> mtasPrefixResponseItem : mtasPrefixResponse) {
+              if (mtasPrefixResponseItem.get("key") != null
+                  && (mtasPrefixResponseItem.get("key") instanceof String)
+                  && mtasPrefixResponseItem.get("key").equals(key)) {
+                item = mtasPrefixResponseItem;
+                break;
+              }
+            }
+            assertFalse("no item with key " + key, item == null);
+            Map<String, List<String>> result = new HashMap<>();
+            Iterator<Entry<String, Object>> it = item.iterator();
+            Entry<String,Object> entry;
+            while(it.hasNext()) {
+              entry = it.next();
+              if(!entry.getKey().equals("key")) {
+                assertTrue("invalid entry prefix", entry.getValue() instanceof List);
+                result.put(entry.getKey(), (List) entry.getValue());
+              }
+            }
+            return result;
+          }
+        }
+      }
+    }  
+    return null;
+  }
+  
   public static boolean deleteDirectory(File directory) {
     if (directory.exists()) {
       File[] files = directory.listFiles();

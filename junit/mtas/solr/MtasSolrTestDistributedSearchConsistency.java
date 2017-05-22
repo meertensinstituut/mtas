@@ -2,6 +2,7 @@ package mtas.solr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,13 +129,13 @@ public class MtasSolrTestDistributedSearchConsistency {
     ModifiableSolrParams params = new ModifiableSolrParams();
     String[] types = new String[] { "n", "sum", "mean", "min", "max" };
     params.set("q", "*:*");
+    params.set("rows", 10);
     params.set("mtas", "true");
     params.set("mtas.stats", "true");
     params.set("mtas.stats.tokens", "true");
     params.set("mtas.stats.tokens.0.field", "mtas");
     params.set("mtas.stats.tokens.0.key", "statsKey");
     params.set("mtas.stats.tokens.0.type", String.join(",", types));
-    params.set("rows", "0");
     Map<String, QueryResponse> list = createResults(params, null);
     createStatsAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
         list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "tokens",
@@ -152,13 +153,13 @@ public class MtasSolrTestDistributedSearchConsistency {
     ModifiableSolrParams params = new ModifiableSolrParams();
     String[] types = new String[] { "n", "sum", "mean", "min", "max" };
     params.set("q", "*:*");
+    params.set("rows", 10);
     params.set("mtas", "true");
     params.set("mtas.stats", "true");
     params.set("mtas.stats.positions", "true");
     params.set("mtas.stats.positions.0.field", "mtas");
     params.set("mtas.stats.positions.0.key", "statsKey");
     params.set("mtas.stats.positions.0.type", String.join(",", types));
-    params.set("rows", "0");
     Map<String, QueryResponse> list = createResults(params, null);
     createStatsAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
         list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "positions",
@@ -176,15 +177,17 @@ public class MtasSolrTestDistributedSearchConsistency {
     ModifiableSolrParams params = new ModifiableSolrParams();
     String[] types = new String[] { "n", "sum", "mean", "min", "max" };
     params.set("q", "*:*");
+    params.set("rows", 10);
     params.set("mtas", "true");
     params.set("mtas.stats", "true");
     params.set("mtas.stats.spans", "true");
     params.set("mtas.stats.spans.0.field", "mtas");
     params.set("mtas.stats.spans.0.key", "statsKey");
     params.set("mtas.stats.spans.0.query.0.type", "cql");
-    params.set("mtas.stats.spans.0.query.0.value", "[pos=\"LID\"]");
+    params.set("mtas.stats.spans.0.query.0.value", "[pos=$pos]");
+    params.set("mtas.stats.spans.0.query.0.variable.0.name", "pos");
+    params.set("mtas.stats.spans.0.query.0.variable.0.value", "LID,N");
     params.set("mtas.stats.spans.0.type", String.join(",", types));
-    params.set("rows", "0");
     Map<String, QueryResponse> list = createResults(params, null);
     createStatsAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
         list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "spans",
@@ -198,7 +201,7 @@ public class MtasSolrTestDistributedSearchConsistency {
     String[] collections = new String[] { COLLECTION_ALL_OPTIMIZED,
         COLLECTION_ALL_MULTIPLE_SEGMENTS, COLLECTION_DISTRIBUTED };
     params.set("q", "*:*");
-    params.set("rows", 0);
+    params.set("rows", 10);
     params.set("mtas", "true");
     params.set("mtas.termvector", "true");
     params.set("mtas.termvector.0.field", "mtas");
@@ -243,10 +246,10 @@ public class MtasSolrTestDistributedSearchConsistency {
           Object itemValue = MtasSolrBase.getFromMtasStats(
               itemList.get(entry.getKey()).getResponse(), "spans", "statsKey",
               type);
-          assertFalse(
+          assertTrue(
               "for " + entry.getKey() + ", stats for '" + key + "' - " + type
                   + " are wrong : " + item.get(type) + " and " + itemValue,
-              !item.get(type).equals(itemValue));
+              item.get(type).equals(itemValue));
         }
       }
 
@@ -266,7 +269,7 @@ public class MtasSolrTestDistributedSearchConsistency {
             100, 1000 }) {
           params.clear();
           params.set("q", "*:*");
-          params.set("rows", 0);
+          params.set("rows", 10);
           params.set("mtas", "true");
           params.set("mtas.termvector", "true");
           params.set("mtas.termvector.0.field", "mtas");
@@ -297,6 +300,21 @@ public class MtasSolrTestDistributedSearchConsistency {
         }
       }
     }
+  }
+  
+  @org.junit.Test
+  public void mtasRequestHandlerPrefix() throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    String[] collections = new String[] { COLLECTION_ALL_OPTIMIZED,
+        COLLECTION_ALL_MULTIPLE_SEGMENTS, COLLECTION_DISTRIBUTED };
+    params.set("q", "*:*");
+    params.set("mtas", "true");
+    params.set("mtas.prefix", "true");
+    params.set("mtas.prefix.0.key", "prefixKey");
+    params.set("mtas.prefix.0.field", "mtas");
+    Map<String, QueryResponse> list = createResults(params, Arrays.asList(collections));
+    createPrefixAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(), list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "prefixKey");
+    createPrefixAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(), list.get(COLLECTION_DISTRIBUTED).getResponse(), "prefixKey");
   }
 
   /**
@@ -388,6 +406,20 @@ public class MtasSolrTestDistributedSearchConsistency {
       }
     }
   }
+  
+  private static void createPrefixAssertions(NamedList<Object> response1,
+      NamedList<Object> response2, String key) {
+    Map<String,List<String>> prefix1 = MtasSolrBase.getFromMtasPrefix(response1, key);
+    Map<String,List<String>> prefix2 = MtasSolrBase.getFromMtasPrefix(response2, key);
+    assertTrue("inequal sizes keysets results", prefix1.keySet().size()==prefix2.keySet().size());
+    for(Entry<String,List<String>> entry : prefix1.entrySet()) {
+      assertTrue("doesn't contain "+entry.getKey(), prefix2.containsKey(entry.getKey()));
+      if(prefix2.containsKey(entry.getKey())) {
+        assertTrue("inequal result for key "+entry.getKey(), prefix1.keySet().size()==prefix2.keySet().size());
+        assertTrue("inequal result for key "+entry.getKey(), prefix1.keySet().containsAll(prefix2.keySet()));
+      }
+    }
+  }
 
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
@@ -401,8 +433,8 @@ public class MtasSolrTestDistributedSearchConsistency {
         Object key1 = list1.get(i).get("key");
         Object key2 = list2.get(i).get("key");
         assertFalse("key should be provided", (key1 == null) || (key2 == null));
-        assertFalse("key should be string",
-            !(key1 instanceof String) || !(key2 instanceof String));
+        assertTrue("key should be string",
+            (key1 instanceof String) && (key2 instanceof String));
         assertEquals(
             "element " + i + " should be equal: " + key1 + " - " + key2, key1,
             key2);

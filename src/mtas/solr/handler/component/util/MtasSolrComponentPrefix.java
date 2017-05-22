@@ -26,7 +26,8 @@ public class MtasSolrComponentPrefix
     implements MtasSolrComponent<ComponentPrefix> {
 
   /** The Constant log. */
-  private static final Log log = LogFactory.getLog(MtasSolrComponentPrefix.class);
+  private static final Log log = LogFactory
+      .getLog(MtasSolrComponentPrefix.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -44,14 +45,20 @@ public class MtasSolrComponentPrefix
   /**
    * Instantiates a new mtas solr component prefix.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentPrefix(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -92,8 +99,14 @@ public class MtasSolrComponentPrefix
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -116,8 +129,12 @@ public class MtasSolrComponentPrefix
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentPrefix prefix,
       Boolean encode) {
@@ -141,8 +158,12 @@ public class MtasSolrComponentPrefix
     return mtasPrefixResponse;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -171,8 +192,13 @@ public class MtasSolrComponentPrefix
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -186,12 +212,16 @@ public class MtasSolrComponentPrefix
       mtasResponse = null;
     }
     if (mtasResponse != null) {
-      NamedList<Object> mtasResponsePrefix;
+      ArrayList<Object> mtasResponsePrefix;
       try {
-        mtasResponsePrefix = (NamedList<Object>) mtasResponse.get("prefix");
+        mtasResponsePrefix = (ArrayList<Object>) mtasResponse.get("prefix");
         if (mtasResponsePrefix != null) {
-          repairPrefixItems(mtasResponsePrefix);
-          MtasSolrResultUtil.rewrite(mtasResponsePrefix);
+          NamedList<Object> mtasResponsePrefixItem;
+          for (Object mtasResponsePrefixItemRaw : mtasResponsePrefix) {
+            mtasResponsePrefixItem = (NamedList<Object>) mtasResponsePrefixItemRaw;
+            repairPrefixItems(mtasResponsePrefixItem);
+            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem);
+          }
         }
       } catch (ClassCastException e) {
         log.debug(e);
@@ -203,7 +233,8 @@ public class MtasSolrComponentPrefix
   /**
    * Repair prefix items.
    *
-   * @param mtasResponse the mtas response
+   * @param mtasResponse
+   *          the mtas response
    */
   @SuppressWarnings("unchecked")
   private void repairPrefixItems(NamedList<Object> mtasResponse) {

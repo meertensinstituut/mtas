@@ -1,6 +1,8 @@
 package mtas.search;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,6 +44,7 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.junit.Assert;
 
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecInfo;
@@ -116,30 +119,13 @@ public class MtasSearchTestConsistency {
   }
 
   @org.junit.Test
-  public void basicSearchContaining() throws IOException {
-    IndexReader indexReader = DirectoryReader.open(directory);
-    testNumberOfHits(indexReader, FIELD_CONTENT, Arrays.asList("<s/>"),
-        Arrays.asList("<s/> containing [pos=\"ADJ\"]",
-            "<s/> !containing [pos=\"ADJ\"]"));
-    indexReader.close();
-  }
-
-  @org.junit.Test
   public void basicSearchIntersecting() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
     testNumberOfHits(indexReader, FIELD_CONTENT, Arrays.asList("<s/>"),
         Arrays.asList("<s/> intersecting [pos=\"ADJ\"]",
             "<s/> !intersecting [pos=\"ADJ\"]"));
     indexReader.close();
-  }
-
-  @org.junit.Test
-  public void basicSearchWithin() throws IOException {
-    IndexReader indexReader = DirectoryReader.open(directory);
-    testNumberOfHits(indexReader, FIELD_CONTENT, Arrays.asList("[]"),
-        Arrays.asList("[] within <s/>"));
-    indexReader.close();
-  }
+  }  
 
   @org.junit.Test
   public void basicSearchIgnore() throws IOException {
@@ -162,6 +148,98 @@ public class MtasSearchTestConsistency {
         ignoreNumber, null);
     assertEquals("Article followed by Noun ignoring Adjectives",
         queryResult1.hits, queryResult2.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchSequence() throws IOException {
+    String cql1 = "[pos=\"N\"][]{2,3}[pos=\"LID\"]";
+    String cql2 = "[][pos=\"N\"][]{2,3}[pos=\"LID\"][]";
+    String cql3 = "[]{0,3}[pos=\"N\"][]{2,3}[pos=\"LID\"][]{0,2}";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    assertTrue("Sequences: not #"+cql1+" ("+queryResult1.hits+") >= #"+cql2+" ("+queryResult2.hits+")",
+        queryResult1.hits >= queryResult2.hits);
+    assertTrue("Sequences: not #"+cql1+" ("+queryResult1.hits+") >= #"+cql3+" ("+queryResult3.hits+")",
+        queryResult1.hits <= queryResult3.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchWithin1() throws IOException {
+    IndexReader indexReader = DirectoryReader.open(directory);
+    testNumberOfHits(indexReader, FIELD_CONTENT, Arrays.asList("[]"),
+        Arrays.asList("[] within <s/>"));
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchWithin2() throws IOException {
+    String cql1 = "[pos=\"N\"][][pos=\"LID\"]";
+    String cql2 = "[pos=\"N\"][pos=\"N\"][pos=\"LID\"]";
+    String cql3 = "[pos=\"N\"] within [pos=\"N\"][][pos=\"LID\"]";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    assertEquals("Within: "+cql3, queryResult3.hits, queryResult1.hits+queryResult2.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchWithin3() throws IOException {
+    String cql1 = "[pos=\"N\"][][pos=\"LID\"][]{2}";
+    String cql2 = "[pos=\"N\"][pos=\"N\"][pos=\"LID\"][]{2}";
+    String cql3 = "[pos=\"N\"] within []{0,2}[pos=\"N\"][][pos=\"LID\"][]{2,3}";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    assertTrue("Within: "+cql3+" not "+queryResult3.hits+" >= " + queryResult1.hits+" + "+queryResult2.hits, queryResult3.hits>=queryResult1.hits+queryResult2.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchContaining1() throws IOException {
+    IndexReader indexReader = DirectoryReader.open(directory);
+    testNumberOfHits(indexReader, FIELD_CONTENT, Arrays.asList("<s/>"),
+        Arrays.asList("<s/> containing [pos=\"ADJ\"]",
+            "<s/> !containing [pos=\"ADJ\"]"));
+    indexReader.close();
+  }
+
+  @org.junit.Test
+  public void basicSearchContaining2() throws IOException {
+    String cql1 = "[pos=\"N\"][][pos=\"LID\"]";
+    String cql2 = "[pos=\"N\"][pos=\"N\"][pos=\"LID\"]";
+    String cql3 = "[pos=\"N\"][][pos=\"LID\"] containing [pos=\"N\"][pos=\"LID\"]";
+    String cql4 = "[pos=\"N\"][][pos=\"LID\"] !containing [pos=\"N\"][pos=\"LID\"]";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    QueryResult queryResult4 = doQuery(indexReader, FIELD_CONTENT, cql4, null,
+        null, null);
+    assertEquals("Containing: "+cql3, queryResult3.hits, queryResult2.hits);
+    assertEquals("Containing: "+cql4, queryResult4.hits, queryResult1.hits - queryResult2.hits);
     indexReader.close();
   }
   
@@ -231,6 +309,39 @@ public class MtasSearchTestConsistency {
         null, null);
     assertEquals("Adjective preceded by Article",
         queryResult1.hits, queryResult2.hits);
+    indexReader.close();
+  }
+  
+  @org.junit.Test
+  public void basicSearchFullyAlignedWith() throws IOException {
+    String cql1 = "[pos=\"N\"]";
+    String cql2 = "[] fullyalignedwith [pos=\"N\"]";
+    String cql3 = "[pos=\"N\"]{2}";
+    String cql4 = "[pos=\"N\"]{1} fullyalignedwith [pos=\"N\"]{2}";
+    String cql5 = "[pos=\"N\"]{2} fullyalignedwith [pos=\"N\"]{2}";
+    String cql6 = "[pos=\"N\"]{0,3} fullyalignedwith [pos=\"N\"]{2}";
+    // get total number 
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null);
+    QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null);
+    QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null);
+    QueryResult queryResult4 = doQuery(indexReader, FIELD_CONTENT, cql4, null,
+        null, null);
+    QueryResult queryResult5 = doQuery(indexReader, FIELD_CONTENT, cql5, null,
+        null, null);
+    QueryResult queryResult6 = doQuery(indexReader, FIELD_CONTENT, cql6, null,
+        null, null);
+    assertEquals("Fully Aligned With (1)",
+        queryResult1.hits, queryResult2.hits);
+    assertTrue("Fully Aligned With (2): was "+queryResult4.hits,
+        queryResult4.hits==0);
+    assertEquals("Fully Aligned With (3)",
+        queryResult3.hits, queryResult5.hits);
+    assertEquals("Fully Aligned With (4)",
+        queryResult3.hits, queryResult6.hits);
     indexReader.close();
   }
 
@@ -393,7 +504,7 @@ public class MtasSearchTestConsistency {
   }
 
   @org.junit.Test
-  public void collectStatsSpans() throws IOException {
+  public void collectStatsSpans1() throws IOException {
     String cql1 = "[pos=\"N\"]";
     String cql2 = "[pos=\"LID\"]";
     String cql3 = "[pos=\"N\" | pos=\"LID\"]";
@@ -485,8 +596,8 @@ public class MtasSearchTestConsistency {
     } catch (mtas.parser.function.ParseException | ParseException e) {
       log.error(e);
     }
-  }
-
+  }  
+  
   @org.junit.Test
   public void collectGroup() throws IOException {
     String cql = "[pos=\"LID\"]";

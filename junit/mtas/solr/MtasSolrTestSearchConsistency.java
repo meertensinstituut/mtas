@@ -2,6 +2,7 @@ package mtas.solr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -346,9 +347,9 @@ public class MtasSolrTestSearchConsistency {
     //checks
     assertFalse("no keys matching", keys.isEmpty());
     for(String key : keys) {
-      assertFalse(key+" not matching regexp", !key.matches("een[a-z]*")); 
+      assertTrue(key+" not matching regexp", key.matches("een[a-z]*")); 
       assertFalse(key+" matching ignoreRegexp", key.matches(".*d"));
-      assertFalse(key+" not matching list regexps", !key.matches("(.*g|.*l)")); 
+      assertTrue(key+" not matching list regexps", key.matches("(.*g|.*l)")); 
       assertFalse(key+" matching ignoreList regexps", key.matches("(.*st.*|.*nm.*)"));       
     }
   }
@@ -420,8 +421,8 @@ public class MtasSolrTestSearchConsistency {
         Object key1 = list1.get(i).get("key");
         Object key2 = list2.get(i).get("key");
         assertFalse("key should be provided", (key1 == null) || (key2 == null));
-        assertFalse("key should be string",
-            !(key1 instanceof String) || !(key2 instanceof String));
+        assertTrue("key should be string",
+            (key1 instanceof String) && (key2 instanceof String));
         assertEquals(
             "element " + i + " should be equal: " + key1 + " - " + key2, key1,
             key2);

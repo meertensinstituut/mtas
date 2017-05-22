@@ -261,7 +261,7 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
       MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(
           w2.spanWeight.getSpans(context, requiredPostings));
       return new MtasSpanFullyAlignedWithSpans(
-          MtasSpanFullyAlignedWithQuery.this, s1, s2);
+          s1, s2); 
     }
 
     /*

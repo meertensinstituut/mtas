@@ -130,7 +130,7 @@ defined slightly different:
   followIndexAnalyzer="mtas_config" defaultConfiguration="default"
   configurationFromField="type" setNumberOfTokens="numberOfTokens"
   setNumberOfPositions="numberOfPositions" setSize="size"
-  setError="error" postingsFormat="MtasCodec">
+  setError="error" setPrefix="prefixes" postingsFormat="MtasCodec">
   <analyzer type="query">
     <tokenizer class="solr.WhitespaceTokenizerFactory" />
     <filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory" prefix="t" />
@@ -150,8 +150,8 @@ we defined before. The optional attribute `defaultConfiguration` contains the na
 of the default configuration to be used, and the obligatory attribute 
 `configurationFromField` contains the name of the field defining the required 
 configuration. The optional attributes `setNumberOfTokens`, 
-`setNumberOfPositions`, `setSize` and `setError` define fields that may be filled
-with respectively number of tokens, number of positions, filesize and possible errors.
+`setNumberOfPositions`, `setSize`, `setPrefix` and `setError` define fields that may be filled
+with respectively number of tokens, number of positions, filesize, prefixes and possible errors.
 
 **Example of a Mtas configuration file**
 

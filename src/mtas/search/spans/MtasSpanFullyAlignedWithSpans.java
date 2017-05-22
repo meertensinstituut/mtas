@@ -15,27 +15,28 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
 
   /** The spans 1. */
   private MtasSpanFullyAlignedWithQuerySpans spans1;
-  
+
   /** The spans 2. */
   private MtasSpanFullyAlignedWithQuerySpans spans2;
 
   /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-  
+
   /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
-  
+
   /** The previous spans 2 start position. */
   private int previousSpans2StartPosition;
-  
+
   /** The previous spans 2 end positions. */
   private HashSet<Integer> previousSpans2EndPositions;
 
   /** The called next start position. */
   private boolean calledNextStartPosition;
-  
+
   /** The no more positions. */
   private boolean noMorePositions;
+  private boolean noMorePositionsSpan2;
 
   /** The doc id. */
   private int docId;
@@ -43,19 +44,21 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span fully aligned with spans.
    *
-   * @param mtasSpanFullyAlignedWithQuery the mtas span fully aligned with query
-   * @param spans1 the spans 1
-   * @param spans2 the spans 2
+   * @param mtasSpanFullyAlignedWithQuery
+   *          the mtas span fully aligned with query
+   * @param spans1
+   *          the spans 1
+   * @param spans2
+   *          the spans 2
    */
   public MtasSpanFullyAlignedWithSpans(
-      MtasSpanFullyAlignedWithQuery mtasSpanFullyAlignedWithQuery,
       MtasSpanFullyAlignedWithQuerySpans spans1,
       MtasSpanFullyAlignedWithQuerySpans spans2) {
     super();
     docId = -1;
     this.spans1 = spans1;
     this.spans2 = spans2;
-    previousSpans2EndPositions = new HashSet<Integer>();
+    previousSpans2EndPositions = new HashSet<>();
   }
 
   /*
@@ -95,9 +98,15 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    */
   @Override
   public int startPosition() {
-    return calledNextStartPosition
-        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.startPosition())
-        : -1;
+    if(calledNextStartPosition) {
+      if(noMorePositions) {
+        return NO_MORE_POSITIONS;
+      } else {
+        return spans1.spans.startPosition();
+      }
+    } else {
+      return -1;
+    }
   }
 
   /*
@@ -107,9 +116,15 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    */
   @Override
   public int endPosition() {
-    return calledNextStartPosition
-        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.endPosition())
-        : -1;
+    if(calledNextStartPosition) {
+      if(noMorePositions) {
+        return NO_MORE_POSITIONS;
+      } else { 
+        return spans1.spans.endPosition();
+      }
+    } else {
+      return -1;
+    }    
   }
 
   /*
@@ -119,8 +134,15 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    */
   @Override
   public int width() {
-    return calledNextStartPosition ? (noMorePositions ? 0
-        : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;
+    if(calledNextStartPosition) {
+      if(noMorePositions) {
+        return 0;
+      } else {
+        return spans1.spans.endPosition() - spans1.spans.startPosition();
+      }
+    } else {
+      return 0;
+    }    
   }
 
   /*
@@ -186,18 +208,19 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
     } else {
       // advance 1
       int spans1DocId = spans1.spans.docID();
-      if (spans1DocId < target) {
+      int newTarget = target;
+      if (spans1DocId < newTarget) {
         spans1DocId = spans1.spans.advance(target);
         if (spans1DocId == NO_MORE_DOCS) {
           docId = NO_MORE_DOCS;
           return docId;
         }
-        target = Math.max(target, spans1DocId);
+        newTarget = Math.max(newTarget, spans1DocId);
       }
       int spans2DocId = spans2.spans.docID();
       // advance 2
-      if (spans2DocId < target) {
-        spans2DocId = spans2.spans.advance(target);
+      if (spans2DocId < newTarget) {
+        spans2DocId = spans2.spans.advance(newTarget);
         if (spans2DocId == NO_MORE_DOCS) {
           docId = NO_MORE_DOCS;
           return docId;
@@ -222,7 +245,8 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -240,11 +264,9 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
           docId = spans2DocId;
         }
       }
-      if (docId != NO_MORE_DOCS) {
-        if (!goToNextStartPosition()) {
-          reset();
-          return false;
-        }
+      if (docId != NO_MORE_DOCS && !goToNextStartPosition()) {
+        reset();
+        return false;
       }
       return true;
     }
@@ -254,40 +276,52 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
    * Go to next start position.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
-    int nextSpans1StartPosition, nextSpans1EndPosition;
-    int nextSpans2StartPosition, nextSpans2EndPosition;
+    int nextSpans1StartPosition;
+    int nextSpans1EndPosition;
+    int nextSpans2StartPosition;
+    int nextSpans2EndPosition;
+    // loop over span1
     while ((nextSpans1StartPosition = spans1.spans
         .nextStartPosition()) != NO_MORE_POSITIONS) {
       nextSpans1EndPosition = spans1.spans.endPosition();
-      if (nextSpans1StartPosition == previousSpans2StartPosition) {
-        if (previousSpans2EndPositions.contains(nextSpans1EndPosition)) {
-          return true;
-        }
-      } else if (nextSpans1StartPosition == lastSpans2StartPosition) {
-        if (nextSpans1EndPosition == lastSpans2EndPosition) {
-          return true;
-        }
+      if (noMorePositionsSpan2
+          && nextSpans1StartPosition > lastSpans2StartPosition) {
+        noMorePositions = true;
+        return false;
+        // check if start/en span1 matches start/end span2 from last or previous
+      } else if ((nextSpans1StartPosition == lastSpans2StartPosition
+          && nextSpans1EndPosition == lastSpans2EndPosition)
+          || (nextSpans1StartPosition == previousSpans2StartPosition
+              && previousSpans2EndPositions.contains(nextSpans1EndPosition))) {
+        return true;
       } else {
-        while (lastSpans2StartPosition <= nextSpans1StartPosition) {
+        // try to find matching span2
+        while (!noMorePositionsSpan2
+            && nextSpans1StartPosition >= lastSpans2StartPosition) {
+          // get new span2
           nextSpans2StartPosition = spans2.spans.nextStartPosition();
+          // check for finished span2
           if (nextSpans2StartPosition == NO_MORE_POSITIONS) {
-            noMorePositions = true;
-            return false;
+            noMorePositionsSpan2 = true;
           } else {
+            // get end for new span2
             nextSpans2EndPosition = spans2.spans.endPosition();
-            if (lastSpans2StartPosition == nextSpans2StartPosition
-                && nextSpans1StartPosition == nextSpans2StartPosition) {
+            // check for registering last span2 as previous
+            if (nextSpans1StartPosition <= lastSpans2StartPosition) {
               if (previousSpans2StartPosition != lastSpans2StartPosition) {
                 previousSpans2StartPosition = lastSpans2StartPosition;
                 previousSpans2EndPositions.clear();
               }
               previousSpans2EndPositions.add(lastSpans2EndPosition);
             }
+            // register span2 as last
             lastSpans2StartPosition = nextSpans2StartPosition;
             lastSpans2EndPosition = nextSpans2EndPosition;
+            // check for match
             if (nextSpans1StartPosition == nextSpans2StartPosition
                 && nextSpans1EndPosition == nextSpans2EndPosition) {
               return true;
@@ -307,6 +341,7 @@ public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
   private void reset() {
     calledNextStartPosition = false;
     noMorePositions = false;
+    noMorePositionsSpan2 = false;
     lastSpans2StartPosition = -1;
     lastSpans2EndPosition = -1;
     previousSpans2StartPosition = -1;
