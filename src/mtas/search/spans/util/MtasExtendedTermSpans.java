@@ -48,6 +48,11 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
     payloadSpanCollector = new PayloadSpanCollector();
     this.assumeSinglePosition = assumeSinglePosition;
   }
+  
+  @Override
+  public int startPosition() {
+    return super.startPosition();
+  }
 
   /*
    * (non-Javadoc)
@@ -60,12 +65,18 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
       return super.endPosition();
     } else {
       int status = super.endPosition();
-      try {
-        processEncodedPayload();
-        return (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)
-            : NO_MORE_POSITIONS;
-      } catch (IOException e) {
-        return NO_MORE_POSITIONS;
+      if(status>=0) {
+        try {
+          processEncodedPayload();
+          int end = (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)
+              : NO_MORE_POSITIONS;
+          return (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)
+              : NO_MORE_POSITIONS;
+        } catch (IOException e) {
+          return NO_MORE_POSITIONS;
+        }
+      } else {
+        return status;
       }
     }
   }

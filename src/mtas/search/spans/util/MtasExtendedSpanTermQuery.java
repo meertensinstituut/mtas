@@ -8,6 +8,7 @@ import java.util.Set;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecUtil;
 import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -18,6 +19,7 @@ import org.apache.lucene.index.TermState;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.FilterSpans;
 import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
@@ -101,7 +103,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     return new SpanTermWeight(context, searcher,
         needsScores ? Collections.singletonMap(localTerm, context) : null);
   }
-
+  
+  
   /**
    * The Class SpanTermWeight.
    */
@@ -167,8 +170,9 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       }
 
       final Terms terms = context.reader().terms(localTerm.field());
-      if (terms == null)
+      if (terms == null) {
         return null;
+      }  
       if (!terms.hasPositions())
         throw new IllegalStateException("field \"" + localTerm.field()
             + "\" was indexed without position data; cannot run SpanTermQuery (term="

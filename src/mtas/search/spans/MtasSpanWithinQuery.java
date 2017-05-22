@@ -108,7 +108,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newBigQuery = bigQuery.rewrite(reader);
-    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);
+    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);      
 
     if (newBigQuery == null || newBigQuery instanceof MtasSpanMatchNoneQuery
         || newSmallQuery == null
@@ -234,12 +234,12 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
           }
         }
       }
-    }
-
+    }    
+    
     if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {
       return (new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
           leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
-          rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);
+          rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);      
     } else if (newBigQuery.equals(newSmallQuery)) {
       return newBigQuery;
     } else {

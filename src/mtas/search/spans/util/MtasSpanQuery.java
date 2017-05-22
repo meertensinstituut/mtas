@@ -65,11 +65,11 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    MtasSpanQuery newClause = this;
     if(minimumSpanWidth!=null && maximumSpanWidth!=null && minimumSpanWidth>maximumSpanWidth) {
-      newClause = new MtasSpanMatchNoneQuery(this.getField());
-    } 
-    return (newClause!=this)?newClause:this;
+      return new MtasSpanMatchNoneQuery(this.getField());
+    } else {
+      return this;
+    }
   }
 
   /**

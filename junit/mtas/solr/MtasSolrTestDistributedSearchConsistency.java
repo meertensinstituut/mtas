@@ -136,10 +136,12 @@ public class MtasSolrTestDistributedSearchConsistency {
     params.set("mtas.stats.tokens.0.field", "mtas");
     params.set("mtas.stats.tokens.0.key", "statsKey");
     params.set("mtas.stats.tokens.0.type", String.join(",", types));
+    params.set("mtas.stats.tokens.0.minimum", 1);
+    params.set("mtas.stats.tokens.0.maximum", 1000000);
     Map<String, QueryResponse> list = createResults(params, null);
     createStatsAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
         list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "tokens",
-        "statsKey", types);
+        "statsKey", types);    
   }
 
   /**
@@ -301,7 +303,7 @@ public class MtasSolrTestDistributedSearchConsistency {
       }
     }
   }
-  
+
   @org.junit.Test
   public void mtasRequestHandlerPrefix() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -312,9 +314,12 @@ public class MtasSolrTestDistributedSearchConsistency {
     params.set("mtas.prefix", "true");
     params.set("mtas.prefix.0.key", "prefixKey");
     params.set("mtas.prefix.0.field", "mtas");
-    Map<String, QueryResponse> list = createResults(params, Arrays.asList(collections));
-    createPrefixAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(), list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "prefixKey");
-    createPrefixAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(), list.get(COLLECTION_DISTRIBUTED).getResponse(), "prefixKey");
+    Map<String, QueryResponse> list = createResults(params,
+        Arrays.asList(collections));
+    createPrefixAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
+        list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "prefixKey");
+    createPrefixAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
+        list.get(COLLECTION_DISTRIBUTED).getResponse(), "prefixKey");
   }
 
   /**
@@ -406,17 +411,23 @@ public class MtasSolrTestDistributedSearchConsistency {
       }
     }
   }
-  
+
   private static void createPrefixAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key) {
-    Map<String,List<String>> prefix1 = MtasSolrBase.getFromMtasPrefix(response1, key);
-    Map<String,List<String>> prefix2 = MtasSolrBase.getFromMtasPrefix(response2, key);
-    assertTrue("inequal sizes keysets results", prefix1.keySet().size()==prefix2.keySet().size());
-    for(Entry<String,List<String>> entry : prefix1.entrySet()) {
-      assertTrue("doesn't contain "+entry.getKey(), prefix2.containsKey(entry.getKey()));
-      if(prefix2.containsKey(entry.getKey())) {
-        assertTrue("inequal result for key "+entry.getKey(), prefix1.keySet().size()==prefix2.keySet().size());
-        assertTrue("inequal result for key "+entry.getKey(), prefix1.keySet().containsAll(prefix2.keySet()));
+    Map<String, List<String>> prefix1 = MtasSolrBase
+        .getFromMtasPrefix(response1, key);
+    Map<String, List<String>> prefix2 = MtasSolrBase
+        .getFromMtasPrefix(response2, key);
+    assertTrue("inequal sizes keysets results",
+        prefix1.keySet().size() == prefix2.keySet().size());
+    for (Entry<String, List<String>> entry : prefix1.entrySet()) {
+      assertTrue("doesn't contain " + entry.getKey(),
+          prefix2.containsKey(entry.getKey()));
+      if (prefix2.containsKey(entry.getKey())) {
+        assertTrue("inequal result for key " + entry.getKey(),
+            prefix1.keySet().size() == prefix2.keySet().size());
+        assertTrue("inequal result for key " + entry.getKey(),
+            prefix1.keySet().containsAll(prefix2.keySet()));
       }
     }
   }

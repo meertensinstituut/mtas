@@ -2,6 +2,7 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanUniquePositionQuery;
 import mtas.search.spans.util.MtasExtendedSpanTermQuery;
 
 import org.apache.lucene.index.IndexReader;
@@ -66,6 +67,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+    baseQuery = (MtasExtendedSpanTermQuery) baseQuery.rewrite(reader);
     return super.rewrite(reader);
   }
 
