@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y lsof software-properties-common python-
     locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en
             
 RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
-    if [[ $mathurl = *[!\ ]* ]]; then \
+    if echo "$mathurl" | grep -q '^.*[^ ].*$'; then \
       curl -f -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl; \
     fi && \
     if [ ! -f /root/lib/commons-math3-3.6.1-bin.tar.gz ]; then \
