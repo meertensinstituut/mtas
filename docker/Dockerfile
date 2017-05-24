@@ -41,7 +41,7 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     rm -rf /var/lib/apt/lists/*
 
 RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.5.1/solr-6.5.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
-    if [[ $solrurl = *[!\ ]* ]]; then \
+    if echo "$solrurl" | grep -q '^.*[^ ].*$'; then \
       curl -f -o /root/solr-6.5.1.tgz -O $solrurl; \
     fi && \
     if [ ! -f /root/solr-6.5.1.tgz ]; then \
