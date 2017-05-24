@@ -1,5 +1,5 @@
 # Automatically generated Dockerfile 
-# - Build 2017-05-24 05:43
+# - Build 2017-05-24 06:05
 # - Lucene/Solr version 6.5.1
 # - Mtas release 20170524 
 #
@@ -40,17 +40,17 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get install -y oracle-java8-installer && \
     rm -rf /var/lib/apt/lists/*
 
-RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.5.1/solr-6.5.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
+RUN /bin/bash -c "solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.5.1/solr-6.5.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if [[ $solrurl = *[!\ ]* ]]; then \
       curl -f -o /root/solr-6.5.1.tgz -O $solrurl; \
     fi && \
     if [ ! -f /root/solr-6.5.1.tgz ]; then \
-      echo "Solr 6.5.1 not found in mirror, falling back to apache archive"; \ 
-      solrurl="http://archive.apache.org/dist/lucene/solr/6.5.1/solr-6.5.1.tgz"; \
+      echo 'Solr 6.5.1 not found in mirror, falling back to apache archive'; \ 
+      solrurl='http://archive.apache.org/dist/lucene/solr/6.5.1/solr-6.5.1.tgz'; \
       curl -f -o /root/solr-6.5.1.tgz -O $solrurl; \ 
     fi && \    
     tar xzf solr-6.5.1.tgz solr-6.5.1/bin/install_solr_service.sh --strip-components=2 && \
-    bash ./install_solr_service.sh solr-6.5.1.tgz && rm install_solr_service.sh && rm -rf solr-6.5.1.tgz
+    bash ./install_solr_service.sh solr-6.5.1.tgz && rm install_solr_service.sh && rm -rf solr-6.5.1.tgz"
     
 RUN service apache2 stop && \
     echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf && \
@@ -74,7 +74,7 @@ RUN service apache2 stop && \
     chmod -R 755 /var/www/html && \
     printf "echo\n" >> /start.sh && \
     printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh && \
-    printf "echo \"  Timestamp 2017-05-24 05:43\"\n" >> /start.sh && \
+    printf "echo \"  Timestamp 2017-05-24 06:05\"\n" >> /start.sh && \
     printf "echo \"  Lucene/Solr version 6.5.1\"\n" >> /start.sh && \
     printf "echo \"  Mtas release 20170524\"\n" >> /start.sh && \
     printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \

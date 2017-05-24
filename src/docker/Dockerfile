@@ -40,17 +40,17 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get install -y oracle-java8-installer && \
     rm -rf /var/lib/apt/lists/*
 
-RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
+RUN /bin/bash -c "solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if [[ $solrurl = *[!\ ]* ]]; then \
       curl -f -o /root/solr-${currentDevelopmentVersion}.tgz -O $solrurl; \
     fi && \
     if [ ! -f /root/solr-${currentDevelopmentVersion}.tgz ]; then \
-      echo "Solr ${currentDevelopmentVersion} not found in mirror, falling back to apache archive"; \ 
-      solrurl="http://archive.apache.org/dist/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz"; \
+      echo 'Solr ${currentDevelopmentVersion} not found in mirror, falling back to apache archive'; \ 
+      solrurl='http://archive.apache.org/dist/lucene/solr/${currentDevelopmentVersion}/solr-${currentDevelopmentVersion}.tgz'; \
       curl -f -o /root/solr-${currentDevelopmentVersion}.tgz -O $solrurl; \ 
     fi && \    
     tar xzf solr-${currentDevelopmentVersion}.tgz solr-${currentDevelopmentVersion}/bin/install_solr_service.sh --strip-components=2 && \
-    bash ./install_solr_service.sh solr-${currentDevelopmentVersion}.tgz && rm install_solr_service.sh && rm -rf solr-${currentDevelopmentVersion}.tgz
+    bash ./install_solr_service.sh solr-${currentDevelopmentVersion}.tgz && rm install_solr_service.sh && rm -rf solr-${currentDevelopmentVersion}.tgz"
     
 RUN service apache2 stop && \
     echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf && \
