@@ -617,7 +617,7 @@ public class MtasFunctionParserFunctionBasic
 <span class="fc bfc" id="L617" title="All 2 branches covered.">      for (int i = 0; i &lt; number; i++) {</span>
 <span class="pc bpc" id="L618" title="10 of 22 branches missed.">        switch (operatorList[i]) {</span>
         case BASIC_OPERATOR_ADD:
-<span class="pc bpc" id="L620" title="20 of 26 branches missed.">          switch (typeList[i]) {</span>
+<span class="pc bpc" id="L620" title="17 of 26 branches missed.">          switch (typeList[i]) {</span>
           case MtasFunctionParserItem.TYPE_ARGUMENT:
 <span class="fc" id="L622">            sum += args[idList[i]];</span>
 <span class="fc" id="L623">            break;</span>
@@ -631,8 +631,8 @@ public class MtasFunctionParserFunctionBasic
 <span class="nc" id="L631">            sum += constantDoubles[idList[i]].longValue();</span>
 <span class="nc" id="L632">            break;</span>
           case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
-<span class="nc" id="L634">            sum += constantLongs[idList[i]];</span>
-<span class="nc" id="L635">            break;</span>
+<span class="fc" id="L634">            sum += constantLongs[idList[i]];</span>
+<span class="fc" id="L635">            break;</span>
           case MtasFunctionParserItem.TYPE_N:
 <span class="fc" id="L637">            sum += n;</span>
 <span class="fc" id="L638">            break;</span>
@@ -641,7 +641,7 @@ public class MtasFunctionParserFunctionBasic
           }
 <span class="fc" id="L642">          break;</span>
         case BASIC_OPERATOR_SUBTRACT:
-<span class="pc bpc" id="L644" title="20 of 26 branches missed.">          switch (typeList[i]) {</span>
+<span class="pc bpc" id="L644" title="17 of 26 branches missed.">          switch (typeList[i]) {</span>
           case MtasFunctionParserItem.TYPE_ARGUMENT:
 <span class="fc" id="L646">            sum -= args[idList[i]];</span>
 <span class="fc" id="L647">            break;</span>
@@ -655,8 +655,8 @@ public class MtasFunctionParserFunctionBasic
 <span class="nc" id="L655">            sum -= constantDoubles[idList[i]].longValue();</span>
 <span class="nc" id="L656">            break;</span>
           case MtasFunctionParserItem.TYPE_CONSTANT_LONG:
-<span class="nc" id="L658">            sum -= constantLongs[idList[i]];</span>
-<span class="nc" id="L659">            break;</span>
+<span class="fc" id="L658">            sum -= constantLongs[idList[i]];</span>
+<span class="fc" id="L659">            break;</span>
           case MtasFunctionParserItem.TYPE_N:
 <span class="fc" id="L661">            sum -= n;</span>
 <span class="fc" id="L662">            break;</span>
