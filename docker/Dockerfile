@@ -40,17 +40,17 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get install -y oracle-java8-installer && \
     rm -rf /var/lib/apt/lists/*
 
-RUN /bin/bash -c "solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.5.1/solr-6.5.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
+RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.5.1/solr-6.5.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if [[ $solrurl = *[!\ ]* ]]; then \
       curl -f -o /root/solr-6.5.1.tgz -O $solrurl; \
     fi && \
     if [ ! -f /root/solr-6.5.1.tgz ]; then \
-      echo 'Solr 6.5.1 not found in mirror, falling back to apache archive'; \ 
-      solrurl='http://archive.apache.org/dist/lucene/solr/6.5.1/solr-6.5.1.tgz'; \
+      echo "Solr 6.5.1 not found in mirror, falling back to apache archive"; \ 
+      solrurl="http://archive.apache.org/dist/lucene/solr/6.5.1/solr-6.5.1.tgz"; \
       curl -f -o /root/solr-6.5.1.tgz -O $solrurl; \ 
     fi && \    
     tar xzf solr-6.5.1.tgz solr-6.5.1/bin/install_solr_service.sh --strip-components=2 && \
-    bash ./install_solr_service.sh solr-6.5.1.tgz && rm install_solr_service.sh && rm -rf solr-6.5.1.tgz"
+    bash ./install_solr_service.sh solr-6.5.1.tgz && rm install_solr_service.sh && rm -rf solr-6.5.1.tgz
     
 RUN service apache2 stop && \
     echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf && \
