@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -121,8 +120,7 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler stats tokens.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerStatsTokens() throws IOException {
@@ -141,14 +139,13 @@ public class MtasSolrTestDistributedSearchConsistency {
     Map<String, QueryResponse> list = createResults(params, null);
     createStatsAssertions(list.get(COLLECTION_ALL_OPTIMIZED).getResponse(),
         list.get(COLLECTION_ALL_MULTIPLE_SEGMENTS).getResponse(), "tokens",
-        "statsKey", types);    
+        "statsKey", types);
   }
 
   /**
    * Mtas request handler stats positions.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerStatsPositions() throws IOException {
@@ -171,8 +168,7 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler stats spans.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerStatsSpans() throws IOException {
@@ -196,6 +192,11 @@ public class MtasSolrTestDistributedSearchConsistency {
         "statsKey", types);
   }
 
+  /**
+   * Mtas request handler termvector 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerTermvector1() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -259,6 +260,11 @@ public class MtasSolrTestDistributedSearchConsistency {
 
   }
 
+  /**
+   * Mtas request handler termvector 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerTermvector2() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -304,6 +310,11 @@ public class MtasSolrTestDistributedSearchConsistency {
     }
   }
 
+  /**
+   * Mtas request handler prefix.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerPrefix() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -325,8 +336,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the results.
    *
-   * @param params
-   *          the params
+   * @param params the params
+   * @param collections the collections
    * @return the hash map
    */
   private static HashMap<String, QueryResponse> createResults(
@@ -369,16 +380,11 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the stats assertions.
    *
-   * @param response1
-   *          the response 1
-   * @param response2
-   *          the response 2
-   * @param type
-   *          the type
-   * @param key
-   *          the key
-   * @param names
-   *          the names
+   * @param response1 the response 1
+   * @param response2 the response 2
+   * @param type the type
+   * @param key the key
+   * @param names the names
    */
   private static void createStatsAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String type, String key, String[] names) {
@@ -389,16 +395,11 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the stats assertions.
    *
-   * @param response1
-   *          the response 1
-   * @param responses2
-   *          the responses 2
-   * @param type
-   *          the type
-   * @param key
-   *          the key
-   * @param names
-   *          the names
+   * @param response1 the response 1
+   * @param responses2 the responses 2
+   * @param type the type
+   * @param key the key
+   * @param names the names
    */
   private static void createStatsAssertions(NamedList<Object> response1,
       NamedList<Object>[] responses2, String type, String key, String[] names) {
@@ -412,6 +413,13 @@ public class MtasSolrTestDistributedSearchConsistency {
     }
   }
 
+  /**
+   * Creates the prefix assertions.
+   *
+   * @param response1 the response 1
+   * @param response2 the response 2
+   * @param key the key
+   */
   private static void createPrefixAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key) {
     Map<String, List<String>> prefix1 = MtasSolrBase
@@ -432,6 +440,14 @@ public class MtasSolrTestDistributedSearchConsistency {
     }
   }
 
+  /**
+   * Creates the termvector assertions.
+   *
+   * @param response1 the response 1
+   * @param response2 the response 2
+   * @param key the key
+   * @param names the names
+   */
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
     List<NamedList> list1 = MtasSolrBase.getFromMtasTermvector(response1, key);
@@ -523,16 +539,11 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the cloud collection.
    *
-   * @param collectionName
-   *          the collection name
-   * @param numShards
-   *          the num shards
-   * @param replicationFactor
-   *          the replication factor
-   * @param confDir
-   *          the conf dir
-   * @throws Exception
-   *           the exception
+   * @param collectionName the collection name
+   * @param numShards the num shards
+   * @param replicationFactor the replication factor
+   * @param confDir the conf dir
+   * @throws Exception the exception
    */
   private static void createCloudCollection(String collectionName,
       int numShards, int replicationFactor, Path confDir) throws Exception {

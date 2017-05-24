@@ -19,8 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -35,15 +33,24 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.CoreContainer;
 
+/**
+ * The Class MtasSolrTestSearchConsistency.
+ */
 public class MtasSolrTestSearchConsistency {
 
+  /** The log. */
   private static Log log = LogFactory
       .getLog(MtasSolrTestSearchConsistency.class);
 
+  /** The server. */
   private static EmbeddedSolrServer server;
 
+  /** The solr path. */
   private static Path solrPath;
 
+  /**
+   * Setup.
+   */
   @org.junit.BeforeClass
   public static void setup() {
     try {
@@ -81,6 +88,13 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Initialize directory.
+   *
+   * @param dataPath the data path
+   * @param collections the collections
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void initializeDirectory(Path dataPath,
       List<String> collections) throws IOException {
     solrPath = Files.createTempDirectory("junitSolr");
@@ -93,6 +107,13 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Creates the collection.
+   *
+   * @param collectionName the collection name
+   * @param dataPath the data path
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createCollection(String collectionName, Path dataPath)
       throws IOException {
     File solrFile;
@@ -125,12 +146,22 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Shutdown.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.AfterClass
   public static void shutdown() throws IOException {
     server.close();
     MtasSolrBase.deleteDirectory(solrPath.toFile());
   }
 
+  /**
+   * Cql query parser.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void cqlQueryParser() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -150,6 +181,11 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Cql query parser filter.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void cqlQueryParserFilter() throws IOException {
     ModifiableSolrParams params1 = new ModifiableSolrParams();
@@ -171,6 +207,11 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Mtas request handler stats spans and positions.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerStatsSpansAndPositions() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -207,6 +248,11 @@ public class MtasSolrTestSearchConsistency {
 
   }
 
+  /**
+   * Mtas request handler stats tokens.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerStatsTokens() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -235,6 +281,11 @@ public class MtasSolrTestSearchConsistency {
         MtasSolrBase.getFromStats(response, "numberOfTokens", "sum", true));
   }
 
+  /**
+   * Mtas request handler termvector 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerTermvector1() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -276,6 +327,11 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Mtas request handler termvector 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerTermvector2() throws IOException {
     String[] list = new String[] { "de", "het", "een",
@@ -351,6 +407,11 @@ public class MtasSolrTestSearchConsistency {
 
   }
 
+  /**
+   * Mtas request handler termvector 3.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerTermvector3() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -393,6 +454,11 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Mtas solr schema pre analyzed parser and field.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasSolrSchemaPreAnalyzedParserAndField() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -447,6 +513,14 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
+  /**
+   * Creates the termvector assertions.
+   *
+   * @param response1 the response 1
+   * @param response2 the response 2
+   * @param key the key
+   * @param names the names
+   */
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
     List<NamedList> list1 = MtasSolrBase.getFromMtasTermvector(response1, key);

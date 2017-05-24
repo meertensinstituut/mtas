@@ -234,7 +234,7 @@
 						</configuration>
 						<reports>
 							<report>javadoc</report>
-							<!-- <report>test-javadoc</report> -->
+							<report>test-javadoc</report>
 						</reports>
 					</reportSet>
 					<reportSet>
@@ -298,35 +298,15 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.5</version>
-			</plugin> -->
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
-				<configuration>
-					<linkXref>true</linkXref>
-					<sourceEncoding>utf-8</sourceEncoding>
-					<minimumTokens>100</minimumTokens>					
-				</configuration>
-			</plugin> -->
-			<!-- <plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<version>2.2</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>dependency-updates-report</report>
-							<report>plugin-updates-report</report>
-							<report>property-updates-report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jxr-plugin</artifactId> 
+				<version>2.5</version> </plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-pmd-plugin</artifactId> 
+				<version>3.8</version> <configuration> <linkXref>true</linkXref> <sourceEncoding>utf-8</sourceEncoding> 
+				<minimumTokens>100</minimumTokens> </configuration> </plugin> -->
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>versions-maven-plugin</artifactId> 
+				<version>2.2</version> <reportSets> <reportSet> <reports> <report>dependency-updates-report</report> 
+				<report>plugin-updates-report</report> <report>property-updates-report</report> 
+				</reports> </reportSet> </reportSets> </plugin> -->			
 		</plugins>
 	</reporting>
 	<repositories>
@@ -376,12 +356,8 @@
 			<artifactId>slf4j-simple</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency> -->
+		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
+			<scope>runtime</scope> <optional>true</optional> </dependency> -->
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

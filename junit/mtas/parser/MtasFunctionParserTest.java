@@ -15,16 +15,36 @@ import mtas.parser.function.util.MtasFunctionParserFunctionResponse;
 import mtas.parser.function.util.MtasFunctionParserFunctionResponseDouble;
 import mtas.parser.function.util.MtasFunctionParserFunctionResponseLong;
 
+/**
+ * The Class MtasFunctionParserTest.
+ */
 public class MtasFunctionParserTest {
 
+  /** The generator. */
   Random generator = new Random();
 
+  /**
+   * Test function.
+   *
+   * @param pf the pf
+   * @param args the args
+   * @param n the n
+   * @param r the r
+   */
   private void testFunction(MtasFunctionParserFunction pf, long[] args, int n,
       MtasFunctionParserFunctionResponse r) {
     assertEquals(pf + "\tn:" + n + "\targs:" + Arrays.toString(args),
-        pf.getResponse(args, n), r); 
+        pf.getResponse(args, n), r);
   }
 
+  /**
+   * Gets the args.
+   *
+   * @param n the n
+   * @param min the min
+   * @param max the max
+   * @return the args
+   */
   private long[] getArgs(int n, int min, int max) {
     long[] args = new long[n];
     for (int i = 0; i < n; i++) {
@@ -33,10 +53,20 @@ public class MtasFunctionParserTest {
     return args;
   }
 
+  /**
+   * Gets the n.
+   *
+   * @param min the min
+   * @param max the max
+   * @return the n
+   */
   private int getN(int min, int max) {
     return min + generator.nextInt((1 + max - min));
   }
 
+  /**
+   * Basic test function 1.
+   */
   @org.junit.Test
   public void basicTestFunction1() {
     String function = null;
@@ -60,6 +90,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 2.
+   */
   @org.junit.Test
   public void basicTestFunction2() {
     String function = null;
@@ -82,6 +115,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 3.
+   */
   @org.junit.Test
   public void basicTestFunction3() {
     String function = null;
@@ -129,8 +165,7 @@ public class MtasFunctionParserTest {
           answer = answer instanceof Double
               ? compute(o4, (double) answer, args[k5])
               : compute(o4, (int) answer, args[k5]);
-          answer = answer instanceof Double 
-              ? compute(o5, (double) answer, n)
+          answer = answer instanceof Double ? compute(o5, (double) answer, n)
               : compute(o5, (int) answer, n);
           answer = answer instanceof Double
               ? compute(o6, (double) answer, args[k6])
@@ -141,8 +176,7 @@ public class MtasFunctionParserTest {
                     true));
           } else {
             testFunction(pf, args, n,
-                new MtasFunctionParserFunctionResponseLong((int) answer,
-                    true));
+                new MtasFunctionParserFunctionResponseLong((int) answer, true));
           }
         } catch (IOException | IllegalArgumentException e) {
           if (answer != null && answer instanceof Double) {
@@ -160,6 +194,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 4.
+   */
   @org.junit.Test
   public void basicTestFunction4() {
     String function = null;
@@ -182,6 +219,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 5.
+   */
   @org.junit.Test
   public void basicTestFunction5() {
     String function = null;
@@ -201,6 +241,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 6.
+   */
   @org.junit.Test
   public void basicTestFunction6() {
     String function = null;
@@ -225,6 +268,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 7.
+   */
   @org.junit.Test
   public void basicTestFunction7() {
     String function = null;
@@ -252,6 +298,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 8.
+   */
   @org.junit.Test
   public void basicTestFunction8() {
     String function = null;
@@ -283,6 +332,9 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Basic test function 9.
+   */
   @org.junit.Test
   public void basicTestFunction9() {
     String function = null;
@@ -304,7 +356,10 @@ public class MtasFunctionParserTest {
       e.printStackTrace();
     }
   }
-  
+
+  /**
+   * Basic test function 10.
+   */
   @org.junit.Test
   public void basicTestFunction10() {
     String function = "(1+2)/3";
@@ -316,21 +371,30 @@ public class MtasFunctionParserTest {
       int k1 = generator.nextInt(10);
       int k2 = generator.nextInt(10);
       int k3 = generator.nextInt(10);
-      function = "("+k1+" + "+k2+")/($q0 + 1 + "+k3+" - 2)";
+      function = "(" + k1 + " + " + k2 + ")/($q0 + 1 + " + k3 + " - 2)";
       p = new MtasFunctionParser(
           new BufferedReader(new StringReader(function)));
       pf = p.parse();
       args = getArgs(10 + generator.nextInt(20), 0, 2);
-      if((args[0]+1+k3-2)!=0) {
-        double answer = (double)(k1+k2) / (args[0]+1+k3-2);
+      if ((args[0] + 1 + k3 - 2) != 0) {
+        double answer = (double) (k1 + k2) / (args[0] + 1 + k3 - 2);
         testFunction(pf, args, n,
-          new MtasFunctionParserFunctionResponseDouble(answer, true));
-      }  
+            new MtasFunctionParserFunctionResponseDouble(answer, true));
+      }
     } catch (ParseException e) {
       e.printStackTrace();
-    }  
+    }
   }
-  
+
+  /**
+   * Compute.
+   *
+   * @param op the op
+   * @param v1 the v 1
+   * @param v2 the v 2
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private Object compute(int op, long v1, long v2) throws IOException {
     if (op == 0) {
       Long s;
@@ -375,10 +439,28 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Compute.
+   *
+   * @param op the op
+   * @param v1 the v 1
+   * @param v2 the v 2
+   * @return the double
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private Double compute(int op, double v1, long v2) throws IOException {
     return compute(op, v1, (double) v2);
   }
 
+  /**
+   * Compute.
+   *
+   * @param op the op
+   * @param v1 the v 1
+   * @param v2 the v 2
+   * @return the double
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private Double compute(int op, double v1, double v2) throws IOException {
     if (op == 0) {
       return v1 + v2;
@@ -399,6 +481,12 @@ public class MtasFunctionParserTest {
     }
   }
 
+  /**
+   * Gets the operator.
+   *
+   * @param op the op
+   * @return the operator
+   */
   private String getOperator(int op) {
     if (op == 0) {
       return "+";

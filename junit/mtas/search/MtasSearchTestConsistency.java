@@ -1,7 +1,6 @@
 package mtas.search;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -64,19 +63,35 @@ import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanRegexpQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
+/**
+ * The Class MtasSearchTestConsistency.
+ */
 public class MtasSearchTestConsistency {
 
+  /** The log. */
   private static Log log = LogFactory.getLog(MtasSearchTestConsistency.class);
-  
+
+  /** The Constant FIELD_ID. */
   private static final String FIELD_ID = "id";
+  
+  /** The Constant FIELD_TITLE. */
   private static final String FIELD_TITLE = "title";
+  
+  /** The Constant FIELD_CONTENT. */
   private static final String FIELD_CONTENT = "content";
 
+  /** The directory. */
   private static Directory directory;
 
+  /** The files. */
   private static HashMap<String, String> files;
+  
+  /** The docs. */
   private static ArrayList<Integer> docs;
 
+  /**
+   * Initialize.
+   */
   @org.junit.BeforeClass
   public static void initialize() {
     try {
@@ -84,16 +99,27 @@ public class MtasSearchTestConsistency {
       // directory = FSDirectory.open(Paths.get("testindexMtas"));
       directory = new RAMDirectory();
       files = new HashMap<>();
-      files.put("Een onaangenaam mens in de Haarlemmerhout", path.resolve("resources").resolve("beets1.xml.gz").toAbsolutePath().toString());
-      files.put("Een oude kennis", path.resolve("resources").resolve("beets2.xml.gz").toAbsolutePath().toString());
-      files.put("Varen en Rijden", path.resolve("resources").resolve("beets3.xml.gz").toAbsolutePath().toString());
-      createIndex(path.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(), files);
+      files.put("Een onaangenaam mens in de Haarlemmerhout",
+          path.resolve("resources").resolve("beets1.xml.gz").toAbsolutePath()
+              .toString());
+      files.put("Een oude kennis", path.resolve("resources")
+          .resolve("beets2.xml.gz").toAbsolutePath().toString());
+      files.put("Varen en Rijden", path.resolve("resources")
+          .resolve("beets3.xml.gz").toAbsolutePath().toString());
+      createIndex(
+          path.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(),
+          files);
       docs = getLiveDocs(DirectoryReader.open(directory));
     } catch (IOException e) {
       log.error(e);
     }
   }
 
+  /**
+   * Basic search number of words.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchNumberOfWords() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
@@ -102,6 +128,11 @@ public class MtasSearchTestConsistency {
     indexReader.close();
   }
 
+  /**
+   * Basic search start sentence 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchStartSentence1() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
@@ -110,6 +141,11 @@ public class MtasSearchTestConsistency {
     indexReader.close();
   }
 
+  /**
+   * Basic search start sentence 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchStartSentence2() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
@@ -118,6 +154,11 @@ public class MtasSearchTestConsistency {
     indexReader.close();
   }
 
+  /**
+   * Basic search intersecting.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchIntersecting() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
@@ -125,8 +166,13 @@ public class MtasSearchTestConsistency {
         Arrays.asList("<s/> intersecting [pos=\"ADJ\"]",
             "<s/> !intersecting [pos=\"ADJ\"]"));
     indexReader.close();
-  }  
+  }
 
+  /**
+   * Basic search ignore.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchIgnore() throws IOException {
     int ignoreNumber = 10;
@@ -150,13 +196,18 @@ public class MtasSearchTestConsistency {
         queryResult1.hits, queryResult2.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search sequence.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchSequence() throws IOException {
     String cql1 = "[pos=\"N\"][]{2,3}[pos=\"LID\"]";
     String cql2 = "[][pos=\"N\"][]{2,3}[pos=\"LID\"][]";
     String cql3 = "[]{0,3}[pos=\"N\"][]{2,3}[pos=\"LID\"][]{0,2}";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -164,13 +215,22 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
         null, null);
-    assertTrue("Sequences: not #"+cql1+" ("+queryResult1.hits+") >= #"+cql2+" ("+queryResult2.hits+")",
+    assertTrue(
+        "Sequences: not #" + cql1 + " (" + queryResult1.hits + ") >= #" + cql2
+            + " (" + queryResult2.hits + ")",
         queryResult1.hits >= queryResult2.hits);
-    assertTrue("Sequences: not #"+cql1+" ("+queryResult1.hits+") >= #"+cql3+" ("+queryResult3.hits+")",
+    assertTrue(
+        "Sequences: not #" + cql1 + " (" + queryResult1.hits + ") >= #" + cql3
+            + " (" + queryResult3.hits + ")",
         queryResult1.hits <= queryResult3.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search within 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchWithin1() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
@@ -178,13 +238,18 @@ public class MtasSearchTestConsistency {
         Arrays.asList("[] within <s/>"));
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search within 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchWithin2() throws IOException {
     String cql1 = "[pos=\"N\"][][pos=\"LID\"]";
     String cql2 = "[pos=\"N\"][pos=\"N\"][pos=\"LID\"]";
     String cql3 = "[pos=\"N\"] within [pos=\"N\"][][pos=\"LID\"]";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -192,16 +257,22 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
         null, null);
-    assertEquals("Within: "+cql3, queryResult3.hits, queryResult1.hits+queryResult2.hits);
+    assertEquals("Within: " + cql3, queryResult3.hits,
+        queryResult1.hits + queryResult2.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search within 3.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchWithin3() throws IOException {
     String cql1 = "[pos=\"N\"][][pos=\"LID\"][]{2}";
     String cql2 = "[pos=\"N\"][pos=\"N\"][pos=\"LID\"][]{2}";
     String cql3 = "[pos=\"N\"] within []{0,2}[pos=\"N\"][][pos=\"LID\"][]{2,3}";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -209,10 +280,18 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
         null, null);
-    assertTrue("Within: "+cql3+" not "+queryResult3.hits+" >= " + queryResult1.hits+" + "+queryResult2.hits, queryResult3.hits>=queryResult1.hits+queryResult2.hits);
+    assertTrue(
+        "Within: " + cql3 + " not " + queryResult3.hits + " >= "
+            + queryResult1.hits + " + " + queryResult2.hits,
+        queryResult3.hits >= queryResult1.hits + queryResult2.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search containing 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchContaining1() throws IOException {
     IndexReader indexReader = DirectoryReader.open(directory);
@@ -222,13 +301,18 @@ public class MtasSearchTestConsistency {
     indexReader.close();
   }
 
+  /**
+   * Basic search containing 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchContaining2() throws IOException {
     String cql1 = "[pos=\"N\"][][pos=\"LID\"]";
     String cql2 = "[pos=\"N\"][pos=\"N\"][pos=\"LID\"]";
     String cql3 = "[pos=\"N\"][][pos=\"LID\"] containing [pos=\"N\"][pos=\"LID\"]";
     String cql4 = "[pos=\"N\"][][pos=\"LID\"] !containing [pos=\"N\"][pos=\"LID\"]";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -238,17 +322,23 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult4 = doQuery(indexReader, FIELD_CONTENT, cql4, null,
         null, null);
-    assertEquals("Containing: "+cql3, queryResult3.hits, queryResult2.hits);
-    assertEquals("Containing: "+cql4, queryResult4.hits, queryResult1.hits - queryResult2.hits);
+    assertEquals("Containing: " + cql3, queryResult3.hits, queryResult2.hits);
+    assertEquals("Containing: " + cql4, queryResult4.hits,
+        queryResult1.hits - queryResult2.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search followed by 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchFollowedBy1() throws IOException {
     String cql1 = "[pos=\"LID\"] followedby []?[pos=\"ADJ\"]";
     String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
     String cql3 = "[pos=\"LID\"][pos=\"ADJ\"][pos=\"ADJ\"]";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -256,17 +346,22 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
         null, null);
-    assertEquals("Article followed by Adjective",
-        queryResult1.hits, (long) queryResult2.hits - queryResult3.hits);
+    assertEquals("Article followed by Adjective", queryResult1.hits,
+        (long) queryResult2.hits - queryResult3.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search followed by 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchFollowedBy2() throws IOException {
     String cql1 = "[pos=\"LID\"] followedby []?[pos=\"ADJ\"]";
     String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
     String cql3 = "[pos=\"LID\"][pos=\"ADJ\"][pos=\"ADJ\"]";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -274,17 +369,22 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
         null, null);
-    assertEquals("Article followed by Adjective",
-        queryResult1.hits, (long) queryResult2.hits - queryResult3.hits);
+    assertEquals("Article followed by Adjective", queryResult1.hits,
+        (long) queryResult2.hits - queryResult3.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search preceded by 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchPrecededBy1() throws IOException {
     String cql1 = "[pos=\"ADJ\"] precededby [pos=\"LID\"][]?";
     String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
     String cql3 = "[pos=\"LID\"][pos=\"LID\"][pos=\"ADJ\"]";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -292,26 +392,36 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
         null, null);
-    assertEquals("Adjective preceded by Article",
-        queryResult1.hits, (long) queryResult2.hits - queryResult3.hits);
+    assertEquals("Adjective preceded by Article", queryResult1.hits,
+        (long) queryResult2.hits - queryResult3.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search preceded by 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchPrecededBy2() throws IOException {
     String cql1 = "[]?[pos=\"ADJ\"] precededby [pos=\"LID\"]";
     String cql2 = "[pos=\"LID\"][]?[pos=\"ADJ\"]";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
         null, null);
-    assertEquals("Adjective preceded by Article",
-        queryResult1.hits, queryResult2.hits);
+    assertEquals("Adjective preceded by Article", queryResult1.hits,
+        queryResult2.hits);
     indexReader.close();
   }
-  
+
+  /**
+   * Basic search fully aligned with.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void basicSearchFullyAlignedWith() throws IOException {
     String cql1 = "[pos=\"N\"]";
@@ -320,7 +430,7 @@ public class MtasSearchTestConsistency {
     String cql4 = "[pos=\"N\"]{1} fullyalignedwith [pos=\"N\"]{2}";
     String cql5 = "[pos=\"N\"]{2} fullyalignedwith [pos=\"N\"]{2}";
     String cql6 = "[pos=\"N\"]{0,3} fullyalignedwith [pos=\"N\"]{2}";
-    // get total number 
+    // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
         null, null);
@@ -334,17 +444,22 @@ public class MtasSearchTestConsistency {
         null, null);
     QueryResult queryResult6 = doQuery(indexReader, FIELD_CONTENT, cql6, null,
         null, null);
-    assertEquals("Fully Aligned With (1)",
-        queryResult1.hits, queryResult2.hits);
-    assertTrue("Fully Aligned With (2): was "+queryResult4.hits,
-        queryResult4.hits==0);
-    assertEquals("Fully Aligned With (3)",
-        queryResult3.hits, queryResult5.hits);
-    assertEquals("Fully Aligned With (4)",
-        queryResult3.hits, queryResult6.hits);
+    assertEquals("Fully Aligned With (1)", queryResult1.hits,
+        queryResult2.hits);
+    assertTrue("Fully Aligned With (2): was " + queryResult4.hits,
+        queryResult4.hits == 0);
+    assertEquals("Fully Aligned With (3)", queryResult3.hits,
+        queryResult5.hits);
+    assertEquals("Fully Aligned With (4)", queryResult3.hits,
+        queryResult6.hits);
     indexReader.close();
   }
 
+  /**
+   * Collect stats positions 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void collectStatsPositions1() throws IOException {
     // get total number of words
@@ -357,13 +472,12 @@ public class MtasSearchTestConsistency {
     try {
       ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_ID);
-      fieldStats.statsPositionList.add(
-          new ComponentPosition("total", null, null, "all"));
-      fieldStats.statsPositionList.add(new ComponentPosition(
-          "minimum", (double) (averageNumberOfPositions - 1), null,
-          "n,sum,mean,min,max"));
-      fieldStats.statsPositionList.add(new ComponentPosition(
-          "maximum", null, (double) averageNumberOfPositions, "sum"));
+      fieldStats.statsPositionList
+          .add(new ComponentPosition("total", null, null, "all"));
+      fieldStats.statsPositionList.add(new ComponentPosition("minimum",
+          (double) (averageNumberOfPositions - 1), null, "n,sum,mean,min,max"));
+      fieldStats.statsPositionList.add(new ComponentPosition("maximum", null,
+          (double) averageNumberOfPositions, "sum"));
       Map<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       Map<String, Object> responseTotal = (Map<String, Object>) response
@@ -378,8 +492,7 @@ public class MtasSearchTestConsistency {
           ? (Long) responseMinimum.get("sum") : 0;
       Long totalMaximum = responseTotal != null
           ? (Long) responseMaximum.get("sum") : 0;
-      assertEquals("Number of positions", total.longValue(),
-          queryResult.hits);
+      assertEquals("Number of positions", total.longValue(), queryResult.hits);
       assertEquals("Minimum and maximum on number of positions",
           total.longValue(), totalMinimum + totalMaximum);
     } catch (mtas.parser.function.ParseException e) {
@@ -387,14 +500,19 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  /**
+   * Collect stats positions 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void collectStatsPositions2() throws IOException {
     ArrayList<Integer> fullDocSet = docs;
     try {
       // compute total
       ComponentField fieldStats = new ComponentField(FIELD_ID);
-      fieldStats.statsPositionList.add(new ComponentPosition(
-          "total", null, null, "n,sum,min,max"));
+      fieldStats.statsPositionList
+          .add(new ComponentPosition("total", null, null, "n,sum,min,max"));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
@@ -414,8 +532,8 @@ public class MtasSearchTestConsistency {
       for (Integer docId : fullDocSet) {
         subDocSet.add(docId);
         fieldStats = new ComponentField(FIELD_ID);
-        fieldStats.statsPositionList.add(new ComponentPosition(
-            "total", null, null, "n,sum,min,max"));
+        fieldStats.statsPositionList
+            .add(new ComponentPosition("total", null, null, "n,sum,min,max"));
         response = doAdvancedSearch(subDocSet, fieldStats);
         responseTotal = (HashMap<String, Object>) response.get("statsPositions")
             .get("total");
@@ -445,14 +563,19 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  /**
+   * Collect stats tokens.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void collectStatsTokens() throws IOException {
     ArrayList<Integer> fullDocSet = docs;
     try {
       // compute total
       ComponentField fieldStats = new ComponentField(FIELD_ID);
-      fieldStats.statsTokenList.add(new ComponentToken("total",
-          null, null, "n,sum,min,max"));
+      fieldStats.statsTokenList
+          .add(new ComponentToken("total", null, null, "n,sum,min,max"));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
@@ -472,8 +595,8 @@ public class MtasSearchTestConsistency {
       for (Integer docId : fullDocSet) {
         subDocSet.add(docId);
         fieldStats = new ComponentField(FIELD_ID);
-        fieldStats.statsTokenList.add(new ComponentToken("total",
-            null, null, "n,sum,min,max"));
+        fieldStats.statsTokenList
+            .add(new ComponentToken("total", null, null, "n,sum,min,max"));
         response = doAdvancedSearch(subDocSet, fieldStats);
         responseTotal = (HashMap<String, Object>) response.get("statsTokens")
             .get("total");
@@ -503,6 +626,11 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  /**
+   * Collect stats spans 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void collectStatsSpans1() throws IOException {
     String cql1 = "[pos=\"N\"]";
@@ -576,13 +704,10 @@ public class MtasSearchTestConsistency {
           ? (Long) responseMinimum1.get("sum") : 0;
       Long totalMaximum1 = responseTotal1 != null
           ? (Long) responseMaximum1.get("sum") : 0;
-      assertEquals("Number of nouns", total1.longValue(),
-          queryResult1.hits);
-      assertEquals("Number of articles", total2.longValue(),
-          queryResult2.hits);
+      assertEquals("Number of nouns", total1.longValue(), queryResult1.hits);
+      assertEquals("Number of articles", total2.longValue(), queryResult2.hits);
       assertEquals("Number of nouns and articles - external 1",
-          total12.longValue(),
-          (long) queryResult1.hits + queryResult2.hits);
+          total12.longValue(), (long) queryResult1.hits + queryResult2.hits);
       assertEquals("Number of nouns and articles - external 2",
           total12.longValue(), queryResult3.hits);
       assertEquals("Number of nouns and articles - internal",
@@ -591,13 +716,17 @@ public class MtasSearchTestConsistency {
           difference12.longValue(),
           (long) queryResult1.hits - queryResult2.hits);
       assertEquals("Minimum and maximum on number of positions nouns",
-          total1.longValue(),
-          totalMinimum1 + totalMaximum1);
+          total1.longValue(), totalMinimum1 + totalMaximum1);
     } catch (mtas.parser.function.ParseException | ParseException e) {
       log.error(e);
     }
-  }  
-  
+  }
+
+  /**
+   * Collect group.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void collectGroup() throws IOException {
     String cql = "[pos=\"LID\"]";
@@ -609,8 +738,9 @@ public class MtasSearchTestConsistency {
       fieldStats.spanQueryList.add(q);
       fieldStats.statsSpanList.add(new ComponentSpan(new MtasSpanQuery[] { q },
           "total", null, null, "sum", null, null, null));
-      fieldStats.groupList.add(new ComponentGroup(q, "articles", Integer.MAX_VALUE, "t_lc", null, null, null,
-          null, null, null, null, null, null, null, null, null));
+      fieldStats.groupList.add(new ComponentGroup(q, "articles",
+          Integer.MAX_VALUE, "t_lc", null, null, null, null, null, null, null,
+          null, null, null, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       ArrayList<HashMap<String, Object>> list = (ArrayList<HashMap<String, Object>>) response
@@ -642,6 +772,11 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  /**
+   * Collect termvector.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void collectTermvector() throws IOException {
     String prefix = "t_lc";
@@ -650,14 +785,16 @@ public class MtasSearchTestConsistency {
     try {
       ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_ID);
-      fieldStats.statsPositionList.add(
-          new ComponentPosition( "total", null, null, "sum"));
-      fieldStats.termVectorList.add(new ComponentTermVector("toplist", prefix,
-          null, false, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
-          null, number, null, null, null, null, null, null, prefix, null, null));
+      fieldStats.statsPositionList
+          .add(new ComponentPosition("total", null, null, "sum"));
+      fieldStats.termVectorList
+          .add(new ComponentTermVector("toplist", prefix, null, false, "sum",
+              CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC, null, number, null,
+              null, null, null, null, null, prefix, null, null));
       fieldStats.termVectorList.add(new ComponentTermVector("fulllist", prefix,
           null, true, "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC,
-          null, Integer.MAX_VALUE, null, null, null, null, null, null, prefix, null, null));
+          null, Integer.MAX_VALUE, null, null, null, null, null, null, prefix,
+          null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);
       HashMap<String, Object> responseTotal = (HashMap<String, Object>) response
@@ -667,9 +804,10 @@ public class MtasSearchTestConsistency {
           .get("termvector").get("toplist");
       Map<String, Object> fullList = (Map<String, Object>) response
           .get("termvector").get("fulllist");
-      
-      for (Entry<String,Object> entry : topList.entrySet()) {
-        HashMap<String, Object> responseTopTotal = (HashMap<String, Object>) entry.getValue();
+
+      for (Entry<String, Object> entry : topList.entrySet()) {
+        HashMap<String, Object> responseTopTotal = (HashMap<String, Object>) entry
+            .getValue();
         HashMap<String, Object> responseFullTotal = (HashMap<String, Object>) fullList
             .get(entry.getKey());
         Long topTotal = responseTopTotal != null
@@ -688,8 +826,9 @@ public class MtasSearchTestConsistency {
             + " compared with fullItem", topTotal, subFullTotal);
       }
       Long fullTotal = Long.valueOf(0);
-      for (Entry<String,Object> entry : fullList.entrySet()) {
-        HashMap<String, Object> responseFullTotal = (HashMap<String, Object>) entry.getValue();
+      for (Entry<String, Object> entry : fullList.entrySet()) {
+        HashMap<String, Object> responseFullTotal = (HashMap<String, Object>) entry
+            .getValue();
         Long subFullTotal = responseFullTotal != null
             ? (Long) responseFullTotal.get("sum") : 0;
         fullTotal += subFullTotal;
@@ -704,6 +843,13 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  /**
+   * Do advanced search.
+   *
+   * @param fullDocSet the full doc set
+   * @param fieldStats the field stats
+   * @return the hash map
+   */
   private HashMap<String, HashMap<String, Object>> doAdvancedSearch(
       ArrayList<Integer> fullDocSet, ComponentField fieldStats) {
     HashMap<String, HashMap<String, Object>> response = new HashMap<>();
@@ -741,12 +887,13 @@ public class MtasSearchTestConsistency {
       for (ComponentGroup cg : fieldStats.groupList) {
         SortedMap<String, ?> list = cg.dataCollector.getResult().getList();
         ArrayList<HashMap<String, Object>> groupList = new ArrayList<>();
-        for (Entry<String,?> entry : list.entrySet()) {
+        for (Entry<String, ?> entry : list.entrySet()) {
           HashMap<String, Object> subList = new HashMap<>();
           StringBuilder newKey = new StringBuilder("");
           subList.put("group", GroupHit.keyToObject(entry.getKey(), newKey));
           subList.put("key", newKey.toString().trim());
-          subList.putAll(((MtasDataItem<?, ?>) entry.getValue()).rewrite(false));
+          subList
+              .putAll(((MtasDataItem<?, ?>) entry.getValue()).rewrite(false));
           groupList.add(subList);
         }
         response.get("group").put(cg.key, groupList);
@@ -756,7 +903,7 @@ public class MtasSearchTestConsistency {
         HashMap<String, Map<String, Object>> tvList = new HashMap<>();
         Map<String, ?> tcList = ct.subComponentFunction.dataCollector
             .getResult().getList();
-        for (Entry<String,?> entry : tcList.entrySet()) {
+        for (Entry<String, ?> entry : tcList.entrySet()) {
           tvList.put(entry.getKey(),
               ((MtasDataItem<?, ?>) entry.getValue()).rewrite(false));
         }
@@ -770,6 +917,13 @@ public class MtasSearchTestConsistency {
     return response;
   }
 
+  /**
+   * Creates the index.
+   *
+   * @param configFile the config file
+   * @param files the files
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void createIndex(String configFile,
       HashMap<String, String> files) throws IOException {
     // analyzer
@@ -794,27 +948,34 @@ public class MtasSearchTestConsistency {
     w.deleteAll();
     // add
     int counter = 0;
-    for (Entry<String,String> entry : files.entrySet()) {
-      addDoc(w, counter, entry.getKey(), entry.getValue());      
-      if (counter == 0) {   
+    for (Entry<String, String> entry : files.entrySet()) {
+      addDoc(w, counter, entry.getKey(), entry.getValue());
+      if (counter == 0) {
         w.commit();
-      } else {      
+      } else {
         addDoc(w, counter, entry.getKey(), entry.getValue());
         addDoc(w, counter, "deletable", entry.getValue());
         w.commit();
-        w.deleteDocuments(
-            new Term(FIELD_ID, Integer.toString(counter)));
-        w.deleteDocuments(
-            new Term(FIELD_TITLE, "deletable"));
+        w.deleteDocuments(new Term(FIELD_ID, Integer.toString(counter)));
+        w.deleteDocuments(new Term(FIELD_TITLE, "deletable"));
         addDoc(w, counter, entry.getKey(), entry.getValue());
       }
       counter++;
     }
-    w.commit();   
+    w.commit();
     // finish
     w.close();
   }
 
+  /**
+   * Adds the doc.
+   *
+   * @param w the w
+   * @param id the id
+   * @param title the title
+   * @param file the file
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private static void addDoc(IndexWriter w, Integer id, String title,
       String file) throws IOException {
     try {
@@ -828,6 +989,12 @@ public class MtasSearchTestConsistency {
     }
   }
 
+  /**
+   * Gets the live docs.
+   *
+   * @param indexReader the index reader
+   * @return the live docs
+   */
   private static ArrayList<Integer> getLiveDocs(IndexReader indexReader) {
     ArrayList<Integer> list = new ArrayList<>();
     ListIterator<LeafReaderContext> iterator = indexReader.leaves()
@@ -835,15 +1002,25 @@ public class MtasSearchTestConsistency {
     while (iterator.hasNext()) {
       LeafReaderContext lrc = iterator.next();
       SegmentReader r = (SegmentReader) lrc.reader();
-      for(int docId=0;docId<r.maxDoc();docId++) {
-        if (r.numDocs()==r.maxDoc() || r.getLiveDocs().get(docId)) { 
-          list.add(lrc.docBase+docId);
+      for (int docId = 0; docId < r.maxDoc(); docId++) {
+        if (r.numDocs() == r.maxDoc() || r.getLiveDocs().get(docId)) {
+          list.add(lrc.docBase + docId);
         }
       }
     }
     return list;
   }
-  
+
+  /**
+   * Creates the query.
+   *
+   * @param field the field
+   * @param cql the cql
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
+   * @return the mtas span query
+   * @throws ParseException the parse exception
+   */
   private MtasSpanQuery createQuery(String field, String cql,
       MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
     Reader reader = new BufferedReader(new StringReader(cql));
@@ -851,6 +1028,18 @@ public class MtasSearchTestConsistency {
     return p.parse(field, null, null, ignore, maximumIgnoreLength);
   }
 
+  /**
+   * Do query.
+   *
+   * @param indexReader the index reader
+   * @param field the field
+   * @param cql the cql
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
+   * @param prefixes the prefixes
+   * @return the query result
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private QueryResult doQuery(IndexReader indexReader, String field, String cql,
       MtasSpanQuery ignore, Integer maximumIgnoreLength,
       ArrayList<String> prefixes) throws IOException {
@@ -864,14 +1053,24 @@ public class MtasSearchTestConsistency {
     return queryResult;
   }
 
+  /**
+   * Do query.
+   *
+   * @param indexReader the index reader
+   * @param field the field
+   * @param q the q
+   * @param prefixes the prefixes
+   * @return the query result
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private QueryResult doQuery(IndexReader indexReader, String field,
       MtasSpanQuery q, ArrayList<String> prefixes) throws IOException {
     QueryResult queryResult = new QueryResult();
     ListIterator<LeafReaderContext> iterator = indexReader.leaves()
         .listIterator();
     IndexSearcher searcher = new IndexSearcher(indexReader);
-    SpanWeight spanweight = q.rewrite(indexReader)
-        .createWeight(searcher, false);
+    SpanWeight spanweight = q.rewrite(indexReader).createWeight(searcher,
+        false);
 
     while (iterator.hasNext()) {
       LeafReaderContext lrc = iterator.next();
@@ -881,7 +1080,7 @@ public class MtasSearchTestConsistency {
       CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
       if (spans != null) {
         while (spans.nextDoc() != Spans.NO_MORE_DOCS) {
-          if (r.numDocs()==r.maxDoc() || r.getLiveDocs().get(spans.docID())) { 
+          if (r.numDocs() == r.maxDoc() || r.getLiveDocs().get(spans.docID())) {
             queryResult.docs++;
             while (spans.nextStartPosition() != Spans.NO_MORE_POSITIONS) {
               queryResult.hits++;
@@ -898,13 +1097,22 @@ public class MtasSearchTestConsistency {
                 }
               }
             }
-          } 
+          }
         }
       }
     }
     return queryResult;
   }
 
+  /**
+   * Test number of hits.
+   *
+   * @param indexReader the index reader
+   * @param field the field
+   * @param cqls1 the cqls 1
+   * @param cqls2 the cqls 2
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void testNumberOfHits(IndexReader indexReader, String field,
       List<String> cqls1, List<String> cqls2) throws IOException {
     Integer sum1 = 0;
@@ -921,18 +1129,32 @@ public class MtasSearchTestConsistency {
     assertEquals(sum1, sum2);
   }
 
+  /**
+   * The Class QueryResult.
+   */
   private static class QueryResult {
 
+    /** The docs. */
     public int docs;
+    
+    /** The hits. */
     public int hits;
+    
+    /** The result list. */
     public List<QueryHit> resultList;
 
+    /**
+     * Instantiates a new query result.
+     */
     public QueryResult() {
       docs = 0;
       hits = 0;
       resultList = new ArrayList<>();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
       StringBuilder buffer = new StringBuilder();
@@ -941,6 +1163,9 @@ public class MtasSearchTestConsistency {
       return buffer.toString();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
       if (this == obj)
@@ -952,7 +1177,10 @@ public class MtasSearchTestConsistency {
       QueryResult other = (QueryResult) obj;
       return other.hits == hits && other.docs == docs;
     }
-    
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
       int h = this.getClass().getSimpleName().hashCode();
@@ -963,9 +1191,22 @@ public class MtasSearchTestConsistency {
 
   }
 
-  private static class QueryHit {    
+  /**
+   * The Class QueryHit.
+   */
+  private static class QueryHit {
+    
+    /**
+     * Instantiates a new query hit.
+     *
+     * @param docId the doc id
+     * @param startPosition the start position
+     * @param endPosition the end position
+     * @param prefix the prefix
+     * @param value the value
+     */
     protected QueryHit(int docId, int startPosition, int endPosition,
-        String prefix, String value) {      
+        String prefix, String value) {
     }
   }
 
