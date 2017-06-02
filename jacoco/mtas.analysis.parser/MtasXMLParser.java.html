@@ -52,70 +52,70 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="fc" id="L52">  protected boolean allowNonContent = false;</span>
 
   /** The relation key map. */
-<span class="fc" id="L55">  private Map&lt;String, SortedSet&lt;String&gt;&gt; relationKeyMap = new HashMap&lt;String, SortedSet&lt;String&gt;&gt;();</span>
+<span class="fc" id="L55">  private Map&lt;String, SortedSet&lt;String&gt;&gt; relationKeyMap = new HashMap&lt;&gt;();</span>
 
   /** The q names. */
-<span class="fc" id="L58">  private Map&lt;String, QName&gt; qNames = new HashMap&lt;String, QName&gt;();</span>
+<span class="fc" id="L58">  private Map&lt;String, QName&gt; qNames = new HashMap&lt;&gt;();</span>
 
   /** The relation types. */
-<span class="fc" id="L61">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; relationTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L61">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; relationTypes = new HashMap&lt;&gt;();</span>
 
   /** The relation annotation types. */
-<span class="fc" id="L64">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; relationAnnotationTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L64">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; relationAnnotationTypes = new HashMap&lt;&gt;();</span>
 
   /** The ref types. */
-<span class="fc" id="L67">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; refTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L67">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; refTypes = new HashMap&lt;&gt;();</span>
 
   /** The group types. */
-<span class="fc" id="L70">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; groupTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L70">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; groupTypes = new HashMap&lt;&gt;();</span>
 
   /** The group annotation types. */
-<span class="fc" id="L73">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; groupAnnotationTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L73">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; groupAnnotationTypes = new HashMap&lt;&gt;();</span>
 
   /** The word types. */
-<span class="fc" id="L76">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; wordTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L76">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; wordTypes = new HashMap&lt;&gt;();</span>
 
   /** The word annotation types. */
-<span class="fc" id="L79">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; wordAnnotationTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="fc" id="L79">  private Map&lt;QName, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; wordAnnotationTypes = new HashMap&lt;&gt;();</span>
 
   /** The variable types. */
-<span class="fc" id="L82">  private Map&lt;QName, MtasParserType&lt;MtasParserVariable&gt;&gt; variableTypes = new HashMap&lt;QName, MtasParserType&lt;MtasParserVariable&gt;&gt;();</span>
+<span class="fc" id="L82">  private Map&lt;QName, MtasParserType&lt;MtasParserVariable&gt;&gt; variableTypes = new HashMap&lt;&gt;();</span>
 
   /** The xml variables. */
-<span class="fc" id="L85">  private static String XML_VARIABLES = &quot;variables&quot;;</span>
+  private static final String XML_VARIABLES = &quot;variables&quot;;
 
   /** The xml variable. */
-<span class="fc" id="L88">  private static String XML_VARIABLE = &quot;variable&quot;;</span>
+  private static final String XML_VARIABLE = &quot;variable&quot;;
 
   /** The xml variable name. */
-<span class="fc" id="L91">  private static String XML_VARIABLE_NAME = &quot;name&quot;;</span>
+  private static final String XML_VARIABLE_NAME = &quot;name&quot;;
 
   /** The xml variable value. */
-<span class="fc" id="L94">  private static String XML_VARIABLE_VALUE = &quot;value&quot;;</span>
+  private static final String XML_VARIABLE_VALUE = &quot;value&quot;;
 
   /** The xml references. */
-<span class="fc" id="L97">  private static String XML_REFERENCES = &quot;references&quot;;</span>
+  private static final String XML_REFERENCES = &quot;references&quot;;
 
   /** The xml reference. */
-<span class="fc" id="L100">  private static String XML_REFERENCE = &quot;reference&quot;;</span>
+  private static final String XML_REFERENCE = &quot;reference&quot;;
 
   /** The xml reference name. */
-<span class="fc" id="L103">  private static String XML_REFERENCE_NAME = &quot;name&quot;;</span>
+  private static final String XML_REFERENCE_NAME = &quot;name&quot;;
 
   /** The xml reference ref. */
-<span class="fc" id="L106">  private static String XML_REFERENCE_REF = &quot;ref&quot;;</span>
+  private static final String XML_REFERENCE_REF = &quot;ref&quot;;
 
   /** The xml mappings. */
-<span class="fc" id="L109">  private static String XML_MAPPINGS = &quot;mappings&quot;;</span>
+  private static final String XML_MAPPINGS = &quot;mappings&quot;;
 
   /** The xml mapping. */
-<span class="fc" id="L112">  private static String XML_MAPPING = &quot;mapping&quot;;</span>
+  private static final String XML_MAPPING = &quot;mapping&quot;;
 
   /** The xml mapping type. */
-<span class="fc" id="L115">  private static String XML_MAPPING_TYPE = &quot;type&quot;;</span>
+  private static final String XML_MAPPING_TYPE = &quot;type&quot;;
 
   /** The xml mapping name. */
-<span class="fc" id="L118">  private static String XML_MAPPING_NAME = &quot;name&quot;;</span>
+  private static final String XML_MAPPING_NAME = &quot;name&quot;;
 
   /**
    * Instantiates a new mtas XML parser.
@@ -236,7 +236,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="nc bnc" id="L236" title="All 2 branches missed.">                if (variableTypes.containsKey(qn)) {</span>
 <span class="nc" id="L237">                  variableTypes.get(qn).addItem(v);</span>
                 } else {
-<span class="nc" id="L239">                  MtasParserType&lt;MtasParserVariable&gt; t = new MtasParserType&lt;MtasParserVariable&gt;(</span>
+<span class="nc" id="L239">                  MtasParserType&lt;MtasParserVariable&gt; t = new MtasParserType&lt;&gt;(</span>
                       nameVariable, valueVariable, false);
 <span class="nc" id="L241">                  t.addItem(v);</span>
 <span class="nc" id="L242">                  variableTypes.put(qn, t);</span>
@@ -251,7 +251,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="fc" id="L251">              String name = reference.attributes.get(XML_REFERENCE_NAME);</span>
 <span class="fc" id="L252">              String ref = reference.attributes.get(XML_REFERENCE_REF);</span>
 <span class="pc bpc" id="L253" title="2 of 4 branches missed.">              if ((name != null) &amp;&amp; (ref != null)) {</span>
-<span class="fc" id="L254">                MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="fc" id="L254">                MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                     MAPPING_TYPE_REF, name, false, ref);
 <span class="fc" id="L256">                refTypes.put(getQName(t.getName()), t);</span>
               }
@@ -271,7 +271,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="pc bpc" id="L271" title="1 of 2 branches missed.">                  if (relationTypes.containsKey(qn)) {</span>
 <span class="nc" id="L272">                    relationTypes.get(qn).addItem(m);</span>
                   } else {
-<span class="fc" id="L274">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="fc" id="L274">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="fc" id="L276">                    t.addItem(m);</span>
 <span class="fc" id="L277">                    relationTypes.put(qn, t);</span>
@@ -284,7 +284,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="nc bnc" id="L284" title="All 2 branches missed.">                  if (relationAnnotationTypes.containsKey(qn)) {</span>
 <span class="nc" id="L285">                    relationAnnotationTypes.get(qn).addItem(m);</span>
                   } else {
-<span class="nc" id="L287">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="nc" id="L287">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="nc" id="L289">                    t.addItem(m);</span>
 <span class="nc" id="L290">                    relationAnnotationTypes.put(qn, t);</span>
@@ -296,7 +296,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="fc bfc" id="L296" title="All 2 branches covered.">                  if (wordTypes.containsKey(qn)) {</span>
 <span class="fc" id="L297">                    wordTypes.get(qn).addItem(m);</span>
                   } else {
-<span class="fc" id="L299">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="fc" id="L299">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="fc" id="L301">                    t.addItem(m);</span>
 <span class="fc" id="L302">                    wordTypes.put(qn, t);</span>
@@ -308,7 +308,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="fc bfc" id="L308" title="All 2 branches covered.">                  if (wordAnnotationTypes.containsKey(qn)) {</span>
 <span class="fc" id="L309">                    wordAnnotationTypes.get(qn).addItem(m);</span>
                   } else {
-<span class="fc" id="L311">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="fc" id="L311">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="fc" id="L313">                    t.addItem(m);</span>
 <span class="fc" id="L314">                    wordAnnotationTypes.put(qn, t);</span>
@@ -320,7 +320,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="pc bpc" id="L320" title="1 of 2 branches missed.">                  if (groupTypes.containsKey(qn)) {</span>
 <span class="nc" id="L321">                    groupTypes.get(qn).addItem(m);</span>
                   } else {
-<span class="fc" id="L323">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="fc" id="L323">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="fc" id="L325">                    t.addItem(m);</span>
 <span class="fc" id="L326">                    groupTypes.put(qn, t);</span>
@@ -332,7 +332,7 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="pc bpc" id="L332" title="1 of 2 branches missed.">                  if (groupAnnotationTypes.containsKey(qn)) {</span>
 <span class="nc" id="L333">                    groupAnnotationTypes.get(qn).addItem(m);</span>
                   } else {
-<span class="fc" id="L335">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="fc" id="L335">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="fc" id="L337">                    t.addItem(m);</span>
 <span class="fc" id="L338">                    groupAnnotationTypes.put(qn, t);</span>
@@ -517,384 +517,383 @@ import mtas.analysis.util.MtasConfiguration;
                   }
                   // check for word annotation: not within relation, not within
                   // groupAnnotation, but within word
-<span class="fc bfc" id="L520" title="All 2 branches covered.">                } else if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)</span>
-<span class="fc" id="L521">                    &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
-<span class="pc bpc" id="L522" title="1 of 2 branches missed.">                        .size() == 0)</span>
-<span class="fc bfc" id="L523" title="All 2 branches covered.">                    &amp;&amp; (currentList.get(MAPPING_TYPE_WORD).size() &gt; 0)</span>
+<span class="fc bfc" id="L520" title="All 2 branches covered.">                } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())</span>
+<span class="pc bpc" id="L521" title="1 of 2 branches missed.">                    &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())</span>
+<span class="fc bfc" id="L522" title="All 2 branches covered.">                    &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())</span>
                     &amp;&amp; (tmpCurrentType = wordAnnotationTypes
-<span class="fc bfc" id="L525" title="All 2 branches covered.">                        .get(qname)) != null) {</span>
-<span class="fc" id="L526">                  currentObject = new MtasParserObject(tmpCurrentType);</span>
-<span class="fc" id="L527">                  collectAttributes(currentObject, streamReader);</span>
-<span class="fc" id="L528">                  currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="fc" id="L529">                      .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
-<span class="fc" id="L530">                      .getPositions());</span>
-<span class="fc" id="L531">                  currentObject.setUnknownAncestorNumber(unknownAncestors);</span>
-<span class="fc" id="L532">                  currentObject.setRealOffsetStart(lastOffset);</span>
-<span class="fc bfc" id="L533" title="All 2 branches covered.">                  if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="fc" id="L534">                    unknownAncestors++;</span>
+<span class="fc bfc" id="L524" title="All 2 branches covered.">                        .get(qname)) != null) {</span>
+<span class="fc" id="L525">                  currentObject = new MtasParserObject(tmpCurrentType);</span>
+<span class="fc" id="L526">                  collectAttributes(currentObject, streamReader);</span>
+<span class="fc" id="L527">                  currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="fc" id="L528">                      .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
+<span class="fc" id="L529">                      .getPositions());</span>
+<span class="fc" id="L530">                  currentObject.setUnknownAncestorNumber(unknownAncestors);</span>
+<span class="fc" id="L531">                  currentObject.setRealOffsetStart(lastOffset);</span>
+<span class="fc bfc" id="L532" title="All 2 branches covered.">                  if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="fc" id="L533">                    unknownAncestors++;</span>
                   } else {
-<span class="fc" id="L536">                    currentType = tmpCurrentType;</span>
-<span class="fc" id="L537">                    currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
-<span class="fc" id="L538">                        .add(currentObject);</span>
-<span class="fc" id="L539">                    unknownAncestors = 0;</span>
+<span class="fc" id="L535">                    currentType = tmpCurrentType;</span>
+<span class="fc" id="L536">                    currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="fc" id="L537">                        .add(currentObject);</span>
+<span class="fc" id="L538">                    unknownAncestors = 0;</span>
                   }
                   // check for references: within relation
-<span class="fc bfc" id="L542" title="All 2 branches covered.">                } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()</span>
-<span class="pc bpc" id="L543" title="1 of 2 branches missed.">                    &amp;&amp; (tmpCurrentType = refTypes.get(qname)) != null) {</span>
-<span class="fc" id="L544">                  currentObject = new MtasParserObject(tmpCurrentType);</span>
-<span class="fc" id="L545">                  collectAttributes(currentObject, streamReader);</span>
-<span class="fc" id="L546">                  currentObject.setUnknownAncestorNumber(unknownAncestors);</span>
-<span class="fc" id="L547">                  currentObject.setRealOffsetStart(lastOffset);</span>
-<span class="pc bpc" id="L548" title="1 of 2 branches missed.">                  if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="nc" id="L549">                    unknownAncestors++;</span>
+<span class="fc bfc" id="L541" title="All 2 branches covered.">                } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()</span>
+<span class="pc bpc" id="L542" title="1 of 2 branches missed.">                    &amp;&amp; (tmpCurrentType = refTypes.get(qname)) != null) {</span>
+<span class="fc" id="L543">                  currentObject = new MtasParserObject(tmpCurrentType);</span>
+<span class="fc" id="L544">                  collectAttributes(currentObject, streamReader);</span>
+<span class="fc" id="L545">                  currentObject.setUnknownAncestorNumber(unknownAncestors);</span>
+<span class="fc" id="L546">                  currentObject.setRealOffsetStart(lastOffset);</span>
+<span class="pc bpc" id="L547" title="1 of 2 branches missed.">                  if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="nc" id="L548">                    unknownAncestors++;</span>
                   } else {
-<span class="fc" id="L551">                    currentType = tmpCurrentType;</span>
-<span class="fc" id="L552">                    currentList.get(MAPPING_TYPE_REF).add(currentObject);</span>
-<span class="fc" id="L553">                    unknownAncestors = 0;</span>
+<span class="fc" id="L550">                    currentType = tmpCurrentType;</span>
+<span class="fc" id="L551">                    currentList.get(MAPPING_TYPE_REF).add(currentObject);</span>
+<span class="fc" id="L552">                    unknownAncestors = 0;</span>
                     // add reference to ancestor relations
                     for (MtasParserObject currentRelation : currentList
-<span class="fc bfc" id="L556" title="All 2 branches covered.">                        .get(MAPPING_TYPE_RELATION)) {</span>
-<span class="fc" id="L557">                      currentRelation.addRefId(currentObject</span>
-<span class="fc" id="L558">                          .getAttribute(currentType.getRefAttributeName()));</span>
+<span class="fc bfc" id="L555" title="All 2 branches covered.">                        .get(MAPPING_TYPE_RELATION)) {</span>
+<span class="fc" id="L556">                      currentRelation.addRefId(currentObject</span>
+<span class="fc" id="L557">                          .getAttribute(currentType.getRefAttributeName()));</span>
                       // register mapping for relation (for recursive relations)
                       SortedSet&lt;String&gt; keyMapList;
-<span class="fc bfc" id="L561" title="All 2 branches covered.">                      if (currentRelation.getId() != null) {</span>
-<span class="fc" id="L562">                        if (relationKeyMap</span>
-<span class="fc bfc" id="L563" title="All 2 branches covered.">                            .containsKey(currentRelation.getId())) {</span>
-<span class="fc" id="L564">                          keyMapList = relationKeyMap</span>
-<span class="fc" id="L565">                              .get(currentRelation.getId());</span>
+<span class="fc bfc" id="L560" title="All 2 branches covered.">                      if (currentRelation.getId() != null) {</span>
+<span class="fc" id="L561">                        if (relationKeyMap</span>
+<span class="fc bfc" id="L562" title="All 2 branches covered.">                            .containsKey(currentRelation.getId())) {</span>
+<span class="fc" id="L563">                          keyMapList = relationKeyMap</span>
+<span class="fc" id="L564">                              .get(currentRelation.getId());</span>
                         } else {
-<span class="fc" id="L567">                          keyMapList = new TreeSet&lt;&gt;();</span>
-<span class="fc" id="L568">                          relationKeyMap.put(currentRelation.getId(),</span>
+<span class="fc" id="L566">                          keyMapList = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L567">                          relationKeyMap.put(currentRelation.getId(),</span>
                               keyMapList);
                         }
-<span class="fc" id="L571">                        keyMapList.add(currentObject</span>
-<span class="fc" id="L572">                            .getAttribute(currentType.getRefAttributeName()));</span>
+<span class="fc" id="L570">                        keyMapList.add(currentObject</span>
+<span class="fc" id="L571">                            .getAttribute(currentType.getRefAttributeName()));</span>
                       }
-<span class="fc" id="L574">                    }</span>
+<span class="fc" id="L573">                    }</span>
                   }
                 } else {
-<span class="fc" id="L577">                  unknownAncestors++;</span>
+<span class="fc" id="L576">                  unknownAncestors++;</span>
                 }
                 // check for start content
-<span class="fc bfc" id="L580" title="All 2 branches covered.">              } else if (qname.equals(getQName(contentTag))) {</span>
-<span class="fc" id="L581">                parsingContent = true;</span>
+<span class="fc bfc" id="L579" title="All 2 branches covered.">              } else if (qname.equals(getQName(contentTag))) {</span>
+<span class="fc" id="L580">                parsingContent = true;</span>
                 // unexpected
-<span class="pc bpc" id="L583" title="1 of 2 branches missed.">              } else if (!allowNonContent) {</span>
-<span class="nc" id="L584">                throw new MtasParserException(</span>
-<span class="nc" id="L585">                    &quot;Unexpected &quot; + qname.getLocalPart() + &quot; in document&quot;);</span>
+<span class="pc bpc" id="L582" title="1 of 2 branches missed.">              } else if (!allowNonContent) {</span>
+<span class="nc" id="L583">                throw new MtasParserException(</span>
+<span class="nc" id="L584">                    &quot;Unexpected &quot; + qname.getLocalPart() + &quot; in document&quot;);</span>
               }
             }
             // set offset (end of start-element)
-<span class="fc" id="L589">            lastOffset = streamReader.getLocation().getCharacterOffset();</span>
-<span class="fc" id="L590">            break;</span>
+<span class="fc" id="L588">            lastOffset = streamReader.getLocation().getCharacterOffset();</span>
+<span class="fc" id="L589">            break;</span>
           case XMLStreamConstants.END_ELEMENT:
             // set offset (end of end-element)
-<span class="fc" id="L593">            lastOffset = streamReader.getLocation().getCharacterOffset();</span>
+<span class="fc" id="L592">            lastOffset = streamReader.getLocation().getCharacterOffset();</span>
             // get data
-<span class="fc" id="L595">            qname = streamReader.getName();</span>
+<span class="fc" id="L594">            qname = streamReader.getName();</span>
             // parse content
-<span class="fc bfc" id="L597" title="All 2 branches covered.">            if (parsingContent) {</span>
-<span class="fc bfc" id="L598" title="All 2 branches covered.">              if (unknownAncestors &gt; 0) {</span>
-<span class="fc" id="L599">                unknownAncestors--;</span>
+<span class="fc bfc" id="L596" title="All 2 branches covered.">            if (parsingContent) {</span>
+<span class="fc bfc" id="L597" title="All 2 branches covered.">              if (unknownAncestors &gt; 0) {</span>
+<span class="fc" id="L598">                unknownAncestors--;</span>
                 // check for reference: because otherwise currentList should
                 // contain no references
-<span class="fc bfc" id="L602" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_REF).isEmpty()) {</span>
-<span class="pc bpc" id="L603" title="1 of 2 branches missed.">                if ((currentType = refTypes.get(qname)) != null) {</span>
-<span class="fc" id="L604">                  currentObject = currentList.get(MAPPING_TYPE_REF)</span>
-<span class="fc" id="L605">                      .remove(currentList.get(MAPPING_TYPE_REF).size() - 1);</span>
-<span class="pc bpc" id="L606" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="pc bpc" id="L607" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L608">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L609">                          + currentType.getName();</span>
-<span class="pc bpc" id="L610" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L611">                      + currentObject.getType().getName();</span>
+<span class="fc bfc" id="L601" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_REF).isEmpty()) {</span>
+<span class="pc bpc" id="L602" title="1 of 2 branches missed.">                if ((currentType = refTypes.get(qname)) != null) {</span>
+<span class="fc" id="L603">                  currentObject = currentList.get(MAPPING_TYPE_REF)</span>
+<span class="fc" id="L604">                      .remove(currentList.get(MAPPING_TYPE_REF).size() - 1);</span>
+<span class="pc bpc" id="L605" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="pc bpc" id="L606" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L607">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L608">                          + currentType.getName();</span>
+<span class="pc bpc" id="L609" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L610">                      + currentObject.getType().getName();</span>
                   // ignore text and realOffset: not relevant
-<span class="fc" id="L613">                  idPositions.put(currentObject.getId(),</span>
-<span class="fc" id="L614">                      currentObject.getPositions());</span>
-<span class="fc" id="L615">                  idOffsets.put(currentObject.getId(),</span>
-<span class="fc" id="L616">                      currentObject.getOffset());</span>
-<span class="fc" id="L617">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="fc" id="L618">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="fc" id="L619">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="fc" id="L612">                  idPositions.put(currentObject.getId(),</span>
+<span class="fc" id="L613">                      currentObject.getPositions());</span>
+<span class="fc" id="L614">                  idOffsets.put(currentObject.getId(),</span>
+<span class="fc" id="L615">                      currentObject.getOffset());</span>
+<span class="fc" id="L616">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="fc" id="L617">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="fc" id="L618">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
                   // this shouldn't happen
                 }
                 // check for wordAnnotation: because otherwise currentList
                 // should contain no wordAnnotations
-<span class="fc" id="L626">              } else if (!currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
-<span class="fc bfc" id="L627" title="All 2 branches covered.">                  .isEmpty()) {</span>
-<span class="pc bpc" id="L628" title="1 of 2 branches missed.">                if ((currentType = wordAnnotationTypes.get(qname)) != null) {</span>
-<span class="fc" id="L629">                  currentObject = currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
-<span class="fc" id="L630">                      .remove(</span>
-<span class="fc" id="L631">                          currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size()</span>
+<span class="fc" id="L625">              } else if (!currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="fc bfc" id="L626" title="All 2 branches covered.">                  .isEmpty()) {</span>
+<span class="pc bpc" id="L627" title="1 of 2 branches missed.">                if ((currentType = wordAnnotationTypes.get(qname)) != null) {</span>
+<span class="fc" id="L628">                  currentObject = currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="fc" id="L629">                      .remove(</span>
+<span class="fc" id="L630">                          currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size()</span>
                               - 1);
-<span class="pc bpc" id="L633" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="pc bpc" id="L634" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L635">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L636">                          + currentType.getName();</span>
-<span class="pc bpc" id="L637" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L638">                      + currentObject.getType().getName();</span>
-<span class="fc" id="L639">                  currentObject.setRealOffsetEnd(lastOffset);</span>
-<span class="fc" id="L640">                  idPositions.put(currentObject.getId(),</span>
-<span class="fc" id="L641">                      currentObject.getPositions());</span>
-<span class="fc" id="L642">                  idOffsets.put(currentObject.getId(),</span>
-<span class="fc" id="L643">                      currentObject.getOffset());</span>
+<span class="pc bpc" id="L632" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="pc bpc" id="L633" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L634">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L635">                          + currentType.getName();</span>
+<span class="pc bpc" id="L636" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L637">                      + currentObject.getType().getName();</span>
+<span class="fc" id="L638">                  currentObject.setRealOffsetEnd(lastOffset);</span>
+<span class="fc" id="L639">                  idPositions.put(currentObject.getId(),</span>
+<span class="fc" id="L640">                      currentObject.getPositions());</span>
+<span class="fc" id="L641">                  idOffsets.put(currentObject.getId(),</span>
+<span class="fc" id="L642">                      currentObject.getOffset());</span>
                   // offset always null, so update later with word (should be
                   // possible)
-<span class="pc bpc" id="L646" title="1 of 2 branches missed.">                  if ((currentObject.getId() != null)</span>
-<span class="nc bnc" id="L647" title="All 2 branches missed.">                      &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
-<span class="nc" id="L648">                    currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="nc" id="L649">                        .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
-<span class="nc" id="L650">                        .addUpdateableIdWithOffset(currentObject.getId());</span>
+<span class="pc bpc" id="L645" title="1 of 2 branches missed.">                  if ((currentObject.getId() != null)</span>
+<span class="nc bnc" id="L646" title="All 2 branches missed.">                      &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
+<span class="nc" id="L647">                    currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="nc" id="L648">                        .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
+<span class="nc" id="L649">                        .addUpdateableIdWithOffset(currentObject.getId());</span>
                   }
-<span class="fc" id="L652">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="fc" id="L653">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="fc" id="L654">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="fc" id="L651">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="fc" id="L652">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="fc" id="L653">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
                   // this shouldn't happen
                 }
                 // check for word: because otherwise currentList should contain
                 // no words
-<span class="fc bfc" id="L661" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_WORD).isEmpty()) {</span>
-<span class="pc bpc" id="L662" title="1 of 2 branches missed.">                if ((currentType = wordTypes.get(qname)) != null) {</span>
-<span class="fc" id="L663">                  currentObject = currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="fc" id="L664">                      .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);</span>
-<span class="pc bpc" id="L665" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="pc bpc" id="L666" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L667">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L668">                          + currentType.getName();</span>
-<span class="pc bpc" id="L669" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L670">                      + currentObject.getType().getName();</span>
-<span class="fc" id="L671">                  currentObject.setOffsetEnd(lastOffset);</span>
-<span class="fc" id="L672">                  currentObject.setRealOffsetEnd(lastOffset);</span>
+<span class="fc bfc" id="L660" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_WORD).isEmpty()) {</span>
+<span class="pc bpc" id="L661" title="1 of 2 branches missed.">                if ((currentType = wordTypes.get(qname)) != null) {</span>
+<span class="fc" id="L662">                  currentObject = currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="fc" id="L663">                      .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);</span>
+<span class="pc bpc" id="L664" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="pc bpc" id="L665" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L666">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L667">                          + currentType.getName();</span>
+<span class="pc bpc" id="L668" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L669">                      + currentObject.getType().getName();</span>
+<span class="fc" id="L670">                  currentObject.setOffsetEnd(lastOffset);</span>
+<span class="fc" id="L671">                  currentObject.setRealOffsetEnd(lastOffset);</span>
                   // update ancestor groups with position and offset
                   for (MtasParserObject currentGroup : currentList
-<span class="fc bfc" id="L675" title="All 2 branches covered.">                      .get(MAPPING_TYPE_GROUP)) {</span>
-<span class="fc" id="L676">                    currentGroup.addPositions(currentObject.getPositions());</span>
-<span class="fc" id="L677">                    currentGroup.addOffsetStart(currentObject.getOffsetStart());</span>
-<span class="fc" id="L678">                    currentGroup.addOffsetEnd(currentObject.getOffsetEnd());</span>
-<span class="fc" id="L679">                  }</span>
-<span class="fc" id="L680">                  idPositions.put(currentObject.getId(),</span>
-<span class="fc" id="L681">                      currentObject.getPositions());</span>
-<span class="fc" id="L682">                  idOffsets.put(currentObject.getId(),</span>
-<span class="fc" id="L683">                      currentObject.getOffset());</span>
-<span class="fc" id="L684">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="fc" id="L685">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="fc" id="L686">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="fc bfc" id="L674" title="All 2 branches covered.">                      .get(MAPPING_TYPE_GROUP)) {</span>
+<span class="fc" id="L675">                    currentGroup.addPositions(currentObject.getPositions());</span>
+<span class="fc" id="L676">                    currentGroup.addOffsetStart(currentObject.getOffsetStart());</span>
+<span class="fc" id="L677">                    currentGroup.addOffsetEnd(currentObject.getOffsetEnd());</span>
+<span class="fc" id="L678">                  }</span>
+<span class="fc" id="L679">                  idPositions.put(currentObject.getId(),</span>
+<span class="fc" id="L680">                      currentObject.getPositions());</span>
+<span class="fc" id="L681">                  idOffsets.put(currentObject.getId(),</span>
+<span class="fc" id="L682">                      currentObject.getOffset());</span>
+<span class="fc" id="L683">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="fc" id="L684">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="fc" id="L685">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
                   // this shouldn't happen
                 }
                 // check for group annotation: because otherwise currentList
                 // should contain no groupAnnotations
-<span class="fc" id="L693">              } else if (!currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
-<span class="pc bpc" id="L694" title="1 of 2 branches missed.">                  .isEmpty()) {</span>
-<span class="nc bnc" id="L695" title="All 2 branches missed.">                if ((currentType = groupAnnotationTypes.get(qname)) != null) {</span>
-<span class="nc" id="L696">                  currentObject = currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
-<span class="nc" id="L697">                      .remove(</span>
-<span class="nc" id="L698">                          currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size()</span>
+<span class="fc" id="L692">              } else if (!currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
+<span class="pc bpc" id="L693" title="1 of 2 branches missed.">                  .isEmpty()) {</span>
+<span class="nc bnc" id="L694" title="All 2 branches missed.">                if ((currentType = groupAnnotationTypes.get(qname)) != null) {</span>
+<span class="nc" id="L695">                  currentObject = currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
+<span class="nc" id="L696">                      .remove(</span>
+<span class="nc" id="L697">                          currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size()</span>
                               - 1);
-<span class="nc bnc" id="L700" title="All 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="nc bnc" id="L701" title="All 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L702">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L703">                          + currentType.getName();</span>
-<span class="nc bnc" id="L704" title="All 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L705">                      + currentObject.getType().getName();</span>
-<span class="nc" id="L706">                  currentObject.setRealOffsetEnd(lastOffset);</span>
-<span class="nc" id="L707">                  idPositions.put(currentObject.getId(),</span>
-<span class="nc" id="L708">                      currentObject.getPositions());</span>
-<span class="nc" id="L709">                  idOffsets.put(currentObject.getId(),</span>
-<span class="nc" id="L710">                      currentObject.getOffset());</span>
-<span class="nc" id="L711">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="nc" id="L712">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="nc" id="L713">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="nc bnc" id="L699" title="All 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="nc bnc" id="L700" title="All 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L701">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L702">                          + currentType.getName();</span>
+<span class="nc bnc" id="L703" title="All 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L704">                      + currentObject.getType().getName();</span>
+<span class="nc" id="L705">                  currentObject.setRealOffsetEnd(lastOffset);</span>
+<span class="nc" id="L706">                  idPositions.put(currentObject.getId(),</span>
+<span class="nc" id="L707">                      currentObject.getPositions());</span>
+<span class="nc" id="L708">                  idOffsets.put(currentObject.getId(),</span>
+<span class="nc" id="L709">                      currentObject.getOffset());</span>
+<span class="nc" id="L710">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="nc" id="L711">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="nc" id="L712">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
                   // this shouldn't happen
                 }
                 // check for relation annotation
-<span class="fc" id="L719">              } else if (!currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)</span>
-<span class="pc bpc" id="L720" title="1 of 2 branches missed.">                  .isEmpty()) {</span>
-<span class="nc" id="L721">                if ((currentType = relationAnnotationTypes</span>
-<span class="nc bnc" id="L722" title="All 2 branches missed.">                    .get(qname)) != null) {</span>
-<span class="nc" id="L723">                  currentObject = currentList</span>
-<span class="nc" id="L724">                      .get(MAPPING_TYPE_RELATION_ANNOTATION).remove(currentList</span>
-<span class="nc" id="L725">                          .get(MAPPING_TYPE_RELATION_ANNOTATION).size() - 1);</span>
-<span class="nc bnc" id="L726" title="All 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="nc bnc" id="L727" title="All 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L728">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L729">                          + currentType.getName();</span>
-<span class="nc bnc" id="L730" title="All 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L731">                      + currentObject.getType().getName();</span>
-<span class="nc" id="L732">                  currentObject.setRealOffsetEnd(lastOffset);</span>
-<span class="nc" id="L733">                  idPositions.put(currentObject.getId(),</span>
-<span class="nc" id="L734">                      currentObject.getPositions());</span>
-<span class="nc" id="L735">                  idOffsets.put(currentObject.getId(),</span>
-<span class="nc" id="L736">                      currentObject.getOffset());</span>
-<span class="nc" id="L737">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="nc" id="L738">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="nc" id="L739">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="fc" id="L718">              } else if (!currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)</span>
+<span class="pc bpc" id="L719" title="1 of 2 branches missed.">                  .isEmpty()) {</span>
+<span class="nc" id="L720">                if ((currentType = relationAnnotationTypes</span>
+<span class="nc bnc" id="L721" title="All 2 branches missed.">                    .get(qname)) != null) {</span>
+<span class="nc" id="L722">                  currentObject = currentList</span>
+<span class="nc" id="L723">                      .get(MAPPING_TYPE_RELATION_ANNOTATION).remove(currentList</span>
+<span class="nc" id="L724">                          .get(MAPPING_TYPE_RELATION_ANNOTATION).size() - 1);</span>
+<span class="nc bnc" id="L725" title="All 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="nc bnc" id="L726" title="All 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L727">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L728">                          + currentType.getName();</span>
+<span class="nc bnc" id="L729" title="All 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L730">                      + currentObject.getType().getName();</span>
+<span class="nc" id="L731">                  currentObject.setRealOffsetEnd(lastOffset);</span>
+<span class="nc" id="L732">                  idPositions.put(currentObject.getId(),</span>
+<span class="nc" id="L733">                      currentObject.getPositions());</span>
+<span class="nc" id="L734">                  idOffsets.put(currentObject.getId(),</span>
+<span class="nc" id="L735">                      currentObject.getOffset());</span>
+<span class="nc" id="L736">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="nc" id="L737">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="nc" id="L738">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
                   // this shouldn't happen
                 }
                 // check for relation
-<span class="fc bfc" id="L745" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {</span>
-<span class="pc bpc" id="L746" title="1 of 2 branches missed.">                if ((currentType = relationTypes.get(qname)) != null) {</span>
-<span class="fc" id="L747">                  currentObject = currentList.get(MAPPING_TYPE_RELATION).remove(</span>
-<span class="fc" id="L748">                      currentList.get(MAPPING_TYPE_RELATION).size() - 1);</span>
-<span class="pc bpc" id="L749" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="pc bpc" id="L750" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L751">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L752">                          + currentType.getName();</span>
-<span class="pc bpc" id="L753" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L754">                      + currentObject.getType().getName();</span>
+<span class="fc bfc" id="L744" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {</span>
+<span class="pc bpc" id="L745" title="1 of 2 branches missed.">                if ((currentType = relationTypes.get(qname)) != null) {</span>
+<span class="fc" id="L746">                  currentObject = currentList.get(MAPPING_TYPE_RELATION).remove(</span>
+<span class="fc" id="L747">                      currentList.get(MAPPING_TYPE_RELATION).size() - 1);</span>
+<span class="pc bpc" id="L748" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="pc bpc" id="L749" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L750">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L751">                          + currentType.getName();</span>
+<span class="pc bpc" id="L752" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L753">                      + currentObject.getType().getName();</span>
                   // ignore text: should not occur
-<span class="fc" id="L756">                  currentObject.setRealOffsetEnd(lastOffset);</span>
-<span class="fc" id="L757">                  idPositions.put(currentObject.getId(),</span>
-<span class="fc" id="L758">                      currentObject.getPositions());</span>
-<span class="fc" id="L759">                  idOffsets.put(currentObject.getId(),</span>
-<span class="fc" id="L760">                      currentObject.getOffset());</span>
-<span class="fc" id="L761">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="fc" id="L762">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="fc" id="L763">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="fc" id="L755">                  currentObject.setRealOffsetEnd(lastOffset);</span>
+<span class="fc" id="L756">                  idPositions.put(currentObject.getId(),</span>
+<span class="fc" id="L757">                      currentObject.getPositions());</span>
+<span class="fc" id="L758">                  idOffsets.put(currentObject.getId(),</span>
+<span class="fc" id="L759">                      currentObject.getOffset());</span>
+<span class="fc" id="L760">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="fc" id="L761">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="fc" id="L762">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
                   // this shouldn't happen
                 }
                 // check for group
-<span class="fc bfc" id="L769" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {</span>
-<span class="pc bpc" id="L770" title="1 of 2 branches missed.">                if ((currentType = groupTypes.get(qname)) != null) {</span>
-<span class="fc" id="L771">                  currentObject = currentList.get(MAPPING_TYPE_GROUP)</span>
-<span class="fc" id="L772">                      .remove(currentList.get(MAPPING_TYPE_GROUP).size() - 1);</span>
-<span class="pc bpc" id="L773" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
-<span class="pc bpc" id="L774" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
-<span class="nc" id="L775">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
-<span class="nc" id="L776">                          + currentType.getName();</span>
-<span class="pc bpc" id="L777" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L778">                      + currentObject.getType().getName();</span>
+<span class="fc bfc" id="L768" title="All 2 branches covered.">              } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {</span>
+<span class="pc bpc" id="L769" title="1 of 2 branches missed.">                if ((currentType = groupTypes.get(qname)) != null) {</span>
+<span class="fc" id="L770">                  currentObject = currentList.get(MAPPING_TYPE_GROUP)</span>
+<span class="fc" id="L771">                      .remove(currentList.get(MAPPING_TYPE_GROUP).size() - 1);</span>
+<span class="pc bpc" id="L772" title="1 of 2 branches missed.">                  assert currentObject.getType()</span>
+<span class="pc bpc" id="L773" title="1 of 2 branches missed.">                      .equals(currentType) : &quot;object expected to be &quot;</span>
+<span class="nc" id="L774">                          + currentObject.getType().getName() + &quot;, not &quot;</span>
+<span class="nc" id="L775">                          + currentType.getName();</span>
+<span class="pc bpc" id="L776" title="2 of 4 branches missed.">                  assert unknownAncestors == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L777">                      + currentObject.getType().getName();</span>
                   // ignore text: should not occur
-<span class="fc" id="L780">                  currentObject.setRealOffsetEnd(lastOffset);</span>
-<span class="fc" id="L781">                  idPositions.put(currentObject.getId(),</span>
-<span class="fc" id="L782">                      currentObject.getPositions());</span>
-<span class="fc" id="L783">                  idOffsets.put(currentObject.getId(),</span>
-<span class="fc" id="L784">                      currentObject.getOffset());</span>
-<span class="fc" id="L785">                  currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="fc" id="L786">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
-<span class="fc" id="L787">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="fc" id="L779">                  currentObject.setRealOffsetEnd(lastOffset);</span>
+<span class="fc" id="L780">                  idPositions.put(currentObject.getId(),</span>
+<span class="fc" id="L781">                      currentObject.getPositions());</span>
+<span class="fc" id="L782">                  idOffsets.put(currentObject.getId(),</span>
+<span class="fc" id="L783">                      currentObject.getOffset());</span>
+<span class="fc" id="L784">                  currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="fc" id="L785">                  unknownAncestors = currentObject.getUnknownAncestorNumber();</span>
+<span class="fc" id="L786">                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                       currentList, updateList);
                 } else {
-<span class="nc" id="L790">                  unknownAncestors--;</span>
+<span class="nc" id="L789">                  unknownAncestors--;</span>
                 }
-<span class="pc bpc" id="L792" title="1 of 2 branches missed.">              } else if (qname.equals(getQName(&quot;text&quot;))) {</span>
-<span class="fc" id="L793">                parsingContent = false;</span>
-<span class="pc bpc" id="L794" title="2 of 4 branches missed.">                assert unknownAncestors == 0 : &quot;error in administration unknownAncestors&quot;;</span>
-<span class="pc bpc" id="L795" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_REF)</span>
-<span class="pc bpc" id="L796" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration references&quot;;</span>
-<span class="pc bpc" id="L797" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_GROUP)</span>
-<span class="pc bpc" id="L798" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration groups&quot;;</span>
-<span class="pc bpc" id="L799" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
-<span class="pc bpc" id="L800" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration groupAnnotations&quot;;</span>
-<span class="pc bpc" id="L801" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="pc bpc" id="L802" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration words&quot;;</span>
-<span class="pc bpc" id="L803" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
-<span class="pc bpc" id="L804" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration wordAnnotations&quot;;</span>
-<span class="pc bpc" id="L805" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_RELATION)</span>
-<span class="pc bpc" id="L806" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration relations&quot;;</span>
-<span class="pc bpc" id="L807" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)</span>
-<span class="pc bpc" id="L808" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration relationAnnotations&quot;;</span>
+<span class="pc bpc" id="L791" title="1 of 2 branches missed.">              } else if (qname.equals(getQName(&quot;text&quot;))) {</span>
+<span class="fc" id="L792">                parsingContent = false;</span>
+<span class="pc bpc" id="L793" title="2 of 4 branches missed.">                assert unknownAncestors == 0 : &quot;error in administration unknownAncestors&quot;;</span>
+<span class="pc bpc" id="L794" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_REF)</span>
+<span class="pc bpc" id="L795" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration references&quot;;</span>
+<span class="pc bpc" id="L796" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_GROUP)</span>
+<span class="pc bpc" id="L797" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration groups&quot;;</span>
+<span class="pc bpc" id="L798" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)</span>
+<span class="pc bpc" id="L799" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration groupAnnotations&quot;;</span>
+<span class="pc bpc" id="L800" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="pc bpc" id="L801" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration words&quot;;</span>
+<span class="pc bpc" id="L802" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="pc bpc" id="L803" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration wordAnnotations&quot;;</span>
+<span class="pc bpc" id="L804" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_RELATION)</span>
+<span class="pc bpc" id="L805" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration relations&quot;;</span>
+<span class="pc bpc" id="L806" title="1 of 2 branches missed.">                assert currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)</span>
+<span class="pc bpc" id="L807" title="1 of 2 branches missed.">                    .isEmpty() : &quot;error in administration relationAnnotations&quot;;</span>
               }
             }
             // forget text
-<span class="fc" id="L812">            textContent = null;</span>
-<span class="fc" id="L813">            break;</span>
+<span class="fc" id="L811">            textContent = null;</span>
+<span class="fc" id="L812">            break;</span>
           case XMLStreamConstants.CHARACTERS:
             // set offset (end of start-element)
-<span class="fc" id="L816">            lastOffset = streamReader.getLocation().getCharacterOffset();</span>
+<span class="fc" id="L815">            lastOffset = streamReader.getLocation().getCharacterOffset();</span>
             // check for text
-<span class="pc bpc" id="L818" title="1 of 2 branches missed.">            if (streamReader.hasText()) {</span>
-<span class="fc" id="L819">              textContent = streamReader.getText();</span>
+<span class="pc bpc" id="L817" title="1 of 2 branches missed.">            if (streamReader.hasText()) {</span>
+<span class="fc" id="L818">              textContent = streamReader.getText();</span>
             }
-<span class="fc bfc" id="L821" title="All 2 branches covered.">            if (currentObject != null) {</span>
-<span class="fc" id="L822">              currentObject.addText(textContent);</span>
+<span class="fc bfc" id="L820" title="All 2 branches covered.">            if (currentObject != null) {</span>
+<span class="fc" id="L821">              currentObject.addText(textContent);</span>
             }
             break;
           default:
             break;
           }
-<span class="fc bfc" id="L828" title="All 2 branches covered.">          if (!streamReader.hasNext()) {</span>
-<span class="fc" id="L829">            break;</span>
+<span class="fc bfc" id="L827" title="All 2 branches covered.">          if (!streamReader.hasNext()) {</span>
+<span class="fc" id="L828">            break;</span>
           }
-<span class="fc" id="L831">          event = streamReader.next();</span>
+<span class="fc" id="L830">          event = streamReader.next();</span>
         }
       } finally {
-<span class="pc" id="L834">        streamReader.close();</span>
-<span class="fc" id="L835">      }</span>
+<span class="pc" id="L833">        streamReader.close();</span>
+<span class="fc" id="L834">      }</span>
       // final checks
-<span class="pc bpc" id="L837" title="2 of 4 branches missed.">      assert unknownAncestors == 0 : &quot;error in administration unknownAncestors&quot;;</span>
-<span class="pc bpc" id="L838" title="2 of 4 branches missed.">      assert hasRoot : &quot;no &quot; + rootTag;</span>
-<span class="nc" id="L839">    } catch (XMLStreamException e) {</span>
-<span class="nc" id="L840">      log.debug(e);</span>
-<span class="nc" id="L841">      throw new MtasParserException(&quot;No valid XML: &quot; + e.getMessage());</span>
-<span class="fc" id="L842">    }</span>
+<span class="pc bpc" id="L836" title="2 of 4 branches missed.">      assert unknownAncestors == 0 : &quot;error in administration unknownAncestors&quot;;</span>
+<span class="pc bpc" id="L837" title="2 of 4 branches missed.">      assert hasRoot : &quot;no &quot; + rootTag;</span>
+<span class="nc" id="L838">    } catch (XMLStreamException e) {</span>
+<span class="nc" id="L839">      log.debug(e);</span>
+<span class="nc" id="L840">      throw new MtasParserException(&quot;No valid XML: &quot; + e.getMessage());</span>
+<span class="fc" id="L841">    }</span>
 
     // update tokens with variable
     for (Entry&lt;Integer, Set&lt;String&gt;&gt; updateItem : updateList
-<span class="pc bpc" id="L846" title="1 of 2 branches missed.">        .get(UPDATE_TYPE_VARIABLE).entrySet()) {</span>
-<span class="nc" id="L847">      MtasToken token = tokenCollection.get(updateItem.getKey());</span>
-<span class="nc" id="L848">      String encodedPrefix = token.getPrefix();</span>
-<span class="nc" id="L849">      String encodedPostfix = token.getPostfix();</span>
-<span class="nc" id="L850">      token.setValue(decodeAndUpdateWithVariables(encodedPrefix, encodedPostfix,</span>
+<span class="pc bpc" id="L845" title="1 of 2 branches missed.">        .get(UPDATE_TYPE_VARIABLE).entrySet()) {</span>
+<span class="nc" id="L846">      MtasToken token = tokenCollection.get(updateItem.getKey());</span>
+<span class="nc" id="L847">      String encodedPrefix = token.getPrefix();</span>
+<span class="nc" id="L848">      String encodedPostfix = token.getPostfix();</span>
+<span class="nc" id="L849">      token.setValue(decodeAndUpdateWithVariables(encodedPrefix, encodedPostfix,</span>
           variables));
-<span class="nc" id="L852">    }</span>
+<span class="nc" id="L851">    }</span>
     // update tokens with offset
     for (Entry&lt;Integer, Set&lt;String&gt;&gt; updateItem : updateList
-<span class="fc bfc" id="L855" title="All 2 branches covered.">        .get(UPDATE_TYPE_OFFSET).entrySet()) {</span>
-<span class="fc" id="L856">      Set&lt;String&gt; refIdList = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L857" title="All 2 branches covered.">      for (String refId : updateItem.getValue()) {</span>
-<span class="pc bpc" id="L858" title="1 of 2 branches missed.">        if (idPositions.containsKey(refId)) {</span>
-<span class="fc" id="L859">          refIdList.add(refId);</span>
+<span class="fc bfc" id="L854" title="All 2 branches covered.">        .get(UPDATE_TYPE_OFFSET).entrySet()) {</span>
+<span class="fc" id="L855">      Set&lt;String&gt; refIdList = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L856" title="All 2 branches covered.">      for (String refId : updateItem.getValue()) {</span>
+<span class="pc bpc" id="L857" title="1 of 2 branches missed.">        if (idPositions.containsKey(refId)) {</span>
+<span class="fc" id="L858">          refIdList.add(refId);</span>
         }
-<span class="pc bpc" id="L861" title="1 of 2 branches missed.">        if (relationKeyMap.containsKey(refId)) {</span>
-<span class="nc" id="L862">          refIdList.addAll(recursiveCollect(refId, relationKeyMap, 10));</span>
+<span class="pc bpc" id="L860" title="1 of 2 branches missed.">        if (relationKeyMap.containsKey(refId)) {</span>
+<span class="nc" id="L861">          refIdList.addAll(recursiveCollect(refId, relationKeyMap, 10));</span>
         }
-<span class="fc" id="L864">      }</span>
-<span class="fc bfc" id="L865" title="All 2 branches covered.">      for (String refId : refIdList) {</span>
-<span class="fc" id="L866">        Integer[] refOffset = idOffsets.get(refId);</span>
-<span class="fc" id="L867">        Integer tokenId = updateItem.getKey();</span>
-<span class="pc bpc" id="L868" title="2 of 4 branches missed.">        if (tokenId != null &amp;&amp; refOffset != null) {</span>
-<span class="fc" id="L869">          MtasToken token = tokenCollection.get(tokenId);</span>
-<span class="fc" id="L870">          token.addOffset(refOffset[0], refOffset[1]);</span>
+<span class="fc" id="L863">      }</span>
+<span class="fc bfc" id="L864" title="All 2 branches covered.">      for (String refId : refIdList) {</span>
+<span class="fc" id="L865">        Integer[] refOffset = idOffsets.get(refId);</span>
+<span class="fc" id="L866">        Integer tokenId = updateItem.getKey();</span>
+<span class="pc bpc" id="L867" title="2 of 4 branches missed.">        if (tokenId != null &amp;&amp; refOffset != null) {</span>
+<span class="fc" id="L868">          MtasToken token = tokenCollection.get(tokenId);</span>
+<span class="fc" id="L869">          token.addOffset(refOffset[0], refOffset[1]);</span>
         }
-<span class="fc" id="L872">      }</span>
-<span class="fc" id="L873">    }</span>
+<span class="fc" id="L871">      }</span>
+<span class="fc" id="L872">    }</span>
     // update tokens with position
     for (Entry&lt;Integer, Set&lt;String&gt;&gt; updateItem : updateList
-<span class="fc bfc" id="L876" title="All 2 branches covered.">        .get(UPDATE_TYPE_POSITION).entrySet()) {</span>
-<span class="fc" id="L877">      HashSet&lt;String&gt; refIdList = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L878" title="All 2 branches covered.">      for (String refId : updateItem.getValue()) {</span>
-<span class="pc bpc" id="L879" title="1 of 2 branches missed.">        if (idPositions.containsKey(refId)) {</span>
-<span class="fc" id="L880">          refIdList.add(refId);</span>
+<span class="fc bfc" id="L875" title="All 2 branches covered.">        .get(UPDATE_TYPE_POSITION).entrySet()) {</span>
+<span class="fc" id="L876">      HashSet&lt;String&gt; refIdList = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L877" title="All 2 branches covered.">      for (String refId : updateItem.getValue()) {</span>
+<span class="pc bpc" id="L878" title="1 of 2 branches missed.">        if (idPositions.containsKey(refId)) {</span>
+<span class="fc" id="L879">          refIdList.add(refId);</span>
         }
-<span class="pc bpc" id="L882" title="1 of 2 branches missed.">        if (relationKeyMap.containsKey(refId)) {</span>
-<span class="nc" id="L883">          refIdList.addAll(recursiveCollect(refId, relationKeyMap, 10));</span>
+<span class="pc bpc" id="L881" title="1 of 2 branches missed.">        if (relationKeyMap.containsKey(refId)) {</span>
+<span class="nc" id="L882">          refIdList.addAll(recursiveCollect(refId, relationKeyMap, 10));</span>
         }
-<span class="fc" id="L885">      }</span>
-<span class="fc bfc" id="L886" title="All 2 branches covered.">      for (String refId : refIdList) {</span>
-<span class="fc" id="L887">        Set&lt;Integer&gt; refPositions = idPositions.get(refId);</span>
-<span class="fc" id="L888">        Integer tokenId = updateItem.getKey();</span>
-<span class="pc bpc" id="L889" title="2 of 4 branches missed.">        if (tokenId != null &amp;&amp; refPositions != null) {</span>
-<span class="fc" id="L890">          MtasToken token = tokenCollection.get(tokenId);</span>
-<span class="fc" id="L891">          token.addPositions(refPositions);</span>
+<span class="fc" id="L884">      }</span>
+<span class="fc bfc" id="L885" title="All 2 branches covered.">      for (String refId : refIdList) {</span>
+<span class="fc" id="L886">        Set&lt;Integer&gt; refPositions = idPositions.get(refId);</span>
+<span class="fc" id="L887">        Integer tokenId = updateItem.getKey();</span>
+<span class="pc bpc" id="L888" title="2 of 4 branches missed.">        if (tokenId != null &amp;&amp; refPositions != null) {</span>
+<span class="fc" id="L889">          MtasToken token = tokenCollection.get(tokenId);</span>
+<span class="fc" id="L890">          token.addPositions(refPositions);</span>
         }
-<span class="fc" id="L893">      }</span>
-<span class="fc" id="L894">    }</span>
+<span class="fc" id="L892">      }</span>
+<span class="fc" id="L893">    }</span>
     // final check
-<span class="fc" id="L896">    tokenCollection.check(autorepair, makeunique);</span>
-<span class="fc" id="L897">    return tokenCollection;</span>
+<span class="fc" id="L895">    tokenCollection.check(autorepair, makeunique);</span>
+<span class="fc" id="L896">    return tokenCollection;</span>
   }
 
   /**
@@ -907,16 +906,16 @@ import mtas.analysis.util.MtasConfiguration;
    */
   private Collection&lt;? extends String&gt; recursiveCollect(String refId,
       Map&lt;String, SortedSet&lt;String&gt;&gt; relationKeyMap, int maxRecursion) {
-<span class="nc" id="L910">    Set&lt;String&gt; list = new HashSet&lt;&gt;();</span>
-<span class="nc bnc" id="L911" title="All 4 branches missed.">    if (maxRecursion &gt; 0 &amp;&amp; relationKeyMap.containsKey(refId)) {</span>
-<span class="nc" id="L912">      SortedSet&lt;String&gt; subList = relationKeyMap.get(refId);</span>
-<span class="nc bnc" id="L913" title="All 2 branches missed.">      for (String subRefId : subList) {</span>
-<span class="nc" id="L914">        list.add(subRefId);</span>
-<span class="nc" id="L915">        list.addAll(</span>
-<span class="nc" id="L916">            recursiveCollect(subRefId, relationKeyMap, maxRecursion - 1));</span>
-<span class="nc" id="L917">      }</span>
+<span class="nc" id="L909">    Set&lt;String&gt; list = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L910" title="All 4 branches missed.">    if (maxRecursion &gt; 0 &amp;&amp; relationKeyMap.containsKey(refId)) {</span>
+<span class="nc" id="L911">      SortedSet&lt;String&gt; subList = relationKeyMap.get(refId);</span>
+<span class="nc bnc" id="L912" title="All 2 branches missed.">      for (String subRefId : subList) {</span>
+<span class="nc" id="L913">        list.add(subRefId);</span>
+<span class="nc" id="L914">        list.addAll(</span>
+<span class="nc" id="L915">            recursiveCollect(subRefId, relationKeyMap, maxRecursion - 1));</span>
+<span class="nc" id="L916">      }</span>
     }
-<span class="nc" id="L919">    return list;</span>
+<span class="nc" id="L918">    return list;</span>
   }
 
   /**
@@ -927,11 +926,11 @@ import mtas.analysis.util.MtasConfiguration;
    */
   private QName getQName(String key) {
     QName qname;
-<span class="fc bfc" id="L930" title="All 2 branches covered.">    if ((qname = qNames.get(key)) == null) {</span>
-<span class="fc" id="L931">      qname = new QName(namespaceURI, key);</span>
-<span class="fc" id="L932">      qNames.put(key, qname);</span>
+<span class="fc bfc" id="L929" title="All 2 branches covered.">    if ((qname = qNames.get(key)) == null) {</span>
+<span class="fc" id="L930">      qname = new QName(namespaceURI, key);</span>
+<span class="fc" id="L931">      qNames.put(key, qname);</span>
     }
-<span class="fc" id="L934">    return qname;</span>
+<span class="fc" id="L933">    return qname;</span>
   }
 
   /**
@@ -943,21 +942,21 @@ import mtas.analysis.util.MtasConfiguration;
   public void collectAttributes(MtasParserObject currentObject,
       XMLStreamReader streamReader) {
     String attributeNamespaceURI;
-<span class="fc" id="L946">    currentObject.objectAttributes.clear();</span>
-<span class="fc" id="L947">    currentObject.objectId = streamReader.getAttributeValue(namespaceURI_id,</span>
+<span class="fc" id="L945">    currentObject.objectAttributes.clear();</span>
+<span class="fc" id="L946">    currentObject.objectId = streamReader.getAttributeValue(namespaceURI_id,</span>
         &quot;id&quot;);
-<span class="fc bfc" id="L949" title="All 2 branches covered.">    for (int i = 0; i &lt; streamReader.getAttributeCount(); i++) {</span>
-<span class="fc" id="L950">      attributeNamespaceURI = streamReader.getAttributeNamespace(i);</span>
-<span class="pc bpc" id="L951" title="1 of 4 branches missed.">      if (attributeNamespaceURI == null || attributeNamespaceURI.equals(&quot;&quot;)) {</span>
-<span class="fc" id="L952">        attributeNamespaceURI = streamReader.getNamespaceURI();</span>
+<span class="fc bfc" id="L948" title="All 2 branches covered.">    for (int i = 0; i &lt; streamReader.getAttributeCount(); i++) {</span>
+<span class="fc" id="L949">      attributeNamespaceURI = streamReader.getAttributeNamespace(i);</span>
+<span class="pc bpc" id="L950" title="1 of 4 branches missed.">      if (attributeNamespaceURI == null || attributeNamespaceURI.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L951">        attributeNamespaceURI = streamReader.getNamespaceURI();</span>
       }
-<span class="pc bpc" id="L954" title="1 of 4 branches missed.">      if (namespaceURI == null || attributeNamespaceURI.equals(namespaceURI)) {</span>
-<span class="fc" id="L955">        currentObject.objectAttributes.put(</span>
-<span class="fc" id="L956">            streamReader.getAttributeLocalName(i),</span>
-<span class="fc" id="L957">            streamReader.getAttributeValue(i));</span>
+<span class="pc bpc" id="L953" title="1 of 4 branches missed.">      if (namespaceURI == null || attributeNamespaceURI.equals(namespaceURI)) {</span>
+<span class="fc" id="L954">        currentObject.objectAttributes.put(</span>
+<span class="fc" id="L955">            streamReader.getAttributeLocalName(i),</span>
+<span class="fc" id="L956">            streamReader.getAttributeValue(i));</span>
       }
     }
-<span class="fc" id="L960">  }</span>
+<span class="fc" id="L959">  }</span>
 
   /**
    * The Class MtasXMLParserMappingRelation.
@@ -968,13 +967,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping relation.
      */
-<span class="fc" id="L971">    public MtasXMLParserMappingRelation() {</span>
-<span class="fc" id="L972">      super();</span>
-<span class="fc" id="L973">      this.position = SOURCE_REFS;</span>
-<span class="fc" id="L974">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L975">      this.offset = SOURCE_REFS;</span>
-<span class="fc" id="L976">      this.type = MAPPING_TYPE_RELATION;</span>
-<span class="fc" id="L977">    }</span>
+<span class="fc" id="L970">    public MtasXMLParserMappingRelation() {</span>
+<span class="fc" id="L971">      super();</span>
+<span class="fc" id="L972">      this.position = SOURCE_REFS;</span>
+<span class="fc" id="L973">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L974">      this.offset = SOURCE_REFS;</span>
+<span class="fc" id="L975">      this.type = MAPPING_TYPE_RELATION;</span>
+<span class="fc" id="L976">    }</span>
 
     /*
      * (non-Javadoc)
@@ -983,7 +982,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingRelation self() {
-<span class="nc" id="L986">      return this;</span>
+<span class="nc" id="L985">      return this;</span>
     }
   }
 
@@ -996,13 +995,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping relation annotation.
      */
-<span class="nc" id="L999">    public MtasXMLParserMappingRelationAnnotation() {</span>
-<span class="nc" id="L1000">      super();</span>
-<span class="nc" id="L1001">      this.position = SOURCE_ANCESTOR_RELATION;</span>
-<span class="nc" id="L1002">      this.realOffset = SOURCE_OWN;</span>
-<span class="nc" id="L1003">      this.offset = SOURCE_ANCESTOR_RELATION;</span>
-<span class="nc" id="L1004">      this.type = MAPPING_TYPE_RELATION_ANNOTATION;</span>
-<span class="nc" id="L1005">    }</span>
+<span class="nc" id="L998">    public MtasXMLParserMappingRelationAnnotation() {</span>
+<span class="nc" id="L999">      super();</span>
+<span class="nc" id="L1000">      this.position = SOURCE_ANCESTOR_RELATION;</span>
+<span class="nc" id="L1001">      this.realOffset = SOURCE_OWN;</span>
+<span class="nc" id="L1002">      this.offset = SOURCE_ANCESTOR_RELATION;</span>
+<span class="nc" id="L1003">      this.type = MAPPING_TYPE_RELATION_ANNOTATION;</span>
+<span class="nc" id="L1004">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1011,7 +1010,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingRelationAnnotation self() {
-<span class="nc" id="L1014">      return this;</span>
+<span class="nc" id="L1013">      return this;</span>
     }
 
   }
@@ -1025,13 +1024,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping group.
      */
-<span class="fc" id="L1028">    public MtasXMLParserMappingGroup() {</span>
-<span class="fc" id="L1029">      super();</span>
-<span class="fc" id="L1030">      this.position = SOURCE_OWN;</span>
-<span class="fc" id="L1031">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1032">      this.offset = SOURCE_OWN;</span>
-<span class="fc" id="L1033">      this.type = MAPPING_TYPE_GROUP;</span>
-<span class="fc" id="L1034">    }</span>
+<span class="fc" id="L1027">    public MtasXMLParserMappingGroup() {</span>
+<span class="fc" id="L1028">      super();</span>
+<span class="fc" id="L1029">      this.position = SOURCE_OWN;</span>
+<span class="fc" id="L1030">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1031">      this.offset = SOURCE_OWN;</span>
+<span class="fc" id="L1032">      this.type = MAPPING_TYPE_GROUP;</span>
+<span class="fc" id="L1033">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1040,7 +1039,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingGroup self() {
-<span class="nc" id="L1043">      return this;</span>
+<span class="nc" id="L1042">      return this;</span>
     }
   }
 
@@ -1053,13 +1052,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping group annotation.
      */
-<span class="fc" id="L1056">    public MtasXMLParserMappingGroupAnnotation() {</span>
-<span class="fc" id="L1057">      super();</span>
-<span class="fc" id="L1058">      this.position = SOURCE_ANCESTOR_GROUP;</span>
-<span class="fc" id="L1059">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1060">      this.offset = SOURCE_ANCESTOR_GROUP;</span>
-<span class="fc" id="L1061">      this.type = MAPPING_TYPE_GROUP_ANNOTATION;</span>
-<span class="fc" id="L1062">    }</span>
+<span class="fc" id="L1055">    public MtasXMLParserMappingGroupAnnotation() {</span>
+<span class="fc" id="L1056">      super();</span>
+<span class="fc" id="L1057">      this.position = SOURCE_ANCESTOR_GROUP;</span>
+<span class="fc" id="L1058">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1059">      this.offset = SOURCE_ANCESTOR_GROUP;</span>
+<span class="fc" id="L1060">      this.type = MAPPING_TYPE_GROUP_ANNOTATION;</span>
+<span class="fc" id="L1061">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1068,7 +1067,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingGroupAnnotation self() {
-<span class="nc" id="L1071">      return this;</span>
+<span class="nc" id="L1070">      return this;</span>
     }
 
     /*
@@ -1080,12 +1079,12 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected void setStartEnd(String start, String end) {
-<span class="fc" id="L1083">      super.setStartEnd(start, end);</span>
-<span class="pc bpc" id="L1084" title="3 of 4 branches missed.">      if (start != null &amp;&amp; end != null) {</span>
-<span class="nc" id="L1085">        position = SOURCE_REFS;</span>
-<span class="nc" id="L1086">        offset = SOURCE_REFS;</span>
+<span class="fc" id="L1082">      super.setStartEnd(start, end);</span>
+<span class="pc bpc" id="L1083" title="3 of 4 branches missed.">      if (start != null &amp;&amp; end != null) {</span>
+<span class="nc" id="L1084">        position = SOURCE_REFS;</span>
+<span class="nc" id="L1085">        offset = SOURCE_REFS;</span>
       }
-<span class="fc" id="L1088">    }</span>
+<span class="fc" id="L1087">    }</span>
 
   }
 
@@ -1098,13 +1097,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping word.
      */
-<span class="fc" id="L1101">    public MtasXMLParserMappingWord() {</span>
-<span class="fc" id="L1102">      super();</span>
-<span class="fc" id="L1103">      this.position = SOURCE_OWN;</span>
-<span class="fc" id="L1104">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1105">      this.offset = SOURCE_OWN;</span>
-<span class="fc" id="L1106">      this.type = MAPPING_TYPE_WORD;</span>
-<span class="fc" id="L1107">    }</span>
+<span class="fc" id="L1100">    public MtasXMLParserMappingWord() {</span>
+<span class="fc" id="L1101">      super();</span>
+<span class="fc" id="L1102">      this.position = SOURCE_OWN;</span>
+<span class="fc" id="L1103">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1104">      this.offset = SOURCE_OWN;</span>
+<span class="fc" id="L1105">      this.type = MAPPING_TYPE_WORD;</span>
+<span class="fc" id="L1106">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1113,7 +1112,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingWord self() {
-<span class="nc" id="L1116">      return this;</span>
+<span class="nc" id="L1115">      return this;</span>
     }
   }
 
@@ -1126,13 +1125,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping word annotation.
      */
-<span class="fc" id="L1129">    public MtasXMLParserMappingWordAnnotation() {</span>
-<span class="fc" id="L1130">      super();</span>
-<span class="fc" id="L1131">      this.position = SOURCE_OWN;</span>
-<span class="fc" id="L1132">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1133">      this.offset = SOURCE_ANCESTOR_WORD;</span>
-<span class="fc" id="L1134">      this.type = MAPPING_TYPE_WORD_ANNOTATION;</span>
-<span class="fc" id="L1135">    }</span>
+<span class="fc" id="L1128">    public MtasXMLParserMappingWordAnnotation() {</span>
+<span class="fc" id="L1129">      super();</span>
+<span class="fc" id="L1130">      this.position = SOURCE_OWN;</span>
+<span class="fc" id="L1131">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1132">      this.offset = SOURCE_ANCESTOR_WORD;</span>
+<span class="fc" id="L1133">      this.type = MAPPING_TYPE_WORD_ANNOTATION;</span>
+<span class="fc" id="L1134">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1141,7 +1140,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingWordAnnotation self() {
-<span class="nc" id="L1144">      return this;</span>
+<span class="nc" id="L1143">      return this;</span>
     }
   }
 

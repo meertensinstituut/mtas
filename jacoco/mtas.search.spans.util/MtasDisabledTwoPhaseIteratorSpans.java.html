@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasDisabledTwoPhaseIteratorSpans.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasDisabledTwoPhaseIteratorSpans.java</span></div><h1>MtasDisabledTwoPhaseIteratorSpans.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.spans.SpanCollector;
+import org.apache.lucene.search.spans.Spans;
+
+/**
+ * The Class MtasDisabledTwoPhaseIteratorSpans.
+ */
+public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
+
+  /** The sub spans. */
+  private Spans subSpans;
+
+  /**
+   * Instantiates a new mtas disabled two phase iterator spans.
+   *
+   * @param subSpans the sub spans
+   */
+  public MtasDisabledTwoPhaseIteratorSpans(Spans subSpans) {
+<span class="fc" id="L23">    super();</span>
+<span class="fc" id="L24">    this.subSpans = subSpans;</span>
+<span class="fc" id="L25">  }</span>
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
+  @Override
+  public int nextStartPosition() throws IOException {
+<span class="fc" id="L32">    return subSpans.nextStartPosition();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
+  @Override
+  public int startPosition() {
+<span class="nc" id="L40">    return subSpans.startPosition();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
+  @Override
+  public int endPosition() {
+<span class="nc" id="L48">    return subSpans.endPosition();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
+  @Override
+  public int width() {
+<span class="nc" id="L56">    return subSpans.width();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+   */
+  @Override
+  public void collect(SpanCollector collector) throws IOException {
+<span class="nc" id="L64">    subSpans.collect(collector);</span>
+<span class="nc" id="L65">  }</span>
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
+  @Override
+  public float positionsCost() {
+<span class="nc" id="L72">    return subSpans.positionsCost();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
+  @Override
+  public int docID() {
+<span class="fc" id="L80">    return subSpans.docID();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
+  @Override
+  public int nextDoc() throws IOException {
+<span class="fc" id="L88">    return subSpans.nextDoc();</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
+  @Override
+  public int advance(int target) throws IOException {
+<span class="nc" id="L96">    return subSpans.advance(target);</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+<span class="nc" id="L104">    return subSpans.asTwoPhaseIterator();</span>
+    // return null;
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
+  @Override
+  public long cost() {
+<span class="nc" id="L113">    return subSpans.cost();</span>
+  }
+  
+  @Override
+  public String toString() {
+<span class="nc" id="L118">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L119">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">    buffer.append(subSpans!=null?subSpans.toString():&quot;null&quot;);</span>
+<span class="nc" id="L121">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L122">    return buffer.toString();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

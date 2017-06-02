@@ -24,37 +24,37 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
 
   /** The advanced value sum list. */
 <span class="fc" id="L26">  protected T1[] advancedValueSumList = null;</span>
-  
+
   /** The new advanced value sum list. */
 <span class="fc" id="L29">  protected T1[] newAdvancedValueSumList = null;</span>
 
   /** The advanced value max list. */
 <span class="fc" id="L32">  protected T1[] advancedValueMaxList = null;</span>
-  
+
   /** The new advanced value max list. */
 <span class="fc" id="L35">  protected T1[] newAdvancedValueMaxList = null;</span>
 
   /** The advanced value min list. */
 <span class="fc" id="L38">  protected T1[] advancedValueMinList = null;</span>
-  
+
   /** The new advanced value min list. */
 <span class="fc" id="L41">  protected T1[] newAdvancedValueMinList = null;</span>
 
   /** The advanced value sum of squares list. */
 <span class="fc" id="L44">  protected T1[] advancedValueSumOfSquaresList = null;</span>
-  
+
   /** The new advanced value sum of squares list. */
 <span class="fc" id="L47">  protected T1[] newAdvancedValueSumOfSquaresList = null;</span>
 
   /** The advanced value sum of logs list. */
 <span class="fc" id="L50">  protected T2[] advancedValueSumOfLogsList = null;</span>
-  
+
   /** The new advanced value sum of logs list. */
 <span class="fc" id="L53">  protected T2[] newAdvancedValueSumOfLogsList = null;</span>
 
   /** The advanced value N list. */
 <span class="fc" id="L56">  protected long[] advancedValueNList = null;</span>
-  
+
   /** The new advanced value N list. */
 <span class="fc" id="L59">  protected long[] newAdvancedValueNList = null;</span>
 
@@ -502,7 +502,7 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
   @Override
   public final void initNewList(int maxNumberOfTerms) throws IOException {
 <span class="fc" id="L504">    super.initNewList(maxNumberOfTerms);</span>
-<span class="fc" id="L505">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L505">    initNewListBasic();</span>
 <span class="fc" id="L506">  }</span>
 
   /*
@@ -515,7 +515,7 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
   public final void initNewList(int maxNumberOfTerms, String segmentName,
       int segmentNumber, String boundary) throws IOException {
 <span class="fc" id="L517">    super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);</span>
-<span class="fc" id="L518">    initNewListBasic(maxNumberOfTerms);</span>
+<span class="fc" id="L518">    initNewListBasic();</span>
 <span class="fc" id="L519">  }</span>
 
   /**
@@ -523,7 +523,7 @@ abstract class MtasDataAdvanced&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
    *
    * @param maxNumberOfTerms the max number of terms
    */
-  private void initNewListBasic(int maxNumberOfTerms) {
+  private void initNewListBasic() {
 <span class="fc" id="L527">    newAdvancedValueSumList = operations.createVector1(newSize);</span>
 <span class="fc" id="L528">    newAdvancedValueSumOfLogsList = operations.createVector2(newSize);</span>
 <span class="fc" id="L529">    newAdvancedValueSumOfSquaresList = operations.createVector1(newSize);</span>

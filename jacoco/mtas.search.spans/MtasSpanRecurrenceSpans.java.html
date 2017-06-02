@@ -2,8 +2,8 @@
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +16,7 @@ import mtas.search.spans.util.MtasSpans;
 /**
  * The Class MtasSpanRecurrenceSpans.
  */
-<span class="pc bpc" id="L19" title="1 of 2 branches missed.">public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {</span>
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">public class MtasSpanRecurrenceSpans extends MtasSpans {</span>
 
   /** The log. */
 <span class="fc" id="L22">  private static Log log = LogFactory.getLog(MtasSpanRecurrenceSpans.class);</span>
@@ -294,7 +294,7 @@ import mtas.search.spans.util.MtasSpans;
   private void findMatches(Match match, int n) throws IOException {
 <span class="fc bfc" id="L295" title="All 2 branches covered.">    if (n &gt; 0) {</span>
 <span class="fc" id="L296">      int largestMatchingEndPosition = match.endPosition();</span>
-<span class="fc" id="L297">      HashSet&lt;Integer&gt; list = ignoreItem.getFullEndPositionList(spans.docID(),</span>
+<span class="fc" id="L297">      Set&lt;Integer&gt; list = ignoreItem.getFullEndPositionList(spans.docID(),</span>
 <span class="fc" id="L298">          match.endPosition());</span>
       // try to find matches with existing queue
 <span class="fc bfc" id="L300" title="All 2 branches covered.">      if (!queueSpans.isEmpty()) {</span>
@@ -346,7 +346,7 @@ import mtas.search.spans.util.MtasSpans;
   private List&lt;Match&gt; expandWithIgnoreItem(int docId, Match match) {
 <span class="nc" id="L347">    List&lt;Match&gt; list = new ArrayList&lt;&gt;();</span>
     try {
-<span class="nc" id="L349">      HashSet&lt;Integer&gt; ignoreList = ignoreItem.getFullEndPositionList(docId,</span>
+<span class="nc" id="L349">      Set&lt;Integer&gt; ignoreList = ignoreItem.getFullEndPositionList(docId,</span>
 <span class="nc" id="L350">          match.endPosition);</span>
 <span class="nc bnc" id="L351" title="All 2 branches missed.">      if (ignoreList != null) {</span>
 <span class="nc bnc" id="L352" title="All 2 branches missed.">        for (Integer endPosition : ignoreList) {</span>

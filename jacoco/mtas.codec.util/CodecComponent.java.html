@@ -237,7 +237,7 @@ public class CodecComponent {
      *          the prefix
      */
     public void addMultiplePosition(String prefix) {
-<span class="pc bpc" id="L240" title="1 of 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">      if (!prefix.trim().isEmpty()) {</span>
 <span class="pc bpc" id="L241" title="1 of 2 branches missed.">        if (!singlePositionList.contains(prefix)) {</span>
 <span class="fc bfc" id="L242" title="All 2 branches covered.">          if (!multiplePositionList.contains(prefix)) {</span>
 <span class="fc" id="L243">            multiplePositionList.add(prefix);</span>
@@ -256,7 +256,7 @@ public class CodecComponent {
      *          the prefix
      */
     public void addSetPosition(String prefix) {
-<span class="pc bpc" id="L259" title="1 of 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">      if (!prefix.trim().isEmpty()) {</span>
 <span class="pc bpc" id="L260" title="1 of 2 branches missed.">        if (!singlePositionList.contains(prefix)) {</span>
 <span class="fc bfc" id="L261" title="All 2 branches covered.">          if (!setPositionList.contains(prefix)) {</span>
 <span class="fc" id="L262">            setPositionList.add(prefix);</span>
@@ -275,7 +275,7 @@ public class CodecComponent {
      *          the prefix
      */
     public void addIntersecting(String prefix) {
-<span class="pc bpc" id="L278" title="1 of 2 branches missed.">      if (!prefix.trim().equals(&quot;&quot;)) {</span>
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">      if (!prefix.trim().isEmpty()) {</span>
 <span class="fc" id="L279">        intersectingList.add(prefix);</span>
       }
 <span class="fc" id="L281">    }</span>
@@ -376,7 +376,7 @@ public class CodecComponent {
 <span class="nc" id="L376">      this.prefix = prefix;</span>
 <span class="nc" id="L377">      this.regexp = regexp;</span>
 <span class="nc bnc" id="L378" title="All 4 branches missed.">      if (list != null &amp;&amp; list.length &gt; 0) {</span>
-<span class="nc" id="L379">        this.list = new HashSet(Arrays.asList(list));</span>
+<span class="nc" id="L379">        this.list = new HashSet&lt;&gt;(Arrays.asList(list));</span>
 <span class="nc bnc" id="L380" title="All 2 branches missed.">        this.listRegexp = listRegexp != null ? listRegexp : false;</span>
 <span class="nc bnc" id="L381" title="All 4 branches missed.">        this.listExpand = (listExpand != null &amp;&amp; listExpandNumber &gt; 0)</span>
 <span class="nc" id="L382">            ? listExpand : false;</span>
@@ -393,7 +393,7 @@ public class CodecComponent {
       }
 <span class="nc" id="L394">      this.ignoreRegexp = ignoreRegexp;</span>
 <span class="nc bnc" id="L395" title="All 4 branches missed.">      if (ignoreList != null &amp;&amp; ignoreList.length &gt; 0) {</span>
-<span class="nc" id="L396">        this.ignoreList = new HashSet(Arrays.asList(ignoreList));</span>
+<span class="nc" id="L396">        this.ignoreList = new HashSet&lt;&gt;(Arrays.asList(ignoreList));</span>
 <span class="nc bnc" id="L397" title="All 2 branches missed.">        this.ignoreListRegexp = ignoreListRegexp != null ? ignoreListRegexp</span>
             : false;
       } else {
@@ -910,7 +910,7 @@ public class CodecComponent {
 <span class="nc" id="L910">          tmpList = prefixes[i].split(&quot;,&quot;);</span>
 <span class="nc" id="L911">          tmpPrefixList = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L912" title="All 2 branches missed.">          for (String tmpItem : tmpList) {</span>
-<span class="nc bnc" id="L913" title="All 2 branches missed.">            if (!tmpItem.trim().equals(&quot;&quot;)) {</span>
+<span class="nc bnc" id="L913" title="All 2 branches missed.">            if (!tmpItem.trim().isEmpty()) {</span>
 <span class="nc" id="L914">              tmpPrefixList.add(tmpItem.trim());</span>
             }
           }
@@ -2718,8 +2718,8 @@ public class CodecComponent {
      */
     private static Map&lt;Integer, Map&lt;String, String&gt;[]&gt; keyToSubObject(
         String key, StringBuilder newKey) {
-<span class="fc" id="L2721">      Map&lt;Integer, Map&lt;String, String&gt;[]&gt; result = new HashMap();</span>
-<span class="pc bpc" id="L2722" title="1 of 4 branches missed.">      if (key == null || key.trim().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L2721">      Map&lt;Integer, Map&lt;String, String&gt;[]&gt; result = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L2722" title="1 of 4 branches missed.">      if (key == null || key.trim().isEmpty()) {</span>
 <span class="fc" id="L2723">        return null;</span>
       } else {
 <span class="fc" id="L2725">        String[] parts = key.split(Pattern.quote(&quot;,&quot;), -1);</span>

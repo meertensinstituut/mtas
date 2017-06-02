@@ -8,9 +8,10 @@ import java.util.Set;
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -18,8 +19,6 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
-import org.apache.lucene.search.spans.SpanWeight;
-import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanPositionQuery.
@@ -31,7 +30,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
 
   /** The start. */
   private int start;
-  
+
   /** The end. */
   private int end;
 
@@ -42,8 +41,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    * @param position the position
    */
   public MtasSpanPositionQuery(String field, int position) {
-<span class="fc" id="L45">    this(field, position, position);</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L44">    this(field, position, position);</span>
+<span class="fc" id="L45">  }</span>
 
   /**
    * Instantiates a new mtas span position query.
@@ -53,11 +52,11 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    * @param end the end
    */
   public MtasSpanPositionQuery(String field, int start, int end) {
-<span class="fc" id="L56">    super(1,1);</span>
-<span class="fc" id="L57">    this.field = field;</span>
-<span class="fc" id="L58">    this.start = start;</span>
-<span class="fc" id="L59">    this.end = end;</span>
-<span class="fc" id="L60">  }</span>
+<span class="fc" id="L55">    super(1, 1);</span>
+<span class="fc" id="L56">    this.field = field;</span>
+<span class="fc" id="L57">    this.start = start;</span>
+<span class="fc" id="L58">    this.end = end;</span>
+<span class="fc" id="L59">  }</span>
 
   /*
    * (non-Javadoc)
@@ -66,7 +65,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public String getField() {
-<span class="fc" id="L69">    return field;</span>
+<span class="fc" id="L68">    return field;</span>
   }
 
   /*
@@ -77,23 +76,21 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
-<span class="fc" id="L82">    return new SpanAllWeight(searcher, null);</span>
-  }
-  
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
-   */
-  @Override
-  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L90">    return super.rewrite(reader);</span>
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
+<span class="fc" id="L81">    return new SpanAllWeight(searcher, null);</span>
   }
 
   /**
    * The Class SpanAllWeight.
    */
-  protected class SpanAllWeight extends SpanWeight {
+  protected class SpanAllWeight extends MtasSpanWeight {
+
+    /** The Constant METHOD_GET_DELEGATE. */
+    private static final String METHOD_GET_DELEGATE = &quot;getDelegate&quot;;
+
+    /** The Constant METHOD_GET_POSTINGS_READER. */
+    private static final String METHOD_GET_POSTINGS_READER = &quot;getPostingsReader&quot;;
 
     /**
      * Instantiates a new span all weight.
@@ -103,9 +100,9 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanAllWeight(IndexSearcher searcher,
-<span class="fc" id="L106">        Map&lt;Term, TermContext&gt; termContexts) throws IOException {</span>
-<span class="fc" id="L107">      super(MtasSpanPositionQuery.this, searcher, termContexts);</span>
-<span class="fc" id="L108">    }</span>
+<span class="fc" id="L103">        Map&lt;Term, TermContext&gt; termContexts) throws IOException {</span>
+<span class="fc" id="L104">      super(MtasSpanPositionQuery.this, searcher, termContexts);</span>
+<span class="fc" id="L105">    }</span>
 
     /*
      * (non-Javadoc)
@@ -116,8 +113,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-      //don't do anything
-<span class="nc" id="L120">    }</span>
+      // don't do anything
+<span class="nc" id="L117">    }</span>
 
     /*
      * (non-Javadoc)
@@ -128,38 +125,39 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       try {
         // get leafreader
-<span class="fc" id="L135">        LeafReader r = context.reader();</span>
+<span class="fc" id="L132">        LeafReader r = context.reader();</span>
         // get delegate
-<span class="fc" id="L137">        Boolean hasMethod = true;</span>
-<span class="fc bfc" id="L138" title="All 2 branches covered.">        while (hasMethod) {</span>
-<span class="fc" id="L139">          hasMethod = false;</span>
-<span class="fc" id="L140">          Method[] methods = r.getClass().getMethods();</span>
-<span class="fc bfc" id="L141" title="All 2 branches covered.">          for (Method m : methods) {</span>
-<span class="pc bpc" id="L142" title="1 of 2 branches missed.">            if (m.getName().equals(&quot;getDelegate&quot;)) {</span>
-<span class="nc" id="L143">              hasMethod = true;</span>
-<span class="nc" id="L144">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
-<span class="nc" id="L145">              break;</span>
+<span class="fc" id="L134">        Boolean hasMethod = true;</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        while (hasMethod) {</span>
+<span class="fc" id="L136">          hasMethod = false;</span>
+<span class="fc" id="L137">          Method[] methods = r.getClass().getMethods();</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">          for (Method m : methods) {</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            if (m.getName().equals(METHOD_GET_DELEGATE)) {</span>
+<span class="nc" id="L140">              hasMethod = true;</span>
+<span class="nc" id="L141">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="nc" id="L142">              break;</span>
             }
           }
-<span class="fc" id="L148">        }</span>
+<span class="fc" id="L145">        }</span>
         // get fieldsproducer
-<span class="fc" id="L150">        Method fpm = r.getClass().getMethod(&quot;getPostingsReader&quot;,</span>
+<span class="fc" id="L147">        Method fpm = r.getClass().getMethod(METHOD_GET_POSTINGS_READER,</span>
             (Class&lt;?&gt;[]) null);
-<span class="fc" id="L152">        FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
+<span class="fc" id="L149">        FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
         // get MtasFieldsProducer using terms
-<span class="fc" id="L154">        Terms t = fp.terms(field);</span>
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (t == null) {</span>
-<span class="nc" id="L156">          return new MtasSpanMatchNoneSpans(field);</span>
+<span class="fc" id="L151">        Terms t = fp.terms(field);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (t == null) {</span>
+<span class="nc" id="L153">          return new MtasSpanMatchNoneSpans();</span>
         } else {
-<span class="fc" id="L158">          CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
-<span class="fc" id="L159">          return new MtasSpanPositionSpans(mtasCodecInfo, field, start, end);</span>
+<span class="fc" id="L155">          CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
+<span class="fc" id="L156">          return new MtasSpanPositionSpans(mtasCodecInfo, field, start, end);</span>
         }
-<span class="nc" id="L161">      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {</span>
-<span class="nc" id="L162">        throw new IOException(&quot;Can't get reader&quot;, e);</span>
+<span class="nc" id="L158">      } catch (InvocationTargetException | IllegalAccessException</span>
+          | NoSuchMethodException e) {
+<span class="nc" id="L160">        throw new IOException(&quot;Can't get reader&quot;, e);</span>
       }
 
     }
@@ -171,8 +169,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-      //don't do anything
-<span class="nc" id="L175">    }</span>
+      // don't do anything
+<span class="nc" id="L173">    }</span>
 
     /*
      * (non-Javadoc)
@@ -183,7 +181,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public SimScorer getSimScorer(LeafReaderContext context) {
-<span class="nc" id="L186">      return new MtasSimScorer();</span>
+<span class="nc" id="L184">      return new MtasSimScorer();</span>
     }
 
   }
@@ -196,10 +194,10 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L199">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L200">    buffer.append(</span>
-<span class="nc bnc" id="L201" title="All 2 branches missed.">        this.getClass().getSimpleName() + &quot;([&quot; + start + (start != end ? &quot;,&quot; + end : &quot;&quot;) + &quot;])&quot;);</span>
-<span class="nc" id="L202">    return buffer.toString();</span>
+<span class="nc" id="L197">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot; + start</span>
+        + (start != end ? &quot;,&quot; + end : &quot;&quot;) + &quot;])&quot;);
+<span class="nc" id="L200">    return buffer.toString();</span>
   }
 
   /*
@@ -209,14 +207,14 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L212" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L213">      return true;</span>
-<span class="pc bpc" id="L214" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L215">      return false;</span>
-<span class="fc bfc" id="L216" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L217">      return false;</span>
-<span class="fc" id="L218">    final MtasSpanPositionQuery that = (MtasSpanPositionQuery) obj;</span>
-<span class="pc bpc" id="L219" title="3 of 6 branches missed.">    return field.equals(that.field) &amp;&amp; start == that.start &amp;&amp; end == that.end;</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L211">      return true;</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L213">      return false;</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L215">      return false;</span>
+<span class="fc" id="L216">    final MtasSpanPositionQuery that = (MtasSpanPositionQuery) obj;</span>
+<span class="pc bpc" id="L217" title="3 of 6 branches missed.">    return field.equals(that.field) &amp;&amp; start == that.start &amp;&amp; end == that.end;</span>
   }
 
   /*
@@ -226,11 +224,11 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L229">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L230">    h = (h * 7) ^ field.hashCode();</span>
-<span class="fc" id="L231">    h = (h * 13) ^ start;</span>
-<span class="fc" id="L232">    h = (h * 17) ^ end;</span>
-<span class="fc" id="L233">    return h;</span>
+<span class="fc" id="L227">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L228">    h = (h * 7) ^ field.hashCode();</span>
+<span class="fc" id="L229">    h = (h * 13) ^ start;</span>
+<span class="fc" id="L230">    h = (h * 17) ^ end;</span>
+<span class="fc" id="L231">    return h;</span>
   }
 
 }

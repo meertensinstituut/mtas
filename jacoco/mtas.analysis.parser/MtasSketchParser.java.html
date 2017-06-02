@@ -34,10 +34,10 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L34">  private MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; wordType = null;</span>
 
   /** The word annotation types. */
-<span class="nc" id="L37">  private HashMap&lt;Integer, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; wordAnnotationTypes = new HashMap&lt;Integer, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="nc" id="L37">  private HashMap&lt;Integer, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; wordAnnotationTypes = new HashMap&lt;&gt;();</span>
 
   /** The group types. */
-<span class="nc" id="L40">  private HashMap&lt;String, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; groupTypes = new HashMap&lt;String, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt;();</span>
+<span class="nc" id="L40">  private HashMap&lt;String, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; groupTypes = new HashMap&lt;&gt;();</span>
 
   /**
    * Instantiates a new mtas sketch parser.
@@ -66,7 +66,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc bnc" id="L66" title="All 2 branches missed.">    if (config != null) {</span>
 
       // always word, no mappings
-<span class="nc" id="L69">      wordType = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(MAPPING_TYPE_WORD,</span>
+<span class="nc" id="L69">      wordType = new MtasParserType&lt;&gt;(MAPPING_TYPE_WORD,</span>
           null, false);
 
 <span class="nc bnc" id="L72" title="All 2 branches missed.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
@@ -91,7 +91,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L91">                    wordAnnotationTypes.get(Integer.parseInt(nameMapping))</span>
 <span class="nc" id="L92">                        .addItem(m);</span>
                   } else {
-<span class="nc" id="L94">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="nc" id="L94">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="nc" id="L96">                    t.addItem(m);</span>
 <span class="nc" id="L97">                    wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);</span>
@@ -103,7 +103,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc bnc" id="L103" title="All 2 branches missed.">                  if (groupTypes.containsKey(nameMapping)) {</span>
 <span class="nc" id="L104">                    groupTypes.get(nameMapping).addItem(m);</span>
                   } else {
-<span class="nc" id="L106">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;(</span>
+<span class="nc" id="L106">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
 <span class="nc" id="L108">                    t.addItem(m);</span>
 <span class="nc" id="L109">                    groupTypes.put(nameMapping, t);</span>
@@ -132,7 +132,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L132">    Integer unknownAncestors = 0;</span>
 
 <span class="nc" id="L134">    Map&lt;String, Set&lt;Integer&gt;&gt; idPositions = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L135">    Map&lt;String, Integer[]&gt; idOffsets = new HashMap&lt;String, Integer[]&gt;();</span>
+<span class="nc" id="L135">    Map&lt;String, Integer[]&gt; idOffsets = new HashMap&lt;&gt;();</span>
 
 <span class="nc" id="L137">    Map&lt;String, Map&lt;Integer, Set&lt;String&gt;&gt;&gt; updateList = createUpdateList();</span>
 <span class="nc" id="L138">    Map&lt;String, List&lt;MtasParserObject&gt;&gt; currentList = createCurrentList();</span>
@@ -163,9 +163,9 @@ import mtas.analysis.util.MtasParserException;
             // start group
             // System.out.println(&quot;Start &quot;+matcherGroupStart.group(1)+&quot; -
             // &quot;+matcherGroupStart.group(2));
-<span class="nc bnc" id="L166" title="All 2 branches missed.">            if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)</span>
-<span class="nc bnc" id="L167" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_RELATION).size() == 0)</span>
-<span class="nc bnc" id="L168" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size() == 0)</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">            if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_RELATION).isEmpty())</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())</span>
                 &amp;&amp; (tmpCurrentType = groupTypes
 <span class="nc bnc" id="L170" title="All 2 branches missed.">                    .get(matcherGroupStart.group(1))) != null) {</span>
 <span class="nc" id="L171">              currentObject = new MtasParserObject(tmpCurrentType);</span>
@@ -190,7 +190,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L190">            }</span>
 <span class="nc bnc" id="L191" title="All 2 branches missed.">          } else if (matcherGroupEnd.find()) {</span>
             // end group
-<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (currentList.get(MAPPING_TYPE_GROUP).size() &gt; 0) {</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {</span>
 <span class="nc" id="L194">              if ((tmpCurrentType = groupTypes</span>
 <span class="nc bnc" id="L195" title="All 2 branches missed.">                  .get(matcherGroupEnd.group(1))) != null) {</span>
 <span class="nc" id="L196">                currentObject = currentList.get(MAPPING_TYPE_GROUP)</span>
@@ -210,10 +210,10 @@ import mtas.analysis.util.MtasParserException;
             }
           }
 <span class="nc" id="L212">        } else {</span>
-<span class="nc bnc" id="L213" title="All 2 branches missed.">          if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)</span>
-<span class="nc bnc" id="L214" title="All 2 branches missed.">              &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size() == 0)</span>
-<span class="nc bnc" id="L215" title="All 2 branches missed.">              &amp;&amp; (currentList.get(MAPPING_TYPE_WORD).size() == 0)</span>
-<span class="nc bnc" id="L216" title="All 4 branches missed.">              &amp;&amp; (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size() == 0)</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">          if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">              &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">              &amp;&amp; (currentList.get(MAPPING_TYPE_WORD).isEmpty())</span>
+<span class="nc bnc" id="L216" title="All 4 branches missed.">              &amp;&amp; (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).isEmpty())</span>
               &amp;&amp; (wordType != null)) {
             // start word
 <span class="nc" id="L219">            currentObject = new MtasParserObject(wordType);</span>
@@ -228,9 +228,9 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L228">              currentList.get(MAPPING_TYPE_WORD).add(currentObject);</span>
 <span class="nc" id="L229">              unknownAncestors = 0;</span>
             }
-<span class="nc bnc" id="L231" title="All 2 branches missed.">            if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)</span>
-<span class="nc bnc" id="L232" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size() == 0)</span>
-<span class="nc bnc" id="L233" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_WORD).size() &gt; 0)) {</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">            if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">                &amp;&amp; (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">                &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
               // start and finish word annotations
 <span class="nc" id="L235">              String[] items = line.split(&quot;\t&quot;);</span>
 <span class="nc bnc" id="L236" title="All 2 branches missed.">              for (int i = 0; i &lt; items.length; i++) {</span>
@@ -268,7 +268,7 @@ import mtas.analysis.util.MtasParserException;
                     // offset always null, so update later with word (should be
                     // possible)
 <span class="nc bnc" id="L270" title="All 2 branches missed.">                    if ((currentObject.getId() != null)</span>
-<span class="nc bnc" id="L271" title="All 2 branches missed.">                        &amp;&amp; (currentList.get(MAPPING_TYPE_WORD).size() &gt; 0)) {</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">                        &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
 <span class="nc" id="L272">                      currentList.get(MAPPING_TYPE_WORD)</span>
 <span class="nc" id="L273">                          .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
 <span class="nc" id="L274">                          .addUpdateableIdWithOffset(currentObject.getId());</span>

@@ -2,24 +2,31 @@
 
 import java.io.IOException;
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.MtasSpanIntersectingQuery.MtasSpanIntersectingQuerySpans;
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanIntersectingSpans.
  */
-public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
+public class MtasSpanIntersectingSpans extends MtasSpans {
 
+  /** The spans 1. */
+  private MtasSpanIntersectingQuerySpans spans1;
+  
   /** The spans 2. */
-  private MtasSpanIntersectingQuerySpans spans1, spans2;
+  private MtasSpanIntersectingQuerySpans spans2;
 
+  /** The called next start position. */
+  private boolean calledNextStartPosition;
+  
   /** The no more positions. */
-  private boolean calledNextStartPosition, noMorePositions;
+  private boolean noMorePositions;
 
+  /** The last spans 2 start position. */
+  private int lastSpans2StartPosition;
+  
   /** The last spans 2 end position. */
-  private int lastSpans2StartPosition, lastSpans2EndPosition;
+  private int lastSpans2EndPosition;
 
   /** The doc id. */
   private int docId;
@@ -32,151 +39,171 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
    * @param spans2 the spans 2
    */
   public MtasSpanIntersectingSpans(
-      MtasSpanIntersectingQuery mtasSpanIntersectingQuery,
       MtasSpanIntersectingQuerySpans spans1,
       MtasSpanIntersectingQuerySpans spans2) {
-<span class="fc" id="L38">    super();</span>
-<span class="fc" id="L39">    docId = -1;</span>
-<span class="fc" id="L40">    this.spans1 = spans1;</span>
-<span class="fc" id="L41">    this.spans2 = spans2;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L44">    super();</span>
+<span class="fc" id="L45">    docId = -1;</span>
+<span class="fc" id="L46">    this.spans1 = spans1;</span>
+<span class="fc" id="L47">    this.spans2 = spans2;</span>
+<span class="fc" id="L48">  }</span>
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
   public int nextStartPosition() throws IOException {
     // no document
-<span class="pc bpc" id="L50" title="2 of 4 branches missed.">    if (docId == -1 || docId == NO_MORE_DOCS) {</span>
-<span class="nc" id="L51">      throw new IOException(&quot;no document&quot;);</span>
+<span class="pc bpc" id="L58" title="2 of 4 branches missed.">    if (docId == -1 || docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L59">      throw new IOException(&quot;no document&quot;);</span>
       // finished
-<span class="pc bpc" id="L53" title="1 of 2 branches missed.">    } else if (noMorePositions) {</span>
-<span class="nc" id="L54">      return NO_MORE_POSITIONS;</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">    } else if (noMorePositions) {</span>
+<span class="nc" id="L62">      return NO_MORE_POSITIONS;</span>
       // littleSpans already at start match, because of check for matching
       // document
-<span class="fc bfc" id="L57" title="All 2 branches covered.">    } else if (!calledNextStartPosition) {</span>
-<span class="fc" id="L58">      calledNextStartPosition = true;</span>
-<span class="fc" id="L59">      return spans1.spans.startPosition();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    } else if (!calledNextStartPosition) {</span>
+<span class="fc" id="L66">      calledNextStartPosition = true;</span>
+<span class="fc" id="L67">      return spans1.spans.startPosition();</span>
       // compute next match
     } else {
-<span class="fc bfc" id="L62" title="All 2 branches covered.">      if (goToNextStartPosition()) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">      if (goToNextStartPosition()) {</span>
         // match found
-<span class="fc" id="L64">        return spans1.spans.startPosition();</span>
+<span class="fc" id="L72">        return spans1.spans.startPosition();</span>
       } else {
         // no more matches: document finished
-<span class="fc" id="L67">        return NO_MORE_POSITIONS;</span>
+<span class="fc" id="L75">        return NO_MORE_POSITIONS;</span>
       }
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
   public int startPosition() {
-<span class="pc bpc" id="L77" title="1 of 4 branches missed.">    return calledNextStartPosition</span>
-<span class="fc" id="L78">        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.startPosition())</span>
+<span class="pc bpc" id="L87" title="2 of 4 branches missed.">    return calledNextStartPosition</span>
+<span class="pc" id="L88">        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.startPosition())</span>
         : -1;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
   public int endPosition() {
-<span class="pc bpc" id="L87" title="2 of 4 branches missed.">    return calledNextStartPosition</span>
-<span class="pc" id="L88">        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.endPosition())</span>
+<span class="pc bpc" id="L99" title="1 of 4 branches missed.">    return calledNextStartPosition</span>
+<span class="pc" id="L100">        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.endPosition())</span>
         : -1;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
   public int width() {
-<span class="nc bnc" id="L97" title="All 4 branches missed.">    return calledNextStartPosition ? (noMorePositions ? 0</span>
-<span class="nc" id="L98">        : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">    return calledNextStartPosition ? (noMorePositions ? 0</span>
+<span class="nc" id="L112">        : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;</span>
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-<span class="nc" id="L106">    spans1.spans.collect(collector);</span>
-<span class="nc" id="L107">    spans2.spans.collect(collector);</span>
-<span class="nc" id="L108">  }</span>
+<span class="nc" id="L124">    spans1.spans.collect(collector);</span>
+<span class="nc" id="L125">    spans2.spans.collect(collector);</span>
+<span class="nc" id="L126">  }</span>
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
   public float positionsCost() {
-<span class="nc" id="L115">    return 0;</span>
+<span class="nc" id="L135">    return 0;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
   public int docID() {
-<span class="fc" id="L123">    return docId;</span>
+<span class="fc" id="L145">    return docId;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="fc" id="L131">    reset();</span>
-<span class="pc bpc" id="L132" title="1 of 2 branches missed.">    while (!goToNextDoc())</span>
-<span class="nc" id="L133">      ;</span>
-<span class="fc" id="L134">    return docId;</span>
+<span class="fc" id="L155">    reset();</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    while (!goToNextDoc())</span>
+<span class="nc" id="L157">      ;</span>
+<span class="fc" id="L158">    return docId;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="fc" id="L142">    reset();</span>
-<span class="pc bpc" id="L143" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
-<span class="nc" id="L144">      return docId;</span>
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    } else if (target &lt; docId) {</span>
+<span class="fc" id="L168">    reset();</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L170">      return docId;</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">    } else if (target &lt; docId) {</span>
       // should not happen
-<span class="nc" id="L147">      docId = NO_MORE_DOCS;</span>
-<span class="nc" id="L148">      return docId;</span>
+<span class="nc" id="L173">      docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L174">      return docId;</span>
     } else {
       // advance 1
-<span class="fc" id="L151">      int spans1DocId = spans1.spans.docID();</span>
-<span class="pc bpc" id="L152" title="1 of 2 branches missed.">      if (spans1DocId &lt; target) {</span>
-<span class="fc" id="L153">        spans1DocId = spans1.spans.advance(target);</span>
-<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (spans1DocId == NO_MORE_DOCS) {</span>
-<span class="nc" id="L155">          docId = NO_MORE_DOCS;</span>
-<span class="nc" id="L156">          return docId;</span>
+<span class="fc" id="L177">      int spans1DocId = spans1.spans.docID();</span>
+<span class="fc" id="L178">      int newTarget = target;</span>
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">      if (spans1DocId &lt; newTarget) {</span>
+<span class="fc" id="L180">        spans1DocId = spans1.spans.advance(newTarget);</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">        if (spans1DocId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L182">          docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L183">          return docId;</span>
         }
-<span class="fc" id="L158">        target = Math.max(target, spans1DocId);</span>
+<span class="fc" id="L185">        newTarget = Math.max(newTarget, spans1DocId);</span>
       }
-<span class="fc" id="L160">      int spans2DocId = spans2.spans.docID();</span>
+<span class="fc" id="L187">      int spans2DocId = spans2.spans.docID();</span>
       // advance 2
-<span class="pc bpc" id="L162" title="1 of 2 branches missed.">      if (spans2DocId &lt; target) {</span>
-<span class="fc" id="L163">        spans2DocId = spans2.spans.advance(target);</span>
-<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (spans2DocId == NO_MORE_DOCS) {</span>
-<span class="nc" id="L165">          docId = NO_MORE_DOCS;</span>
-<span class="nc" id="L166">          return docId;</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">      if (spans2DocId &lt; newTarget) {</span>
+<span class="fc" id="L190">        spans2DocId = spans2.spans.advance(newTarget);</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">        if (spans2DocId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L192">          docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L193">          return docId;</span>
         }
       }
       // check equal docId, otherwise next
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">      if (spans1DocId == spans2DocId) {</span>
-<span class="fc" id="L171">        docId = spans1DocId;</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">      if (spans1DocId == spans2DocId) {</span>
+<span class="fc" id="L198">        docId = spans1DocId;</span>
         // check match
-<span class="pc bpc" id="L173" title="1 of 2 branches missed.">        if (goToNextStartPosition()) {</span>
-<span class="fc" id="L174">          return docId;</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">        if (goToNextStartPosition()) {</span>
+<span class="fc" id="L201">          return docId;</span>
         } else {
-<span class="nc" id="L176">          return nextDoc();</span>
+<span class="nc" id="L203">          return nextDoc();</span>
         }
       } else {
-<span class="nc" id="L179">        return nextDoc();</span>
+<span class="nc" id="L206">        return nextDoc();</span>
       }
     }
   }
@@ -188,28 +215,28 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
-<span class="pc bpc" id="L191" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
-<span class="nc" id="L192">      return true;</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L219">      return true;</span>
     } else {
-<span class="fc" id="L194">      int spans1DocId = spans1.spans.nextDoc();</span>
-<span class="fc" id="L195">      int spans2DocId = spans2.spans.docID();</span>
-<span class="fc" id="L196">      docId = Math.max(spans1DocId, spans2DocId);</span>
-<span class="fc bfc" id="L197" title="All 4 branches covered.">      while (spans1DocId != spans2DocId &amp;&amp; docId != NO_MORE_DOCS) {</span>
-<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        if (spans1DocId &lt; spans2DocId) {</span>
-<span class="nc" id="L199">          spans1DocId = spans1.spans.advance(spans2DocId);</span>
-<span class="nc" id="L200">          docId = spans1DocId;</span>
+<span class="fc" id="L221">      int spans1DocId = spans1.spans.nextDoc();</span>
+<span class="fc" id="L222">      int spans2DocId = spans2.spans.docID();</span>
+<span class="fc" id="L223">      docId = Math.max(spans1DocId, spans2DocId);</span>
+<span class="fc bfc" id="L224" title="All 4 branches covered.">      while (spans1DocId != spans2DocId &amp;&amp; docId != NO_MORE_DOCS) {</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">        if (spans1DocId &lt; spans2DocId) {</span>
+<span class="nc" id="L226">          spans1DocId = spans1.spans.advance(spans2DocId);</span>
+<span class="nc" id="L227">          docId = spans1DocId;</span>
         } else {
-<span class="fc" id="L202">          spans2DocId = spans2.spans.advance(spans1DocId);</span>
-<span class="fc" id="L203">          docId = spans2DocId;</span>
+<span class="fc" id="L229">          spans2DocId = spans2.spans.advance(spans1DocId);</span>
+<span class="fc" id="L230">          docId = spans2DocId;</span>
         }
       }
-<span class="fc bfc" id="L206" title="All 2 branches covered.">      if (docId != NO_MORE_DOCS) {</span>
-<span class="pc bpc" id="L207" title="1 of 2 branches missed.">        if (!goToNextStartPosition()) {</span>
-<span class="nc" id="L208">          reset();</span>
-<span class="nc" id="L209">          return false;</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">      if (docId != NO_MORE_DOCS) {</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (!goToNextStartPosition()) {</span>
+<span class="nc" id="L235">          reset();</span>
+<span class="nc" id="L236">          return false;</span>
         }
       }
-<span class="fc" id="L212">      return true;</span>
+<span class="fc" id="L239">      return true;</span>
     }
   }
 
@@ -220,30 +247,32 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
-    int nextSpans1StartPosition, nextSpans1EndPosition;
-    int nextSpans2StartPosition, nextSpans2EndPosition;
-<span class="fc" id="L225">    while ((nextSpans1StartPosition = spans1.spans</span>
-<span class="fc bfc" id="L226" title="All 2 branches covered.">        .nextStartPosition()) != NO_MORE_POSITIONS) {</span>
-<span class="fc" id="L227">      nextSpans1EndPosition = spans1.spans.endPosition();</span>
-<span class="fc bfc" id="L228" title="All 4 branches covered.">      if (nextSpans1StartPosition &lt;= lastSpans2EndPosition</span>
+    int nextSpans1StartPosition;
+    int nextSpans1EndPosition;
+    int nextSpans2StartPosition;
+    int nextSpans2EndPosition;
+<span class="fc" id="L254">    while ((nextSpans1StartPosition = spans1.spans</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">        .nextStartPosition()) != NO_MORE_POSITIONS) {</span>
+<span class="fc" id="L256">      nextSpans1EndPosition = spans1.spans.endPosition();</span>
+<span class="fc bfc" id="L257" title="All 4 branches covered.">      if (nextSpans1StartPosition &lt;= lastSpans2EndPosition</span>
           &amp;&amp; nextSpans1EndPosition &gt;= lastSpans2StartPosition) {
-<span class="fc" id="L230">        return true;</span>
+<span class="fc" id="L259">        return true;</span>
       } else {
-<span class="fc bfc" id="L232" title="All 2 branches covered.">        while (lastSpans2StartPosition &lt;= nextSpans1EndPosition) {</span>
-<span class="fc" id="L233">          nextSpans2StartPosition = spans2.spans.nextStartPosition();</span>
-<span class="fc bfc" id="L234" title="All 2 branches covered.">          if (nextSpans2StartPosition == NO_MORE_POSITIONS) {</span>
-<span class="fc" id="L235">            noMorePositions = true;</span>
-<span class="fc" id="L236">            return false;</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        while (lastSpans2StartPosition &lt;= nextSpans1EndPosition) {</span>
+<span class="fc" id="L262">          nextSpans2StartPosition = spans2.spans.nextStartPosition();</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">          if (nextSpans2StartPosition == NO_MORE_POSITIONS) {</span>
+<span class="fc" id="L264">            noMorePositions = true;</span>
+<span class="fc" id="L265">            return false;</span>
           } else {
-<span class="fc" id="L238">            nextSpans2EndPosition = spans2.spans.endPosition();</span>
-<span class="pc bpc" id="L239" title="3 of 4 branches missed.">            if (nextSpans2StartPosition &gt; lastSpans2StartPosition</span>
+<span class="fc" id="L267">            nextSpans2EndPosition = spans2.spans.endPosition();</span>
+<span class="pc bpc" id="L268" title="3 of 4 branches missed.">            if (nextSpans2StartPosition &gt; lastSpans2StartPosition</span>
                 || nextSpans2EndPosition &gt; lastSpans2EndPosition) {
-<span class="pc bpc" id="L241" title="1 of 2 branches missed.">              if (nextSpans2EndPosition &gt; lastSpans2EndPosition) {</span>
-<span class="fc" id="L242">                lastSpans2StartPosition = nextSpans2StartPosition;</span>
-<span class="fc" id="L243">                lastSpans2EndPosition = nextSpans2EndPosition;</span>
-<span class="fc bfc" id="L244" title="All 4 branches covered.">                if (nextSpans1StartPosition &lt;= lastSpans2EndPosition</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">              if (nextSpans2EndPosition &gt; lastSpans2EndPosition) {</span>
+<span class="fc" id="L271">                lastSpans2StartPosition = nextSpans2StartPosition;</span>
+<span class="fc" id="L272">                lastSpans2EndPosition = nextSpans2EndPosition;</span>
+<span class="fc bfc" id="L273" title="All 4 branches covered.">                if (nextSpans1StartPosition &lt;= lastSpans2EndPosition</span>
                     &amp;&amp; nextSpans1EndPosition &gt;= lastSpans2StartPosition) {
-<span class="fc" id="L246">                  return true;</span>
+<span class="fc" id="L275">                  return true;</span>
                 }
               }
             }
@@ -251,26 +280,28 @@ public class MtasSpanIntersectingSpans extends Spans implements MtasSpans {
         }
       }
     }
-<span class="fc" id="L254">    noMorePositions = true;</span>
-<span class="fc" id="L255">    return false;</span>
+<span class="fc" id="L283">    noMorePositions = true;</span>
+<span class="fc" id="L284">    return false;</span>
   }
 
   /**
    * Reset.
    */
   private void reset() {
-<span class="fc" id="L262">    calledNextStartPosition = false;</span>
-<span class="fc" id="L263">    noMorePositions = false;</span>
-<span class="fc" id="L264">    lastSpans2StartPosition = -1;</span>
-<span class="fc" id="L265">    lastSpans2EndPosition = -1;</span>
-<span class="fc" id="L266">  }</span>
+<span class="fc" id="L291">    calledNextStartPosition = false;</span>
+<span class="fc" id="L292">    noMorePositions = false;</span>
+<span class="fc" id="L293">    lastSpans2StartPosition = -1;</span>
+<span class="fc" id="L294">    lastSpans2EndPosition = -1;</span>
+<span class="fc" id="L295">  }</span>
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
   public long cost() {
-<span class="nc" id="L273">    return 0;</span>
+<span class="nc" id="L304">    return 0;</span>
   }
 
 }

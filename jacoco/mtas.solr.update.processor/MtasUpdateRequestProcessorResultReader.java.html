@@ -22,7 +22,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
   /** The stored string value. */
   private String storedStringValue;
-
+ 
   /** The file input stream. */
   private FileInputStream fileInputStream;
 
@@ -153,7 +153,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @return the stored bin value
    */
   public byte[] getStoredBinValue() {    
-<span class="fc" id="L156">    return null;</span>
+<span class="fc" id="L156">    return new byte[0];</span>
   }
 
   /**
@@ -172,14 +172,14 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    */
   @Override
   public void close() throws IOException {
-<span class="nc" id="L175">    forceClose();</span>
-<span class="nc" id="L176">  }</span>
+<span class="fc" id="L175">    forceClose();</span>
+<span class="fc" id="L176">  }</span>
 
   /**
    * Force close.
    */
   private void forceClose() {
-<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (file != null) {</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    if (file != null) {</span>
 <span class="pc bpc" id="L183" title="3 of 6 branches missed.">      if (file.exists() &amp;&amp; file.canWrite() &amp;&amp; !file.delete()) {</span>
 <span class="nc" id="L184">        log.debug(&quot;couldn't delete &quot; + file.getName());</span>
       }

@@ -6,6 +6,8 @@ import java.util.Collection;
 import mtas.analysis.token.MtasPosition;
 import mtas.codec.payload.MtasPayloadDecoder;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.payloads.PayloadSpanCollector;
@@ -14,10 +16,13 @@ import org.apache.lucene.search.spans.TermSpans;
 /**
  * The Class MtasExtendedTermSpans.
  */
-public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
+public class MtasExtendedTermSpans extends TermSpans {
+
+  /** The Constant log. */
+<span class="fc" id="L22">  private static final Log log = LogFactory.getLog(MtasExtendedTermSpans.class);</span>
 
   /** The mtas position. */
-<span class="fc" id="L20">  protected MtasPosition mtasPosition = null;</span>
+<span class="fc" id="L25">  protected MtasPosition mtasPosition = null;</span>
 
   /** The assume single position. */
   private boolean assumeSinglePosition;
@@ -32,8 +37,8 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
    * @param term the term
    */
   public MtasExtendedTermSpans(PostingsEnum postings, Term term) {
-<span class="nc" id="L35">    this(postings, term, false);</span>
-<span class="nc" id="L36">  }</span>
+<span class="nc" id="L40">    this(postings, term, false);</span>
+<span class="nc" id="L41">  }</span>
 
   /**
    * Instantiates a new mtas extended term spans.
@@ -44,15 +49,10 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
    */
   public MtasExtendedTermSpans(PostingsEnum postings, Term term,
       boolean assumeSinglePosition) {
-<span class="fc" id="L47">    super(null, postings, term, 1);</span>
-<span class="fc" id="L48">    payloadSpanCollector = new PayloadSpanCollector();</span>
-<span class="fc" id="L49">    this.assumeSinglePosition = assumeSinglePosition;</span>
-<span class="fc" id="L50">  }</span>
-  
-  @Override
-  public int startPosition() {
-<span class="fc" id="L54">    return super.startPosition();</span>
-  }
+<span class="fc" id="L52">    super(null, postings, term, 1);</span>
+<span class="fc" id="L53">    payloadSpanCollector = new PayloadSpanCollector();</span>
+<span class="fc" id="L54">    this.assumeSinglePosition = assumeSinglePosition;</span>
+<span class="fc" id="L55">  }</span>
 
   /*
    * (non-Javadoc)
@@ -65,18 +65,17 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
 <span class="fc" id="L65">      return super.endPosition();</span>
     } else {
 <span class="fc" id="L67">      int status = super.endPosition();</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">      if(status&gt;=0) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      if (status &gt;= 0) {</span>
         try {
 <span class="fc" id="L70">          processEncodedPayload();</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">          int end = (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">          return (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)</span>
               : NO_MORE_POSITIONS;
-<span class="fc bfc" id="L73" title="All 2 branches covered.">          return (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)</span>
-              : NO_MORE_POSITIONS;
-<span class="nc" id="L75">        } catch (IOException e) {</span>
-<span class="nc" id="L76">          return NO_MORE_POSITIONS;</span>
+<span class="nc" id="L73">        } catch (IOException e) {</span>
+<span class="nc" id="L74">          log.debug(e);</span>
+<span class="nc" id="L75">          return NO_MORE_POSITIONS;</span>
         }
       } else {
-<span class="fc" id="L79">        return status;</span>
+<span class="fc" id="L78">        return status;</span>
       }
     }
   }
@@ -88,18 +87,19 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
    */
   public int[] getPositions() {
     int[] list;
-<span class="nc bnc" id="L91" title="All 2 branches missed.">    if (assumeSinglePosition) {</span>
-<span class="nc" id="L92">      list = new int[1];</span>
-<span class="nc" id="L93">      list[0] = super.startPosition();</span>
-<span class="nc" id="L94">      return list;</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">    if (assumeSinglePosition) {</span>
+<span class="nc" id="L91">      list = new int[1];</span>
+<span class="nc" id="L92">      list[0] = super.startPosition();</span>
+<span class="nc" id="L93">      return list;</span>
     } else {
       try {
-<span class="nc" id="L97">        processEncodedPayload();</span>
-<span class="nc" id="L98">        list = mtasPosition.getPositions();</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (list != null) {</span>
-<span class="nc" id="L100">          return mtasPosition.getPositions();</span>
+<span class="nc" id="L96">        processEncodedPayload();</span>
+<span class="nc" id="L97">        list = mtasPosition.getPositions();</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (list != null) {</span>
+<span class="nc" id="L99">          return mtasPosition.getPositions();</span>
         }
-<span class="nc" id="L102">      } catch (IOException e) {</span>
+<span class="nc" id="L101">      } catch (IOException e) {</span>
+<span class="nc" id="L102">        log.debug(e);</span>
         // do nothing
 <span class="nc" id="L104">      }</span>
 <span class="nc" id="L105">      int start = super.startPosition();</span>

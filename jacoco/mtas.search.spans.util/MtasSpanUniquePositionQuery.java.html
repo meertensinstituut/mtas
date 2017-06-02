@@ -117,7 +117,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
 <span class="fc" id="L122">    SpanWeight subWeight = clause.createWeight(searcher, false);</span>
 <span class="fc bfc" id="L123" title="All 2 branches covered.">    return new SpanUniquePositionWeight(subWeight, searcher,</span>
@@ -127,7 +127,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
   /**
    * The Class SpanUniquePositionWeight.
    */
-  public class SpanUniquePositionWeight extends SpanWeight {
+  public class SpanUniquePositionWeight extends MtasSpanWeight {
 
     /** The sub weight. */
     final SpanWeight subWeight;
@@ -168,13 +168,13 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
 <span class="fc" id="L173">      Spans subSpan = subWeight.getSpans(context, requiredPostings);</span>
 <span class="fc bfc" id="L174" title="All 2 branches covered.">      if (subSpan == null) {</span>
 <span class="fc" id="L175">        return null;</span>
       } else {
-<span class="fc" id="L177">        return new MtasSpanUniquePosition(subSpan);</span>
+<span class="fc" id="L177">        return new MtasSpanUniquePositionSpans(subSpan);</span>
       }
     }
 

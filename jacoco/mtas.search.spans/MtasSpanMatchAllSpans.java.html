@@ -5,21 +5,22 @@ import java.io.IOException;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.search.spans.util.MtasSpans;
-
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanMatchAllSpans.
  */
-public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
+public class MtasSpanMatchAllSpans extends MtasSpans {
 
   /** The field. */
   private String field;
 
   /** The doc id. */
-  private int minPosition, maxPosition, currentStartPosition,
-      currentEndPosition, docId;
+  private int minPosition;
+  private int maxPosition;
+  private int currentStartPosition;
+  private int currentEndPosition;
+  private int docId;
 
   /** The mtas codec info. */
   private CodecInfo mtasCodecInfo;
@@ -27,19 +28,21 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span match all spans.
    *
-   * @param mtasCodecInfo the mtas codec info
-   * @param field the field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param field
+   *          the field
    */
   public MtasSpanMatchAllSpans(CodecInfo mtasCodecInfo, String field) {
-<span class="fc" id="L34">    super();</span>
-<span class="fc" id="L35">    this.mtasCodecInfo = mtasCodecInfo;</span>
-<span class="fc" id="L36">    this.field = field;</span>
-<span class="fc" id="L37">    minPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L38">    maxPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L39">    currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L40">    currentEndPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L41">    docId = -1;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L37">    super();</span>
+<span class="fc" id="L38">    this.mtasCodecInfo = mtasCodecInfo;</span>
+<span class="fc" id="L39">    this.field = field;</span>
+<span class="fc" id="L40">    minPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L41">    maxPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L42">    currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L43">    currentEndPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L44">    docId = -1;</span>
+<span class="fc" id="L45">  }</span>
 
   /*
    * (non-Javadoc)
@@ -48,18 +51,18 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int nextStartPosition() throws IOException {
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    if (currentStartPosition &lt; minPosition) {</span>
-<span class="fc" id="L52">      currentStartPosition = minPosition;</span>
-<span class="fc" id="L53">      currentEndPosition = currentStartPosition + 1;</span>
-    } else {
-<span class="fc" id="L55">      currentStartPosition++;</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    if (currentStartPosition &lt; minPosition) {</span>
+<span class="fc" id="L55">      currentStartPosition = minPosition;</span>
 <span class="fc" id="L56">      currentEndPosition = currentStartPosition + 1;</span>
-<span class="fc bfc" id="L57" title="All 2 branches covered.">      if (currentStartPosition &gt; maxPosition) {</span>
-<span class="fc" id="L58">        currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L59">        currentEndPosition = NO_MORE_POSITIONS;</span>
+    } else {
+<span class="fc" id="L58">      currentStartPosition++;</span>
+<span class="fc" id="L59">      currentEndPosition = currentStartPosition + 1;</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">      if (currentStartPosition &gt; maxPosition) {</span>
+<span class="fc" id="L61">        currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L62">        currentEndPosition = NO_MORE_POSITIONS;</span>
       }
     }
-<span class="fc" id="L62">    return currentStartPosition;</span>
+<span class="fc" id="L65">    return currentStartPosition;</span>
   }
 
   /*
@@ -69,7 +72,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int startPosition() {
-<span class="fc" id="L72">    return currentStartPosition;</span>
+<span class="fc" id="L75">    return currentStartPosition;</span>
   }
 
   /*
@@ -79,7 +82,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int endPosition() {
-<span class="fc" id="L82">    return currentEndPosition;</span>
+<span class="fc" id="L85">    return currentEndPosition;</span>
   }
 
   /*
@@ -89,7 +92,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int width() {
-<span class="nc" id="L92">    return 0;</span>
+<span class="nc" id="L95">    return 0;</span>
   }
 
   /*
@@ -101,8 +104,8 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-
-<span class="nc" id="L105">  }</span>
+    // do nothing
+<span class="nc" id="L108">  }</span>
 
   /*
    * (non-Javadoc)
@@ -111,7 +114,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int docID() {
-<span class="fc" id="L114">    return docId;</span>
+<span class="fc" id="L117">    return docId;</span>
   }
 
   /*
@@ -121,21 +124,21 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="fc" id="L124">    IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, docId);</span>
-<span class="fc bfc" id="L125" title="All 2 branches covered.">    if (indexDoc != null) {</span>
-<span class="fc" id="L126">      docId = indexDoc.docId;</span>
-<span class="fc" id="L127">      minPosition = indexDoc.minPosition;</span>
-<span class="fc" id="L128">      maxPosition = indexDoc.maxPosition;</span>
-<span class="fc" id="L129">      currentStartPosition = -1;</span>
-<span class="fc" id="L130">      currentEndPosition = -1;</span>
+<span class="fc" id="L127">    IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, docId);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    if (indexDoc != null) {</span>
+<span class="fc" id="L129">      docId = indexDoc.docId;</span>
+<span class="fc" id="L130">      minPosition = indexDoc.minPosition;</span>
+<span class="fc" id="L131">      maxPosition = indexDoc.maxPosition;</span>
+<span class="fc" id="L132">      currentStartPosition = -1;</span>
+<span class="fc" id="L133">      currentEndPosition = -1;</span>
     } else {
-<span class="fc" id="L132">      docId = NO_MORE_DOCS;</span>
-<span class="fc" id="L133">      minPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L134">      maxPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L135">      currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L136">      currentEndPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L135">      docId = NO_MORE_DOCS;</span>
+<span class="fc" id="L136">      minPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L137">      maxPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L138">      currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L139">      currentEndPosition = NO_MORE_POSITIONS;</span>
     }
-<span class="fc" id="L138">    return docId;</span>
+<span class="fc" id="L141">    return docId;</span>
   }
 
   /*
@@ -145,21 +148,21 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="fc" id="L148">    IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, (target - 1));</span>
-<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (indexDoc != null) {</span>
-<span class="fc" id="L150">      docId = indexDoc.docId;</span>
-<span class="fc" id="L151">      minPosition = indexDoc.minPosition;</span>
-<span class="fc" id="L152">      maxPosition = indexDoc.maxPosition;</span>
-<span class="fc" id="L153">      currentStartPosition = -1;</span>
-<span class="fc" id="L154">      currentEndPosition = -1;</span>
+<span class="fc" id="L151">    IndexDoc indexDoc = mtasCodecInfo.getNextDoc(field, (target - 1));</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">    if (indexDoc != null) {</span>
+<span class="fc" id="L153">      docId = indexDoc.docId;</span>
+<span class="fc" id="L154">      minPosition = indexDoc.minPosition;</span>
+<span class="fc" id="L155">      maxPosition = indexDoc.maxPosition;</span>
+<span class="fc" id="L156">      currentStartPosition = -1;</span>
+<span class="fc" id="L157">      currentEndPosition = -1;</span>
     } else {
-<span class="nc" id="L156">      docId = NO_MORE_DOCS;</span>
-<span class="nc" id="L157">      minPosition = NO_MORE_POSITIONS;</span>
-<span class="nc" id="L158">      maxPosition = NO_MORE_POSITIONS;</span>
-<span class="nc" id="L159">      currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="nc" id="L160">      currentEndPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L159">      docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L160">      minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L161">      maxPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L162">      currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L163">      currentEndPosition = NO_MORE_POSITIONS;</span>
     }
-<span class="fc" id="L162">    return docId;</span>
+<span class="fc" id="L165">    return docId;</span>
   }
 
   /*
@@ -169,7 +172,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public long cost() {
-<span class="fc" id="L172">    return 0;</span>
+<span class="fc" id="L175">    return 0;</span>
   }
 
   /*
@@ -179,7 +182,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public float positionsCost() {
-<span class="nc" id="L182">    return 0;</span>
+<span class="nc" id="L185">    return 0;</span>
   }
 
 }

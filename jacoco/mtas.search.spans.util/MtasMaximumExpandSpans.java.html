@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasMaximumExpandSpans.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasMaximumExpandSpans.java</span></div><h1>MtasMaximumExpandSpans.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.spans.SpanCollector;
+import org.apache.lucene.search.spans.Spans;
+
+import mtas.codec.util.CodecInfo;
+import mtas.codec.util.CodecInfo.IndexDoc;
+
+public class MtasMaximumExpandSpans extends MtasSpans {
+
+  /** The sub spans. */
+  Spans subSpans;
+  
+  MtasMaximumExpandSpanQuery query;
+
+  /** The min position. */
+  int minPosition;
+
+  /** The max position. */
+  int maxPosition;
+
+  /** The field. */
+  String field;
+
+  /** The mtas codec info. */
+  CodecInfo mtasCodecInfo;
+
+  /** The start position. */
+  int startPosition;
+
+  /** The end position. */
+  int endPosition;
+
+  /**
+   * Instantiates a new mtas maximum expand spans.
+   *
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
+   * @param subSpans the sub spans
+   */
+  public MtasMaximumExpandSpans(MtasMaximumExpandSpanQuery query, CodecInfo mtasCodecInfo, String field,
+      Spans subSpans) {
+<span class="fc" id="L46">    super();</span>
+<span class="fc" id="L47">    this.subSpans = subSpans;</span>
+<span class="fc" id="L48">    this.field = field;</span>
+<span class="fc" id="L49">    this.mtasCodecInfo = mtasCodecInfo;</span>
+<span class="fc" id="L50">    this.minPosition = 0;</span>
+<span class="fc" id="L51">    this.maxPosition = 0;</span>
+<span class="fc" id="L52">    this.startPosition = -1;</span>
+<span class="fc" id="L53">    this.endPosition = -1;</span>
+<span class="fc" id="L54">    this.query = query;</span>
+<span class="fc" id="L55">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
+  @Override
+  public int nextStartPosition() throws IOException {
+    int basicStartPosition;
+    int basicEndPosition;
+<span class="fc" id="L66">    while ((basicStartPosition = subSpans</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        .nextStartPosition()) != NO_MORE_POSITIONS) {</span>
+<span class="fc" id="L68">      basicEndPosition = subSpans.endPosition();</span>
+<span class="fc" id="L69">      startPosition = Math.max(minPosition,</span>
+          (basicStartPosition - query.maximumLeft));
+<span class="fc" id="L71">      endPosition = Math.min(maxPosition + 1,</span>
+          (basicEndPosition + query.maximumRight));
+<span class="pc bpc" id="L73" title="1 of 4 branches missed.">      if (startPosition &lt;= (basicStartPosition - query.minimumLeft)</span>
+          &amp;&amp; endPosition &gt;= (basicEndPosition + query.minimumRight)) {
+<span class="fc" id="L75">        return this.startPosition;</span>
+      }
+    }
+<span class="fc" id="L78">    startPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L79">    endPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L80">    return NO_MORE_POSITIONS;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
+  @Override
+  public int startPosition() {
+<span class="fc" id="L90">    return startPosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
+  @Override
+  public int endPosition() {
+<span class="fc" id="L100">    return endPosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
+  @Override
+  public int width() {
+<span class="nc" id="L110">    return endPosition - startPosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.
+   * spans.SpanCollector)
+   */
+  @Override
+  public void collect(SpanCollector collector) throws IOException {
+<span class="nc" id="L122">    subSpans.collect(collector);</span>
+<span class="nc" id="L123">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
+  @Override
+  public float positionsCost() {
+    // return subSpans.positionsCost();
+<span class="nc" id="L133">    return 0;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
+  @Override
+  public int docID() {
+<span class="fc" id="L143">    return subSpans.docID();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
+  @Override
+  public int nextDoc() throws IOException {
+<span class="fc" id="L153">    int docId = subSpans.nextDoc();</span>
+<span class="fc" id="L154">    startPosition = -1;</span>
+<span class="fc" id="L155">    endPosition = -1;</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (docId != NO_MORE_DOCS) {</span>
+<span class="fc" id="L157">      IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">      if (doc != null) {</span>
+<span class="fc" id="L159">        minPosition = doc.minPosition;</span>
+<span class="fc" id="L160">        maxPosition = doc.maxPosition;</span>
+      } else {
+<span class="nc" id="L162">        minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L163">        maxPosition = NO_MORE_POSITIONS;</span>
+      }
+<span class="fc" id="L165">    } else {</span>
+<span class="fc" id="L166">      minPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L167">      maxPosition = NO_MORE_POSITIONS;</span>
+    }
+<span class="fc" id="L169">    return docId;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
+  @Override
+  public int advance(int target) throws IOException {
+<span class="nc" id="L179">    int docId = subSpans.advance(target);</span>
+<span class="nc" id="L180">    startPosition = -1;</span>
+<span class="nc" id="L181">    endPosition = -1;</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">    if (docId != NO_MORE_DOCS) {</span>
+<span class="nc" id="L183">      IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">      if (doc != null) {</span>
+<span class="nc" id="L185">        minPosition = doc.minPosition;</span>
+<span class="nc" id="L186">        maxPosition = doc.maxPosition;</span>
+      } else {
+<span class="nc" id="L188">        minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L189">        maxPosition = NO_MORE_POSITIONS;</span>
+      }
+<span class="nc" id="L191">    } else {</span>
+<span class="nc" id="L192">      minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L193">      maxPosition = NO_MORE_POSITIONS;</span>
+    }
+<span class="nc" id="L195">    return docId;</span>
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+<span class="fc" id="L203">    return subSpans.asTwoPhaseIterator();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
+  @Override
+  public long cost() {
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">    return subSpans != null ? subSpans.cost() : 0;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

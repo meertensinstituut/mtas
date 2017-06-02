@@ -17,8 +17,7 @@ public class MtasScoreProvider extends CustomScoreProvider {
    */
   public MtasScoreProvider(LeafReaderContext context) {
 <span class="nc" id="L19">    super(context);</span>
-
-<span class="nc" id="L21">  }</span>
+<span class="nc" id="L20">  }</span>
 
   /*
    * (non-Javadoc)
@@ -28,9 +27,7 @@ public class MtasScoreProvider extends CustomScoreProvider {
    */
   @Override
   public float customScore(int doc, float subQueryScore, float valSrcScore) {
-<span class="nc" id="L31">    System.out.println(&quot;* Init MTAS scorerprovider doc &quot; + doc + &quot; - &quot;</span>
-        + subQueryScore + &quot; - &quot; + valSrcScore);
-<span class="nc" id="L33">    return (float) 3.0;</span>
+<span class="nc" id="L30">    return (float) 0.0;</span>
   }
 
   /*
@@ -40,16 +37,9 @@ public class MtasScoreProvider extends CustomScoreProvider {
    * float[])
    */
   @Override
-  public float customScore(int doc, float subQueryScore, float valSrcScores[])
+  public float customScore(int doc, float subQueryScore, float[] valSrcScores)
       throws IOException {
-<span class="nc" id="L45">    System.out.print(&quot;** Init MTAS scorerprovider doc &quot; + doc + &quot; - &quot;</span>
-        + subQueryScore + &quot; - &quot;);
-<span class="nc" id="L47">    System.out.print(valSrcScores.length + &quot;:&quot;);</span>
-<span class="nc bnc" id="L48" title="All 2 branches missed.">    for (int i = 0; i &lt; valSrcScores.length; i++) {</span>
-<span class="nc" id="L49">      System.out.print(valSrcScores[i] + &quot;,&quot;);</span>
-    }
-<span class="nc" id="L51">    System.out.println(&quot; voor veld &quot;);</span>
-<span class="nc" id="L52">    return (float) 4.0;</span>
+<span class="nc" id="L42">    return (float) 0.0;</span>
   }
 
 }

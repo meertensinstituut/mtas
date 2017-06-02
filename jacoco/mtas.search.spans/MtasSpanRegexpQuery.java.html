@@ -58,7 +58,7 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
   public MtasSpanRegexpQuery(Term term, boolean singlePosition) {
 <span class="fc bfc" id="L59" title="All 4 branches covered.">    super(singlePosition?1:null, singlePosition?1:null);</span>
 <span class="fc" id="L60">    RegexpQuery req = new RegexpQuery(term);    </span>
-<span class="fc" id="L61">    query = new SpanMultiTermQueryWrapper&lt;RegexpQuery&gt;(req);</span>
+<span class="fc" id="L61">    query = new SpanMultiTermQueryWrapper&lt;&gt;(req);</span>
 <span class="fc" id="L62">    this.term = term;</span>
 <span class="fc" id="L63">    this.singlePosition = singlePosition;</span>
 <span class="fc" id="L64">    int i = term.text().indexOf(MtasToken.DELIMITER);</span>
@@ -159,8 +159,8 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
 <span class="nc" id="L159">      return true;</span>
 <span class="pc bpc" id="L160" title="1 of 2 branches missed.">    if (obj == null)</span>
 <span class="nc" id="L161">      return false;</span>
-<span class="pc bpc" id="L162" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L163">      return false;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L163">      return false;</span>
 <span class="fc" id="L164">    MtasSpanRegexpQuery that = (MtasSpanRegexpQuery) obj;</span>
 <span class="pc bpc" id="L165" title="1 of 4 branches missed.">    return term.equals(that.term) &amp;&amp; singlePosition == that.singlePosition;</span>
   }

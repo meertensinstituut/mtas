@@ -22,15 +22,13 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
 
-import mtas.analysis.MtasTokenizer;
-
 /**
  * The Class MtasFieldsProducer.
  */
 public class MtasFieldsProducer extends FieldsProducer {
 
   /** The Constant log. */
-<span class="fc" id="L33">  private static final Log log = LogFactory.getLog(MtasFieldsProducer.class);</span>
+<span class="fc" id="L31">  private static final Log log = LogFactory.getLog(MtasFieldsProducer.class);</span>
 
   /** The delegate fields producer. */
   private FieldsProducer delegateFieldsProducer;
@@ -52,54 +50,54 @@ public class MtasFieldsProducer extends FieldsProducer {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasFieldsProducer(SegmentReadState state, String name)
-<span class="fc" id="L55">      throws IOException {</span>
-<span class="fc" id="L56">    String postingsFormatName = null;</span>
-<span class="fc" id="L57">    indexInputList = new HashMap&lt;String, IndexInput&gt;();</span>
-<span class="fc" id="L58">    indexInputOffsetList = new HashMap&lt;String, Long&gt;();</span>
-<span class="fc" id="L59">    version = MtasCodecPostingsFormat.VERSION_CURRENT;</span>
+<span class="fc" id="L53">      throws IOException {</span>
+<span class="fc" id="L54">    String postingsFormatName = null;</span>
+<span class="fc" id="L55">    indexInputList = new HashMap&lt;String, IndexInput&gt;();</span>
+<span class="fc" id="L56">    indexInputOffsetList = new HashMap&lt;String, Long&gt;();</span>
+<span class="fc" id="L57">    version = MtasCodecPostingsFormat.VERSION_CURRENT;</span>
 
-<span class="fc" id="L61">    postingsFormatName = addIndexInputToList(&quot;object&quot;, openMtasFile(state, name,</span>
+<span class="fc" id="L59">    postingsFormatName = addIndexInputToList(&quot;object&quot;, openMtasFile(state, name,</span>
         MtasCodecPostingsFormat.MTAS_OBJECT_EXTENSION), postingsFormatName);
-<span class="fc" id="L63">    addIndexInputToList(&quot;term&quot;,</span>
-<span class="fc" id="L64">        openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_TERM_EXTENSION),</span>
+<span class="fc" id="L61">    addIndexInputToList(&quot;term&quot;,</span>
+<span class="fc" id="L62">        openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_TERM_EXTENSION),</span>
         postingsFormatName);
-<span class="fc" id="L66">    addIndexInputToList(&quot;prefix&quot;, openMtasFile(state, name,</span>
+<span class="fc" id="L64">    addIndexInputToList(&quot;prefix&quot;, openMtasFile(state, name,</span>
         MtasCodecPostingsFormat.MTAS_PREFIX_EXTENSION), postingsFormatName);
-<span class="fc" id="L68">    addIndexInputToList(&quot;field&quot;,</span>
-<span class="fc" id="L69">        openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_FIELD_EXTENSION),</span>
+<span class="fc" id="L66">    addIndexInputToList(&quot;field&quot;,</span>
+<span class="fc" id="L67">        openMtasFile(state, name, MtasCodecPostingsFormat.MTAS_FIELD_EXTENSION),</span>
         postingsFormatName);
-<span class="fc" id="L71">    addIndexInputToList(&quot;indexDocId&quot;,</span>
-<span class="fc" id="L72">        openMtasFile(state, name,</span>
+<span class="fc" id="L69">    addIndexInputToList(&quot;indexDocId&quot;,</span>
+<span class="fc" id="L70">        openMtasFile(state, name,</span>
             MtasCodecPostingsFormat.MTAS_INDEX_DOC_ID_EXTENSION),
         postingsFormatName);
-<span class="fc" id="L75">    addIndexInputToList(&quot;indexObjectId&quot;,</span>
-<span class="fc" id="L76">        openMtasFile(state, name,</span>
+<span class="fc" id="L73">    addIndexInputToList(&quot;indexObjectId&quot;,</span>
+<span class="fc" id="L74">        openMtasFile(state, name,</span>
             MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_ID_EXTENSION),
         postingsFormatName);
     try {
-<span class="fc" id="L80">      addIndexInputToList(</span>
-<span class="fc" id="L81">          &quot;doc&quot;, openMtasFile(state, name,</span>
-<span class="fc" id="L82">              MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),</span>
+<span class="fc" id="L78">      addIndexInputToList(</span>
+<span class="fc" id="L79">          &quot;doc&quot;, openMtasFile(state, name,</span>
+<span class="fc" id="L80">              MtasCodecPostingsFormat.MTAS_DOC_EXTENSION, version, version),</span>
           postingsFormatName);
-<span class="fc" id="L84">      addIndexInputToList(&quot;indexObjectPosition&quot;,</span>
-<span class="fc" id="L85">          openMtasFile(state, name,</span>
+<span class="fc" id="L82">      addIndexInputToList(&quot;indexObjectPosition&quot;,</span>
+<span class="fc" id="L83">          openMtasFile(state, name,</span>
               MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_POSITION_EXTENSION,
-<span class="fc" id="L87">              version, version),</span>
+<span class="fc" id="L85">              version, version),</span>
           postingsFormatName);
-<span class="fc" id="L89">      addIndexInputToList(&quot;indexObjectParent&quot;,</span>
-<span class="fc" id="L90">          openMtasFile(state, name,</span>
+<span class="fc" id="L87">      addIndexInputToList(&quot;indexObjectParent&quot;,</span>
+<span class="fc" id="L88">          openMtasFile(state, name,</span>
               MtasCodecPostingsFormat.MTAS_INDEX_OBJECT_PARENT_EXTENSION,
-<span class="fc" id="L92">              version, version),</span>
+<span class="fc" id="L90">              version, version),</span>
           postingsFormatName);
-<span class="nc" id="L94">    } catch (IndexFormatTooOldException e) {</span>
-<span class="nc" id="L95">      log.debug(e);</span>
-<span class="nc" id="L96">      throw new IOException(</span>
+<span class="nc" id="L92">    } catch (IndexFormatTooOldException e) {</span>
+<span class="nc" id="L93">      log.debug(e);</span>
+<span class="nc" id="L94">      throw new IOException(</span>
           &quot;This MTAS doesn't support your index version, please upgrade&quot;);
-<span class="fc" id="L98">    }</span>
+<span class="fc" id="L96">    }</span>
     // Load the delegate postingsFormatName from this file
-<span class="fc" id="L100">    this.delegateFieldsProducer = PostingsFormat.forName(postingsFormatName)</span>
-<span class="fc" id="L101">        .fieldsProducer(state);</span>
-<span class="fc" id="L102">  }</span>
+<span class="fc" id="L98">    this.delegateFieldsProducer = PostingsFormat.forName(postingsFormatName)</span>
+<span class="fc" id="L99">        .fieldsProducer(state);</span>
+<span class="fc" id="L100">  }</span>
 
   /**
    * Adds the index input to list.
@@ -112,19 +110,19 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   private String addIndexInputToList(String name, IndexInput in,
       String postingsFormatName) throws IOException {
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    if (indexInputList.get(name) != null) {</span>
-<span class="nc" id="L116">      indexInputList.get(name).close();</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (indexInputList.get(name) != null) {</span>
+<span class="nc" id="L114">      indexInputList.get(name).close();</span>
     }
-<span class="fc" id="L118">    String localPostingsFormatName = postingsFormatName;</span>
-<span class="fc bfc" id="L119" title="All 2 branches covered.">    if (localPostingsFormatName == null) {</span>
-<span class="fc" id="L120">      localPostingsFormatName = in.readString();</span>
-<span class="pc bpc" id="L121" title="1 of 2 branches missed.">    } else if (!in.readString().equals(localPostingsFormatName)) {</span>
-<span class="nc" id="L122">      throw new IOException(</span>
-          &quot;delegate codec &quot; + name + &quot; doesn't equal &quot; + localPostingsFormatName);
+<span class="fc" id="L116">    String localPostingsFormatName = postingsFormatName;</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (localPostingsFormatName == null) {</span>
+<span class="fc" id="L118">      localPostingsFormatName = in.readString();</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    } else if (!in.readString().equals(localPostingsFormatName)) {</span>
+<span class="nc" id="L120">      throw new IOException(&quot;delegate codec &quot; + name + &quot; doesn't equal &quot;</span>
+          + localPostingsFormatName);
     }
-<span class="fc" id="L125">    indexInputList.put(name, in);</span>
-<span class="fc" id="L126">    indexInputOffsetList.put(name, in.getFilePointer());</span>
-<span class="fc" id="L127">    return localPostingsFormatName;</span>
+<span class="fc" id="L123">    indexInputList.put(name, in);</span>
+<span class="fc" id="L124">    indexInputOffsetList.put(name, in.getFilePointer());</span>
+<span class="fc" id="L125">    return localPostingsFormatName;</span>
   }
 
   /*
@@ -134,7 +132,7 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public Iterator&lt;String&gt; iterator() {
-<span class="nc" id="L137">    return delegateFieldsProducer.iterator();</span>
+<span class="nc" id="L135">    return delegateFieldsProducer.iterator();</span>
   }
 
   /*
@@ -144,11 +142,11 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public void close() throws IOException {
-<span class="fc" id="L147">    delegateFieldsProducer.close();</span>
-<span class="fc bfc" id="L148" title="All 2 branches covered.">    for (Entry&lt;String, IndexInput&gt; entry : indexInputList.entrySet()) {</span>
-<span class="fc" id="L149">      entry.getValue().close();</span>
-<span class="fc" id="L150">    }</span>
-<span class="fc" id="L151">  }</span>
+<span class="fc" id="L145">    delegateFieldsProducer.close();</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    for (Entry&lt;String, IndexInput&gt; entry : indexInputList.entrySet()) {</span>
+<span class="fc" id="L147">      entry.getValue().close();</span>
+<span class="fc" id="L148">    }</span>
+<span class="fc" id="L149">  }</span>
 
   /*
    * (non-Javadoc)
@@ -157,7 +155,7 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public Terms terms(String field) throws IOException {
-<span class="fc" id="L160">    return new MtasTerms(delegateFieldsProducer.terms(field), indexInputList,</span>
+<span class="fc" id="L158">    return new MtasTerms(delegateFieldsProducer.terms(field), indexInputList,</span>
         indexInputOffsetList, version);
   }
 
@@ -168,7 +166,7 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public int size() {
-<span class="nc" id="L171">    return delegateFieldsProducer.size();</span>
+<span class="nc" id="L169">    return delegateFieldsProducer.size();</span>
   }
 
   /*
@@ -179,7 +177,7 @@ public class MtasFieldsProducer extends FieldsProducer {
   @Override
   public long ramBytesUsed() {
     // return BASE_RAM_BYTES_USED + delegateFieldsProducer.ramBytesUsed();
-<span class="nc" id="L182">    return 3 * delegateFieldsProducer.ramBytesUsed();</span>
+<span class="nc" id="L180">    return 3 * delegateFieldsProducer.ramBytesUsed();</span>
   }
 
   /*
@@ -189,12 +187,12 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public Collection&lt;Accountable&gt; getChildResources() {
-<span class="nc" id="L192">    List&lt;Accountable&gt; resources = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L193" title="All 2 branches missed.">    if (delegateFieldsProducer != null) {</span>
-<span class="nc" id="L194">      resources.add(</span>
-<span class="nc" id="L195">          Accountables.namedAccountable(&quot;delegate&quot;, delegateFieldsProducer));</span>
+<span class="nc" id="L190">    List&lt;Accountable&gt; resources = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">    if (delegateFieldsProducer != null) {</span>
+<span class="nc" id="L192">      resources.add(</span>
+<span class="nc" id="L193">          Accountables.namedAccountable(&quot;delegate&quot;, delegateFieldsProducer));</span>
     }
-<span class="nc" id="L197">    return Collections.unmodifiableList(resources);</span>
+<span class="nc" id="L195">    return Collections.unmodifiableList(resources);</span>
   }
 
   /*
@@ -204,8 +202,8 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public void checkIntegrity() throws IOException {
-<span class="nc" id="L207">    delegateFieldsProducer.checkIntegrity();</span>
-<span class="nc" id="L208">  }</span>
+<span class="nc" id="L205">    delegateFieldsProducer.checkIntegrity();</span>
+<span class="nc" id="L206">  }</span>
 
   /*
    * (non-Javadoc)
@@ -214,7 +212,7 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   @Override
   public String toString() {
-<span class="nc" id="L217">    return getClass().getSimpleName() + &quot;(delegate=&quot; + delegateFieldsProducer</span>
+<span class="nc" id="L215">    return getClass().getSimpleName() + &quot;(delegate=&quot; + delegateFieldsProducer</span>
         + &quot;)&quot;;
   }
 
@@ -231,24 +229,24 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension, Integer minimum, Integer maximum) throws IOException {
-<span class="fc" id="L234">    String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
+<span class="fc" id="L232">    String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,</span>
         state.segmentSuffix, extension);
     IndexInput object;
-<span class="fc" id="L237">    object = state.directory.openInput(fileName, state.context);</span>
-<span class="fc bfc" id="L238" title="All 2 branches covered.">    int minVersion = (minimum == null) ? MtasCodecPostingsFormat.VERSION_START</span>
-<span class="fc" id="L239">        : minimum.intValue();</span>
-<span class="fc bfc" id="L240" title="All 2 branches covered.">    int maxVersion = (maximum == null) ? MtasCodecPostingsFormat.VERSION_CURRENT</span>
-<span class="fc" id="L241">        : maximum.intValue();</span>
+<span class="fc" id="L235">    object = state.directory.openInput(fileName, state.context);</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">    int minVersion = (minimum == null) ? MtasCodecPostingsFormat.VERSION_START</span>
+<span class="fc" id="L237">        : minimum.intValue();</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">    int maxVersion = (maximum == null) ? MtasCodecPostingsFormat.VERSION_CURRENT</span>
+<span class="fc" id="L239">        : maximum.intValue();</span>
     try {
-<span class="fc" id="L243">      CodecUtil.checkIndexHeader(object, name, minVersion, maxVersion,</span>
-<span class="fc" id="L244">          state.segmentInfo.getId(), state.segmentSuffix);</span>
-<span class="nc" id="L245">    } catch (IndexFormatTooOldException e) {</span>
-<span class="nc" id="L246">      object.close();</span>
-<span class="nc" id="L247">      log.debug(e);</span>
-<span class="nc" id="L248">      throw new IndexFormatTooOldException(e.getMessage(), e.getVersion(),</span>
-<span class="nc" id="L249">          e.getMinVersion(), e.getMaxVersion());</span>
-<span class="fc" id="L250">    }</span>
-<span class="fc" id="L251">    return object;</span>
+<span class="fc" id="L241">      CodecUtil.checkIndexHeader(object, name, minVersion, maxVersion,</span>
+<span class="fc" id="L242">          state.segmentInfo.getId(), state.segmentSuffix);</span>
+<span class="nc" id="L243">    } catch (IndexFormatTooOldException e) {</span>
+<span class="nc" id="L244">      object.close();</span>
+<span class="nc" id="L245">      log.debug(e);</span>
+<span class="nc" id="L246">      throw new IndexFormatTooOldException(e.getMessage(), e.getVersion(),</span>
+<span class="nc" id="L247">          e.getMinVersion(), e.getMaxVersion());</span>
+<span class="fc" id="L248">    }</span>
+<span class="fc" id="L249">    return object;</span>
   }
 
   /**
@@ -262,7 +260,7 @@ public class MtasFieldsProducer extends FieldsProducer {
    */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension) throws IOException {
-<span class="fc" id="L265">    return openMtasFile(state, name, extension, null, null);</span>
+<span class="fc" id="L263">    return openMtasFile(state, name, extension, null, null);</span>
   }
 
 }

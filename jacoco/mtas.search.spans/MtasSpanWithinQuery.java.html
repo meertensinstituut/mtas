@@ -7,7 +7,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.SpanWithinQuery;
-import mtas.search.spans.util.MtasSpanMaximumExpandQuery;
+import mtas.search.spans.util.MtasMaximumExpandSpanQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -91,7 +91,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     }
 <span class="pc bpc" id="L92" title="1 of 2 branches missed.">    if (field != null) {</span>
 <span class="fc" id="L93">      baseQuery = new SpanWithinQuery(</span>
-          new MtasSpanMaximumExpandQuery(bigQuery, leftBoundaryMinimum,
+          new MtasMaximumExpandSpanQuery(bigQuery, leftBoundaryMinimum,
               leftBoundaryMaximum, rightBoundaryMinimum, rightBoundaryMaximum),
           smallQuery);
     } else {
@@ -152,7 +152,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
 <span class="fc" id="L152">        MtasSpanSequenceQuery sequenceQuery = (MtasSpanSequenceQuery) newBigQuery;</span>
 <span class="pc bpc" id="L153" title="1 of 2 branches missed.">        if (sequenceQuery.getIgnoreQuery() == null) {</span>
 <span class="fc" id="L154">          List&lt;MtasSpanSequenceItem&gt; items = sequenceQuery.getItems();</span>
-<span class="fc" id="L155">          List&lt;MtasSpanSequenceItem&gt; newItems = new ArrayList&lt;MtasSpanSequenceItem&gt;();</span>
+<span class="fc" id="L155">          List&lt;MtasSpanSequenceItem&gt; newItems = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L156">          int newLeftBoundaryMinimum = 0;</span>
 <span class="fc" id="L157">          int newLeftBoundaryMaximum = 0;</span>
 <span class="fc" id="L158">          int newRightBoundaryMinimum = 0;</span>

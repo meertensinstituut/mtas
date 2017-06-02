@@ -12,13 +12,9 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.util.Attribute;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.AttributeSource.State;
-import org.apache.solr.schema.SchemaField;
-import org.apache.solr.schema.PreAnalyzedField;
 import org.apache.solr.schema.PreAnalyzedField.ParseResult;
 import org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser;
 import mtas.solr.update.processor.MtasUpdateRequestProcessorResultItem;
@@ -27,10 +23,10 @@ import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
 /**
  * The Class MtasPreAnalyzedParser.
  */
-<span class="fc" id="L30">public class MtasPreAnalyzedParser implements PreAnalyzedParser {</span>
+<span class="fc" id="L26">public class MtasPreAnalyzedParser implements PreAnalyzedParser {</span>
 
   /** The log. */
-<span class="fc" id="L33">  private static Log log = LogFactory.getLog(MtasPreAnalyzedParser.class);</span>
+<span class="fc" id="L29">  private static Log log = LogFactory.getLog(MtasPreAnalyzedParser.class);</span>
 
   /*
    * (non-Javadoc)
@@ -42,66 +38,65 @@ import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
   @Override
   public ParseResult parse(Reader reader, AttributeSource parent)
       throws IOException {
-<span class="fc" id="L45">    ParseResult res = new ParseResult();   </span>
-    
+<span class="fc" id="L41">    ParseResult res = new ParseResult();</span>
+
     // get MtasUpdateRequestProcessorResult
-<span class="fc" id="L48">    StringBuilder sb = new StringBuilder();</span>
-<span class="fc" id="L49">    char[] buf = new char[128];</span>
+<span class="fc" id="L44">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L45">    char[] buf = new char[128];</span>
     int cnt;
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    while ((cnt = reader.read(buf)) &gt; 0) {</span>
-<span class="fc" id="L52">      sb.append(buf, 0, cnt);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    while ((cnt = reader.read(buf)) &gt; 0) {</span>
+<span class="fc" id="L48">      sb.append(buf, 0, cnt);</span>
     }
     Iterator&lt;MtasUpdateRequestProcessorResultItem&gt; iterator;
-    
-    try {
-<span class="fc" id="L57">      MtasUpdateRequestProcessorResultReader result = new MtasUpdateRequestProcessorResultReader(</span>
-<span class="fc" id="L58">          sb.toString());</span>
-<span class="fc" id="L59">      iterator = result.getIterator();</span>
-<span class="pc bpc" id="L60" title="2 of 4 branches missed.">      if (iterator != null &amp;&amp; iterator.hasNext()) {</span>
-<span class="fc" id="L61">        res.str = result.getStoredStringValue();</span>
-<span class="fc" id="L62">        res.bin = result.getStoredBinValue();      </span>
-      } else {
-<span class="nc" id="L64">        res.str = null;</span>
-<span class="nc" id="L65">        res.bin = null;</span>
-<span class="nc" id="L66">        result.close();</span>
-<span class="nc" id="L67">        return res;</span>
-      }
 
-<span class="fc" id="L70">      parent.clearAttributes();</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">      while (iterator.hasNext()) {</span>
-<span class="fc" id="L72">        MtasUpdateRequestProcessorResultItem item = iterator.next();</span>
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (item.tokenTerm != null) {</span>
-<span class="fc" id="L74">          CharTermAttribute catt = parent.addAttribute(CharTermAttribute.class);</span>
-<span class="fc" id="L75">          catt.append(item.tokenTerm);</span>
+<span class="pc" id="L52">    try (</span>
+<span class="fc" id="L53">        MtasUpdateRequestProcessorResultReader result = new MtasUpdateRequestProcessorResultReader(</span>
+<span class="fc" id="L54">            sb.toString());) {</span>
+<span class="fc" id="L55">      iterator = result.getIterator();</span>
+<span class="pc bpc" id="L56" title="2 of 4 branches missed.">      if (iterator != null &amp;&amp; iterator.hasNext()) {</span>
+<span class="fc" id="L57">        res.str = result.getStoredStringValue();</span>
+<span class="fc" id="L58">        res.bin = result.getStoredBinValue();</span>
+      } else {
+<span class="nc" id="L60">        res.str = null;</span>
+<span class="nc" id="L61">        res.bin = null;</span>
+<span class="nc" id="L62">        result.close();</span>
+<span class="nc" id="L63">        return res;</span>
+      }
+<span class="fc" id="L65">      parent.clearAttributes();</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">      while (iterator.hasNext()) {</span>
+<span class="fc" id="L67">        MtasUpdateRequestProcessorResultItem item = iterator.next();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if (item.tokenTerm != null) {</span>
+<span class="fc" id="L69">          CharTermAttribute catt = parent.addAttribute(CharTermAttribute.class);</span>
+<span class="fc" id="L70">          catt.append(item.tokenTerm);</span>
         }
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (item.tokenFlags != null) {</span>
-<span class="nc" id="L78">          FlagsAttribute flags = parent.addAttribute(FlagsAttribute.class);</span>
-<span class="nc" id="L79">          flags.setFlags(item.tokenFlags);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (item.tokenFlags != null) {</span>
+<span class="nc" id="L73">          FlagsAttribute flags = parent.addAttribute(FlagsAttribute.class);</span>
+<span class="nc" id="L74">          flags.setFlags(item.tokenFlags);</span>
         }
-<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (item.tokenPosIncr != null) {</span>
-<span class="fc" id="L82">          PositionIncrementAttribute patt = parent</span>
-<span class="fc" id="L83">              .addAttribute(PositionIncrementAttribute.class);</span>
-<span class="fc" id="L84">          patt.setPositionIncrement(item.tokenPosIncr);</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (item.tokenPosIncr != null) {</span>
+<span class="fc" id="L77">          PositionIncrementAttribute patt = parent</span>
+<span class="fc" id="L78">              .addAttribute(PositionIncrementAttribute.class);</span>
+<span class="fc" id="L79">          patt.setPositionIncrement(item.tokenPosIncr);</span>
         }
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        if (item.tokenPayload != null) {</span>
-<span class="fc" id="L87">          PayloadAttribute p = parent.addAttribute(PayloadAttribute.class);</span>
-<span class="fc" id="L88">          p.setPayload(new BytesRef(item.tokenPayload));</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (item.tokenPayload != null) {</span>
+<span class="fc" id="L82">          PayloadAttribute p = parent.addAttribute(PayloadAttribute.class);</span>
+<span class="fc" id="L83">          p.setPayload(new BytesRef(item.tokenPayload));</span>
         }
-<span class="pc bpc" id="L90" title="2 of 4 branches missed.">        if (item.tokenOffsetStart != null &amp;&amp; item.tokenOffsetEnd != null) {</span>
-<span class="fc" id="L91">          OffsetAttribute offset = parent.addAttribute(OffsetAttribute.class);</span>
-<span class="fc" id="L92">          offset.setOffset(item.tokenOffsetStart, item.tokenOffsetEnd);</span>
+<span class="pc bpc" id="L85" title="2 of 4 branches missed.">        if (item.tokenOffsetStart != null &amp;&amp; item.tokenOffsetEnd != null) {</span>
+<span class="fc" id="L86">          OffsetAttribute offset = parent.addAttribute(OffsetAttribute.class);</span>
+<span class="fc" id="L87">          offset.setOffset(item.tokenOffsetStart, item.tokenOffsetEnd);</span>
         }
         // capture state and add to result
-<span class="fc" id="L95">        State state = parent.captureState();</span>
-<span class="fc" id="L96">        res.states.add(state.clone());       </span>
+<span class="fc" id="L90">        State state = parent.captureState();</span>
+<span class="fc" id="L91">        res.states.add(state.clone());</span>
         // reset for reuse
-<span class="fc" id="L98">        parent.clearAttributes();</span>
-<span class="fc" id="L99">      }</span>
-<span class="nc" id="L100">    } catch (IOException e) {</span>
-      //ignore
-<span class="nc" id="L102">      log.debug(e);           </span>
-<span class="fc" id="L103">    }</span>
-<span class="fc" id="L104">    return res;</span>
+<span class="fc" id="L93">        parent.clearAttributes();</span>
+<span class="fc" id="L94">      }</span>
+<span class="pc bpc" id="L95" title="10 of 12 branches missed.">    } catch (IOException e) {</span>
+      // ignore
+<span class="nc" id="L97">      log.debug(e);</span>
+<span class="fc" id="L98">    }</span>
+<span class="fc" id="L99">    return res;</span>
   }
 
   /*
@@ -112,11 +107,9 @@ import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
    * (org.apache.lucene.document.Field)
    */
   @Override
-  public String toFormattedString(Field f) throws IOException {    
-<span class="nc" id="L116">    return this.getClass().getName() + &quot; &quot; + f.name();</span>
+  public String toFormattedString(Field f) throws IOException {
+<span class="nc" id="L111">    return this.getClass().getName() + &quot; &quot; + f.name();</span>
   }
-  
-  
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

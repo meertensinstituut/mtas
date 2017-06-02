@@ -11,43 +11,46 @@ import mtas.codec.util.CodecComponent.ComponentJoin;
  * The Class MtasSolrJoinResult.
  */
 public class MtasSolrJoinResult implements Serializable {
-  
+
+  /** The Constant serialVersionUID. */
+  private static final long serialVersionUID = 1L;
+
   /** The values. */
   private Set&lt;String&gt; values;
-  
+
   /** The key. */
   private String key;
-  
+
   /**
    * Instantiates a new mtas solr join result.
    *
    * @param join the join
    */
-<span class="nc" id="L26">  public MtasSolrJoinResult(ComponentJoin join) {</span>
-<span class="nc" id="L27">    values = join.values();</span>
-<span class="nc" id="L28">    key = join.key();</span>
-<span class="nc" id="L29">  }</span>
-  
+<span class="nc" id="L29">  public MtasSolrJoinResult(ComponentJoin join) {</span>
+<span class="nc" id="L30">    values = join.values();</span>
+<span class="nc" id="L31">    key = join.key();</span>
+<span class="nc" id="L32">  }</span>
+
   /**
    * Rewrite.
    *
    * @return the named list
    */
   public NamedList&lt;Object&gt; rewrite() {
-<span class="nc" id="L37">    NamedList&lt;Object&gt; response = new NamedList&lt;&gt;();</span>
-<span class="nc" id="L38">    response.add(&quot;values&quot;, values);</span>
-<span class="nc" id="L39">    response.add(&quot;key&quot;, key);</span>
-<span class="nc" id="L40">    return response;</span>
+<span class="nc" id="L40">    NamedList&lt;Object&gt; response = new NamedList&lt;&gt;();</span>
+<span class="nc" id="L41">    response.add(&quot;values&quot;, values);</span>
+<span class="nc" id="L42">    response.add(&quot;key&quot;, key);</span>
+<span class="nc" id="L43">    return response;</span>
   }
-  
+
   /**
    * Merge.
    *
    * @param newItem the new item
    */
   public void merge(MtasSolrJoinResult newItem) {
-<span class="nc" id="L49">    values.addAll(newItem.values);</span>
-<span class="nc" id="L50">  }</span>
+<span class="nc" id="L52">    values.addAll(newItem.values);</span>
+<span class="nc" id="L53">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

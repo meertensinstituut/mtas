@@ -12,8 +12,9 @@ public class MtasFunctionParserFunctionResponseLong
     extends MtasFunctionParserFunctionResponse {
 
   /** The log. */
-<span class="fc" id="L15">  private static Log log = LogFactory.getLog(MtasFunctionParserFunctionResponseLong.class);</span>
-  
+<span class="fc" id="L15">  private static Log log = LogFactory</span>
+<span class="fc" id="L16">      .getLog(MtasFunctionParserFunctionResponseLong.class);</span>
+
   /** The value. */
   private long value;
 
@@ -24,9 +25,9 @@ public class MtasFunctionParserFunctionResponseLong
    * @param s the s
    */
   public MtasFunctionParserFunctionResponseLong(long l, boolean s) {
-<span class="fc" id="L27">    super(s);</span>
-<span class="fc" id="L28">    value = l;</span>
-<span class="fc" id="L29">  }</span>
+<span class="fc" id="L28">    super(s);</span>
+<span class="fc" id="L29">    value = l;</span>
+<span class="fc" id="L30">  }</span>
 
   /**
    * Gets the value.
@@ -35,10 +36,10 @@ public class MtasFunctionParserFunctionResponseLong
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public long getValue() throws IOException {
-<span class="pc bpc" id="L38" title="1 of 2 branches missed.">    if (defined) {</span>
-<span class="fc" id="L39">      return value;</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">    if (defined) {</span>
+<span class="fc" id="L40">      return value;</span>
     } else {
-<span class="nc" id="L41">      throw new IOException(&quot;undefined&quot;);</span>
+<span class="nc" id="L42">      throw new IOException(&quot;undefined&quot;);</span>
     }
   }
 
@@ -51,33 +52,35 @@ public class MtasFunctionParserFunctionResponseLong
    */
   @Override
   public boolean equals(Object obj) {
-<span class="pc bpc" id="L54" title="1 of 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L55">      return true;</span>
-<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L57">      return false;</span>
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L59">      return false;</span>
-<span class="fc" id="L60">    MtasFunctionParserFunctionResponseLong other = (MtasFunctionParserFunctionResponseLong) obj;</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L56">      return true;</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L58">      return false;</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L60">      return false;</span>
+<span class="fc" id="L61">    MtasFunctionParserFunctionResponseLong other = (MtasFunctionParserFunctionResponseLong) obj;</span>
     try {
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">      if (value == other.getValue()) {</span>
-<span class="fc" id="L63">        return defined;</span>
-      } else {        
-<span class="nc" id="L65">        return false;</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">      if (value == other.getValue()) {</span>
+<span class="fc" id="L64">        return defined;</span>
+      } else {
+<span class="nc" id="L66">        return false;</span>
       }
-<span class="nc" id="L67">    } catch (IOException e) {</span>
-<span class="nc" id="L68">      log.debug(e);</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">      return !defined;</span>
+<span class="nc" id="L68">    } catch (IOException e) {</span>
+<span class="nc" id="L69">      log.debug(e);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">      return !defined;</span>
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L78">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L79">    h = (int) ((h * 7) ^ value);</span>
-<span class="nc" id="L80">    return h;</span>
+<span class="nc" id="L81">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L82">    h = (int) ((h * 7) ^ value);</span>
+<span class="nc" id="L83">    return h;</span>
   }
 
   /*
@@ -87,7 +90,7 @@ public class MtasFunctionParserFunctionResponseLong
    */
   @Override
   public String toString() {
-<span class="nc bnc" id="L90" title="All 2 branches missed.">    return defined ? &quot;long:&quot; + value : &quot;long:undefined&quot;;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">    return defined ? &quot;long:&quot; + value : &quot;long:undefined&quot;;</span>
   }
 
 }

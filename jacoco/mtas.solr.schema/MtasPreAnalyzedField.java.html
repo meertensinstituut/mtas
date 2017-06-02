@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasPreAnalyzedField.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.schema</a> &gt; <span class="el_source">MtasPreAnalyzedField.java</span></div><h1>MtasPreAnalyzedField.java</h1><pre class="source lang-java linenums">package mtas.solr.schema;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
-import org.apache.lucene.index.IndexableField;
 import org.apache.solr.schema.IndexSchema;
-import org.apache.solr.schema.JsonPreAnalyzedParser;
 import org.apache.solr.schema.PreAnalyzedField;
-import org.apache.solr.schema.SchemaField;
 
 /**
  * The Class MtasPreAnalyzedField.
  */
-<span class="fc" id="L17">public class MtasPreAnalyzedField extends PreAnalyzedField {</span>
+<span class="fc" id="L11">public class MtasPreAnalyzedField extends PreAnalyzedField {</span>
 
   /** The follow index analyzer. */
   private final static String FOLLOW_INDEX_ANALYZER = &quot;followIndexAnalyzer&quot;;
@@ -41,28 +35,28 @@ import org.apache.solr.schema.SchemaField;
   private final static String SET_PREFIX = &quot;setPrefix&quot;;
 
   /** The follow index analyzer. */
-<span class="fc" id="L44">  public String followIndexAnalyzer = null;</span>
+<span class="fc" id="L38">  public String followIndexAnalyzer = null;</span>
 
   /** The default configuration. */
-<span class="fc" id="L47">  public String defaultConfiguration = null;</span>
+<span class="fc" id="L41">  public String defaultConfiguration = null;</span>
 
   /** The configuration from field. */
-<span class="fc" id="L50">  public String configurationFromField = null;</span>
+<span class="fc" id="L44">  public String configurationFromField = null;</span>
 
   /** The set number of tokens. */
-<span class="fc" id="L53">  public String setNumberOfTokens = null;</span>
+<span class="fc" id="L47">  public String setNumberOfTokens = null;</span>
 
   /** The set number of positions. */
-<span class="fc" id="L56">  public String setNumberOfPositions = null;</span>
+<span class="fc" id="L50">  public String setNumberOfPositions = null;</span>
 
   /** The set size. */
-<span class="fc" id="L59">  public String setSize = null;</span>
+<span class="fc" id="L53">  public String setSize = null;</span>
 
   /** The set error. */
-<span class="fc" id="L62">  public String setError = null;</span>
+<span class="fc" id="L56">  public String setError = null;</span>
 
   /** The set prefix. */
-<span class="fc" id="L65">  public String setPrefix = null;</span>
+<span class="fc" id="L59">  public String setPrefix = null;</span>
 
   /*
    * (non-Javadoc)
@@ -72,9 +66,9 @@ import org.apache.solr.schema.SchemaField;
    */
   @Override
   public void init(IndexSchema schema, Map&lt;String, String&gt; args) {
-<span class="fc" id="L75">    args.put(PARSER_IMPL, MtasPreAnalyzedParser.class.getName());</span>
-<span class="fc" id="L76">    super.init(schema, args);</span>
-<span class="fc" id="L77">  }</span>
+<span class="fc" id="L69">    args.put(PARSER_IMPL, MtasPreAnalyzedParser.class.getName());</span>
+<span class="fc" id="L70">    super.init(schema, args);</span>
+<span class="fc" id="L71">  }</span>
 
   /*
    * (non-Javadoc)
@@ -84,28 +78,28 @@ import org.apache.solr.schema.SchemaField;
    */
   @Override
   protected void setArgs(IndexSchema schema, Map&lt;String, String&gt; args) {
-<span class="fc" id="L87">    followIndexAnalyzer = args.get(FOLLOW_INDEX_ANALYZER);</span>
-<span class="fc" id="L88">    defaultConfiguration = args.get(DEFAULT_CONFIGURATION);</span>
-<span class="fc" id="L89">    configurationFromField = args.get(CONFIGURATION_FROM_FIELD);</span>
-<span class="fc" id="L90">    setNumberOfTokens = args.get(SET_NUMBER_OF_TOKENS);</span>
-<span class="fc" id="L91">    setNumberOfPositions = args.get(SET_NUMBER_OF_POSITIONS);</span>
-<span class="fc" id="L92">    setSize = args.get(SET_SIZE);</span>
-<span class="fc" id="L93">    setError = args.get(SET_ERROR);</span>
-<span class="fc" id="L94">    setPrefix = args.get(SET_PREFIX);</span>
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    if (followIndexAnalyzer == null) {</span>
-<span class="nc" id="L96">      throw new RuntimeException(&quot;No &quot; + FOLLOW_INDEX_ANALYZER</span>
-<span class="nc" id="L97">          + &quot; for fieldType &quot; + this.getTypeName());</span>
+<span class="fc" id="L81">    followIndexAnalyzer = args.get(FOLLOW_INDEX_ANALYZER);</span>
+<span class="fc" id="L82">    defaultConfiguration = args.get(DEFAULT_CONFIGURATION);</span>
+<span class="fc" id="L83">    configurationFromField = args.get(CONFIGURATION_FROM_FIELD);</span>
+<span class="fc" id="L84">    setNumberOfTokens = args.get(SET_NUMBER_OF_TOKENS);</span>
+<span class="fc" id="L85">    setNumberOfPositions = args.get(SET_NUMBER_OF_POSITIONS);</span>
+<span class="fc" id="L86">    setSize = args.get(SET_SIZE);</span>
+<span class="fc" id="L87">    setError = args.get(SET_ERROR);</span>
+<span class="fc" id="L88">    setPrefix = args.get(SET_PREFIX);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">    if (followIndexAnalyzer == null) {</span>
+<span class="nc" id="L90">      throw new RuntimeException(&quot;No &quot; + FOLLOW_INDEX_ANALYZER</span>
+<span class="nc" id="L91">          + &quot; for fieldType &quot; + this.getTypeName());</span>
     }
-<span class="fc" id="L99">    args.remove(FOLLOW_INDEX_ANALYZER);</span>
-<span class="fc" id="L100">    args.remove(DEFAULT_CONFIGURATION);</span>
-<span class="fc" id="L101">    args.remove(CONFIGURATION_FROM_FIELD);</span>
-<span class="fc" id="L102">    args.remove(SET_NUMBER_OF_TOKENS);</span>
-<span class="fc" id="L103">    args.remove(SET_NUMBER_OF_POSITIONS);</span>
-<span class="fc" id="L104">    args.remove(SET_SIZE);</span>
-<span class="fc" id="L105">    args.remove(SET_ERROR);</span>
-<span class="fc" id="L106">    args.remove(SET_PREFIX);</span>
-<span class="fc" id="L107">    super.setArgs(schema, args);</span>
-<span class="fc" id="L108">  }</span>
+<span class="fc" id="L93">    args.remove(FOLLOW_INDEX_ANALYZER);</span>
+<span class="fc" id="L94">    args.remove(DEFAULT_CONFIGURATION);</span>
+<span class="fc" id="L95">    args.remove(CONFIGURATION_FROM_FIELD);</span>
+<span class="fc" id="L96">    args.remove(SET_NUMBER_OF_TOKENS);</span>
+<span class="fc" id="L97">    args.remove(SET_NUMBER_OF_POSITIONS);</span>
+<span class="fc" id="L98">    args.remove(SET_SIZE);</span>
+<span class="fc" id="L99">    args.remove(SET_ERROR);</span>
+<span class="fc" id="L100">    args.remove(SET_PREFIX);</span>
+<span class="fc" id="L101">    super.setArgs(schema, args);</span>
+<span class="fc" id="L102">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
