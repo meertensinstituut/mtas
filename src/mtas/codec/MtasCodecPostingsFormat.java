@@ -2,7 +2,6 @@ package mtas.codec;
 
 import java.io.IOException;
 
-import mtas.analysis.MtasTokenizer;
 import mtas.analysis.token.MtasTokenString;
 
 import org.apache.commons.logging.Log;
@@ -22,7 +21,8 @@ import org.apache.lucene.util.BytesRef;
 public class MtasCodecPostingsFormat extends PostingsFormat {
 
   /** The Constant log. */
-  private static final Log log = LogFactory.getLog(MtasCodecPostingsFormat.class);
+  private static final Log log = LogFactory
+      .getLog(MtasCodecPostingsFormat.class);
 
   /** The Constant VERSION_START. */
   public static final int VERSION_START = 3;

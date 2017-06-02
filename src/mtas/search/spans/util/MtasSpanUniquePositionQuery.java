@@ -117,7 +117,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     SpanWeight subWeight = clause.createWeight(searcher, false);
     return new SpanUniquePositionWeight(subWeight, searcher,
@@ -127,7 +127,7 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
   /**
    * The Class SpanUniquePositionWeight.
    */
-  public class SpanUniquePositionWeight extends SpanWeight {
+  public class SpanUniquePositionWeight extends MtasSpanWeight {
 
     /** The sub weight. */
     final SpanWeight subWeight;
@@ -168,13 +168,13 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
       Spans subSpan = subWeight.getSpans(context, requiredPostings);
       if (subSpan == null) {
         return null;
       } else {
-        return new MtasSpanUniquePosition(subSpan);
+        return new MtasSpanUniquePositionSpans(subSpan);
       }
     }
 

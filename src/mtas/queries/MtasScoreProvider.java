@@ -17,7 +17,6 @@ public class MtasScoreProvider extends CustomScoreProvider {
    */
   public MtasScoreProvider(LeafReaderContext context) {
     super(context);
-
   }
 
   /*
@@ -28,9 +27,7 @@ public class MtasScoreProvider extends CustomScoreProvider {
    */
   @Override
   public float customScore(int doc, float subQueryScore, float valSrcScore) {
-    System.out.println("* Init MTAS scorerprovider doc " + doc + " - "
-        + subQueryScore + " - " + valSrcScore);
-    return (float) 3.0;
+    return (float) 0.0;
   }
 
   /*
@@ -40,16 +37,9 @@ public class MtasScoreProvider extends CustomScoreProvider {
    * float[])
    */
   @Override
-  public float customScore(int doc, float subQueryScore, float valSrcScores[])
+  public float customScore(int doc, float subQueryScore, float[] valSrcScores)
       throws IOException {
-    System.out.print("** Init MTAS scorerprovider doc " + doc + " - "
-        + subQueryScore + " - ");
-    System.out.print(valSrcScores.length + ":");
-    for (int i = 0; i < valSrcScores.length; i++) {
-      System.out.print(valSrcScores[i] + ",");
-    }
-    System.out.println(" voor veld ");
-    return (float) 4.0;
+    return (float) 0.0;
   }
 
 }

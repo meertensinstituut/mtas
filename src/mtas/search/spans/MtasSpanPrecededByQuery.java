@@ -17,6 +17,8 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanPrecededByQuery.
@@ -28,7 +30,7 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
 
   /** The q 1. */
   private SpanQuery q1;
-  
+
   /** The q 2. */
   private SpanQuery q2;
 
@@ -64,11 +66,15 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     return field;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.
+   * IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     if (q1 == null || q2 == null) {
       return null;
@@ -102,7 +108,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     return getTermContexts(weights);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#toString(java.lang.String)
    */
   @Override
@@ -124,7 +132,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
@@ -139,7 +149,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     return q1.equals(other.q1) && q2.equals(other.q2);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
@@ -151,8 +163,11 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     return h;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -171,11 +186,11 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
   /**
    * The Class SpanPrecededByWeight.
    */
-  protected class SpanPrecededByWeight extends SpanWeight {
+  protected class SpanPrecededByWeight extends MtasSpanWeight {
 
     /** The w 1. */
     MtasSpanPrecededByQueryWeight w1;
-    
+
     /** The w 2. */
     MtasSpanPrecededByQueryWeight w2;
 
@@ -218,7 +233,7 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
       Terms terms = context.reader().terms(field);
       if (terms == null) {
@@ -228,7 +243,7 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanPrecededByQuerySpans s2 = new MtasSpanPrecededByQuerySpans(
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanPrecededBySpans(MtasSpanPrecededByQuery.this, s1, s2);
+      return new MtasSpanPrecededBySpans(s1, s2);
     }
 
     /*
@@ -258,7 +273,7 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      * @param spans the spans
      */
     public MtasSpanPrecededByQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
     }
 
   }

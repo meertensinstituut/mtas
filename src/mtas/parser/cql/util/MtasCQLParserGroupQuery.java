@@ -68,7 +68,7 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
   public MtasCQLParserGroupQuery(String field, String prefix, String value,
       String type) {
     super(null, null);
-    if (value == null || value.trim().equals("")) {
+    if (value == null || value.trim().isEmpty()) {
       term = new Term(field, prefix + MtasToken.DELIMITER);
       query = new MtasSpanPrefixQuery(term, false);
     } else if (type == null) {

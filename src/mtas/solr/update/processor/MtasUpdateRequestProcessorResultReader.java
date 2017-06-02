@@ -22,7 +22,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
   /** The stored string value. */
   private String storedStringValue;
-
+ 
   /** The file input stream. */
   private FileInputStream fileInputStream;
 
@@ -153,7 +153,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    * @return the stored bin value
    */
   public byte[] getStoredBinValue() {    
-    return null;
+    return new byte[0];
   }
 
   /**

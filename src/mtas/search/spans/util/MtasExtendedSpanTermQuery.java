@@ -8,7 +8,6 @@ import java.util.Set;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecUtil;
 import org.apache.lucene.index.FieldInfo;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
@@ -19,7 +18,6 @@ import org.apache.lucene.index.TermState;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.spans.FilterSpans;
 import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
@@ -70,7 +68,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
   public MtasExtendedSpanTermQuery(SpanTermQuery query,
       boolean singlePosition) {
     super(query.getTerm());
-    localTerm = query.getTerm();    
+    localTerm = query.getTerm();
     this.singlePosition = singlePosition;
     int i = localTerm.text().indexOf(MtasToken.DELIMITER);
     if (i >= 0) {
@@ -103,12 +101,14 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     return new SpanTermWeight(context, searcher,
         needsScores ? Collections.singletonMap(localTerm, context) : null);
   }
-  
-  
+
   /**
    * The Class SpanTermWeight.
    */
   public class SpanTermWeight extends SpanWeight {
+
+    /** The Constant METHOD_GET_DELEGATE. */
+    private static final String METHOD_GET_DELEGATE = "getDelegate";
 
     /** The term context. */
     final TermContext termContext;
@@ -172,7 +172,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       final Terms terms = context.reader().terms(localTerm.field());
       if (terms == null) {
         return null;
-      }  
+      }
       if (!terms.hasPositions())
         throw new IllegalStateException("field \"" + localTerm.field()
             + "\" was indexed without position data; cannot run SpanTermQuery (term="
@@ -194,7 +194,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
           hasMethod = false;
           Method[] methods = r.getClass().getMethods();
           for (Method m : methods) {
-            if (m.getName().equals("getDelegate")) {
+            if (m.getName().equals(METHOD_GET_DELEGATE)) {
               hasMethod = true;
               r = (LeafReader) m.invoke(r, (Object[]) null);
               break;
@@ -213,23 +213,21 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
               .atLeast(Postings.PAYLOADS).getRequiredPostings());
           matchSpans = new MtasExtendedTermSpans(postings, localTerm, false);
         }
-        if(singlePosition) {
+        if (singlePosition) {
           return new FilterSpans(matchSpans) {
             @Override
-            protected AcceptStatus accept(Spans candidate)
-                throws IOException {
+            protected AcceptStatus accept(Spans candidate) throws IOException {
               assert candidate.startPosition() != candidate.endPosition();
-              if((candidate.endPosition()
-                  - candidate.startPosition()) == 1) {
+              if ((candidate.endPosition() - candidate.startPosition()) == 1) {
                 return AcceptStatus.YES;
               } else {
                 return AcceptStatus.NO;
-              }                           
+              }
             }
           };
         } else {
           return matchSpans;
-        }        
+        }
       } catch (Exception e) {
         // e.printStackTrace();
         throw new IOException("Can't get reader: " + e.getMessage(), e);
@@ -271,18 +269,21 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
     if (getClass() != obj.getClass())
       return false;
     MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;
-    return other.localTerm.equals(localTerm) && (other.singlePosition == singlePosition);
+    return other.localTerm.equals(localTerm)
+        && (other.singlePosition == singlePosition);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanTermQuery#hashCode()
    */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 5) ^ localTerm.hashCode();
-    if(singlePosition) {
-      h+=1;
+    if (singlePosition) {
+      h += 1;
     }
     return h;
   }

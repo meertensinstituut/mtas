@@ -49,8 +49,12 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
     } else {
       field = null;
     }
-    if (field != null) {
-      baseQuery = new SpanContainingQuery(bigQuery, smallQuery);
+    if (field != null && bigQuery!=null && smallQuery!=null) {
+      if(bigQuery.getField() != null && smallQuery.getField() != null) {
+        baseQuery = new SpanContainingQuery(bigQuery, smallQuery);
+      } else {
+        baseQuery = null;
+      }
     } else {
       baseQuery = null;
     }
@@ -86,7 +90,14 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-    return baseQuery.toString(field);
+    StringBuilder buffer = new StringBuilder();
+    buffer.append(this.getClass().getSimpleName());
+    buffer.append("(");
+    buffer.append(bigQuery!=null?bigQuery.toString(field):"null");
+    buffer.append(", ");
+    buffer.append(smallQuery!=null?smallQuery.toString(field):"null");
+    buffer.append(")");
+    return buffer.toString();
   }
 
   /*
@@ -104,13 +115,14 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
         || newSmallQuery instanceof MtasSpanMatchNoneQuery) {
       return new MtasSpanMatchNoneQuery(field);
     }
-
     if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {
       return new MtasSpanContainingQuery(newBigQuery, newSmallQuery)
           .rewrite(reader);
     } else if (newBigQuery.equals(newSmallQuery)) {
       return newBigQuery;
-    } else {
+    } else if (baseQuery==null) {
+      return new MtasSpanMatchNoneQuery(field);
+    } else {  
       baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);
       return super.rewrite(reader);
     }

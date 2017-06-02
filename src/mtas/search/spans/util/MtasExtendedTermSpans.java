@@ -6,6 +6,8 @@ import java.util.Collection;
 import mtas.analysis.token.MtasPosition;
 import mtas.codec.payload.MtasPayloadDecoder;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.payloads.PayloadSpanCollector;
@@ -14,7 +16,10 @@ import org.apache.lucene.search.spans.TermSpans;
 /**
  * The Class MtasExtendedTermSpans.
  */
-public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
+public class MtasExtendedTermSpans extends TermSpans {
+
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasExtendedTermSpans.class);
 
   /** The mtas position. */
   protected MtasPosition mtasPosition = null;
@@ -48,11 +53,6 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
     payloadSpanCollector = new PayloadSpanCollector();
     this.assumeSinglePosition = assumeSinglePosition;
   }
-  
-  @Override
-  public int startPosition() {
-    return super.startPosition();
-  }
 
   /*
    * (non-Javadoc)
@@ -65,14 +65,13 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
       return super.endPosition();
     } else {
       int status = super.endPosition();
-      if(status>=0) {
+      if (status >= 0) {
         try {
           processEncodedPayload();
-          int end = (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)
-              : NO_MORE_POSITIONS;
           return (status != NO_MORE_POSITIONS) ? (mtasPosition.getEnd() + 1)
               : NO_MORE_POSITIONS;
         } catch (IOException e) {
+          log.debug(e);
           return NO_MORE_POSITIONS;
         }
       } else {
@@ -100,6 +99,7 @@ public class MtasExtendedTermSpans extends TermSpans implements MtasSpans {
           return mtasPosition.getPositions();
         }
       } catch (IOException e) {
+        log.debug(e);
         // do nothing
       }
       int start = super.startPosition();

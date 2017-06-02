@@ -237,7 +237,7 @@ public class CodecComponent {
      *          the prefix
      */
     public void addMultiplePosition(String prefix) {
-      if (!prefix.trim().equals("")) {
+      if (!prefix.trim().isEmpty()) {
         if (!singlePositionList.contains(prefix)) {
           if (!multiplePositionList.contains(prefix)) {
             multiplePositionList.add(prefix);
@@ -256,7 +256,7 @@ public class CodecComponent {
      *          the prefix
      */
     public void addSetPosition(String prefix) {
-      if (!prefix.trim().equals("")) {
+      if (!prefix.trim().isEmpty()) {
         if (!singlePositionList.contains(prefix)) {
           if (!setPositionList.contains(prefix)) {
             setPositionList.add(prefix);
@@ -275,7 +275,7 @@ public class CodecComponent {
      *          the prefix
      */
     public void addIntersecting(String prefix) {
-      if (!prefix.trim().equals("")) {
+      if (!prefix.trim().isEmpty()) {
         intersectingList.add(prefix);
       }
     }
@@ -376,7 +376,7 @@ public class CodecComponent {
       this.prefix = prefix;
       this.regexp = regexp;
       if (list != null && list.length > 0) {
-        this.list = new HashSet(Arrays.asList(list));
+        this.list = new HashSet<>(Arrays.asList(list));
         this.listRegexp = listRegexp != null ? listRegexp : false;
         this.listExpand = (listExpand != null && listExpandNumber > 0)
             ? listExpand : false;
@@ -393,7 +393,7 @@ public class CodecComponent {
       }
       this.ignoreRegexp = ignoreRegexp;
       if (ignoreList != null && ignoreList.length > 0) {
-        this.ignoreList = new HashSet(Arrays.asList(ignoreList));
+        this.ignoreList = new HashSet<>(Arrays.asList(ignoreList));
         this.ignoreListRegexp = ignoreListRegexp != null ? ignoreListRegexp
             : false;
       } else {
@@ -910,7 +910,7 @@ public class CodecComponent {
           tmpList = prefixes[i].split(",");
           tmpPrefixList = new ArrayList<>();
           for (String tmpItem : tmpList) {
-            if (!tmpItem.trim().equals("")) {
+            if (!tmpItem.trim().isEmpty()) {
               tmpPrefixList.add(tmpItem.trim());
             }
           }
@@ -2718,8 +2718,8 @@ public class CodecComponent {
      */
     private static Map<Integer, Map<String, String>[]> keyToSubObject(
         String key, StringBuilder newKey) {
-      Map<Integer, Map<String, String>[]> result = new HashMap();
-      if (key == null || key.trim().equals("")) {
+      Map<Integer, Map<String, String>[]> result = new HashMap<>();
+      if (key == null || key.trim().isEmpty()) {
         return null;
       } else {
         String[] parts = key.split(Pattern.quote(","), -1);

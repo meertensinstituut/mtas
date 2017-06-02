@@ -52,70 +52,70 @@ abstract class MtasXMLParser extends MtasBasicParser {
   protected boolean allowNonContent = false;
 
   /** The relation key map. */
-  private Map<String, SortedSet<String>> relationKeyMap = new HashMap<String, SortedSet<String>>();
+  private Map<String, SortedSet<String>> relationKeyMap = new HashMap<>();
 
   /** The q names. */
-  private Map<String, QName> qNames = new HashMap<String, QName>();
+  private Map<String, QName> qNames = new HashMap<>();
 
   /** The relation types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> relationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> relationTypes = new HashMap<>();
 
   /** The relation annotation types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> relationAnnotationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> relationAnnotationTypes = new HashMap<>();
 
   /** The ref types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> refTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> refTypes = new HashMap<>();
 
   /** The group types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<>();
 
   /** The group annotation types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> groupAnnotationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> groupAnnotationTypes = new HashMap<>();
 
   /** The word types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> wordTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> wordTypes = new HashMap<>();
 
   /** The word annotation types. */
-  private Map<QName, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<QName, MtasParserType<MtasParserMapping<?>>>();
+  private Map<QName, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<>();
 
   /** The variable types. */
-  private Map<QName, MtasParserType<MtasParserVariable>> variableTypes = new HashMap<QName, MtasParserType<MtasParserVariable>>();
+  private Map<QName, MtasParserType<MtasParserVariable>> variableTypes = new HashMap<>();
 
   /** The xml variables. */
-  private static String XML_VARIABLES = "variables";
+  private static final String XML_VARIABLES = "variables";
 
   /** The xml variable. */
-  private static String XML_VARIABLE = "variable";
+  private static final String XML_VARIABLE = "variable";
 
   /** The xml variable name. */
-  private static String XML_VARIABLE_NAME = "name";
+  private static final String XML_VARIABLE_NAME = "name";
 
   /** The xml variable value. */
-  private static String XML_VARIABLE_VALUE = "value";
+  private static final String XML_VARIABLE_VALUE = "value";
 
   /** The xml references. */
-  private static String XML_REFERENCES = "references";
+  private static final String XML_REFERENCES = "references";
 
   /** The xml reference. */
-  private static String XML_REFERENCE = "reference";
+  private static final String XML_REFERENCE = "reference";
 
   /** The xml reference name. */
-  private static String XML_REFERENCE_NAME = "name";
+  private static final String XML_REFERENCE_NAME = "name";
 
   /** The xml reference ref. */
-  private static String XML_REFERENCE_REF = "ref";
+  private static final String XML_REFERENCE_REF = "ref";
 
   /** The xml mappings. */
-  private static String XML_MAPPINGS = "mappings";
+  private static final String XML_MAPPINGS = "mappings";
 
   /** The xml mapping. */
-  private static String XML_MAPPING = "mapping";
+  private static final String XML_MAPPING = "mapping";
 
   /** The xml mapping type. */
-  private static String XML_MAPPING_TYPE = "type";
+  private static final String XML_MAPPING_TYPE = "type";
 
   /** The xml mapping name. */
-  private static String XML_MAPPING_NAME = "name";
+  private static final String XML_MAPPING_NAME = "name";
 
   /**
    * Instantiates a new mtas XML parser.
@@ -236,7 +236,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                 if (variableTypes.containsKey(qn)) {
                   variableTypes.get(qn).addItem(v);
                 } else {
-                  MtasParserType<MtasParserVariable> t = new MtasParserType<MtasParserVariable>(
+                  MtasParserType<MtasParserVariable> t = new MtasParserType<>(
                       nameVariable, valueVariable, false);
                   t.addItem(v);
                   variableTypes.put(qn, t);
@@ -251,7 +251,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
               String name = reference.attributes.get(XML_REFERENCE_NAME);
               String ref = reference.attributes.get(XML_REFERENCE_REF);
               if ((name != null) && (ref != null)) {
-                MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                     MAPPING_TYPE_REF, name, false, ref);
                 refTypes.put(getQName(t.getName()), t);
               }
@@ -271,7 +271,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   if (relationTypes.containsKey(qn)) {
                     relationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     relationTypes.put(qn, t);
@@ -284,7 +284,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   if (relationAnnotationTypes.containsKey(qn)) {
                     relationAnnotationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     relationAnnotationTypes.put(qn, t);
@@ -296,7 +296,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   if (wordTypes.containsKey(qn)) {
                     wordTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     wordTypes.put(qn, t);
@@ -308,7 +308,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   if (wordAnnotationTypes.containsKey(qn)) {
                     wordAnnotationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     wordAnnotationTypes.put(qn, t);
@@ -320,7 +320,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   if (groupTypes.containsKey(qn)) {
                     groupTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     groupTypes.put(qn, t);
@@ -332,7 +332,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   if (groupAnnotationTypes.containsKey(qn)) {
                     groupAnnotationTypes.get(qn).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     groupAnnotationTypes.put(qn, t);
@@ -517,10 +517,9 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   }
                   // check for word annotation: not within relation, not within
                   // groupAnnotation, but within word
-                } else if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                        .size() == 0)
-                    && (currentList.get(MAPPING_TYPE_WORD).size() > 0)
+                } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+                    && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (tmpCurrentType = wordAnnotationTypes
                         .get(qname)) != null) {
                   currentObject = new MtasParserObject(tmpCurrentType);

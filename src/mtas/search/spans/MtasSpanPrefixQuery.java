@@ -54,7 +54,7 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
   public MtasSpanPrefixQuery(Term term, boolean singlePosition) {
     super(singlePosition?1:null,singlePosition?1:null);    
     PrefixQuery pfq = new PrefixQuery(term);
-    query = new SpanMultiTermQueryWrapper<PrefixQuery>(pfq);
+    query = new SpanMultiTermQueryWrapper<>(pfq);
     this.term = term;
     this.singlePosition = singlePosition;
     int i = term.text().indexOf(MtasToken.DELIMITER);

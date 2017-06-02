@@ -553,13 +553,16 @@ public class MtasSolrComponentTermvector
                 ArrayList<?> tvList = (ArrayList<?>) o;
                 for (int i = 0; i < tmpCounter; i++) {
                   for (int j = 0; j < tvList.size(); j++) {
-                    NamedList item = (NamedList) tvList.get(j);
-                    if (item != null && item.get("key") != null
-                        && item.get("key") instanceof String
-                        && item.get("list") != null
-                        && item.get("list") instanceof ArrayList) {
+                    NamedList<Object> item = (NamedList<Object>) tvList.get(j);
+                    boolean condition;
+                    condition = item != null;
+                    condition &= item.get("key") != null;
+                    condition &= item.get("key") instanceof String;
+                    condition &= item.get("list") != null;
+                    condition &= item.get("list") instanceof ArrayList;                    
+                    if (condition) {
                       String key = (String) item.get("key");
-                      ArrayList list = (ArrayList) item.get("list");
+                      ArrayList<Object> list = (ArrayList<Object>) item.get("list");
                       if (key.equals(keys[i])) {
                         int number;
                         if (numbers[i] != null) {

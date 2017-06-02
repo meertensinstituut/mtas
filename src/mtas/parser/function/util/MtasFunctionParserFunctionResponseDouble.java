@@ -62,7 +62,7 @@ public class MtasFunctionParserFunctionResponseDouble
     try {
       if (value == other.getValue()) {
         return defined;
-      } else {        
+      } else {
         return false;
       }
     } catch (IOException e) {
@@ -71,7 +71,9 @@ public class MtasFunctionParserFunctionResponseDouble
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

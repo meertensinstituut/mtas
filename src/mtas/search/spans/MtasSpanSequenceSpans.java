@@ -4,20 +4,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import mtas.search.spans.MtasSpanSequenceQuery.MtasSpanSequenceQuerySpans;
 import mtas.search.spans.util.MtasIgnoreItem;
 import mtas.search.spans.util.MtasSpans;
-
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanSequenceSpans.
  */
-public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
+public class MtasSpanSequenceSpans extends MtasSpans {
 
   /** The queue spans. */
   private List<QueueItem> queueSpans;
@@ -30,7 +29,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
 
   /** The doc id. */
   private int docId;
-  
+
   /** The current position. */
   private int currentPosition;
 
@@ -387,17 +386,18 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
           for (int j = (i + 1); j < queueSpans.size(); j++) {
 
             // check for available lowestPosition
-            if (!queueSpans.get(j).sequenceSpans.optional && queueSpans.get(j).lowestPosition != null) {
-                minStartPositionNext = (minStartPositionNext == null)
-                    ? queueSpans.get(j).lowestPosition
-                    : Math.min(minStartPositionNext,
-                        queueSpans.get(j).lowestPosition);
-                // computing restrictions not possible
+            if (!queueSpans.get(j).sequenceSpans.optional
+                && queueSpans.get(j).lowestPosition != null) {
+              minStartPositionNext = (minStartPositionNext == null)
+                  ? queueSpans.get(j).lowestPosition
+                  : Math.min(minStartPositionNext,
+                      queueSpans.get(j).lowestPosition);
+              // computing restrictions not possible
             } else {
               if (!queueSpans.get(j).sequenceSpans.optional) {
                 minStartPositionNext = null;
               }
-              break;              
+              break;
             }
           }
           // fill queue
@@ -636,7 +636,7 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
       } else if (!subMatchesOptional && !item.sequenceSpans.optional
           && item.filledPosition) {
         for (Match m : subMatchesQueue) {
-          HashSet<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
+          Set<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
               m.endPosition);
           Integer[] checkList;
           if (ignoreList == null) {
@@ -742,19 +742,19 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
 
     /** The no more docs. */
     private boolean noMoreDocs;
-    
+
     /** The no more positions. */
     private boolean noMorePositions;
-    
+
     /** The filled position. */
     private boolean filledPosition;
 
     /** The lowest position. */
     private Integer lowestPosition;
-    
+
     /** The last filled position. */
     private Integer lastFilledPosition;
-    
+
     /** The last retrieved position. */
     private Integer lastRetrievedPosition;
 
@@ -899,7 +899,9 @@ public class MtasSpanSequenceSpans extends Spans implements MtasSpans {
           && endPosition == that.endPosition;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override

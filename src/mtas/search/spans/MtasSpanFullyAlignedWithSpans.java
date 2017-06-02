@@ -3,15 +3,13 @@ package mtas.search.spans;
 import java.io.IOException;
 import java.util.HashSet;
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.MtasSpanFullyAlignedWithQuery.MtasSpanFullyAlignedWithQuerySpans;
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanFullyAlignedWithSpans.
  */
-public class MtasSpanFullyAlignedWithSpans extends Spans implements MtasSpans {
+public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
 
   /** The spans 1. */
   private MtasSpanFullyAlignedWithQuerySpans spans1;

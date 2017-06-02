@@ -2,8 +2,8 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +16,7 @@ import mtas.search.spans.util.MtasSpans;
 /**
  * The Class MtasSpanRecurrenceSpans.
  */
-public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
+public class MtasSpanRecurrenceSpans extends MtasSpans {
 
   /** The log. */
   private static Log log = LogFactory.getLog(MtasSpanRecurrenceSpans.class);
@@ -294,7 +294,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
       int largestMatchingEndPosition = match.endPosition();
-      HashSet<Integer> list = ignoreItem.getFullEndPositionList(spans.docID(),
+      Set<Integer> list = ignoreItem.getFullEndPositionList(spans.docID(),
           match.endPosition());
       // try to find matches with existing queue
       if (!queueSpans.isEmpty()) {
@@ -346,7 +346,7 @@ public class MtasSpanRecurrenceSpans extends Spans implements MtasSpans {
   private List<Match> expandWithIgnoreItem(int docId, Match match) {
     List<Match> list = new ArrayList<>();
     try {
-      HashSet<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
+      Set<Integer> ignoreList = ignoreItem.getFullEndPositionList(docId,
           match.endPosition);
       if (ignoreList != null) {
         for (Integer endPosition : ignoreList) {

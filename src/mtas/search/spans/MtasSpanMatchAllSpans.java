@@ -5,21 +5,22 @@ import java.io.IOException;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.search.spans.util.MtasSpans;
-
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanMatchAllSpans.
  */
-public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
+public class MtasSpanMatchAllSpans extends MtasSpans {
 
   /** The field. */
   private String field;
 
   /** The doc id. */
-  private int minPosition, maxPosition, currentStartPosition,
-      currentEndPosition, docId;
+  private int minPosition;
+  private int maxPosition;
+  private int currentStartPosition;
+  private int currentEndPosition;
+  private int docId;
 
   /** The mtas codec info. */
   private CodecInfo mtasCodecInfo;
@@ -27,8 +28,10 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span match all spans.
    *
-   * @param mtasCodecInfo the mtas codec info
-   * @param field the field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param field
+   *          the field
    */
   public MtasSpanMatchAllSpans(CodecInfo mtasCodecInfo, String field) {
     super();
@@ -101,7 +104,7 @@ public class MtasSpanMatchAllSpans extends Spans implements MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-
+    // do nothing
   }
 
   /*

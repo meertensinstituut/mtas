@@ -58,7 +58,7 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
   public MtasSpanWildcardQuery(Term term, boolean singlePosition) {
     super(singlePosition?1:null, singlePosition?1:null);
     WildcardQuery wcq = new WildcardQuery(term);
-    query = new SpanMultiTermQueryWrapper<WildcardQuery>(wcq);
+    query = new SpanMultiTermQueryWrapper<>(wcq);
     this.term = term;
     this.singlePosition = singlePosition;
     int i = term.text().indexOf(MtasToken.DELIMITER);

@@ -2,6 +2,7 @@ package mtas.search.spans;
 
 import java.io.IOException;
 
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
@@ -10,7 +11,7 @@ import mtas.search.spans.util.MtasSpans;
 /**
  * The Class MtasSpanStartSpans.
  */
-public class MtasSpanStartSpans extends Spans implements MtasSpans {
+public class MtasSpanStartSpans extends MtasSpans {
 
   /** The spans. */
   Spans spans;
@@ -107,6 +108,15 @@ public class MtasSpanStartSpans extends Spans implements MtasSpans {
   @Override
   public int advance(int target) throws IOException {
     return (spans == null) ? NO_MORE_DOCS : spans.advance(target);
+  }
+  
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if(spans == null) {
+      return null;
+    } else {
+      return spans.asTwoPhaseIterator();     
+    }
   }
 
   /*

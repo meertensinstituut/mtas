@@ -5,21 +5,24 @@ import java.io.IOException;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.search.spans.util.MtasSpans;
-
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanPositionSpans.
  */
-public class MtasSpanPositionSpans extends Spans implements MtasSpans {
+public class MtasSpanPositionSpans extends MtasSpans {
 
   /** The field. */
   private String field;
 
   /** The doc id. */
-  private int start, end, minPosition, maxPosition, currentStartPosition,
-      currentEndPosition, docId;
+  private int start;
+  private int end;
+  private int minPosition;
+  private int maxPosition;
+  private int currentStartPosition;
+  private int currentEndPosition;
+  private int docId;
 
   /** The mtas codec info. */
   private CodecInfo mtasCodecInfo;
@@ -27,10 +30,14 @@ public class MtasSpanPositionSpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span position spans.
    *
-   * @param mtasCodecInfo the mtas codec info
-   * @param field the field
-   * @param start the start
-   * @param end the end
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param field
+   *          the field
+   * @param start
+   *          the start
+   * @param end
+   *          the end
    */
   public MtasSpanPositionSpans(CodecInfo mtasCodecInfo, String field, int start,
       int end) {
@@ -106,7 +113,7 @@ public class MtasSpanPositionSpans extends Spans implements MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-
+    // don't do anything
   }
 
   /*

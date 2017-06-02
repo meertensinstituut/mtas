@@ -4,37 +4,35 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.MtasSpanPrecededByQuery.MtasSpanPrecededByQuerySpans;
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanPrecededBySpans.
  */
-public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
+public class MtasSpanPrecededBySpans extends MtasSpans {
 
   /** The spans 1. */
   private MtasSpanPrecededByQuerySpans spans1;
-  
+
   /** The spans 2. */
   private MtasSpanPrecededByQuerySpans spans2;
 
   /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-  
+
   /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
-  
+
   /** The maximum spans 2 end position. */
   private int maximumSpans2EndPosition;
-  
+
   /** The previous spans 2 end positions. */
   private HashSet<Integer> previousSpans2EndPositions;
 
   /** The called next start position. */
   private boolean calledNextStartPosition;
-  
+
   /** The no more positions. */
   private boolean noMorePositions;
 
@@ -44,13 +42,14 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
   /**
    * Instantiates a new mtas span preceded by spans.
    *
-   * @param mtasSpanPrecededByQuery the mtas span preceded by query
-   * @param spans1 the spans 1
-   * @param spans2 the spans 2
+   * @param mtasSpanPrecededByQuery
+   *          the mtas span preceded by query
+   * @param spans1
+   *          the spans 1
+   * @param spans2
+   *          the spans 2
    */
-  public MtasSpanPrecededBySpans(
-      MtasSpanPrecededByQuery mtasSpanPrecededByQuery,
-      MtasSpanPrecededByQuerySpans spans1,
+  public MtasSpanPrecededBySpans(MtasSpanPrecededByQuerySpans spans1,
       MtasSpanPrecededByQuerySpans spans2) {
     super();
     docId = -1;
@@ -59,8 +58,12 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     previousSpans2EndPositions = new HashSet<>();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
@@ -68,17 +71,23 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     spans2.spans.collect(collector);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
   public int endPosition() {
-    return calledNextStartPosition
-        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.endPosition())
-        : -1;
+    if(calledNextStartPosition) {
+      return noMorePositions ? NO_MORE_POSITIONS : spans1.spans.endPosition();
+    } else {
+      return -1;
+    }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
@@ -106,7 +115,9 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
@@ -114,26 +125,38 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
   public int startPosition() {
-    return calledNextStartPosition
-        ? (noMorePositions ? NO_MORE_POSITIONS : spans1.spans.startPosition())
-        : -1;
+    if(calledNextStartPosition) {
+      return noMorePositions ? NO_MORE_POSITIONS : spans1.spans.startPosition();
+    } else {
+      return -1;
+    }    
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
   public int width() {
-    return calledNextStartPosition ? (noMorePositions ? 0
-        : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;
+    if(calledNextStartPosition) {
+      return noMorePositions ? 0
+          : spans1.spans.endPosition() - spans1.spans.startPosition();
+    } else {
+      return 0;
+    }      
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
@@ -148,18 +171,19 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     } else {
       // advance 1
       int spans1DocId = spans1.spans.docID();
-      if (spans1DocId < target) {
+      int newTarget = target;
+      if (spans1DocId < newTarget) {
         spans1DocId = spans1.spans.advance(target);
         if (spans1DocId == NO_MORE_DOCS) {
           docId = NO_MORE_DOCS;
           return docId;
         }
-        target = Math.max(target, spans1DocId);
+        newTarget = Math.max(newTarget, spans1DocId);
       }
       int spans2DocId = spans2.spans.docID();
       // advance 2
-      if (spans2DocId < target) {
-        spans2DocId = spans2.spans.advance(target);
+      if (spans2DocId < newTarget) {
+        spans2DocId = spans2.spans.advance(newTarget);
         if (spans2DocId == NO_MORE_DOCS) {
           docId = NO_MORE_DOCS;
           return docId;
@@ -180,7 +204,9 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
@@ -188,7 +214,9 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -196,7 +224,9 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
@@ -211,7 +241,8 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -229,13 +260,12 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
           docId = spans2DocId;
         }
       }
-      if (docId != NO_MORE_DOCS) {
-        if (!goToNextStartPosition()) {
-          reset();
-          return false;
-        }
-      }
-      return true;
+      if (docId != NO_MORE_DOCS && !goToNextStartPosition()) {
+        reset();
+        return false;
+      } else {
+        return true;
+      }  
     }
   }
 
@@ -243,7 +273,8 @@ public class MtasSpanPrecededBySpans extends Spans implements MtasSpans {
    * Go to next start position.
    *
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition;

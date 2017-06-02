@@ -3,24 +3,29 @@ package mtas.search.spans;
 import java.io.IOException;
 
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanMatchNoneSpans.
  */
-public class MtasSpanMatchNoneSpans extends Spans implements MtasSpans {
+public class MtasSpanMatchNoneSpans extends MtasSpans {
+
+  /** The current start position. */
+  private int currentStartPosition;
+
+  /** The current end position. */
+  private int currentEndPosition;
 
   /** The doc id. */
-  private int currentStartPosition, currentEndPosition, docId;
+  private int docId;
 
   /**
    * Instantiates a new mtas span match none spans.
    *
-   * @param field the field
+   * @param field
+   *          the field
    */
-  public MtasSpanMatchNoneSpans(String field) {
+  public MtasSpanMatchNoneSpans() {
     currentStartPosition = NO_MORE_POSITIONS;
     currentEndPosition = NO_MORE_POSITIONS;
     docId = -1;
@@ -75,7 +80,7 @@ public class MtasSpanMatchNoneSpans extends Spans implements MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-
+    // do nothing
   }
 
   /*

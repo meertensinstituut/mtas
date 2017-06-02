@@ -11,9 +11,9 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanEndQuery.
@@ -85,7 +85,7 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))
         .createWeight(searcher, needsScores);
@@ -95,7 +95,7 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
   /**
    * The Class SpanTermWeight.
    */
-  public class SpanTermWeight extends SpanWeight {
+  public class SpanTermWeight extends MtasSpanWeight {
 
     /** The span weight. */
     SpanWeight spanWeight;
@@ -134,7 +134,7 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
       return new MtasSpanEndSpans(
           spanWeight.getSpans(context, requiredPostings));

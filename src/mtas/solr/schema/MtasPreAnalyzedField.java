@@ -1,15 +1,9 @@
 package mtas.solr.schema;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
-import org.apache.lucene.index.IndexableField;
 import org.apache.solr.schema.IndexSchema;
-import org.apache.solr.schema.JsonPreAnalyzedParser;
 import org.apache.solr.schema.PreAnalyzedField;
-import org.apache.solr.schema.SchemaField;
 
 /**
  * The Class MtasPreAnalyzedField.

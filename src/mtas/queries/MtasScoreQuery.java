@@ -18,7 +18,6 @@ public class MtasScoreQuery extends CustomScoreQuery {
    */
   public MtasScoreQuery(Query subQuery) {
     super(subQuery);
-    System.out.println("* Init MTAS scorer " + subQuery.toString());
   }
 
   /**
@@ -29,7 +28,6 @@ public class MtasScoreQuery extends CustomScoreQuery {
    */
   public MtasScoreQuery(Query subQuery, FunctionQuery scoringQuery) {
     super(subQuery, scoringQuery);
-    System.out.println("** Init MTAS scorer " + subQuery.toString());
   }
 
   /**
@@ -40,7 +38,6 @@ public class MtasScoreQuery extends CustomScoreQuery {
    */
   public MtasScoreQuery(Query subQuery, FunctionQuery... scoringQueries) {
     super(subQuery, scoringQueries);
-    System.out.println("*** Init MTAS scorer " + subQuery.toString());
   }
 
   /*

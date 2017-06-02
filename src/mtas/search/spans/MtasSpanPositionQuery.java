@@ -8,9 +8,10 @@ import java.util.Set;
 import mtas.codec.util.CodecInfo;
 import mtas.search.similarities.MtasSimScorer;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 import org.apache.lucene.codecs.FieldsProducer;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -18,8 +19,6 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity.SimScorer;
-import org.apache.lucene.search.spans.SpanWeight;
-import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanPositionQuery.
@@ -31,7 +30,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
 
   /** The start. */
   private int start;
-  
+
   /** The end. */
   private int end;
 
@@ -53,7 +52,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    * @param end the end
    */
   public MtasSpanPositionQuery(String field, int start, int end) {
-    super(1,1);
+    super(1, 1);
     this.field = field;
     this.start = start;
     this.end = end;
@@ -77,23 +76,21 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     return new SpanAllWeight(searcher, null);
-  }
-  
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
-   */
-  @Override
-  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    return super.rewrite(reader);
   }
 
   /**
    * The Class SpanAllWeight.
    */
-  protected class SpanAllWeight extends SpanWeight {
+  protected class SpanAllWeight extends MtasSpanWeight {
+
+    /** The Constant METHOD_GET_DELEGATE. */
+    private static final String METHOD_GET_DELEGATE = "getDelegate";
+
+    /** The Constant METHOD_GET_POSTINGS_READER. */
+    private static final String METHOD_GET_POSTINGS_READER = "getPostingsReader";
 
     /**
      * Instantiates a new span all weight.
@@ -116,7 +113,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
-      //don't do anything
+      // don't do anything
     }
 
     /*
@@ -128,8 +125,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       try {
         // get leafreader
         LeafReader r = context.reader();
@@ -139,7 +136,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
           hasMethod = false;
           Method[] methods = r.getClass().getMethods();
           for (Method m : methods) {
-            if (m.getName().equals("getDelegate")) {
+            if (m.getName().equals(METHOD_GET_DELEGATE)) {
               hasMethod = true;
               r = (LeafReader) m.invoke(r, (Object[]) null);
               break;
@@ -147,18 +144,19 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
           }
         }
         // get fieldsproducer
-        Method fpm = r.getClass().getMethod("getPostingsReader",
+        Method fpm = r.getClass().getMethod(METHOD_GET_POSTINGS_READER,
             (Class<?>[]) null);
         FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);
         // get MtasFieldsProducer using terms
         Terms t = fp.terms(field);
         if (t == null) {
-          return new MtasSpanMatchNoneSpans(field);
+          return new MtasSpanMatchNoneSpans();
         } else {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
           return new MtasSpanPositionSpans(mtasCodecInfo, field, start, end);
         }
-      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+      } catch (InvocationTargetException | IllegalAccessException
+          | NoSuchMethodException e) {
         throw new IOException("Can't get reader", e);
       }
 
@@ -171,7 +169,7 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set<Term> terms) {
-      //don't do anything
+      // don't do anything
     }
 
     /*
@@ -197,8 +195,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(
-        this.getClass().getSimpleName() + "([" + start + (start != end ? "," + end : "") + "])");
+    buffer.append(this.getClass().getSimpleName() + "([" + start
+        + (start != end ? "," + end : "") + "])");
     return buffer.toString();
   }
 

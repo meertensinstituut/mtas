@@ -1,8 +1,9 @@
 package mtas.parser.cql.util;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import mtas.analysis.token.MtasToken;
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanMatchNoneQuery;
@@ -49,7 +50,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
    * @param variables the variables
    */
   public MtasCQLParserWordQuery(String field, String prefix,
-      HashMap<String, String[]> variables) {
+      Map<String, String[]> variables) {
     super(1,1);
     term = new Term(field, prefix + MtasToken.DELIMITER);
     query = new MtasSpanPrefixQuery(term, true);
@@ -66,7 +67,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
    * @throws ParseException the parse exception
    */
   public MtasCQLParserWordQuery(String field, String prefix, String value,
-      HashMap<String, String[]> variables, HashSet<String> usedVariables)
+      Map<String, String[]> variables, Set<String> usedVariables)
       throws ParseException {
     this(field, prefix, value, MTAS_CQL_REGEXP_QUERY, variables, usedVariables);
   }
@@ -83,8 +84,8 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
    * @throws ParseException the parse exception
    */
   public MtasCQLParserWordQuery(String field, String prefix, String value,
-      String type, HashMap<String, String[]> variables,
-      HashSet<String> usedVariables) throws ParseException {
+      String type, Map<String, String[]> variables,
+      Set<String> usedVariables) throws ParseException {
     super(1,1);
     String termBase = prefix + MtasToken.DELIMITER + value;
     if (type.equals(MTAS_CQL_REGEXP_QUERY)) {

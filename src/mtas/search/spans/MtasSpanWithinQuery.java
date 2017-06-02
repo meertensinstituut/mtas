@@ -7,7 +7,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.SpanWithinQuery;
-import mtas.search.spans.util.MtasSpanMaximumExpandQuery;
+import mtas.search.spans.util.MtasMaximumExpandSpanQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -91,7 +91,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     }
     if (field != null) {
       baseQuery = new SpanWithinQuery(
-          new MtasSpanMaximumExpandQuery(bigQuery, leftBoundaryMinimum,
+          new MtasMaximumExpandSpanQuery(bigQuery, leftBoundaryMinimum,
               leftBoundaryMaximum, rightBoundaryMinimum, rightBoundaryMaximum),
           smallQuery);
     } else {
@@ -152,7 +152,7 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
         MtasSpanSequenceQuery sequenceQuery = (MtasSpanSequenceQuery) newBigQuery;
         if (sequenceQuery.getIgnoreQuery() == null) {
           List<MtasSpanSequenceItem> items = sequenceQuery.getItems();
-          List<MtasSpanSequenceItem> newItems = new ArrayList<MtasSpanSequenceItem>();
+          List<MtasSpanSequenceItem> newItems = new ArrayList<>();
           int newLeftBoundaryMinimum = 0;
           int newLeftBoundaryMaximum = 0;
           int newRightBoundaryMinimum = 0;

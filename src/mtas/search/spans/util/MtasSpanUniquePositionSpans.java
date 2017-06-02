@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasSpanUniquePosition.
  */
-public class MtasSpanUniquePosition extends Spans implements MtasSpans {
+public class MtasSpanUniquePositionSpans extends MtasSpans {
 
   /** The spans. */
   Spans spans;
@@ -38,7 +39,7 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
    *
    * @param spans the spans
    */
-  public MtasSpanUniquePosition(Spans spans) {
+  public MtasSpanUniquePositionSpans(Spans spans) {
     super();
     this.spans = spans;
     queueSpans = new ArrayList<>();
@@ -157,6 +158,11 @@ public class MtasSpanUniquePosition extends Spans implements MtasSpans {
     noMorePositions = false;
     return (spans.advance(target) == NO_MORE_DOCS) ? NO_MORE_DOCS
         : toMatchDoc();
+  }
+  
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    return spans.asTwoPhaseIterator();     
   }
 
   /**

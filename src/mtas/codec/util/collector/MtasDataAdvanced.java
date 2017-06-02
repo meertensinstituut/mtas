@@ -24,37 +24,37 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
 
   /** The advanced value sum list. */
   protected T1[] advancedValueSumList = null;
-  
+
   /** The new advanced value sum list. */
   protected T1[] newAdvancedValueSumList = null;
 
   /** The advanced value max list. */
   protected T1[] advancedValueMaxList = null;
-  
+
   /** The new advanced value max list. */
   protected T1[] newAdvancedValueMaxList = null;
 
   /** The advanced value min list. */
   protected T1[] advancedValueMinList = null;
-  
+
   /** The new advanced value min list. */
   protected T1[] newAdvancedValueMinList = null;
 
   /** The advanced value sum of squares list. */
   protected T1[] advancedValueSumOfSquaresList = null;
-  
+
   /** The new advanced value sum of squares list. */
   protected T1[] newAdvancedValueSumOfSquaresList = null;
 
   /** The advanced value sum of logs list. */
   protected T2[] advancedValueSumOfLogsList = null;
-  
+
   /** The new advanced value sum of logs list. */
   protected T2[] newAdvancedValueSumOfLogsList = null;
 
   /** The advanced value N list. */
   protected long[] advancedValueNList = null;
-  
+
   /** The new advanced value N list. */
   protected long[] newAdvancedValueNList = null;
 
@@ -502,7 +502,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   @Override
   public final void initNewList(int maxNumberOfTerms) throws IOException {
     super.initNewList(maxNumberOfTerms);
-    initNewListBasic(maxNumberOfTerms);
+    initNewListBasic();
   }
 
   /*
@@ -515,7 +515,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
   public final void initNewList(int maxNumberOfTerms, String segmentName,
       int segmentNumber, String boundary) throws IOException {
     super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);
-    initNewListBasic(maxNumberOfTerms);
+    initNewListBasic();
   }
 
   /**
@@ -523,7 +523,7 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
    *
    * @param maxNumberOfTerms the max number of terms
    */
-  private void initNewListBasic(int maxNumberOfTerms) {
+  private void initNewListBasic() {
     newAdvancedValueSumList = operations.createVector1(newSize);
     newAdvancedValueSumOfLogsList = operations.createVector2(newSize);
     newAdvancedValueSumOfSquaresList = operations.createVector1(newSize);

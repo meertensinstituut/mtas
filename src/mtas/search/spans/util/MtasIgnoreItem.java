@@ -3,53 +3,59 @@ package mtas.search.spans.util;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.spans.Spans;
 
 /**
  * The Class MtasIgnoreItem.
  */
 public class MtasIgnoreItem {
-  
+
+  /** The Constant log. */
+  private static final Log log = LogFactory.getLog(MtasIgnoreItem.class);
+
   /** The Constant DEFAULT_MAXIMUM_IGNORE_LENGTH. */
   public static final int DEFAULT_MAXIMUM_IGNORE_LENGTH = 10;
 
   /** The ignore spans. */
   Spans ignoreSpans;
-  
+
   /** The current doc id. */
   int currentDocId;
-  
+
   /** The current position. */
   int currentPosition;
-  
+
   /** The minimum position. */
   int minimumPosition;
-  
+
   /** The maximum ignore length. */
   int maximumIgnoreLength;
-  
+
   /** The base start position list. */
   HashMap<Integer, HashSet<Integer>> baseStartPositionList;
-  
+
   /** The base end position list. */
   HashMap<Integer, HashSet<Integer>> baseEndPositionList;
-  
+
   /** The full end position list. */
   HashMap<Integer, HashSet<Integer>> fullEndPositionList;
-  
+
   /** The min base start position. */
   HashMap<Integer, Integer> minBaseStartPosition;
-  
+
   /** The max base end position. */
   HashMap<Integer, Integer> maxBaseEndPosition;
-  
+
   /** The min full start position. */
   HashMap<Integer, Integer> minFullStartPosition;
 
-/** The max full end position. */
-HashMap<Integer, Integer> maxFullEndPosition;
-  
+  /** The max full end position. */
+  HashMap<Integer, Integer> maxFullEndPosition;
+
   /**
    * Instantiates a new mtas ignore item.
    *
@@ -61,13 +67,13 @@ HashMap<Integer, Integer> maxFullEndPosition;
     currentDocId = -1;
     currentPosition = -1;
     minimumPosition = -1;
-    baseStartPositionList = new HashMap<Integer, HashSet<Integer>>();
-    baseEndPositionList = new HashMap<Integer, HashSet<Integer>>();
-    fullEndPositionList = new HashMap<Integer, HashSet<Integer>>();
-    minBaseStartPosition = new HashMap<Integer, Integer>();
-    maxBaseEndPosition = new HashMap<Integer, Integer>();
-    minFullStartPosition = new HashMap<Integer, Integer>();
-    maxFullEndPosition = new HashMap<Integer, Integer>();
+    baseStartPositionList = new HashMap<>();
+    baseEndPositionList = new HashMap<>();
+    fullEndPositionList = new HashMap<>();
+    minBaseStartPosition = new HashMap<>();
+    maxBaseEndPosition = new HashMap<>();
+    minFullStartPosition = new HashMap<>();
+    maxFullEndPosition = new HashMap<>();
     if (maximumIgnoreLength == null) {
       this.maximumIgnoreLength = DEFAULT_MAXIMUM_IGNORE_LENGTH;
     } else {
@@ -116,17 +122,17 @@ HashMap<Integer, Integer> maxFullEndPosition;
             "Unexpected position, should be >= " + minimumPosition + "!");
       } else {
         computeFullStartPositionMinimum(position);
-        if(minFullStartPosition.containsKey(position)) {
+        if (minFullStartPosition.containsKey(position)) {
           return minFullStartPosition.get(position);
         } else {
           return 0;
         }
-      }      
+      }
     } else {
       return 0;
     }
   }
-  
+
   /**
    * Gets the max end position.
    *
@@ -142,7 +148,7 @@ HashMap<Integer, Integer> maxFullEndPosition;
             "Unexpected position, should be >= " + minimumPosition + "!");
       }
       computeFullEndPositionList(position);
-      if(maxFullEndPosition.containsKey(position)) {
+      if (maxFullEndPosition.containsKey(position)) {
         return maxFullEndPosition.get(position);
       } else {
         return 0;
@@ -160,7 +166,7 @@ HashMap<Integer, Integer> maxFullEndPosition;
    * @return the full end position list
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public HashSet<Integer> getFullEndPositionList(int docId, int position)
+  public Set<Integer> getFullEndPositionList(int docId, int position)
       throws IOException {
     if (ignoreSpans != null && docId == currentDocId) {
       if (position < minimumPosition) {
@@ -174,27 +180,29 @@ HashMap<Integer, Integer> maxFullEndPosition;
       return null;
     }
   }
-  
+
   /**
    * Compute full start position minimum.
    *
    * @param position the position
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  private void computeFullStartPositionMinimum(int position) throws IOException {
+  private void computeFullStartPositionMinimum(int position)
+      throws IOException {
     if (ignoreSpans != null && !minFullStartPosition.containsKey(position)) {
       HashSet<Integer> list = baseStartPositionList.get(position);
-      HashSet<Integer> newList = new HashSet<Integer>();
+      HashSet<Integer> newList = new HashSet<>();
       int minimumStartPosition = position;
-      while(list!=null && !list.isEmpty()) {
+      while (list != null && !list.isEmpty()) {
         newList.clear();
-        for(int startPosition : list) {
-          if(minFullStartPosition.containsKey(startPosition)) {
-            minimumStartPosition = Math.min(minimumStartPosition, minFullStartPosition.get(startPosition));
-          } else if(baseStartPositionList.containsKey(startPosition)) {
-            newList.addAll(baseStartPositionList.get(startPosition));            
+        for (int startPosition : list) {
+          if (minFullStartPosition.containsKey(startPosition)) {
+            minimumStartPosition = Math.min(minimumStartPosition,
+                minFullStartPosition.get(startPosition));
+          } else if (baseStartPositionList.containsKey(startPosition)) {
+            newList.addAll(baseStartPositionList.get(startPosition));
           } else {
-            if(startPosition<minimumStartPosition) {
+            if (startPosition < minimumStartPosition) {
               minimumStartPosition = startPosition;
             }
           }
@@ -204,7 +212,7 @@ HashMap<Integer, Integer> maxFullEndPosition;
       }
       minFullStartPosition.put(position, minimumStartPosition);
     }
-  }  
+  }
 
   /**
    * Compute full end position list.
@@ -219,8 +227,8 @@ HashMap<Integer, Integer> maxFullEndPosition;
       HashSet<Integer> list = baseEndPositionList.get(position);
       if (list != null && !list.isEmpty()) {
         int maxEndPosition = maxBaseEndPosition.get(position);
-        HashSet<Integer> checkList = new HashSet<Integer>();
-        HashSet<Integer> subCheckList = new HashSet<Integer>();
+        HashSet<Integer> checkList = new HashSet<>();
+        HashSet<Integer> subCheckList = new HashSet<>();
         checkList.addAll(list);
         int depth = 1;
         while (!checkList.isEmpty()) {
@@ -279,20 +287,25 @@ HashMap<Integer, Integer> maxFullEndPosition;
           } else {
             maxBaseEndPosition.put(currentPosition,
                 Math.max(maxBaseEndPosition.get(currentPosition),
-                    ignoreSpans.endPosition()));  
+                    ignoreSpans.endPosition()));
           }
           if (!baseStartPositionList.containsKey(ignoreSpans.endPosition())) {
-            baseStartPositionList.put(ignoreSpans.endPosition(), new HashSet<Integer>());
-            minBaseStartPosition.put(ignoreSpans.endPosition(), ignoreSpans.endPosition());
+            baseStartPositionList.put(ignoreSpans.endPosition(),
+                new HashSet<Integer>());
+            minBaseStartPosition.put(ignoreSpans.endPosition(),
+                ignoreSpans.endPosition());
           } else {
             minBaseStartPosition.put(ignoreSpans.endPosition(),
                 Math.min(minBaseStartPosition.get(ignoreSpans.endPosition()),
-                    currentPosition)); 
+                    currentPosition));
           }
-          baseStartPositionList.get(ignoreSpans.endPosition()).add(currentPosition); 
-          baseEndPositionList.get(currentPosition).add(ignoreSpans.endPosition());                  
+          baseStartPositionList.get(ignoreSpans.endPosition())
+              .add(currentPosition);
+          baseEndPositionList.get(currentPosition)
+              .add(ignoreSpans.endPosition());
         }
       } catch (IOException e) {
+        log.debug(e);
         currentPosition = Spans.NO_MORE_POSITIONS;
         break;
       }
@@ -307,17 +320,20 @@ HashMap<Integer, Integer> maxFullEndPosition;
    */
   public void removeBefore(int docId, int position) {
     if (ignoreSpans != null && docId == currentDocId) {
-      baseStartPositionList.entrySet().removeIf(entry -> entry.getKey() < position);
-      baseEndPositionList.entrySet().removeIf(entry -> entry.getKey() < position);
-      fullEndPositionList.entrySet().removeIf(entry -> entry.getKey() < position);
+      baseStartPositionList.entrySet()
+          .removeIf(entry -> entry.getKey() < position);
+      baseEndPositionList.entrySet()
+          .removeIf(entry -> entry.getKey() < position);
+      fullEndPositionList.entrySet()
+          .removeIf(entry -> entry.getKey() < position);
       minBaseStartPosition.entrySet()
           .removeIf(entry -> entry.getKey() < position);
       maxBaseEndPosition.entrySet()
-      .removeIf(entry -> entry.getKey() < position);
+          .removeIf(entry -> entry.getKey() < position);
       minFullStartPosition.entrySet()
-      .removeIf(entry -> entry.getKey() < position);
+          .removeIf(entry -> entry.getKey() < position);
       maxFullEndPosition.entrySet()
-      .removeIf(entry -> entry.getKey() < position);
+          .removeIf(entry -> entry.getKey() < position);
       if (minimumPosition < position) {
         minimumPosition = position;
       }

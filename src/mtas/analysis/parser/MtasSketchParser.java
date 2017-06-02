@@ -34,10 +34,10 @@ final public class MtasSketchParser extends MtasBasicParser {
   private MtasParserType<MtasParserMapping<?>> wordType = null;
 
   /** The word annotation types. */
-  private HashMap<Integer, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<Integer, MtasParserType<MtasParserMapping<?>>>();
+  private HashMap<Integer, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<>();
 
   /** The group types. */
-  private HashMap<String, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<String, MtasParserType<MtasParserMapping<?>>>();
+  private HashMap<String, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<>();
 
   /**
    * Instantiates a new mtas sketch parser.
@@ -66,7 +66,7 @@ final public class MtasSketchParser extends MtasBasicParser {
     if (config != null) {
 
       // always word, no mappings
-      wordType = new MtasParserType<MtasParserMapping<?>>(MAPPING_TYPE_WORD,
+      wordType = new MtasParserType<>(MAPPING_TYPE_WORD,
           null, false);
 
       for (int i = 0; i < config.children.size(); i++) {
@@ -91,7 +91,7 @@ final public class MtasSketchParser extends MtasBasicParser {
                     wordAnnotationTypes.get(Integer.parseInt(nameMapping))
                         .addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
@@ -103,7 +103,7 @@ final public class MtasSketchParser extends MtasBasicParser {
                   if (groupTypes.containsKey(nameMapping)) {
                     groupTypes.get(nameMapping).addItem(m);
                   } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<MtasParserMapping<?>>(
+                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                         typeMapping, nameMapping, false);
                     t.addItem(m);
                     groupTypes.put(nameMapping, t);
@@ -132,7 +132,7 @@ final public class MtasSketchParser extends MtasBasicParser {
     Integer unknownAncestors = 0;
 
     Map<String, Set<Integer>> idPositions = new HashMap<>();
-    Map<String, Integer[]> idOffsets = new HashMap<String, Integer[]>();
+    Map<String, Integer[]> idOffsets = new HashMap<>();
 
     Map<String, Map<Integer, Set<String>>> updateList = createUpdateList();
     Map<String, List<MtasParserObject>> currentList = createCurrentList();
@@ -163,9 +163,9 @@ final public class MtasSketchParser extends MtasBasicParser {
             // start group
             // System.out.println("Start "+matcherGroupStart.group(1)+" -
             // "+matcherGroupStart.group(2));
-            if ((currentList.get(MAPPING_TYPE_WORD).size() == 0)
-                && (currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size() == 0)
+            if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
+                && (currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+                && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
                 && (tmpCurrentType = groupTypes
                     .get(matcherGroupStart.group(1))) != null) {
               currentObject = new MtasParserObject(tmpCurrentType);
@@ -190,7 +190,7 @@ final public class MtasSketchParser extends MtasBasicParser {
             }
           } else if (matcherGroupEnd.find()) {
             // end group
-            if (currentList.get(MAPPING_TYPE_GROUP).size() > 0) {
+            if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
               if ((tmpCurrentType = groupTypes
                   .get(matcherGroupEnd.group(1))) != null) {
                 currentObject = currentList.get(MAPPING_TYPE_GROUP)
@@ -210,10 +210,10 @@ final public class MtasSketchParser extends MtasBasicParser {
             }
           }
         } else {
-          if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-              && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size() == 0)
-              && (currentList.get(MAPPING_TYPE_WORD).size() == 0)
-              && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size() == 0)
+          if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+              && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+              && (currentList.get(MAPPING_TYPE_WORD).isEmpty())
+              && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).isEmpty())
               && (wordType != null)) {
             // start word
             currentObject = new MtasParserObject(wordType);
@@ -228,9 +228,9 @@ final public class MtasSketchParser extends MtasBasicParser {
               currentList.get(MAPPING_TYPE_WORD).add(currentObject);
               unknownAncestors = 0;
             }
-            if ((currentList.get(MAPPING_TYPE_RELATION).size() == 0)
-                && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size() == 0)
-                && (currentList.get(MAPPING_TYPE_WORD).size() > 0)) {
+            if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+                && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+                && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
               // start and finish word annotations
               String[] items = line.split("\t");
               for (int i = 0; i < items.length; i++) {
@@ -268,7 +268,7 @@ final public class MtasSketchParser extends MtasBasicParser {
                     // offset always null, so update later with word (should be
                     // possible)
                     if ((currentObject.getId() != null)
-                        && (currentList.get(MAPPING_TYPE_WORD).size() > 0)) {
+                        && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
                       currentList.get(MAPPING_TYPE_WORD)
                           .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
                           .addUpdateableIdWithOffset(currentObject.getId());

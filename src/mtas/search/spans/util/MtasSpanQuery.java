@@ -3,9 +3,7 @@ package mtas.search.spans.util;
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.search.spans.SpanWeight;
 import mtas.search.spans.MtasSpanMatchNoneQuery;
 
 /**
@@ -13,12 +11,18 @@ import mtas.search.spans.MtasSpanMatchNoneQuery;
  */
 public abstract class MtasSpanQuery extends SpanQuery {
 
-  /** The span width. */
-  private Integer minimumSpanWidth, maximumSpanWidth, spanWidth;
+  /** The minimum span width. */
+  private Integer minimumSpanWidth;
   
+  /** The maximum span width. */
+  private Integer maximumSpanWidth;
+  
+  /** The span width. */
+  private Integer spanWidth;
+
   /** The single position query. */
   private boolean singlePositionQuery;
-  
+
   /**
    * Instantiates a new mtas span query.
    *
@@ -51,21 +55,22 @@ public abstract class MtasSpanQuery extends SpanQuery {
     maximumSpanWidth = maximum;
     spanWidth = (minimum != null && maximum != null && minimum.equals(maximum))
         ? minimum : null;
-    singlePositionQuery = spanWidth != null && spanWidth.equals(1);   
+    singlePositionQuery = spanWidth != null && spanWidth.equals(1);
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  // public abstract MtasSpanWeight createWeight(IndexSearcher searcher,
+  // boolean needsScores) throws IOException;
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public abstract SpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException;
-
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
-   */
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    if(minimumSpanWidth!=null && maximumSpanWidth!=null && minimumSpanWidth>maximumSpanWidth) {
+    if (minimumSpanWidth != null && maximumSpanWidth != null
+        && minimumSpanWidth > maximumSpanWidth) {
       return new MtasSpanMatchNoneQuery(this.getField());
     } else {
       return this;
@@ -98,7 +103,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
   public Integer getMaximumWidth() {
     return maximumSpanWidth;
   }
-  
+
   /**
    * Checks if is single position query.
    *
@@ -107,5 +112,17 @@ public abstract class MtasSpanQuery extends SpanQuery {
   public boolean isSinglePositionQuery() {
     return singlePositionQuery;
   }
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
+  @Override
+  public abstract boolean equals(Object object);
+
+  /* (non-Javadoc)
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
+  @Override
+  public abstract int hashCode();
 
 }

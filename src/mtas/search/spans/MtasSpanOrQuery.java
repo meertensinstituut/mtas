@@ -25,7 +25,8 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span or query.
    *
-   * @param initialClauses the initial clauses
+   * @param initialClauses
+   *          the initial clauses
    */
   public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
@@ -34,12 +35,21 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     clauses = new HashSet<>();
     for (MtasSpanQuery item : initialClauses) {
       if (!clauses.contains(item)) {
-        minimum = clauses.isEmpty() ? item.getMinimumWidth()
-            : (minimum != null && item.getMinimumWidth() != null)
-                ? Math.min(minimum, item.getMinimumWidth()) : null;
-        maximum = clauses.isEmpty() ? item.getMaximumWidth()
-            : (maximum != null && item.getMaximumWidth() != null)
-                ? Math.max(maximum, item.getMaximumWidth()) : null;
+        if (clauses.isEmpty()) {
+          minimum = item.getMinimumWidth();
+          maximum = item.getMaximumWidth();
+        } else {
+          if (minimum != null && item.getMinimumWidth() != null) {
+            minimum = Math.min(minimum, item.getMinimumWidth());
+          } else {
+            minimum = null;
+          }
+          if(maximum != null && item.getMaximumWidth() != null) {
+            maximum = Math.max(maximum, item.getMaximumWidth());
+          } else {
+            maximum = null;
+          }
+        }        
         clauses.add(item);
       }
     }
@@ -48,7 +58,9 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
         clauses.toArray(new MtasSpanQuery[clauses.size()]));
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -56,8 +68,12 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     return baseQuery.getField();
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.
+   * IndexSearcher, boolean)
    */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
@@ -65,8 +81,11 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     return baseQuery.createWeight(searcher, needsScores);
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -82,7 +101,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
       boolean actuallyRewritten = false;
       for (int i = 0; i < oldClauses.length; i++) {
         newClauses[i] = oldClauses[i].rewrite(reader);
-        actuallyRewritten |= oldClauses[i] != newClauses[i];
+        actuallyRewritten |= !oldClauses[i].equals(newClauses[i]);
         if (newClauses[i] instanceof MtasSpanMatchNoneQuery) {
           matchNoneQueries++;
         } else if (newClauses[i].isSinglePositionQuery()) {
@@ -103,10 +122,8 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
         int j = 0;
         for (int i = 0; i < newClauses.length; i++) {
           if (!(newClauses[i] instanceof MtasSpanMatchNoneQuery)) {
-            if (!newClauses[i].isSinglePositionQuery()) {
-              newFilteredClauses[j] = newClauses[i];
-              j++;
-            } else if (matchAllSinglePositionQueries == 0) {
+            if (!newClauses[i].isSinglePositionQuery()
+                || matchAllSinglePositionQueries == 0) {
               newFilteredClauses[j] = newClauses[i];
               j++;
             } else if (singlePositionQueries > 0) {

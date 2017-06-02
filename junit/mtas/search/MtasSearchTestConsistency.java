@@ -43,8 +43,6 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.junit.Assert;
-
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecUtil;
@@ -61,6 +59,7 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanRegexpQuery;
+import mtas.search.spans.util.MtasDisabledTwoPhaseIteratorSpanQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
 /**
@@ -73,10 +72,10 @@ public class MtasSearchTestConsistency {
 
   /** The Constant FIELD_ID. */
   private static final String FIELD_ID = "id";
-  
+
   /** The Constant FIELD_TITLE. */
   private static final String FIELD_TITLE = "title";
-  
+
   /** The Constant FIELD_CONTENT. */
   private static final String FIELD_CONTENT = "content";
 
@@ -85,7 +84,7 @@ public class MtasSearchTestConsistency {
 
   /** The files. */
   private static HashMap<String, String> files;
-  
+
   /** The docs. */
   private static ArrayList<Integer> docs;
 
@@ -118,7 +117,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search number of words.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchNumberOfWords() throws IOException {
@@ -131,7 +131,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search start sentence 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchStartSentence1() throws IOException {
@@ -144,7 +145,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search start sentence 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchStartSentence2() throws IOException {
@@ -157,7 +159,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search intersecting.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchIntersecting() throws IOException {
@@ -171,7 +174,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search ignore.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchIgnore() throws IOException {
@@ -183,24 +187,34 @@ public class MtasSearchTestConsistency {
     // get total number of nouns
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1,
+        null, null, null, true);
     MtasSpanQuery ignore;
     try {
-      ignore = createQuery(FIELD_CONTENT, cql2ignore, null, null);
+      ignore = createQuery(FIELD_CONTENT, cql2ignore, null, null, false);
     } catch (ParseException e) {
       throw new IOException("Parse Exception", e);
     }
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, ignore,
-        ignoreNumber, null);
+        ignoreNumber, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2,
+        ignore, ignoreNumber, null, true);
     assertEquals("Article followed by Noun ignoring Adjectives",
         queryResult1.hits, queryResult2.hits);
+    assertEquals(
+        "Article followed by Noun ignoring Adjectives - disabled twoPhaseIterator",
+        queryResult1disabled.hits, queryResult2disabled.hits);
+    assertEquals("Ignore: twoPhaseIterator", queryResult1.hits,
+        queryResult1disabled.hits);
     indexReader.close();
   }
 
   /**
    * Basic search sequence.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchSequence() throws IOException {
@@ -210,26 +224,47 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1,
+        null, null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2,
+        null, null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3,
+        null, null, null, true);
     assertTrue(
         "Sequences: not #" + cql1 + " (" + queryResult1.hits + ") >= #" + cql2
             + " (" + queryResult2.hits + ")",
         queryResult1.hits >= queryResult2.hits);
     assertTrue(
+        "Sequences: not #" + cql1 + " (" + queryResult1.hits + ") >= #" + cql2
+            + " (" + queryResult2.hits + ") - disabled twoPhaseIterator",
+        queryResult1disabled.hits >= queryResult2disabled.hits);
+    assertTrue(
         "Sequences: not #" + cql1 + " (" + queryResult1.hits + ") >= #" + cql3
             + " (" + queryResult3.hits + ")",
         queryResult1.hits <= queryResult3.hits);
+    assertTrue(
+        "Sequences: not #" + cql1 + " (" + queryResult1.hits + ") >= #" + cql3
+            + " (" + queryResult3.hits + ") - disabled twoPhaseIterator",
+        queryResult1disabled.hits <= queryResult3disabled.hits);
+    assertEquals("Sequences: twoPhaseIterator 1", queryResult1.hits,
+        queryResult1disabled.hits);
+    assertEquals("Sequences: twoPhaseIterator 2", queryResult2.hits,
+        queryResult2disabled.hits);
+    assertEquals("Sequences: twoPhaseIterator 3", queryResult3.hits,
+        queryResult3disabled.hits);
     indexReader.close();
   }
 
   /**
    * Basic search within 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin1() throws IOException {
@@ -242,7 +277,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search within 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin2() throws IOException {
@@ -252,20 +288,32 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     assertEquals("Within: " + cql3, queryResult3.hits,
-        queryResult1.hits + queryResult2.hits);
+        (long) queryResult1.hits + queryResult2.hits);
+    assertEquals("Within: " + cql3+" - disabled twoPhaseIterator", queryResult3.hits,
+        (long) queryResult1.hits + queryResult2.hits);
+    assertEquals("Within: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("Within: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
+    assertEquals("Within: twoPhaseIterator 3", queryResult3.hits, queryResult3disabled.hits);
     indexReader.close();
   }
 
   /**
    * Basic search within 3.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin3() throws IOException {
@@ -275,22 +323,57 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     assertTrue(
         "Within: " + cql3 + " not " + queryResult3.hits + " >= "
             + queryResult1.hits + " + " + queryResult2.hits,
         queryResult3.hits >= queryResult1.hits + queryResult2.hits);
+    assertTrue(
+        "Within: " + cql3 + " not " + queryResult3.hits + " >= "
+            + queryResult1.hits + " + " + queryResult2.hits+" - disabled twoPhaseIterator",
+        queryResult3.hits >= queryResult1.hits + queryResult2.hits);
+    assertEquals("Within: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("Within: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
+    assertEquals("Within: twoPhaseIterator 3", queryResult3.hits, queryResult3disabled.hits);
     indexReader.close();
+  }
+
+  /**
+   * Basic search within 4.
+   *
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  @org.junit.Test
+  public void basicSearchWithin4() throws IOException {
+    String cql = "((<s>) !within ([]{0,5}[pos=\"N\"])) within ([]{0,5}[pos=\"N\"])";
+    // get total number
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql, null,
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql, null,
+        null, null, true);
+    assertTrue("Within: " + cql + " has hits (" + queryResult1.hits + ")",
+        queryResult1.hits == 0);
+    assertEquals("Within: - twoPhaseIterator",
+        queryResult1.hits, queryResult1disabled.hits);
   }
 
   /**
    * Basic search containing 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchContaining1() throws IOException {
@@ -304,7 +387,8 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search containing 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchContaining2() throws IOException {
@@ -315,23 +399,60 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     QueryResult queryResult4 = doQuery(indexReader, FIELD_CONTENT, cql4, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult4disabled = doQuery(indexReader, FIELD_CONTENT, cql4, null,
+        null, null, true);
     assertEquals("Containing: " + cql3, queryResult3.hits, queryResult2.hits);
+    assertEquals("Containing: " + cql3+" disabled twoPhaseIterator", queryResult3disabled.hits, queryResult2disabled.hits);
     assertEquals("Containing: " + cql4, queryResult4.hits,
-        queryResult1.hits - queryResult2.hits);
+        (long) queryResult1.hits - queryResult2.hits);
+    assertEquals("Containing: " + cql4+" disabled twoPhaseIterator", queryResult4disabled.hits,
+        (long) queryResult1disabled.hits - queryResult2disabled.hits);
+    assertEquals("Containing: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("Containing: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
+    assertEquals("Containing: twoPhaseIterator 3", queryResult3.hits, queryResult3disabled.hits);
+    assertEquals("Containing: twoPhaseIterator 4", queryResult4.hits, queryResult4disabled.hits);    
     indexReader.close();
+  }
+
+  /**
+   * Basic search containing 3.
+   *
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  @org.junit.Test
+  public void basicSearchContaining3() throws IOException {
+    String cql = "(([]{0,5}[pos=\"N\"]) !containing (<s>)) containing (<s>)";
+    // get total number
+    IndexReader indexReader = DirectoryReader.open(directory);
+    QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql, null,
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql, null,
+        null, null, true);
+    assertTrue("Containing: " + cql + " has hits (" + queryResult1.hits + ")",
+        queryResult1.hits == 0);
+    assertEquals("Containing: twoPhaseIterator",
+        queryResult1.hits, queryResult1disabled.hits);    
   }
 
   /**
    * Basic search followed by 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFollowedBy1() throws IOException {
@@ -341,20 +462,31 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     assertEquals("Article followed by Adjective", queryResult1.hits,
         (long) queryResult2.hits - queryResult3.hits);
+    assertEquals("Article followed by Adjective - disabled twoPhaseIterator", queryResult1.hits,
+        (long) queryResult2disabled.hits - queryResult3disabled.hits);
+    assertEquals("FollowedBy: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("FollowedBy: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);    
     indexReader.close();
   }
 
   /**
    * Basic search followed by 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFollowedBy2() throws IOException {
@@ -364,20 +496,31 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     assertEquals("Article followed by Adjective", queryResult1.hits,
         (long) queryResult2.hits - queryResult3.hits);
+    assertEquals("Article followed by Adjective - disabled twoPhaseIterator", queryResult1disabled.hits,
+        (long) queryResult2disabled.hits - queryResult3disabled.hits);
+    assertEquals("FollowedBy: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("FollowedBy: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
     indexReader.close();
   }
 
   /**
    * Basic search preceded by 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchPrecededBy1() throws IOException {
@@ -387,20 +530,32 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     assertEquals("Adjective preceded by Article", queryResult1.hits,
         (long) queryResult2.hits - queryResult3.hits);
+    assertEquals("Adjective preceded by Article - disabled twoPhaseIterator", queryResult1disabled.hits,
+        (long) queryResult2disabled.hits - queryResult3disabled.hits);
+    assertEquals("PrecededBy: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("PrecededBy: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
+    assertEquals("PrecededBy: twoPhaseIterator 3", queryResult3.hits, queryResult3disabled.hits);    
     indexReader.close();
   }
 
   /**
    * Basic search preceded by 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchPrecededBy2() throws IOException {
@@ -409,18 +564,27 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     assertEquals("Adjective preceded by Article", queryResult1.hits,
         queryResult2.hits);
+    assertEquals("Adjective preceded by Article - disabled twoPhaseIterator", queryResult1disabled.hits,
+        queryResult2disabled.hits);
+    assertEquals("PrecededBy: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("PrecededBy: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
     indexReader.close();
   }
 
   /**
    * Basic search fully aligned with.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFullyAlignedWith() throws IOException {
@@ -433,39 +597,66 @@ public class MtasSearchTestConsistency {
     // get total number
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     QueryResult queryResult4 = doQuery(indexReader, FIELD_CONTENT, cql4, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult4disabled = doQuery(indexReader, FIELD_CONTENT, cql4, null,
+        null, null, true);
     QueryResult queryResult5 = doQuery(indexReader, FIELD_CONTENT, cql5, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult5disabled = doQuery(indexReader, FIELD_CONTENT, cql5, null,
+        null, null, true);
     QueryResult queryResult6 = doQuery(indexReader, FIELD_CONTENT, cql6, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult6disabled = doQuery(indexReader, FIELD_CONTENT, cql6, null,
+        null, null, true);
     assertEquals("Fully Aligned With (1)", queryResult1.hits,
         queryResult2.hits);
+    assertEquals("Fully Aligned With (1) - disable twoPhaseIterator", queryResult1disabled.hits,
+        queryResult2disabled.hits);
     assertTrue("Fully Aligned With (2): was " + queryResult4.hits,
         queryResult4.hits == 0);
+    assertTrue("Fully Aligned With (2): was" + queryResult4.hits+" - disable twoPhaseIterator",
+        queryResult4disabled.hits == 0);
     assertEquals("Fully Aligned With (3)", queryResult3.hits,
         queryResult5.hits);
+    assertEquals("Fully Aligned With (3) - disable twoPhaseIterator", queryResult3disabled.hits,
+        queryResult5disabled.hits);
     assertEquals("Fully Aligned With (4)", queryResult3.hits,
         queryResult6.hits);
+    assertEquals("Fully Aligned With (4) - disable twoPhaseIterator", queryResult3disabled.hits,
+        queryResult6disabled.hits);
+    assertEquals("FullyAlignedWith: twoPhaseIterator 1", queryResult1.hits, queryResult1disabled.hits);
+    assertEquals("FullyAlignedWith: twoPhaseIterator 2", queryResult2.hits, queryResult2disabled.hits);
+    assertEquals("FullyAlignedWith: twoPhaseIterator 3", queryResult3.hits, queryResult3disabled.hits);    
+    assertEquals("FullyAlignedWith: twoPhaseIterator 4", queryResult4.hits, queryResult4disabled.hits);    
+    assertEquals("FullyAlignedWith: twoPhaseIterator 5", queryResult5.hits, queryResult5disabled.hits);    
+    assertEquals("FullyAlignedWith: twoPhaseIterator 6", queryResult6.hits, queryResult6disabled.hits);    
     indexReader.close();
   }
 
   /**
    * Collect stats positions 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsPositions1() throws IOException {
     // get total number of words
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult = doQuery(indexReader, FIELD_CONTENT, "[]", null,
-        null, null);
+        null, null, false);
     indexReader.close();
     int averageNumberOfPositions = queryResult.hits / queryResult.docs;
     // do position query
@@ -503,7 +694,8 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats positions 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsPositions2() throws IOException {
@@ -566,7 +758,8 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats tokens.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsTokens() throws IOException {
@@ -629,7 +822,8 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats spans 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsSpans1() throws IOException {
@@ -639,20 +833,26 @@ public class MtasSearchTestConsistency {
     // get total number of nouns
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult1 = doQuery(indexReader, FIELD_CONTENT, cql1, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult1disabled = doQuery(indexReader, FIELD_CONTENT, cql1, null,
+        null, null, true);
     QueryResult queryResult2 = doQuery(indexReader, FIELD_CONTENT, cql2, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult2disabled = doQuery(indexReader, FIELD_CONTENT, cql2, null,
+        null, null, true);
     QueryResult queryResult3 = doQuery(indexReader, FIELD_CONTENT, cql3, null,
-        null, null);
+        null, null, false);
+    QueryResult queryResult3disabled = doQuery(indexReader, FIELD_CONTENT, cql3, null,
+        null, null, true);
     indexReader.close();
     int averageNumberOfPositions = queryResult1.hits / queryResult1.docs;
     // do stats query for nouns
     try {
       ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_ID);
-      MtasSpanQuery q1 = createQuery(FIELD_CONTENT, cql1, null, null);
-      MtasSpanQuery q2 = createQuery(FIELD_CONTENT, cql2, null, null);
-      MtasSpanQuery q3 = createQuery(FIELD_CONTENT, cql3, null, null);
+      MtasSpanQuery q1 = createQuery(FIELD_CONTENT, cql1, null, null, false);
+      MtasSpanQuery q2 = createQuery(FIELD_CONTENT, cql2, null, null, false);
+      MtasSpanQuery q3 = createQuery(FIELD_CONTENT, cql3, null, null, false);
       MtasSpanQuery[] queries1 = new MtasSpanQuery[] { q1 };
       MtasSpanQuery[] queries2 = new MtasSpanQuery[] { q2 };
       MtasSpanQuery[] queries12 = new MtasSpanQuery[] { q1, q2 };
@@ -705,16 +905,25 @@ public class MtasSearchTestConsistency {
       Long totalMaximum1 = responseTotal1 != null
           ? (Long) responseMaximum1.get("sum") : 0;
       assertEquals("Number of nouns", total1.longValue(), queryResult1.hits);
+      assertEquals("Number of nouns - disabled twoPhaseIterator", total1.longValue(), queryResult1disabled.hits);
       assertEquals("Number of articles", total2.longValue(), queryResult2.hits);
+      assertEquals("Number of articles - disabled twoPhaseIterator", total2.longValue(), queryResult2disabled.hits);
       assertEquals("Number of nouns and articles - external 1",
           total12.longValue(), (long) queryResult1.hits + queryResult2.hits);
+      assertEquals("Number of nouns and articles - external 1 - disabled twoPhaseIterator",
+          total12.longValue(), (long) queryResult1disabled.hits + queryResult2disabled.hits);
       assertEquals("Number of nouns and articles - external 2",
           total12.longValue(), queryResult3.hits);
+      assertEquals("Number of nouns and articles - external 2 - disabled twoPhaseIterator",
+          total12.longValue(), queryResult3disabled.hits);
       assertEquals("Number of nouns and articles - internal",
           total12.longValue(), total3.longValue());
       assertEquals("Number of nouns and articles - functions",
           difference12.longValue(),
           (long) queryResult1.hits - queryResult2.hits);
+      assertEquals("Number of nouns and articles - functions - disabled twoPhaseIterator",
+          difference12.longValue(),
+          (long) queryResult1disabled.hits - queryResult2disabled.hits);
       assertEquals("Minimum and maximum on number of positions nouns",
           total1.longValue(), totalMinimum1 + totalMaximum1);
     } catch (mtas.parser.function.ParseException | ParseException e) {
@@ -725,7 +934,8 @@ public class MtasSearchTestConsistency {
   /**
    * Collect group.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectGroup() throws IOException {
@@ -734,7 +944,7 @@ public class MtasSearchTestConsistency {
     try {
       ArrayList<Integer> fullDocSet = docs;
       ComponentField fieldStats = new ComponentField(FIELD_ID);
-      MtasSpanQuery q = createQuery(FIELD_CONTENT, cql, null, null);
+      MtasSpanQuery q = createQuery(FIELD_CONTENT, cql, null, null, false);
       fieldStats.spanQueryList.add(q);
       fieldStats.statsSpanList.add(new ComponentSpan(new MtasSpanQuery[] { q },
           "total", null, null, "sum", null, null, null));
@@ -754,7 +964,7 @@ public class MtasSearchTestConsistency {
         cql = "[pos=\"LID\" & " + hitListItem.get("prefix") + "=\""
             + hitListItem.get("value") + "\"]";
         QueryResult queryResult = doQuery(indexReader, FIELD_CONTENT, cql, null,
-            null, null);
+            null, null, false);
         assertEquals(
             "number of hits for articles equals to " + hitListItem.get("value"),
             listItem.get("sum"), Long.valueOf(queryResult.hits));
@@ -775,7 +985,8 @@ public class MtasSearchTestConsistency {
   /**
    * Collect termvector.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectTermvector() throws IOException {
@@ -846,8 +1057,10 @@ public class MtasSearchTestConsistency {
   /**
    * Do advanced search.
    *
-   * @param fullDocSet the full doc set
-   * @param fieldStats the field stats
+   * @param fullDocSet
+   *          the full doc set
+   * @param fieldStats
+   *          the field stats
    * @return the hash map
    */
   private HashMap<String, HashMap<String, Object>> doAdvancedSearch(
@@ -920,9 +1133,12 @@ public class MtasSearchTestConsistency {
   /**
    * Creates the index.
    *
-   * @param configFile the config file
-   * @param files the files
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param configFile
+   *          the config file
+   * @param files
+   *          the files
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createIndex(String configFile,
       HashMap<String, String> files) throws IOException {
@@ -970,11 +1186,16 @@ public class MtasSearchTestConsistency {
   /**
    * Adds the doc.
    *
-   * @param w the w
-   * @param id the id
-   * @param title the title
-   * @param file the file
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param w
+   *          the w
+   * @param id
+   *          the id
+   * @param title
+   *          the title
+   * @param file
+   *          the file
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void addDoc(IndexWriter w, Integer id, String title,
       String file) throws IOException {
@@ -992,7 +1213,8 @@ public class MtasSearchTestConsistency {
   /**
    * Gets the live docs.
    *
-   * @param indexReader the index reader
+   * @param indexReader
+   *          the index reader
    * @return the live docs
    */
   private static ArrayList<Integer> getLiveDocs(IndexReader indexReader) {
@@ -1014,54 +1236,83 @@ public class MtasSearchTestConsistency {
   /**
    * Creates the query.
    *
-   * @param field the field
-   * @param cql the cql
-   * @param ignore the ignore
-   * @param maximumIgnoreLength the maximum ignore length
+   * @param field
+   *          the field
+   * @param cql
+   *          the cql
+   * @param ignore
+   *          the ignore
+   * @param maximumIgnoreLength
+   *          the maximum ignore length
+   * @param disableTwoPhaseIterator
+   *          the disable two phase iterator
    * @return the mtas span query
-   * @throws ParseException the parse exception
+   * @throws ParseException
+   *           the parse exception
    */
   private MtasSpanQuery createQuery(String field, String cql,
-      MtasSpanQuery ignore, Integer maximumIgnoreLength) throws ParseException {
+      MtasSpanQuery ignore, Integer maximumIgnoreLength,
+      boolean disableTwoPhaseIterator) throws ParseException {
     Reader reader = new BufferedReader(new StringReader(cql));
     MtasCQLParser p = new MtasCQLParser(reader);
-    return p.parse(field, null, null, ignore, maximumIgnoreLength);
+    MtasSpanQuery q = p.parse(field, null, null, ignore, maximumIgnoreLength);
+    if (disableTwoPhaseIterator) {
+      return new MtasDisabledTwoPhaseIteratorSpanQuery(q);
+    } else {
+      return q;
+    }
   }
 
   /**
    * Do query.
    *
-   * @param indexReader the index reader
-   * @param field the field
-   * @param cql the cql
-   * @param ignore the ignore
-   * @param maximumIgnoreLength the maximum ignore length
-   * @param prefixes the prefixes
+   * @param indexReader
+   *          the index reader
+   * @param field
+   *          the field
+   * @param cql
+   *          the cql
+   * @param ignore
+   *          the ignore
+   * @param maximumIgnoreLength
+   *          the maximum ignore length
+   * @param prefixes
+   *          the prefixes
+   * @param disableTwoPhaseIterator
+   *          the disable two phase iterator
    * @return the query result
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private QueryResult doQuery(IndexReader indexReader, String field, String cql,
       MtasSpanQuery ignore, Integer maximumIgnoreLength,
-      ArrayList<String> prefixes) throws IOException {
+      ArrayList<String> prefixes, boolean disableTwoPhaseIterator)
+      throws IOException {
     QueryResult queryResult = new QueryResult();
     try {
-      MtasSpanQuery q = createQuery(field, cql, ignore, maximumIgnoreLength);
+      MtasSpanQuery q = createQuery(field, cql, ignore, maximumIgnoreLength,
+          disableTwoPhaseIterator);
       queryResult = doQuery(indexReader, field, q, prefixes);
     } catch (mtas.parser.cql.ParseException e) {
       log.error(e);
-    }
+    } 
     return queryResult;
   }
 
   /**
    * Do query.
    *
-   * @param indexReader the index reader
-   * @param field the field
-   * @param q the q
-   * @param prefixes the prefixes
+   * @param indexReader
+   *          the index reader
+   * @param field
+   *          the field
+   * @param q
+   *          the q
+   * @param prefixes
+   *          the prefixes
    * @return the query result
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private QueryResult doQuery(IndexReader indexReader, String field,
       MtasSpanQuery q, ArrayList<String> prefixes) throws IOException {
@@ -1078,7 +1329,7 @@ public class MtasSearchTestConsistency {
       SegmentReader r = (SegmentReader) lrc.reader();
       Terms t = r.terms(field);
       CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
-      if (spans != null) {
+      if (spans != null) {   
         while (spans.nextDoc() != Spans.NO_MORE_DOCS) {
           if (r.numDocs() == r.maxDoc() || r.getLiveDocs().get(spans.docID())) {
             queryResult.docs++;
@@ -1098,7 +1349,7 @@ public class MtasSearchTestConsistency {
               }
             }
           }
-        }
+        } 
       }
     }
     return queryResult;
@@ -1107,26 +1358,43 @@ public class MtasSearchTestConsistency {
   /**
    * Test number of hits.
    *
-   * @param indexReader the index reader
-   * @param field the field
-   * @param cqls1 the cqls 1
-   * @param cqls2 the cqls 2
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param indexReader
+   *          the index reader
+   * @param field
+   *          the field
+   * @param cqls1
+   *          the cqls 1
+   * @param cqls2
+   *          the cqls 2
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void testNumberOfHits(IndexReader indexReader, String field,
       List<String> cqls1, List<String> cqls2) throws IOException {
-    Integer sum1 = 0;
-    Integer sum2 = 0;
+    int sum1 = 0;
+    int sum2 = 0;
+    int sum3 = 0;
+    int sum4 = 0;
     QueryResult queryResult;
     for (String cql1 : cqls1) {
-      queryResult = doQuery(indexReader, field, cql1, null, null, null);
+      queryResult = doQuery(indexReader, field, cql1, null, null, null, false);
       sum1 += queryResult.hits;
-    }
-    for (String cql2 : cqls2) {
-      queryResult = doQuery(indexReader, field, cql2, null, null, null);
+      queryResult = doQuery(indexReader, field, cql1, null, null, null, true);
       sum2 += queryResult.hits;
     }
-    assertEquals(sum1, sum2);
+    for (String cql2 : cqls2) {
+      queryResult = doQuery(indexReader, field, cql2, null, null, null, false);
+      sum3 += queryResult.hits;
+      queryResult = doQuery(indexReader, field, cql2, null, null, null, true);
+      sum4 += queryResult.hits;
+    }
+    assertEquals("twoPhaseIterator enabled for " + cqls1 + " (" + sum1
+        + ") and " + cqls2 + " (" + sum3 + ")", sum1, sum3);
+    assertEquals("twoPhaseIterator disabled for " + cqls1 + " (" + sum2
+        + ") and " + cqls2 + " (" + sum4 + ")", sum2, sum4);
+    assertEquals(
+        "twoPhaseIterator for " + cqls1 + " (" + sum1 + " / " + sum2 + ")",
+        sum1, sum2);
   }
 
   /**
@@ -1136,10 +1404,10 @@ public class MtasSearchTestConsistency {
 
     /** The docs. */
     public int docs;
-    
+
     /** The hits. */
     public int hits;
-    
+
     /** The result list. */
     public List<QueryHit> resultList;
 
@@ -1152,7 +1420,9 @@ public class MtasSearchTestConsistency {
       resultList = new ArrayList<>();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
@@ -1163,7 +1433,9 @@ public class MtasSearchTestConsistency {
       return buffer.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -1178,7 +1450,9 @@ public class MtasSearchTestConsistency {
       return other.hits == hits && other.docs == docs;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -1195,15 +1469,20 @@ public class MtasSearchTestConsistency {
    * The Class QueryHit.
    */
   private static class QueryHit {
-    
+
     /**
      * Instantiates a new query hit.
      *
-     * @param docId the doc id
-     * @param startPosition the start position
-     * @param endPosition the end position
-     * @param prefix the prefix
-     * @param value the value
+     * @param docId
+     *          the doc id
+     * @param startPosition
+     *          the start position
+     * @param endPosition
+     *          the end position
+     * @param prefix
+     *          the prefix
+     * @param value
+     *          the value
      */
     protected QueryHit(int docId, int startPosition, int endPosition,
         String prefix, String value) {

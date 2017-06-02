@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import org.apache.lucene.search.spans.SpanCollector;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.MtasSpanFollowedByQuery.MtasSpanFollowedByQuerySpans;
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanFollowedBySpans.
  */
-public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
+public class MtasSpanFollowedBySpans extends MtasSpans {
 
   /** The spans 1. */
   private MtasSpanFollowedByQuerySpans spans1;
@@ -44,7 +42,6 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
    * @param spans2 the spans 2
    */
   public MtasSpanFollowedBySpans(
-      MtasSpanFollowedByQuery mtasSpanFollowedByQuery,
       MtasSpanFollowedByQuerySpans spans1,
       MtasSpanFollowedByQuerySpans spans2) {
     super();
@@ -106,7 +103,6 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
    */
   @Override
   public float positionsCost() {
-    // TODO Auto-generated method stub
     return 0;
   }
 
@@ -144,18 +140,19 @@ public class MtasSpanFollowedBySpans extends Spans implements MtasSpans {
     } else {
       // advance 1
       int spans1DocId = spans1.spans.docID();
-      if (spans1DocId < target) {
-        spans1DocId = spans1.spans.advance(target);
+      int newTarget = target;
+      if (spans1DocId < newTarget) {
+        spans1DocId = spans1.spans.advance(newTarget);
         if (spans1DocId == NO_MORE_DOCS) {
           docId = NO_MORE_DOCS;
           return docId;
         }
-        target = Math.max(target, spans1DocId);
+        newTarget = Math.max(newTarget, spans1DocId);
       }
       int spans2DocId = spans2.spans.docID();
       // advance 2
-      if (spans2DocId < target) {
-        spans2DocId = spans2.spans.advance(target);
+      if (spans2DocId < newTarget) {
+        spans2DocId = spans2.spans.advance(newTarget);
         if (spans2DocId == NO_MORE_DOCS) {
           docId = NO_MORE_DOCS;
           return docId;

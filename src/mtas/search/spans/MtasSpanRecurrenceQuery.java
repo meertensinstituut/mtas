@@ -14,6 +14,8 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanRecurrenceQuery.
@@ -261,7 +263,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     SpanWeight subWeight = query.createWeight(searcher, false);
     SpanWeight ignoreWeight = null;
@@ -276,7 +278,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
   /**
    * The Class SpanRecurrenceWeight.
    */
-  protected class SpanRecurrenceWeight extends SpanWeight {
+  protected class SpanRecurrenceWeight extends MtasSpanWeight {
 
     /** The sub weight. */
     final SpanWeight subWeight;
@@ -327,7 +329,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
       if (field == null) {
         return null;

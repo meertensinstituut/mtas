@@ -339,7 +339,7 @@ public class MtasFunctionParserFunctionBasic
             }
           } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
             sumRule = false;
-            degree = null;            
+            degree = null;
           }
         }
         break;
@@ -370,7 +370,7 @@ public class MtasFunctionParserFunctionBasic
             degree += parser.degree;
           } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
             sumRule = false;
-            degree = null;            
+            degree = null;
           }
         }
         break;
@@ -402,7 +402,7 @@ public class MtasFunctionParserFunctionBasic
             degree += parser.degree;
           } else if (operator.equals(BASIC_OPERATOR_POWER) && (degree != 0)) {
             sumRule = false;
-            degree = null;            
+            degree = null;
           }
         }
         break;

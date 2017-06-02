@@ -16,6 +16,8 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanIntersectingQuery.
@@ -27,7 +29,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 
   /** The q 1. */
   private SpanQuery q1;
-  
+
   /** The q 2. */
   private SpanQuery q2;
 
@@ -41,7 +43,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
     if (q1 != null && (field = q1.getField()) != null) {
-      if (q2 != null && q2.getField()!=null && !q2.getField().equals(field)) {
+      if (q2 != null && q2.getField() != null && !q2.getField().equals(field)) {
         throw new IllegalArgumentException("Clauses must have same field.");
       }
     } else if (q2 != null) {
@@ -71,7 +73,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     if (q1 == null || q2 == null) {
       return null;
@@ -192,11 +194,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   /**
    * The Class SpanIntersectingWeight.
    */
-  protected class SpanIntersectingWeight extends SpanWeight {
+  protected class SpanIntersectingWeight extends MtasSpanWeight {
 
     /** The w 1. */
     MtasSpanIntersectingQueryWeight w1;
-    
+
     /** The w 2. */
     MtasSpanIntersectingQueryWeight w2;
 
@@ -239,7 +241,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext context, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
         throws IOException {
       Terms terms = context.reader().terms(field);
       if (terms == null) {
@@ -249,8 +251,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanIntersectingQuerySpans s2 = new MtasSpanIntersectingQuerySpans(
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanIntersectingSpans(MtasSpanIntersectingQuery.this, s1,
-          s2);
+      return new MtasSpanIntersectingSpans(s1, s2);
     }
 
     /*
@@ -280,7 +281,7 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
      * @param spans the spans
      */
     public MtasSpanIntersectingQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(field);
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
     }
 
   }

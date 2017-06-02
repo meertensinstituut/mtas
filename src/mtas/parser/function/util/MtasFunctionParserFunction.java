@@ -13,7 +13,7 @@ import mtas.parser.function.ParseException;
  * The Class MtasFunctionParserFunction.
  */
 public abstract class MtasFunctionParserFunction {
-  
+
   /** The log. */
   private static Log log = LogFactory.getLog(MtasFunctionParserFunction.class);
 

@@ -22,8 +22,6 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
 
-import mtas.analysis.MtasTokenizer;
-
 /**
  * The Class MtasFieldsProducer.
  */
@@ -119,8 +117,8 @@ public class MtasFieldsProducer extends FieldsProducer {
     if (localPostingsFormatName == null) {
       localPostingsFormatName = in.readString();
     } else if (!in.readString().equals(localPostingsFormatName)) {
-      throw new IOException(
-          "delegate codec " + name + " doesn't equal " + localPostingsFormatName);
+      throw new IOException("delegate codec " + name + " doesn't equal "
+          + localPostingsFormatName);
     }
     indexInputList.put(name, in);
     indexInputOffsetList.put(name, in.getFilePointer());

@@ -11,9 +11,9 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
-import org.apache.lucene.search.spans.Spans;
-
 import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanStartQuery.
@@ -42,7 +42,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newClause = clause.rewrite(reader);
-    if (newClause != clause) {
+    if (!newClause.equals(clause)) {
       return new MtasSpanStartQuery(newClause).rewrite(reader);
     } else if(newClause.getMaximumWidth()!=null && newClause.getMaximumWidth()==0) {
       return newClause;
@@ -84,7 +84,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
       throws IOException {
     SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))
         .createWeight(searcher, needsScores);
@@ -94,7 +94,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
   /**
    * The Class SpanTermWeight.
    */
-  protected class SpanTermWeight extends SpanWeight {
+  protected class SpanTermWeight extends MtasSpanWeight {
 
     /** The span weight. */
     SpanWeight spanWeight;
@@ -133,7 +133,7 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
+    public MtasSpans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
       return new MtasSpanStartSpans(spanWeight.getSpans(ctx, requiredPostings));
     }

@@ -12,8 +12,9 @@ public class MtasFunctionParserFunctionResponseLong
     extends MtasFunctionParserFunctionResponse {
 
   /** The log. */
-  private static Log log = LogFactory.getLog(MtasFunctionParserFunctionResponseLong.class);
-  
+  private static Log log = LogFactory
+      .getLog(MtasFunctionParserFunctionResponseLong.class);
+
   /** The value. */
   private long value;
 
@@ -61,7 +62,7 @@ public class MtasFunctionParserFunctionResponseLong
     try {
       if (value == other.getValue()) {
         return defined;
-      } else {        
+      } else {
         return false;
       }
     } catch (IOException e) {
@@ -69,8 +70,10 @@ public class MtasFunctionParserFunctionResponseLong
       return !defined;
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
