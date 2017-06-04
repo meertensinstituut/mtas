@@ -259,8 +259,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     List<MtasSpanSequenceQueryWeight> subWeights = new ArrayList<>();
     SpanWeight ignoreWeight = null;
     for (MtasSpanSequenceItem item : items) {
@@ -349,8 +349,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       if (field == null) {
         return null;
       } else {
@@ -408,7 +408,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanSequenceQuerySpans.
    */
-  protected class MtasSpanSequenceQuerySpans {
+  protected static class MtasSpanSequenceQuerySpans {
 
     /** The spans. */
     public Spans spans;

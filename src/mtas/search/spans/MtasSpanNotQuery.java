@@ -79,8 +79,8 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
    * IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     // return baseQuery.createWeight(searcher, needsScores);
     if (q1 == null || q2 == null) {
       return null;
@@ -233,8 +233,8 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       Terms terms = context.reader().terms(field);
       if (terms == null) {
         return null; // field does not exist
@@ -262,7 +262,7 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanNotQuerySpans.
    */
-  protected class MtasSpanNotQuerySpans {
+  protected static class MtasSpanNotQuerySpans {
 
     /** The spans. */
     public Spans spans;

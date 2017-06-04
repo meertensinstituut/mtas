@@ -262,7 +262,7 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
   /**
    * The Class MtasSpanPrecededByQuerySpans.
    */
-  protected class MtasSpanPrecededByQuerySpans {
+  protected static class MtasSpanPrecededByQuerySpans {
 
     /** The spans. */
     public Spans spans;
