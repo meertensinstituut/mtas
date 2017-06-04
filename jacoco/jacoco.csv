@@ -15,7 +15,7 @@ MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingWordAnnotation,2,19,
 MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingWord,2,19,0,0,1,7,1,1,1,1
 MTAS,mtas.analysis.parser,MtasCRMParser,2135,0,198,0,380,0,111,0,12,0
 MTAS,mtas.analysis.parser,MtasCRMParser.MtasCRMAncestors,6,0,0,0,2,0,1,0,1,0
-MTAS,mtas.analysis.parser,MtasParser,0,62,1,7,0,12,1,5,0,2
+MTAS,mtas.analysis.parser,MtasParser,0,62,1,7,0,11,1,5,0,2
 MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingGroup,2,19,0,0,1,7,1,1,1,1
 MTAS,mtas.analysis.parser,MtasBasicParser.MtasParserMappingToken,0,45,0,0,0,15,0,4,0,4
 MTAS,mtas.analysis.parser,MtasCRMParser.MtasCRMParserMappingCRMPair,21,0,0,0,8,0,2,0,2,0
@@ -32,8 +32,8 @@ MTAS,mtas.analysis.parser,MtasBasicParser.MtasParserVariableValue,9,0,0,0,4,0,1,
 MTAS,mtas.analysis.parser,MtasSketchParser,1180,0,124,0,214,0,68,0,6,0
 MTAS,mtas.analysis.parser,MtasXMLParser,1290,1810,149,212,179,388,127,66,4,6
 MTAS,mtas.analysis.parser,MtasBasicParser,1993,1685,360,202,388,356,221,85,6,19
-MTAS,mtas.analysis.parser,MtasCRMParser.MtasCRMParserFunction,11,0,0,0,4,0,1,0,1,0
 MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingGroupAnnotation,10,26,3,1,3,10,3,2,1,2
+MTAS,mtas.analysis.parser,MtasCRMParser.MtasCRMParserFunction,11,0,0,0,4,0,1,0,1,0
 MTAS,mtas.parser.function,MtasFunctionParser.LookaheadSuccess,0,3,0,0,0,1,0,1,0,1
 MTAS,mtas.parser.function,MtasFunctionParser.JJCalls,0,3,0,0,0,1,0,1,0,1
 MTAS,mtas.parser.function,MtasFunctionParserConstants,68,0,0,0,1,0,1,0,1,0
@@ -69,7 +69,7 @@ MTAS,mtas.codec.util,CodecCollector,6220,3726,995,535,1170,827,601,205,15,26
 MTAS,mtas.codec.util,CodecComponent.KwicHit,16,0,0,0,5,0,1,0,1,0
 MTAS,mtas.codec.util,CodecComponent.ComponentKwic,151,0,26,0,29,0,14,0,1,0
 MTAS,mtas.codec.util,CodecCollector.RegisterStatus,0,9,0,0,0,4,0,1,0,1
-MTAS,mtas.codec.util,CodecSearchTree,103,785,27,97,15,150,24,49,1,10
+MTAS,mtas.codec.util,CodecSearchTree,103,785,27,97,14,150,24,49,1,10
 MTAS,mtas.codec.util,CodecSearchTree.MtasTreeItem,0,30,0,0,0,11,0,1,0,1
 MTAS,mtas.codec.util,CodecInfo.IndexDoc,6,63,0,2,2,17,0,2,0,1
 MTAS,mtas.codec.util,CodecComponent.ListHit,22,0,0,0,7,0,1,0,1,0
@@ -116,8 +116,8 @@ MTAS,mtas.search.similarities,MtasSimScorer,9,0,0,0,4,0,4,0,4,0
 MTAS,mtas.queries,MtasScoreProvider,8,0,0,0,4,0,3,0,3,0
 MTAS,mtas.queries,MtasScoreQuery,19,0,0,0,7,0,4,0,4,0
 MTAS,mtas.search.spans.util,MtasExtendedSpanTermQuery,96,118,9,13,17,24,11,7,3,4
-MTAS,mtas.search.spans.util,MtasExtendedSpanTermQuery.SpanTermWeight.new FilterSpans() {...},8,29,4,4,1,4,4,3,0,3
 MTAS,mtas.search.spans.util,MtasSpanUniquePositionSpans,35,269,10,36,8,69,10,29,3,13
+MTAS,mtas.search.spans.util,MtasExtendedSpanTermQuery.SpanTermWeight.new FilterSpans() {...},8,29,4,4,1,4,4,3,0,3
 MTAS,mtas.search.spans.util,MtasDisabledTwoPhaseIteratorSpanQuery.MtasDisabledTwoPhaseIteratorWeight,18,24,1,1,4,6,3,2,2,2
 MTAS,mtas.search.spans.util,MtasIgnoreItem,207,613,37,63,37,115,29,38,1,16
 MTAS,mtas.search.spans.util,MtasDisabledTwoPhaseIteratorSpans,69,18,2,0,14,6,10,4,9,4
@@ -172,8 +172,8 @@ MTAS,mtas.search.spans,MtasSpanPrecededByQuery.MtasSpanPrecededByQuerySpans,3,9,
 MTAS,mtas.search.spans,MtasSpanSequenceQuery,179,388,34,58,36,77,29,28,3,8
 MTAS,mtas.search.spans,MtasSpanContainingQuery,96,167,29,27,19,32,27,8,2,5
 MTAS,mtas.search.spans,MtasSpanFollowedByQuery.MtasSpanFollowedByQuerySpans,3,9,1,1,0,3,1,1,0,1
-MTAS,mtas.search.spans,MtasSpanSequenceQuery.SpanSequenceWeight,49,112,11,11,14,29,9,6,1,3
 MTAS,mtas.search.spans,MtasSpanSequenceSpans.QueueItem,0,174,2,20,0,41,2,13,0,4
+MTAS,mtas.search.spans,MtasSpanSequenceQuery.SpanSequenceWeight,49,112,11,11,14,29,9,6,1,3
 MTAS,mtas.search.spans,MtasSpanSequenceQuery.MtasSpanSequenceQueryWeight,0,9,0,0,0,4,0,1,0,1
 MTAS,mtas.search.spans,MtasSpanPrecededBySpans,158,239,34,38,46,62,29,21,5,9
 MTAS,mtas.search.spans,MtasSpanStartSpans,28,70,11,9,5,13,12,10,2,10
@@ -194,16 +194,16 @@ MTAS,mtas.search.spans,MtasSpanEndQuery,54,77,4,8,11,19,5,8,2,5
 MTAS,mtas.search.spans,MtasSpanWithinQuery,298,497,50,56,52,96,42,19,1,7
 MTAS,mtas.search.spans,MtasSpanFullyAlignedWithQuery.MtasSpanFullyAlignedWithQueryWeight,0,6,0,0,0,3,0,1,0,1
 MTAS,mtas.search.spans,MtasSpanRegexpQuery,128,177,11,19,18,32,13,10,3,5
-MTAS,mtas.search.spans,MtasSpanFullyAlignedWithSpans,156,263,32,48,48,67,27,27,5,9
 MTAS,mtas.search.spans,MtasSpanStartQuery,54,77,4,8,10,19,5,8,2,5
+MTAS,mtas.search.spans,MtasSpanFullyAlignedWithSpans,156,263,32,48,48,67,27,27,5,9
 MTAS,mtas.search.spans,MtasSpanRecurrenceSpans,138,408,29,55,33,94,26,34,4,14
 MTAS,mtas.search.spans,MtasSpanNotQuery.SpanNotWeight,24,49,1,1,7,12,3,2,2,2
 MTAS,mtas.search.spans,MtasSpanPositionSpans,80,143,8,8,20,37,10,9,5,6
 MTAS,mtas.search.spans,MtasSpanFollowedByQuery.MtasSpanFollowedByQueryWeight,0,6,0,0,0,3,0,1,0,1
 MTAS,mtas.search.spans,MtasSpanOrQuery,129,270,29,33,32,55,22,16,1,6
 MTAS,mtas.search.spans,MtasSpanIntersectingQuery.MtasSpanIntersectingQueryWeight,0,6,0,0,0,3,0,1,0,1
-MTAS,mtas.search.spans,MtasSpanMatchAllQuery.SpanAllWeight,43,92,3,7,13,21,5,5,3,2
 MTAS,mtas.search.spans,MtasSpanPositionQuery,45,97,6,8,4,21,6,8,1,6
+MTAS,mtas.search.spans,MtasSpanMatchAllQuery.SpanAllWeight,43,92,3,7,13,21,5,5,3,2
 MTAS,mtas.search.spans,MtasSpanStartQuery.SpanTermWeight,10,21,0,0,4,5,2,2,2,2
 MTAS,mtas.search.spans,MtasSpanMatchNoneQuery,59,32,8,4,12,10,7,5,2,4
 MTAS,mtas.search.spans,MtasSpanFullyAlignedWithQuery.SpanFullyAlignedWithWeight,24,49,1,1,7,12,3,2,2,2
@@ -216,8 +216,8 @@ MTAS,mtas.search.spans,MtasSpanPrecededByQuery.SpanPrecededByWeight,24,49,1,1,7,
 MTAS,mtas.search.spans,MtasSpanSequenceItem,458,130,81,21,86,32,47,13,2,7
 MTAS,mtas.search.spans,MtasSpanFollowedByQuery,141,163,26,24,29,30,25,8,3,5
 MTAS,mtas.search.spans,MtasSpanMatchAllQuery,22,62,1,5,4,16,2,8,1,6
-MTAS,mtas.search.spans,MtasSpanRecurrenceQuery.SpanRecurrenceWeight,17,61,4,4,6,17,5,3,1,3
 MTAS,mtas.search.spans,MtasSpanTermQuery,20,70,1,9,6,15,4,10,3,6
+MTAS,mtas.search.spans,MtasSpanRecurrenceQuery.SpanRecurrenceWeight,17,61,4,4,6,17,5,3,1,3
 MTAS,mtas.search.spans,MtasSpanRecurrenceSpans.Match,29,40,5,5,7,11,6,4,1,4
 MTAS,mtas.search.spans,MtasSpanMatchNoneSpans,19,36,0,0,8,13,8,3,8,3
 MTAS,mtas.search.spans,MtasSpanMatchNoneQuery.SpanNoneWeight,13,62,0,6,5,15,3,5,3,2
