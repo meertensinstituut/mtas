@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y locales lsof software-properties-common
             
 RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binaries/commons-math3-3.6.1-bin.tar.gz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if echo "$mathurl" | grep -q '^.*[^ ].*$'; then \
-      curl -f -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl; \
+      curl -f -o /root/lib/commons-math3-3.6.1-bin.tar.gz -O $mathurl || true; \
     fi && \
     if [ ! -f /root/lib/commons-math3-3.6.1-bin.tar.gz ]; then \
       echo "Commons-math3 not found in mirror, falling back to apache archive"; \ 
@@ -42,7 +42,7 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
 
 RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.5.1/solr-6.5.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if echo "$solrurl" | grep -q '^.*[^ ].*$'; then \
-      curl -f -o /root/solr-6.5.1.tgz -O $solrurl; \
+      curl -f -o /root/solr-6.5.1.tgz -O $solrurl || true; \
     fi && \
     if [ ! -f /root/solr-6.5.1.tgz ]; then \
       echo "Solr 6.5.1 not found in mirror, falling back to apache archive"; \ 
