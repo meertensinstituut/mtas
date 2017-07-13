@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+
+	<!-- START MTAS INDEX CONFIGURATION -->
+	<index>
+		<!-- START GENERAL SETTINGS MTAS INDEX PROCESS -->
+		<payload index="true" />
+		<offset index="true" />
+		<realoffset index="true" />
+		<parent index="true" />
+		<!-- END GENERAL SETTINGS MTAS INDEX PROCESS -->
+	</index>
+	<!-- END MTAS INDEX CONFIGURATION -->
+
+
+
+	<!-- START CONFIGURATION MTAS CHAT PARSER -->
+	<parser name="mtas.analysis.parser.MtasChatParser">
+
+		<!-- START GENERAL SETTINGS MTAS CHAT PARSER -->
+		<autorepair value="true" />
+		<makeunique value="true" />
+		<!-- END GENERAL SETTINGS MTAS CHAT PARSER -->
+
+		<!-- START VARIABLES -->
+		<variables>
+			<variable name="participant" value="participant.role">
+				<value>
+					<item type="attribute" name="role" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.name">
+				<value>
+					<item type="attribute" name="name" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.age">
+				<value>
+					<item type="attribute" name="age" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.group">
+				<value>
+					<item type="attribute" name="group" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.sex">
+				<value>
+					<item type="attribute" name="sex" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.SES">
+				<value>
+					<item type="attribute" name="SES" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.education">
+				<value>
+					<item type="attribute" name="education" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.custom-field">
+				<value>
+					<item type="attribute" name="custom-field" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.birthday">
+				<value>
+					<item type="attribute" name="birthday" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.language">
+				<value>
+					<item type="attribute" name="language" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.first-language">
+				<value>
+					<item type="attribute" name="first-language" />
+				</value>
+			</variable>
+			<variable name="participant" value="participant.birthplace">
+				<value>
+					<item type="attribute" name="birthplace" />
+				</value>
+			</variable>
+		</variables>
+		<!-- END VARIABLES -->
+
+		<!-- START REFERENCES -->
+		<!-- END REFERENCES -->
+
+		<!-- START MAPPINGS -->
+		<mappings>
+
+			<!-- START WORDS -->
+			<mapping type="word" name="w">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="word" name="t">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="attribute" name="type" prefix="." />
+					</pre>
+				</token>
+			</mapping>
+			<mapping type="word" name="a">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="attribute" name="type" prefix="." />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="word" name="e">
+        <token type="string" offset="false">
+          <pre>
+            <item type="name" />
+          </pre>
+          <post>
+            <item type="text" />
+          </post>
+        </token>
+      </mapping>
+      <mapping type="word" name="lazy-gem">
+        <token type="string" offset="false">
+          <pre>
+            <item type="name" />
+          </pre>
+          <post>
+            <item type="attribute" name="label" />
+          </post>
+        </token>
+      </mapping>
+			<!-- END WORDS -->
+
+			<!-- START WORD ANNOTATIONS -->			
+			<mapping type="wordAnnotation" name="pos">
+			</mapping>
+			<mapping type="wordAnnotation" name="c">
+				<token type="string" offset="false">
+					<pre>
+						<item type="ancestorName" />
+						<item type="name" prefix="." />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+				<condition>
+					<item type="ancestorName" condition="pos" />
+					<item type="ancestorWordName" condition="w" />
+				</condition>
+			</mapping>
+			<mapping type="wordAnnotation" name="s">
+				<token type="string" offset="false">
+					<pre>
+						<item type="ancestorName" />
+						<item type="name" prefix="." />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+				<condition>
+					<item type="ancestorName" condition="pos" />
+					<item type="ancestorWordName" condition="w" />
+				</condition>
+			</mapping>
+			<mapping type="wordAnnotation" name="stem">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+				<condition>
+          <item type="ancestorWordName" condition="w" />
+        </condition>
+			</mapping>
+			<mapping type="wordAnnotation" name="mk">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="attribute" name="type" prefix="." />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+				<condition>
+          <item type="ancestorWordName" condition="w" />
+        </condition>
+			</mapping>
+			<mapping type="wordAnnotation" name="ga">
+        <token type="string" offset="false">
+          <pre>
+            <item type="ancestorWordName" />
+            <item type="name" prefix="." />
+            <item type="attribute" name="type" prefix="." />
+          </pre>
+          <post>
+            <item type="text" />
+          </post>
+        </token>
+        <condition>
+          <item type="ancestorWordName" condition="e" />
+        </condition>
+      </mapping>
+      <mapping type="wordAnnotation" name="action">
+        <token type="string" offset="false">
+          <pre>
+            <item type="ancestorWordName" />
+            <item type="name" prefix="." />
+          </pre>
+        </token>
+        <condition>
+          <item type="ancestorWordName" condition="e" />
+        </condition>
+      </mapping>
+			<!-- END WORD ANNOTATIONS -->
+
+			<!-- START RELATIONS -->
+			<!-- END RELATIONS -->
+
+			<!-- START GROUPS -->
+			<mapping type="group" name="tcu">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+				</token>
+			</mapping>
+			<mapping type="group" name="u">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+				</token>
+			</mapping>
+			<mapping type="group" name="u">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".id" />
+					</pre>
+					<post>
+						<item type="attribute" name="uID" />
+					</post>
+				</token>
+				<condition>
+					<item type="attribute" name="uID" />
+				</condition>
+			</mapping>
+			<mapping type="group" name="u">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".role" />
+					</pre>
+					<post>
+						<item type="variableFromAttribute" name="participant.role"
+							value="who" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="group" name="u">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".name" />
+					</pre>
+					<post>
+						<item type="variableFromAttribute" name="participant.name"
+							value="who" />
+					</post>
+				</token>
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".age" />
+					</pre>
+					<post>
+						<item type="variableFromAttribute" name="participant.age"
+							value="who" />
+					</post>
+				</token>
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".sex" />
+					</pre>
+					<post>
+						<item type="variableFromAttribute" name="participant.sex"
+							value="who" />
+					</post>
+				</token>
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".birthday" />
+					</pre>
+					<post>
+						<item type="variableFromAttribute" name="participant.birthday"
+							value="who" />
+					</post>
+				</token>
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".language" />
+					</pre>
+					<post>
+						<item type="variableFromAttribute" name="participant.language"
+							value="who" />
+					</post>
+				</token>
+				<condition>
+					<item type="attribute" name="who" />
+				</condition>
+			</mapping>
+			<mapping type="group" name="g">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+				</token>
+			</mapping>
+			<mapping type="group" name="pg">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+				</token>
+			</mapping>
+			<mapping type="group" name="sg">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+					</pre>
+				</token>
+			</mapping>
+			<!-- END GROUPS -->
+
+			<!-- START GROUP ANNOTATIONS -->
+			<mapping type="groupAnnotation" name="a">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="attribute" name="type" prefix="." />
+						<item type="attribute" name="flavor" prefix="." />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+				<condition>
+					<item type="attribute" name="type" />
+				</condition>
+			</mapping>
+			<mapping type="groupAnnotation" name="media">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".start" />
+					</pre>
+					<post>
+						<item type="attribute" name="start" />
+					</post>
+				</token>
+				<condition>
+					<item type="attribute" name="start" />
+				</condition>
+			</mapping>
+			<mapping type="groupAnnotation" name="media">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".end" />
+					</pre>
+					<post>
+						<item type="attribute" name="end" />
+					</post>
+				</token>
+				<condition>
+					<item type="attribute" name="end" />
+				</condition>
+			</mapping>
+			<mapping type="groupAnnotation" name="media">
+				<token type="string" offset="false">
+					<pre>
+						<item type="name" />
+						<item type="string" value=".unit" />
+					</pre>
+					<post>
+						<item type="attribute" name="unit" />
+					</post>
+				</token>
+				<condition>
+					<item type="attribute" name="unit" />
+				</condition>
+			</mapping>
+			<!-- END GROUP ANNOTATIONS -->
+
+		</mappings>
+		<!-- END MAPPINGS -->
+
+	</parser>
+	<!-- END CONFIGURATION MTAS CHAT PARSER -->
+
+</mtas>
