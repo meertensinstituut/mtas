@@ -45,12 +45,11 @@ public class MtasSolrComponentPrefix
   /**
    * Instantiates a new mtas solr component prefix.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
-<span class="fc" id="L51">  public MtasSolrComponentPrefix(MtasSolrSearchComponent searchComponent) {</span>
-<span class="fc" id="L52">    this.searchComponent = searchComponent;</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L50">  public MtasSolrComponentPrefix(MtasSolrSearchComponent searchComponent) {</span>
+<span class="fc" id="L51">    this.searchComponent = searchComponent;</span>
+<span class="fc" id="L52">  }</span>
 
   /*
    * (non-Javadoc)
@@ -62,42 +61,42 @@ public class MtasSolrComponentPrefix
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="fc" id="L65">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
-<span class="fc" id="L66">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);</span>
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
-<span class="fc" id="L68">      int tmpCounter = 0;</span>
-<span class="fc" id="L69">      String[] fields = new String[ids.size()];</span>
-<span class="fc" id="L70">      String[] keys = new String[ids.size()];</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">      for (String id : ids) {</span>
-<span class="fc" id="L72">        fields[tmpCounter] = rb.req.getParams().get(</span>
+<span class="fc" id="L64">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="fc" id="L65">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="fc" id="L67">      int tmpCounter = 0;</span>
+<span class="fc" id="L68">      String[] fields = new String[ids.size()];</span>
+<span class="fc" id="L69">      String[] keys = new String[ids.size()];</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">      for (String id : ids) {</span>
+<span class="fc" id="L71">        fields[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_PREFIX + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_PREFIX_FIELD, null);
-<span class="fc" id="L74">        keys[tmpCounter] = rb.req.getParams()</span>
-<span class="fc" id="L75">            .get(PARAM_MTAS_PREFIX + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_PREFIX_KEY,</span>
-<span class="fc" id="L76">                String.valueOf(tmpCounter))</span>
-<span class="fc" id="L77">            .trim();</span>
-<span class="fc" id="L78">        tmpCounter++;</span>
-<span class="fc" id="L79">      }</span>
-<span class="fc" id="L80">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
-<span class="fc" id="L81">      mtasFields.doPrefix = true;</span>
+<span class="fc" id="L73">        keys[tmpCounter] = rb.req.getParams()</span>
+<span class="fc" id="L74">            .get(PARAM_MTAS_PREFIX + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_PREFIX_KEY,</span>
+<span class="fc" id="L75">                String.valueOf(tmpCounter))</span>
+<span class="fc" id="L76">            .trim();</span>
+<span class="fc" id="L77">        tmpCounter++;</span>
+<span class="fc" id="L78">      }</span>
+<span class="fc" id="L79">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="fc" id="L80">      mtasFields.doPrefix = true;</span>
       // init and checks
-<span class="fc bfc" id="L83" title="All 2 branches covered.">      for (String field : fields) {</span>
-<span class="pc bpc" id="L84" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
-<span class="nc" id="L85">          throw new IOException(&quot;no (valid) field in mtas prefix&quot;);</span>
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
-<span class="fc" id="L87">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">      for (String field : fields) {</span>
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L84">          throw new IOException(&quot;no (valid) field in mtas prefix&quot;);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="fc" id="L86">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
-<span class="fc" id="L90">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_PREFIX_KEY,</span>
-<span class="fc" id="L91">          NAME_MTAS_PREFIX_FIELD, true);</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
-<span class="fc" id="L93">        String field = fields[i];</span>
-<span class="pc bpc" id="L94" title="2 of 4 branches missed.">        String key = ((keys == null) || (keys[i] == null)</span>
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">            || (keys[i].isEmpty())) ? String.valueOf(i) + &quot;:&quot; + field</span>
-<span class="fc" id="L96">                : keys[i].trim();</span>
-<span class="fc" id="L97">        mtasFields.list.get(field).prefix = new ComponentPrefix(key);</span>
+<span class="fc" id="L89">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_PREFIX_KEY,</span>
+<span class="fc" id="L90">          NAME_MTAS_PREFIX_FIELD, true);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="fc" id="L92">        String field = fields[i];</span>
+<span class="pc bpc" id="L93" title="2 of 4 branches missed.">        String key = ((keys == null) || (keys[i] == null)</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            || (keys[i].isEmpty())) ? String.valueOf(i) + &quot;:&quot; + field</span>
+<span class="fc" id="L95">                : keys[i].trim();</span>
+<span class="fc" id="L96">        mtasFields.list.get(field).prefix = new ComponentPrefix(key);</span>
       }
     }
-<span class="fc" id="L100">  }</span>
+<span class="fc" id="L99">  }</span>
 
   /*
    * (non-Javadoc)
@@ -110,24 +109,24 @@ public class MtasSolrComponentPrefix
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
-<span class="pc bpc" id="L114" title="1 of 4 branches missed.">      if (sreq.params.getBool(PARAM_MTAS_PREFIX, false)</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">      if (sreq.params.getBool(PARAM_MTAS_PREFIX, false)</span>
           &amp;&amp; (sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
         // do nothing
       } else {
         // remove prefix for other requests
-<span class="fc" id="L119">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="fc" id="L120">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);</span>
-<span class="fc" id="L121">        sreq.params.remove(PARAM_MTAS_PREFIX);</span>
-<span class="fc bfc" id="L122" title="All 2 branches covered.">        for (String key : keys) {</span>
-<span class="fc" id="L123">          sreq.params.remove(</span>
+<span class="fc" id="L118">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="fc" id="L119">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_PREFIX);</span>
+<span class="fc" id="L120">        sreq.params.remove(PARAM_MTAS_PREFIX);</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        for (String key : keys) {</span>
+<span class="fc" id="L122">          sreq.params.remove(</span>
               PARAM_MTAS_PREFIX + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_PREFIX_FIELD);
-<span class="fc" id="L125">          sreq.params.remove(</span>
+<span class="fc" id="L124">          sreq.params.remove(</span>
               PARAM_MTAS_PREFIX + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_PREFIX_KEY);
-<span class="fc" id="L127">        }</span>
+<span class="fc" id="L126">        }</span>
       }
     }
-<span class="fc" id="L130">  }</span>
+<span class="fc" id="L129">  }</span>
 
   /*
    * (non-Javadoc)
@@ -138,24 +137,24 @@ public class MtasSolrComponentPrefix
    */
   public SimpleOrderedMap&lt;Object&gt; create(ComponentPrefix prefix,
       Boolean encode) {
-<span class="fc" id="L141">    SimpleOrderedMap&lt;Object&gt; mtasPrefixResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="fc" id="L142">    mtasPrefixResponse.add(&quot;key&quot;, prefix.key);</span>
-<span class="fc bfc" id="L143" title="All 2 branches covered.">    if (encode) {</span>
-<span class="fc" id="L144">      mtasPrefixResponse.add(&quot;_encoded_singlePosition&quot;,</span>
-<span class="fc" id="L145">          MtasSolrResultUtil.encode(prefix.singlePositionList));</span>
-<span class="fc" id="L146">      mtasPrefixResponse.add(&quot;_encoded_multiplePosition&quot;,</span>
-<span class="fc" id="L147">          MtasSolrResultUtil.encode(prefix.multiplePositionList));</span>
-<span class="fc" id="L148">      mtasPrefixResponse.add(&quot;_encoded_setPosition&quot;,</span>
-<span class="fc" id="L149">          MtasSolrResultUtil.encode(prefix.setPositionList));</span>
-<span class="fc" id="L150">      mtasPrefixResponse.add(&quot;_encoded_intersecting&quot;,</span>
-<span class="fc" id="L151">          MtasSolrResultUtil.encode(prefix.intersectingList));</span>
+<span class="fc" id="L140">    SimpleOrderedMap&lt;Object&gt; mtasPrefixResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L141">    mtasPrefixResponse.add(&quot;key&quot;, prefix.key);</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">    if (encode) {</span>
+<span class="fc" id="L143">      mtasPrefixResponse.add(&quot;_encoded_singlePosition&quot;,</span>
+<span class="fc" id="L144">          MtasSolrResultUtil.encode(prefix.singlePositionList));</span>
+<span class="fc" id="L145">      mtasPrefixResponse.add(&quot;_encoded_multiplePosition&quot;,</span>
+<span class="fc" id="L146">          MtasSolrResultUtil.encode(prefix.multiplePositionList));</span>
+<span class="fc" id="L147">      mtasPrefixResponse.add(&quot;_encoded_setPosition&quot;,</span>
+<span class="fc" id="L148">          MtasSolrResultUtil.encode(prefix.setPositionList));</span>
+<span class="fc" id="L149">      mtasPrefixResponse.add(&quot;_encoded_intersecting&quot;,</span>
+<span class="fc" id="L150">          MtasSolrResultUtil.encode(prefix.intersectingList));</span>
     } else {
-<span class="fc" id="L153">      mtasPrefixResponse.add(&quot;singlePosition&quot;, prefix.singlePositionList);</span>
-<span class="fc" id="L154">      mtasPrefixResponse.add(&quot;multiplePosition&quot;, prefix.multiplePositionList);</span>
-<span class="fc" id="L155">      mtasPrefixResponse.add(&quot;setPosition&quot;, prefix.setPositionList);</span>
-<span class="fc" id="L156">      mtasPrefixResponse.add(&quot;intersecting&quot;, prefix.intersectingList);</span>
+<span class="fc" id="L152">      mtasPrefixResponse.add(&quot;singlePosition&quot;, prefix.singlePositionList);</span>
+<span class="fc" id="L153">      mtasPrefixResponse.add(&quot;multiplePosition&quot;, prefix.multiplePositionList);</span>
+<span class="fc" id="L154">      mtasPrefixResponse.add(&quot;setPosition&quot;, prefix.setPositionList);</span>
+<span class="fc" id="L155">      mtasPrefixResponse.add(&quot;intersecting&quot;, prefix.intersectingList);</span>
     }
-<span class="fc" id="L158">    return mtasPrefixResponse;</span>
+<span class="fc" id="L157">    return mtasPrefixResponse;</span>
   }
 
   /*
@@ -167,30 +166,30 @@ public class MtasSolrComponentPrefix
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
-<span class="pc bpc" id="L170" title="1 of 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="pc bpc" id="L169" title="1 of 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
         &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
         &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
-<span class="fc bfc" id="L173" title="All 2 branches covered.">      for (ShardRequest sreq : rb.finished) {</span>
-<span class="pc bpc" id="L174" title="1 of 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="pc bpc" id="L175" title="1 of 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_PREFIX, false)) {</span>
-<span class="fc bfc" id="L176" title="All 2 branches covered.">          for (ShardResponse shardResponse : sreq.responses) {</span>
-<span class="fc" id="L177">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
-<span class="fc" id="L178">                .getResponse();</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_PREFIX, false)) {</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="fc" id="L176">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="fc" id="L177">                .getResponse();</span>
             try {
-<span class="fc" id="L180">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
-<span class="fc" id="L181">                  .findRecursive(&quot;mtas&quot;, &quot;prefix&quot;);</span>
-<span class="pc bpc" id="L182" title="1 of 2 branches missed.">              if (data != null) {</span>
-<span class="fc" id="L183">                MtasSolrResultUtil.decode(data);</span>
+<span class="fc" id="L179">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
+<span class="fc" id="L180">                  .findRecursive(&quot;mtas&quot;, &quot;prefix&quot;);</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">              if (data != null) {</span>
+<span class="fc" id="L182">                MtasSolrResultUtil.decode(data);</span>
               }
-<span class="nc" id="L185">            } catch (ClassCastException e) {</span>
-<span class="nc" id="L186">              log.debug(e);</span>
+<span class="nc" id="L184">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L185">              log.debug(e);</span>
               // shouldnt happen
-<span class="fc" id="L188">            }</span>
-<span class="fc" id="L189">          }</span>
+<span class="fc" id="L187">            }</span>
+<span class="fc" id="L188">          }</span>
         }
-<span class="fc" id="L191">      }</span>
+<span class="fc" id="L190">      }</span>
     }
-<span class="fc" id="L193">  }</span>
+<span class="fc" id="L192">  }</span>
 
   /*
    * (non-Javadoc)
@@ -204,64 +203,63 @@ public class MtasSolrComponentPrefix
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // rewrite
-<span class="fc" id="L207">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+<span class="fc" id="L206">    NamedList&lt;Object&gt; mtasResponse = null;</span>
     try {
-<span class="fc" id="L209">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
-<span class="nc" id="L210">    } catch (ClassCastException e) {</span>
-<span class="nc" id="L211">      log.debug(e);</span>
-<span class="nc" id="L212">      mtasResponse = null;</span>
-<span class="fc" id="L213">    }</span>
-<span class="pc bpc" id="L214" title="1 of 2 branches missed.">    if (mtasResponse != null) {</span>
+<span class="fc" id="L208">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L209">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L210">      log.debug(e);</span>
+<span class="nc" id="L211">      mtasResponse = null;</span>
+<span class="fc" id="L212">    }</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">    if (mtasResponse != null) {</span>
       ArrayList&lt;Object&gt; mtasResponsePrefix;
       try {
-<span class="fc" id="L217">        mtasResponsePrefix = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;prefix&quot;);</span>
-<span class="pc bpc" id="L218" title="1 of 2 branches missed.">        if (mtasResponsePrefix != null) {</span>
+<span class="fc" id="L216">        mtasResponsePrefix = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;prefix&quot;);</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">        if (mtasResponsePrefix != null) {</span>
           NamedList&lt;Object&gt; mtasResponsePrefixItem;
-<span class="fc bfc" id="L220" title="All 2 branches covered.">          for (Object mtasResponsePrefixItemRaw : mtasResponsePrefix) {</span>
-<span class="fc" id="L221">            mtasResponsePrefixItem = (NamedList&lt;Object&gt;) mtasResponsePrefixItemRaw;</span>
-<span class="fc" id="L222">            repairPrefixItems(mtasResponsePrefixItem);</span>
-<span class="fc" id="L223">            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem);</span>
-<span class="fc" id="L224">          }</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">          for (Object mtasResponsePrefixItemRaw : mtasResponsePrefix) {</span>
+<span class="fc" id="L220">            mtasResponsePrefixItem = (NamedList&lt;Object&gt;) mtasResponsePrefixItemRaw;</span>
+<span class="fc" id="L221">            repairPrefixItems(mtasResponsePrefixItem);</span>
+<span class="fc" id="L222">            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem);</span>
+<span class="fc" id="L223">          }</span>
         }
-<span class="nc" id="L226">      } catch (ClassCastException e) {</span>
-<span class="nc" id="L227">        log.debug(e);</span>
-<span class="nc" id="L228">        mtasResponse.remove(&quot;prefix&quot;);</span>
-<span class="fc" id="L229">      }</span>
+<span class="nc" id="L225">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L226">        log.debug(e);</span>
+<span class="nc" id="L227">        mtasResponse.remove(&quot;prefix&quot;);</span>
+<span class="fc" id="L228">      }</span>
     }
-<span class="fc" id="L231">  }</span>
+<span class="fc" id="L230">  }</span>
 
   /**
    * Repair prefix items.
    *
-   * @param mtasResponse
-   *          the mtas response
+   * @param mtasResponse the mtas response
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   private void repairPrefixItems(NamedList&lt;Object&gt; mtasResponse) {
     // repair prefix lists
     try {
-<span class="fc" id="L243">      ArrayList&lt;NamedList&lt;?&gt;&gt; list = (ArrayList&lt;NamedList&lt;?&gt;&gt;) mtasResponse</span>
-<span class="fc" id="L244">          .findRecursive(&quot;prefix&quot;);</span>
+<span class="fc" id="L241">      ArrayList&lt;NamedList&lt;?&gt;&gt; list = (ArrayList&lt;NamedList&lt;?&gt;&gt;) mtasResponse</span>
+<span class="fc" id="L242">          .findRecursive(&quot;prefix&quot;);</span>
       // MtasSolrResultUtil.rewrite(list);
-<span class="pc bpc" id="L246" title="1 of 2 branches missed.">      if (list != null) {</span>
-<span class="nc bnc" id="L247" title="All 2 branches missed.">        for (NamedList&lt;?&gt; item : list) {</span>
-<span class="nc" id="L248">          SortedSet&lt;String&gt; singlePosition = (SortedSet&lt;String&gt;) item</span>
-<span class="nc" id="L249">              .get(&quot;singlePosition&quot;);</span>
-<span class="nc" id="L250">          SortedSet&lt;String&gt; multiplePosition = (SortedSet&lt;String&gt;) item</span>
-<span class="nc" id="L251">              .get(&quot;multiplePosition&quot;);</span>
-<span class="nc bnc" id="L252" title="All 4 branches missed.">          if (singlePosition != null &amp;&amp; multiplePosition != null) {</span>
-<span class="nc bnc" id="L253" title="All 2 branches missed.">            for (String prefix : multiplePosition) {</span>
-<span class="nc bnc" id="L254" title="All 2 branches missed.">              if (singlePosition.contains(prefix)) {</span>
-<span class="nc" id="L255">                singlePosition.remove(prefix);</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">      if (list != null) {</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        for (NamedList&lt;?&gt; item : list) {</span>
+<span class="nc" id="L246">          SortedSet&lt;String&gt; singlePosition = (SortedSet&lt;String&gt;) item</span>
+<span class="nc" id="L247">              .get(&quot;singlePosition&quot;);</span>
+<span class="nc" id="L248">          SortedSet&lt;String&gt; multiplePosition = (SortedSet&lt;String&gt;) item</span>
+<span class="nc" id="L249">              .get(&quot;multiplePosition&quot;);</span>
+<span class="nc bnc" id="L250" title="All 4 branches missed.">          if (singlePosition != null &amp;&amp; multiplePosition != null) {</span>
+<span class="nc bnc" id="L251" title="All 2 branches missed.">            for (String prefix : multiplePosition) {</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">              if (singlePosition.contains(prefix)) {</span>
+<span class="nc" id="L253">                singlePosition.remove(prefix);</span>
               }
-<span class="nc" id="L257">            }</span>
+<span class="nc" id="L255">            }</span>
           }
-<span class="nc" id="L259">        }</span>
+<span class="nc" id="L257">        }</span>
       }
-<span class="nc" id="L261">    } catch (ClassCastException e) {</span>
-<span class="nc" id="L262">      log.debug(e);</span>
-<span class="fc" id="L263">    }</span>
-<span class="fc" id="L264">  }</span>
+<span class="nc" id="L259">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L260">      log.debug(e);</span>
+<span class="fc" id="L261">    }</span>
+<span class="fc" id="L262">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

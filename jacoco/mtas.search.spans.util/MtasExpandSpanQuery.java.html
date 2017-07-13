@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasExpandSpanQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasExpandSpanQuery.java</span></div><h1>MtasExpandSpanQuery.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.lucene.codecs.FieldsProducer;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermContext;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.spans.SpanWeight;
+import org.apache.lucene.search.spans.Spans;
+
+import mtas.codec.util.CodecInfo;
+import mtas.search.spans.MtasSpanMatchNoneSpans;
+
+/**
+ * The Class MtasExpandSpanQuery.
+ */
+public class MtasExpandSpanQuery extends MtasSpanQuery {
+
+  /** The query. */
+  MtasSpanQuery query;
+
+  /** The minimum left. */
+  int minimumLeft;
+
+  /** The maximum left. */
+  int maximumLeft;
+
+  /** The minimum right. */
+  int minimumRight;
+
+  /** The maximum right. */
+  int maximumRight;
+
+  /**
+   * Instantiates a new mtas expand span query.
+   *
+   * @param query the query
+   * @param minimumLeft the minimum left
+   * @param maximumLeft the maximum left
+   * @param minimumRight the minimum right
+   * @param maximumRight the maximum right
+   */
+  public MtasExpandSpanQuery(MtasSpanQuery query, int minimumLeft,
+      int maximumLeft, int minimumRight, int maximumRight) {
+<span class="fc" id="L53">    super(null, null);</span>
+<span class="fc" id="L54">    this.query = query;</span>
+<span class="pc bpc" id="L55" title="4 of 8 branches missed.">    if (minimumLeft &gt; maximumLeft || minimumRight &gt; maximumRight</span>
+        || minimumLeft &lt; 0 || minimumRight &lt; 0) {
+<span class="nc" id="L57">      throw new IllegalArgumentException();</span>
+    }
+<span class="fc" id="L59">    this.minimumLeft = minimumLeft;</span>
+<span class="fc" id="L60">    this.maximumLeft = maximumLeft;</span>
+<span class="fc" id="L61">    this.minimumRight = minimumRight;</span>
+<span class="fc" id="L62">    this.maximumRight = maximumRight;</span>
+<span class="fc" id="L63">    Integer minimum = query.getMinimumWidth();</span>
+<span class="fc" id="L64">    Integer maximum = query.getMaximumWidth();</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (minimum != null) {</span>
+<span class="fc" id="L66">      minimum += minimumLeft + minimumRight;</span>
+    }
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    if (maximum != null) {</span>
+<span class="fc" id="L69">      maximum += maximumLeft + maximumRight;</span>
+    }
+<span class="fc" id="L71">    setWidth(minimum, maximum);</span>
+<span class="fc" id="L72">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.
+   * IndexSearcher, boolean)
+   */
+  @Override
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+      throws IOException {
+<span class="fc" id="L84">    SpanWeight subWeight = query.createWeight(searcher, needsScores);</span>
+<span class="pc bpc" id="L85" title="1 of 4 branches missed.">    if (maximumLeft == 0 &amp;&amp; maximumRight == 0) {</span>
+<span class="nc" id="L86">      return subWeight;</span>
+    } else {
+<span class="fc" id="L88">      return new MtasExpandWeight(subWeight, searcher, needsScores);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.SpanQuery#getField()
+   */
+  @Override
+  public String getField() {
+<span class="fc" id="L99">    return query.getField();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#toString(java.lang.String)
+   */
+  @Override
+  public String toString(String field) {
+<span class="nc" id="L109">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L110">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc" id="L111">    buffer.append(query.toString(field) + &quot;][&quot; + minimumLeft + &quot;,&quot; + maximumLeft</span>
+        + &quot;][&quot; + minimumRight + &quot;,&quot; + maximumRight + &quot;])&quot;);
+<span class="nc" id="L113">    return buffer.toString();</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L124">      return true;</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L126">      return false;</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L128">      return false;</span>
+<span class="nc" id="L129">    final MtasExpandSpanQuery that = (MtasExpandSpanQuery) obj;</span>
+    boolean isEqual;
+<span class="nc" id="L131">    isEqual = query.equals(that.query);</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">    isEqual &amp;= minimumLeft == that.minimumLeft;</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">    isEqual &amp;= maximumLeft == that.maximumLeft;</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">    isEqual &amp;= minimumRight == that.minimumRight;</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">    isEqual &amp;= maximumRight == that.maximumRight;</span>
+<span class="nc" id="L136">    return isEqual;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.Query#hashCode()
+   */
+  @Override
+  public int hashCode() {
+<span class="nc" id="L146">    int h = Integer.rotateLeft(classHash(), 1);</span>
+<span class="nc" id="L147">    h ^= query.hashCode();</span>
+<span class="nc" id="L148">    h = Integer.rotateLeft(h, minimumLeft) + minimumLeft;</span>
+<span class="nc" id="L149">    h ^= 2;</span>
+<span class="nc" id="L150">    h = Integer.rotateLeft(h, maximumLeft) + maximumLeft;</span>
+<span class="nc" id="L151">    h ^= 3;</span>
+<span class="nc" id="L152">    h = Integer.rotateLeft(h, minimumRight) + minimumRight;</span>
+<span class="nc" id="L153">    h ^= 5;</span>
+<span class="nc" id="L154">    h = Integer.rotateLeft(h, maximumRight) + maximumRight;</span>
+<span class="nc" id="L155">    return h;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
+   */
+  @Override
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+<span class="fc" id="L166">    MtasSpanQuery newQuery = query.rewrite(reader);</span>
+<span class="pc bpc" id="L167" title="1 of 4 branches missed.">    if (maximumLeft == 0 &amp;&amp; maximumRight == 0) {</span>
+<span class="nc" id="L168">      return newQuery;</span>
+<span class="pc bpc" id="L169" title="1 of 8 branches missed.">    } else if (((maximumLeft == 0) || (maximumLeft == minimumLeft))</span>
+        &amp;&amp; ((maximumRight == 0) || (maximumRight == minimumRight))) {
+<span class="fc" id="L171">      MtasSpanQuery maximumExpandedQuery = new MtasMaximumExpandSpanQuery(</span>
+          newQuery, minimumLeft, maximumLeft, minimumRight, maximumRight);
+<span class="fc" id="L173">      return maximumExpandedQuery.rewrite(reader);</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">    } else if (!query.equals(newQuery)) {</span>
+<span class="nc" id="L175">      return new MtasExpandSpanQuery(newQuery, minimumLeft, maximumLeft,</span>
+          minimumRight, maximumRight);
+    } else {
+<span class="fc" id="L178">      return super.rewrite(reader);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+<span class="fc" id="L189">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L190">    query.disableTwoPhaseIterator();</span>
+<span class="fc" id="L191">  }</span>
+
+  /**
+   * The Class MtasExpandWeight.
+   */
+  private class MtasExpandWeight extends MtasSpanWeight {
+
+    /** The Constant METHOD_GET_DELEGATE. */
+    private static final String METHOD_GET_DELEGATE = &quot;getDelegate&quot;;
+
+    /** The Constant METHOD_GET_POSTINGS_READER. */
+    private static final String METHOD_GET_POSTINGS_READER = &quot;getPostingsReader&quot;;
+
+    /** The sub weight. */
+    SpanWeight subWeight;
+
+    /**
+     * Instantiates a new mtas expand weight.
+     *
+     * @param subWeight the sub weight
+     * @param searcher the searcher
+     * @param needsScores the needs scores
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public MtasExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
+<span class="fc" id="L216">        boolean needsScores) throws IOException {</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">      super(MtasExpandSpanQuery.this, searcher,</span>
+<span class="pc" id="L218">          needsScores ? getTermContexts(subWeight) : null);</span>
+<span class="fc" id="L219">      this.subWeight = subWeight;</span>
+<span class="fc" id="L220">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
+     */
+    @Override
+    public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
+<span class="nc" id="L231">      subWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L232">    }</span>
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
+     */
+    @Override
+    public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
+        throws IOException {
+<span class="fc" id="L245">      Spans spans = subWeight.getSpans(ctx, requiredPostings);</span>
+<span class="pc bpc" id="L246" title="2 of 6 branches missed.">      if ((maximumLeft == 0 &amp;&amp; maximumRight == 0) || spans == null) {</span>
+<span class="nc" id="L247">        return spans;</span>
+      } else {
+        try {
+          // get leafreader
+<span class="fc" id="L251">          LeafReader r = ctx.reader();</span>
+          // get delegate
+<span class="fc" id="L253">          Boolean hasMethod = true;</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">          while (hasMethod) {</span>
+<span class="fc" id="L255">            hasMethod = false;</span>
+<span class="fc" id="L256">            Method[] methods = r.getClass().getMethods();</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">            for (Method m : methods) {</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">              if (m.getName().equals(METHOD_GET_DELEGATE)) {</span>
+<span class="nc" id="L259">                hasMethod = true;</span>
+<span class="nc" id="L260">                r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="nc" id="L261">                break;</span>
+              }
+            }
+<span class="fc" id="L264">          } // get fieldsproducer</span>
+<span class="fc" id="L265">          Method fpm = r.getClass().getMethod(METHOD_GET_POSTINGS_READER,</span>
+              (Class&lt;?&gt;[]) null);
+<span class="fc" id="L267">          FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
+          // get MtasFieldsProducer using terms
+<span class="fc" id="L269">          Terms t = fp.terms(field);</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">          if (t == null) {</span>
+<span class="nc" id="L271">            return new MtasSpanMatchNoneSpans(MtasExpandSpanQuery.this);</span>
+          } else {
+<span class="fc" id="L273">            CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
+<span class="fc" id="L274">            return new MtasExpandSpans(MtasExpandSpanQuery.this, mtasCodecInfo,</span>
+<span class="fc" id="L275">                query.getField(), spans);</span>
+          }
+<span class="nc" id="L277">        } catch (Exception e) {</span>
+<span class="nc" id="L278">          throw new IOException(&quot;Can't get reader&quot;, e);</span>
+        }
+
+      }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
+     */
+    @Override
+    public void extractTerms(Set&lt;Term&gt; terms) {
+<span class="nc" id="L291">      subWeight.extractTerms(terms);</span>
+<span class="nc" id="L292">    }</span>
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

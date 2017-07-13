@@ -168,5 +168,14 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
 <span class="fc" id="L168">    return h;</span>
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+<span class="nc" id="L176">    super.disableTwoPhaseIterator();</span>
+<span class="nc" id="L177">    query.disableTwoPhaseIterator();</span>
+<span class="nc" id="L178">  }</span>
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

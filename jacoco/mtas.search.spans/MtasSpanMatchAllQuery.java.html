@@ -150,14 +150,15 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
         // get MtasFieldsProducer using terms
 <span class="fc" id="L151">        Terms t = fp.terms(field);</span>
 <span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (t == null) {</span>
-<span class="nc" id="L153">          return new MtasSpanMatchNoneSpans();</span>
+<span class="nc" id="L153">          return new MtasSpanMatchNoneSpans(MtasSpanMatchAllQuery.this);</span>
         } else {
 <span class="fc" id="L155">          CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
-<span class="fc" id="L156">          return new MtasSpanMatchAllSpans(mtasCodecInfo, field);</span>
+<span class="fc" id="L156">          return new MtasSpanMatchAllSpans(MtasSpanMatchAllQuery.this,</span>
+              mtasCodecInfo, field);
         }
-<span class="nc" id="L158">      } catch (InvocationTargetException | IllegalAccessException</span>
+<span class="nc" id="L159">      } catch (InvocationTargetException | IllegalAccessException</span>
           | NoSuchMethodException e) {
-<span class="nc" id="L160">        throw new IOException(&quot;Can't get reader&quot;, e);</span>
+<span class="nc" id="L161">        throw new IOException(&quot;Can't get reader&quot;, e);</span>
       }
 
     }
@@ -170,7 +171,7 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
       // don't do anything
-<span class="nc" id="L173">    }</span>
+<span class="nc" id="L174">    }</span>
 
     /*
      * (non-Javadoc)
@@ -181,7 +182,7 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
      */
     @Override
     public SimScorer getSimScorer(LeafReaderContext context) {
-<span class="nc" id="L184">      return new MtasSimScorer();</span>
+<span class="nc" id="L185">      return new MtasSimScorer();</span>
     }
 
   }
@@ -194,9 +195,9 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L197">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L198">    buffer.append(this.getClass().getSimpleName() + &quot;([])&quot;);</span>
-<span class="nc" id="L199">    return buffer.toString();</span>
+<span class="nc" id="L198">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L199">    buffer.append(this.getClass().getSimpleName() + &quot;([])&quot;);</span>
+<span class="nc" id="L200">    return buffer.toString();</span>
   }
 
   /*
@@ -206,14 +207,14 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L209" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L210">      return true;</span>
-<span class="pc bpc" id="L211" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L212">      return false;</span>
-<span class="fc bfc" id="L213" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L214">      return false;</span>
-<span class="fc" id="L215">    final MtasSpanMatchAllQuery that = (MtasSpanMatchAllQuery) obj;</span>
-<span class="fc" id="L216">    return field.equals(that.field);</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L211">      return true;</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L213">      return false;</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L215">      return false;</span>
+<span class="fc" id="L216">    final MtasSpanMatchAllQuery that = (MtasSpanMatchAllQuery) obj;</span>
+<span class="fc" id="L217">    return field.equals(that.field);</span>
   }
 
   /*
@@ -223,9 +224,9 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L226">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L227">    h = (h * 7) ^ field.hashCode();</span>
-<span class="fc" id="L228">    return h;</span>
+<span class="fc" id="L227">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L228">    h = (h * 7) ^ field.hashCode();</span>
+<span class="fc" id="L229">    return h;</span>
   }
 
 }

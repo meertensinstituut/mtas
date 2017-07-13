@@ -51,21 +51,24 @@ public class MtasCQLParserGroupCondition {
   public boolean equals(Object object) {
 <span class="pc bpc" id="L52" title="2 of 4 branches missed.">    if (object != null &amp;&amp; object instanceof MtasCQLParserGroupCondition) {</span>
 <span class="fc" id="L53">      MtasCQLParserGroupCondition groupCondition = (MtasCQLParserGroupCondition) object;</span>
-<span class="pc bpc" id="L54" title="2 of 4 branches missed.">      return field.equals(groupCondition.field) &amp;&amp; condition.equals(groupCondition.condition);      </span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">      return field.equals(groupCondition.field)</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">          &amp;&amp; condition.equals(groupCondition.condition);</span>
     } else {
-<span class="nc" id="L56">      return false;</span>
+<span class="nc" id="L57">      return false;</span>
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L65">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L66">    h = (h * 5) ^ field.hashCode();</span>
-<span class="nc" id="L67">    h = (h * 7) ^ condition.hashCode();</span>
-<span class="nc" id="L68">    return h;</span>
+<span class="nc" id="L68">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L69">    h = (h * 5) ^ field.hashCode();</span>
+<span class="nc" id="L70">    h = (h * 7) ^ condition.hashCode();</span>
+<span class="nc" id="L71">    return h;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

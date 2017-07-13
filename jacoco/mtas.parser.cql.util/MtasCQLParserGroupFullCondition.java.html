@@ -149,24 +149,25 @@ public class MtasCQLParserGroupFullCondition
 <span class="nc" id="L149">      return false;</span>
 <span class="fc bfc" id="L150" title="All 2 branches covered.">    if (object instanceof MtasCQLParserGroupFullCondition) {</span>
 <span class="fc" id="L151">      MtasCQLParserGroupFullCondition word = (MtasCQLParserGroupFullCondition) object;</span>
-<span class="pc bpc" id="L152" title="2 of 4 branches missed.">      return groupCondition.equals(word.groupCondition) &amp;&amp; type.equals(word.type);      </span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">      return groupCondition.equals(word.groupCondition)</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">          &amp;&amp; type.equals(word.type);</span>
     } else {
-<span class="fc" id="L154">      return false;</span>
+<span class="fc" id="L155">      return false;</span>
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L163">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L164">    h = (h * 5) ^ groupCondition.hashCode();</span>
-<span class="nc" id="L165">    h = (h * 7) ^ type.hashCode();</span>
-<span class="nc" id="L166">    return h;</span>
+<span class="nc" id="L166">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L167">    h = (h * 5) ^ groupCondition.hashCode();</span>
+<span class="nc" id="L168">    h = (h * 7) ^ type.hashCode();</span>
+<span class="nc" id="L169">    return h;</span>
   }
-  
-  
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -32,7 +32,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
    * @param rb the rb
    */
   @SuppressWarnings(&quot;unchecked&quot;)
-  public void merge(ResponseBuilder rb) { 
+  public void merge(ResponseBuilder rb) {
 <span class="pc bpc" id="L36" title="1 of 2 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
       // mtas response
 <span class="fc" id="L38">      NamedList&lt;Object&gt; mtasResponse = null;</span>
@@ -263,7 +263,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 <span class="nc" id="L263">        log.error(e);</span>
 <span class="fc" id="L264">      }</span>
 <span class="fc" id="L265">    }</span>
-   
+
     try {
 <span class="fc bfc" id="L268" title="All 2 branches covered.">      for (ArrayList&lt;Object&gt; mtasListShardResponse : mtasListShardResponses</span>
 <span class="fc" id="L269">          .values()) {</span>
@@ -271,10 +271,10 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 <span class="fc" id="L271">      }</span>
 <span class="pc bpc" id="L272" title="1 of 2 branches missed.">      for (ArrayList&lt;Object&gt; mtasListShardResponse : mtasListShardResponsesExtra) {</span>
 <span class="nc" id="L273">        mergeResponsesArrayList(mtasListResponse, mtasListShardResponse);</span>
-<span class="nc" id="L274">      }      </span>
+<span class="nc" id="L274">      }</span>
 <span class="nc" id="L275">    } catch (IOException e) {</span>
 <span class="nc" id="L276">      log.error(e);</span>
-<span class="fc" id="L277">    }    </span>
+<span class="fc" id="L277">    }</span>
 <span class="fc" id="L278">  }</span>
 
   /**
@@ -308,7 +308,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 <span class="fc" id="L308">        Object key = itemList.get(&quot;key&quot;);</span>
 <span class="pc bpc" id="L309" title="2 of 4 branches missed.">        if ((key != null) &amp;&amp; (key instanceof String)) {</span>
 <span class="fc" id="L310">          originalKeyList.put((String) key, item);</span>
-        }                
+        }
       }
 <span class="fc" id="L313">    }</span>
 <span class="fc bfc" id="L314" title="All 2 branches covered.">    for (Object item : shardList) {</span>
@@ -322,7 +322,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 <span class="fc" id="L322">            Object originalItem = originalKeyList.get(key);</span>
 <span class="pc bpc" id="L323" title="1 of 2 branches missed.">            if (originalItem.getClass().equals(item.getClass())) {</span>
 <span class="fc" id="L324">              mergeResponsesNamedList((NamedList&lt;Object&gt;) originalItem,</span>
-                  (NamedList&lt;Object&gt;) item);              
+                  (NamedList&lt;Object&gt;) item);
             } else {
               // ignore?
             }
@@ -365,7 +365,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 <span class="nc" id="L365">          original = adjustablePartsCloned(shardValue);</span>
 <span class="pc bpc" id="L366" title="1 of 2 branches missed.">        } else if (shardValue != null</span>
 <span class="pc bpc" id="L367" title="1 of 2 branches missed.">            &amp;&amp; original.getClass().equals(shardValue.getClass())) {</span>
-          // merge ArrayList 
+          // merge ArrayList
 <span class="fc bfc" id="L369" title="All 2 branches covered.">          if (original instanceof ArrayList) {</span>
 <span class="fc" id="L370">            ArrayList originalList = (ArrayList) original;</span>
 <span class="fc" id="L371">            ArrayList shardList = (ArrayList) shardValue;</span>
@@ -380,7 +380,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
                 (SortedSet&lt;Object&gt;) shardValue);
 <span class="fc bfc" id="L381" title="All 2 branches covered.">          } else if (original instanceof MtasSolrMtasResult) {</span>
 <span class="fc" id="L382">            MtasSolrMtasResult originalComponentResult = (MtasSolrMtasResult) original;</span>
-<span class="fc" id="L383">            originalComponentResult.merge((MtasSolrMtasResult) shardValue);            </span>
+<span class="fc" id="L383">            originalComponentResult.merge((MtasSolrMtasResult) shardValue);</span>
 <span class="pc bpc" id="L384" title="1 of 2 branches missed.">          } else if (original instanceof MtasSolrJoinResult) {</span>
 <span class="nc" id="L385">            MtasSolrJoinResult originalComponentResult = (MtasSolrJoinResult) original;</span>
 <span class="nc" id="L386">            originalComponentResult.merge((MtasSolrJoinResult) shardValue);</span>

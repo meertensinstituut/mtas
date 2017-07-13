@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasExpandSpans.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.search.spans.util</a> &gt; <span class="el_source">MtasExpandSpans.java</span></div><h1>MtasExpandSpans.java</h1><pre class="source lang-java linenums">package mtas.search.spans.util;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.spans.SpanCollector;
+import org.apache.lucene.search.spans.Spans;
+
+import mtas.codec.util.CodecInfo;
+import mtas.codec.util.CodecInfo.IndexDoc;
+
+/**
+ * The Class MtasExpandSpans.
+ */
+public class MtasExpandSpans extends MtasSpans {
+
+  /** The sub spans. */
+  Spans subSpans;
+
+  /** The query. */
+  MtasExpandSpanQuery query;
+
+  /** The min position. */
+  int minPosition;
+
+  /** The max position. */
+  int maxPosition;
+
+  /** The field. */
+  String field;
+
+  /** The mtas codec info. */
+  CodecInfo mtasCodecInfo;
+
+  /** The start position. */
+  int startPosition;
+
+  /** The end position. */
+  int endPosition;
+
+  /** The collected positions. */
+  SortedMap&lt;Integer, List&lt;Integer&gt;&gt; collectedPositions;
+
+  /** The last collected start position. */
+  int lastCollectedStartPosition;
+
+  /** The called next start position. */
+  private boolean calledNextStartPosition;
+
+  /** The doc id. */
+  int docId;
+
+  /**
+   * Instantiates a new mtas expand spans.
+   *
+   * @param query the query
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
+   * @param subSpans the sub spans
+   */
+  public MtasExpandSpans(MtasExpandSpanQuery query, CodecInfo mtasCodecInfo,
+      String field, Spans subSpans) {
+<span class="fc" id="L67">    super();</span>
+<span class="fc" id="L68">    this.subSpans = subSpans;</span>
+<span class="fc" id="L69">    this.field = field;</span>
+<span class="fc" id="L70">    this.mtasCodecInfo = mtasCodecInfo;</span>
+<span class="fc" id="L71">    this.query = query;</span>
+<span class="fc" id="L72">    docId = -1;</span>
+<span class="fc" id="L73">    collectedPositions = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L74">    reset();</span>
+<span class="fc" id="L75">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
+   */
+  @Override
+  public int nextStartPosition() throws IOException {
+<span class="pc bpc" id="L84" title="2 of 4 branches missed.">    if (docId == -1 || docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L85">      throw new IOException(&quot;no document&quot;);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    } else if (!calledNextStartPosition) {</span>
+<span class="fc" id="L87">      calledNextStartPosition = true;</span>
+<span class="fc" id="L88">      return startPosition;</span>
+      // compute next match
+    } else {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">      if (goToNextStartPosition()) {</span>
+        // match found
+<span class="fc" id="L93">        return startPosition;</span>
+      } else {
+        // no more matches: document finished
+<span class="fc" id="L96">        return NO_MORE_POSITIONS;</span>
+      }
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#startPosition()
+   */
+  @Override
+  public int startPosition() {
+<span class="fc" id="L108">    return startPosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#endPosition()
+   */
+  @Override
+  public int endPosition() {
+<span class="fc" id="L118">    return endPosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#width()
+   */
+  @Override
+  public int width() {
+<span class="nc" id="L128">    return endPosition - startPosition;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.
+   * spans.SpanCollector)
+   */
+  @Override
+  public void collect(SpanCollector collector) throws IOException {
+<span class="nc" id="L139">    subSpans.collect(collector);</span>
+<span class="nc" id="L140">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#positionsCost()
+   */
+  @Override
+  public float positionsCost() {
+    // return subSpans.positionsCost();
+<span class="nc" id="L150">    return 0;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#docID()
+   */
+  @Override
+  public int docID() {
+<span class="fc" id="L160">    return docId;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
+   */
+  @Override
+  public int nextDoc() throws IOException {
+<span class="fc" id="L170">    reset();</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">    while (!goToNextDoc())</span>
+<span class="nc" id="L172">      ;</span>
+<span class="fc" id="L173">    return docId;</span>
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
+   */
+  @Override
+  public int advance(int target) throws IOException {
+<span class="fc" id="L183">    reset();</span>
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L185">      return docId;</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">    } else if (target &lt;= docId) {</span>
+      // should not happen
+<span class="nc" id="L188">      docId = NO_MORE_DOCS;</span>
+<span class="nc" id="L189">      return docId;</span>
+    } else {
+<span class="fc" id="L191">      docId = subSpans.advance(target);</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">      if (docId == NO_MORE_DOCS) {</span>
+<span class="fc" id="L193">        return docId;</span>
+      } else {
+<span class="fc" id="L195">        IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        if (doc != null) {</span>
+<span class="fc" id="L197">          minPosition = doc.minPosition;</span>
+<span class="fc" id="L198">          maxPosition = doc.maxPosition;</span>
+        } else {
+<span class="nc" id="L200">          minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L201">          maxPosition = NO_MORE_POSITIONS;</span>
+        }
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">        if (goToNextStartPosition()) {</span>
+<span class="fc" id="L204">          return docId;</span>
+        } else {
+<span class="nc" id="L206">          return nextDoc();</span>
+        }
+      }
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+<span class="fc bfc" id="L219" title="All 2 branches covered.">    if (!query.twoPhaseIteratorAllowed()) {</span>
+<span class="fc" id="L220">      return null;</span>
+    } else {
+<span class="fc" id="L222">      TwoPhaseIterator originalTwoPhaseIterator = subSpans.asTwoPhaseIterator();</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">      if (originalTwoPhaseIterator != null) {</span>
+<span class="fc" id="L224">        return new TwoPhaseIterator(originalTwoPhaseIterator.approximation()) {</span>
+          @Override
+          public boolean matches() throws IOException {
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">            return originalTwoPhaseIterator.matches()</span>
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">                &amp;&amp; twoPhaseCurrentDocMatches();</span>
+          }
+
+          @Override
+          public float matchCost() {
+<span class="fc" id="L233">            return originalTwoPhaseIterator.matchCost();</span>
+          }
+        };
+      } else {
+<span class="fc" id="L237">        return new TwoPhaseIterator(subSpans) {</span>
+          @Override
+          public boolean matches() throws IOException {
+<span class="fc" id="L240">            return twoPhaseCurrentDocMatches();</span>
+          }
+
+          @Override
+          public float matchCost() {
+<span class="fc" id="L245">            return subSpans.positionsCost();</span>
+          }
+        };
+      }
+    }
+  }
+
+  /**
+   * Two phase current doc matches.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private boolean twoPhaseCurrentDocMatches() throws IOException {
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">    if (docId != subSpans.docID()) {</span>
+<span class="fc" id="L260">      reset();</span>
+<span class="fc" id="L261">      docId = subSpans.docID();</span>
+<span class="fc" id="L262">      IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">      if (doc != null) {</span>
+<span class="fc" id="L264">        minPosition = doc.minPosition;</span>
+<span class="fc" id="L265">        maxPosition = doc.maxPosition;</span>
+      } else {
+<span class="nc" id="L267">        minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L268">        maxPosition = NO_MORE_POSITIONS;</span>
+      }
+    }
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L272">      return false;</span>
+    } else {
+<span class="fc" id="L274">      return goToNextStartPosition();</span>
+    }
+  }
+
+  /**
+   * Go to next doc.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private boolean goToNextDoc() throws IOException {
+<span class="fc" id="L285">    reset();</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">    if (docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L287">      minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L288">      maxPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L289">      return true;</span>
+    } else {
+<span class="fc" id="L291">      docId = subSpans.nextDoc();</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">      if (docId == NO_MORE_DOCS) {</span>
+<span class="fc" id="L293">        minPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L294">        maxPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L295">        return true;</span>
+      } else {
+<span class="fc" id="L297">        IndexDoc doc = mtasCodecInfo.getDoc(field, docId);</span>
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">        if (doc != null) {</span>
+<span class="fc" id="L299">          minPosition = doc.minPosition;</span>
+<span class="fc" id="L300">          maxPosition = doc.maxPosition;</span>
+        } else {
+<span class="nc" id="L302">          minPosition = NO_MORE_POSITIONS;</span>
+<span class="nc" id="L303">          maxPosition = NO_MORE_POSITIONS;</span>
+        }
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">        if (goToNextStartPosition()) {</span>
+<span class="fc" id="L306">          return true;</span>
+        } else {
+<span class="nc" id="L308">          return false;</span>
+        }
+      }
+    }
+  }
+
+  /**
+   * Go to next start position.
+   *
+   * @return true, if successful
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private boolean goToNextStartPosition() throws IOException {
+    int basicStartPositionMin;
+    int basicStartPositionMax;
+    int basicEndPosition;
+    int basicEndPositionMin;
+    int basicEndPositionMax;
+<span class="pc bpc" id="L326" title="2 of 4 branches missed.">    if (docId == -1 || docId == NO_MORE_DOCS) {</span>
+<span class="nc" id="L327">      throw new IOException(&quot;no document&quot;);</span>
+    } else {
+<span class="fc bfc" id="L329" title="All 2 branches covered.">      if (lastCollectedStartPosition &lt; NO_MORE_POSITIONS</span>
+<span class="fc bfc" id="L330" title="All 2 branches covered.">          &amp;&amp; (collectedPositions.isEmpty()</span>
+<span class="fc bfc" id="L331" title="All 2 branches covered.">              || (collectedPositions.firstKey() &gt;= (lastCollectedStartPosition</span>
+                  - query.maximumLeft)))) {
+        // collect new positions
+<span class="fc" id="L334">        while ((lastCollectedStartPosition = subSpans</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">            .nextStartPosition()) != NO_MORE_POSITIONS) {</span>
+<span class="fc" id="L336">          basicEndPosition = subSpans.endPosition();</span>
+<span class="fc" id="L337">          basicStartPositionMin = Math.max(minPosition,</span>
+              lastCollectedStartPosition - query.maximumLeft);
+<span class="fc" id="L339">          basicStartPositionMax = lastCollectedStartPosition</span>
+              - query.minimumLeft;
+<span class="fc" id="L341">          basicEndPositionMin = basicEndPosition + query.minimumRight;</span>
+<span class="fc" id="L342">          basicEndPositionMax = Math.min(maxPosition + 1,</span>
+              basicEndPosition + query.maximumRight);
+<span class="fc bfc" id="L344" title="All 2 branches covered.">          for (int cLeft = basicStartPositionMin; cLeft &lt;= basicStartPositionMax; cLeft++) {</span>
+<span class="fc bfc" id="L345" title="All 2 branches covered.">            for (int cRight = basicEndPositionMin; cRight &lt;= basicEndPositionMax; cRight++) {</span>
+<span class="fc bfc" id="L346" title="All 2 branches covered.">              if (!collectedPositions.containsKey(cLeft)) {</span>
+<span class="fc" id="L347">                collectedPositions.put(cLeft, new ArrayList&lt;Integer&gt;());</span>
+              }
+<span class="fc" id="L349">              collectedPositions.get(cLeft).add(cRight);</span>
+            }
+          }
+<span class="pc bpc" id="L352" title="1 of 2 branches missed.">          if (!collectedPositions.isEmpty() &amp;&amp; (collectedPositions</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">              .firstKey() &lt; (lastCollectedStartPosition - query.maximumLeft))) {</span>
+<span class="fc" id="L354">            break;</span>
+          }
+        }
+      }
+<span class="fc bfc" id="L358" title="All 2 branches covered.">      if (collectedPositions.isEmpty()) {</span>
+<span class="fc" id="L359">        return false;</span>
+      } else {
+<span class="fc" id="L361">        startPosition = collectedPositions.firstKey();</span>
+<span class="fc" id="L362">        endPosition = collectedPositions.get(startPosition).remove(0);</span>
+<span class="fc bfc" id="L363" title="All 2 branches covered.">        if (collectedPositions.get(startPosition).isEmpty()) {</span>
+<span class="fc" id="L364">          collectedPositions.remove(startPosition);</span>
+        }
+<span class="fc" id="L366">        return true;</span>
+      }
+    }
+  }
+
+  /**
+   * Reset.
+   */
+  private void reset() {
+<span class="fc" id="L375">    calledNextStartPosition = false;</span>
+<span class="fc" id="L376">    minPosition = 0;</span>
+<span class="fc" id="L377">    maxPosition = 0;</span>
+<span class="fc" id="L378">    startPosition = -1;</span>
+<span class="fc" id="L379">    endPosition = -1;</span>
+<span class="fc" id="L380">    collectedPositions.clear();</span>
+<span class="fc" id="L381">    lastCollectedStartPosition = -1;</span>
+<span class="fc" id="L382">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.DocIdSetIterator#cost()
+   */
+  @Override
+  public long cost() {
+<span class="pc bpc" id="L391" title="1 of 2 branches missed.">    return subSpans != null ? subSpans.cost() : 0;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

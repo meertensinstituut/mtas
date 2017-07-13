@@ -85,8 +85,8 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
 <span class="fc" id="L90">    SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))</span>
 <span class="fc" id="L91">        .createWeight(searcher, needsScores);</span>
 <span class="fc" id="L92">    return new SpanTermWeight(spanWeight, searcher);</span>
@@ -134,9 +134,9 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
-<span class="fc" id="L139">      return new MtasSpanEndSpans(</span>
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
+<span class="fc" id="L139">      return new MtasSpanEndSpans(MtasSpanEndQuery.this,</span>
 <span class="fc" id="L140">          spanWeight.getSpans(context, requiredPostings));</span>
     }
 
@@ -180,6 +180,15 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
 <span class="nc" id="L180">    h = (h * 7) ^ clause.hashCode();</span>
 <span class="nc" id="L181">    return h;</span>
   }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+<span class="fc" id="L189">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L190">    clause.disableTwoPhaseIterator();</span>
+<span class="fc" id="L191">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

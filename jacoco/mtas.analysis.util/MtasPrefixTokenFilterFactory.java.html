@@ -85,29 +85,33 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
       }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.util.AttributeSource#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-<span class="nc bnc" id="L93" title="All 2 branches missed.">      if (this == obj)</span>
-<span class="nc" id="L94">        return true;</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">      if (obj == null)</span>
-<span class="nc" id="L96">        return false;</span>
-<span class="nc bnc" id="L97" title="All 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      if (this == obj)</span>
+<span class="nc" id="L96">        return true;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">      if (obj == null)</span>
 <span class="nc" id="L98">        return false;</span>
-<span class="nc" id="L99">      final MtasPrefixTokenFilter that = (MtasPrefixTokenFilter) obj;</span>
-<span class="nc bnc" id="L100" title="All 4 branches missed.">      return prefix.equals(that.prefix) &amp;&amp; super.equals(that);</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc" id="L100">        return false;</span>
+<span class="nc" id="L101">      final MtasPrefixTokenFilter that = (MtasPrefixTokenFilter) obj;</span>
+<span class="nc bnc" id="L102" title="All 4 branches missed.">      return prefix.equals(that.prefix) &amp;&amp; super.equals(that);</span>
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.util.AttributeSource#hashCode()
      */
     @Override
     public int hashCode() {
-<span class="nc" id="L108">      int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L109">      h = (h * 7) ^ prefix.hashCode();</span>
-<span class="nc" id="L110">      return h;</span>
+<span class="nc" id="L112">      int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L113">      h = (h * 7) ^ prefix.hashCode();</span>
+<span class="nc" id="L114">      return h;</span>
     }
 
   }

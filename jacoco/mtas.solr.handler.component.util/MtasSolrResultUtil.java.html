@@ -69,7 +69,7 @@ public class MtasSolrResultUtil {
 <span class="nc bnc" id="L69" title="All 2 branches missed.">      } else if (al.get(i) instanceof ArrayList) {</span>
 <span class="nc" id="L70">        rewrite((ArrayList) al.get(i));</span>
       }
-    }        
+    }
 <span class="fc" id="L73">  }</span>
 
   /**
@@ -79,7 +79,7 @@ public class MtasSolrResultUtil {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void rewrite(NamedList&lt;Object&gt; nl) throws IOException {
-<span class="fc" id="L82">    rewrite(nl, true);    </span>
+<span class="fc" id="L82">    rewrite(nl, true);</span>
 <span class="fc" id="L83">  }</span>
 
   /**
@@ -121,9 +121,9 @@ public class MtasSolrResultUtil {
 <span class="nc" id="L121">                nnl.setVal(j, mdi);</span>
               }
             }
-            //System.out.println(&quot;rewrite -- &quot;+nnl);
+            // System.out.println(&quot;rewrite -- &quot;+nnl);
 <span class="fc" id="L125">            nl.setVal(i, rewriteToArray(nnl));</span>
-            //System.out.println(&quot;rewrite! &quot;+nl.getVal(i));
+            // System.out.println(&quot;rewrite! &quot;+nl.getVal(i));
 <span class="fc" id="L127">          } else {</span>
 <span class="fc" id="L128">            NamedList&lt;Object&gt; tmpResponse = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="fc" id="L129">            tmpResponse.add(nl.getName(i) + &quot;Total&quot;, o.dataCollector.getSize());</span>
@@ -425,7 +425,7 @@ public class MtasSolrResultUtil {
 <span class="nc" id="L425">        MtasCQLParser ip = new MtasCQLParser(queryIgnoreReader);</span>
         try {
 <span class="nc" id="L427">          ignore = ip.parse(field, null, null, null, null);</span>
-<span class="nc" id="L428">        } catch (mtas.parser.cql.ParseException e) {          </span>
+<span class="nc" id="L428">        } catch (mtas.parser.cql.ParseException e) {</span>
 <span class="nc" id="L429">          throw new IOException(&quot;couldn't parse &quot; + queryType + &quot; query &quot;</span>
 <span class="nc" id="L430">              + queryIgnore + &quot; (&quot; + e.getMessage() + &quot;)&quot;, e);</span>
 <span class="nc" id="L431">        } catch (TokenMgrError e) {</span>

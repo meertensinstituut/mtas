@@ -8,7 +8,6 @@ import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanOrQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
-
 /**
  * The Class MtasCQLParserWordCondition.
  */
@@ -22,7 +21,7 @@ public class MtasCQLParserWordCondition {
 
   /** The positive query list. */
   private List&lt;MtasSpanQuery&gt; positiveQueryList;
-  
+
   /** The negative query list. */
   private List&lt;MtasSpanQuery&gt; negativeQueryList;
 
@@ -47,15 +46,15 @@ public class MtasCQLParserWordCondition {
    * @param field the field
    * @param type the type
    */
-<span class="fc" id="L50">  public MtasCQLParserWordCondition(String field, String type) {</span>
-<span class="fc" id="L51">    this.field = field;</span>
-<span class="fc" id="L52">    this.type = type;</span>
-<span class="fc" id="L53">    not = false;</span>
-<span class="fc" id="L54">    simplified = true;</span>
-<span class="fc" id="L55">    positiveQueryList = new ArrayList&lt;MtasSpanQuery&gt;();</span>
-<span class="fc" id="L56">    negativeQueryList = new ArrayList&lt;MtasSpanQuery&gt;();</span>
-<span class="fc" id="L57">    conditionList = new ArrayList&lt;MtasCQLParserWordCondition&gt;();</span>
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L49">  public MtasCQLParserWordCondition(String field, String type) {</span>
+<span class="fc" id="L50">    this.field = field;</span>
+<span class="fc" id="L51">    this.type = type;</span>
+<span class="fc" id="L52">    not = false;</span>
+<span class="fc" id="L53">    simplified = true;</span>
+<span class="fc" id="L54">    positiveQueryList = new ArrayList&lt;MtasSpanQuery&gt;();</span>
+<span class="fc" id="L55">    negativeQueryList = new ArrayList&lt;MtasSpanQuery&gt;();</span>
+<span class="fc" id="L56">    conditionList = new ArrayList&lt;MtasCQLParserWordCondition&gt;();</span>
+<span class="fc" id="L57">  }</span>
 
   /**
    * Type.
@@ -63,7 +62,7 @@ public class MtasCQLParserWordCondition {
    * @return the string
    */
   public String type() {
-<span class="fc" id="L66">    return type;</span>
+<span class="fc" id="L65">    return type;</span>
   }
 
   /**
@@ -72,16 +71,16 @@ public class MtasCQLParserWordCondition {
    * @return the string
    */
   public String field() {
-<span class="fc" id="L75">    return field;</span>
+<span class="fc" id="L74">    return field;</span>
   }
 
   /**
    * Swap not.
    */
   public void swapNot() {
-<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    not = not ? false : true;</span>
-<span class="fc" id="L83">    simplified = false;</span>
-<span class="fc" id="L84">  }</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">    not = not ? false : true;</span>
+<span class="fc" id="L82">    simplified = false;</span>
+<span class="fc" id="L83">  }</span>
 
   /**
    * Not.
@@ -89,7 +88,7 @@ public class MtasCQLParserWordCondition {
    * @return true, if successful
    */
   public boolean not() {
-<span class="fc" id="L92">    return not;</span>
+<span class="fc" id="L91">    return not;</span>
   }
 
   /**
@@ -98,8 +97,8 @@ public class MtasCQLParserWordCondition {
    * @param q the q
    */
   public void addPositiveQuery(MtasSpanQuery q) {
-<span class="fc" id="L101">    positiveQueryList.add(q);</span>
-<span class="fc" id="L102">  }</span>
+<span class="fc" id="L100">    positiveQueryList.add(q);</span>
+<span class="fc" id="L101">  }</span>
 
   /**
    * Adds the negative query.
@@ -107,8 +106,8 @@ public class MtasCQLParserWordCondition {
    * @param q the q
    */
   public void addNegativeQuery(MtasSpanQuery q) {
-<span class="nc" id="L110">    negativeQueryList.add(q);</span>
-<span class="nc" id="L111">  }</span>
+<span class="nc" id="L109">    negativeQueryList.add(q);</span>
+<span class="nc" id="L110">  }</span>
 
   /**
    * Gets the positive query.
@@ -116,7 +115,7 @@ public class MtasCQLParserWordCondition {
    * @return the positive query
    */
   public List&lt;MtasSpanQuery&gt; getPositiveQuery() {
-<span class="fc" id="L119">    return positiveQueryList;</span>
+<span class="fc" id="L118">    return positiveQueryList;</span>
   }
 
   /**
@@ -126,10 +125,10 @@ public class MtasCQLParserWordCondition {
    * @return the positive query
    */
   public MtasSpanQuery getPositiveQuery(int index) {
-<span class="pc bpc" id="L129" title="2 of 4 branches missed.">    if ((index &gt;= 0) &amp;&amp; (index &lt; positiveQueryList.size())) {</span>
-<span class="fc" id="L130">      return positiveQueryList.get(index);</span>
+<span class="pc bpc" id="L128" title="2 of 4 branches missed.">    if ((index &gt;= 0) &amp;&amp; (index &lt; positiveQueryList.size())) {</span>
+<span class="fc" id="L129">      return positiveQueryList.get(index);</span>
     } else {
-<span class="nc" id="L132">      return null;</span>
+<span class="nc" id="L131">      return null;</span>
     }
   }
 
@@ -139,7 +138,7 @@ public class MtasCQLParserWordCondition {
    * @return the negative query
    */
   public List&lt;MtasSpanQuery&gt; getNegativeQuery() {
-<span class="fc" id="L142">    return negativeQueryList;</span>
+<span class="fc" id="L141">    return negativeQueryList;</span>
   }
 
   /**
@@ -149,10 +148,10 @@ public class MtasCQLParserWordCondition {
    * @return the negative query
    */
   public MtasSpanQuery getNegativeQuery(int index) {
-<span class="pc bpc" id="L152" title="2 of 4 branches missed.">    if ((index &gt;= 0) &amp;&amp; (index &lt; negativeQueryList.size())) {</span>
-<span class="fc" id="L153">      return negativeQueryList.get(index);</span>
+<span class="pc bpc" id="L151" title="2 of 4 branches missed.">    if ((index &gt;= 0) &amp;&amp; (index &lt; negativeQueryList.size())) {</span>
+<span class="fc" id="L152">      return negativeQueryList.get(index);</span>
     } else {
-<span class="nc" id="L155">      return null;</span>
+<span class="nc" id="L154">      return null;</span>
     }
   }
 
@@ -162,9 +161,9 @@ public class MtasCQLParserWordCondition {
    * @param c the c
    */
   public void addCondition(MtasCQLParserWordCondition c) {
-<span class="fc" id="L165">    conditionList.add(c);</span>
-<span class="fc" id="L166">    simplified = false;</span>
-<span class="fc" id="L167">  }</span>
+<span class="fc" id="L164">    conditionList.add(c);</span>
+<span class="fc" id="L165">    simplified = false;</span>
+<span class="fc" id="L166">  }</span>
 
   /**
    * Checks if is single.
@@ -173,13 +172,13 @@ public class MtasCQLParserWordCondition {
    */
   public boolean isSingle() {
     // assume simplified
-<span class="pc bpc" id="L176" title="1 of 4 branches missed.">    if ((positiveQueryList.size() == 1) &amp;&amp; (negativeQueryList.size() == 0)) {</span>
-<span class="fc" id="L177">      return true;</span>
-<span class="fc bfc" id="L178" title="All 2 branches covered.">    } else if ((positiveQueryList.size() == 0)</span>
-<span class="pc bpc" id="L179" title="1 of 2 branches missed.">        &amp;&amp; (negativeQueryList.size() == 1)) {</span>
-<span class="nc" id="L180">      return true;</span>
+<span class="pc bpc" id="L175" title="1 of 4 branches missed.">    if ((positiveQueryList.size() == 1) &amp;&amp; (negativeQueryList.size() == 0)) {</span>
+<span class="fc" id="L176">      return true;</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">    } else if ((positiveQueryList.size() == 0)</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        &amp;&amp; (negativeQueryList.size() == 1)) {</span>
+<span class="nc" id="L179">      return true;</span>
     }
-<span class="fc" id="L182">    return false;</span>
+<span class="fc" id="L181">    return false;</span>
   }
 
   /**
@@ -189,10 +188,10 @@ public class MtasCQLParserWordCondition {
    */
   public boolean isSimplePositive() {
     // assume simplified
-<span class="fc bfc" id="L192" title="All 4 branches covered.">    if ((positiveQueryList.size() &gt; 0) &amp;&amp; (negativeQueryList.size() == 0)) {</span>
-<span class="fc" id="L193">      return true;</span>
+<span class="fc bfc" id="L191" title="All 4 branches covered.">    if ((positiveQueryList.size() &gt; 0) &amp;&amp; (negativeQueryList.size() == 0)) {</span>
+<span class="fc" id="L192">      return true;</span>
     }
-<span class="fc" id="L195">    return false;</span>
+<span class="fc" id="L194">    return false;</span>
   }
 
   /**
@@ -202,10 +201,10 @@ public class MtasCQLParserWordCondition {
    */
   public boolean isSimpleNegative() {
     // assume simplified
-<span class="fc bfc" id="L205" title="All 4 branches covered.">    if ((negativeQueryList.size() &gt; 0) &amp;&amp; (positiveQueryList.size() == 0)) {</span>
-<span class="fc" id="L206">      return true;</span>
+<span class="fc bfc" id="L204" title="All 4 branches covered.">    if ((negativeQueryList.size() &gt; 0) &amp;&amp; (positiveQueryList.size() == 0)) {</span>
+<span class="fc" id="L205">      return true;</span>
     }
-<span class="fc" id="L208">    return false;</span>
+<span class="fc" id="L207">    return false;</span>
   }
 
   /**
@@ -214,33 +213,33 @@ public class MtasCQLParserWordCondition {
    * @return true, if is empty
    */
   public boolean isEmpty() {
-<span class="pc bpc" id="L217" title="1 of 4 branches missed.">    if ((positiveQueryList.size() == 0) &amp;&amp; (negativeQueryList.size() == 0)</span>
-<span class="pc bpc" id="L218" title="1 of 2 branches missed.">        &amp;&amp; (conditionList.size() == 0)) {</span>
-<span class="fc" id="L219">      return true;</span>
+<span class="pc bpc" id="L216" title="1 of 4 branches missed.">    if ((positiveQueryList.size() == 0) &amp;&amp; (negativeQueryList.size() == 0)</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">        &amp;&amp; (conditionList.size() == 0)) {</span>
+<span class="fc" id="L218">      return true;</span>
     }
-<span class="fc" id="L221">    return false;</span>
+<span class="fc" id="L220">    return false;</span>
   }
 
   /**
    * Swap type.
    */
   public void swapType() {
-<span class="pc bpc" id="L228" title="1 of 2 branches missed.">    if (type.equals(TYPE_AND)) {</span>
-<span class="fc" id="L229">      type = TYPE_OR;</span>
-<span class="nc bnc" id="L230" title="All 2 branches missed.">    } else if (type.equals(TYPE_OR)) {</span>
-<span class="nc" id="L231">      type = TYPE_AND;</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">    if (type.equals(TYPE_AND)) {</span>
+<span class="fc" id="L228">      type = TYPE_OR;</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">    } else if (type.equals(TYPE_OR)) {</span>
+<span class="nc" id="L230">      type = TYPE_AND;</span>
     } else {
-<span class="nc" id="L233">      throw new Error(&quot;unknown type&quot;);</span>
+<span class="nc" id="L232">      throw new Error(&quot;unknown type&quot;);</span>
     }
-<span class="fc" id="L235">    swapNot();</span>
-<span class="fc" id="L236">    List&lt;MtasSpanQuery&gt; queryList = positiveQueryList;</span>
-<span class="fc" id="L237">    positiveQueryList = negativeQueryList;</span>
-<span class="fc" id="L238">    negativeQueryList = queryList;</span>
-<span class="pc bpc" id="L239" title="1 of 2 branches missed.">    for (MtasCQLParserWordCondition c : conditionList) {</span>
-<span class="nc" id="L240">      c.swapNot();</span>
-<span class="nc" id="L241">    }</span>
-<span class="fc" id="L242">    simplified = false;</span>
-<span class="fc" id="L243">  }</span>
+<span class="fc" id="L234">    swapNot();</span>
+<span class="fc" id="L235">    List&lt;MtasSpanQuery&gt; queryList = positiveQueryList;</span>
+<span class="fc" id="L236">    positiveQueryList = negativeQueryList;</span>
+<span class="fc" id="L237">    negativeQueryList = queryList;</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">    for (MtasCQLParserWordCondition c : conditionList) {</span>
+<span class="nc" id="L239">      c.swapNot();</span>
+<span class="nc" id="L240">    }</span>
+<span class="fc" id="L241">    simplified = false;</span>
+<span class="fc" id="L242">  }</span>
 
   /**
    * Simplified.
@@ -248,115 +247,121 @@ public class MtasCQLParserWordCondition {
    * @return the boolean
    */
   public Boolean simplified() {
-<span class="nc" id="L251">    return simplified;</span>
+<span class="nc" id="L250">    return simplified;</span>
   }
 
   /**
    * Simplify.
    */
   public void simplify() {
-<span class="fc bfc" id="L258" title="All 2 branches covered.">    if (!simplified) {</span>
-<span class="fc bfc" id="L259" title="All 2 branches covered.">      if (conditionList.size() &gt; 0) {</span>
-<span class="fc bfc" id="L260" title="All 2 branches covered.">        for (MtasCQLParserWordCondition c : conditionList) {</span>
-<span class="fc" id="L261">          c.simplify();</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">    if (!simplified) {</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">      if (conditionList.size() &gt; 0) {</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        for (MtasCQLParserWordCondition c : conditionList) {</span>
+<span class="fc" id="L260">          c.simplify();</span>
           // A &amp; B &amp; ( C &amp; !D )
-<span class="fc bfc" id="L263" title="All 4 branches covered.">          if (c.type().equals(type) &amp;&amp; !c.not()) {</span>
-<span class="fc" id="L264">            positiveQueryList.addAll(c.positiveQueryList);</span>
-<span class="fc" id="L265">            negativeQueryList.addAll(c.negativeQueryList);</span>
+<span class="fc bfc" id="L262" title="All 4 branches covered.">          if (c.type().equals(type) &amp;&amp; !c.not()) {</span>
+<span class="fc" id="L263">            positiveQueryList.addAll(c.positiveQueryList);</span>
+<span class="fc" id="L264">            negativeQueryList.addAll(c.negativeQueryList);</span>
             // A &amp; B &amp; !( C | !D )
-<span class="fc bfc" id="L267" title="All 4 branches covered.">          } else if (!c.type().equals(type) &amp;&amp; c.not()) {</span>
-<span class="fc" id="L268">            positiveQueryList.addAll(c.negativeQueryList);</span>
-<span class="fc" id="L269">            negativeQueryList.addAll(c.positiveQueryList);</span>
+<span class="fc bfc" id="L266" title="All 4 branches covered.">          } else if (!c.type().equals(type) &amp;&amp; c.not()) {</span>
+<span class="fc" id="L267">            positiveQueryList.addAll(c.negativeQueryList);</span>
+<span class="fc" id="L268">            negativeQueryList.addAll(c.positiveQueryList);</span>
             // A &amp; B &amp; ( C )
-<span class="fc bfc" id="L271" title="All 4 branches covered.">          } else if (c.isSingle() &amp;&amp; !c.not()) {</span>
-<span class="fc" id="L272">            positiveQueryList.addAll(c.positiveQueryList);</span>
-<span class="fc" id="L273">            negativeQueryList.addAll(c.negativeQueryList);</span>
+<span class="fc bfc" id="L270" title="All 4 branches covered.">          } else if (c.isSingle() &amp;&amp; !c.not()) {</span>
+<span class="fc" id="L271">            positiveQueryList.addAll(c.positiveQueryList);</span>
+<span class="fc" id="L272">            negativeQueryList.addAll(c.negativeQueryList);</span>
             // A &amp; B &amp; !( C )
-<span class="pc bpc" id="L275" title="1 of 4 branches missed.">          } else if (c.isSingle() &amp;&amp; c.not()) {</span>
-<span class="fc" id="L276">            positiveQueryList.addAll(c.negativeQueryList);</span>
-<span class="fc" id="L277">            negativeQueryList.addAll(c.positiveQueryList);</span>
-<span class="pc bpc" id="L278" title="1 of 2 branches missed.">          } else if (c.isSimplePositive()) {</span>
+<span class="pc bpc" id="L274" title="1 of 4 branches missed.">          } else if (c.isSingle() &amp;&amp; c.not()) {</span>
+<span class="fc" id="L275">            positiveQueryList.addAll(c.negativeQueryList);</span>
+<span class="fc" id="L276">            negativeQueryList.addAll(c.positiveQueryList);</span>
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">          } else if (c.isSimplePositive()) {</span>
             // A | B | ( C &amp; D )
-<span class="fc bfc" id="L280" title="All 2 branches covered.">            if (c.type().equals(TYPE_AND)) {</span>
-<span class="fc" id="L281">              MtasSpanQuery q = new MtasSpanAndQuery(c.positiveQueryList</span>
-<span class="fc" id="L282">                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
-<span class="pc bpc" id="L283" title="1 of 2 branches missed.">              if (c.not()) {</span>
-<span class="nc" id="L284">                negativeQueryList.add(q);</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">            if (c.type().equals(TYPE_AND)) {</span>
+<span class="fc" id="L280">              MtasSpanQuery q = new MtasSpanAndQuery(c.positiveQueryList</span>
+<span class="fc" id="L281">                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">              if (c.not()) {</span>
+<span class="nc" id="L283">                negativeQueryList.add(q);</span>
               } else {
-<span class="fc" id="L286">                positiveQueryList.add(q);</span>
+<span class="fc" id="L285">                positiveQueryList.add(q);</span>
               }
               // A &amp; B &amp; ( C | D )
-<span class="fc" id="L289">            } else {</span>
-<span class="fc" id="L290">              MtasSpanQuery q = new MtasSpanOrQuery(c.positiveQueryList</span>
-<span class="fc" id="L291">                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
-<span class="pc bpc" id="L292" title="1 of 2 branches missed.">              if (c.not()) {</span>
-<span class="nc" id="L293">                negativeQueryList.add(q);</span>
+<span class="fc" id="L288">            } else {</span>
+<span class="fc" id="L289">              MtasSpanQuery q = new MtasSpanOrQuery(c.positiveQueryList</span>
+<span class="fc" id="L290">                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">              if (c.not()) {</span>
+<span class="nc" id="L292">                negativeQueryList.add(q);</span>
               } else {
-<span class="fc" id="L295">                positiveQueryList.add(q);</span>
+<span class="fc" id="L294">                positiveQueryList.add(q);</span>
               }
-<span class="fc" id="L297">            }</span>
-<span class="nc bnc" id="L298" title="All 2 branches missed.">          } else if (c.isSimpleNegative()) {</span>
+<span class="fc" id="L296">            }</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">          } else if (c.isSimpleNegative()) {</span>
             // A | B | ( !C | !D )
-<span class="nc bnc" id="L300" title="All 2 branches missed.">            if (c.type().equals(TYPE_OR)) {</span>
-<span class="nc" id="L301">              MtasSpanQuery q = new MtasSpanAndQuery(c.negativeQueryList</span>
-<span class="nc" id="L302">                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
-<span class="nc bnc" id="L303" title="All 2 branches missed.">              if (c.not()) {</span>
-<span class="nc" id="L304">                positiveQueryList.add(q);</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">            if (c.type().equals(TYPE_OR)) {</span>
+<span class="nc" id="L300">              MtasSpanQuery q = new MtasSpanAndQuery(c.negativeQueryList</span>
+<span class="nc" id="L301">                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">              if (c.not()) {</span>
+<span class="nc" id="L303">                positiveQueryList.add(q);</span>
               } else {
-<span class="nc" id="L306">                negativeQueryList.add(q);</span>
+<span class="nc" id="L305">                negativeQueryList.add(q);</span>
               }
               // A | B | ( !C &amp; !D )
-<span class="nc" id="L309">            } else {</span>
-<span class="nc" id="L310">              MtasSpanQuery q = new MtasSpanOrQuery(c.negativeQueryList</span>
-<span class="nc" id="L311">                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
-<span class="nc bnc" id="L312" title="All 2 branches missed.">              if (c.not()) {</span>
-<span class="nc" id="L313">                positiveQueryList.add(q);</span>
+<span class="nc" id="L308">            } else {</span>
+<span class="nc" id="L309">              MtasSpanQuery q = new MtasSpanOrQuery(c.negativeQueryList</span>
+<span class="nc" id="L310">                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">              if (c.not()) {</span>
+<span class="nc" id="L312">                positiveQueryList.add(q);</span>
               } else {
-<span class="nc" id="L315">                negativeQueryList.add(q);</span>
+<span class="nc" id="L314">                negativeQueryList.add(q);</span>
               }
-<span class="nc" id="L317">            }</span>
+<span class="nc" id="L316">            }</span>
           } else {
             // swap if necessary
-<span class="nc bnc" id="L320" title="All 4 branches missed.">            if (this.isSimplePositive() &amp;&amp; c.not()) {</span>
-<span class="nc" id="L321">              c.swapType();</span>
-<span class="nc bnc" id="L322" title="All 4 branches missed.">            } else if (this.isSimpleNegative() &amp;&amp; !c.not()) {</span>
-<span class="nc" id="L323">              c.swapType();</span>
+<span class="nc bnc" id="L319" title="All 4 branches missed.">            if (this.isSimplePositive() &amp;&amp; c.not()) {</span>
+<span class="nc" id="L320">              c.swapType();</span>
+<span class="nc bnc" id="L321" title="All 4 branches missed.">            } else if (this.isSimpleNegative() &amp;&amp; !c.not()) {</span>
+<span class="nc" id="L322">              c.swapType();</span>
             }
             // A | B | ( C &amp; !D )
-<span class="nc bnc" id="L326" title="All 2 branches missed.">            if (c.type().equals(TYPE_AND)) {</span>
-<span class="nc" id="L327">              MtasSpanQuery positiveQuery = new MtasSpanAndQuery(c.positiveQueryList</span>
-<span class="nc" id="L328">                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
-<span class="nc" id="L329">              MtasSpanQuery negativeQuery = new MtasSpanAndQuery(c.negativeQueryList</span>
-<span class="nc" id="L330">                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
-<span class="nc" id="L331">              MtasSpanQuery q = new MtasSpanNotQuery(positiveQuery, negativeQuery);</span>
-<span class="nc bnc" id="L332" title="All 2 branches missed.">              if (c.not()) {</span>
-<span class="nc" id="L333">                negativeQueryList.add(q);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">            if (c.type().equals(TYPE_AND)) {</span>
+<span class="nc" id="L326">              MtasSpanQuery positiveQuery = new MtasSpanAndQuery(</span>
+                  c.positiveQueryList
+<span class="nc" id="L328">                      .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
+<span class="nc" id="L329">              MtasSpanQuery negativeQuery = new MtasSpanAndQuery(</span>
+                  c.negativeQueryList
+<span class="nc" id="L331">                      .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
+<span class="nc" id="L332">              MtasSpanQuery q = new MtasSpanNotQuery(positiveQuery,</span>
+                  negativeQuery);
+<span class="nc bnc" id="L334" title="All 2 branches missed.">              if (c.not()) {</span>
+<span class="nc" id="L335">                negativeQueryList.add(q);</span>
               } else {
-<span class="nc" id="L335">                positiveQueryList.add(q);</span>
+<span class="nc" id="L337">                positiveQueryList.add(q);</span>
               }
               // A &amp; B &amp; ( C | !D )
-<span class="nc" id="L338">            } else {</span>
-<span class="nc" id="L339">              MtasSpanQuery positiveQuery = new MtasSpanOrQuery(c.positiveQueryList</span>
-<span class="nc" id="L340">                  .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
-<span class="nc" id="L341">              MtasSpanQuery negativeQuery = new MtasSpanOrQuery(c.negativeQueryList</span>
-<span class="nc" id="L342">                  .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
-<span class="nc" id="L343">              MtasSpanQuery q = new MtasSpanNotQuery(positiveQuery, negativeQuery);</span>
-<span class="nc bnc" id="L344" title="All 2 branches missed.">              if (c.not()) {</span>
-<span class="nc" id="L345">                negativeQueryList.add(q);</span>
+<span class="nc" id="L340">            } else {</span>
+<span class="nc" id="L341">              MtasSpanQuery positiveQuery = new MtasSpanOrQuery(</span>
+                  c.positiveQueryList
+<span class="nc" id="L343">                      .toArray(new MtasSpanQuery[c.positiveQueryList.size()]));</span>
+<span class="nc" id="L344">              MtasSpanQuery negativeQuery = new MtasSpanOrQuery(</span>
+                  c.negativeQueryList
+<span class="nc" id="L346">                      .toArray(new MtasSpanQuery[c.negativeQueryList.size()]));</span>
+<span class="nc" id="L347">              MtasSpanQuery q = new MtasSpanNotQuery(positiveQuery,</span>
+                  negativeQuery);
+<span class="nc bnc" id="L349" title="All 2 branches missed.">              if (c.not()) {</span>
+<span class="nc" id="L350">                negativeQueryList.add(q);</span>
               } else {
-<span class="nc" id="L347">                positiveQueryList.add(q);</span>
+<span class="nc" id="L352">                positiveQueryList.add(q);</span>
               }
             }
           }
-<span class="fc" id="L351">        }</span>
-<span class="fc" id="L352">        conditionList.clear();</span>
+<span class="fc" id="L356">        }</span>
+<span class="fc" id="L357">        conditionList.clear();</span>
       }
-<span class="fc bfc" id="L354" title="All 2 branches covered.">      if (isSimpleNegative()) {</span>
-<span class="fc" id="L355">        swapType();</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">      if (isSimpleNegative()) {</span>
+<span class="fc" id="L360">        swapType();</span>
       }
-<span class="fc" id="L357">      simplified = true;</span>
+<span class="fc" id="L362">      simplified = true;</span>
     }
-<span class="fc" id="L359">  }</span>
+<span class="fc" id="L364">  }</span>
 
   /*
    * (non-Javadoc)
@@ -365,7 +370,7 @@ public class MtasCQLParserWordCondition {
    */
   @Override
   public String toString() {
-<span class="nc" id="L368">    return toString(&quot;&quot;, &quot;&quot;);</span>
+<span class="nc" id="L373">    return toString(&quot;&quot;, &quot;&quot;);</span>
   }
 
   /**
@@ -376,32 +381,33 @@ public class MtasCQLParserWordCondition {
    * @return the string
    */
   public String toString(String firstIndent, String indent) {
-<span class="nc" id="L379">    StringBuilder text = new StringBuilder();</span>
-<span class="nc bnc" id="L380" title="All 2 branches missed.">    if (isEmpty()) {</span>
-<span class="nc" id="L381">      text.append(firstIndent + &quot;Type: any word&quot;);</span>
-<span class="nc bnc" id="L382" title="All 2 branches missed.">      text.append(not ? &quot; (not)\n&quot; : &quot;\n&quot;);</span>
+<span class="nc" id="L384">    StringBuilder text = new StringBuilder();</span>
+<span class="nc bnc" id="L385" title="All 2 branches missed.">    if (isEmpty()) {</span>
+<span class="nc" id="L386">      text.append(firstIndent + &quot;Type: any word&quot;);</span>
+<span class="nc bnc" id="L387" title="All 2 branches missed.">      text.append(not ? &quot; (not)\n&quot; : &quot;\n&quot;);</span>
     } else {
-<span class="nc" id="L384">      text.append(firstIndent + &quot;Type: &quot; + type);</span>
-<span class="nc bnc" id="L385" title="All 2 branches missed.">      text.append(not ? &quot; (not)\n&quot; : &quot;\n&quot;);</span>
-<span class="nc bnc" id="L386" title="All 2 branches missed.">      if (positiveQueryList.size() &gt; 0) {</span>
-<span class="nc bnc" id="L387" title="All 2 branches missed.">        for (MtasSpanQuery q : positiveQueryList) {</span>
-<span class="nc" id="L388">          text.append(indent + &quot;List Positive Subqueries: &quot; + q.toString(field)</span>
-              + &quot;\n&quot;);
-<span class="nc" id="L390">        }</span>
-      }
-<span class="nc bnc" id="L392" title="All 2 branches missed.">      if (negativeQueryList.size() &gt; 0) {</span>
-<span class="nc bnc" id="L393" title="All 2 branches missed.">        for (MtasSpanQuery q : negativeQueryList) {</span>
-<span class="nc" id="L394">          text.append(indent + &quot;List Negative Queries: &quot; + q.toString(field) + &quot;\n&quot;);</span>
+<span class="nc" id="L389">      text.append(firstIndent + &quot;Type: &quot; + type);</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">      text.append(not ? &quot; (not)\n&quot; : &quot;\n&quot;);</span>
+<span class="nc bnc" id="L391" title="All 2 branches missed.">      if (positiveQueryList.size() &gt; 0) {</span>
+<span class="nc bnc" id="L392" title="All 2 branches missed.">        for (MtasSpanQuery q : positiveQueryList) {</span>
+<span class="nc" id="L393">          text.append(</span>
+<span class="nc" id="L394">              indent + &quot;List Positive Subqueries: &quot; + q.toString(field) + &quot;\n&quot;);</span>
 <span class="nc" id="L395">        }</span>
       }
-<span class="nc bnc" id="L397" title="All 2 branches missed.">      if (conditionList.size() &gt; 0) {</span>
-<span class="nc" id="L398">        text.append(indent + &quot;List Conditions\n&quot;);</span>
-<span class="nc bnc" id="L399" title="All 2 branches missed.">        for (MtasCQLParserWordCondition c : conditionList) {</span>
-<span class="nc" id="L400">          text.append(c.toString(indent + &quot;- &quot;, indent + &quot;  &quot;) + &quot;\n&quot;);</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">      if (negativeQueryList.size() &gt; 0) {</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">        for (MtasSpanQuery q : negativeQueryList) {</span>
+<span class="nc" id="L399">          text.append(</span>
+<span class="nc" id="L400">              indent + &quot;List Negative Queries: &quot; + q.toString(field) + &quot;\n&quot;);</span>
 <span class="nc" id="L401">        }</span>
       }
+<span class="nc bnc" id="L403" title="All 2 branches missed.">      if (conditionList.size() &gt; 0) {</span>
+<span class="nc" id="L404">        text.append(indent + &quot;List Conditions\n&quot;);</span>
+<span class="nc bnc" id="L405" title="All 2 branches missed.">        for (MtasCQLParserWordCondition c : conditionList) {</span>
+<span class="nc" id="L406">          text.append(c.toString(indent + &quot;- &quot;, indent + &quot;  &quot;) + &quot;\n&quot;);</span>
+<span class="nc" id="L407">        }</span>
+      }
     }
-<span class="nc" id="L404">    return text.toString();</span>
+<span class="nc" id="L410">    return text.toString();</span>
   }
 
   /*
@@ -411,72 +417,74 @@ public class MtasCQLParserWordCondition {
    */
   @Override
   public boolean equals(Object object) {
-<span class="pc bpc" id="L414" title="1 of 2 branches missed.">    if (object == null) {</span>
-<span class="nc" id="L415">      return false;</span>
-<span class="pc bpc" id="L416" title="1 of 2 branches missed.">    } else if (object instanceof MtasCQLParserWordCondition) {</span>
-<span class="fc" id="L417">      MtasCQLParserWordCondition condition = (MtasCQLParserWordCondition) object;</span>
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">    if (object == null) {</span>
+<span class="nc" id="L421">      return false;</span>
+<span class="pc bpc" id="L422" title="1 of 2 branches missed.">    } else if (object instanceof MtasCQLParserWordCondition) {</span>
+<span class="fc" id="L423">      MtasCQLParserWordCondition condition = (MtasCQLParserWordCondition) object;</span>
       // basic checks
-<span class="pc bpc" id="L419" title="2 of 4 branches missed.">      if (!field.equals(condition.field) || not ^ condition.not</span>
-<span class="pc bpc" id="L420" title="1 of 4 branches missed.">          || !type.equals(condition.type) || isSingle() ^ condition.isSingle()</span>
-<span class="pc bpc" id="L421" title="1 of 2 branches missed.">          || isSimplePositive() ^ condition.isSimplePositive()</span>
-<span class="pc bpc" id="L422" title="1 of 2 branches missed.">          || isSimpleNegative() ^ condition.isSimpleNegative()</span>
-<span class="pc bpc" id="L423" title="1 of 2 branches missed.">          || isEmpty() ^ condition.isEmpty()) {</span>
-<span class="fc" id="L424">        return false;</span>
-<span class="fc bfc" id="L425" title="All 2 branches covered.">      } else if (isEmpty()) {</span>
-<span class="fc" id="L426">        return true;</span>
+<span class="pc bpc" id="L425" title="2 of 4 branches missed.">      if (!field.equals(condition.field) || not ^ condition.not</span>
+<span class="pc bpc" id="L426" title="1 of 4 branches missed.">          || !type.equals(condition.type) || isSingle() ^ condition.isSingle()</span>
+<span class="pc bpc" id="L427" title="1 of 2 branches missed.">          || isSimplePositive() ^ condition.isSimplePositive()</span>
+<span class="pc bpc" id="L428" title="1 of 2 branches missed.">          || isSimpleNegative() ^ condition.isSimpleNegative()</span>
+<span class="pc bpc" id="L429" title="1 of 2 branches missed.">          || isEmpty() ^ condition.isEmpty()) {</span>
+<span class="fc" id="L430">        return false;</span>
+<span class="fc bfc" id="L431" title="All 2 branches covered.">      } else if (isEmpty()) {</span>
+<span class="fc" id="L432">        return true;</span>
       } else {
-<span class="fc bfc" id="L428" title="All 2 branches covered.">        if (!positiveQueryList.equals(condition.positiveQueryList)) {</span>
-<span class="fc" id="L429">          return false;</span>
+<span class="fc bfc" id="L434" title="All 2 branches covered.">        if (!positiveQueryList.equals(condition.positiveQueryList)) {</span>
+<span class="fc" id="L435">          return false;</span>
         } else {
-<span class="fc bfc" id="L431" title="All 2 branches covered.">          for (int i = 0; i &lt; positiveQueryList.size(); i++) {</span>
-<span class="pc bpc" id="L432" title="1 of 2 branches missed.">            if (positiveQueryList.get(i) instanceof MtasCQLParserWordQuery) {</span>
-<span class="fc" id="L433">              if (!(condition.positiveQueryList</span>
-<span class="pc bpc" id="L434" title="1 of 2 branches missed.">                  .get(i) instanceof MtasCQLParserWordQuery)) {</span>
-<span class="nc" id="L435">                return false;</span>
-<span class="fc" id="L436">              } else if (!((MtasCQLParserWordQuery) positiveQueryList.get(i))</span>
-<span class="pc bpc" id="L437" title="1 of 2 branches missed.">                  .equals(condition.positiveQueryList.get(i))) {</span>
-<span class="nc" id="L438">                return false;</span>
+<span class="fc bfc" id="L437" title="All 2 branches covered.">          for (int i = 0; i &lt; positiveQueryList.size(); i++) {</span>
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">            if (positiveQueryList.get(i) instanceof MtasCQLParserWordQuery) {</span>
+<span class="fc" id="L439">              if (!(condition.positiveQueryList</span>
+<span class="pc bpc" id="L440" title="1 of 2 branches missed.">                  .get(i) instanceof MtasCQLParserWordQuery)) {</span>
+<span class="nc" id="L441">                return false;</span>
+<span class="fc" id="L442">              } else if (!((MtasCQLParserWordQuery) positiveQueryList.get(i))</span>
+<span class="pc bpc" id="L443" title="1 of 2 branches missed.">                  .equals(condition.positiveQueryList.get(i))) {</span>
+<span class="nc" id="L444">                return false;</span>
               }
             }
           }
         }
-<span class="pc bpc" id="L443" title="1 of 2 branches missed.">        if (!negativeQueryList.equals(condition.negativeQueryList)) {</span>
-<span class="nc" id="L444">          return false;</span>
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">        if (!negativeQueryList.equals(condition.negativeQueryList)) {</span>
+<span class="nc" id="L450">          return false;</span>
         } else {
-<span class="pc bpc" id="L446" title="1 of 2 branches missed.">          for (int i = 0; i &lt; negativeQueryList.size(); i++) {</span>
-<span class="nc bnc" id="L447" title="All 2 branches missed.">            if (negativeQueryList.get(i) instanceof MtasCQLParserWordQuery) {</span>
-<span class="nc" id="L448">              if (!(condition.negativeQueryList</span>
-<span class="nc bnc" id="L449" title="All 2 branches missed.">                  .get(i) instanceof MtasCQLParserWordQuery)) {</span>
-<span class="nc" id="L450">                return false;</span>
-<span class="nc" id="L451">              } else if (!((MtasCQLParserWordQuery) negativeQueryList.get(i))</span>
-<span class="nc bnc" id="L452" title="All 2 branches missed.">                  .equals(condition.negativeQueryList.get(i))) {</span>
-<span class="nc" id="L453">                return false;</span>
+<span class="pc bpc" id="L452" title="1 of 2 branches missed.">          for (int i = 0; i &lt; negativeQueryList.size(); i++) {</span>
+<span class="nc bnc" id="L453" title="All 2 branches missed.">            if (negativeQueryList.get(i) instanceof MtasCQLParserWordQuery) {</span>
+<span class="nc" id="L454">              if (!(condition.negativeQueryList</span>
+<span class="nc bnc" id="L455" title="All 2 branches missed.">                  .get(i) instanceof MtasCQLParserWordQuery)) {</span>
+<span class="nc" id="L456">                return false;</span>
+<span class="nc" id="L457">              } else if (!((MtasCQLParserWordQuery) negativeQueryList.get(i))</span>
+<span class="nc bnc" id="L458" title="All 2 branches missed.">                  .equals(condition.negativeQueryList.get(i))) {</span>
+<span class="nc" id="L459">                return false;</span>
               }
             }
           }
         }
-<span class="fc" id="L458">        return true;</span>
+<span class="fc" id="L464">        return true;</span>
       }
     } else {
-<span class="nc" id="L461">      return false;</span>
+<span class="nc" id="L467">      return false;</span>
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L470">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L471">    h = (h * 3) ^ field.hashCode();</span>
-<span class="nc" id="L472">    h = (h * 5) ^ type.hashCode();</span>
-<span class="nc bnc" id="L473" title="All 2 branches missed.">    h += (h * 7) ^ (not ? 3 : 5);</span>
-<span class="nc bnc" id="L474" title="All 2 branches missed.">    h += (h * 11) ^ (simplified ? 7 : 13);</span>
-<span class="nc" id="L475">    h = (h * 17) ^ conditionList.hashCode();</span>
-<span class="nc" id="L476">    h = (h * 19) ^ positiveQueryList.hashCode();</span>
-<span class="nc" id="L477">    h = (h * 23) ^ negativeQueryList.hashCode();</span>
-<span class="nc" id="L478">    return h;</span>
+<span class="nc" id="L478">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L479">    h = (h * 3) ^ field.hashCode();</span>
+<span class="nc" id="L480">    h = (h * 5) ^ type.hashCode();</span>
+<span class="nc bnc" id="L481" title="All 2 branches missed.">    h += (h * 7) ^ (not ? 3 : 5);</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">    h += (h * 11) ^ (simplified ? 7 : 13);</span>
+<span class="nc" id="L483">    h = (h * 17) ^ conditionList.hashCode();</span>
+<span class="nc" id="L484">    h = (h * 19) ^ positiveQueryList.hashCode();</span>
+<span class="nc" id="L485">    h = (h * 23) ^ negativeQueryList.hashCode();</span>
+<span class="nc" id="L486">    return h;</span>
   }
-  
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

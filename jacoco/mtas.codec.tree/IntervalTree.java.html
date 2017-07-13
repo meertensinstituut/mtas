@@ -63,12 +63,14 @@ abstract public class IntervalTree&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&
    */
   abstract protected void addRangeEmpty(int left, int right);
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-<span class="nc" id="L71">    return printBalance(1, root);</span>
+<span class="nc" id="L73">    return printBalance(1, root);</span>
   }
 
   /**
@@ -79,21 +81,21 @@ abstract public class IntervalTree&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&
    * @return the string
    */
   final private String printBalance(Integer p, N n) {
-<span class="nc" id="L82">    StringBuilder text = new StringBuilder();</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">    if (n != null) {</span>
-<span class="nc" id="L84">      text.append(printBalance((p + 1), n.leftChild));</span>
-<span class="nc" id="L85">      String format = &quot;%&quot; + (3 * p) + &quot;s&quot;;</span>
-<span class="nc" id="L86">      text.append(String.format(format, &quot;&quot;));</span>
-<span class="nc bnc" id="L87" title="All 2 branches missed.">      if (n.left == n.right) {</span>
-<span class="nc" id="L88">        text.append(&quot;[&quot; + n.left + &quot;] (&quot; + n.max + &quot;) : &quot; + n.lists.size()</span>
+<span class="nc" id="L84">    StringBuilder text = new StringBuilder();</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">    if (n != null) {</span>
+<span class="nc" id="L86">      text.append(printBalance((p + 1), n.leftChild));</span>
+<span class="nc" id="L87">      String format = &quot;%&quot; + (3 * p) + &quot;s&quot;;</span>
+<span class="nc" id="L88">      text.append(String.format(format, &quot;&quot;));</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">      if (n.left == n.right) {</span>
+<span class="nc" id="L90">        text.append(&quot;[&quot; + n.left + &quot;] (&quot; + n.max + &quot;) : &quot; + n.lists.size()</span>
             + &quot; lists\n&quot;);
       } else {
-<span class="nc" id="L91">        text.append(&quot;[&quot; + n.left + &quot;-&quot; + n.right + &quot;] (&quot; + n.max + &quot;) : &quot;</span>
-<span class="nc" id="L92">            + n.lists.size() + &quot; lists\n&quot;);</span>
+<span class="nc" id="L93">        text.append(&quot;[&quot; + n.left + &quot;-&quot; + n.right + &quot;] (&quot; + n.max + &quot;) : &quot;</span>
+<span class="nc" id="L94">            + n.lists.size() + &quot; lists\n&quot;);</span>
       }
-<span class="nc" id="L94">      text.append(printBalance((p + 1), n.rightChild));</span>
+<span class="nc" id="L96">      text.append(printBalance((p + 1), n.rightChild));</span>
     }
-<span class="nc" id="L96">    return text.toString();</span>
+<span class="nc" id="L98">    return text.toString();</span>
   }
 
   /**
@@ -102,7 +104,7 @@ abstract public class IntervalTree&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&
    * @return the root
    */
   final public N getRoot() {
-<span class="fc" id="L105">    return root;</span>
+<span class="fc" id="L107">    return root;</span>
   }
 
   /**
@@ -111,7 +113,7 @@ abstract public class IntervalTree&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&
    * @return the current
    */
   final public N getCurrent() {
-<span class="nc" id="L114">    return current;</span>
+<span class="nc" id="L116">    return current;</span>
   }
 
   /**
@@ -120,8 +122,8 @@ abstract public class IntervalTree&lt;T, N extends IntervalTreeNode&lt;T, N&gt;&
    * @param node the new current
    */
   final public void setCurrent(N node) {
-<span class="nc" id="L123">    current = node;</span>
-<span class="nc" id="L124">  }</span>
+<span class="nc" id="L125">    current = node;</span>
+<span class="nc" id="L126">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

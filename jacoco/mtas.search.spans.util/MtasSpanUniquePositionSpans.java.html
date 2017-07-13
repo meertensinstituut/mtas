@@ -9,43 +9,49 @@ import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
- * The Class MtasSpanUniquePosition.
+ * The Class MtasSpanUniquePositionSpans.
  */
 public class MtasSpanUniquePositionSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanUniquePositionQuery query;
+
   /** The spans. */
-  Spans spans;
+  private Spans spans;
 
   /** The queue spans. */
-  List&lt;Match&gt; queueSpans;
+  private List&lt;Match&gt; queueSpans;
 
   /** The queue matches. */
-  List&lt;Match&gt; queueMatches;
+  private List&lt;Match&gt; queueMatches;
 
   /** The current match. */
-  Match currentMatch;
+  private Match currentMatch;
 
   /** The last start position. */
-  int lastStartPosition; // startPosition of last retrieved span
+  private int lastStartPosition; // startPosition of last retrieved span
 
   /** The last span. */
-  boolean lastSpan; // last span for this document added to queue
+  private boolean lastSpan; // last span for this document added to queue
 
   /** The no more positions. */
-  boolean noMorePositions;
+  private boolean noMorePositions;
 
   /**
-   * Instantiates a new mtas span unique position.
+   * Instantiates a new mtas span unique position spans.
    *
+   * @param query the query
    * @param spans the spans
    */
-  public MtasSpanUniquePositionSpans(Spans spans) {
-<span class="fc" id="L43">    super();</span>
-<span class="fc" id="L44">    this.spans = spans;</span>
-<span class="fc" id="L45">    queueSpans = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L46">    queueMatches = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L47">    resetQueue();</span>
-<span class="fc" id="L48">  }</span>
+  public MtasSpanUniquePositionSpans(MtasSpanUniquePositionQuery query,
+      Spans spans) {
+<span class="fc" id="L48">    super();</span>
+<span class="fc" id="L49">    this.query = query;</span>
+<span class="fc" id="L50">    this.spans = spans;</span>
+<span class="fc" id="L51">    queueSpans = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L52">    queueMatches = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L53">    resetQueue();</span>
+<span class="fc" id="L54">  }</span>
 
   /*
    * (non-Javadoc)
@@ -54,15 +60,15 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int nextStartPosition() throws IOException {
-<span class="fc bfc" id="L57" title="All 2 branches covered.">    if (findMatches()) {</span>
-<span class="fc" id="L58">      currentMatch = queueMatches.get(0);</span>
-<span class="fc" id="L59">      queueMatches.remove(0);</span>
-<span class="fc" id="L60">      noMorePositions = false;</span>
-<span class="fc" id="L61">      return currentMatch.startPosition();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (findMatches()) {</span>
+<span class="fc" id="L64">      currentMatch = queueMatches.get(0);</span>
+<span class="fc" id="L65">      queueMatches.remove(0);</span>
+<span class="fc" id="L66">      noMorePositions = false;</span>
+<span class="fc" id="L67">      return currentMatch.startPosition();</span>
     } else {
-<span class="fc" id="L63">      currentMatch = null;</span>
-<span class="fc" id="L64">      noMorePositions = true;</span>
-<span class="fc" id="L65">      return NO_MORE_POSITIONS;</span>
+<span class="fc" id="L69">      currentMatch = null;</span>
+<span class="fc" id="L70">      noMorePositions = true;</span>
+<span class="fc" id="L71">      return NO_MORE_POSITIONS;</span>
     }
   }
 
@@ -73,15 +79,15 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int startPosition() {
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">    if (currentMatch == null) {      </span>
-<span class="fc bfc" id="L77" title="All 2 branches covered.">      if(noMorePositions) {</span>
-<span class="fc" id="L78">        return NO_MORE_POSITIONS;</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    if (currentMatch == null) {</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">      if (noMorePositions) {</span>
+<span class="fc" id="L84">        return NO_MORE_POSITIONS;</span>
       } else {
-<span class="fc" id="L80">        return -1;</span>
+<span class="fc" id="L86">        return -1;</span>
       }
-    } else {  
-<span class="nc" id="L83">      return currentMatch.startPosition();</span>
-    } 
+    } else {
+<span class="nc" id="L89">      return currentMatch.startPosition();</span>
+    }
   }
 
   /*
@@ -91,15 +97,15 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int endPosition() {
-<span class="fc bfc" id="L94" title="All 2 branches covered.">    if (currentMatch == null) {      </span>
-<span class="fc bfc" id="L95" title="All 2 branches covered.">      if(noMorePositions) {</span>
-<span class="fc" id="L96">        return NO_MORE_POSITIONS;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">    if (currentMatch == null) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">      if (noMorePositions) {</span>
+<span class="fc" id="L102">        return NO_MORE_POSITIONS;</span>
       } else {
-<span class="fc" id="L98">        return -1;</span>
+<span class="fc" id="L104">        return -1;</span>
       }
-    } else {  
-<span class="fc" id="L101">      return currentMatch.endPosition();</span>
-    }    
+    } else {
+<span class="fc" id="L107">      return currentMatch.endPosition();</span>
+    }
   }
 
   /*
@@ -110,7 +116,7 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
   @Override
   public int width() {
     // return (currentMatch.endPosition() - currentMatch.startPosition());
-<span class="fc" id="L113">    return 1;</span>
+<span class="fc" id="L119">    return 1;</span>
   }
 
   /*
@@ -122,8 +128,8 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-<span class="nc" id="L125">    spans.collect(collector);</span>
-<span class="nc" id="L126">  }</span>
+<span class="nc" id="L131">    spans.collect(collector);</span>
+<span class="nc" id="L132">  }</span>
 
   /*
    * (non-Javadoc)
@@ -132,7 +138,7 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int docID() {
-<span class="fc" id="L135">    return spans.docID();</span>
+<span class="fc" id="L141">    return spans.docID();</span>
   }
 
   /*
@@ -142,9 +148,9 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="fc" id="L145">    resetQueue();</span>
-<span class="fc" id="L146">    noMorePositions = false;</span>
-<span class="fc bfc" id="L147" title="All 2 branches covered.">    return (spans.nextDoc() == NO_MORE_DOCS) ? NO_MORE_DOCS : toMatchDoc();</span>
+<span class="fc" id="L151">    resetQueue();</span>
+<span class="fc" id="L152">    noMorePositions = false;</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    return (spans.nextDoc() == NO_MORE_DOCS) ? NO_MORE_DOCS : toMatchDoc();</span>
   }
 
   /*
@@ -154,27 +160,36 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="fc" id="L157">    resetQueue();</span>
-<span class="fc" id="L158">    noMorePositions = false;</span>
-<span class="fc bfc" id="L159" title="All 2 branches covered.">    return (spans.advance(target) == NO_MORE_DOCS) ? NO_MORE_DOCS</span>
-<span class="fc" id="L160">        : toMatchDoc();</span>
+<span class="fc" id="L163">    resetQueue();</span>
+<span class="fc" id="L164">    noMorePositions = false;</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    return (spans.advance(target) == NO_MORE_DOCS) ? NO_MORE_DOCS</span>
+<span class="fc" id="L166">        : toMatchDoc();</span>
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-<span class="fc" id="L165">    return spans.asTwoPhaseIterator();     </span>
+<span class="pc bpc" id="L176" title="2 of 4 branches missed.">    if (spans == null || !query.twoPhaseIteratorAllowed()) {</span>
+<span class="nc" id="L177">      return null;</span>
+    } else {
+<span class="fc" id="L179">      return spans.asTwoPhaseIterator();</span>
+    }
   }
 
   /**
    * Reset queue.
    */
   void resetQueue() {
-<span class="fc" id="L172">    queueSpans.clear();</span>
-<span class="fc" id="L173">    queueMatches.clear();</span>
-<span class="fc" id="L174">    lastStartPosition = 0;</span>
-<span class="fc" id="L175">    lastSpan = false;</span>
-<span class="fc" id="L176">    currentMatch = null;</span>
-<span class="fc" id="L177">  }</span>
+<span class="fc" id="L187">    queueSpans.clear();</span>
+<span class="fc" id="L188">    queueMatches.clear();</span>
+<span class="fc" id="L189">    lastStartPosition = 0;</span>
+<span class="fc" id="L190">    lastSpan = false;</span>
+<span class="fc" id="L191">    currentMatch = null;</span>
+<span class="fc" id="L192">  }</span>
 
   /**
    * To match doc.
@@ -184,11 +199,11 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   int toMatchDoc() throws IOException {
     while (true) {
-<span class="pc bpc" id="L187" title="1 of 2 branches missed.">      if (findMatches()) {</span>
-<span class="fc" id="L188">        return docID();</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">      if (findMatches()) {</span>
+<span class="fc" id="L203">        return docID();</span>
       }
-<span class="nc bnc" id="L190" title="All 2 branches missed.">      if (spans.nextDoc() == NO_MORE_DOCS) {</span>
-<span class="nc" id="L191">        return NO_MORE_DOCS;</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">      if (spans.nextDoc() == NO_MORE_DOCS) {</span>
+<span class="nc" id="L206">        return NO_MORE_DOCS;</span>
       }
     }
   }
@@ -201,15 +216,15 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
-<span class="fc bfc" id="L204" title="All 2 branches covered.">    if (lastSpan) {</span>
-<span class="fc" id="L205">      return false;</span>
-<span class="fc bfc" id="L206" title="All 2 branches covered.">    } else if (spans.nextStartPosition() == NO_MORE_POSITIONS) {</span>
-<span class="fc" id="L207">      lastSpan = true;</span>
-<span class="fc" id="L208">      return false;</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">    if (lastSpan) {</span>
+<span class="fc" id="L220">      return false;</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">    } else if (spans.nextStartPosition() == NO_MORE_POSITIONS) {</span>
+<span class="fc" id="L222">      lastSpan = true;</span>
+<span class="fc" id="L223">      return false;</span>
     } else {
-<span class="fc" id="L210">      queueSpans.add(new Match(spans.startPosition(), spans.endPosition()));</span>
-<span class="fc" id="L211">      lastStartPosition = spans.startPosition();</span>
-<span class="fc" id="L212">      return true;</span>
+<span class="fc" id="L225">      queueSpans.add(new Match(spans.startPosition(), spans.endPosition()));</span>
+<span class="fc" id="L226">      lastStartPosition = spans.startPosition();</span>
+<span class="fc" id="L227">      return true;</span>
     }
   }
 
@@ -221,42 +236,42 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
-<span class="fc bfc" id="L224" title="All 2 branches covered.">    if (!queueMatches.isEmpty()) {</span>
-<span class="fc" id="L225">      return true;</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">    if (!queueMatches.isEmpty()) {</span>
+<span class="fc" id="L240">      return true;</span>
     } else {
       while (true) {
         // try to get something in queue of spans
-<span class="fc bfc" id="L229" title="All 4 branches covered.">        if (queueSpans.isEmpty() &amp;&amp; !collectSpan()) {</span>
-<span class="fc" id="L230">          return false;</span>
+<span class="fc bfc" id="L244" title="All 4 branches covered.">        if (queueSpans.isEmpty() &amp;&amp; !collectSpan()) {</span>
+<span class="fc" id="L245">          return false;</span>
         }
         // try to get matches with first span in queue
-<span class="fc" id="L233">        Match firstMatch = queueSpans.get(0);</span>
-<span class="fc" id="L234">        queueSpans.remove(0);</span>
+<span class="fc" id="L248">        Match firstMatch = queueSpans.get(0);</span>
+<span class="fc" id="L249">        queueSpans.remove(0);</span>
         // create a list of matches with same startposition as firstMatch
-<span class="fc" id="L236">        List&lt;Match&gt; matches = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L237">        matches.add(firstMatch);</span>
+<span class="fc" id="L251">        List&lt;Match&gt; matches = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L252">        matches.add(firstMatch);</span>
         // try to collect spans until lastStartPosition not equal to
         // startposition of firstMatch
-<span class="fc bfc" id="L240" title="All 4 branches covered.">        while (!lastSpan &amp;&amp; (lastStartPosition == firstMatch.startPosition())) {</span>
-<span class="fc" id="L241">          collectSpan();</span>
+<span class="fc bfc" id="L255" title="All 4 branches covered.">        while (!lastSpan &amp;&amp; (lastStartPosition == firstMatch.startPosition())) {</span>
+<span class="fc" id="L256">          collectSpan();</span>
         }
-<span class="fc bfc" id="L243" title="All 2 branches covered.">        while (!queueSpans.isEmpty() &amp;&amp; (queueSpans.get(0)</span>
-<span class="fc bfc" id="L244" title="All 2 branches covered.">            .startPosition() == firstMatch.startPosition())) {</span>
-<span class="fc" id="L245">          matches.add(queueSpans.get(0));</span>
-<span class="fc" id="L246">          queueSpans.remove(0);</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">        while (!queueSpans.isEmpty() &amp;&amp; (queueSpans.get(0)</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">            .startPosition() == firstMatch.startPosition())) {</span>
+<span class="fc" id="L260">          matches.add(queueSpans.get(0));</span>
+<span class="fc" id="L261">          queueSpans.remove(0);</span>
         }
         // construct all matches for this startposition
-<span class="fc bfc" id="L249" title="All 2 branches covered.">        for (Match match : matches) {</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        for (Match match : matches) {</span>
           // only unique spans
-<span class="pc bpc" id="L251" title="1 of 2 branches missed.">          if (!queueMatches.contains(match)) {</span>
-<span class="fc" id="L252">            queueMatches.add(match);</span>
+<span class="fc bfc" id="L266" title="All 2 branches covered.">          if (!queueMatches.contains(match)) {</span>
+<span class="fc" id="L267">            queueMatches.add(match);</span>
           }
-<span class="fc" id="L254">        }</span>
+<span class="fc" id="L269">        }</span>
         // check for something in queue of matches
-<span class="pc bpc" id="L256" title="1 of 2 branches missed.">        if (!queueMatches.isEmpty()) {</span>
-<span class="fc" id="L257">          return true;</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">        if (!queueMatches.isEmpty()) {</span>
+<span class="fc" id="L272">          return true;</span>
         }
-<span class="nc" id="L259">      }</span>
+<span class="nc" id="L274">      }</span>
     }
   }
 
@@ -277,10 +292,10 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
      * @param startPosition the start position
      * @param endPosition the end position
      */
-<span class="fc" id="L280">    Match(int startPosition, int endPosition) {</span>
-<span class="fc" id="L281">      this.startPosition = startPosition;</span>
-<span class="fc" id="L282">      this.endPosition = endPosition;</span>
-<span class="fc" id="L283">    }</span>
+<span class="fc" id="L295">    Match(int startPosition, int endPosition) {</span>
+<span class="fc" id="L296">      this.startPosition = startPosition;</span>
+<span class="fc" id="L297">      this.endPosition = endPosition;</span>
+<span class="fc" id="L298">    }</span>
 
     /**
      * Start position.
@@ -288,7 +303,7 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
      * @return the int
      */
     public int startPosition() {
-<span class="fc" id="L291">      return startPosition;</span>
+<span class="fc" id="L306">      return startPosition;</span>
     }
 
     /**
@@ -297,7 +312,7 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
      * @return the int
      */
     public int endPosition() {
-<span class="fc" id="L300">      return endPosition;</span>
+<span class="fc" id="L315">      return endPosition;</span>
     }
 
     /*
@@ -307,26 +322,28 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
      */
     @Override
     public boolean equals(Object obj) {
-<span class="pc bpc" id="L310" title="1 of 2 branches missed.">      if (this == obj)</span>
-<span class="nc" id="L311">        return true;</span>
-<span class="pc bpc" id="L312" title="1 of 2 branches missed.">      if (obj == null)</span>
-<span class="nc" id="L313">        return false;</span>
-<span class="pc bpc" id="L314" title="1 of 2 branches missed.">      if (getClass() != obj.getClass())</span>
-<span class="nc" id="L315">        return false;</span>
-<span class="fc" id="L316">      final Match that = (Match) obj;</span>
-<span class="pc bpc" id="L317" title="2 of 4 branches missed.">      return startPosition == that.startPosition</span>
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">      if (this == obj)</span>
+<span class="nc" id="L326">        return true;</span>
+<span class="pc bpc" id="L327" title="1 of 2 branches missed.">      if (obj == null)</span>
+<span class="nc" id="L328">        return false;</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc" id="L330">        return false;</span>
+<span class="fc" id="L331">      final Match that = (Match) obj;</span>
+<span class="pc bpc" id="L332" title="1 of 4 branches missed.">      return startPosition == that.startPosition</span>
           &amp;&amp; endPosition == that.endPosition;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-<span class="nc" id="L326">      int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L327">      h = (h * 5) ^ startPosition;</span>
-<span class="nc" id="L328">      h = (h * 7) ^ endPosition;</span>
-<span class="nc" id="L329">      return h;</span>
+<span class="nc" id="L343">      int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L344">      h = (h * 5) ^ startPosition;</span>
+<span class="nc" id="L345">      h = (h * 7) ^ endPosition;</span>
+<span class="nc" id="L346">      return h;</span>
     }
 
   }
@@ -338,7 +355,7 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public long cost() {
-<span class="nc bnc" id="L341" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
+<span class="nc bnc" id="L358" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
   }
 
   /*
@@ -348,7 +365,7 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public float positionsCost() {
-<span class="nc bnc" id="L351" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
   }
 
 }

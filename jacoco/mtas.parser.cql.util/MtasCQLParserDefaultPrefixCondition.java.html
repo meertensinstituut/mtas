@@ -22,14 +22,16 @@ public class MtasCQLParserDefaultPrefixCondition
    * @throws ParseException the parse exception
    */
   public MtasCQLParserDefaultPrefixCondition(String field, String prefix,
-      String value, HashMap&lt;String, String[] &gt; variables, HashSet&lt;String&gt; usedVariables) throws ParseException {
-<span class="fc" id="L26">    super(field, TYPE_AND);</span>
-<span class="pc bpc" id="L27" title="1 of 2 branches missed.">    if (prefix == null) {</span>
-<span class="nc" id="L28">      throw new ParseException(&quot;no default prefix defined&quot;);</span>
+      String value, HashMap&lt;String, String[]&gt; variables,
+      HashSet&lt;String&gt; usedVariables) throws ParseException {
+<span class="fc" id="L27">    super(field, TYPE_AND);</span>
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">    if (prefix == null) {</span>
+<span class="nc" id="L29">      throw new ParseException(&quot;no default prefix defined&quot;);</span>
     } else {
-<span class="fc" id="L30">      addPositiveQuery(new MtasCQLParserWordQuery(field, prefix, value, variables, usedVariables));</span>
+<span class="fc" id="L31">      addPositiveQuery(new MtasCQLParserWordQuery(field, prefix, value,</span>
+          variables, usedVariables));
     }
-<span class="fc" id="L32">  }</span>
+<span class="fc" id="L34">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

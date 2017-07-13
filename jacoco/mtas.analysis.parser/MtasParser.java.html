@@ -241,7 +241,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="pc bpc" id="L241" title="1 of 2 branches missed.">      for (String id : updateableIdsWithOffset) {</span>
 <span class="nc bnc" id="L242" title="All 2 branches missed.">        if (idOffsets.containsKey(id)) {</span>
 <span class="nc" id="L243">          Integer[] currentOffset = idOffsets.get(id);</span>
-<span class="nc bnc" id="L244" title="All 4 branches missed.">          if (currentOffset == null || currentOffset.length==0) {</span>
+<span class="nc bnc" id="L244" title="All 4 branches missed.">          if (currentOffset == null || currentOffset.length == 0) {</span>
 <span class="nc" id="L245">            idOffsets.put(id,</span>
                 new Integer[] { objectOffsetStart, objectOffsetEnd });
           }

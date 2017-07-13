@@ -25,7 +25,7 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The data type. */
   public String dataType;
-  
+
   /** The stats type. */
   public String statsType;
 
@@ -34,13 +34,13 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The sort type. */
   public String sortType;
-  
+
   /** The sort direction. */
   public String sortDirection;
 
   /** The start. */
   public Integer start;
-  
+
   /** The number. */
   public Integer number;
 
@@ -52,7 +52,7 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The sub data type. */
   private String[] subDataType;
-  
+
   /** The sub stats type. */
   private String[] subStatsType;
 
@@ -61,13 +61,13 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The sub sort type. */
   private String[] subSortType;
-  
+
   /** The sub sort direction. */
   private String[] subSortDirection;
 
   /** The sub start. */
   private Integer[] subStart;
-  
+
   /** The sub number. */
   private Integer[] subNumber;
 
@@ -147,7 +147,7 @@ public class MtasSolrMtasResult implements Serializable {
    * @param newItem the new item
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  void merge(MtasSolrMtasResult newItem) throws IOException { 
+  void merge(MtasSolrMtasResult newItem) throws IOException {
 <span class="fc" id="L151">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, MtasDataCollector&lt;?, ?&gt;&gt; map = new HashMap&lt;&gt;();</span>
 <span class="fc bfc" id="L152" title="All 2 branches covered.">    if (newItem.dataCollector.withTotal()) {</span>
 <span class="fc" id="L153">      dataCollector.setWithTotal();</span>
@@ -365,14 +365,14 @@ public class MtasSolrMtasResult implements Serializable {
   public String toString() {
 <span class="nc" id="L366">    if (dataCollector.getCollectorType()</span>
 <span class="nc bnc" id="L367" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L368">      return this.getClass().getSimpleName()+&quot;(data-&quot; + hashCode() + &quot;)&quot;;</span>
+<span class="nc" id="L368">      return this.getClass().getSimpleName() + &quot;(data-&quot; + hashCode() + &quot;)&quot;;</span>
     }
 <span class="nc" id="L370">    if (dataCollector.getCollectorType()</span>
 <span class="nc bnc" id="L371" title="All 2 branches missed.">        .equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L372">      return this.getClass().getSimpleName()+&quot;(list(&quot; + dataCollector.getSize() + &quot;)-&quot;</span>
-<span class="nc" id="L373">          + hashCode() + &quot;)&quot;;</span>
+<span class="nc" id="L372">      return this.getClass().getSimpleName() + &quot;(list(&quot;</span>
+<span class="nc" id="L373">          + dataCollector.getSize() + &quot;)-&quot; + hashCode() + &quot;)&quot;;</span>
     } else {
-<span class="nc" id="L375">      return this.getClass().getSimpleName()+&quot;: unknown&quot;;</span>
+<span class="nc" id="L375">      return this.getClass().getSimpleName() + &quot;: unknown&quot;;</span>
     }
   }
 

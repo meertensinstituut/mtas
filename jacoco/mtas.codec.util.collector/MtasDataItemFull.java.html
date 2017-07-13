@@ -219,9 +219,10 @@ abstract class MtasDataItemFull&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
 <span class="nc" id="L219">    createStats();</span>
 <span class="nc bnc" id="L220" title="All 6 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_N:
-<span class="nc" id="L222">      return new MtasDataItemNumberComparator&lt;Long&gt;(stats.getN(), sortDirection);</span>
+<span class="nc" id="L222">      return new MtasDataItemNumberComparator&lt;Long&gt;(stats.getN(),</span>
+          sortDirection);
     default:
-<span class="nc" id="L224">      return null;</span>
+<span class="nc" id="L225">      return null;</span>
     }
   }
 

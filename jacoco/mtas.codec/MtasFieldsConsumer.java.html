@@ -364,49 +364,49 @@ import org.apache.lucene.util.IOUtils;
 
   /** The mtas tmp field file name. */
   private String mtasTmpFieldFileName;
-  
+
   /** The mtas tmp object file name. */
   private String mtasTmpObjectFileName;
-  
+
   /** The mtas tmp docs file name. */
   private String mtasTmpDocsFileName;
-  
+
   /** The mtas tmp doc file name. */
   private String mtasTmpDocFileName;
-  
+
   /** The mtas tmp docs chained file name. */
   private String mtasTmpDocsChainedFileName;
 
   /** The mtas object file name. */
   private String mtasObjectFileName;
-  
+
   /** The mtas term file name. */
   private String mtasTermFileName;
-  
+
   /** The mtas index field file name. */
   private String mtasIndexFieldFileName;
-  
+
   /** The mtas prefix file name. */
   private String mtasPrefixFileName;
-  
+
   /** The mtas doc file name. */
   private String mtasDocFileName;
-  
+
   /** The mtas index doc id file name. */
   private String mtasIndexDocIdFileName;
-  
+
   /** The mtas index object id file name. */
   private String mtasIndexObjectIdFileName;
-  
+
   /** The mtas index object position file name. */
   private String mtasIndexObjectPositionFileName;
-  
+
   /** The mtas index object parent file name. */
   private String mtasIndexObjectParentFileName;
 
   /** The name. */
   private String name;
-  
+
   /** The delegate postings format name. */
   private String delegatePostingsFormatName;
 
@@ -1507,7 +1507,7 @@ import org.apache.lucene.util.IOUtils;
   private Long storeTree(MtasTreeNode&lt;?&gt; node, boolean isSinglePoint,
       boolean storeAdditionalInformation, IndexOutput out,
       Long nodeRefApproxOffset, long refApproxOffset) throws IOException {
-<span class="fc" id="L1510">    Long localNodeRefApproxOffset = nodeRefApproxOffset; </span>
+<span class="fc" id="L1510">    Long localNodeRefApproxOffset = nodeRefApproxOffset;</span>
 <span class="pc bpc" id="L1511" title="1 of 2 branches missed.">    if (node != null) {</span>
 <span class="fc" id="L1512">      Boolean isRoot = false;</span>
 <span class="fc bfc" id="L1513" title="All 2 branches covered.">      if (localNodeRefApproxOffset == null) {</span>
@@ -1518,15 +1518,15 @@ import org.apache.lucene.util.IOUtils;
       Long fpIndexObjectPositionRightChild;
 <span class="fc bfc" id="L1519" title="All 2 branches covered.">      if (node.leftChild != null) {</span>
 <span class="fc" id="L1520">        fpIndexObjectPositionLeftChild = storeTree(node.leftChild,</span>
-            isSinglePoint, storeAdditionalInformation, out, localNodeRefApproxOffset,
-            refApproxOffset);
+            isSinglePoint, storeAdditionalInformation, out,
+            localNodeRefApproxOffset, refApproxOffset);
       } else {
 <span class="fc" id="L1524">        fpIndexObjectPositionLeftChild = (long) 0; // tmp</span>
       }
 <span class="fc bfc" id="L1526" title="All 2 branches covered.">      if (node.rightChild != null) {</span>
 <span class="fc" id="L1527">        fpIndexObjectPositionRightChild = storeTree(node.rightChild,</span>
-            isSinglePoint, storeAdditionalInformation, out, localNodeRefApproxOffset,
-            refApproxOffset);
+            isSinglePoint, storeAdditionalInformation, out,
+            localNodeRefApproxOffset, refApproxOffset);
       } else {
 <span class="fc" id="L1531">        fpIndexObjectPositionRightChild = (long) 0; // tmp</span>
       }
@@ -1558,42 +1558,45 @@ import org.apache.lucene.util.IOUtils;
 <span class="fc" id="L1558">      out.writeVInt(node.max);</span>
 <span class="pc bpc" id="L1559" title="2 of 4 branches missed.">      assert fpIndexObjectPositionLeftChild &gt;= localNodeRefApproxOffset : &quot;fpIndexObjectPositionLeftChild&lt;nodeRefApproxOffset : &quot;</span>
           + fpIndexObjectPositionLeftChild + &quot; and &quot; + localNodeRefApproxOffset;
-<span class="fc" id="L1561">      out.writeVLong((fpIndexObjectPositionLeftChild - localNodeRefApproxOffset));</span>
-<span class="pc bpc" id="L1562" title="2 of 4 branches missed.">      assert fpIndexObjectPositionRightChild &gt;= localNodeRefApproxOffset : &quot;fpIndexObjectPositionRightChild&lt;nodeRefApproxOffset&quot;</span>
-          + fpIndexObjectPositionRightChild + &quot; and &quot; + localNodeRefApproxOffset;
-<span class="fc" id="L1564">      out.writeVLong((fpIndexObjectPositionRightChild - localNodeRefApproxOffset));</span>
-<span class="fc bfc" id="L1565" title="All 2 branches covered.">      if (!isSinglePoint) {</span>
-<span class="fc" id="L1566">        out.writeVInt(node.ids.size());</span>
+<span class="fc" id="L1561">      out.writeVLong(</span>
+<span class="fc" id="L1562">          (fpIndexObjectPositionLeftChild - localNodeRefApproxOffset));</span>
+<span class="pc bpc" id="L1563" title="2 of 4 branches missed.">      assert fpIndexObjectPositionRightChild &gt;= localNodeRefApproxOffset : &quot;fpIndexObjectPositionRightChild&lt;nodeRefApproxOffset&quot;</span>
+          + fpIndexObjectPositionRightChild + &quot; and &quot;
+          + localNodeRefApproxOffset;
+<span class="fc" id="L1566">      out.writeVLong(</span>
+<span class="fc" id="L1567">          (fpIndexObjectPositionRightChild - localNodeRefApproxOffset));</span>
+<span class="fc bfc" id="L1568" title="All 2 branches covered.">      if (!isSinglePoint) {</span>
+<span class="fc" id="L1569">        out.writeVInt(node.ids.size());</span>
       }
-<span class="fc" id="L1568">      HashMap&lt;Integer, MtasTreeNodeId&gt; ids = node.ids;</span>
+<span class="fc" id="L1571">      HashMap&lt;Integer, MtasTreeNodeId&gt; ids = node.ids;</span>
       Long objectRefCorrected;
-<span class="fc" id="L1570">      long objectRefCorrectedPrevious = 0;</span>
+<span class="fc" id="L1573">      long objectRefCorrectedPrevious = 0;</span>
       // sort refs
-<span class="fc" id="L1572">      List&lt;MtasTreeNodeId&gt; nodeIds = new ArrayList&lt;&gt;(ids.values());</span>
-<span class="fc" id="L1573">      Collections.sort(nodeIds);</span>
-<span class="pc bpc" id="L1574" title="1 of 4 branches missed.">      if (isSinglePoint &amp;&amp; (nodeIds.size() != 1)) {</span>
-<span class="nc" id="L1575">        throw new IOException(&quot;singlePoint tree, but missing single point...&quot;);</span>
+<span class="fc" id="L1575">      List&lt;MtasTreeNodeId&gt; nodeIds = new ArrayList&lt;&gt;(ids.values());</span>
+<span class="fc" id="L1576">      Collections.sort(nodeIds);</span>
+<span class="pc bpc" id="L1577" title="1 of 4 branches missed.">      if (isSinglePoint &amp;&amp; (nodeIds.size() != 1)) {</span>
+<span class="nc" id="L1578">        throw new IOException(&quot;singlePoint tree, but missing single point...&quot;);</span>
       }
-<span class="fc" id="L1577">      int counter = 0;</span>
-<span class="fc bfc" id="L1578" title="All 2 branches covered.">      for (MtasTreeNodeId nodeId : nodeIds) {</span>
-<span class="fc" id="L1579">        counter++;</span>
-<span class="fc" id="L1580">        objectRefCorrected = (nodeId.ref - refApproxOffset);</span>
-<span class="pc bpc" id="L1581" title="2 of 4 branches missed.">        assert objectRefCorrected &gt;= objectRefCorrectedPrevious : &quot;objectRefCorrected&lt;objectRefCorrectedPrevious : &quot;</span>
+<span class="fc" id="L1580">      int counter = 0;</span>
+<span class="fc bfc" id="L1581" title="All 2 branches covered.">      for (MtasTreeNodeId nodeId : nodeIds) {</span>
+<span class="fc" id="L1582">        counter++;</span>
+<span class="fc" id="L1583">        objectRefCorrected = (nodeId.ref - refApproxOffset);</span>
+<span class="pc bpc" id="L1584" title="2 of 4 branches missed.">        assert objectRefCorrected &gt;= objectRefCorrectedPrevious : &quot;objectRefCorrected&lt;objectRefCorrectedPrevious : &quot;</span>
             + objectRefCorrected + &quot; and &quot; + objectRefCorrectedPrevious;
-<span class="fc" id="L1583">        out.writeVLong((objectRefCorrected - objectRefCorrectedPrevious));</span>
-<span class="fc" id="L1584">        objectRefCorrectedPrevious = objectRefCorrected;</span>
-<span class="fc bfc" id="L1585" title="All 2 branches covered.">        if (storeAdditionalInformation) {</span>
-<span class="pc bpc" id="L1586" title="2 of 4 branches missed.">          assert nodeId.additionalId &gt;= 0 : &quot;nodeId.additionalId &lt; 0 for item &quot;</span>
+<span class="fc" id="L1586">        out.writeVLong((objectRefCorrected - objectRefCorrectedPrevious));</span>
+<span class="fc" id="L1587">        objectRefCorrectedPrevious = objectRefCorrected;</span>
+<span class="fc bfc" id="L1588" title="All 2 branches covered.">        if (storeAdditionalInformation) {</span>
+<span class="pc bpc" id="L1589" title="2 of 4 branches missed.">          assert nodeId.additionalId &gt;= 0 : &quot;nodeId.additionalId &lt; 0 for item &quot;</span>
               + counter + &quot; : &quot; + nodeId.additionalId;
-<span class="fc" id="L1588">          out.writeVInt(nodeId.additionalId);</span>
-<span class="pc bpc" id="L1589" title="2 of 4 branches missed.">          assert nodeId.additionalRef &gt;= 0 : &quot;nodeId.additionalRef &lt; 0 for item &quot;</span>
+<span class="fc" id="L1591">          out.writeVInt(nodeId.additionalId);</span>
+<span class="pc bpc" id="L1592" title="2 of 4 branches missed.">          assert nodeId.additionalRef &gt;= 0 : &quot;nodeId.additionalRef &lt; 0 for item &quot;</span>
               + counter + &quot; : &quot; + nodeId.additionalRef;
-<span class="fc" id="L1591">          out.writeVLong(nodeId.additionalRef);</span>
+<span class="fc" id="L1594">          out.writeVLong(nodeId.additionalRef);</span>
         }
-<span class="fc" id="L1593">      }</span>
-<span class="fc" id="L1594">      return fpIndexObjectPosition;</span>
+<span class="fc" id="L1596">      }</span>
+<span class="fc" id="L1597">      return fpIndexObjectPosition;</span>
     } else {
-<span class="nc" id="L1596">      return null;</span>
+<span class="nc" id="L1599">      return null;</span>
     }
   }
 
@@ -1604,18 +1607,18 @@ import org.apache.lucene.util.IOUtils;
    * @param max the max
    */
   private void tokenStatsAdd(int min, int max) {
-<span class="fc" id="L1607">    tokenStatsNumber++;</span>
-<span class="fc bfc" id="L1608" title="All 2 branches covered.">    if (tokenStatsMinPos == null) {</span>
-<span class="fc" id="L1609">      tokenStatsMinPos = min;</span>
+<span class="fc" id="L1610">    tokenStatsNumber++;</span>
+<span class="fc bfc" id="L1611" title="All 2 branches covered.">    if (tokenStatsMinPos == null) {</span>
+<span class="fc" id="L1612">      tokenStatsMinPos = min;</span>
     } else {
-<span class="fc" id="L1611">      tokenStatsMinPos = Math.min(tokenStatsMinPos, min);</span>
+<span class="fc" id="L1614">      tokenStatsMinPos = Math.min(tokenStatsMinPos, min);</span>
     }
-<span class="fc bfc" id="L1613" title="All 2 branches covered.">    if (tokenStatsMaxPos == null) {</span>
-<span class="fc" id="L1614">      tokenStatsMaxPos = max;</span>
+<span class="fc bfc" id="L1616" title="All 2 branches covered.">    if (tokenStatsMaxPos == null) {</span>
+<span class="fc" id="L1617">      tokenStatsMaxPos = max;</span>
     } else {
-<span class="fc" id="L1616">      tokenStatsMaxPos = Math.max(tokenStatsMaxPos, max);</span>
+<span class="fc" id="L1619">      tokenStatsMaxPos = Math.max(tokenStatsMaxPos, max);</span>
     }
-<span class="fc" id="L1618">  }</span>
+<span class="fc" id="L1621">  }</span>
 
   /**
    * Copy object and update stats.
@@ -1631,62 +1634,62 @@ import org.apache.lucene.util.IOUtils;
     int mtasId;
     int objectFlags;
     // read
-<span class="fc" id="L1634">    in.seek(inRef);</span>
-<span class="fc" id="L1635">    mtasId = in.readVInt();</span>
-<span class="pc bpc" id="L1636" title="2 of 4 branches missed.">    assert id == mtasId : &quot;wrong id detected while copying object&quot;;</span>
-<span class="fc" id="L1637">    objectFlags = in.readVInt();</span>
-<span class="fc" id="L1638">    out.writeVInt(mtasId);</span>
-<span class="fc" id="L1639">    out.writeVInt(objectFlags);</span>
-<span class="fc bfc" id="L1640" title="All 2 branches covered.">    if ((objectFlags</span>
+<span class="fc" id="L1637">    in.seek(inRef);</span>
+<span class="fc" id="L1638">    mtasId = in.readVInt();</span>
+<span class="pc bpc" id="L1639" title="2 of 4 branches missed.">    assert id == mtasId : &quot;wrong id detected while copying object&quot;;</span>
+<span class="fc" id="L1640">    objectFlags = in.readVInt();</span>
+<span class="fc" id="L1641">    out.writeVInt(mtasId);</span>
+<span class="fc" id="L1642">    out.writeVInt(objectFlags);</span>
+<span class="fc bfc" id="L1643" title="All 2 branches covered.">    if ((objectFlags</span>
         &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PARENT) {
-<span class="fc" id="L1642">      out.writeVInt(in.readVInt());</span>
+<span class="fc" id="L1645">      out.writeVInt(in.readVInt());</span>
     }
-<span class="fc bfc" id="L1644" title="All 2 branches covered.">    if ((objectFlags</span>
+<span class="fc bfc" id="L1647" title="All 2 branches covered.">    if ((objectFlags</span>
         &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_RANGE) {
-<span class="fc" id="L1646">      int minPos = in.readVInt();</span>
-<span class="fc" id="L1647">      int maxPos = in.readVInt();</span>
-<span class="fc" id="L1648">      out.writeVInt(minPos);</span>
-<span class="fc" id="L1649">      out.writeVInt(maxPos);</span>
-<span class="fc" id="L1650">      tokenStatsAdd(minPos, maxPos);</span>
-<span class="fc bfc" id="L1651" title="All 2 branches covered.">    } else if ((objectFlags</span>
+<span class="fc" id="L1649">      int minPos = in.readVInt();</span>
+<span class="fc" id="L1650">      int maxPos = in.readVInt();</span>
+<span class="fc" id="L1651">      out.writeVInt(minPos);</span>
+<span class="fc" id="L1652">      out.writeVInt(maxPos);</span>
+<span class="fc" id="L1653">      tokenStatsAdd(minPos, maxPos);</span>
+<span class="fc bfc" id="L1654" title="All 2 branches covered.">    } else if ((objectFlags</span>
         &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_POSITION_SET) {
-<span class="fc" id="L1653">      int size = in.readVInt();</span>
-<span class="fc" id="L1654">      out.writeVInt(size);</span>
-<span class="fc" id="L1655">      SortedSet&lt;Integer&gt; list = new TreeSet&lt;&gt;();</span>
-<span class="fc" id="L1656">      int previousPosition = 0;</span>
-<span class="fc bfc" id="L1657" title="All 2 branches covered.">      for (int t = 0; t &lt; size; t++) {</span>
-<span class="fc" id="L1658">        int pos = in.readVInt();</span>
-<span class="fc" id="L1659">        out.writeVInt(pos);</span>
-<span class="fc" id="L1660">        previousPosition = (pos + previousPosition);</span>
-<span class="fc" id="L1661">        list.add(previousPosition);</span>
+<span class="fc" id="L1656">      int size = in.readVInt();</span>
+<span class="fc" id="L1657">      out.writeVInt(size);</span>
+<span class="fc" id="L1658">      SortedSet&lt;Integer&gt; list = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L1659">      int previousPosition = 0;</span>
+<span class="fc bfc" id="L1660" title="All 2 branches covered.">      for (int t = 0; t &lt; size; t++) {</span>
+<span class="fc" id="L1661">        int pos = in.readVInt();</span>
+<span class="fc" id="L1662">        out.writeVInt(pos);</span>
+<span class="fc" id="L1663">        previousPosition = (pos + previousPosition);</span>
+<span class="fc" id="L1664">        list.add(previousPosition);</span>
       }
-<span class="pc bpc" id="L1663" title="2 of 4 branches missed.">      assert list.size() == size : &quot;duplicate positions in set are not allowed&quot;;</span>
-<span class="fc" id="L1664">      tokenStatsAdd(list.first(), list.last());</span>
-<span class="fc" id="L1665">    } else {</span>
-<span class="fc" id="L1666">      int pos = in.readVInt();</span>
-<span class="fc" id="L1667">      out.writeVInt(pos);</span>
-<span class="fc" id="L1668">      tokenStatsAdd(pos, pos);</span>
+<span class="pc bpc" id="L1666" title="2 of 4 branches missed.">      assert list.size() == size : &quot;duplicate positions in set are not allowed&quot;;</span>
+<span class="fc" id="L1667">      tokenStatsAdd(list.first(), list.last());</span>
+<span class="fc" id="L1668">    } else {</span>
+<span class="fc" id="L1669">      int pos = in.readVInt();</span>
+<span class="fc" id="L1670">      out.writeVInt(pos);</span>
+<span class="fc" id="L1671">      tokenStatsAdd(pos, pos);</span>
     }
-<span class="pc bpc" id="L1670" title="1 of 2 branches missed.">    if ((objectFlags</span>
+<span class="pc bpc" id="L1673" title="1 of 2 branches missed.">    if ((objectFlags</span>
         &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_OFFSET) {
-<span class="nc" id="L1672">      out.writeVInt(in.readVInt());</span>
-<span class="nc" id="L1673">      out.writeVInt(in.readVInt());</span>
+<span class="nc" id="L1675">      out.writeVInt(in.readVInt());</span>
+<span class="nc" id="L1676">      out.writeVInt(in.readVInt());</span>
     }
-<span class="pc bpc" id="L1675" title="1 of 2 branches missed.">    if ((objectFlags</span>
+<span class="pc bpc" id="L1678" title="1 of 2 branches missed.">    if ((objectFlags</span>
         &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_REALOFFSET) {
-<span class="nc" id="L1677">      out.writeVInt(in.readVInt());</span>
-<span class="nc" id="L1678">      out.writeVInt(in.readVInt());</span>
+<span class="nc" id="L1680">      out.writeVInt(in.readVInt());</span>
+<span class="nc" id="L1681">      out.writeVInt(in.readVInt());</span>
     }
-<span class="pc bpc" id="L1680" title="1 of 2 branches missed.">    if ((objectFlags</span>
+<span class="pc bpc" id="L1683" title="1 of 2 branches missed.">    if ((objectFlags</span>
         &amp; MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) == MtasCodecPostingsFormat.MTAS_OBJECT_HAS_PAYLOAD) {
-<span class="nc" id="L1682">      int length = in.readVInt();</span>
-<span class="nc" id="L1683">      out.writeVInt(length);</span>
-<span class="nc" id="L1684">      byte[] payload = new byte[length];</span>
-<span class="nc" id="L1685">      in.readBytes(payload, 0, length);</span>
-<span class="nc" id="L1686">      out.writeBytes(payload, payload.length);</span>
+<span class="nc" id="L1685">      int length = in.readVInt();</span>
+<span class="nc" id="L1686">      out.writeVInt(length);</span>
+<span class="nc" id="L1687">      byte[] payload = new byte[length];</span>
+<span class="nc" id="L1688">      in.readBytes(payload, 0, length);</span>
+<span class="nc" id="L1689">      out.writeBytes(payload, payload.length);</span>
     }
-<span class="fc" id="L1688">    out.writeVLong(in.readVLong());</span>
-<span class="fc" id="L1689">  }</span>
+<span class="fc" id="L1691">    out.writeVLong(in.readVLong());</span>
+<span class="fc" id="L1692">  }</span>
 
   /*
    * (non-Javadoc)
@@ -1695,8 +1698,8 @@ import org.apache.lucene.util.IOUtils;
    */
   @Override
   public void close() throws IOException {
-<span class="fc" id="L1698">    delegateFieldsConsumer.close();</span>
-<span class="fc" id="L1699">  }</span>
+<span class="fc" id="L1701">    delegateFieldsConsumer.close();</span>
+<span class="fc" id="L1702">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

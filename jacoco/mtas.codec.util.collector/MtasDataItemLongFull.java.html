@@ -167,15 +167,19 @@ class MtasDataItemLongFull extends MtasDataItemFull&lt;Long, Double&gt; {
 <span class="nc" id="L167">    createStats();</span>
 <span class="nc bnc" id="L168" title="All 18 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_SUM:
-<span class="nc" id="L170">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getSum()), sortDirection);</span>
+<span class="nc" id="L170">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getSum()),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_MAX:
-<span class="nc" id="L172">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getMax()), sortDirection);</span>
+<span class="nc" id="L173">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getMax()),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_MIN:
-<span class="nc" id="L174">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getMin()), sortDirection);</span>
+<span class="nc" id="L176">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getMin()),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
-<span class="nc" id="L176">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getSumsq()), sortDirection);</span>
+<span class="nc" id="L179">      return new MtasDataItemNumberComparator&lt;&gt;(Math.round(stats.getSumsq()),</span>
+          sortDirection);
     default:
-<span class="nc" id="L178">      return null;</span>
+<span class="nc" id="L182">      return null;</span>
     }
   }
 
@@ -186,31 +190,39 @@ class MtasDataItemLongFull extends MtasDataItemFull&lt;Long, Double&gt; {
    */
   @Override
   public MtasDataItemNumberComparator&lt;Double&gt; getCompareValue2() {
-<span class="nc" id="L189">    createStats();</span>
-<span class="nc bnc" id="L190" title="All 42 branches missed.">    switch (sortType) {</span>
+<span class="nc" id="L193">    createStats();</span>
+<span class="nc bnc" id="L194" title="All 42 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_SUMOFLOGS:
-<span class="nc" id="L192">      return new MtasDataItemNumberComparator&lt;&gt;(</span>
-<span class="nc" id="L193">          stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);</span>
+<span class="nc" id="L196">      return new MtasDataItemNumberComparator&lt;&gt;(</span>
+<span class="nc" id="L197">          stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);</span>
     case CodecUtil.STATS_TYPE_MEAN:
-<span class="nc" id="L195">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getMean(), sortDirection);</span>
+<span class="nc" id="L199">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getMean(), sortDirection);</span>
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-<span class="nc" id="L197">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getGeometricMean(), sortDirection);</span>
+<span class="nc" id="L201">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getGeometricMean(),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-<span class="nc" id="L199">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getStandardDeviation(), sortDirection);</span>
+<span class="nc" id="L204">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getStandardDeviation(),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_VARIANCE:
-<span class="nc" id="L201">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getVariance(), sortDirection);</span>
+<span class="nc" id="L207">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getVariance(),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-<span class="nc" id="L203">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPopulationVariance(), sortDirection);</span>
+<span class="nc" id="L210">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPopulationVariance(),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-<span class="nc" id="L205">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getQuadraticMean(), sortDirection);</span>
+<span class="nc" id="L213">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getQuadraticMean(),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
-<span class="nc" id="L207">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getKurtosis(), sortDirection);</span>
+<span class="nc" id="L216">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getKurtosis(),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_MEDIAN:
-<span class="nc" id="L209">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPercentile(50), sortDirection);</span>
+<span class="nc" id="L219">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPercentile(50),</span>
+          sortDirection);
     case CodecUtil.STATS_TYPE_SKEWNESS:
-<span class="nc" id="L211">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getSkewness(), sortDirection);</span>
+<span class="nc" id="L222">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getSkewness(),</span>
+          sortDirection);
     default:
-<span class="nc" id="L213">      return null;</span>
+<span class="nc" id="L225">      return null;</span>
     }
   }
 
@@ -220,34 +232,38 @@ class MtasDataItemLongFull extends MtasDataItemFull&lt;Long, Double&gt; {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-<span class="nc" id="L223">    return this.getClass().getSimpleName() + &quot;[&quot; + fullValues.length + &quot;]&quot;;</span>
+<span class="nc" id="L235">    return this.getClass().getSimpleName() + &quot;[&quot; + fullValues.length + &quot;]&quot;;</span>
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
-<span class="nc bnc" id="L231" title="All 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L232">      return true;</span>
-<span class="nc bnc" id="L233" title="All 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L234">      return false;</span>
-<span class="nc bnc" id="L235" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L236">      return false;</span>
-<span class="nc" id="L237">    MtasDataItemLongFull that = (MtasDataItemLongFull) obj;</span>
-<span class="nc" id="L238">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
-<span class="nc" id="L239">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
-<span class="nc bnc" id="L240" title="All 6 branches missed.">    return (c1!=null&amp;&amp;c2!=null&amp;&amp;c1.equals(c2));    </span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L246">      return true;</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L248">      return false;</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L250">      return false;</span>
+<span class="nc" id="L251">    MtasDataItemLongFull that = (MtasDataItemLongFull) obj;</span>
+<span class="nc" id="L252">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
+<span class="nc" id="L253">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
+<span class="nc bnc" id="L254" title="All 6 branches missed.">    return (c1 != null &amp;&amp; c2 != null &amp;&amp; c1.equals(c2));</span>
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L248">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L249">    h = (h * 7) ^ getComparableValue().hashCode();</span>
-<span class="nc" id="L250">    return h;</span>
+<span class="nc" id="L264">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L265">    h = (h * 7) ^ getComparableValue().hashCode();</span>
+<span class="nc" id="L266">    return h;</span>
   }
 
 }

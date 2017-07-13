@@ -13,18 +13,23 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanStartSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanStartQuery query;
+
   /** The spans. */
-  Spans spans;
+  private Spans spans;
 
   /**
    * Instantiates a new mtas span start spans.
    *
+   * @param query the query
    * @param spans the spans
    */
-  public MtasSpanStartSpans(Spans spans) {
-<span class="fc" id="L25">    super();</span>
-<span class="fc" id="L26">    this.spans = spans;</span>
-<span class="fc" id="L27">  }</span>
+  public MtasSpanStartSpans(MtasSpanStartQuery query, Spans spans) {
+<span class="fc" id="L29">    super();</span>
+<span class="fc" id="L30">    this.query = query;</span>
+<span class="fc" id="L31">    this.spans = spans;</span>
+<span class="fc" id="L32">  }</span>
 
   /*
    * (non-Javadoc)
@@ -33,7 +38,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int nextStartPosition() throws IOException {
-<span class="pc bpc" id="L36" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_POSITIONS : spans.nextStartPosition();</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_POSITIONS : spans.nextStartPosition();</span>
   }
 
   /*
@@ -43,7 +48,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int startPosition() {
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
   }
 
   /*
@@ -53,7 +58,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int endPosition() {
-<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">    return (spans == null) ? -1 : spans.startPosition();</span>
   }
 
   /*
@@ -63,7 +68,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int width() {
-<span class="nc" id="L66">    return 0;</span>
+<span class="nc" id="L71">    return 0;</span>
   }
 
   /*
@@ -75,10 +80,10 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-<span class="nc bnc" id="L78" title="All 2 branches missed.">    if (spans != null) {</span>
-<span class="nc" id="L79">      spans.collect(collector);</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">    if (spans != null) {</span>
+<span class="nc" id="L84">      spans.collect(collector);</span>
     }
-<span class="nc" id="L81">  }</span>
+<span class="nc" id="L86">  }</span>
 
   /*
    * (non-Javadoc)
@@ -87,7 +92,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int docID() {
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.docID();</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.docID();</span>
   }
 
   /*
@@ -97,7 +102,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.nextDoc();</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.nextDoc();</span>
   }
 
   /*
@@ -107,15 +112,18 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="pc bpc" id="L110" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.advance(target);</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.advance(target);</span>
   }
-  
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    if(spans == null) {</span>
-<span class="nc" id="L116">      return null;</span>
+<span class="pc bpc" id="L123" title="1 of 4 branches missed.">    if (spans == null || !query.twoPhaseIteratorAllowed()) {</span>
+<span class="fc" id="L124">      return null;</span>
     } else {
-<span class="fc" id="L118">      return spans.asTwoPhaseIterator();     </span>
+<span class="fc" id="L126">      return spans.asTwoPhaseIterator();</span>
     }
   }
 
@@ -126,7 +134,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public long cost() {
-<span class="pc bpc" id="L129" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
   }
 
   /*
@@ -136,7 +144,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public float positionsCost() {
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
   }
 
 }

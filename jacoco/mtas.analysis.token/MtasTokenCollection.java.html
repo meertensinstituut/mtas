@@ -233,10 +233,10 @@ public class MtasTokenCollection {
 <span class="pc bpc" id="L233" title="1 of 2 branches missed.">      putInTrash |= (token.getPositionStart() == null)</span>
 <span class="pc bpc" id="L234" title="1 of 2 branches missed.">          || (token.getPositionEnd() == null);</span>
 <span class="pc bpc" id="L235" title="2 of 4 branches missed.">      putInTrash |= token.getValue() == null || (token.getValue().isEmpty());</span>
-<span class="pc bpc" id="L236" title="2 of 4 branches missed.">      putInTrash |= token.getPrefix() == null || (token.getPrefix().isEmpty());          </span>
+<span class="pc bpc" id="L236" title="2 of 4 branches missed.">      putInTrash |= token.getPrefix() == null || (token.getPrefix().isEmpty());</span>
 <span class="pc bpc" id="L237" title="1 of 2 branches missed.">      if (putInTrash) {</span>
 <span class="nc" id="L238">        trash.add(entry.getKey());</span>
-      } 
+      }
 <span class="fc" id="L240">    }</span>
     // check parentId
 <span class="fc bfc" id="L242" title="All 2 branches covered.">    for (Entry&lt;Integer, MtasToken&gt; entry : tokenCollection.entrySet()) {</span>
@@ -351,26 +351,24 @@ public class MtasTokenCollection {
       public int compare(Integer t1, Integer t2) {
 <span class="fc" id="L352">        Integer p1 = tokenCollection.get(t1).getPositionStart();</span>
 <span class="fc" id="L353">        Integer p2 = tokenCollection.get(t2).getPositionStart();</span>
-<span class="pc bpc" id="L354" title="2 of 4 branches missed.">        assert p1 != null : &quot;no position for &quot;</span>
-<span class="nc" id="L355">            + tokenCollection.get(t1);</span>
-<span class="pc bpc" id="L356" title="2 of 4 branches missed.">        assert p2 != null : &quot;no position for &quot;</span>
-<span class="nc" id="L357">            + tokenCollection.get(t2);</span>
-<span class="fc bfc" id="L358" title="All 2 branches covered.">        if (p1.equals(p2)) {</span>
-<span class="fc" id="L359">          Integer o1 = tokenCollection.get(t1).getOffsetStart();</span>
-<span class="fc" id="L360">          Integer o2 = tokenCollection.get(t2).getOffsetStart();</span>
-<span class="pc bpc" id="L361" title="2 of 4 branches missed.">          if (o1 != null &amp;&amp; o2 != null) {</span>
-<span class="pc bpc" id="L362" title="1 of 2 branches missed.">            if (o1.equals(o2)) {</span>
-<span class="fc" id="L363">              return tokenCollection.get(t1).getValue()</span>
-<span class="fc" id="L364">                  .compareTo(tokenCollection.get(t2).getValue());</span>
+<span class="pc bpc" id="L354" title="2 of 4 branches missed.">        assert p1 != null : &quot;no position for &quot; + tokenCollection.get(t1);</span>
+<span class="pc bpc" id="L355" title="2 of 4 branches missed.">        assert p2 != null : &quot;no position for &quot; + tokenCollection.get(t2);</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">        if (p1.equals(p2)) {</span>
+<span class="fc" id="L357">          Integer o1 = tokenCollection.get(t1).getOffsetStart();</span>
+<span class="fc" id="L358">          Integer o2 = tokenCollection.get(t2).getOffsetStart();</span>
+<span class="pc bpc" id="L359" title="2 of 4 branches missed.">          if (o1 != null &amp;&amp; o2 != null) {</span>
+<span class="pc bpc" id="L360" title="1 of 2 branches missed.">            if (o1.equals(o2)) {</span>
+<span class="fc" id="L361">              return tokenCollection.get(t1).getValue()</span>
+<span class="fc" id="L362">                  .compareTo(tokenCollection.get(t2).getValue());</span>
             } else {
-<span class="nc" id="L366">              return o1.compareTo(o2);</span>
+<span class="nc" id="L364">              return o1.compareTo(o2);</span>
             }
           } else {
-<span class="nc" id="L369">            return tokenCollection.get(t1).getValue()</span>
-<span class="nc" id="L370">                .compareTo(tokenCollection.get(t2).getValue());</span>
+<span class="nc" id="L367">            return tokenCollection.get(t1).getValue()</span>
+<span class="nc" id="L368">                .compareTo(tokenCollection.get(t2).getValue());</span>
           }
         }
-<span class="fc" id="L373">        return p1.compareTo(p2);</span>
+<span class="fc" id="L371">        return p1.compareTo(p2);</span>
       }
     };
   }
@@ -379,9 +377,9 @@ public class MtasTokenCollection {
    * Clear.
    */
   private void clear() {
-<span class="fc" id="L382">    tokenCollectionIndex.clear();</span>
-<span class="fc" id="L383">    tokenCollection.clear();</span>
-<span class="fc" id="L384">  }</span>
+<span class="fc" id="L380">    tokenCollectionIndex.clear();</span>
+<span class="fc" id="L381">    tokenCollection.clear();</span>
+<span class="fc" id="L382">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

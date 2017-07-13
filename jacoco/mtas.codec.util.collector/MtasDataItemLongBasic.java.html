@@ -77,9 +77,10 @@ class MtasDataItemLongBasic extends MtasDataItemBasic&lt;Long, Double&gt; {
   public MtasDataItemNumberComparator&lt;Double&gt; getCompareValue2() {
 <span class="nc bnc" id="L78" title="All 6 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_MEAN:
-<span class="nc" id="L80">      return new MtasDataItemNumberComparator&lt;Double&gt;(getValue(sortType), sortDirection);</span>
+<span class="nc" id="L80">      return new MtasDataItemNumberComparator&lt;Double&gt;(getValue(sortType),</span>
+          sortDirection);
     default:
-<span class="nc" id="L82">      return null;</span>
+<span class="nc" id="L83">      return null;</span>
     }
   }
 
@@ -89,35 +90,39 @@ class MtasDataItemLongBasic extends MtasDataItemBasic&lt;Long, Double&gt; {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-<span class="nc" id="L92">    return this.getClass().getSimpleName() + &quot;[&quot; + valueSum + &quot;,&quot; + valueN</span>
+<span class="nc" id="L93">    return this.getClass().getSimpleName() + &quot;[&quot; + valueSum + &quot;,&quot; + valueN</span>
         + &quot;]&quot;;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
-<span class="nc bnc" id="L101" title="All 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L102">      return true;</span>
-<span class="nc bnc" id="L103" title="All 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L104">      return false;</span>
-<span class="nc bnc" id="L105" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L106">      return false;</span>
-<span class="nc" id="L107">    MtasDataItemLongBasic that = (MtasDataItemLongBasic) obj;</span>
-<span class="nc" id="L108">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
-<span class="nc" id="L109">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
-<span class="nc bnc" id="L110" title="All 6 branches missed.">    return (c1!=null&amp;&amp;c2!=null&amp;&amp;c1.equals(c2));    </span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L105">      return true;</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L107">      return false;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L109">      return false;</span>
+<span class="nc" id="L110">    MtasDataItemLongBasic that = (MtasDataItemLongBasic) obj;</span>
+<span class="nc" id="L111">    MtasDataItemNumberComparator&lt;?&gt; c1 = getComparableValue();</span>
+<span class="nc" id="L112">    MtasDataItemNumberComparator&lt;?&gt; c2 = that.getComparableValue();</span>
+<span class="nc bnc" id="L113" title="All 6 branches missed.">    return (c1 != null &amp;&amp; c2 != null &amp;&amp; c1.equals(c2));</span>
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L118">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L119">    h = (h * 7) ^ getComparableValue().hashCode();</span>
-<span class="nc" id="L120">    return h;</span>
+<span class="nc" id="L123">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L124">    h = (h * 7) ^ getComparableValue().hashCode();</span>
+<span class="nc" id="L125">    return h;</span>
   }
 
 }

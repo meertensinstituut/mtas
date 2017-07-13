@@ -118,7 +118,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
           }
 <span class="fc" id="L119">        }</span>
         // get MtasFieldsProducer using terms
-<span class="fc" id="L121">        return new MtasSpanMatchNoneSpans();</span>
+<span class="fc" id="L121">        return new MtasSpanMatchNoneSpans(MtasSpanMatchNoneQuery.this);</span>
 <span class="nc" id="L122">      } catch (InvocationTargetException | IllegalAccessException e) {</span>
 <span class="nc" id="L123">        throw new IOException(&quot;Can't get reader&quot;, e);</span>
       }

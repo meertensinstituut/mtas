@@ -44,7 +44,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    * @param singlePosition the single position
    */
   public MtasSpanTermQuery(SpanTermQuery query, boolean singlePosition) {
-<span class="fc bfc" id="L47" title="All 4 branches covered.">    super(singlePosition?1:null, singlePosition?1:null);</span>
+<span class="fc bfc" id="L47" title="All 4 branches covered.">    super(singlePosition ? 1 : null, singlePosition ? 1 : null);</span>
 <span class="fc" id="L48">    baseQuery = new MtasExtendedSpanTermQuery(query, singlePosition);</span>
 <span class="fc" id="L49">  }</span>
 
@@ -60,14 +60,17 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
       throws IOException {
 <span class="fc" id="L61">    return baseQuery.createWeight(searcher, needsScores);</span>
   }
-  
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L69">    baseQuery = (MtasExtendedSpanTermQuery) baseQuery.rewrite(reader);</span>
-<span class="fc" id="L70">    return super.rewrite(reader);</span>
+<span class="fc" id="L72">    baseQuery = (MtasExtendedSpanTermQuery) baseQuery.rewrite(reader);</span>
+<span class="fc" id="L73">    return super.rewrite(reader);</span>
   }
 
   /*
@@ -78,7 +81,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L81">    return baseQuery.toString(field);</span>
+<span class="nc" id="L84">    return baseQuery.toString(field);</span>
   }
 
   /*
@@ -88,30 +91,34 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L91" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L92">      return true;</span>
-<span class="pc bpc" id="L93" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L94">      return false;</span>
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L96">      return false;</span>
-<span class="fc" id="L97">    MtasSpanTermQuery other = (MtasSpanTermQuery) obj;</span>
-<span class="fc" id="L98">    return baseQuery.equals(other.baseQuery);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L95">      return true;</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L97">      return false;</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L99">      return false;</span>
+<span class="fc" id="L100">    MtasSpanTermQuery other = (MtasSpanTermQuery) obj;</span>
+<span class="fc" id="L101">    return baseQuery.equals(other.baseQuery);</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
   public String getField() {
-<span class="fc" id="L106">    return baseQuery.getField();</span>
+<span class="fc" id="L111">    return baseQuery.getField();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L114">    return baseQuery.hashCode();</span>
+<span class="fc" id="L121">    return baseQuery.hashCode();</span>
   }
 
 }

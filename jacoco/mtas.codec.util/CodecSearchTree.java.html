@@ -147,7 +147,7 @@ import org.apache.lucene.store.IndexInput;
         nodeRefApproxOffset, in, objectRefApproxOffset));
 <span class="fc" id="L148">    ArrayList&lt;Long&gt; history = new ArrayList&lt;Long&gt;();</span>
     do {
-<span class="fc" id="L150">      MtasTreeItem checkItem = checkList.remove(checkList.size() - 1);      </span>
+<span class="fc" id="L150">      MtasTreeItem checkItem = checkList.remove(checkList.size() - 1);</span>
 <span class="fc" id="L151">      searchMtasTree(checkItem, startPosition, endPosition, in, isSinglePoint,</span>
           isStoreAdditionalId, objectRefApproxOffset, list, nodeRefApproxOffset,
           checkList);
@@ -179,7 +179,7 @@ import org.apache.lucene.store.IndexInput;
       AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
       ArrayList&lt;MtasTreeHit&lt;?&gt;&gt; list, AtomicLong nodeRefApproxOffset,
       ArrayList&lt;MtasTreeItem&gt; checkList) throws IOException {
-<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (startPosition &lt;= treeItem.max) {      </span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (startPosition &lt;= treeItem.max) {</span>
       // match current node
 <span class="fc bfc" id="L184" title="All 4 branches covered.">      if ((endPosition &gt;= treeItem.left) &amp;&amp; (startPosition &lt;= treeItem.right)) {</span>
 <span class="fc bfc" id="L185" title="All 2 branches covered.">        for (int i = 0; i &lt; treeItem.objectRefs.length; i++) {</span>

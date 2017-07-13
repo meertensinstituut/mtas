@@ -154,7 +154,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L154">    ArrayList&lt;String&gt; files = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L155" title="All 2 branches missed.">    String fullDir = subDir == null ? dir : dir + File.separator + subDir;</span>
 <span class="nc" id="L156">    File[] listOfFiles = (new File(fullDir)).listFiles();</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">    if(listOfFiles!=null) {</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">    if (listOfFiles != null) {</span>
 <span class="nc bnc" id="L158" title="All 2 branches missed.">      for (File file : listOfFiles) {</span>
 <span class="nc bnc" id="L159" title="All 2 branches missed.">        String fullName = subDir == null ? file.getName()</span>
 <span class="nc" id="L160">            : subDir + File.separator + file.getName();</span>
@@ -164,7 +164,7 @@ import mtas.analysis.util.MtasParserException;
 <span class="nc" id="L164">          files.addAll(getFiles(dir, fullName));</span>
         }
       }
-    }  
+    }
 <span class="nc" id="L168">    return files;</span>
   }
 

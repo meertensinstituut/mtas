@@ -97,8 +97,8 @@ import mtas.codec.tree.MtasRBTreeNode;
             additionalRef, id, ref);
 <span class="fc" id="L98">        updateMax(localN, localN.leftChild);</span>
       } else {
-<span class="fc" id="L100">        localN.rightChild = addRange(localN.rightChild, left, right, additionalId,</span>
-            additionalRef, id, ref);
+<span class="fc" id="L100">        localN.rightChild = addRange(localN.rightChild, left, right,</span>
+            additionalId, additionalRef, id, ref);
 <span class="fc" id="L102">        updateMax(localN, localN.rightChild);</span>
       }
 <span class="fc bfc" id="L104" title="All 4 branches covered.">      if (isRed(localN.rightChild) &amp;&amp; !isRed(localN.leftChild)) {</span>

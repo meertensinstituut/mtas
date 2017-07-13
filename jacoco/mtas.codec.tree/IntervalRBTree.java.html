@@ -95,7 +95,7 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 <span class="fc bfc" id="L95" title="All 2 branches covered.">    if (localN == null) {</span>
 <span class="fc" id="L96">      String key = left.toString() + &quot;_&quot; + right.toString();</span>
 <span class="fc" id="L97">      localN = new IntervalRBTreeNode&lt;&gt;(left, right, IntervalRBTreeNode.RED, 1);</span>
-<span class="fc" id="L98">      localN.addList(list);      </span>
+<span class="fc" id="L98">      localN.addList(list);</span>
 <span class="fc" id="L99">      index.put(key, localN);</span>
 <span class="fc" id="L100">    } else {</span>
 <span class="pc bpc" id="L101" title="1 of 2 branches missed.">      if (left &lt;= localN.left) {</span>
@@ -114,8 +114,8 @@ import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 <span class="fc bfc" id="L114" title="All 4 branches covered.">      if (isRed(localN.leftChild) &amp;&amp; isRed(localN.rightChild)) {</span>
 <span class="fc" id="L115">        flipColors(localN);</span>
       }
-<span class="fc" id="L117">      localN.n = size(localN.leftChild) + size(localN.rightChild) + 1;      </span>
-    }    
+<span class="fc" id="L117">      localN.n = size(localN.leftChild) + size(localN.rightChild) + 1;</span>
+    }
 <span class="fc" id="L119">    return localN;</span>
   }
 

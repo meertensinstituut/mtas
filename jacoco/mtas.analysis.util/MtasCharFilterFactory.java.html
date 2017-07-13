@@ -135,8 +135,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
 <span class="fc" id="L135">              configs = MtasConfiguration.readMtasCharFilterConfigurations(</span>
                   resourceLoader, configArgument);
 <span class="nc" id="L137">            } catch (IOException e) {</span>
-<span class="nc" id="L138">              throw new IOException(&quot;problem loading configurations from &quot;</span>
-                  + configArgument, e);
+<span class="nc" id="L138">              throw new IOException(</span>
+                  &quot;problem loading configurations from &quot; + configArgument, e);
 <span class="fc" id="L140">            }</span>
           }
         }

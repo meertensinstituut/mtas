@@ -24,102 +24,130 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
 <span class="fc" id="L24">    this.subSpans = subSpans;</span>
 <span class="fc" id="L25">  }</span>
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
   public int nextStartPosition() throws IOException {
-<span class="fc" id="L32">    return subSpans.nextStartPosition();</span>
+<span class="fc" id="L34">    return subSpans.nextStartPosition();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
   public int startPosition() {
-<span class="nc" id="L40">    return subSpans.startPosition();</span>
+<span class="nc" id="L44">    return subSpans.startPosition();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
   public int endPosition() {
-<span class="nc" id="L48">    return subSpans.endPosition();</span>
+<span class="nc" id="L54">    return subSpans.endPosition();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
   public int width() {
-<span class="nc" id="L56">    return subSpans.width();</span>
+<span class="nc" id="L64">    return subSpans.width();</span>
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
-<span class="nc" id="L64">    subSpans.collect(collector);</span>
-<span class="nc" id="L65">  }</span>
+<span class="nc" id="L76">    subSpans.collect(collector);</span>
+<span class="nc" id="L77">  }</span>
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
   public float positionsCost() {
-<span class="nc" id="L72">    return subSpans.positionsCost();</span>
+<span class="nc" id="L86">    return subSpans.positionsCost();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
   public int docID() {
-<span class="fc" id="L80">    return subSpans.docID();</span>
+<span class="fc" id="L96">    return subSpans.docID();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="fc" id="L88">    return subSpans.nextDoc();</span>
+<span class="fc" id="L106">    return subSpans.nextDoc();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="nc" id="L96">    return subSpans.advance(target);</span>
+<span class="nc" id="L116">    return subSpans.advance(target);</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
    */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-<span class="nc" id="L104">    return subSpans.asTwoPhaseIterator();</span>
-    // return null;
+<span class="nc" id="L126">    return null;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
   public long cost() {
-<span class="nc" id="L113">    return subSpans.cost();</span>
+<span class="nc" id="L136">    return subSpans.cost();</span>
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#toString()
+   */
   @Override
   public String toString() {
-<span class="nc" id="L118">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L119">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
-<span class="nc bnc" id="L120" title="All 2 branches missed.">    buffer.append(subSpans!=null?subSpans.toString():&quot;null&quot;);</span>
-<span class="nc" id="L121">    buffer.append(&quot;])&quot;);</span>
-<span class="nc" id="L122">    return buffer.toString();</span>
+<span class="nc" id="L146">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L147">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    buffer.append(subSpans != null ? subSpans.toString() : &quot;null&quot;);</span>
+<span class="nc" id="L149">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L150">    return buffer.toString();</span>
   }
 
 }

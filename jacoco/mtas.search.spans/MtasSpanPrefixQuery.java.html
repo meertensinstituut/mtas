@@ -52,7 +52,7 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
    * @param singlePosition the single position
    */
   public MtasSpanPrefixQuery(Term term, boolean singlePosition) {
-<span class="pc bpc" id="L55" title="2 of 4 branches missed.">    super(singlePosition?1:null,singlePosition?1:null);    </span>
+<span class="pc bpc" id="L55" title="2 of 4 branches missed.">    super(singlePosition ? 1 : null, singlePosition ? 1 : null);</span>
 <span class="fc" id="L56">    PrefixQuery pfq = new PrefixQuery(term);</span>
 <span class="fc" id="L57">    query = new SpanMultiTermQueryWrapper&lt;&gt;(pfq);</span>
 <span class="fc" id="L58">    this.term = term;</span>

@@ -20,15 +20,13 @@ public class MtasSpanSequenceItem {
   /**
    * Instantiates a new mtas span sequence item.
    *
-   * @param spanQuery
-   *          the span query
-   * @param optional
-   *          the optional
+   * @param spanQuery the span query
+   * @param optional the optional
    */
-<span class="fc" id="L28">  public MtasSpanSequenceItem(MtasSpanQuery spanQuery, boolean optional) {</span>
-<span class="fc" id="L29">    this.spanQuery = spanQuery;</span>
-<span class="fc" id="L30">    this.optional = optional;</span>
-<span class="fc" id="L31">  }</span>
+<span class="fc" id="L26">  public MtasSpanSequenceItem(MtasSpanQuery spanQuery, boolean optional) {</span>
+<span class="fc" id="L27">    this.spanQuery = spanQuery;</span>
+<span class="fc" id="L28">    this.optional = optional;</span>
+<span class="fc" id="L29">  }</span>
 
   /**
    * Gets the query.
@@ -36,18 +34,17 @@ public class MtasSpanSequenceItem {
    * @return the query
    */
   public MtasSpanQuery getQuery() {
-<span class="fc" id="L39">    return spanQuery;</span>
+<span class="fc" id="L37">    return spanQuery;</span>
   }
 
   /**
    * Sets the query.
    *
-   * @param spanQuery
-   *          the new query
+   * @param spanQuery the new query
    */
   public void setQuery(MtasSpanQuery spanQuery) {
-<span class="nc" id="L49">    this.spanQuery = spanQuery;</span>
-<span class="nc" id="L50">  }</span>
+<span class="nc" id="L46">    this.spanQuery = spanQuery;</span>
+<span class="nc" id="L47">  }</span>
 
   /**
    * Checks if is optional.
@@ -55,7 +52,7 @@ public class MtasSpanSequenceItem {
    * @return true, if is optional
    */
   public boolean isOptional() {
-<span class="fc" id="L58">    return optional;</span>
+<span class="fc" id="L55">    return optional;</span>
   }
 
   /*
@@ -65,12 +62,12 @@ public class MtasSpanSequenceItem {
    */
   @Override
   public boolean equals(Object o) {
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    if (o instanceof MtasSpanSequenceItem) {</span>
-<span class="fc" id="L69">      MtasSpanSequenceItem that = (MtasSpanSequenceItem) o;</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">      return spanQuery.equals(that.getQuery())</span>
-<span class="pc bpc" id="L71" title="1 of 2 branches missed.">          &amp;&amp; (optional == that.isOptional());</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    if (o instanceof MtasSpanSequenceItem) {</span>
+<span class="fc" id="L66">      MtasSpanSequenceItem that = (MtasSpanSequenceItem) o;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      return spanQuery.equals(that.getQuery())</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">          &amp;&amp; (optional == that.isOptional());</span>
     } else {
-<span class="nc" id="L73">      return false;</span>
+<span class="nc" id="L70">      return false;</span>
     }
   }
 
@@ -81,27 +78,25 @@ public class MtasSpanSequenceItem {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L84">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L85">    h = (h * 3) ^ spanQuery.hashCode();</span>
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    h += (optional ? 1 : 0);</span>
-<span class="fc" id="L87">    return h;</span>
+<span class="fc" id="L81">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L82">    h = (h * 3) ^ spanQuery.hashCode();</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    h += (optional ? 1 : 0);</span>
+<span class="fc" id="L84">    return h;</span>
   }
 
   /**
    * Rewrite.
    *
-   * @param reader
-   *          the reader
+   * @param reader the reader
    * @return the mtas span sequence item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasSpanSequenceItem rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L100">    MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);</span>
-<span class="fc bfc" id="L101" title="All 2 branches covered.">    if (!newSpanQuery.equals(spanQuery)) {</span>
-<span class="fc" id="L102">      return new MtasSpanSequenceItem(newSpanQuery, optional);</span>
+<span class="fc" id="L95">    MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (!newSpanQuery.equals(spanQuery)) {</span>
+<span class="fc" id="L97">      return new MtasSpanSequenceItem(newSpanQuery, optional);</span>
     } else {
-<span class="fc" id="L104">      return this;</span>
+<span class="fc" id="L99">      return this;</span>
     }
   }
 
@@ -112,124 +107,120 @@ public class MtasSpanSequenceItem {
    */
   @Override
   public String toString() {
-<span class="nc bnc" id="L115" title="All 2 branches missed.">    return &quot;[&quot; + spanQuery.toString() + &quot; - &quot;</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">    return &quot;[&quot; + spanQuery.toString() + &quot; - &quot;</span>
         + (optional ? &quot;OPTIONAL&quot; : &quot;NOT OPTIONAL&quot;) + &quot;]&quot;;
   }
 
   /**
    * Merge.
    *
-   * @param item1
-   *          the item 1
-   * @param item2
-   *          the item 2
-   * @param ignoreQuery
-   *          the ignore query
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
+   * @param item1 the item 1
+   * @param item2 the item 2
+   * @param ignoreQuery the ignore query
+   * @param maximumIgnoreLength the maximum ignore length
    * @return the mtas span sequence item
    */
   public static MtasSpanSequenceItem merge(MtasSpanSequenceItem item1,
       MtasSpanSequenceItem item2, MtasSpanQuery ignoreQuery,
       Integer maximumIgnoreLength) {
-<span class="pc bpc" id="L135" title="1 of 4 branches missed.">    if (item1 == null || item2 == null) {</span>
-<span class="fc" id="L136">      return null;</span>
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">    if (item1 == null || item2 == null) {</span>
+<span class="fc" id="L127">      return null;</span>
     } else {
-<span class="fc" id="L138">      MtasSpanQuery q1 = item1.getQuery();</span>
-<span class="fc" id="L139">      MtasSpanQuery q2 = item2.getQuery();</span>
-<span class="pc bpc" id="L140" title="1 of 4 branches missed.">      boolean optional = item1.optional &amp;&amp; item2.optional;</span>
+<span class="fc" id="L129">      MtasSpanQuery q1 = item1.getQuery();</span>
+<span class="fc" id="L130">      MtasSpanQuery q2 = item2.getQuery();</span>
+<span class="pc bpc" id="L131" title="1 of 4 branches missed.">      boolean optional = item1.optional &amp;&amp; item2.optional;</span>
       // first spanRecurrenceQuery
-<span class="fc bfc" id="L142" title="All 2 branches covered.">      if (q1 instanceof MtasSpanRecurrenceQuery) {</span>
-<span class="fc" id="L143">        MtasSpanRecurrenceQuery rq1 = (MtasSpanRecurrenceQuery) q1;</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">      if (q1 instanceof MtasSpanRecurrenceQuery) {</span>
+<span class="fc" id="L134">        MtasSpanRecurrenceQuery rq1 = (MtasSpanRecurrenceQuery) q1;</span>
         // both spanRecurrenceQuery
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">        if (q2 instanceof MtasSpanRecurrenceQuery) {</span>
-<span class="nc" id="L146">          MtasSpanRecurrenceQuery rq2 = (MtasSpanRecurrenceQuery) q2;</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (q2 instanceof MtasSpanRecurrenceQuery) {</span>
+<span class="nc" id="L137">          MtasSpanRecurrenceQuery rq2 = (MtasSpanRecurrenceQuery) q2;</span>
           // equal query
-<span class="nc bnc" id="L148" title="All 2 branches missed.">          if (rq1.getQuery().equals(rq2.getQuery())) {</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">          if (rq1.getQuery().equals(rq2.getQuery())) {</span>
             // equal ignoreQuery settings
             boolean checkCondition;
-<span class="nc bnc" id="L151" title="All 2 branches missed.">            checkCondition = ignoreQuery != null</span>
-<span class="nc bnc" id="L152" title="All 2 branches missed.">                &amp;&amp; rq1.getIgnoreQuery() != null;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">            checkCondition = ignoreQuery != null</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                &amp;&amp; rq1.getIgnoreQuery() != null;</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            checkCondition = checkCondition</span>
+<span class="nc" id="L145">                ? ignoreQuery.equals(rq1.getIgnoreQuery()) : false;</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            checkCondition = checkCondition</span>
+<span class="nc" id="L147">                ? maximumIgnoreLength.equals(rq1.getMaximumIgnoreLength())</span>
+                : false;
+<span class="nc bnc" id="L149" title="All 4 branches missed.">            checkCondition = checkCondition ? rq2.getIgnoreQuery() != null</span>
+                : false;
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            checkCondition = checkCondition</span>
+<span class="nc" id="L152">                ? ignoreQuery.equals(rq2.getIgnoreQuery()) : false;</span>
 <span class="nc bnc" id="L153" title="All 2 branches missed.">            checkCondition = checkCondition</span>
-<span class="nc" id="L154">                ? ignoreQuery.equals(rq1.getIgnoreQuery()) : false;</span>
-<span class="nc bnc" id="L155" title="All 2 branches missed.">            checkCondition = checkCondition</span>
-<span class="nc" id="L156">                ? maximumIgnoreLength.equals(rq1.getMaximumIgnoreLength())</span>
+<span class="nc" id="L154">                ? maximumIgnoreLength.equals(rq2.getMaximumIgnoreLength())</span>
                 : false;
-<span class="nc bnc" id="L158" title="All 4 branches missed.">            checkCondition = checkCondition ? rq2.getIgnoreQuery() != null</span>
-                : false;
-<span class="nc bnc" id="L160" title="All 2 branches missed.">            checkCondition = checkCondition</span>
-<span class="nc" id="L161">                ? ignoreQuery.equals(rq2.getIgnoreQuery()) : false;</span>
-<span class="nc bnc" id="L162" title="All 2 branches missed.">            checkCondition = checkCondition</span>
-<span class="nc" id="L163">                ? maximumIgnoreLength.equals(rq2.getMaximumIgnoreLength())</span>
-                : false;
-<span class="nc bnc" id="L165" title="All 2 branches missed.">            if (checkCondition) {</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">            if (checkCondition) {</span>
               // at least one optional
-<span class="nc bnc" id="L167" title="All 4 branches missed.">              if (item1.optional || item2.optional) {</span>
-<span class="nc" id="L168">                int minimum = Math.min(rq1.getMinimumRecurrence(),</span>
-<span class="nc" id="L169">                    rq2.getMinimumRecurrence());</span>
-<span class="nc" id="L170">                int maximum = rq1.getMaximumRecurrence()</span>
-<span class="nc" id="L171">                    + rq2.getMaximumRecurrence();</span>
+<span class="nc bnc" id="L158" title="All 4 branches missed.">              if (item1.optional || item2.optional) {</span>
+<span class="nc" id="L159">                int minimum = Math.min(rq1.getMinimumRecurrence(),</span>
+<span class="nc" id="L160">                    rq2.getMinimumRecurrence());</span>
+<span class="nc" id="L161">                int maximum = rq1.getMaximumRecurrence()</span>
+<span class="nc" id="L162">                    + rq2.getMaximumRecurrence();</span>
                 // only if ranges match
-<span class="nc" id="L173">                if ((rq1.getMaximumRecurrence() + 1) &gt;= rq2</span>
-<span class="nc bnc" id="L174" title="All 2 branches missed.">                    .getMinimumRecurrence()</span>
-<span class="nc" id="L175">                    &amp;&amp; (rq2.getMaximumRecurrence() + 1) &gt;= rq1</span>
-<span class="nc bnc" id="L176" title="All 2 branches missed.">                        .getMinimumRecurrence()) {</span>
-<span class="nc" id="L177">                  return new MtasSpanSequenceItem(</span>
-<span class="nc" id="L178">                      new MtasSpanRecurrenceQuery(rq1.getQuery(), minimum,</span>
+<span class="nc" id="L164">                if ((rq1.getMaximumRecurrence() + 1) &gt;= rq2</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">                    .getMinimumRecurrence()</span>
+<span class="nc" id="L166">                    &amp;&amp; (rq2.getMaximumRecurrence() + 1) &gt;= rq1</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                        .getMinimumRecurrence()) {</span>
+<span class="nc" id="L168">                  return new MtasSpanSequenceItem(</span>
+<span class="nc" id="L169">                      new MtasSpanRecurrenceQuery(rq1.getQuery(), minimum,</span>
                           maximum, ignoreQuery, maximumIgnoreLength),
                       optional);
                 }
                 // not optional
-<span class="nc" id="L183">              } else {</span>
-<span class="nc" id="L184">                int minimum = rq1.getMinimumRecurrence()</span>
-<span class="nc" id="L185">                    + rq2.getMinimumRecurrence();</span>
-<span class="nc" id="L186">                int maximum = rq1.getMaximumRecurrence()</span>
-<span class="nc" id="L187">                    + rq2.getMaximumRecurrence();</span>
+<span class="nc" id="L174">              } else {</span>
+<span class="nc" id="L175">                int minimum = rq1.getMinimumRecurrence()</span>
+<span class="nc" id="L176">                    + rq2.getMinimumRecurrence();</span>
+<span class="nc" id="L177">                int maximum = rq1.getMaximumRecurrence()</span>
+<span class="nc" id="L178">                    + rq2.getMaximumRecurrence();</span>
                 // only if ranges match
-<span class="nc" id="L189">                if ((rq1.getMaximumRecurrence() + 1) &gt;= rq2</span>
-<span class="nc bnc" id="L190" title="All 2 branches missed.">                    .getMinimumRecurrence()</span>
-<span class="nc" id="L191">                    &amp;&amp; (rq2.getMaximumRecurrence() + 1) &gt;= rq1</span>
-<span class="nc bnc" id="L192" title="All 2 branches missed.">                        .getMinimumRecurrence()) {</span>
-<span class="nc" id="L193">                  return new MtasSpanSequenceItem(</span>
-<span class="nc" id="L194">                      new MtasSpanRecurrenceQuery(rq1.getQuery(), minimum,</span>
+<span class="nc" id="L180">                if ((rq1.getMaximumRecurrence() + 1) &gt;= rq2</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                    .getMinimumRecurrence()</span>
+<span class="nc" id="L182">                    &amp;&amp; (rq2.getMaximumRecurrence() + 1) &gt;= rq1</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                        .getMinimumRecurrence()) {</span>
+<span class="nc" id="L184">                  return new MtasSpanSequenceItem(</span>
+<span class="nc" id="L185">                      new MtasSpanRecurrenceQuery(rq1.getQuery(), minimum,</span>
                           maximum, ignoreQuery, maximumIgnoreLength),
                       optional);
                 }
               }
             }
           }
-<span class="nc" id="L201">        } else {</span>
-<span class="pc bpc" id="L202" title="1 of 2 branches missed.">          if (rq1.getQuery().equals(q2)) {</span>
+<span class="nc" id="L192">        } else {</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">          if (rq1.getQuery().equals(q2)) {</span>
             boolean checkCondition;
-<span class="nc bnc" id="L204" title="All 2 branches missed.">            checkCondition = ignoreQuery != null;</span>
-<span class="nc bnc" id="L205" title="All 2 branches missed.">            checkCondition &amp;= rq1.getIgnoreQuery() != null;</span>
-<span class="nc" id="L206">            checkCondition &amp;= ignoreQuery.equals(rq1.getIgnoreQuery());</span>
-<span class="nc bnc" id="L207" title="All 2 branches missed.">            checkCondition &amp;= rq1.getMaximumIgnoreLength() != null;</span>
-<span class="nc" id="L208">            checkCondition &amp;= maximumIgnoreLength</span>
-<span class="nc" id="L209">                .equals(rq1.getMaximumIgnoreLength());</span>
-<span class="nc bnc" id="L210" title="All 2 branches missed.">            if (checkCondition) {</span>
-<span class="nc bnc" id="L211" title="All 2 branches missed.">              if (!optional) {</span>
-<span class="nc bnc" id="L212" title="All 2 branches missed.">                if (item1.optional) {</span>
-<span class="nc bnc" id="L213" title="All 2 branches missed.">                  if (rq1.getMinimumRecurrence() == 1) {</span>
-<span class="nc" id="L214">                    return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
-<span class="nc" id="L215">                        q2, 1, rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">            checkCondition = ignoreQuery != null;</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">            checkCondition &amp;= rq1.getIgnoreQuery() != null;</span>
+<span class="nc" id="L197">            checkCondition &amp;= ignoreQuery.equals(rq1.getIgnoreQuery());</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">            checkCondition &amp;= rq1.getMaximumIgnoreLength() != null;</span>
+<span class="nc" id="L199">            checkCondition &amp;= maximumIgnoreLength</span>
+<span class="nc" id="L200">                .equals(rq1.getMaximumIgnoreLength());</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">            if (checkCondition) {</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">              if (!optional) {</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">                if (item1.optional) {</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">                  if (rq1.getMinimumRecurrence() == 1) {</span>
+<span class="nc" id="L205">                    return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
+<span class="nc" id="L206">                        q2, 1, rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
                         maximumIgnoreLength), false);
                   }
-<span class="nc bnc" id="L218" title="All 2 branches missed.">                } else if (item2.optional) {</span>
-<span class="nc" id="L219">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
-<span class="nc" id="L220">                      q2, rq1.getMinimumRecurrence(),</span>
-<span class="nc" id="L221">                      rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                } else if (item2.optional) {</span>
+<span class="nc" id="L210">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
+<span class="nc" id="L211">                      q2, rq1.getMinimumRecurrence(),</span>
+<span class="nc" id="L212">                      rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
                       maximumIgnoreLength), false);
                 } else {
-<span class="nc" id="L224">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
-<span class="nc" id="L225">                      q2, rq1.getMinimumRecurrence() + 1,</span>
-<span class="nc" id="L226">                      rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc" id="L215">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
+<span class="nc" id="L216">                      q2, rq1.getMinimumRecurrence() + 1,</span>
+<span class="nc" id="L217">                      rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
                       maximumIgnoreLength), false);
                 }
               } else {
-<span class="nc bnc" id="L230" title="All 2 branches missed.">                if (rq1.getMinimumRecurrence() == 1) {</span>
-<span class="nc" id="L231">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
-<span class="nc" id="L232">                      q2, 1, rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">                if (rq1.getMinimumRecurrence() == 1) {</span>
+<span class="nc" id="L222">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
+<span class="nc" id="L223">                      q2, 1, rq1.getMaximumRecurrence() + 1, ignoreQuery,</span>
                       maximumIgnoreLength), true);
                 }
               }
@@ -237,54 +228,54 @@ public class MtasSpanSequenceItem {
           }
         }
         // second spanRecurrenceQuery
-<span class="fc bfc" id="L240" title="All 2 branches covered.">      } else if (q2 instanceof MtasSpanRecurrenceQuery) {</span>
-<span class="fc" id="L241">        MtasSpanRecurrenceQuery rq2 = (MtasSpanRecurrenceQuery) q2;</span>
-<span class="pc bpc" id="L242" title="1 of 2 branches missed.">        if (rq2.getQuery().equals(q1)) {</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">      } else if (q2 instanceof MtasSpanRecurrenceQuery) {</span>
+<span class="fc" id="L232">        MtasSpanRecurrenceQuery rq2 = (MtasSpanRecurrenceQuery) q2;</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">        if (rq2.getQuery().equals(q1)) {</span>
           boolean checkCondition;
-<span class="nc bnc" id="L244" title="All 2 branches missed.">          checkCondition = ignoreQuery != null;</span>
-<span class="nc bnc" id="L245" title="All 2 branches missed.">          checkCondition &amp;= rq2.getIgnoreQuery() != null;</span>
-<span class="nc" id="L246">          checkCondition &amp;= ignoreQuery.equals(rq2.getIgnoreQuery());</span>
-<span class="nc" id="L247">          checkCondition &amp;= maximumIgnoreLength</span>
-<span class="nc" id="L248">              .equals(rq2.getMaximumIgnoreLength());</span>
-<span class="nc bnc" id="L249" title="All 2 branches missed.">          if (checkCondition) {</span>
-<span class="nc bnc" id="L250" title="All 2 branches missed.">            if (!optional) {</span>
-<span class="nc bnc" id="L251" title="All 2 branches missed.">              if (item1.optional) {</span>
-<span class="nc" id="L252">                return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,</span>
-<span class="nc" id="L253">                    rq2.getMinimumRecurrence(), rq2.getMaximumRecurrence() + 1,</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">          checkCondition = ignoreQuery != null;</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">          checkCondition &amp;= rq2.getIgnoreQuery() != null;</span>
+<span class="nc" id="L237">          checkCondition &amp;= ignoreQuery.equals(rq2.getIgnoreQuery());</span>
+<span class="nc" id="L238">          checkCondition &amp;= maximumIgnoreLength</span>
+<span class="nc" id="L239">              .equals(rq2.getMaximumIgnoreLength());</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">          if (checkCondition) {</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (!optional) {</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">              if (item1.optional) {</span>
+<span class="nc" id="L243">                return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,</span>
+<span class="nc" id="L244">                    rq2.getMinimumRecurrence(), rq2.getMaximumRecurrence() + 1,</span>
                     ignoreQuery, maximumIgnoreLength), false);
-<span class="nc bnc" id="L255" title="All 2 branches missed.">              } else if (item2.optional) {</span>
-<span class="nc bnc" id="L256" title="All 2 branches missed.">                if (rq2.getMinimumRecurrence() == 1) {</span>
-<span class="nc" id="L257">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
-<span class="nc" id="L258">                      q1, 1, rq2.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">              } else if (item2.optional) {</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">                if (rq2.getMinimumRecurrence() == 1) {</span>
+<span class="nc" id="L248">                  return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(</span>
+<span class="nc" id="L249">                      q1, 1, rq2.getMaximumRecurrence() + 1, ignoreQuery,</span>
                       maximumIgnoreLength), false);
                 }
               } else {
-<span class="nc" id="L262">                return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,</span>
-<span class="nc" id="L263">                    rq2.getMinimumRecurrence() + 1,</span>
-<span class="nc" id="L264">                    rq2.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc" id="L253">                return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,</span>
+<span class="nc" id="L254">                    rq2.getMinimumRecurrence() + 1,</span>
+<span class="nc" id="L255">                    rq2.getMaximumRecurrence() + 1, ignoreQuery,</span>
                     maximumIgnoreLength), false);
               }
             } else {
-<span class="nc bnc" id="L268" title="All 2 branches missed.">              if (rq2.getMinimumRecurrence() == 1) {</span>
-<span class="nc" id="L269">                return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,</span>
-<span class="nc" id="L270">                    1, rq2.getMaximumRecurrence() + 1, ignoreQuery,</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">              if (rq2.getMinimumRecurrence() == 1) {</span>
+<span class="nc" id="L260">                return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1,</span>
+<span class="nc" id="L261">                    1, rq2.getMaximumRecurrence() + 1, ignoreQuery,</span>
                     maximumIgnoreLength), true);
               }
             }
           }
         }
         // both no spanRecurrenceQuery
-<span class="pc bpc" id="L277" title="1 of 2 branches missed.">      } else if (q1.equals(q2)) {</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">      } else if (q1.equals(q2)) {</span>
         // at least one optional
-<span class="nc bnc" id="L279" title="All 4 branches missed.">        if (item1.optional || item2.optional) {</span>
-<span class="nc" id="L280">          return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1, 1, 2,</span>
+<span class="nc bnc" id="L270" title="All 4 branches missed.">        if (item1.optional || item2.optional) {</span>
+<span class="nc" id="L271">          return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1, 1, 2,</span>
               ignoreQuery, maximumIgnoreLength), optional);
         } else {
-<span class="nc" id="L283">          return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1, 2, 2,</span>
+<span class="nc" id="L274">          return new MtasSpanSequenceItem(new MtasSpanRecurrenceQuery(q1, 2, 2,</span>
               ignoreQuery, maximumIgnoreLength), optional);
         }
       }
-<span class="fc" id="L287">      return null;</span>
+<span class="fc" id="L278">      return null;</span>
     }
   }
 

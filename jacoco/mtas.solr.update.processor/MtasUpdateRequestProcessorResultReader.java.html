@@ -22,7 +22,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
   /** The stored string value. */
   private String storedStringValue;
- 
+
   /** The file input stream. */
   private FileInputStream fileInputStream;
 
@@ -71,7 +71,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 <span class="fc bfc" id="L71" title="All 2 branches covered.">              if (next != null) {</span>
 <span class="fc" id="L72">                return true;</span>
               } else {
-<span class="fc" id="L74">                next = getNext();                </span>
+<span class="fc" id="L74">                next = getNext();</span>
 <span class="fc bfc" id="L75" title="All 2 branches covered.">                return next != null;</span>
               }
             } else {
@@ -104,7 +104,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
 
           private MtasUpdateRequestProcessorResultItem getNext() {
 <span class="pc bpc" id="L106" title="1 of 2 branches missed.">            if (!closed) {</span>
-              try {                
+              try {
 <span class="fc" id="L108">                Object o = objectInputStream.readObject();</span>
 <span class="pc bpc" id="L109" title="1 of 2 branches missed.">                if (o instanceof MtasUpdateRequestProcessorResultItem) {</span>
 <span class="fc" id="L110">                  return (MtasUpdateRequestProcessorResultItem) o;</span>
@@ -152,7 +152,7 @@ public class MtasUpdateRequestProcessorResultReader implements Closeable {
    *
    * @return the stored bin value
    */
-  public byte[] getStoredBinValue() {    
+  public byte[] getStoredBinValue() {
 <span class="fc" id="L156">    return new byte[0];</span>
   }
 

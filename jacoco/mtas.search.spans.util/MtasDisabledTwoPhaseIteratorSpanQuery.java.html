@@ -17,7 +17,7 @@ import mtas.search.spans.MtasSpanMatchNoneQuery;
  */
 public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
 
-  /** The q. */
+  /** The sub query. */
   private MtasSpanQuery subQuery;
 
   /**
@@ -30,72 +30,101 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
 <span class="fc" id="L30">    this.subQuery = q;</span>
 <span class="fc" id="L31">  }</span>
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.
+   * IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
-<span class="fc" id="L39">    SpanWeight subWeight = subQuery.createWeight(searcher, needsScores);</span>
-<span class="fc" id="L40">    return new MtasDisabledTwoPhaseIteratorWeight(subWeight, searcher,</span>
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
+<span class="fc" id="L43">    SpanWeight subWeight = subQuery.createWeight(searcher, needsScores);</span>
+<span class="fc" id="L44">    return new MtasDisabledTwoPhaseIteratorWeight(subWeight, searcher,</span>
         needsScores);
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc" id="L49">    MtasSpanQuery newQ = subQuery.rewrite(reader);</span>
-<span class="pc bpc" id="L50" title="1 of 2 branches missed.">    if (newQ == null) {</span>
-<span class="nc" id="L51">      newQ = new MtasSpanMatchNoneQuery(subQuery.getField());</span>
-<span class="nc" id="L52">      return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ);</span>
-<span class="fc bfc" id="L53" title="All 2 branches covered.">    } else if (!newQ.equals(subQuery)) {</span>
-<span class="fc" id="L54">      return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ).rewrite(reader);</span>
+<span class="fc" id="L56">    MtasSpanQuery newQ = subQuery.rewrite(reader);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">    if (newQ == null) {</span>
+<span class="nc" id="L58">      newQ = new MtasSpanMatchNoneQuery(subQuery.getField());</span>
+<span class="nc" id="L59">      return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ);</span>
     } else {
-<span class="fc" id="L56">      return super.rewrite(reader);</span>
+<span class="fc" id="L61">      newQ.disableTwoPhaseIterator();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">      if (!newQ.equals(subQuery)) {</span>
+<span class="fc" id="L63">        return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ).rewrite(reader);</span>
+      } else {
+<span class="fc" id="L65">        return super.rewrite(reader);</span>
+      }
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   public String getField() {
-<span class="nc" id="L64">    return subQuery.getField();</span>
+<span class="nc" id="L76">    return subQuery.getField();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#toString(java.lang.String)
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L72">    return subQuery.toString(field);</span>
+<span class="nc" id="L86">    return subQuery.toString(field);</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
-<span class="nc bnc" id="L80" title="All 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L81">      return true;</span>
-<span class="nc bnc" id="L82" title="All 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L83">      return false;</span>
-<span class="nc bnc" id="L84" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L85">      return false;</span>
-<span class="nc" id="L86">    final MtasDisabledTwoPhaseIteratorSpanQuery that = (MtasDisabledTwoPhaseIteratorSpanQuery) obj;</span>
-<span class="nc" id="L87">    return that.subQuery.equals(subQuery);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L97">      return true;</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L99">      return false;</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L101">      return false;</span>
+<span class="nc" id="L102">    final MtasDisabledTwoPhaseIteratorSpanQuery that = (MtasDisabledTwoPhaseIteratorSpanQuery) obj;</span>
+<span class="nc" id="L103">    return that.subQuery.equals(subQuery);</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L95">    int h = Integer.rotateLeft(classHash(), 1);</span>
-<span class="nc" id="L96">    h ^= subQuery.hashCode();</span>
-<span class="nc" id="L97">    return h;</span>
+<span class="nc" id="L113">    int h = Integer.rotateLeft(classHash(), 1);</span>
+<span class="nc" id="L114">    h ^= subQuery.hashCode();</span>
+<span class="nc" id="L115">    return h;</span>
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+<span class="nc" id="L125">    super.disableTwoPhaseIterator();</span>
+<span class="nc" id="L126">    subQuery.disableTwoPhaseIterator();</span>
+<span class="nc" id="L127">  }</span>
 
   /**
    * The Class MtasDisabledTwoPhaseIteratorWeight.
@@ -114,36 +143,48 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public MtasDisabledTwoPhaseIteratorWeight(SpanWeight subWeight,
-<span class="fc" id="L117">        IndexSearcher searcher, boolean needsScores) throws IOException {</span>
-<span class="pc bpc" id="L118" title="1 of 2 branches missed.">      super(subQuery, searcher, needsScores ? getTermContexts(subWeight) : null);</span>
-<span class="fc" id="L119">      this.subWeight = subWeight;</span>
-<span class="fc" id="L120">    }</span>
+<span class="fc" id="L146">        IndexSearcher searcher, boolean needsScores) throws IOException {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">      super(subQuery, searcher,</span>
+<span class="pc" id="L148">          needsScores ? getTermContexts(subWeight) : null);</span>
+<span class="fc" id="L149">      this.subWeight = subWeight;</span>
+<span class="fc" id="L150">    }</span>
 
-    /* (non-Javadoc)
-     * @see org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.Map)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L127">      subWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L128">    }</span>
+<span class="nc" id="L161">      subWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L162">    }</span>
 
-    /* (non-Javadoc)
-     * @see org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.search.spans.SpanWeight.Postings)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
     public MtasSpans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
-<span class="fc" id="L136">      return new MtasDisabledTwoPhaseIteratorSpans(</span>
-<span class="fc" id="L137">          subWeight.getSpans(ctx, requiredPostings));</span>
+<span class="fc" id="L175">      return new MtasDisabledTwoPhaseIteratorSpans(</span>
+<span class="fc" id="L176">          subWeight.getSpans(ctx, requiredPostings));</span>
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L145">      subWeight.extractTerms(terms);</span>
-<span class="nc" id="L146">    }</span>
+<span class="nc" id="L186">      subWeight.extractTerms(terms);</span>
+<span class="nc" id="L187">    }</span>
 
   }
 

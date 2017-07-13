@@ -142,9 +142,9 @@ public class CodecUtil {
    * Instantiates a new codec util.
    */
 <span class="nc" id="L144">  private CodecUtil() {</span>
-    //don't do anything
+    // don't do anything
 <span class="nc" id="L146">  }</span>
-  
+
   /**
    * Checks if is single position prefix.
    *
@@ -269,40 +269,41 @@ public class CodecUtil {
    * @return the sorted set
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  static SortedSet&lt;String&gt; createStatsItems(String statsType) throws IOException {
-<span class="fc" id="L273">    SortedSet&lt;String&gt; statsItems = new TreeSet&lt;&gt;();</span>
-<span class="fc" id="L274">    SortedSet&lt;String&gt; functionItems = new TreeSet&lt;&gt;();</span>
-<span class="fc bfc" id="L275" title="All 2 branches covered.">    if (statsType != null) {</span>
-<span class="fc" id="L276">      Matcher m = fpStatsItems.matcher(statsType.trim());</span>
-<span class="fc bfc" id="L277" title="All 2 branches covered.">      while (m.find()) {</span>
-<span class="fc" id="L278">        String tmpStatsItem = m.group(2).trim();</span>
-<span class="fc bfc" id="L279" title="All 2 branches covered.">        if (STATS_TYPES.contains(tmpStatsItem)) {</span>
-<span class="fc" id="L280">          statsItems.add(tmpStatsItem);</span>
-<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        } else if (tmpStatsItem.equals(STATS_TYPE_ALL)) {</span>
-<span class="fc bfc" id="L282" title="All 2 branches covered.">          for (String type : STATS_TYPES) {</span>
-<span class="fc" id="L283">            statsItems.add(type);</span>
-<span class="fc" id="L284">          }</span>
-<span class="nc bnc" id="L285" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
-<span class="nc bnc" id="L286" title="All 2 branches missed.">          if (m.group(3) == null) {</span>
-<span class="nc" id="L287">            throw new IOException(&quot;'&quot; + tmpStatsItem + &quot;' should be called as '&quot;</span>
+  static SortedSet&lt;String&gt; createStatsItems(String statsType)
+      throws IOException {
+<span class="fc" id="L274">    SortedSet&lt;String&gt; statsItems = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L275">    SortedSet&lt;String&gt; functionItems = new TreeSet&lt;&gt;();</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">    if (statsType != null) {</span>
+<span class="fc" id="L277">      Matcher m = fpStatsItems.matcher(statsType.trim());</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">      while (m.find()) {</span>
+<span class="fc" id="L279">        String tmpStatsItem = m.group(2).trim();</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">        if (STATS_TYPES.contains(tmpStatsItem)) {</span>
+<span class="fc" id="L281">          statsItems.add(tmpStatsItem);</span>
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">        } else if (tmpStatsItem.equals(STATS_TYPE_ALL)) {</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">          for (String type : STATS_TYPES) {</span>
+<span class="fc" id="L284">            statsItems.add(type);</span>
+<span class="fc" id="L285">          }</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">          if (m.group(3) == null) {</span>
+<span class="nc" id="L288">            throw new IOException(&quot;'&quot; + tmpStatsItem + &quot;' should be called as '&quot;</span>
                 + tmpStatsItem + &quot;()' with an optional argument&quot;);
           } else {
-<span class="nc" id="L290">            functionItems.add(m.group(1).trim());</span>
+<span class="nc" id="L291">            functionItems.add(m.group(1).trim());</span>
           }
         } else {
-<span class="nc" id="L293">          throw new IOException(&quot;unknown statsType '&quot; + tmpStatsItem + &quot;'&quot;);</span>
+<span class="nc" id="L294">          throw new IOException(&quot;unknown statsType '&quot; + tmpStatsItem + &quot;'&quot;);</span>
         }
-<span class="fc" id="L295">      }</span>
+<span class="fc" id="L296">      }</span>
     }
-<span class="pc bpc" id="L297" title="1 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
-<span class="fc" id="L298">      statsItems.add(STATS_TYPE_SUM);</span>
-<span class="fc" id="L299">      statsItems.add(STATS_TYPE_N);</span>
-<span class="fc" id="L300">      statsItems.add(STATS_TYPE_MEAN);</span>
+<span class="pc bpc" id="L298" title="1 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
+<span class="fc" id="L299">      statsItems.add(STATS_TYPE_SUM);</span>
+<span class="fc" id="L300">      statsItems.add(STATS_TYPE_N);</span>
+<span class="fc" id="L301">      statsItems.add(STATS_TYPE_MEAN);</span>
     }
-<span class="pc bpc" id="L302" title="1 of 2 branches missed.">    if (functionItems.size() &gt; 0) {</span>
-<span class="nc" id="L303">      statsItems.addAll(functionItems);</span>
+<span class="pc bpc" id="L303" title="1 of 2 branches missed.">    if (functionItems.size() &gt; 0) {</span>
+<span class="nc" id="L304">      statsItems.addAll(functionItems);</span>
     }
-<span class="fc" id="L305">    return statsItems;</span>
+<span class="fc" id="L306">    return statsItems;</span>
   }
 
   /**
@@ -315,37 +316,37 @@ public class CodecUtil {
    */
   static String createStatsType(Set&lt;String&gt; statsItems, String sortType,
       MtasFunctionParserFunction functionParser) {
-<span class="fc" id="L318">    String statsType = STATS_BASIC;</span>
-<span class="fc bfc" id="L319" title="All 2 branches covered.">    for (String statsItem : statsItems) {</span>
-<span class="fc bfc" id="L320" title="All 2 branches covered.">      if (STATS_FULL_TYPES.contains(statsItem)) {</span>
-<span class="fc" id="L321">        statsType = STATS_FULL;</span>
-<span class="fc" id="L322">        break;</span>
-<span class="fc bfc" id="L323" title="All 2 branches covered.">      } else if (STATS_ADVANCED_TYPES.contains(statsItem)) {</span>
-<span class="fc" id="L324">        statsType = STATS_ADVANCED;</span>
-<span class="fc bfc" id="L325" title="All 2 branches covered.">      } else if (statsType != STATS_ADVANCED</span>
-<span class="pc bpc" id="L326" title="1 of 2 branches missed.">          &amp;&amp; STATS_BASIC_TYPES.contains(statsItem)) {</span>
-<span class="fc" id="L327">        statsType = STATS_BASIC;</span>
+<span class="fc" id="L319">    String statsType = STATS_BASIC;</span>
+<span class="fc bfc" id="L320" title="All 2 branches covered.">    for (String statsItem : statsItems) {</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">      if (STATS_FULL_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L322">        statsType = STATS_FULL;</span>
+<span class="fc" id="L323">        break;</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">      } else if (STATS_ADVANCED_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L325">        statsType = STATS_ADVANCED;</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">      } else if (statsType != STATS_ADVANCED</span>
+<span class="pc bpc" id="L327" title="1 of 2 branches missed.">          &amp;&amp; STATS_BASIC_TYPES.contains(statsItem)) {</span>
+<span class="fc" id="L328">        statsType = STATS_BASIC;</span>
       } else {
-<span class="fc" id="L329">        Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());</span>
-<span class="pc bpc" id="L330" title="1 of 2 branches missed.">        if (m.find()) {</span>
-<span class="nc bnc" id="L331" title="All 2 branches missed.">          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {</span>
-<span class="nc" id="L332">            statsType = STATS_FULL;</span>
-<span class="nc" id="L333">            break;</span>
+<span class="fc" id="L330">        Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());</span>
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">        if (m.find()) {</span>
+<span class="nc bnc" id="L332" title="All 2 branches missed.">          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {</span>
+<span class="nc" id="L333">            statsType = STATS_FULL;</span>
+<span class="nc" id="L334">            break;</span>
           }
         }
       }
-<span class="fc" id="L337">    }</span>
-<span class="fc bfc" id="L338" title="All 4 branches covered.">    if (sortType != null &amp;&amp; STATS_TYPES.contains(sortType)) {</span>
-<span class="pc bpc" id="L339" title="1 of 2 branches missed.">      if (STATS_FULL_TYPES.contains(sortType)) {</span>
-<span class="nc" id="L340">        statsType = STATS_FULL;</span>
-<span class="pc bpc" id="L341" title="1 of 2 branches missed.">      } else if (STATS_ADVANCED_TYPES.contains(sortType)) {</span>
-<span class="nc bnc" id="L342" title="All 4 branches missed.">        statsType = (statsType == null || statsType != STATS_FULL)</span>
+<span class="fc" id="L338">    }</span>
+<span class="fc bfc" id="L339" title="All 4 branches covered.">    if (sortType != null &amp;&amp; STATS_TYPES.contains(sortType)) {</span>
+<span class="pc bpc" id="L340" title="1 of 2 branches missed.">      if (STATS_FULL_TYPES.contains(sortType)) {</span>
+<span class="nc" id="L341">        statsType = STATS_FULL;</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">      } else if (STATS_ADVANCED_TYPES.contains(sortType)) {</span>
+<span class="nc bnc" id="L343" title="All 4 branches missed.">        statsType = (statsType == null || statsType != STATS_FULL)</span>
             ? STATS_ADVANCED : statsType;
-      } 
+      }
     }
-<span class="fc" id="L346">    return statsType;</span>
+<span class="fc" id="L347">    return statsType;</span>
   }
-  
+
   /**
    * Checks if is stats type.
    *
@@ -353,7 +354,7 @@ public class CodecUtil {
    * @return true, if is stats type
    */
   public static boolean isStatsType(String type) {
-<span class="fc" id="L356">    return STATS_TYPES.contains(type);</span>
+<span class="fc" id="L357">    return STATS_TYPES.contains(type);</span>
   }
 
 }

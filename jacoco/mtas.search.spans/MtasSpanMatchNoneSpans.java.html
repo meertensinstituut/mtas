@@ -2,13 +2,19 @@
 
 import java.io.IOException;
 
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
+
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanMatchNoneSpans.
  */
 public class MtasSpanMatchNoneSpans extends MtasSpans {
+
+  /** The query. */
+  private MtasSpanQuery query;
 
   /** The current start position. */
   private int currentStartPosition;
@@ -22,14 +28,14 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span match none spans.
    *
-   * @param field
-   *          the field
+   * @param query the query
    */
-<span class="fc" id="L28">  public MtasSpanMatchNoneSpans() {</span>
-<span class="fc" id="L29">    currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L30">    currentEndPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L31">    docId = -1;</span>
-<span class="fc" id="L32">  }</span>
+<span class="fc" id="L33">  public MtasSpanMatchNoneSpans(MtasSpanQuery query) {</span>
+<span class="fc" id="L34">    currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L35">    currentEndPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L36">    docId = -1;</span>
+<span class="fc" id="L37">    this.query = query;</span>
+<span class="fc" id="L38">  }</span>
 
   /*
    * (non-Javadoc)
@@ -38,7 +44,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int nextStartPosition() throws IOException {
-<span class="nc" id="L41">    return currentStartPosition;</span>
+<span class="nc" id="L47">    return currentStartPosition;</span>
   }
 
   /*
@@ -48,7 +54,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int startPosition() {
-<span class="nc" id="L51">    return currentStartPosition;</span>
+<span class="nc" id="L57">    return currentStartPosition;</span>
   }
 
   /*
@@ -58,7 +64,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int endPosition() {
-<span class="nc" id="L61">    return currentEndPosition;</span>
+<span class="nc" id="L67">    return currentEndPosition;</span>
   }
 
   /*
@@ -68,7 +74,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int width() {
-<span class="nc" id="L71">    return 0;</span>
+<span class="nc" id="L77">    return 0;</span>
   }
 
   /*
@@ -81,7 +87,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
   @Override
   public void collect(SpanCollector collector) throws IOException {
     // do nothing
-<span class="nc" id="L84">  }</span>
+<span class="nc" id="L90">  }</span>
 
   /*
    * (non-Javadoc)
@@ -90,7 +96,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int docID() {
-<span class="nc" id="L93">    return docId;</span>
+<span class="nc" id="L99">    return docId;</span>
   }
 
   /*
@@ -100,10 +106,10 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int nextDoc() throws IOException {
-<span class="fc" id="L103">    docId = NO_MORE_DOCS;</span>
-<span class="fc" id="L104">    currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L105">    currentEndPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L106">    return docId;</span>
+<span class="fc" id="L109">    docId = NO_MORE_DOCS;</span>
+<span class="fc" id="L110">    currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L111">    currentEndPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L112">    return docId;</span>
   }
 
   /*
@@ -113,10 +119,10 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public int advance(int target) throws IOException {
-<span class="fc" id="L116">    docId = NO_MORE_DOCS;</span>
-<span class="fc" id="L117">    currentStartPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L118">    currentEndPosition = NO_MORE_POSITIONS;</span>
-<span class="fc" id="L119">    return docId;</span>
+<span class="fc" id="L122">    docId = NO_MORE_DOCS;</span>
+<span class="fc" id="L123">    currentStartPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L124">    currentEndPosition = NO_MORE_POSITIONS;</span>
+<span class="fc" id="L125">    return docId;</span>
   }
 
   /*
@@ -126,7 +132,7 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public long cost() {
-<span class="nc" id="L129">    return 0;</span>
+<span class="nc" id="L135">    return 0;</span>
   }
 
   /*
@@ -136,7 +142,20 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
    */
   @Override
   public float positionsCost() {
-<span class="nc" id="L139">    return 0;</span>
+<span class="nc" id="L145">    return 0;</span>
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+<span class="nc bnc" id="L153" title="All 2 branches missed.">    if (!query.twoPhaseIteratorAllowed()) {</span>
+<span class="nc" id="L154">      return null;</span>
+    } else {
+      // TODO
+<span class="nc" id="L157">      return null;</span>
+    }
   }
 
 }

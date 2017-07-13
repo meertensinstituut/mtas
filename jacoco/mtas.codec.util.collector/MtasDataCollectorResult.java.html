@@ -33,10 +33,10 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
 
   /** The sort type. */
   private String sortType;
-  
+
   /** The sort direction. */
   private String sortDirection;
-  
+
   /** The collector type. */
   private String collectorType;
 
@@ -45,7 +45,7 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
 
   /** The start key. */
   String startKey;
-  
+
   /** The end key. */
   String endKey;
 
@@ -61,73 +61,74 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataCollectorResult(String collectorType, String sortType,
-      String sortDirection, NavigableMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; basicList,
-      Integer start, Integer number) throws IOException {
-<span class="fc" id="L66">    this(collectorType, sortType, sortDirection);</span>
-<span class="pc bpc" id="L67" title="1 of 4 branches missed.">    if (sortType == null || sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="pc bpc" id="L68" title="1 of 4 branches missed.">      if (sortDirection == null || sortDirection.equals(CodecUtil.SORT_ASC)) {</span>
-<span class="fc" id="L69">        list = basicList;</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">      } else if (sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
-<span class="fc" id="L71">        list = basicList.descendingMap();</span>
+      String sortDirection,
+      NavigableMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; basicList, Integer start,
+      Integer number) throws IOException {
+<span class="fc" id="L67">    this(collectorType, sortType, sortDirection);</span>
+<span class="pc bpc" id="L68" title="1 of 4 branches missed.">    if (sortType == null || sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="pc bpc" id="L69" title="1 of 4 branches missed.">      if (sortDirection == null || sortDirection.equals(CodecUtil.SORT_ASC)) {</span>
+<span class="fc" id="L70">        list = basicList;</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">      } else if (sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
+<span class="fc" id="L72">        list = basicList.descendingMap();</span>
       } else {
-<span class="nc" id="L73">        throw new IOException(&quot;unknown sort direction &quot; + sortDirection);</span>
+<span class="nc" id="L74">        throw new IOException(&quot;unknown sort direction &quot; + sortDirection);</span>
       }
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    } else if (CodecUtil.isStatsType(sortType)) {</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">    } else if (CodecUtil.isStatsType(sortType)) {</span>
       // comperator
-<span class="fc" id="L77">      Comparator&lt;String&gt; valueComparator = new Comparator&lt;String&gt;() {</span>
+<span class="fc" id="L78">      Comparator&lt;String&gt; valueComparator = new Comparator&lt;String&gt;() {</span>
         @Override
         public int compare(String k1, String k2) {
-<span class="fc" id="L80">          int compare = basicList.get(k1).compareTo(basicList.get(k2));</span>
-<span class="fc bfc" id="L81" title="All 2 branches covered.">          return compare == 0 ? k1.compareTo(k2) : compare;</span>
+<span class="fc" id="L81">          int compare = basicList.get(k1).compareTo(basicList.get(k2));</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">          return compare == 0 ? k1.compareTo(k2) : compare;</span>
         }
       };
-<span class="fc" id="L84">      SortedMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; sortedByValues = new TreeMap&lt;&gt;(</span>
+<span class="fc" id="L85">      SortedMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; sortedByValues = new TreeMap&lt;&gt;(</span>
           valueComparator);
-<span class="fc" id="L86">      sortedByValues.putAll(basicList);</span>
-<span class="fc" id="L87">      list = sortedByValues;</span>
-<span class="fc" id="L88">    } else {</span>
-<span class="nc" id="L89">      throw new IOException(&quot;unknown sort type &quot; + sortType);</span>
+<span class="fc" id="L87">      sortedByValues.putAll(basicList);</span>
+<span class="fc" id="L88">      list = sortedByValues;</span>
+<span class="fc" id="L89">    } else {</span>
+<span class="nc" id="L90">      throw new IOException(&quot;unknown sort type &quot; + sortType);</span>
     }
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">    int listStart = start == null ? 0 : start;</span>
-<span class="pc bpc" id="L92" title="2 of 6 branches missed.">    if (number == null || (start == 0 &amp;&amp; number &gt;= list.size())) {</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    int listStart = start == null ? 0 : start;</span>
+<span class="pc bpc" id="L93" title="2 of 6 branches missed.">    if (number == null || (start == 0 &amp;&amp; number &gt;= list.size())) {</span>
       // do nothing, full list is ok
-<span class="pc bpc" id="L94" title="2 of 4 branches missed.">    } else if (listStart &lt; list.size() &amp;&amp; number &gt; 0) {</span>
+<span class="pc bpc" id="L95" title="2 of 4 branches missed.">    } else if (listStart &lt; list.size() &amp;&amp; number &gt; 0) {</span>
       // subset
-<span class="fc" id="L96">      String boundaryEndKey = null;</span>
-<span class="fc" id="L97">      int counter = 0;</span>
-<span class="fc" id="L98">      MtasDataItem&lt;T1, T2&gt; previous = null;</span>
-<span class="fc bfc" id="L99" title="All 2 branches covered.">      for (Entry&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; entry : list.entrySet()) {</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (listStart == counter) {</span>
-<span class="fc" id="L101">          startKey = entry.getKey();</span>
-<span class="fc bfc" id="L102" title="All 2 branches covered.">        } else if (listStart + number &lt;= counter) {</span>
-<span class="pc bpc" id="L103" title="1 of 4 branches missed.">          if (sortType==null || sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="fc" id="L104">            endKey = entry.getKey();</span>
-<span class="fc" id="L105">            boundaryEndKey = entry.getKey();</span>
-<span class="fc" id="L106">            break;</span>
-<span class="fc bfc" id="L107" title="All 2 branches covered.">          } else if (previous != null) {</span>
-<span class="fc bfc" id="L108" title="All 2 branches covered.">            if (previous.compareTo(entry.getValue()) != 0) {</span>
-<span class="fc" id="L109">              break;</span>
+<span class="fc" id="L97">      String boundaryEndKey = null;</span>
+<span class="fc" id="L98">      int counter = 0;</span>
+<span class="fc" id="L99">      MtasDataItem&lt;T1, T2&gt; previous = null;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      for (Entry&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; entry : list.entrySet()) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (listStart == counter) {</span>
+<span class="fc" id="L102">          startKey = entry.getKey();</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        } else if (listStart + number &lt;= counter) {</span>
+<span class="pc bpc" id="L104" title="1 of 4 branches missed.">          if (sortType == null || sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="fc" id="L105">            endKey = entry.getKey();</span>
+<span class="fc" id="L106">            boundaryEndKey = entry.getKey();</span>
+<span class="fc" id="L107">            break;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">          } else if (previous != null) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            if (previous.compareTo(entry.getValue()) != 0) {</span>
+<span class="fc" id="L110">              break;</span>
             } else {
-<span class="fc" id="L111">              boundaryEndKey = entry.getKey();</span>
+<span class="fc" id="L112">              boundaryEndKey = entry.getKey();</span>
             }
           } else {
-<span class="fc" id="L114">            endKey = entry.getKey();</span>
-<span class="fc" id="L115">            boundaryEndKey = entry.getKey();</span>
-<span class="fc" id="L116">            previous = entry.getValue();</span>
+<span class="fc" id="L115">            endKey = entry.getKey();</span>
+<span class="fc" id="L116">            boundaryEndKey = entry.getKey();</span>
+<span class="fc" id="L117">            previous = entry.getValue();</span>
           }
         } else {
-<span class="fc" id="L119">          endKey = entry.getKey();</span>
+<span class="fc" id="L120">          endKey = entry.getKey();</span>
         }
-<span class="fc" id="L121">        counter++;</span>
-<span class="fc" id="L122">      }</span>
-<span class="fc" id="L123">      list = list.subMap(startKey, boundaryEndKey);</span>
-<span class="fc" id="L124">    } else {</span>
-<span class="nc" id="L125">      list = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L122">        counter++;</span>
+<span class="fc" id="L123">      }</span>
+<span class="fc" id="L124">      list = list.subMap(startKey, boundaryEndKey);</span>
+<span class="fc" id="L125">    } else {</span>
+<span class="nc" id="L126">      list = new TreeMap&lt;&gt;();</span>
     }
-<span class="pc bpc" id="L127" title="1 of 4 branches missed.">    if (list.size() &gt; 0 &amp;&amp; sortType != null) {</span>
-<span class="fc" id="L128">      lastSortValue = list.get(list.lastKey()).getComparableValue();</span>
+<span class="pc bpc" id="L128" title="1 of 4 branches missed.">    if (list.size() &gt; 0 &amp;&amp; sortType != null) {</span>
+<span class="fc" id="L129">      lastSortValue = list.get(list.lastKey()).getComparableValue();</span>
     }
-<span class="fc" id="L130">  }</span>
+<span class="fc" id="L131">  }</span>
 
   /**
    * Instantiates a new mtas data collector result.
@@ -137,9 +138,9 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    */
   public MtasDataCollectorResult(String collectorType,
       MtasDataItem&lt;T1, T2&gt; item) {
-<span class="fc" id="L140">    this(collectorType, null, null);</span>
-<span class="fc" id="L141">    this.item = item;</span>
-<span class="fc" id="L142">  }</span>
+<span class="fc" id="L141">    this(collectorType, null, null);</span>
+<span class="fc" id="L142">    this.item = item;</span>
+<span class="fc" id="L143">  }</span>
 
   /**
    * Instantiates a new mtas data collector result.
@@ -149,14 +150,14 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    * @param sortDirection the sort direction
    */
   public MtasDataCollectorResult(String collectorType, String sortType,
-<span class="fc" id="L152">      String sortDirection) {</span>
-<span class="fc" id="L153">    list = null;</span>
-<span class="fc" id="L154">    item = null;</span>
-<span class="fc" id="L155">    lastSortValue = null;</span>
-<span class="fc" id="L156">    this.collectorType = collectorType;</span>
-<span class="fc" id="L157">    this.sortType = sortType;</span>
-<span class="fc" id="L158">    this.sortDirection = sortDirection;</span>
-<span class="fc" id="L159">  }</span>
+<span class="fc" id="L153">      String sortDirection) {</span>
+<span class="fc" id="L154">    list = null;</span>
+<span class="fc" id="L155">    item = null;</span>
+<span class="fc" id="L156">    lastSortValue = null;</span>
+<span class="fc" id="L157">    this.collectorType = collectorType;</span>
+<span class="fc" id="L158">    this.sortType = sortType;</span>
+<span class="fc" id="L159">    this.sortDirection = sortDirection;</span>
+<span class="fc" id="L160">  }</span>
 
   /**
    * Gets the list.
@@ -166,7 +167,7 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    */
   public final SortedMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; getList()
       throws IOException {
-<span class="fc" id="L169">    return getList(true);</span>
+<span class="fc" id="L170">    return getList(true);</span>
   }
 
   /**
@@ -178,14 +179,14 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    */
   public final SortedMap&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; getList(boolean reduce)
       throws IOException {
-<span class="pc bpc" id="L181" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="pc bpc" id="L182" title="2 of 6 branches missed.">      if (reduce &amp;&amp; startKey != null &amp;&amp; endKey != null) {</span>
-<span class="fc" id="L183">        return list.subMap(startKey, endKey);</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="pc bpc" id="L183" title="2 of 6 branches missed.">      if (reduce &amp;&amp; startKey != null &amp;&amp; endKey != null) {</span>
+<span class="fc" id="L184">        return list.subMap(startKey, endKey);</span>
       } else {
-<span class="fc" id="L185">        return list;</span>
+<span class="fc" id="L186">        return list;</span>
       }
     } else {
-<span class="nc" id="L188">      throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
+<span class="nc" id="L189">      throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
     }
   }
 
@@ -198,14 +199,15 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
   @SuppressWarnings(&quot;rawtypes&quot;)
   public final Map&lt;String, MtasDataItemNumberComparator&gt; getComparatorList()
       throws IOException {
-<span class="pc bpc" id="L201" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="fc" id="L202">      LinkedHashMap&lt;String, MtasDataItemNumberComparator&gt; comparatorList = new LinkedHashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L203" title="All 2 branches covered.">      for (Entry&lt;String, MtasDataItem&lt;T1,T2&gt;&gt; entry: list.entrySet()) {</span>
-<span class="fc" id="L204">        comparatorList.put(entry.getKey(), entry.getValue().getComparableValue());</span>
-<span class="fc" id="L205">      }</span>
-<span class="fc" id="L206">      return comparatorList;</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="fc" id="L203">      LinkedHashMap&lt;String, MtasDataItemNumberComparator&gt; comparatorList = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">      for (Entry&lt;String, MtasDataItem&lt;T1, T2&gt;&gt; entry : list.entrySet()) {</span>
+<span class="fc" id="L205">        comparatorList.put(entry.getKey(),</span>
+<span class="fc" id="L206">            entry.getValue().getComparableValue());</span>
+<span class="fc" id="L207">      }</span>
+<span class="fc" id="L208">      return comparatorList;</span>
     } else {
-<span class="nc" id="L208">      throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
+<span class="nc" id="L210">      throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
     }
   }
 
@@ -216,7 +218,7 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    */
   @SuppressWarnings(&quot;rawtypes&quot;)
   public final MtasDataItemNumberComparator getLastSortValue() {
-<span class="fc" id="L219">    return lastSortValue;</span>
+<span class="fc" id="L221">    return lastSortValue;</span>
   }
 
   /**
@@ -226,23 +228,25 @@ public class MtasDataCollectorResult&lt;T1 extends Number &amp; Comparable&lt;T1
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public final MtasDataItem&lt;T1, T2&gt; getData() throws IOException {
-<span class="pc bpc" id="L229" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="fc" id="L230">      return item;</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="fc" id="L232">      return item;</span>
     } else {
-<span class="nc" id="L232">      throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
+<span class="nc" id="L234">      throw new IOException(&quot;type &quot; + collectorType + &quot; not supported&quot;);</span>
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-<span class="nc" id="L241">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L242">    buffer.append(this.getClass().getSimpleName() + &quot;(&quot;);</span>
-<span class="nc" id="L243">    buffer.append(collectorType+&quot;,&quot;+sortType+&quot;,&quot;+sortDirection);</span>
-<span class="nc" id="L244">    buffer.append(&quot;)&quot;);</span>
-<span class="nc" id="L245">    return buffer.toString();</span>
+<span class="nc" id="L245">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L246">    buffer.append(this.getClass().getSimpleName() + &quot;(&quot;);</span>
+<span class="nc" id="L247">    buffer.append(collectorType + &quot;,&quot; + sortType + &quot;,&quot; + sortDirection);</span>
+<span class="nc" id="L248">    buffer.append(&quot;)&quot;);</span>
+<span class="nc" id="L249">    return buffer.toString();</span>
   }
 
 }

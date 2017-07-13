@@ -42,118 +42,143 @@ public class MtasSolrComponentJoin implements MtasSolrComponent&lt;ComponentJoin
 <span class="fc" id="L42">  public MtasSolrComponentJoin(MtasSolrSearchComponent searchComponent) {</span>
 <span class="fc" id="L43">  }</span>
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="nc bnc" id="L50" title="All 2 branches missed.">    if (rb.req.getParams().get(PARAM_MTAS_JOIN + &quot;.&quot; + NAME_MTAS_JOIN_FIELD,</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">    if (rb.req.getParams().get(PARAM_MTAS_JOIN + &quot;.&quot; + NAME_MTAS_JOIN_FIELD,</span>
         null) != null) {
-<span class="nc" id="L52">      Set&lt;String&gt; fields = new HashSet&lt;&gt;(Arrays.asList(rb.req.getParams()</span>
-<span class="nc" id="L53">          .get(PARAM_MTAS_JOIN + &quot;.&quot; + NAME_MTAS_JOIN_FIELD).split(&quot;,&quot;)));</span>
-<span class="nc" id="L54">      String key = createKeyFromRequest(rb);</span>
-<span class="nc" id="L55">      mtasFields.doJoin = true;</span>
-<span class="nc" id="L56">      mtasFields.join = new ComponentJoin(fields, key);</span>
-<span class="nc" id="L57">      rb.setNeedDocSet(true);</span>
+<span class="nc" id="L57">      Set&lt;String&gt; fields = new HashSet&lt;&gt;(Arrays.asList(rb.req.getParams()</span>
+<span class="nc" id="L58">          .get(PARAM_MTAS_JOIN + &quot;.&quot; + NAME_MTAS_JOIN_FIELD).split(&quot;,&quot;)));</span>
+<span class="nc" id="L59">      String key = createKeyFromRequest(rb);</span>
+<span class="nc" id="L60">      mtasFields.doJoin = true;</span>
+<span class="nc" id="L61">      mtasFields.join = new ComponentJoin(fields, key);</span>
+<span class="nc" id="L62">      rb.setNeedDocSet(true);</span>
     }
 
-<span class="nc" id="L60">  }</span>
+<span class="nc" id="L65">  }</span>
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="nc bnc" id="L67" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L68" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_JOIN, false)) {</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_JOIN, false)) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
         // do nothing
       } else {
         // remove for other requests
-<span class="nc" id="L73">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="nc" id="L74">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_JOIN);</span>
-<span class="nc" id="L75">        sreq.params.remove(PARAM_MTAS_JOIN);</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        for (String key : keys) {</span>
-<span class="nc" id="L77">          sreq.params.remove(PARAM_MTAS_JOIN + &quot;.&quot; + key);</span>
-<span class="nc" id="L78">        }</span>
+<span class="nc" id="L84">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="nc" id="L85">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_JOIN);</span>
+<span class="nc" id="L86">        sreq.params.remove(PARAM_MTAS_JOIN);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        for (String key : keys) {</span>
+<span class="nc" id="L88">          sreq.params.remove(PARAM_MTAS_JOIN + &quot;.&quot; + key);</span>
+<span class="nc" id="L89">        }</span>
       }
     }
-<span class="nc" id="L81">  }</span>
+<span class="nc" id="L92">  }</span>
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
-  public SimpleOrderedMap&lt;Object&gt; create(ComponentJoin join, Boolean encode) throws IOException {
-<span class="nc" id="L87">    MtasSolrJoinResult data = new MtasSolrJoinResult(join);</span>
-<span class="nc" id="L88">    SimpleOrderedMap&lt;Object&gt; mtasJoinResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc bnc" id="L89" title="All 2 branches missed.">    if (encode) {</span>
-<span class="nc" id="L90">      mtasJoinResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
+  public SimpleOrderedMap&lt;Object&gt; create(ComponentJoin join, Boolean encode)
+      throws IOException {
+<span class="nc" id="L103">    MtasSolrJoinResult data = new MtasSolrJoinResult(join);</span>
+<span class="nc" id="L104">    SimpleOrderedMap&lt;Object&gt; mtasJoinResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">    if (encode) {</span>
+<span class="nc" id="L106">      mtasJoinResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
-<span class="nc" id="L92">      mtasJoinResponse.add(&quot;data&quot;, data.rewrite());</span>
+<span class="nc" id="L108">      mtasJoinResponse.add(&quot;data&quot;, data.rewrite());</span>
     }
-<span class="nc" id="L94">    return mtasJoinResponse;</span>
+<span class="nc" id="L110">    return mtasJoinResponse;</span>
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
-<span class="nc bnc" id="L102" title="All 4 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L122" title="All 4 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
         &amp;&amp; rb.stage == MtasSolrSearchComponent.STAGE_JOIN) {
-<span class="nc bnc" id="L104" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_JOIN, false)) {</span>
-<span class="nc bnc" id="L107" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
-<span class="nc" id="L108">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
-<span class="nc" id="L109">                .getResponse();</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_JOIN, false)) {</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="nc" id="L128">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="nc" id="L129">                .getResponse();</span>
             try {
-<span class="nc" id="L111">              Object data = response.findRecursive(&quot;mtas&quot;, &quot;join&quot;);</span>
-<span class="nc bnc" id="L112" title="All 4 branches missed.">              if (data != null &amp;&amp; data instanceof String) {</span>
-<span class="nc" id="L113">                NamedList&lt;Object&gt; mtasResponse = (NamedList&lt;Object&gt;) response</span>
-<span class="nc" id="L114">                    .get(&quot;mtas&quot;);</span>
-<span class="nc" id="L115">                mtasResponse.remove(&quot;join&quot;);</span>
-<span class="nc" id="L116">                mtasResponse.add(&quot;join&quot;,</span>
-<span class="nc" id="L117">                    MtasSolrResultUtil.decode((String) data));</span>
+<span class="nc" id="L131">              Object data = response.findRecursive(&quot;mtas&quot;, &quot;join&quot;);</span>
+<span class="nc bnc" id="L132" title="All 4 branches missed.">              if (data != null &amp;&amp; data instanceof String) {</span>
+<span class="nc" id="L133">                NamedList&lt;Object&gt; mtasResponse = (NamedList&lt;Object&gt;) response</span>
+<span class="nc" id="L134">                    .get(&quot;mtas&quot;);</span>
+<span class="nc" id="L135">                mtasResponse.remove(&quot;join&quot;);</span>
+<span class="nc" id="L136">                mtasResponse.add(&quot;join&quot;,</span>
+<span class="nc" id="L137">                    MtasSolrResultUtil.decode((String) data));</span>
               }
-<span class="nc" id="L119">            } catch (ClassCastException e) {</span>
-<span class="nc" id="L120">              log.debug(e);</span>
+<span class="nc" id="L139">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L140">              log.debug(e);</span>
               // shouldn't happen
-<span class="nc" id="L122">            }</span>
-<span class="nc" id="L123">          }</span>
+<span class="nc" id="L142">            }</span>
+<span class="nc" id="L143">          }</span>
         }
-<span class="nc" id="L125">      }</span>
+<span class="nc" id="L145">      }</span>
     }
-<span class="nc" id="L127">  }</span>
+<span class="nc" id="L147">  }</span>
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // rewrite
-<span class="nc" id="L136">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+<span class="nc" id="L161">    NamedList&lt;Object&gt; mtasResponse = null;</span>
     try {
-<span class="nc" id="L138">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
-<span class="nc" id="L139">    } catch (ClassCastException e) {</span>
-<span class="nc" id="L140">      log.debug(e);</span>
-<span class="nc" id="L141">      mtasResponse = null;</span>
-<span class="nc" id="L142">    }</span>
-<span class="nc bnc" id="L143" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
+<span class="nc" id="L163">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L164">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L165">      log.debug(e);</span>
+<span class="nc" id="L166">      mtasResponse = null;</span>
+<span class="nc" id="L167">    }</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
       MtasSolrJoinResult mtasSolrJoinResult;
       try {
-<span class="nc" id="L146">        mtasSolrJoinResult = (MtasSolrJoinResult) mtasResponse.get(&quot;join&quot;);</span>
-<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (mtasSolrJoinResult != null) {</span>
-<span class="nc" id="L148">          mtasResponse.removeAll(&quot;join&quot;);</span>
-<span class="nc" id="L149">          mtasResponse.add(&quot;join&quot;, mtasSolrJoinResult.rewrite());</span>
+<span class="nc" id="L171">        mtasSolrJoinResult = (MtasSolrJoinResult) mtasResponse.get(&quot;join&quot;);</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (mtasSolrJoinResult != null) {</span>
+<span class="nc" id="L173">          mtasResponse.removeAll(&quot;join&quot;);</span>
+<span class="nc" id="L174">          mtasResponse.add(&quot;join&quot;, mtasSolrJoinResult.rewrite());</span>
         }
-<span class="nc" id="L151">      } catch (ClassCastException e) {</span>
-<span class="nc" id="L152">        log.debug(e);</span>
-<span class="nc" id="L153">        mtasResponse.remove(&quot;join&quot;);</span>
-<span class="nc" id="L154">      }</span>
+<span class="nc" id="L176">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L177">        log.debug(e);</span>
+<span class="nc" id="L178">        mtasResponse.remove(&quot;join&quot;);</span>
+<span class="nc" id="L179">      }</span>
     }
-<span class="nc" id="L156">  }</span>
+<span class="nc" id="L181">  }</span>
 
   /**
    * Creates the key from request.
@@ -162,12 +187,8 @@ public class MtasSolrComponentJoin implements MtasSolrComponent&lt;ComponentJoin
    * @return the string
    */
   private String createKeyFromRequest(ResponseBuilder rb) {
-<span class="nc" id="L165">    return rb.req.getParams().toQueryString();</span>
+<span class="nc" id="L190">    return rb.req.getParams().toQueryString();</span>
   }
-
-
-  
-
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

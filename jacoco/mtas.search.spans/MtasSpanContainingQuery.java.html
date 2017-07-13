@@ -16,13 +16,13 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanContainingQuery baseQuery;
-  
+
   /** The big query. */
   private MtasSpanQuery bigQuery;
-  
+
   /** The small query. */
   private MtasSpanQuery smallQuery;
-  
+
   /** The field. */
   private String field;
 
@@ -49,8 +49,8 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
     } else {
 <span class="nc" id="L50">      field = null;</span>
     }
-<span class="pc bpc" id="L52" title="3 of 6 branches missed.">    if (field != null &amp;&amp; bigQuery!=null &amp;&amp; smallQuery!=null) {</span>
-<span class="pc bpc" id="L53" title="2 of 4 branches missed.">      if(bigQuery.getField() != null &amp;&amp; smallQuery.getField() != null) {</span>
+<span class="pc bpc" id="L52" title="3 of 6 branches missed.">    if (field != null &amp;&amp; bigQuery != null &amp;&amp; smallQuery != null) {</span>
+<span class="pc bpc" id="L53" title="2 of 4 branches missed.">      if (bigQuery.getField() != null &amp;&amp; smallQuery.getField() != null) {</span>
 <span class="fc" id="L54">        baseQuery = new SpanContainingQuery(bigQuery, smallQuery);</span>
       } else {
 <span class="nc" id="L56">        baseQuery = null;</span>
@@ -93,9 +93,9 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 <span class="nc" id="L93">    StringBuilder buffer = new StringBuilder();</span>
 <span class="nc" id="L94">    buffer.append(this.getClass().getSimpleName());</span>
 <span class="nc" id="L95">    buffer.append(&quot;(&quot;);</span>
-<span class="nc bnc" id="L96" title="All 2 branches missed.">    buffer.append(bigQuery!=null?bigQuery.toString(field):&quot;null&quot;);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">    buffer.append(bigQuery != null ? bigQuery.toString(field) : &quot;null&quot;);</span>
 <span class="nc" id="L97">    buffer.append(&quot;, &quot;);</span>
-<span class="nc bnc" id="L98" title="All 2 branches missed.">    buffer.append(smallQuery!=null?smallQuery.toString(field):&quot;null&quot;);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">    buffer.append(smallQuery != null ? smallQuery.toString(field) : &quot;null&quot;);</span>
 <span class="nc" id="L99">    buffer.append(&quot;)&quot;);</span>
 <span class="nc" id="L100">    return buffer.toString();</span>
   }
@@ -118,11 +118,11 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 <span class="pc bpc" id="L118" title="1 of 4 branches missed.">    if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {</span>
 <span class="fc" id="L119">      return new MtasSpanContainingQuery(newBigQuery, newSmallQuery)</span>
 <span class="fc" id="L120">          .rewrite(reader);</span>
-<span class="pc bpc" id="L121" title="1 of 2 branches missed.">    } else if (newBigQuery.equals(newSmallQuery)) {</span>
-<span class="nc" id="L122">      return newBigQuery;</span>
-<span class="pc bpc" id="L123" title="1 of 2 branches missed.">    } else if (baseQuery==null) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    } else if (newBigQuery.equals(newSmallQuery)) {</span>
+<span class="fc" id="L122">      return newBigQuery;</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">    } else if (baseQuery == null) {</span>
 <span class="nc" id="L124">      return new MtasSpanMatchNoneQuery(field);</span>
-    } else {  
+    } else {
 <span class="fc" id="L126">      baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);</span>
 <span class="fc" id="L127">      return super.rewrite(reader);</span>
     }
@@ -154,6 +154,16 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
   public int hashCode() {
 <span class="nc" id="L155">    return baseQuery.hashCode();</span>
   }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+<span class="fc" id="L163">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L164">    bigQuery.disableTwoPhaseIterator();</span>
+<span class="fc" id="L165">    smallQuery.disableTwoPhaseIterator();</span>
+<span class="fc" id="L166">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

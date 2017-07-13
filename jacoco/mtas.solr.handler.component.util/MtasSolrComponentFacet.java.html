@@ -36,7 +36,8 @@ public class MtasSolrComponentFacet
     implements MtasSolrComponent&lt;ComponentFacet&gt; {
 
   /** The Constant log. */
-<span class="fc" id="L39">  private static final Log log = LogFactory.getLog(MtasSolrComponentFacet.class);</span>
+<span class="fc" id="L39">  private static final Log log = LogFactory</span>
+<span class="fc" id="L40">      .getLog(MtasSolrComponentFacet.class);</span>
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -128,9 +129,9 @@ public class MtasSolrComponentFacet
    *
    * @param searchComponent the search component
    */
-<span class="fc" id="L131">  public MtasSolrComponentFacet(MtasSolrSearchComponent searchComponent) {</span>
-<span class="fc" id="L132">    this.searchComponent = searchComponent;</span>
-<span class="fc" id="L133">  }</span>
+<span class="fc" id="L132">  public MtasSolrComponentFacet(MtasSolrSearchComponent searchComponent) {</span>
+<span class="fc" id="L133">    this.searchComponent = searchComponent;</span>
+<span class="fc" id="L134">  }</span>
 
   /*
    * (non-Javadoc)
@@ -142,277 +143,277 @@ public class MtasSolrComponentFacet
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="nc" id="L145">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
-<span class="nc" id="L146">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);</span>
-<span class="nc bnc" id="L147" title="All 2 branches missed.">    if (!ids.isEmpty()) {</span>
-<span class="nc" id="L148">      int tmpCounter = 0;</span>
+<span class="nc" id="L146">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="nc" id="L147">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="nc" id="L149">      int tmpCounter = 0;</span>
       String tmpValue;
-<span class="nc" id="L150">      String[] fields = new String[ids.size()];</span>
-<span class="nc" id="L151">      String[] keys = new String[ids.size()];</span>
-<span class="nc" id="L152">      String[][] queryTypes = new String[ids.size()][];</span>
-<span class="nc" id="L153">      String[][] queryValues = new String[ids.size()][];</span>
-<span class="nc" id="L154">      String[][] queryPrefixes = new String[ids.size()][];</span>
-<span class="nc" id="L155">      String[][] queryIgnores = new String[ids.size()][];</span>
-<span class="nc" id="L156">      String[][] queryMaximumIgnoreLengths = new String[ids.size()][];</span>
-<span class="nc" id="L157">      HashMap&lt;String, String[]&gt;[][] queryVariables = new HashMap[ids.size()][];</span>
-<span class="nc" id="L158">      String[][] baseFields = new String[ids.size()][];</span>
-<span class="nc" id="L159">      String[][] baseFieldTypes = new String[ids.size()][];</span>
-<span class="nc" id="L160">      String[][] baseTypes = new String[ids.size()][];</span>
-<span class="nc" id="L161">      Double[][] baseRangeSizes = new Double[ids.size()][];</span>
-<span class="nc" id="L162">      Double[][] baseRangeBases = new Double[ids.size()][];</span>
-<span class="nc" id="L163">      String[][] baseSortTypes = new String[ids.size()][];</span>
-<span class="nc" id="L164">      String[][] baseSortDirections = new String[ids.size()][];</span>
-<span class="nc" id="L165">      Integer[][] baseNumbers = new Integer[ids.size()][];</span>
-<span class="nc" id="L166">      Double[][] baseMinima = new Double[ids.size()][];</span>
-<span class="nc" id="L167">      Double[][] baseMaxima = new Double[ids.size()][];</span>
-<span class="nc" id="L168">      String[][][] baseFunctionExpressions = new String[ids.size()][][];</span>
-<span class="nc" id="L169">      String[][][] baseFunctionKeys = new String[ids.size()][][];</span>
-<span class="nc" id="L170">      String[][][] baseFunctionTypes = new String[ids.size()][][];</span>
-<span class="nc bnc" id="L171" title="All 2 branches missed.">      for (String id : ids) {</span>
-<span class="nc" id="L172">        fields[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L151">      String[] fields = new String[ids.size()];</span>
+<span class="nc" id="L152">      String[] keys = new String[ids.size()];</span>
+<span class="nc" id="L153">      String[][] queryTypes = new String[ids.size()][];</span>
+<span class="nc" id="L154">      String[][] queryValues = new String[ids.size()][];</span>
+<span class="nc" id="L155">      String[][] queryPrefixes = new String[ids.size()][];</span>
+<span class="nc" id="L156">      String[][] queryIgnores = new String[ids.size()][];</span>
+<span class="nc" id="L157">      String[][] queryMaximumIgnoreLengths = new String[ids.size()][];</span>
+<span class="nc" id="L158">      HashMap&lt;String, String[]&gt;[][] queryVariables = new HashMap[ids.size()][];</span>
+<span class="nc" id="L159">      String[][] baseFields = new String[ids.size()][];</span>
+<span class="nc" id="L160">      String[][] baseFieldTypes = new String[ids.size()][];</span>
+<span class="nc" id="L161">      String[][] baseTypes = new String[ids.size()][];</span>
+<span class="nc" id="L162">      Double[][] baseRangeSizes = new Double[ids.size()][];</span>
+<span class="nc" id="L163">      Double[][] baseRangeBases = new Double[ids.size()][];</span>
+<span class="nc" id="L164">      String[][] baseSortTypes = new String[ids.size()][];</span>
+<span class="nc" id="L165">      String[][] baseSortDirections = new String[ids.size()][];</span>
+<span class="nc" id="L166">      Integer[][] baseNumbers = new Integer[ids.size()][];</span>
+<span class="nc" id="L167">      Double[][] baseMinima = new Double[ids.size()][];</span>
+<span class="nc" id="L168">      Double[][] baseMaxima = new Double[ids.size()][];</span>
+<span class="nc" id="L169">      String[][][] baseFunctionExpressions = new String[ids.size()][][];</span>
+<span class="nc" id="L170">      String[][][] baseFunctionKeys = new String[ids.size()][][];</span>
+<span class="nc" id="L171">      String[][][] baseFunctionTypes = new String[ids.size()][][];</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">      for (String id : ids) {</span>
+<span class="nc" id="L173">        fields[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_FIELD, null);
-<span class="nc" id="L174">        keys[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L175">            .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_KEY,</span>
-<span class="nc" id="L176">                String.valueOf(tmpCounter))</span>
-<span class="nc" id="L177">            .trim();</span>
-<span class="nc" id="L178">        Set&lt;String&gt; qIds = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L179">            rb.req.getParams(),</span>
+<span class="nc" id="L175">        keys[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L176">            .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_KEY,</span>
+<span class="nc" id="L177">                String.valueOf(tmpCounter))</span>
+<span class="nc" id="L178">            .trim();</span>
+<span class="nc" id="L179">        Set&lt;String&gt; qIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L180">            rb.req.getParams(),</span>
             PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY);
-<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (!qIds.isEmpty()) {</span>
-<span class="nc" id="L182">          int tmpQCounter = 0;</span>
-<span class="nc" id="L183">          queryTypes[tmpCounter] = new String[qIds.size()];</span>
-<span class="nc" id="L184">          queryValues[tmpCounter] = new String[qIds.size()];</span>
-<span class="nc" id="L185">          queryPrefixes[tmpCounter] = new String[qIds.size()];</span>
-<span class="nc" id="L186">          queryIgnores[tmpCounter] = new String[qIds.size()];</span>
-<span class="nc" id="L187">          queryMaximumIgnoreLengths[tmpCounter] = new String[qIds.size()];</span>
-<span class="nc" id="L188">          queryVariables[tmpCounter] = new HashMap[qIds.size()];</span>
-<span class="nc bnc" id="L189" title="All 2 branches missed.">          for (String qId : qIds) {</span>
-<span class="nc" id="L190">            queryTypes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="nc" id="L191">                .get(</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        if (!qIds.isEmpty()) {</span>
+<span class="nc" id="L183">          int tmpQCounter = 0;</span>
+<span class="nc" id="L184">          queryTypes[tmpCounter] = new String[qIds.size()];</span>
+<span class="nc" id="L185">          queryValues[tmpCounter] = new String[qIds.size()];</span>
+<span class="nc" id="L186">          queryPrefixes[tmpCounter] = new String[qIds.size()];</span>
+<span class="nc" id="L187">          queryIgnores[tmpCounter] = new String[qIds.size()];</span>
+<span class="nc" id="L188">          queryMaximumIgnoreLengths[tmpCounter] = new String[qIds.size()];</span>
+<span class="nc" id="L189">          queryVariables[tmpCounter] = new HashMap[qIds.size()];</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">          for (String qId : qIds) {</span>
+<span class="nc" id="L191">            queryTypes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="nc" id="L192">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY
                         + &quot;.&quot; + qId + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_TYPE,
                     null);
-<span class="nc" id="L195">            queryValues[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="nc" id="L196">                .get(</span>
+<span class="nc" id="L196">            queryValues[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="nc" id="L197">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY
                         + &quot;.&quot; + qId + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_VALUE,
                     null);
-<span class="nc" id="L200">            queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="nc" id="L201">                .get(</span>
+<span class="nc" id="L201">            queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="nc" id="L202">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY
                         + &quot;.&quot; + qId + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_PREFIX,
                     null);
-<span class="nc" id="L205">            queryIgnores[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="nc" id="L206">                .get(</span>
+<span class="nc" id="L206">            queryIgnores[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="nc" id="L207">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY
                         + &quot;.&quot; + qId + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_IGNORE,
                     null);
-<span class="nc" id="L210">            queryMaximumIgnoreLengths[tmpCounter][tmpQCounter] = rb.req</span>
-<span class="nc" id="L211">                .getParams()</span>
-<span class="nc" id="L212">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY</span>
+<span class="nc" id="L211">            queryMaximumIgnoreLengths[tmpCounter][tmpQCounter] = rb.req</span>
+<span class="nc" id="L212">                .getParams()</span>
+<span class="nc" id="L213">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY</span>
                     + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_QUERY_MAXIMUM_IGNORE_LENGTH, null);
-<span class="nc" id="L215">            Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L216">                rb.req.getParams(),</span>
+<span class="nc" id="L216">            Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L217">                rb.req.getParams(),</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot;
                     + qId + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_VARIABLE);
-<span class="nc" id="L219">            queryVariables[tmpCounter][tmpQCounter] = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L220" title="All 2 branches missed.">            if (!vIds.isEmpty()) {</span>
-<span class="nc" id="L221">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L222" title="All 2 branches missed.">              for (String vId : vIds) {</span>
-<span class="nc" id="L223">                String name = rb.req.getParams().get(PARAM_MTAS_FACET + &quot;.&quot; + id</span>
+<span class="nc" id="L220">            queryVariables[tmpCounter][tmpQCounter] = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (!vIds.isEmpty()) {</span>
+<span class="nc" id="L222">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">              for (String vId : vIds) {</span>
+<span class="nc" id="L224">                String name = rb.req.getParams().get(PARAM_MTAS_FACET + &quot;.&quot; + id</span>
                     + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_QUERY_VARIABLE_NAME, null);
-<span class="nc bnc" id="L227" title="All 2 branches missed.">                if (name != null) {</span>
-<span class="nc bnc" id="L228" title="All 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
-<span class="nc" id="L229">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">                if (name != null) {</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
+<span class="nc" id="L230">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
                   }
-<span class="nc" id="L231">                  String value = rb.req.getParams().get(PARAM_MTAS_FACET + &quot;.&quot;</span>
+<span class="nc" id="L232">                  String value = rb.req.getParams().get(PARAM_MTAS_FACET + &quot;.&quot;</span>
                       + id + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                       + SUBNAME_MTAS_FACET_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;
                       + SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE, null);
-<span class="nc bnc" id="L235" title="All 2 branches missed.">                  if (value != null) {</span>
-<span class="nc" id="L236">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L237">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
-<span class="nc bnc" id="L238" title="All 2 branches missed.">                    for (int i = 0; i &lt; subList.length; i++) {</span>
-<span class="nc" id="L239">                      list.add(</span>
-<span class="nc" id="L240">                          subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">                  if (value != null) {</span>
+<span class="nc" id="L237">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L238">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">                    for (int i = 0; i &lt; subList.length; i++) {</span>
+<span class="nc" id="L240">                      list.add(</span>
+<span class="nc" id="L241">                          subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
                     }
-<span class="nc" id="L242">                    tmpVariables.get(name).addAll(list);</span>
+<span class="nc" id="L243">                    tmpVariables.get(name).addAll(list);</span>
                   }
                 }
-<span class="nc" id="L245">              }</span>
-<span class="nc bnc" id="L246" title="All 2 branches missed.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
-<span class="nc" id="L247">                  .entrySet()) {</span>
-<span class="nc" id="L248">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
-<span class="nc" id="L249">                    entry.getValue()</span>
-<span class="nc" id="L250">                        .toArray(new String[entry.getValue().size()]));</span>
-<span class="nc" id="L251">              }</span>
+<span class="nc" id="L246">              }</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
+<span class="nc" id="L248">                  .entrySet()) {</span>
+<span class="nc" id="L249">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
+<span class="nc" id="L250">                    entry.getValue()</span>
+<span class="nc" id="L251">                        .toArray(new String[entry.getValue().size()]));</span>
+<span class="nc" id="L252">              }</span>
             }
-<span class="nc" id="L253">            tmpQCounter++;</span>
-<span class="nc" id="L254">          }</span>
-<span class="nc" id="L255">        } else {</span>
-<span class="nc" id="L256">          throw new IOException(</span>
+<span class="nc" id="L254">            tmpQCounter++;</span>
+<span class="nc" id="L255">          }</span>
+<span class="nc" id="L256">        } else {</span>
+<span class="nc" id="L257">          throw new IOException(</span>
               &quot;no &quot; + NAME_MTAS_FACET_QUERY + &quot; for mtas facet &quot; + id);
         }
-<span class="nc" id="L259">        Set&lt;String&gt; bIds = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L260">            rb.req.getParams(),</span>
+<span class="nc" id="L260">        Set&lt;String&gt; bIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L261">            rb.req.getParams(),</span>
             PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE);
-<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (!bIds.isEmpty()) {</span>
-<span class="nc" id="L263">          int tmpBCounter = 0;</span>
-<span class="nc" id="L264">          baseFields[tmpCounter] = new String[bIds.size()];</span>
-<span class="nc" id="L265">          baseFieldTypes[tmpCounter] = new String[bIds.size()];</span>
-<span class="nc" id="L266">          baseTypes[tmpCounter] = new String[bIds.size()];</span>
-<span class="nc" id="L267">          baseRangeSizes[tmpCounter] = new Double[bIds.size()];</span>
-<span class="nc" id="L268">          baseRangeBases[tmpCounter] = new Double[bIds.size()];</span>
-<span class="nc" id="L269">          baseSortTypes[tmpCounter] = new String[bIds.size()];</span>
-<span class="nc" id="L270">          baseSortDirections[tmpCounter] = new String[bIds.size()];</span>
-<span class="nc" id="L271">          baseNumbers[tmpCounter] = new Integer[bIds.size()];</span>
-<span class="nc" id="L272">          baseMinima[tmpCounter] = new Double[bIds.size()];</span>
-<span class="nc" id="L273">          baseMaxima[tmpCounter] = new Double[bIds.size()];</span>
-<span class="nc" id="L274">          baseFunctionKeys[tmpCounter] = new String[bIds.size()][];</span>
-<span class="nc" id="L275">          baseFunctionExpressions[tmpCounter] = new String[bIds.size()][];</span>
-<span class="nc" id="L276">          baseFunctionTypes[tmpCounter] = new String[bIds.size()][];</span>
-<span class="nc bnc" id="L277" title="All 2 branches missed.">          for (String bId : bIds) {</span>
-<span class="nc" id="L278">            baseFields[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
-<span class="nc" id="L279">                .get(</span>
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        if (!bIds.isEmpty()) {</span>
+<span class="nc" id="L264">          int tmpBCounter = 0;</span>
+<span class="nc" id="L265">          baseFields[tmpCounter] = new String[bIds.size()];</span>
+<span class="nc" id="L266">          baseFieldTypes[tmpCounter] = new String[bIds.size()];</span>
+<span class="nc" id="L267">          baseTypes[tmpCounter] = new String[bIds.size()];</span>
+<span class="nc" id="L268">          baseRangeSizes[tmpCounter] = new Double[bIds.size()];</span>
+<span class="nc" id="L269">          baseRangeBases[tmpCounter] = new Double[bIds.size()];</span>
+<span class="nc" id="L270">          baseSortTypes[tmpCounter] = new String[bIds.size()];</span>
+<span class="nc" id="L271">          baseSortDirections[tmpCounter] = new String[bIds.size()];</span>
+<span class="nc" id="L272">          baseNumbers[tmpCounter] = new Integer[bIds.size()];</span>
+<span class="nc" id="L273">          baseMinima[tmpCounter] = new Double[bIds.size()];</span>
+<span class="nc" id="L274">          baseMaxima[tmpCounter] = new Double[bIds.size()];</span>
+<span class="nc" id="L275">          baseFunctionKeys[tmpCounter] = new String[bIds.size()][];</span>
+<span class="nc" id="L276">          baseFunctionExpressions[tmpCounter] = new String[bIds.size()][];</span>
+<span class="nc" id="L277">          baseFunctionTypes[tmpCounter] = new String[bIds.size()][];</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">          for (String bId : bIds) {</span>
+<span class="nc" id="L279">            baseFields[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
+<span class="nc" id="L280">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE
                         + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FIELD,
                     null);
-<span class="nc" id="L283">            baseFieldTypes[tmpCounter][tmpBCounter] = getFieldType(</span>
-<span class="nc" id="L284">                rb.req.getSchema(), baseFields[tmpCounter][tmpBCounter]);</span>
-<span class="nc" id="L285">            baseTypes[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
-<span class="nc" id="L286">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc" id="L284">            baseFieldTypes[tmpCounter][tmpBCounter] = getFieldType(</span>
+<span class="nc" id="L285">                rb.req.getSchema(), baseFields[tmpCounter][tmpBCounter]);</span>
+<span class="nc" id="L286">            baseTypes[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
+<span class="nc" id="L287">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                     + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_TYPE, null);
-<span class="nc" id="L288">            tmpValue = rb.req.getParams()</span>
-<span class="nc" id="L289">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc" id="L289">            tmpValue = rb.req.getParams()</span>
+<span class="nc" id="L290">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                     + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_RANGE + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE, null);
-<span class="nc bnc" id="L292" title="All 2 branches missed.">            baseRangeSizes[tmpCounter][tmpBCounter] = tmpValue == null ? null</span>
-<span class="nc" id="L293">                : Double.parseDouble(tmpValue);</span>
-<span class="nc" id="L294">            tmpValue = rb.req.getParams()</span>
-<span class="nc" id="L295">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">            baseRangeSizes[tmpCounter][tmpBCounter] = tmpValue == null ? null</span>
+<span class="nc" id="L294">                : Double.parseDouble(tmpValue);</span>
+<span class="nc" id="L295">            tmpValue = rb.req.getParams()</span>
+<span class="nc" id="L296">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                     + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_RANGE + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_BASE_RANGE_BASE, null);
-<span class="nc bnc" id="L298" title="All 2 branches missed.">            baseRangeBases[tmpCounter][tmpBCounter] = tmpValue == null ? null</span>
-<span class="nc" id="L299">                : Double.parseDouble(tmpValue);</span>
-<span class="nc" id="L300">            baseSortTypes[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
-<span class="nc" id="L301">                .get(</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">            baseRangeBases[tmpCounter][tmpBCounter] = tmpValue == null ? null</span>
+<span class="nc" id="L300">                : Double.parseDouble(tmpValue);</span>
+<span class="nc" id="L301">            baseSortTypes[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
+<span class="nc" id="L302">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE
                         + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_SORT_TYPE,
                     null);
-<span class="nc" id="L305">            baseSortDirections[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
-<span class="nc" id="L306">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc" id="L306">            baseSortDirections[tmpCounter][tmpBCounter] = rb.req.getParams()</span>
+<span class="nc" id="L307">                .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                     + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION,
                     null);
-<span class="nc" id="L309">            tmpValue = rb.req.getParams()</span>
-<span class="nc" id="L310">                .get(</span>
+<span class="nc" id="L310">            tmpValue = rb.req.getParams()</span>
+<span class="nc" id="L311">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE
                         + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_NUMBER,
                     null);
-<span class="nc bnc" id="L314" title="All 2 branches missed.">            baseNumbers[tmpCounter][tmpBCounter] = tmpValue != null</span>
-<span class="nc" id="L315">                ? getPositiveInteger(tmpValue) : null;</span>
-<span class="nc" id="L316">            tmpValue = rb.req.getParams()</span>
-<span class="nc" id="L317">                .get(</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">            baseNumbers[tmpCounter][tmpBCounter] = tmpValue != null</span>
+<span class="nc" id="L316">                ? getPositiveInteger(tmpValue) : null;</span>
+<span class="nc" id="L317">            tmpValue = rb.req.getParams()</span>
+<span class="nc" id="L318">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE
                         + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_MINIMUM,
                     null);
-<span class="nc bnc" id="L321" title="All 2 branches missed.">            baseMinima[tmpCounter][tmpBCounter] = tmpValue != null</span>
-<span class="nc" id="L322">                ? getDouble(tmpValue) : null;</span>
-<span class="nc" id="L323">            tmpValue = rb.req.getParams()</span>
-<span class="nc" id="L324">                .get(</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">            baseMinima[tmpCounter][tmpBCounter] = tmpValue != null</span>
+<span class="nc" id="L323">                ? getDouble(tmpValue) : null;</span>
+<span class="nc" id="L324">            tmpValue = rb.req.getParams()</span>
+<span class="nc" id="L325">                .get(</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE
                         + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_MAXIMUM,
                     null);
-<span class="nc bnc" id="L328" title="All 2 branches missed.">            baseMaxima[tmpCounter][tmpBCounter] = tmpValue != null</span>
-<span class="nc" id="L329">                ? getDouble(tmpValue) : null;</span>
-<span class="nc" id="L330">            Set&lt;String&gt; functionIds = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L331">                rb.req.getParams(),</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">            baseMaxima[tmpCounter][tmpBCounter] = tmpValue != null</span>
+<span class="nc" id="L330">                ? getDouble(tmpValue) : null;</span>
+<span class="nc" id="L331">            Set&lt;String&gt; functionIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L332">                rb.req.getParams(),</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FUNCTION);
-<span class="nc" id="L334">            baseFunctionExpressions[tmpCounter][tmpBCounter] = new String[functionIds</span>
-<span class="nc" id="L335">                .size()];</span>
-<span class="nc" id="L336">            baseFunctionKeys[tmpCounter][tmpBCounter] = new String[functionIds</span>
-<span class="nc" id="L337">                .size()];</span>
-<span class="nc" id="L338">            baseFunctionTypes[tmpCounter][tmpBCounter] = new String[functionIds</span>
-<span class="nc" id="L339">                .size()];</span>
-<span class="nc" id="L340">            int tmpSubCounter = 0;</span>
-<span class="nc bnc" id="L341" title="All 2 branches missed.">            for (String functionId : functionIds) {</span>
-<span class="nc" id="L342">              baseFunctionKeys[tmpCounter][tmpBCounter][tmpSubCounter] = rb.req</span>
-<span class="nc" id="L343">                  .getParams()</span>
-<span class="nc" id="L344">                  .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc" id="L335">            baseFunctionExpressions[tmpCounter][tmpBCounter] = new String[functionIds</span>
+<span class="nc" id="L336">                .size()];</span>
+<span class="nc" id="L337">            baseFunctionKeys[tmpCounter][tmpBCounter] = new String[functionIds</span>
+<span class="nc" id="L338">                .size()];</span>
+<span class="nc" id="L339">            baseFunctionTypes[tmpCounter][tmpBCounter] = new String[functionIds</span>
+<span class="nc" id="L340">                .size()];</span>
+<span class="nc" id="L341">            int tmpSubCounter = 0;</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">            for (String functionId : functionIds) {</span>
+<span class="nc" id="L343">              baseFunctionKeys[tmpCounter][tmpBCounter][tmpSubCounter] = rb.req</span>
+<span class="nc" id="L344">                  .getParams()</span>
+<span class="nc" id="L345">                  .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                       + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FUNCTION + &quot;.&quot;
                       + functionId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FUNCTION_KEY,
-<span class="nc" id="L347">                      String.valueOf(tmpSubCounter))</span>
-<span class="nc" id="L348">                  .trim();</span>
-<span class="nc" id="L349">              baseFunctionExpressions[tmpCounter][tmpBCounter][tmpSubCounter] = rb.req</span>
-<span class="nc" id="L350">                  .getParams()</span>
-<span class="nc" id="L351">                  .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc" id="L348">                      String.valueOf(tmpSubCounter))</span>
+<span class="nc" id="L349">                  .trim();</span>
+<span class="nc" id="L350">              baseFunctionExpressions[tmpCounter][tmpBCounter][tmpSubCounter] = rb.req</span>
+<span class="nc" id="L351">                  .getParams()</span>
+<span class="nc" id="L352">                  .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                       + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FUNCTION + &quot;.&quot;
                       + functionId + &quot;.&quot;
                       + SUBNAME_MTAS_FACET_BASE_FUNCTION_EXPRESSION, null);
-<span class="nc" id="L355">              baseFunctionTypes[tmpCounter][tmpBCounter][tmpSubCounter] = rb.req</span>
-<span class="nc" id="L356">                  .getParams()</span>
-<span class="nc" id="L357">                  .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
+<span class="nc" id="L356">              baseFunctionTypes[tmpCounter][tmpBCounter][tmpSubCounter] = rb.req</span>
+<span class="nc" id="L357">                  .getParams()</span>
+<span class="nc" id="L358">                  .get(PARAM_MTAS_FACET + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_FACET_BASE</span>
                       + &quot;.&quot; + bId + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FUNCTION + &quot;.&quot;
                       + functionId + &quot;.&quot;
                       + SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE, null);
-<span class="nc" id="L361">              tmpSubCounter++;</span>
-<span class="nc" id="L362">            }</span>
-<span class="nc" id="L363">            tmpBCounter++;</span>
-<span class="nc" id="L364">          }</span>
-<span class="nc" id="L365">        } else {</span>
-<span class="nc" id="L366">          throw new IOException(</span>
+<span class="nc" id="L362">              tmpSubCounter++;</span>
+<span class="nc" id="L363">            }</span>
+<span class="nc" id="L364">            tmpBCounter++;</span>
+<span class="nc" id="L365">          }</span>
+<span class="nc" id="L366">        } else {</span>
+<span class="nc" id="L367">          throw new IOException(</span>
               &quot;no &quot; + NAME_MTAS_FACET_BASE + &quot; for mtas facet &quot; + id);
         }
-<span class="nc" id="L369">        tmpCounter++;</span>
-<span class="nc" id="L370">      }</span>
-<span class="nc" id="L371">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
-<span class="nc" id="L372">      mtasFields.doFacet = true;</span>
-<span class="nc" id="L373">      rb.setNeedDocSet(true);</span>
-<span class="nc bnc" id="L374" title="All 2 branches missed.">      for (String field : fields) {</span>
-<span class="nc bnc" id="L375" title="All 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
-<span class="nc" id="L376">          throw new IOException(&quot;no (valid) field in mtas facet&quot;);</span>
-<span class="nc bnc" id="L377" title="All 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
-<span class="nc" id="L378">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+<span class="nc" id="L370">        tmpCounter++;</span>
+<span class="nc" id="L371">      }</span>
+<span class="nc" id="L372">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="nc" id="L373">      mtasFields.doFacet = true;</span>
+<span class="nc" id="L374">      rb.setNeedDocSet(true);</span>
+<span class="nc bnc" id="L375" title="All 2 branches missed.">      for (String field : fields) {</span>
+<span class="nc bnc" id="L376" title="All 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L377">          throw new IOException(&quot;no (valid) field in mtas facet&quot;);</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="nc" id="L379">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
-<span class="nc" id="L381">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_FACET_KEY,</span>
-<span class="nc" id="L382">          NAME_MTAS_FACET_FIELD, true);</span>
-<span class="nc bnc" id="L383" title="All 2 branches missed.">      for (int i = 0; i &lt; fields.length; i++) {</span>
-<span class="nc" id="L384">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
-<span class="nc" id="L385">        int queryNumber = queryValues[i].length;</span>
-<span class="nc" id="L386">        MtasSpanQuery[] ql = new MtasSpanQuery[queryNumber];</span>
-<span class="nc bnc" id="L387" title="All 2 branches missed.">        for (int j = 0; j &lt; queryNumber; j++) {</span>
-<span class="nc bnc" id="L388" title="All 2 branches missed.">          Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
-<span class="nc" id="L389">              ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
-<span class="nc" id="L390">          MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],</span>
+<span class="nc" id="L382">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_FACET_KEY,</span>
+<span class="nc" id="L383">          NAME_MTAS_FACET_FIELD, true);</span>
+<span class="nc bnc" id="L384" title="All 2 branches missed.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="nc" id="L385">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
+<span class="nc" id="L386">        int queryNumber = queryValues[i].length;</span>
+<span class="nc" id="L387">        MtasSpanQuery[] ql = new MtasSpanQuery[queryNumber];</span>
+<span class="nc bnc" id="L388" title="All 2 branches missed.">        for (int j = 0; j &lt; queryNumber; j++) {</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">          Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
+<span class="nc" id="L390">              ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
+<span class="nc" id="L391">          MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],</span>
               queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],
               fields[i], queryIgnores[i][j], maximumIgnoreLength);
           // minimize number of queries
-<span class="nc bnc" id="L394" title="All 2 branches missed.">          if (cf.spanQueryList.contains(q)) {</span>
-<span class="nc" id="L395">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
+<span class="nc bnc" id="L395" title="All 2 branches missed.">          if (cf.spanQueryList.contains(q)) {</span>
+<span class="nc" id="L396">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
           } else {
-<span class="nc" id="L397">            cf.spanQueryList.add(q);</span>
+<span class="nc" id="L398">            cf.spanQueryList.add(q);</span>
           }
-<span class="nc" id="L399">          ql[j] = q;</span>
+<span class="nc" id="L400">          ql[j] = q;</span>
         }
-<span class="nc bnc" id="L401" title="All 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
-<span class="nc" id="L402">            ? String.valueOf(i) + &quot;:&quot; + fields[i] : keys[i].trim();</span>
+<span class="nc bnc" id="L402" title="All 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
+<span class="nc" id="L403">            ? String.valueOf(i) + &quot;:&quot; + fields[i] : keys[i].trim();</span>
         try {
-<span class="nc" id="L404">          mtasFields.list.get(fields[i]).facetList.add(new ComponentFacet(ql,</span>
+<span class="nc" id="L405">          mtasFields.list.get(fields[i]).facetList.add(new ComponentFacet(ql,</span>
               fields[i], key, baseFields[i], baseFieldTypes[i], baseTypes[i],
               baseRangeSizes[i], baseRangeBases[i], baseSortTypes[i],
               baseSortDirections[i], baseNumbers[i], baseMinima[i],
               baseMaxima[i], baseFunctionKeys[i], baseFunctionExpressions[i],
               baseFunctionTypes[i]));
-<span class="nc" id="L410">        } catch (ParseException e) {</span>
-<span class="nc" id="L411">          throw new IOException(e.getMessage());</span>
-<span class="nc" id="L412">        }</span>
+<span class="nc" id="L411">        } catch (ParseException e) {</span>
+<span class="nc" id="L412">          throw new IOException(e.getMessage());</span>
+<span class="nc" id="L413">        }</span>
       }
     }
-<span class="nc" id="L415">  }</span>
+<span class="nc" id="L416">  }</span>
 
   /*
    * (non-Javadoc)
@@ -425,111 +426,111 @@ public class MtasSolrComponentFacet
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="nc bnc" id="L428" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L429" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_FACET, false)) {</span>
-<span class="nc bnc" id="L430" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+<span class="nc bnc" id="L429" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L430" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_FACET, false)) {</span>
+<span class="nc bnc" id="L431" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
         // do nothing
       } else {
         // remove prefix for other requests
-<span class="nc" id="L434">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="nc" id="L435">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);</span>
-<span class="nc" id="L436">        sreq.params.remove(PARAM_MTAS_FACET);</span>
-<span class="nc bnc" id="L437" title="All 2 branches missed.">        for (String key : keys) {</span>
-<span class="nc" id="L438">          sreq.params.remove(</span>
+<span class="nc" id="L435">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="nc" id="L436">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_FACET);</span>
+<span class="nc" id="L437">        sreq.params.remove(PARAM_MTAS_FACET);</span>
+<span class="nc bnc" id="L438" title="All 2 branches missed.">        for (String key : keys) {</span>
+<span class="nc" id="L439">          sreq.params.remove(</span>
               PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_FIELD);
-<span class="nc" id="L440">          sreq.params</span>
-<span class="nc" id="L441">              .remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_KEY);</span>
-<span class="nc" id="L442">          Set&lt;String&gt; subKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L443">              rb.req.getParams(),</span>
+<span class="nc" id="L441">          sreq.params</span>
+<span class="nc" id="L442">              .remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_KEY);</span>
+<span class="nc" id="L443">          Set&lt;String&gt; subKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L444">              rb.req.getParams(),</span>
               PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_QUERY);
-<span class="nc bnc" id="L445" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L446">            sreq.params.remove(</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L447">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_TYPE);
-<span class="nc" id="L449">            sreq.params.remove(</span>
+<span class="nc" id="L450">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_VALUE);
-<span class="nc" id="L452">            sreq.params.remove(</span>
+<span class="nc" id="L453">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_PREFIX);
-<span class="nc" id="L455">            sreq.params.remove(</span>
+<span class="nc" id="L456">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_QUERY + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_QUERY_IGNORE);
-<span class="nc" id="L458">            sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L459">            sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_FACET_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                 + SUBNAME_MTAS_FACET_QUERY_MAXIMUM_IGNORE_LENGTH);
-<span class="nc" id="L461">            Set&lt;String&gt; subSubKeys = MtasSolrResultUtil</span>
-<span class="nc" id="L462">                .getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L462">            Set&lt;String&gt; subSubKeys = MtasSolrResultUtil</span>
+<span class="nc" id="L463">                .getIdsFromParameters(rb.req.getParams(),</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_QUERY
                         + &quot;.&quot; + subKey + &quot;.&quot;
                         + SUBNAME_MTAS_FACET_QUERY_VARIABLE);
-<span class="nc bnc" id="L466" title="All 2 branches missed.">            for (String subSubKey : subSubKeys) {</span>
-<span class="nc" id="L467">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L467" title="All 2 branches missed.">            for (String subSubKey : subSubKeys) {</span>
+<span class="nc" id="L468">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
                   + NAME_MTAS_FACET_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_QUERY_VARIABLE + &quot;.&quot; + subSubKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_QUERY_VARIABLE_NAME);
-<span class="nc" id="L471">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L472">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
                   + NAME_MTAS_FACET_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_QUERY_VARIABLE + &quot;.&quot; + subSubKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE);
-<span class="nc" id="L475">            }</span>
-<span class="nc" id="L476">          }</span>
-<span class="nc" id="L477">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L476">            }</span>
+<span class="nc" id="L477">          }</span>
+<span class="nc" id="L478">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
               PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE);
-<span class="nc bnc" id="L479" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L480">            sreq.params.remove(</span>
+<span class="nc bnc" id="L480" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L481">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_FIELD);
-<span class="nc" id="L483">            sreq.params.remove(</span>
+<span class="nc" id="L484">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_TYPE);
-<span class="nc" id="L486">            sreq.params.remove(</span>
+<span class="nc" id="L487">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_RANGE + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_BASE_RANGE_SIZE);
-<span class="nc" id="L490">            sreq.params.remove(</span>
+<span class="nc" id="L491">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_RANGE + &quot;.&quot;
                     + SUBNAME_MTAS_FACET_BASE_RANGE_BASE);
-<span class="nc" id="L494">            sreq.params.remove(</span>
+<span class="nc" id="L495">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_MAXIMUM);
-<span class="nc" id="L497">            sreq.params.remove(</span>
+<span class="nc" id="L498">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_MINIMUM);
-<span class="nc" id="L500">            sreq.params.remove(</span>
+<span class="nc" id="L501">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_NUMBER);
-<span class="nc" id="L503">            sreq.params.remove(</span>
+<span class="nc" id="L504">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION);
-<span class="nc" id="L506">            sreq.params.remove(</span>
+<span class="nc" id="L507">            sreq.params.remove(</span>
                 PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE + &quot;.&quot;
                     + subKey + &quot;.&quot; + SUBNAME_MTAS_FACET_BASE_SORT_TYPE);
-<span class="nc" id="L509">            Set&lt;String&gt; subSubKeys = MtasSolrResultUtil</span>
-<span class="nc" id="L510">                .getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L510">            Set&lt;String&gt; subSubKeys = MtasSolrResultUtil</span>
+<span class="nc" id="L511">                .getIdsFromParameters(rb.req.getParams(),</span>
                     PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_FACET_BASE
                         + &quot;.&quot; + subKey + &quot;.&quot;
                         + SUBNAME_MTAS_FACET_BASE_FUNCTION);
-<span class="nc bnc" id="L514" title="All 2 branches missed.">            for (String subSubKey : subSubKeys) {</span>
-<span class="nc" id="L515">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L515" title="All 2 branches missed.">            for (String subSubKey : subSubKeys) {</span>
+<span class="nc" id="L516">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
                   + NAME_MTAS_FACET_BASE + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_BASE_FUNCTION + &quot;.&quot; + subSubKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_BASE_FUNCTION_EXPRESSION);
-<span class="nc" id="L519">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L520">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
                   + NAME_MTAS_FACET_BASE + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_BASE_FUNCTION + &quot;.&quot; + subSubKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_BASE_FUNCTION_KEY);
-<span class="nc" id="L523">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L524">              sreq.params.remove(PARAM_MTAS_FACET + &quot;.&quot; + key + &quot;.&quot;</span>
                   + NAME_MTAS_FACET_BASE + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_BASE_FUNCTION + &quot;.&quot; + subSubKey + &quot;.&quot;
                   + SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE);
-<span class="nc" id="L527">            }</span>
-<span class="nc" id="L528">          }</span>
-<span class="nc" id="L529">        }</span>
+<span class="nc" id="L528">            }</span>
+<span class="nc" id="L529">          }</span>
+<span class="nc" id="L530">        }</span>
       }
     }
-<span class="nc" id="L532">  }</span>
+<span class="nc" id="L533">  }</span>
 
   /*
    * (non-Javadoc)
@@ -540,41 +541,41 @@ public class MtasSolrComponentFacet
    */
   public SimpleOrderedMap&lt;Object&gt; create(ComponentFacet facet, Boolean encode)
       throws IOException {
-<span class="nc" id="L543">    SimpleOrderedMap&lt;Object&gt; mtasFacetResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L544">    mtasFacetResponse.add(&quot;key&quot;, facet.key);</span>
-<span class="nc" id="L545">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L546" title="All 2 branches missed.">    for (int i = 0; i &lt; facet.baseFields.length; i++) {</span>
-<span class="nc bnc" id="L547" title="All 2 branches missed.">      if (facet.baseFunctionList[i] != null) {</span>
-<span class="nc bnc" id="L548" title="All 2 branches missed.">        for (MtasDataCollector&lt;?, ?&gt; functionDataCollector : facet.baseFunctionList[i]</span>
-<span class="nc" id="L549">            .keySet()) {</span>
-<span class="nc" id="L550">          SubComponentFunction[] tmpSubComponentFunctionList = facet.baseFunctionList[i]</span>
-<span class="nc" id="L551">              .get(functionDataCollector);</span>
-<span class="nc bnc" id="L552" title="All 2 branches missed.">          if (tmpSubComponentFunctionList != null) {</span>
-<span class="nc" id="L553">            HashMap&lt;String, MtasSolrMtasResult&gt; tmpList = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L554" title="All 2 branches missed.">            for (SubComponentFunction tmpSubComponentFunction : tmpSubComponentFunctionList) {</span>
-<span class="nc" id="L555">              tmpList.put(tmpSubComponentFunction.key,</span>
+<span class="nc" id="L544">    SimpleOrderedMap&lt;Object&gt; mtasFacetResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L545">    mtasFacetResponse.add(&quot;key&quot;, facet.key);</span>
+<span class="nc" id="L546">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L547" title="All 2 branches missed.">    for (int i = 0; i &lt; facet.baseFields.length; i++) {</span>
+<span class="nc bnc" id="L548" title="All 2 branches missed.">      if (facet.baseFunctionList[i] != null) {</span>
+<span class="nc bnc" id="L549" title="All 2 branches missed.">        for (MtasDataCollector&lt;?, ?&gt; functionDataCollector : facet.baseFunctionList[i]</span>
+<span class="nc" id="L550">            .keySet()) {</span>
+<span class="nc" id="L551">          SubComponentFunction[] tmpSubComponentFunctionList = facet.baseFunctionList[i]</span>
+<span class="nc" id="L552">              .get(functionDataCollector);</span>
+<span class="nc bnc" id="L553" title="All 2 branches missed.">          if (tmpSubComponentFunctionList != null) {</span>
+<span class="nc" id="L554">            HashMap&lt;String, MtasSolrMtasResult&gt; tmpList = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L555" title="All 2 branches missed.">            for (SubComponentFunction tmpSubComponentFunction : tmpSubComponentFunctionList) {</span>
+<span class="nc" id="L556">              tmpList.put(tmpSubComponentFunction.key,</span>
                   new MtasSolrMtasResult(tmpSubComponentFunction.dataCollector,
                       tmpSubComponentFunction.dataType,
                       tmpSubComponentFunction.statsType,
                       tmpSubComponentFunction.statsItems, null));
             }
-<span class="nc" id="L561">            functionData.put(functionDataCollector, tmpList);</span>
+<span class="nc" id="L562">            functionData.put(functionDataCollector, tmpList);</span>
           }
-<span class="nc" id="L563">        }</span>
+<span class="nc" id="L564">        }</span>
       }
     }
-<span class="nc" id="L566">    MtasSolrMtasResult data = new MtasSolrMtasResult(facet.dataCollector,</span>
+<span class="nc" id="L567">    MtasSolrMtasResult data = new MtasSolrMtasResult(facet.dataCollector,</span>
         facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,
         facet.baseSortTypes, facet.baseSortDirections, null, facet.baseNumbers,
         functionData);
 
-<span class="nc bnc" id="L571" title="All 2 branches missed.">    if (encode) {</span>
-<span class="nc" id="L572">      mtasFacetResponse.add(&quot;_encoded_list&quot;, MtasSolrResultUtil.encode(data));</span>
+<span class="nc bnc" id="L572" title="All 2 branches missed.">    if (encode) {</span>
+<span class="nc" id="L573">      mtasFacetResponse.add(&quot;_encoded_list&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
-<span class="nc" id="L574">      mtasFacetResponse.add(&quot;list&quot;, data);</span>
-<span class="nc" id="L575">      MtasSolrResultUtil.rewrite(mtasFacetResponse);</span>
+<span class="nc" id="L575">      mtasFacetResponse.add(&quot;list&quot;, data);</span>
+<span class="nc" id="L576">      MtasSolrResultUtil.rewrite(mtasFacetResponse);</span>
     }
-<span class="nc" id="L577">    return mtasFacetResponse;</span>
+<span class="nc" id="L578">    return mtasFacetResponse;</span>
   }
 
   /*
@@ -586,30 +587,30 @@ public class MtasSolrComponentFacet
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
-<span class="nc bnc" id="L589" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L590" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
         &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
         &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
-<span class="nc bnc" id="L592" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
-<span class="nc bnc" id="L593" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L594" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_FACET, false)) {</span>
-<span class="nc bnc" id="L595" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
-<span class="nc" id="L596">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
-<span class="nc" id="L597">                .getResponse();</span>
+<span class="nc bnc" id="L593" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="nc bnc" id="L594" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L595" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_FACET, false)) {</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="nc" id="L597">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="nc" id="L598">                .getResponse();</span>
             try {
-<span class="nc" id="L599">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
-<span class="nc" id="L600">                  .findRecursive(&quot;mtas&quot;, &quot;facet&quot;);</span>
-<span class="nc bnc" id="L601" title="All 2 branches missed.">              if (data != null) {</span>
-<span class="nc" id="L602">                MtasSolrResultUtil.decode(data);</span>
+<span class="nc" id="L600">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
+<span class="nc" id="L601">                  .findRecursive(&quot;mtas&quot;, &quot;facet&quot;);</span>
+<span class="nc bnc" id="L602" title="All 2 branches missed.">              if (data != null) {</span>
+<span class="nc" id="L603">                MtasSolrResultUtil.decode(data);</span>
               }
-<span class="nc" id="L604">            } catch (ClassCastException e) {</span>
-<span class="nc" id="L605">              log.debug(e);</span>
+<span class="nc" id="L605">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L606">              log.debug(e);</span>
               // shouldn't happen
-<span class="nc" id="L607">            }</span>
-<span class="nc" id="L608">          }</span>
+<span class="nc" id="L608">            }</span>
+<span class="nc" id="L609">          }</span>
         }
-<span class="nc" id="L610">      }</span>
+<span class="nc" id="L611">      }</span>
     }
-<span class="nc" id="L612">  }</span>
+<span class="nc" id="L613">  }</span>
 
   /*
    * (non-Javadoc)
@@ -623,26 +624,26 @@ public class MtasSolrComponentFacet
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // rewrite
-<span class="nc" id="L626">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+<span class="nc" id="L627">    NamedList&lt;Object&gt; mtasResponse = null;</span>
     try {
-<span class="nc" id="L628">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
-<span class="nc" id="L629">    } catch (ClassCastException e) {</span>
-<span class="nc" id="L630">      log.debug(e);</span>
-<span class="nc" id="L631">      mtasResponse = null;</span>
-<span class="nc" id="L632">    }</span>
-<span class="nc bnc" id="L633" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
+<span class="nc" id="L629">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L630">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L631">      log.debug(e);</span>
+<span class="nc" id="L632">      mtasResponse = null;</span>
+<span class="nc" id="L633">    }</span>
+<span class="nc bnc" id="L634" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
       ArrayList&lt;Object&gt; mtasResponseFacet;
       try {
-<span class="nc" id="L636">        mtasResponseFacet = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;facet&quot;);</span>
-<span class="nc bnc" id="L637" title="All 2 branches missed.">        if (mtasResponseFacet != null) {</span>
-<span class="nc" id="L638">          MtasSolrResultUtil.rewrite(mtasResponseFacet);</span>
+<span class="nc" id="L637">        mtasResponseFacet = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;facet&quot;);</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">        if (mtasResponseFacet != null) {</span>
+<span class="nc" id="L639">          MtasSolrResultUtil.rewrite(mtasResponseFacet);</span>
         }
-<span class="nc" id="L640">      } catch (ClassCastException e) {</span>
-<span class="nc" id="L641">        log.debug(e);</span>
-<span class="nc" id="L642">        mtasResponse.remove(&quot;facet&quot;);</span>
-<span class="nc" id="L643">      }</span>
+<span class="nc" id="L641">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L642">        log.debug(e);</span>
+<span class="nc" id="L643">        mtasResponse.remove(&quot;facet&quot;);</span>
+<span class="nc" id="L644">      }</span>
     }
-<span class="nc" id="L645">  }</span>
+<span class="nc" id="L646">  }</span>
 
   /**
    * Gets the field type.
@@ -652,21 +653,21 @@ public class MtasSolrComponentFacet
    * @return the field type
    */
   private String getFieldType(IndexSchema schema, String field) {
-<span class="nc" id="L655">    SchemaField sf = schema.getField(field);</span>
-<span class="nc" id="L656">    FieldType ft = sf.getType();</span>
-<span class="nc bnc" id="L657" title="All 4 branches missed.">    if (ft != null &amp;&amp; ft.getNumericType() != null) {</span>
-<span class="nc" id="L658">      LegacyNumericType nt = ft.getNumericType();</span>
-<span class="nc bnc" id="L659" title="All 2 branches missed.">      if (nt.equals(LegacyNumericType.INT)) {</span>
-<span class="nc" id="L660">        return ComponentFacet.TYPE_INTEGER;</span>
-<span class="nc bnc" id="L661" title="All 2 branches missed.">      } else if (nt.equals(LegacyNumericType.DOUBLE)) {</span>
-<span class="nc" id="L662">        return ComponentFacet.TYPE_DOUBLE;</span>
-<span class="nc bnc" id="L663" title="All 2 branches missed.">      } else if (nt.equals(LegacyNumericType.LONG)) {</span>
-<span class="nc" id="L664">        return ComponentFacet.TYPE_LONG;</span>
-<span class="nc bnc" id="L665" title="All 2 branches missed.">      } else if (nt.equals(LegacyNumericType.FLOAT)) {</span>
-<span class="nc" id="L666">        return ComponentFacet.TYPE_FLOAT;</span>
+<span class="nc" id="L656">    SchemaField sf = schema.getField(field);</span>
+<span class="nc" id="L657">    FieldType ft = sf.getType();</span>
+<span class="nc bnc" id="L658" title="All 4 branches missed.">    if (ft != null &amp;&amp; ft.getNumericType() != null) {</span>
+<span class="nc" id="L659">      LegacyNumericType nt = ft.getNumericType();</span>
+<span class="nc bnc" id="L660" title="All 2 branches missed.">      if (nt.equals(LegacyNumericType.INT)) {</span>
+<span class="nc" id="L661">        return ComponentFacet.TYPE_INTEGER;</span>
+<span class="nc bnc" id="L662" title="All 2 branches missed.">      } else if (nt.equals(LegacyNumericType.DOUBLE)) {</span>
+<span class="nc" id="L663">        return ComponentFacet.TYPE_DOUBLE;</span>
+<span class="nc bnc" id="L664" title="All 2 branches missed.">      } else if (nt.equals(LegacyNumericType.LONG)) {</span>
+<span class="nc" id="L665">        return ComponentFacet.TYPE_LONG;</span>
+<span class="nc bnc" id="L666" title="All 2 branches missed.">      } else if (nt.equals(LegacyNumericType.FLOAT)) {</span>
+<span class="nc" id="L667">        return ComponentFacet.TYPE_FLOAT;</span>
       }
     }
-<span class="nc" id="L669">    return ComponentFacet.TYPE_STRING;</span>
+<span class="nc" id="L670">    return ComponentFacet.TYPE_STRING;</span>
   }
 
   /**
@@ -677,9 +678,9 @@ public class MtasSolrComponentFacet
    */
   private int getPositiveInteger(String number) {
     try {
-<span class="nc" id="L680">      return Math.max(0, Integer.parseInt(number));</span>
-<span class="nc" id="L681">    } catch (NumberFormatException e) {</span>
-<span class="nc" id="L682">      return 0;</span>
+<span class="nc" id="L681">      return Math.max(0, Integer.parseInt(number));</span>
+<span class="nc" id="L682">    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L683">      return 0;</span>
     }
   }
 
@@ -691,9 +692,9 @@ public class MtasSolrComponentFacet
    */
   private Double getDouble(String number) {
     try {
-<span class="nc" id="L694">      return Double.parseDouble(number);</span>
-<span class="nc" id="L695">    } catch (NumberFormatException e) {</span>
-<span class="nc" id="L696">      return null;</span>
+<span class="nc" id="L695">      return Double.parseDouble(number);</span>
+<span class="nc" id="L696">    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L697">      return null;</span>
     }
   }
 

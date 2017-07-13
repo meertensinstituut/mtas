@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasChatParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.parser</a> &gt; <span class="el_source">MtasChatParser.java</span></div><h1>MtasChatParser.java</h1><pre class="source lang-java linenums">package mtas.analysis.parser;
+
+import mtas.analysis.util.MtasConfigException;
+import mtas.analysis.util.MtasConfiguration;
+
+/**
+ * The Class MtasChatParser.
+ */
+final public class MtasChatParser extends MtasXMLParser {
+
+  /**
+   * Instantiates a new mtas chat parser.
+   *
+   * @param config the config
+   */
+  public MtasChatParser(MtasConfiguration config) {
+<span class="nc" id="L17">    super(config);</span>
+<span class="nc" id="L18">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.analysis.parser.MtasXMLParser#initParser()
+   */
+  @Override
+  protected void initParser() throws MtasConfigException {
+<span class="nc" id="L27">    namespaceURI = &quot;http://www.talkbank.org/ns/talkbank&quot;;</span>
+<span class="nc" id="L28">    namespaceURI_id = null;</span>
+<span class="nc" id="L29">    rootTag = &quot;CHAT&quot;;</span>
+<span class="nc" id="L30">    super.initParser();</span>
+<span class="nc" id="L31">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
