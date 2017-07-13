@@ -96,8 +96,12 @@ RUN service apache2 stop && \
     cp -rp demo1 demo3 && \
     cp data/schemaFull.xml demo3/conf/schema.xml && \
     echo "name=demo3" > demo3/core.properties && \
+    cp -rp demo1 demo4 && \
+    cp data/schemaFull.xml demo4/conf/schema.xml && \
+    echo "name=demo4" > demo4/core.properties && \
     mv demo1 /var/solr/data/ && \
     mv demo2 /var/solr/data/ && \
-    mv demo3 /var/solr/data/
+    mv demo3 /var/solr/data/ && \
+    mv demo4 /var/solr/data/
 
 CMD bash -C '/start.sh'; 'bash'

@@ -1,5 +1,5 @@
 # Automatically generated Dockerfile 
-# - Build 2017-07-13 06:11
+# - Build 2017-07-13 06:32
 # - Lucene/Solr version 6.6.0
 # - Mtas release 20170713 
 #
@@ -74,7 +74,7 @@ RUN service apache2 stop && \
     chmod -R 755 /var/www/html && \
     printf "echo\n" >> /start.sh && \
     printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh && \
-    printf "echo \"  Timestamp 2017-07-13 06:11\"\n" >> /start.sh && \
+    printf "echo \"  Timestamp 2017-07-13 06:32\"\n" >> /start.sh && \
     printf "echo \"  Lucene/Solr version 6.6.0\"\n" >> /start.sh && \
     printf "echo \"  Mtas release 20170713\"\n" >> /start.sh && \
     printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \
@@ -96,8 +96,12 @@ RUN service apache2 stop && \
     cp -rp demo1 demo3 && \
     cp data/schemaFull.xml demo3/conf/schema.xml && \
     echo "name=demo3" > demo3/core.properties && \
+    cp -rp demo1 demo4 && \
+    cp data/schemaFull.xml demo4/conf/schema.xml && \
+    echo "name=demo4" > demo4/core.properties && \
     mv demo1 /var/solr/data/ && \
     mv demo2 /var/solr/data/ && \
-    mv demo3 /var/solr/data/
+    mv demo3 /var/solr/data/ && \
+    mv demo4 /var/solr/data/
 
 CMD bash -C '/start.sh'; 'bash'
