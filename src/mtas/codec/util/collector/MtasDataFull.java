@@ -24,7 +24,7 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
 
   /** The full value list. */
   protected T1[][] fullValueList = null;
-  
+
   /** The new full value list. */
   protected T1[][] newFullValueList = null;
 
@@ -92,7 +92,7 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
   public final void error(String key, String error) throws IOException {
     if (key != null) {
       add(key, false);
-      setError(newCurrentPosition, error, newCurrentExisting);      
+      setError(newCurrentPosition, error, newCurrentExisting);
     }
   }
 
@@ -136,7 +136,9 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
   @Override

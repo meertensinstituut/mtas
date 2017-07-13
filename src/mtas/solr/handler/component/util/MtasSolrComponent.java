@@ -26,7 +26,7 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    */
   public abstract void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException;
-  
+
   /**
    * Creates the.
    *
@@ -37,7 +37,7 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    */
   public abstract SimpleOrderedMap<Object> create(T response, Boolean encode)
       throws IOException;
-  
+
   /**
    * Modify request.
    *
@@ -47,14 +47,14 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    */
   public abstract void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq);
-  
+
   /**
    * Finish stage.
    *
    * @param rb the rb
    */
   public abstract void finishStage(ResponseBuilder rb);
-  
+
   /**
    * Distributed process.
    *
@@ -62,7 +62,7 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    * @param mtasFields the mtas fields
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
-      throws IOException;
+  public abstract void distributedProcess(ResponseBuilder rb,
+      ComponentFields mtasFields) throws IOException;
 
 }

@@ -23,7 +23,7 @@ public class MtasBufferedReader extends Reader {
 
   /** The n chars. */
   private int nChars;
-  
+
   /** The next char. */
   private int nextChar;
 

@@ -142,9 +142,9 @@ public class CodecUtil {
    * Instantiates a new codec util.
    */
   private CodecUtil() {
-    //don't do anything
+    // don't do anything
   }
-  
+
   /**
    * Checks if is single position prefix.
    *
@@ -269,7 +269,8 @@ public class CodecUtil {
    * @return the sorted set
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  static SortedSet<String> createStatsItems(String statsType) throws IOException {
+  static SortedSet<String> createStatsItems(String statsType)
+      throws IOException {
     SortedSet<String> statsItems = new TreeSet<>();
     SortedSet<String> functionItems = new TreeSet<>();
     if (statsType != null) {
@@ -341,11 +342,11 @@ public class CodecUtil {
       } else if (STATS_ADVANCED_TYPES.contains(sortType)) {
         statsType = (statsType == null || statsType != STATS_FULL)
             ? STATS_ADVANCED : statsType;
-      } 
+      }
     }
     return statsType;
   }
-  
+
   /**
    * Checks if is stats type.
    *

@@ -12,7 +12,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
@@ -28,10 +27,10 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   private String field;
 
   /** The q 1. */
-  private SpanQuery q1;
+  private MtasSpanQuery q1;
 
   /** The q 2. */
-  private SpanQuery q2;
+  private MtasSpanQuery q2;
 
   /**
    * Instantiates a new mtas span intersecting query.
@@ -191,6 +190,18 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    q1.disableTwoPhaseIterator();
+    q2.disableTwoPhaseIterator();
+  }
+
   /**
    * The Class SpanIntersectingWeight.
    */
@@ -248,10 +259,13 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
         return null; // field does not exist
       }
       MtasSpanIntersectingQuerySpans s1 = new MtasSpanIntersectingQuerySpans(
+          MtasSpanIntersectingQuery.this,
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanIntersectingQuerySpans s2 = new MtasSpanIntersectingQuerySpans(
+          MtasSpanIntersectingQuery.this,
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanIntersectingSpans(s1, s2);
+      return new MtasSpanIntersectingSpans(MtasSpanIntersectingQuery.this, s1,
+          s2);
     }
 
     /*
@@ -278,10 +292,12 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span intersecting query spans.
      *
+     * @param query the query
      * @param spans the spans
      */
-    public MtasSpanIntersectingQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
+    public MtasSpanIntersectingQuerySpans(MtasSpanIntersectingQuery query,
+        Spans spans) {
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
     }
 
   }

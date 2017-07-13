@@ -56,8 +56,8 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
    * @param singlePosition the single position
    */
   public MtasSpanRegexpQuery(Term term, boolean singlePosition) {
-    super(singlePosition?1:null, singlePosition?1:null);
-    RegexpQuery req = new RegexpQuery(term);    
+    super(singlePosition ? 1 : null, singlePosition ? 1 : null);
+    RegexpQuery req = new RegexpQuery(term);
     query = new SpanMultiTermQueryWrapper<>(req);
     this.term = term;
     this.singlePosition = singlePosition;
@@ -85,9 +85,8 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
       SpanQuery[] clauses = ((SpanOrQuery) q).getClauses();
       if (clauses.length > MTAS_REGEXP_EXPAND_BOUNDARY) {
         // forward index solution ?
-        throw new IOException("Regexp \""
-            + CodecUtil.termValue(term.text()) + "\" expands to "
-            + clauses.length + " terms, too many (boundary "
+        throw new IOException("Regexp \"" + CodecUtil.termValue(term.text())
+            + "\" expands to " + clauses.length + " terms, too many (boundary "
             + MTAS_REGEXP_EXPAND_BOUNDARY + ")!");
       }
       MtasSpanQuery[] newClauses = new MtasSpanQuery[clauses.length];

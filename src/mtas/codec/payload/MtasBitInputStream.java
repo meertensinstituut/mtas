@@ -53,7 +53,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
   public byte[] readRemainingBytes() throws IOException {
     if (this.available() > 0) {
       byte[] b = new byte[this.available()];
-      if(read(b)>=0) {
+      if (read(b) >= 0) {
         return b;
       } else {
         throw new IOException("returned negative number of remaining bytes");
@@ -74,7 +74,7 @@ public class MtasBitInputStream extends ByteArrayInputStream {
     if ((value % 2) == 0) {
       return (-value) / 2;
     } else {
-      return (value - 1) / 2;      
+      return (value - 1) / 2;
     }
   }
 

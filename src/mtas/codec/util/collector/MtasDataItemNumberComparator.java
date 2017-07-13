@@ -144,8 +144,10 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
       throw new IOException("unknown sortDirection " + sortDirection);
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -159,8 +161,10 @@ public final class MtasDataItemNumberComparator<T extends Number & Comparable<T>
     MtasDataItemNumberComparator<?> that = (MtasDataItemNumberComparator<?>) obj;
     return value.equals(that.value);
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

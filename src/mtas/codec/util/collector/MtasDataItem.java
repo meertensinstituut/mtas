@@ -19,7 +19,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
 
   /** The log. */
   private static Log log = LogFactory.getLog(MtasDataItem.class);
-  
+
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
 
   /** The sort type. */
   protected String sortType;
-  
+
   /** The sort direction. */
   protected String sortDirection;
 
@@ -109,7 +109,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
    * @throws IOException Signals that an I/O exception has occurred.
    */
   protected abstract int getCompareValueType() throws IOException;
-  
+
   /**
    * Gets the stats items.
    *
@@ -127,7 +127,7 @@ public abstract class MtasDataItem<T1 extends Number & Comparable<T1>, T2 extend
   protected final Map<String, Integer> getErrorList() {
     return errorList;
   }
-  
+
   /**
    * Compute comparable value.
    */

@@ -12,7 +12,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import mtas.search.spans.util.MtasSpanQuery;
@@ -28,10 +27,10 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
   private String field;
 
   /** The q 1. */
-  private SpanQuery q1;
+  private MtasSpanQuery q1;
 
   /** The q 2. */
-  private SpanQuery q2;
+  private MtasSpanQuery q2;
 
   /**
    * Instantiates a new mtas span fully aligned with query.
@@ -202,6 +201,16 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    q1.disableTwoPhaseIterator();
+    q2.disableTwoPhaseIterator();
+  }
+
   /**
    * The Class SpanFullyAlignedWithWeight.
    */
@@ -259,10 +268,13 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
         return null; // field does not exist
       }
       MtasSpanFullyAlignedWithQuerySpans s1 = new MtasSpanFullyAlignedWithQuerySpans(
+          MtasSpanFullyAlignedWithQuery.this,
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(
+          MtasSpanFullyAlignedWithQuery.this,
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanFullyAlignedWithSpans(s1, s2);
+      return new MtasSpanFullyAlignedWithSpans(
+          MtasSpanFullyAlignedWithQuery.this, s1, s2);
     }
 
     /*
@@ -289,10 +301,12 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span fully aligned with query spans.
      *
+     * @param query the query
      * @param spans the spans
      */
-    public MtasSpanFullyAlignedWithQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
+    public MtasSpanFullyAlignedWithQuerySpans(
+        MtasSpanFullyAlignedWithQuery query, Spans spans) {
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
     }
 
   }

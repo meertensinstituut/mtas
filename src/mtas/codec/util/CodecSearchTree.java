@@ -147,7 +147,7 @@ public class CodecSearchTree {
         nodeRefApproxOffset, in, objectRefApproxOffset));
     ArrayList<Long> history = new ArrayList<Long>();
     do {
-      MtasTreeItem checkItem = checkList.remove(checkList.size() - 1);      
+      MtasTreeItem checkItem = checkList.remove(checkList.size() - 1);
       searchMtasTree(checkItem, startPosition, endPosition, in, isSinglePoint,
           isStoreAdditionalId, objectRefApproxOffset, list, nodeRefApproxOffset,
           checkList);
@@ -179,7 +179,7 @@ public class CodecSearchTree {
       AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
       ArrayList<MtasTreeHit<?>> list, AtomicLong nodeRefApproxOffset,
       ArrayList<MtasTreeItem> checkList) throws IOException {
-    if (startPosition <= treeItem.max) {      
+    if (startPosition <= treeItem.max) {
       // match current node
       if ((endPosition >= treeItem.left) && (startPosition <= treeItem.right)) {
         for (int i = 0; i < treeItem.objectRefs.length; i++) {

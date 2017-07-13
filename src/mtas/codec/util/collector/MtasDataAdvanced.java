@@ -520,8 +520,6 @@ abstract class MtasDataAdvanced<T1 extends Number & Comparable<T1>, T2 extends N
 
   /**
    * Inits the new list basic.
-   *
-   * @param maxNumberOfTerms the max number of terms
    */
   private void initNewListBasic() {
     newAdvancedValueSumList = operations.createVector1(newSize);

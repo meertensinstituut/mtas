@@ -219,7 +219,8 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
-      return new MtasDataItemNumberComparator<Long>(stats.getN(), sortDirection);
+      return new MtasDataItemNumberComparator<Long>(stats.getN(),
+          sortDirection);
     default:
       return null;
     }

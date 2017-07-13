@@ -17,7 +17,7 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanNearQuery baseQuery;
-  
+
   /** The clauses. */
   private HashSet<MtasSpanQuery> clauses;
 
@@ -35,14 +35,14 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
       if (!clauses.contains(item)) {
         clauses.add(item);
         if (item.getMinimumWidth() != null) {
-          if(minimum != null) {
+          if (minimum != null) {
             minimum = Math.max(minimum, item.getMinimumWidth());
           } else {
             minimum = item.getMinimumWidth();
           }
         }
-        if (item.getMaximumWidth() != null) {          
-          if(maximum != null) {
+        if (item.getMaximumWidth() != null) {
+          if (maximum != null) {
             maximum = Math.max(maximum, item.getMaximumWidth());
           } else {
             maximum = item.getMaximumWidth();
@@ -78,8 +78,11 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
     return baseQuery.createWeight(searcher, needsScores);
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -182,6 +185,17 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ clauses.hashCode();
     return h;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    for (MtasSpanQuery item : clauses) {
+      item.disableTwoPhaseIterator();
+    }
   }
 
 }

@@ -96,8 +96,11 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -117,11 +120,22 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     SpanWeight subWeight = clause.createWeight(searcher, false);
     return new SpanUniquePositionWeight(subWeight, searcher,
         needsScores ? getTermContexts(subWeight) : null);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    clause.disableTwoPhaseIterator();
   }
 
   /**
@@ -168,13 +182,14 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       Spans subSpan = subWeight.getSpans(context, requiredPostings);
       if (subSpan == null) {
         return null;
       } else {
-        return new MtasSpanUniquePositionSpans(subSpan);
+        return new MtasSpanUniquePositionSpans(MtasSpanUniquePositionQuery.this,
+            subSpan);
       }
     }
 

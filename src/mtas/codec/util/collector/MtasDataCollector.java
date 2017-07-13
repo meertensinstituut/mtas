@@ -165,10 +165,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   /** The new size. */
   protected transient int newSize;
-  
+
   /** The new position. */
   protected transient int newPosition;
-  
+
   /** The new current position. */
   protected transient int newCurrentPosition;
 
@@ -1329,14 +1329,15 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
    */
   @Override
   public String toString() {
-    StringBuilder text=new StringBuilder();
-    text.append(this.getClass().getSimpleName() + "-" + this.hashCode()+"\n");
-    text.append("\t=== "+collectorType + " - " + statsType + " " + statsItems + " " + hasSub+" ===\n");
-    text.append("\tclosed: "+closed+"\n");
-    text.append("\tkeylist: "+Arrays.asList(keyList)+"\n");
-    text.append("\tkeylist: "+Arrays.asList(keyList).contains("1")+"\n");
-    text.append("\tsegmentKeys: "+segmentKeys.contains("1")+"\n");
-    text.append("\tnewKeys: "+Arrays.asList(newKeyList).contains("1")+"\n");
+    StringBuilder text = new StringBuilder();
+    text.append(this.getClass().getSimpleName() + "-" + this.hashCode() + "\n");
+    text.append("\t=== " + collectorType + " - " + statsType + " " + statsItems
+        + " " + hasSub + " ===\n");
+    text.append("\tclosed: " + closed + "\n");
+    text.append("\tkeylist: " + Arrays.asList(keyList) + "\n");
+    text.append("\tkeylist: " + Arrays.asList(keyList).contains("1") + "\n");
+    text.append("\tsegmentKeys: " + segmentKeys.contains("1") + "\n");
+    text.append("\tnewKeys: " + Arrays.asList(newKeyList).contains("1") + "\n");
     return text.toString().trim();
   }
 
@@ -1374,7 +1375,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   public SortedSet<String> getStatsItems() {
     return statsItems;
   }
-  
+
   /**
    * Close.
    *

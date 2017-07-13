@@ -26,7 +26,8 @@ public class MtasSolrComponentDocument
     implements MtasSolrComponent<ComponentDocument> {
 
   /** The Constant log. */
-  private static final Log log = LogFactory.getLog(MtasSolrComponentDocument.class);
+  private static final Log log = LogFactory
+      .getLog(MtasSolrComponentDocument.class);
 
   /** The Constant PARAM_MTAS_DOCUMENT. */
   public static final String PARAM_MTAS_DOCUMENT = MtasSolrSearchComponent.PARAM_MTAS
@@ -232,22 +233,23 @@ public class MtasSolrComponentDocument
       if (document.statsList != null) {
         list = document.statsList.get(docId);
       }
-      mtasDocumentItemResponse.add("stats", new MtasSolrMtasResult(stats,
-          stats.getDataType(), stats.getStatsType(), stats.getStatsItems(), null));
+      mtasDocumentItemResponse.add("stats",
+          new MtasSolrMtasResult(stats, stats.getDataType(),
+              stats.getStatsType(), stats.getStatsItems(), null));
       mtasDocumentItemResponse.add("documentKey",
           document.uniqueKey.get(docId));
       if (list != null) {
         if (document.listExpand) {
-          mtasDocumentItemResponse.add("list",
-              new MtasSolrMtasResult(list,
-                  new String[] { list.getDataType(), list.getDataType() },
-                  new String[] { list.getStatsType(), list.getStatsType() },
-                  new SortedSet[] { list.getStatsItems(), list.getStatsItems() },
-                  new String[] { null, null }, new String[] { null, null },
-                  new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
-        } else {
           mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
-              list.getDataType(), list.getStatsType(), list.getStatsItems(), null));
+              new String[] { list.getDataType(), list.getDataType() },
+              new String[] { list.getStatsType(), list.getStatsType() },
+              new SortedSet[] { list.getStatsItems(), list.getStatsItems() },
+              new String[] { null, null }, new String[] { null, null },
+              new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
+        } else {
+          mtasDocumentItemResponse.add("list",
+              new MtasSolrMtasResult(list, list.getDataType(),
+                  list.getStatsType(), list.getStatsItems(), null));
         }
 
       }

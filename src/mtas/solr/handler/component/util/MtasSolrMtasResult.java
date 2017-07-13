@@ -25,7 +25,7 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The data type. */
   public String dataType;
-  
+
   /** The stats type. */
   public String statsType;
 
@@ -34,13 +34,13 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The sort type. */
   public String sortType;
-  
+
   /** The sort direction. */
   public String sortDirection;
 
   /** The start. */
   public Integer start;
-  
+
   /** The number. */
   public Integer number;
 
@@ -52,7 +52,7 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The sub data type. */
   private String[] subDataType;
-  
+
   /** The sub stats type. */
   private String[] subStatsType;
 
@@ -61,13 +61,13 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The sub sort type. */
   private String[] subSortType;
-  
+
   /** The sub sort direction. */
   private String[] subSortDirection;
 
   /** The sub start. */
   private Integer[] subStart;
-  
+
   /** The sub number. */
   private Integer[] subNumber;
 
@@ -147,7 +147,7 @@ public class MtasSolrMtasResult implements Serializable {
    * @param newItem the new item
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  void merge(MtasSolrMtasResult newItem) throws IOException { 
+  void merge(MtasSolrMtasResult newItem) throws IOException {
     HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<>();
     if (newItem.dataCollector.withTotal()) {
       dataCollector.setWithTotal();
@@ -365,14 +365,14 @@ public class MtasSolrMtasResult implements Serializable {
   public String toString() {
     if (dataCollector.getCollectorType()
         .equals(DataCollector.COLLECTOR_TYPE_DATA)) {
-      return this.getClass().getSimpleName()+"(data-" + hashCode() + ")";
+      return this.getClass().getSimpleName() + "(data-" + hashCode() + ")";
     }
     if (dataCollector.getCollectorType()
         .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-      return this.getClass().getSimpleName()+"(list(" + dataCollector.getSize() + ")-"
-          + hashCode() + ")";
+      return this.getClass().getSimpleName() + "(list("
+          + dataCollector.getSize() + ")-" + hashCode() + ")";
     } else {
-      return this.getClass().getSimpleName()+": unknown";
+      return this.getClass().getSimpleName() + ": unknown";
     }
   }
 

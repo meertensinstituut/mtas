@@ -52,7 +52,7 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
    * @param singlePosition the single position
    */
   public MtasSpanPrefixQuery(Term term, boolean singlePosition) {
-    super(singlePosition?1:null,singlePosition?1:null);    
+    super(singlePosition ? 1 : null, singlePosition ? 1 : null);
     PrefixQuery pfq = new PrefixQuery(term);
     query = new SpanMultiTermQueryWrapper<>(pfq);
     this.term = term;

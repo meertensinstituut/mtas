@@ -85,7 +85,9 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
       }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.util.AttributeSource#equals(java.lang.Object)
      */
     @Override
@@ -100,7 +102,9 @@ public class MtasPrefixTokenFilterFactory extends TokenFilterFactory {
       return prefix.equals(that.prefix) && super.equals(that);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.util.AttributeSource#hashCode()
      */
     @Override

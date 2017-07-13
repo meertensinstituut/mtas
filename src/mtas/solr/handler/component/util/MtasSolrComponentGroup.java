@@ -29,7 +29,8 @@ public class MtasSolrComponentGroup
     implements MtasSolrComponent<ComponentGroup> {
 
   /** The Constant log. */
-  private static final Log log = LogFactory.getLog(MtasSolrComponentGroup.class);
+  private static final Log log = LogFactory
+      .getLog(MtasSolrComponentGroup.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;

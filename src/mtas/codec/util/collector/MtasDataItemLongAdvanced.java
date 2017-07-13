@@ -72,7 +72,8 @@ class MtasDataItemLongAdvanced extends MtasDataItemAdvanced<Long, Double> {
     case CodecUtil.STATS_TYPE_MIN:
       return new MtasDataItemNumberComparator<Long>(valueMin, sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
-      return new MtasDataItemNumberComparator<Long>(valueSumOfSquares, sortDirection);
+      return new MtasDataItemNumberComparator<Long>(valueSumOfSquares,
+          sortDirection);
     default:
       return null;
     }
@@ -86,19 +87,26 @@ class MtasDataItemLongAdvanced extends MtasDataItemAdvanced<Long, Double> {
   public MtasDataItemNumberComparator<Double> getCompareValue2() {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUMOFLOGS:
-      return new MtasDataItemNumberComparator<Double>(valueSumOfLogs, sortDirection);
+      return new MtasDataItemNumberComparator<Double>(valueSumOfLogs,
+          sortDirection);
     case CodecUtil.STATS_TYPE_MEAN:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     case CodecUtil.STATS_TYPE_VARIANCE:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     default:
       return null;
     }
@@ -113,8 +121,10 @@ class MtasDataItemLongAdvanced extends MtasDataItemAdvanced<Long, Double> {
     return this.getClass().getSimpleName() + "[" + valueSum + "," + valueN
         + "]";
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -128,10 +138,12 @@ class MtasDataItemLongAdvanced extends MtasDataItemAdvanced<Long, Double> {
     MtasDataItemLongAdvanced that = (MtasDataItemLongAdvanced) obj;
     MtasDataItemNumberComparator<?> c1 = getComparableValue();
     MtasDataItemNumberComparator<?> c2 = that.getComparableValue();
-    return (c1!=null&&c2!=null&&c1.equals(c2));    
+    return (c1 != null && c2 != null && c1.equals(c2));
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

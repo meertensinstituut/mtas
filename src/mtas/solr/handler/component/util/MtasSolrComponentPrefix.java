@@ -45,8 +45,7 @@ public class MtasSolrComponentPrefix
   /**
    * Instantiates a new mtas solr component prefix.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentPrefix(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -233,8 +232,7 @@ public class MtasSolrComponentPrefix
   /**
    * Repair prefix items.
    *
-   * @param mtasResponse
-   *          the mtas response
+   * @param mtasResponse the mtas response
    */
   @SuppressWarnings("unchecked")
   private void repairPrefixItems(NamedList<Object> mtasResponse) {

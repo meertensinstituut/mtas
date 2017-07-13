@@ -17,7 +17,7 @@ import mtas.search.spans.MtasSpanMatchNoneQuery;
  */
 public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
 
-  /** The q. */
+  /** The sub query. */
   private MtasSpanQuery subQuery;
 
   /**
@@ -30,19 +30,26 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     this.subQuery = q;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.IndexSearcher, boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.
+   * IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     SpanWeight subWeight = subQuery.createWeight(searcher, needsScores);
     return new MtasDisabledTwoPhaseIteratorWeight(subWeight, searcher,
         needsScores);
   }
 
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -50,21 +57,28 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     if (newQ == null) {
       newQ = new MtasSpanMatchNoneQuery(subQuery.getField());
       return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ);
-    } else if (!newQ.equals(subQuery)) {
-      return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ).rewrite(reader);
     } else {
-      return super.rewrite(reader);
+      newQ.disableTwoPhaseIterator();
+      if (!newQ.equals(subQuery)) {
+        return new MtasDisabledTwoPhaseIteratorSpanQuery(newQ).rewrite(reader);
+      } else {
+        return super.rewrite(reader);
+      }
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   public String getField() {
     return subQuery.getField();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#toString(java.lang.String)
    */
   @Override
@@ -72,7 +86,9 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     return subQuery.toString(field);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
@@ -87,7 +103,9 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     return that.subQuery.equals(subQuery);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override
@@ -95,6 +113,17 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     int h = Integer.rotateLeft(classHash(), 1);
     h ^= subQuery.hashCode();
     return h;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    subQuery.disableTwoPhaseIterator();
   }
 
   /**
@@ -115,20 +144,30 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
      */
     public MtasDisabledTwoPhaseIteratorWeight(SpanWeight subWeight,
         IndexSearcher searcher, boolean needsScores) throws IOException {
-      super(subQuery, searcher, needsScores ? getTermContexts(subWeight) : null);
+      super(subQuery, searcher,
+          needsScores ? getTermContexts(subWeight) : null);
       this.subWeight = subWeight;
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.Map)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
+     * Map)
      */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       subWeight.extractTermContexts(contexts);
     }
 
-    /* (non-Javadoc)
-     * @see org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.index.LeafReaderContext, org.apache.lucene.search.spans.SpanWeight.Postings)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
+     * index.LeafReaderContext,
+     * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
     public MtasSpans getSpans(LeafReaderContext ctx, Postings requiredPostings)
@@ -137,7 +176,9 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
           subWeight.getSpans(ctx, requiredPostings));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
      */
     @Override

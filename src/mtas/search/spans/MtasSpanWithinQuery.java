@@ -17,28 +17,28 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanWithinQuery baseQuery;
-  
+
   /** The small query. */
   private MtasSpanQuery smallQuery;
-  
+
   /** The big query. */
   private MtasSpanQuery bigQuery;
-  
-  /** The left boundary minimum. */
-  private int leftBoundaryMinimum;
-  
-  /** The left boundary maximum. */
-  private int leftBoundaryMaximum;
-  
-  /** The right boundary maximum. */
-  private int rightBoundaryMaximum;
-  
-  /** The right boundary minimum. */
-  private int rightBoundaryMinimum;
-  
+
+  /** The left boundary big minimum. */
+  private int leftBoundaryBigMinimum;
+
+  /** The left boundary big maximum. */
+  private int leftBoundaryBigMaximum;
+
+  /** The right boundary big maximum. */
+  private int rightBoundaryBigMaximum;
+
+  /** The right boundary big minimum. */
+  private int rightBoundaryBigMinimum;
+
   /** The auto adjust big query. */
   private boolean autoAdjustBigQuery;
-  
+
   /** The field. */
   String field;
 
@@ -67,21 +67,32 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
   public MtasSpanWithinQuery(MtasSpanQuery q1, MtasSpanQuery q2,
       int leftMinimum, int leftMaximum, int rightMinimum, int rightMaximum,
       boolean adjustBigQuery) {
-    super(q1 != null ? q1.getMinimumWidth() : null,
-        q1 != null ? q1.getMaximumWidth() : null);
-    if (q2 != null && q2.getMinimumWidth() != null) {
-      if (this.getMinimumWidth() == null
-          || this.getMinimumWidth() < q2.getMinimumWidth()) {
-        this.setWidth(q2.getMinimumWidth(), this.getMaximumWidth());
-      }
-    }
+    super(null, null);
     bigQuery = q1;
     smallQuery = q2;
-    leftBoundaryMinimum = leftMinimum;
-    leftBoundaryMaximum = leftMaximum;
-    rightBoundaryMinimum = rightMinimum;
-    rightBoundaryMaximum = rightMaximum;
+    leftBoundaryBigMinimum = leftMinimum;
+    leftBoundaryBigMaximum = leftMaximum;
+    rightBoundaryBigMinimum = rightMinimum;
+    rightBoundaryBigMaximum = rightMaximum;
     autoAdjustBigQuery = adjustBigQuery;
+    // recompute width
+    Integer minimumWidth = null;
+    Integer maximumWidth = null;
+    if (bigQuery != null) {
+      maximumWidth = bigQuery.getMaximumWidth();
+      maximumWidth = (maximumWidth != null)
+          ? maximumWidth + rightBoundaryBigMaximum + leftBoundaryBigMaximum
+          : null;
+    }
+    if (smallQuery != null) {
+      if (smallQuery.getMaximumWidth() != null && (maximumWidth == null
+          || smallQuery.getMaximumWidth() < maximumWidth)) {
+        maximumWidth = smallQuery.getMaximumWidth();
+      }
+      minimumWidth = smallQuery.getMinimumWidth();
+    }
+    setWidth(minimumWidth, maximumWidth);
+    // compute field
     if (bigQuery != null && bigQuery.getField() != null) {
       field = bigQuery.getField();
     } else if (smallQuery != null && smallQuery.getField() != null) {
@@ -90,10 +101,9 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
       field = null;
     }
     if (field != null) {
-      baseQuery = new SpanWithinQuery(
-          new MtasMaximumExpandSpanQuery(bigQuery, leftBoundaryMinimum,
-              leftBoundaryMaximum, rightBoundaryMinimum, rightBoundaryMaximum),
-          smallQuery);
+      baseQuery = new SpanWithinQuery(new MtasMaximumExpandSpanQuery(bigQuery,
+          leftBoundaryBigMinimum, leftBoundaryBigMaximum,
+          rightBoundaryBigMinimum, rightBoundaryBigMaximum), smallQuery);
     } else {
       baseQuery = null;
     }
@@ -108,11 +118,18 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newBigQuery = bigQuery.rewrite(reader);
-    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);      
+    MtasSpanQuery newSmallQuery = smallQuery.rewrite(reader);
 
     if (newBigQuery == null || newBigQuery instanceof MtasSpanMatchNoneQuery
         || newSmallQuery == null
         || newSmallQuery instanceof MtasSpanMatchNoneQuery) {
+      return new MtasSpanMatchNoneQuery(field);
+    }
+
+    if (newSmallQuery.getMinimumWidth() != null
+        && newBigQuery.getMaximumWidth() != null
+        && newSmallQuery.getMinimumWidth() > (newBigQuery.getMaximumWidth()
+            + leftBoundaryBigMaximum + rightBoundaryBigMaximum)) {
       return new MtasSpanMatchNoneQuery(field);
     }
 
@@ -121,32 +138,34 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
         MtasSpanRecurrenceQuery recurrenceQuery = (MtasSpanRecurrenceQuery) newBigQuery;
         if (recurrenceQuery.getIgnoreQuery() == null
             && recurrenceQuery.getQuery() instanceof MtasSpanMatchAllQuery) {
-          rightBoundaryMaximum += leftBoundaryMaximum
+          rightBoundaryBigMaximum += leftBoundaryBigMaximum
               + recurrenceQuery.getMaximumRecurrence();
-          rightBoundaryMinimum += leftBoundaryMinimum
+          rightBoundaryBigMinimum += leftBoundaryBigMinimum
               + recurrenceQuery.getMinimumRecurrence();
-          leftBoundaryMaximum = 0;
-          leftBoundaryMinimum = 0;
+          leftBoundaryBigMaximum = 0;
+          leftBoundaryBigMinimum = 0;
           newBigQuery = new MtasSpanMatchAllQuery(field);
           // System.out.println("REPLACE WITH " + newBigQuery + " (["
           // + leftBoundaryMinimum + "," + leftBoundaryMaximum + "],["
           // + rightBoundaryMinimum + "," + rightBoundaryMaximum + "])");
           return new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
-              leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
-              rightBoundaryMaximum, autoAdjustBigQuery).rewrite(reader);
+              leftBoundaryBigMinimum, leftBoundaryBigMaximum,
+              rightBoundaryBigMinimum, rightBoundaryBigMaximum,
+              autoAdjustBigQuery).rewrite(reader);
         }
       } else if (newBigQuery instanceof MtasSpanMatchAllQuery) {
-        if (leftBoundaryMaximum > 0) {
-          rightBoundaryMaximum += leftBoundaryMaximum;
-          rightBoundaryMinimum += leftBoundaryMinimum;
-          leftBoundaryMaximum = 0;
-          leftBoundaryMinimum = 0;
+        if (leftBoundaryBigMaximum > 0) {
+          rightBoundaryBigMaximum += leftBoundaryBigMaximum;
+          rightBoundaryBigMinimum += leftBoundaryBigMinimum;
+          leftBoundaryBigMaximum = 0;
+          leftBoundaryBigMinimum = 0;
           // System.out.println("REPLACE WITH " + newBigQuery + " (["
           // + leftBoundaryMinimum + "," + leftBoundaryMaximum + "],["
           // + rightBoundaryMinimum + "," + rightBoundaryMaximum + "])");
           return new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
-              leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
-              rightBoundaryMaximum, autoAdjustBigQuery).rewrite(reader);
+              leftBoundaryBigMinimum, leftBoundaryBigMaximum,
+              rightBoundaryBigMinimum, rightBoundaryBigMaximum,
+              autoAdjustBigQuery).rewrite(reader);
         }
       } else if (newBigQuery instanceof MtasSpanSequenceQuery) {
         MtasSpanSequenceQuery sequenceQuery = (MtasSpanSequenceQuery) newBigQuery;
@@ -207,17 +226,17 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
               newItems.add(items.get(i));
             }
           }
-          leftBoundaryMaximum += newLeftBoundaryMaximum;
-          leftBoundaryMinimum += newLeftBoundaryMinimum;
-          rightBoundaryMaximum += newRightBoundaryMaximum;
-          rightBoundaryMinimum += newRightBoundaryMinimum;
+          leftBoundaryBigMaximum += newLeftBoundaryMaximum;
+          leftBoundaryBigMinimum += newLeftBoundaryMinimum;
+          rightBoundaryBigMaximum += newRightBoundaryMaximum;
+          rightBoundaryBigMinimum += newRightBoundaryMinimum;
           if (newItems.isEmpty()) {
-            rightBoundaryMaximum = Math.max(0,
-                rightBoundaryMaximum + leftBoundaryMaximum - 1);
-            rightBoundaryMinimum = Math.max(0,
-                rightBoundaryMinimum + leftBoundaryMinimum - 1);
-            leftBoundaryMaximum = 0;
-            leftBoundaryMinimum = 0;
+            rightBoundaryBigMaximum = Math.max(0,
+                rightBoundaryBigMaximum + leftBoundaryBigMaximum - 1);
+            rightBoundaryBigMinimum = Math.max(0,
+                rightBoundaryBigMinimum + leftBoundaryBigMinimum - 1);
+            leftBoundaryBigMaximum = 0;
+            leftBoundaryBigMinimum = 0;
             newItems.add(new MtasSpanSequenceItem(
                 new MtasSpanMatchAllQuery(field), false));
           }
@@ -229,17 +248,19 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
             // + leftBoundaryMinimum + "," + leftBoundaryMaximum + "],["
             // + rightBoundaryMinimum + "," + rightBoundaryMaximum + "])");
             return new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
-                leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
-                rightBoundaryMaximum, autoAdjustBigQuery).rewrite(reader);
+                leftBoundaryBigMinimum, leftBoundaryBigMaximum,
+                rightBoundaryBigMinimum, rightBoundaryBigMaximum,
+                autoAdjustBigQuery).rewrite(reader);
           }
         }
       }
-    }    
-    
+    }
+
     if (!newBigQuery.equals(bigQuery) || !newSmallQuery.equals(smallQuery)) {
       return (new MtasSpanWithinQuery(newBigQuery, newSmallQuery,
-          leftBoundaryMinimum, leftBoundaryMaximum, rightBoundaryMinimum,
-          rightBoundaryMaximum, autoAdjustBigQuery)).rewrite(reader);      
+          leftBoundaryBigMinimum, leftBoundaryBigMaximum,
+          rightBoundaryBigMinimum, rightBoundaryBigMaximum, autoAdjustBigQuery))
+              .rewrite(reader);
     } else if (newBigQuery.equals(newSmallQuery)) {
       return newBigQuery;
     } else {
@@ -291,8 +312,9 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     } else {
       buffer.append("null");
     }
-    buffer.append("],[" + leftBoundaryMinimum + "," + leftBoundaryMaximum
-        + "],[" + rightBoundaryMinimum + "," + rightBoundaryMaximum + "])");
+    buffer.append(
+        "],[" + leftBoundaryBigMinimum + "," + leftBoundaryBigMaximum + "],["
+            + rightBoundaryBigMinimum + "," + rightBoundaryBigMaximum + "])");
     return buffer.toString();
   }
 
@@ -311,10 +333,10 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
       return false;
     final MtasSpanWithinQuery that = (MtasSpanWithinQuery) obj;
     return baseQuery.equals(that.baseQuery)
-        && leftBoundaryMinimum == that.leftBoundaryMinimum
-        && leftBoundaryMaximum == that.leftBoundaryMaximum
-        && rightBoundaryMinimum == that.rightBoundaryMinimum
-        && rightBoundaryMaximum == that.rightBoundaryMaximum;
+        && leftBoundaryBigMinimum == that.leftBoundaryBigMinimum
+        && leftBoundaryBigMaximum == that.leftBoundaryBigMaximum
+        && rightBoundaryBigMinimum == that.rightBoundaryBigMinimum
+        && rightBoundaryBigMaximum == that.rightBoundaryBigMaximum;
   }
 
   /*
@@ -328,14 +350,28 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     h ^= smallQuery.hashCode();
     h = Integer.rotateLeft(h, 1);
     h ^= bigQuery.hashCode();
-    h = Integer.rotateLeft(h, leftBoundaryMinimum) + leftBoundaryMinimum;
+    h = Integer.rotateLeft(h, leftBoundaryBigMinimum) + leftBoundaryBigMinimum;
     h ^= 2;
-    h = Integer.rotateLeft(h, leftBoundaryMaximum) + leftBoundaryMaximum;
+    h = Integer.rotateLeft(h, leftBoundaryBigMaximum) + leftBoundaryBigMaximum;
     h ^= 3;
-    h = Integer.rotateLeft(h, rightBoundaryMinimum) + rightBoundaryMinimum;
+    h = Integer.rotateLeft(h, rightBoundaryBigMinimum)
+        + rightBoundaryBigMinimum;
     h ^= 5;
-    h = Integer.rotateLeft(h, rightBoundaryMaximum) + rightBoundaryMaximum;
+    h = Integer.rotateLeft(h, rightBoundaryBigMaximum)
+        + rightBoundaryBigMaximum;
     return h;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    bigQuery.disableTwoPhaseIterator();
+    smallQuery.disableTwoPhaseIterator();
   }
 
 }

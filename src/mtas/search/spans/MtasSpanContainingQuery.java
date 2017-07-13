@@ -16,13 +16,13 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 
   /** The base query. */
   private SpanContainingQuery baseQuery;
-  
+
   /** The big query. */
   private MtasSpanQuery bigQuery;
-  
+
   /** The small query. */
   private MtasSpanQuery smallQuery;
-  
+
   /** The field. */
   private String field;
 
@@ -49,8 +49,8 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
     } else {
       field = null;
     }
-    if (field != null && bigQuery!=null && smallQuery!=null) {
-      if(bigQuery.getField() != null && smallQuery.getField() != null) {
+    if (field != null && bigQuery != null && smallQuery != null) {
+      if (bigQuery.getField() != null && smallQuery.getField() != null) {
         baseQuery = new SpanContainingQuery(bigQuery, smallQuery);
       } else {
         baseQuery = null;
@@ -93,9 +93,9 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
     StringBuilder buffer = new StringBuilder();
     buffer.append(this.getClass().getSimpleName());
     buffer.append("(");
-    buffer.append(bigQuery!=null?bigQuery.toString(field):"null");
+    buffer.append(bigQuery != null ? bigQuery.toString(field) : "null");
     buffer.append(", ");
-    buffer.append(smallQuery!=null?smallQuery.toString(field):"null");
+    buffer.append(smallQuery != null ? smallQuery.toString(field) : "null");
     buffer.append(")");
     return buffer.toString();
   }
@@ -120,9 +120,9 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
           .rewrite(reader);
     } else if (newBigQuery.equals(newSmallQuery)) {
       return newBigQuery;
-    } else if (baseQuery==null) {
+    } else if (baseQuery == null) {
       return new MtasSpanMatchNoneQuery(field);
-    } else {  
+    } else {
       baseQuery = (SpanContainingQuery) baseQuery.rewrite(reader);
       return super.rewrite(reader);
     }
@@ -153,6 +153,16 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
   @Override
   public int hashCode() {
     return baseQuery.hashCode();
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    bigQuery.disableTwoPhaseIterator();
+    smallQuery.disableTwoPhaseIterator();
   }
 
 }

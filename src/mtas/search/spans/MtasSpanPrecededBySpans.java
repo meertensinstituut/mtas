@@ -3,6 +3,7 @@ package mtas.search.spans;
 import java.io.IOException;
 import java.util.HashSet;
 
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import mtas.search.spans.MtasSpanPrecededByQuery.MtasSpanPrecededByQuerySpans;
 import mtas.search.spans.util.MtasSpans;
@@ -11,6 +12,9 @@ import mtas.search.spans.util.MtasSpans;
  * The Class MtasSpanPrecededBySpans.
  */
 public class MtasSpanPrecededBySpans extends MtasSpans {
+
+  /** The query. */
+  private MtasSpanPrecededByQuery query;
 
   /** The spans 1. */
   private MtasSpanPrecededByQuerySpans spans1;
@@ -42,17 +46,16 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
   /**
    * Instantiates a new mtas span preceded by spans.
    *
-   * @param mtasSpanPrecededByQuery
-   *          the mtas span preceded by query
-   * @param spans1
-   *          the spans 1
-   * @param spans2
-   *          the spans 2
+   * @param query the query
+   * @param spans1 the spans 1
+   * @param spans2 the spans 2
    */
-  public MtasSpanPrecededBySpans(MtasSpanPrecededByQuerySpans spans1,
+  public MtasSpanPrecededBySpans(MtasSpanPrecededByQuery query,
+      MtasSpanPrecededByQuerySpans spans1,
       MtasSpanPrecededByQuerySpans spans2) {
     super();
     docId = -1;
+    this.query = query;
     this.spans1 = spans1;
     this.spans2 = spans2;
     previousSpans2EndPositions = new HashSet<>();
@@ -78,7 +81,7 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
    */
   @Override
   public int endPosition() {
-    if(calledNextStartPosition) {
+    if (calledNextStartPosition) {
       return noMorePositions ? NO_MORE_POSITIONS : spans1.spans.endPosition();
     } else {
       return -1;
@@ -132,11 +135,11 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
    */
   @Override
   public int startPosition() {
-    if(calledNextStartPosition) {
+    if (calledNextStartPosition) {
       return noMorePositions ? NO_MORE_POSITIONS : spans1.spans.startPosition();
     } else {
       return -1;
-    }    
+    }
   }
 
   /*
@@ -146,12 +149,12 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
    */
   @Override
   public int width() {
-    if(calledNextStartPosition) {
+    if (calledNextStartPosition) {
       return noMorePositions ? 0
           : spans1.spans.endPosition() - spans1.spans.startPosition();
     } else {
       return 0;
-    }      
+    }
   }
 
   /*
@@ -241,8 +244,7 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -265,7 +267,7 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
         return false;
       } else {
         return true;
-      }  
+      }
     }
   }
 
@@ -273,8 +275,7 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
    * Go to next start position.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition;
@@ -328,6 +329,19 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
     lastSpans2EndPosition = -1;
     maximumSpans2EndPosition = -1;
     previousSpans2EndPositions.clear();
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

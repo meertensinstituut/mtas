@@ -42,8 +42,13 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
   public MtasSolrComponentJoin(MtasSolrSearchComponent searchComponent) {
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#prepare(org.apache.solr.
+   * handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
@@ -59,8 +64,14 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
 
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache.solr.handler.component.ResponseBuilder, org.apache.solr.handler.component.SearchComponent, org.apache.solr.handler.component.ShardRequest)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#modifyRequest(org.apache
+   * .solr.handler.component.ResponseBuilder,
+   * org.apache.solr.handler.component.SearchComponent,
+   * org.apache.solr.handler.component.ShardRequest)
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
@@ -80,10 +91,15 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.CodecComponent.BasicComponent, java.lang.Boolean)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
    */
-  public SimpleOrderedMap<Object> create(ComponentJoin join, Boolean encode) throws IOException {
+  public SimpleOrderedMap<Object> create(ComponentJoin join, Boolean encode)
+      throws IOException {
     MtasSolrJoinResult data = new MtasSolrJoinResult(join);
     SimpleOrderedMap<Object> mtasJoinResponse = new SimpleOrderedMap<>();
     if (encode) {
@@ -94,8 +110,12 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
     return mtasJoinResponse;
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
+   * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
   public void finishStage(ResponseBuilder rb) {
@@ -126,8 +146,13 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.apache.solr.handler.component.ResponseBuilder, mtas.codec.util.CodecComponent.ComponentFields)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#distributedProcess(org.
+   * apache.solr.handler.component.ResponseBuilder,
+   * mtas.codec.util.CodecComponent.ComponentFields)
    */
   @SuppressWarnings("unchecked")
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
@@ -164,9 +189,5 @@ public class MtasSolrComponentJoin implements MtasSolrComponent<ComponentJoin> {
   private String createKeyFromRequest(ResponseBuilder rb) {
     return rb.req.getParams().toQueryString();
   }
-
-
-  
-
 
 }

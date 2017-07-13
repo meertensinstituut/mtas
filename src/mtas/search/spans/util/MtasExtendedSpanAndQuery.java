@@ -61,7 +61,7 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final MtasExtendedSpanAndQuery that = (MtasExtendedSpanAndQuery) obj;    
+    final MtasExtendedSpanAndQuery that = (MtasExtendedSpanAndQuery) obj;
     return localClauses.equals(that.localClauses);
   }
 
@@ -76,6 +76,5 @@ public class MtasExtendedSpanAndQuery extends SpanNearQuery {
     h = (h * 7) ^ super.hashCode();
     return h;
   }
-  
-  
+
 }

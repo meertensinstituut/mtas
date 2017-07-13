@@ -2,6 +2,8 @@ package mtas.search.spans;
 
 import java.io.IOException;
 import java.util.HashSet;
+
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import mtas.search.spans.MtasSpanFullyAlignedWithQuery.MtasSpanFullyAlignedWithQuerySpans;
 import mtas.search.spans.util.MtasSpans;
@@ -10,6 +12,9 @@ import mtas.search.spans.util.MtasSpans;
  * The Class MtasSpanFullyAlignedWithSpans.
  */
 public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
+
+  /** The query. */
+  private MtasSpanFullyAlignedWithQuery query;
 
   /** The spans 1. */
   private MtasSpanFullyAlignedWithQuerySpans spans1;
@@ -34,6 +39,8 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
 
   /** The no more positions. */
   private boolean noMorePositions;
+  
+  /** The no more positions span 2. */
   private boolean noMorePositionsSpan2;
 
   /** The doc id. */
@@ -42,18 +49,16 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span fully aligned with spans.
    *
-   * @param mtasSpanFullyAlignedWithQuery
-   *          the mtas span fully aligned with query
-   * @param spans1
-   *          the spans 1
-   * @param spans2
-   *          the spans 2
+   * @param query the query
+   * @param spans1 the spans 1
+   * @param spans2 the spans 2
    */
-  public MtasSpanFullyAlignedWithSpans(
+  public MtasSpanFullyAlignedWithSpans(MtasSpanFullyAlignedWithQuery query,
       MtasSpanFullyAlignedWithQuerySpans spans1,
       MtasSpanFullyAlignedWithQuerySpans spans2) {
     super();
     docId = -1;
+    this.query = query;
     this.spans1 = spans1;
     this.spans2 = spans2;
     previousSpans2EndPositions = new HashSet<>();
@@ -96,8 +101,8 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
    */
   @Override
   public int startPosition() {
-    if(calledNextStartPosition) {
-      if(noMorePositions) {
+    if (calledNextStartPosition) {
+      if (noMorePositions) {
         return NO_MORE_POSITIONS;
       } else {
         return spans1.spans.startPosition();
@@ -114,15 +119,15 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
    */
   @Override
   public int endPosition() {
-    if(calledNextStartPosition) {
-      if(noMorePositions) {
+    if (calledNextStartPosition) {
+      if (noMorePositions) {
         return NO_MORE_POSITIONS;
-      } else { 
+      } else {
         return spans1.spans.endPosition();
       }
     } else {
       return -1;
-    }    
+    }
   }
 
   /*
@@ -132,15 +137,15 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
    */
   @Override
   public int width() {
-    if(calledNextStartPosition) {
-      if(noMorePositions) {
+    if (calledNextStartPosition) {
+      if (noMorePositions) {
         return 0;
       } else {
         return spans1.spans.endPosition() - spans1.spans.startPosition();
       }
     } else {
       return 0;
-    }    
+    }
   }
 
   /*
@@ -243,8 +248,7 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
    * Go to next doc.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
@@ -274,8 +278,7 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
    * Go to next start position.
    *
    * @return true, if successful
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition;
@@ -354,6 +357,19 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
   @Override
   public long cost() {
     return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

@@ -81,40 +81,40 @@ abstract class MtasXMLParser extends MtasBasicParser {
   /** The variable types. */
   private Map<QName, MtasParserType<MtasParserVariable>> variableTypes = new HashMap<>();
 
-  /** The xml variables. */
+  /** The Constant XML_VARIABLES. */
   private static final String XML_VARIABLES = "variables";
 
-  /** The xml variable. */
+  /** The Constant XML_VARIABLE. */
   private static final String XML_VARIABLE = "variable";
 
-  /** The xml variable name. */
+  /** The Constant XML_VARIABLE_NAME. */
   private static final String XML_VARIABLE_NAME = "name";
 
-  /** The xml variable value. */
+  /** The Constant XML_VARIABLE_VALUE. */
   private static final String XML_VARIABLE_VALUE = "value";
 
-  /** The xml references. */
+  /** The Constant XML_REFERENCES. */
   private static final String XML_REFERENCES = "references";
 
-  /** The xml reference. */
+  /** The Constant XML_REFERENCE. */
   private static final String XML_REFERENCE = "reference";
 
-  /** The xml reference name. */
+  /** The Constant XML_REFERENCE_NAME. */
   private static final String XML_REFERENCE_NAME = "name";
 
-  /** The xml reference ref. */
+  /** The Constant XML_REFERENCE_REF. */
   private static final String XML_REFERENCE_REF = "ref";
 
-  /** The xml mappings. */
+  /** The Constant XML_MAPPINGS. */
   private static final String XML_MAPPINGS = "mappings";
 
-  /** The xml mapping. */
+  /** The Constant XML_MAPPING. */
   private static final String XML_MAPPING = "mapping";
 
-  /** The xml mapping type. */
+  /** The Constant XML_MAPPING_TYPE. */
   private static final String XML_MAPPING_TYPE = "type";
 
-  /** The xml mapping name. */
+  /** The Constant XML_MAPPING_NAME. */
   private static final String XML_MAPPING_NAME = "name";
 
   /**
@@ -518,7 +518,8 @@ abstract class MtasXMLParser extends MtasBasicParser {
                   // check for word annotation: not within relation, not within
                   // groupAnnotation, but within word
                 } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
-                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+                    && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                        .isEmpty())
                     && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (tmpCurrentType = wordAnnotationTypes
                         .get(qname)) != null) {
@@ -817,7 +818,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
             if (streamReader.hasText()) {
               textContent = streamReader.getText();
             }
-            if (currentObject != null) {
+            if (currentObject != null && unknownAncestors.equals(0)) {
               currentObject.addText(textContent);
             }
             break;
@@ -847,7 +848,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
       String encodedPrefix = token.getPrefix();
       String encodedPostfix = token.getPostfix();
       token.setValue(decodeAndUpdateWithVariables(encodedPrefix, encodedPostfix,
-          variables));
+          variables));      
     }
     // update tokens with offset
     for (Entry<Integer, Set<String>> updateItem : updateList

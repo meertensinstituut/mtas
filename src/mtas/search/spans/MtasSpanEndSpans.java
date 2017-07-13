@@ -13,16 +13,21 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanEndSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanEndQuery query;
+
   /** The spans. */
-  Spans spans;
+  private Spans spans;
 
   /**
    * Instantiates a new mtas span end spans.
    *
+   * @param query the query
    * @param spans the spans
    */
-  public MtasSpanEndSpans(Spans spans) {
+  public MtasSpanEndSpans(MtasSpanEndQuery query, Spans spans) {
     super();
+    this.query = query;
     this.spans = spans;
   }
 
@@ -120,13 +125,18 @@ public class MtasSpanEndSpans extends MtasSpans {
   public long cost() {
     return (spans == null) ? 0 : spans.cost();
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-    if(spans == null) {
+    if (spans == null || !query.twoPhaseIteratorAllowed()) {
       return null;
     } else {
-      return spans.asTwoPhaseIterator();     
+      return spans.asTwoPhaseIterator();
     }
   }
 

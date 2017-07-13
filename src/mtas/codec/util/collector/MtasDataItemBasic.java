@@ -152,6 +152,5 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
       return null;
     }
   }
-  
 
 }

@@ -233,10 +233,10 @@ public class MtasTokenCollection {
       putInTrash |= (token.getPositionStart() == null)
           || (token.getPositionEnd() == null);
       putInTrash |= token.getValue() == null || (token.getValue().isEmpty());
-      putInTrash |= token.getPrefix() == null || (token.getPrefix().isEmpty());          
+      putInTrash |= token.getPrefix() == null || (token.getPrefix().isEmpty());
       if (putInTrash) {
         trash.add(entry.getKey());
-      } 
+      }
     }
     // check parentId
     for (Entry<Integer, MtasToken> entry : tokenCollection.entrySet()) {
@@ -351,10 +351,8 @@ public class MtasTokenCollection {
       public int compare(Integer t1, Integer t2) {
         Integer p1 = tokenCollection.get(t1).getPositionStart();
         Integer p2 = tokenCollection.get(t2).getPositionStart();
-        assert p1 != null : "no position for "
-            + tokenCollection.get(t1);
-        assert p2 != null : "no position for "
-            + tokenCollection.get(t2);
+        assert p1 != null : "no position for " + tokenCollection.get(t1);
+        assert p2 != null : "no position for " + tokenCollection.get(t2);
         if (p1.equals(p2)) {
           Integer o1 = tokenCollection.get(t1).getOffsetStart();
           Integer o2 = tokenCollection.get(t2).getOffsetStart();

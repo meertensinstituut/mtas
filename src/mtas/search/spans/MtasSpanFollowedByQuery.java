@@ -12,7 +12,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
@@ -29,10 +28,10 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
   private String field;
 
   /** The q 1. */
-  private SpanQuery q1;
+  private MtasSpanQuery q1;
 
   /** The q 2. */
-  private SpanQuery q2;
+  private MtasSpanQuery q2;
 
   /**
    * Instantiates a new mtas span followed by query.
@@ -183,6 +182,16 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    q1.disableTwoPhaseIterator();
+    q2.disableTwoPhaseIterator();
+  }
+
   /**
    * The Class SpanFollowedByWeight.
    */
@@ -240,10 +249,12 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
         return null; // field does not exist
       }
       MtasSpanFollowedByQuerySpans s1 = new MtasSpanFollowedByQuerySpans(
+          MtasSpanFollowedByQuery.this,
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanFollowedByQuerySpans s2 = new MtasSpanFollowedByQuerySpans(
+          MtasSpanFollowedByQuery.this,
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanFollowedBySpans(s1, s2);
+      return new MtasSpanFollowedBySpans(MtasSpanFollowedByQuery.this, s1, s2);
     }
 
     /*
@@ -270,10 +281,12 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span followed by query spans.
      *
+     * @param query the query
      * @param spans the spans
      */
-    public MtasSpanFollowedByQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
+    public MtasSpanFollowedByQuerySpans(MtasSpanFollowedByQuery query,
+        Spans spans) {
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
     }
 
   }

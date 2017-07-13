@@ -154,7 +154,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     ArrayList<String> files = new ArrayList<>();
     String fullDir = subDir == null ? dir : dir + File.separator + subDir;
     File[] listOfFiles = (new File(fullDir)).listFiles();
-    if(listOfFiles!=null) {
+    if (listOfFiles != null) {
       for (File file : listOfFiles) {
         String fullName = subDir == null ? file.getName()
             : subDir + File.separator + file.getName();
@@ -164,7 +164,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
           files.addAll(getFiles(dir, fullName));
         }
       }
-    }  
+    }
     return files;
   }
 

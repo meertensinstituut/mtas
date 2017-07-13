@@ -51,7 +51,7 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
    */
   public MtasCQLParserWordQuery(String field, String prefix,
       Map<String, String[]> variables) {
-    super(1,1);
+    super(1, 1);
     term = new Term(field, prefix + MtasToken.DELIMITER);
     query = new MtasSpanPrefixQuery(term, true);
   }
@@ -84,9 +84,9 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
    * @throws ParseException the parse exception
    */
   public MtasCQLParserWordQuery(String field, String prefix, String value,
-      String type, Map<String, String[]> variables,
-      Set<String> usedVariables) throws ParseException {
-    super(1,1);
+      String type, Map<String, String[]> variables, Set<String> usedVariables)
+      throws ParseException {
+    super(1, 1);
     String termBase = prefix + MtasToken.DELIMITER + value;
     if (type.equals(MTAS_CQL_REGEXP_QUERY)) {
       term = new Term(field, termBase + "\u0000*");
@@ -95,7 +95,8 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
       term = new Term(field, termBase);
       query = new MtasSpanWildcardQuery(term, true);
     } else if (type.equals(MTAS_CQL_TERM_QUERY)) {
-      term = new Term(field, "\"" + termBase.replace("\"", "\"\\\"\"") + "\"\u0000*");
+      term = new Term(field,
+          "\"" + termBase.replace("\"", "\"\\\"\"") + "\"\u0000*");
       query = new MtasSpanRegexpQuery(term, true);
     } else if (type.equals(MTAS_CQL_VARIABLE_QUERY)) {
       if (value != null && variables != null && variables.containsKey(value)
@@ -202,6 +203,15 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
     h = (h * 5) ^ term.hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    query.disableTwoPhaseIterator();
   }
 
 }

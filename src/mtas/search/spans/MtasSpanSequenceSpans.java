@@ -10,6 +10,8 @@ import java.util.Set;
 import mtas.search.spans.MtasSpanSequenceQuery.MtasSpanSequenceQuerySpans;
 import mtas.search.spans.util.MtasIgnoreItem;
 import mtas.search.spans.util.MtasSpans;
+
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
@@ -17,6 +19,9 @@ import org.apache.lucene.search.spans.Spans;
  * The Class MtasSpanSequenceSpans.
  */
 public class MtasSpanSequenceSpans extends MtasSpans {
+
+  /** The query. */
+  private MtasSpanSequenceQuery query;
 
   /** The queue spans. */
   private List<QueueItem> queueSpans;
@@ -42,15 +47,17 @@ public class MtasSpanSequenceSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span sequence spans.
    *
+   * @param query the query
    * @param setSequenceSpans the set sequence spans
    * @param ignoreSpans the ignore spans
    * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasSpanSequenceSpans(
+  public MtasSpanSequenceSpans(MtasSpanSequenceQuery query,
       List<MtasSpanSequenceQuerySpans> setSequenceSpans, Spans ignoreSpans,
       Integer maximumIgnoreLength) {
     super();
     docId = -1;
+    this.query = query;
     queueSpans = new ArrayList<>();
     queueMatches = new ArrayList<>();
     for (MtasSpanSequenceQuerySpans sequenceSpans : setSequenceSpans) {
@@ -942,6 +949,19 @@ public class MtasSpanSequenceSpans extends MtasSpans {
   @Override
   public float positionsCost() {
     return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (queueSpans == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

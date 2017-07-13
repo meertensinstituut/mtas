@@ -14,9 +14,12 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanNotSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanNotQuery query;
+
   /** The spans 1. */
   private MtasSpanNotQuerySpans spans1;
-  
+
   /** The spans 2. */
   private MtasSpanNotQuerySpans spans2;
 
@@ -25,16 +28,16 @@ public class MtasSpanNotSpans extends MtasSpans {
 
   /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-  
+
   /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
-  
+
   /** The last spans 2 end positions. */
   private Set<Integer> lastSpans2EndPositions;
-  
+
   /** The next spans 2 start position. */
   private int nextSpans2StartPosition;
-  
+
   /** The next spans 2 end position. */
   private int nextSpans2EndPosition;
 
@@ -44,13 +47,15 @@ public class MtasSpanNotSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span not spans.
    *
+   * @param query the query
    * @param spans1 the spans 1
    * @param spans2 the spans 2
    */
-  public MtasSpanNotSpans(MtasSpanNotQuerySpans spans1,
+  public MtasSpanNotSpans(MtasSpanNotQuery query, MtasSpanNotQuerySpans spans1,
       MtasSpanNotQuerySpans spans2) {
     super();
     docId = -1;
+    this.query = query;
     this.spans1 = spans1;
     this.spans2 = spans2;
     this.lastSpans2EndPositions = new HashSet<>();
@@ -207,36 +212,43 @@ public class MtasSpanNotSpans extends MtasSpans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
    */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-    TwoPhaseIterator twoPhaseIterator1 = spans1.spans.asTwoPhaseIterator();
-    if (twoPhaseIterator1 != null) {
-      return new TwoPhaseIterator(twoPhaseIterator1.approximation()) {
-        @Override
-        public boolean matches() throws IOException {
-          return twoPhaseIterator1.matches() && twoPhaseCurrentDocMatches();
-        }
-
-        @Override
-        public float matchCost() {
-          return twoPhaseIterator1.matchCost();
-        }
-      };
+    if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
     } else {
-      return new TwoPhaseIterator(spans1.spans) {
-        @Override
-        public boolean matches() throws IOException {
-          return twoPhaseCurrentDocMatches();
-        }
 
-        @Override
-        public float matchCost() {
-          return spans1.spans.positionsCost();
-        }
-      };
+      TwoPhaseIterator twoPhaseIterator1 = spans1.spans.asTwoPhaseIterator();
+      if (twoPhaseIterator1 != null) {
+        return new TwoPhaseIterator(twoPhaseIterator1.approximation()) {
+          @Override
+          public boolean matches() throws IOException {
+            return twoPhaseIterator1.matches() && twoPhaseCurrentDocMatches();
+          }
+
+          @Override
+          public float matchCost() {
+            return twoPhaseIterator1.matchCost();
+          }
+        };
+      } else {
+        return new TwoPhaseIterator(spans1.spans) {
+          @Override
+          public boolean matches() throws IOException {
+            return twoPhaseCurrentDocMatches();
+          }
+
+          @Override
+          public float matchCost() {
+            return spans1.spans.positionsCost();
+          }
+        };
+      }
     }
   }
 
@@ -247,7 +259,7 @@ public class MtasSpanNotSpans extends MtasSpans {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean twoPhaseCurrentDocMatches() throws IOException {
-    if(docId != spans1.spans.docID()) {
+    if (docId != spans1.spans.docID()) {
       reset();
       docId = spans1.spans.docID();
     }

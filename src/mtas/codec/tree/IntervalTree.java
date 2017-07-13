@@ -63,7 +63,9 @@ abstract public class IntervalTree<T, N extends IntervalTreeNode<T, N>> {
    */
   abstract protected void addRangeEmpty(int left, int right);
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override

@@ -44,7 +44,8 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     MtasSpanQuery newClause = clause.rewrite(reader);
     if (!newClause.equals(clause)) {
       return new MtasSpanStartQuery(newClause).rewrite(reader);
-    } else if(newClause.getMaximumWidth()!=null && newClause.getMaximumWidth()==0) {
+    } else if (newClause.getMaximumWidth() != null
+        && newClause.getMaximumWidth() == 0) {
       return newClause;
     } else {
       return super.rewrite(reader);
@@ -84,8 +85,8 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))
         .createWeight(searcher, needsScores);
     return new SpanTermWeight(spanWeight, searcher);
@@ -135,7 +136,8 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
-      return new MtasSpanStartSpans(spanWeight.getSpans(ctx, requiredPostings));
+      return new MtasSpanStartSpans(MtasSpanStartQuery.this,
+          spanWeight.getSpans(ctx, requiredPostings));
     }
 
     /*
@@ -177,6 +179,15 @@ public class MtasSpanStartQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ clause.hashCode();
     return h;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    clause.disableTwoPhaseIterator();
   }
 
 }

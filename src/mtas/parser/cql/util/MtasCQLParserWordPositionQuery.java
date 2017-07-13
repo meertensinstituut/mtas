@@ -28,7 +28,7 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
    * @param position the position
    */
   public MtasCQLParserWordPositionQuery(String field, int position) {
-    super(1,1);
+    super(1, 1);
     term = new Term(field);
     query = new MtasSpanPositionQuery(field, position);
   }
@@ -41,7 +41,7 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
    * @param end the end
    */
   public MtasCQLParserWordPositionQuery(String field, int start, int end) {
-    super(1,1);
+    super(1, 1);
     term = new Term(field);
     query = new MtasSpanPositionQuery(field, start, end);
   }
@@ -118,6 +118,15 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
     h = (h * 5) ^ term.hashCode();
     h = (h * 7) ^ query.hashCode();
     return h;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    query.disableTwoPhaseIterator();
   }
 
 }

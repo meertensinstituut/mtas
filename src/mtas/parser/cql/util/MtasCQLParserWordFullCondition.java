@@ -7,7 +7,6 @@ import mtas.search.spans.MtasSpanAndQuery;
 import mtas.search.spans.MtasSpanOrQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
-
 /**
  * The Class MtasCQLParserWordFullCondition.
  */
@@ -72,12 +71,12 @@ public class MtasCQLParserWordFullCondition
         q = wordCondition.getPositiveQuery(0);
       } else {
         if (wordCondition.type().equals(MtasCQLParserWordCondition.TYPE_AND)) {
-          q = new MtasSpanAndQuery(wordCondition.getPositiveQuery()
-              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
+          q = new MtasSpanAndQuery(wordCondition.getPositiveQuery().toArray(
+              new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
         } else if (wordCondition.type()
             .equals(MtasCQLParserWordCondition.TYPE_OR)) {
-          q = new MtasSpanOrQuery(wordCondition.getPositiveQuery()
-              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
+          q = new MtasSpanOrQuery(wordCondition.getPositiveQuery().toArray(
+              new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
         } else {
           throw new ParseException("unknown type " + wordCondition.type());
         }
@@ -93,14 +92,16 @@ public class MtasCQLParserWordFullCondition
         if (wordCondition.getPositiveQuery().size() == 1) {
           qPositive = wordCondition.getPositiveQuery(0);
         } else {
-          qPositive = new MtasSpanAndQuery(wordCondition.getPositiveQuery()
-              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
+          qPositive = new MtasSpanAndQuery(
+              wordCondition.getPositiveQuery().toArray(
+                  new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
         }
         if (wordCondition.getNegativeQuery().size() == 1) {
           qNegative = wordCondition.getNegativeQuery(0);
         } else {
-          qNegative = new MtasSpanOrQuery(wordCondition.getNegativeQuery()
-              .toArray(new MtasSpanQuery[wordCondition.getNegativeQuery().size()]));
+          qNegative = new MtasSpanOrQuery(
+              wordCondition.getNegativeQuery().toArray(
+                  new MtasSpanQuery[wordCondition.getNegativeQuery().size()]));
         }
         q = new MtasSpanNotQuery(qPositive, qNegative);
       } else if (wordCondition.type()
@@ -110,14 +111,16 @@ public class MtasCQLParserWordFullCondition
         if (wordCondition.getPositiveQuery().size() == 1) {
           qPositive = wordCondition.getPositiveQuery(0);
         } else {
-          qPositive = new MtasSpanOrQuery(wordCondition.getPositiveQuery()
-              .toArray(new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
+          qPositive = new MtasSpanOrQuery(
+              wordCondition.getPositiveQuery().toArray(
+                  new MtasSpanQuery[wordCondition.getPositiveQuery().size()]));
         }
         if (wordCondition.getNegativeQuery().size() == 1) {
           qNegative = wordCondition.getNegativeQuery(0);
         } else {
-          qNegative = new MtasSpanAndQuery(wordCondition.getNegativeQuery()
-              .toArray(new MtasSpanQuery[wordCondition.getNegativeQuery().size()]));
+          qNegative = new MtasSpanAndQuery(
+              wordCondition.getNegativeQuery().toArray(
+                  new MtasSpanQuery[wordCondition.getNegativeQuery().size()]));
         }
         q = new MtasSpanNotQuery(qPositive, qNegative);
       } else {
@@ -125,7 +128,8 @@ public class MtasCQLParserWordFullCondition
       }
     }
     if (not) {
-      MtasSpanQuery qPositive = new MtasSpanMatchAllQuery(wordCondition.field());
+      MtasSpanQuery qPositive = new MtasSpanMatchAllQuery(
+          wordCondition.field());
       q = new MtasSpanNotQuery(qPositive, q);
     }
     return q;
@@ -151,8 +155,10 @@ public class MtasCQLParserWordFullCondition
       return false;
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

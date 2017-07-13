@@ -85,8 +85,8 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))
         .createWeight(searcher, needsScores);
     return new SpanTermWeight(spanWeight, searcher);
@@ -134,9 +134,9 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
-      return new MtasSpanEndSpans(
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
+      return new MtasSpanEndSpans(MtasSpanEndQuery.this,
           spanWeight.getSpans(context, requiredPostings));
     }
 
@@ -179,6 +179,15 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ clause.hashCode();
     return h;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    clause.disableTwoPhaseIterator();
   }
 
 }

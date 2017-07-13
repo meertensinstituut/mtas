@@ -150,10 +150,11 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
         // get MtasFieldsProducer using terms
         Terms t = fp.terms(field);
         if (t == null) {
-          return new MtasSpanMatchNoneSpans();
+          return new MtasSpanMatchNoneSpans(MtasSpanMatchAllQuery.this);
         } else {
           CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
-          return new MtasSpanMatchAllSpans(mtasCodecInfo, field);
+          return new MtasSpanMatchAllSpans(MtasSpanMatchAllQuery.this,
+              mtasCodecInfo, field);
         }
       } catch (InvocationTargetException | IllegalAccessException
           | NoSuchMethodException e) {

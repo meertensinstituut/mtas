@@ -29,7 +29,7 @@ public class CodecInfo {
 
   /** The log. */
   private static Log log = LogFactory.getLog(CodecInfo.class);
-  
+
   /** The index input list. */
   HashMap<String, IndexInput> indexInputList;
 
@@ -79,11 +79,9 @@ public class CodecInfo {
       Object[] emptyArgs = null;
       for (Method m : methods) {
         if (m.getName().equals("getIndexInputList")) {
-          indexInputList = (HashMap<String, IndexInput>) m.invoke(t,
-              emptyArgs);
+          indexInputList = (HashMap<String, IndexInput>) m.invoke(t, emptyArgs);
         } else if (m.getName().equals("getIndexInputOffsetList")) {
-          indexInputOffsetList = (HashMap<String, Long>) m.invoke(t,
-              emptyArgs);
+          indexInputOffsetList = (HashMap<String, Long>) m.invoke(t, emptyArgs);
         } else if (m.getName().equals("getVersion")) {
           version = m.invoke(t, emptyArgs);
         }
@@ -92,7 +90,8 @@ public class CodecInfo {
           || version == null) {
         throw new IOException("Reader doesn't provide MtasFieldsProducer");
       } else {
-        return new CodecInfo(indexInputList, indexInputOffsetList, (int) version);
+        return new CodecInfo(indexInputList, indexInputOffsetList,
+            (int) version);
       }
     } catch (IllegalAccessException | InvocationTargetException e) {
       throw new IOException("Can't get codecInfo", e);
@@ -117,15 +116,14 @@ public class CodecInfo {
         long refIndexDoc = inField.readVLong();
         long refIndexDocId = inField.readVLong();
         int numberOfDocs = inField.readVInt();
-        inField.readVLong(); //refTerm
-        inField.readVInt(); //numberOfTerms
+        inField.readVLong(); // refTerm
+        inField.readVInt(); // numberOfTerms
         long refPrefix = inField.readVLong();
         int numberOfPrefixes = inField.readVInt();
-        fieldReferences.put(field,
-            new FieldReferences(refIndexDoc, refIndexDocId, numberOfDocs,
-                refPrefix, numberOfPrefixes));
+        fieldReferences.put(field, new FieldReferences(refIndexDoc,
+            refIndexDocId, numberOfDocs, refPrefix, numberOfPrefixes));
       } catch (IOException e) {
-        log.debug(e); 
+        log.debug(e);
         doInit = false;
       }
     }
@@ -233,9 +231,9 @@ public class CodecInfo {
    * @return the prefix filtered objects by positions
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public List<MtasTokenString> getPrefixFilteredObjectsByPositions(
-      String field, int docId, List<String> prefixes, int startPosition,
-      int endPosition) throws IOException {
+  public List<MtasTokenString> getPrefixFilteredObjectsByPositions(String field,
+      int docId, List<String> prefixes, int startPosition, int endPosition)
+      throws IOException {
     IndexDoc doc = getDoc(field, docId);
     IndexInput inIndexObjectPosition = indexInputList
         .get("indexObjectPosition");
@@ -258,14 +256,13 @@ public class CodecInfo {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private List<MtasTokenString> getPrefixFilteredObjects(
-      List<MtasTreeHit<?>> hits, List<String> prefixes)
-      throws IOException {
+      List<MtasTreeHit<?>> hits, List<String> prefixes) throws IOException {
     ArrayList<MtasTokenString> tokens = new ArrayList<>();
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
-      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,
-          inTerm, hit.ref);
+      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject, inTerm,
+          hit.ref);
       if (token != null) {
         if (!prefixes.isEmpty()) {
           if (prefixes.contains(token.getPrefix())) {
@@ -321,7 +318,7 @@ public class CodecInfo {
       Map<String, Integer> prefixIds = getPrefixesIds(field, prefixes);
       if (prefixIds != null && prefixIds.size() > 0) {
         ArrayList<MtasTreeHit<?>> filteredHitItems = new ArrayList<MtasTreeHit<?>>();
-        
+
         for (MtasTreeHit<?> hitItem : hitItems) {
           if (prefixIds.containsValue(hitItem.additionalId)) {
             filteredHitItems.add(hitItem);
@@ -408,8 +405,8 @@ public class CodecInfo {
     IndexInput inObject = indexInputList.get("object");
     IndexInput inTerm = indexInputList.get("term");
     for (MtasTreeHit<?> hit : hits) {
-      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject,
-          inTerm, hit.ref);
+      MtasTokenString token = MtasCodecPostingsFormat.getToken(inObject, inTerm,
+          hit.ref);
       if (token != null) {
         tokens.add(token);
       }
@@ -450,8 +447,7 @@ public class CodecInfo {
    * @param prefixes the prefixes
    * @return the prefixes ids
    */
-  Map<String, Integer> getPrefixesIds(String field,
-      List<String> prefixes) {
+  Map<String, Integer> getPrefixesIds(String field, List<String> prefixes) {
     LinkedHashMap<String, Long> refs = getPrefixes(field);
     if (refs != null) {
       List<String> list = new ArrayList<>(refs.keySet());
@@ -572,7 +568,7 @@ public class CodecInfo {
       return 0;
     }
   }
-  
+
   /**
    * Gets the number of positions.
    *
@@ -666,32 +662,31 @@ public class CodecInfo {
 
     /** The fp index object id. */
     public long fpIndexObjectId;
-    
+
     /** The fp index object position. */
     public long fpIndexObjectPosition;
-    
+
     /** The fp index object parent. */
     public long fpIndexObjectParent;
 
     /** The smallest object filepointer. */
     public long smallestObjectFilepointer;
-    
+
     /** The object ref approx offset. */
     public long objectRefApproxOffset;
 
     /** The object ref approx quotient. */
     public int objectRefApproxQuotient;
 
-    
     /** The storage flags. */
     public byte storageFlags;
 
     /** The size. */
     public int size;
-    
+
     /** The min position. */
     public int minPosition;
-    
+
     /** The max position. */
     public int maxPosition;
 
@@ -709,7 +704,8 @@ public class CodecInfo {
         }
         docId = inIndexDoc.readVInt(); // docId
         fpIndexObjectId = inIndexDoc.readVLong(); // ref indexObjectId
-        fpIndexObjectPosition = inIndexDoc.readVLong(); // ref indexObjectPosition
+        fpIndexObjectPosition = inIndexDoc.readVLong(); // ref
+                                                        // indexObjectPosition
         fpIndexObjectParent = inIndexDoc.readVLong(); // ref indexObjectParent
         smallestObjectFilepointer = inIndexDoc.readVLong(); // offset
         objectRefApproxQuotient = inIndexDoc.readVInt(); // slope
@@ -731,16 +727,16 @@ public class CodecInfo {
 
     /** The ref index doc. */
     public long refIndexDoc;
-    
+
     /** The ref index doc id. */
     public long refIndexDocId;
-    
+
     /** The ref prefix. */
     public long refPrefix;
 
     /** The number of docs. */
     public int numberOfDocs;
-    
+
     /** The number of prefixes. */
     public int numberOfPrefixes;
 
@@ -754,8 +750,7 @@ public class CodecInfo {
      * @param numberOfPrefixes the number of prefixes
      */
     public FieldReferences(long refIndexDoc, long refIndexDocId,
-        int numberOfDocs, long refPrefix,
-        int numberOfPrefixes) {
+        int numberOfDocs, long refPrefix, int numberOfPrefixes) {
       this.refIndexDoc = refIndexDoc;
       this.refIndexDocId = refIndexDocId;
       this.numberOfDocs = numberOfDocs;

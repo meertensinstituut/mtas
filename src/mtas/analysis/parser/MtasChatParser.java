@@ -1,22 +1,19 @@
-/**
- * 
- */
 package mtas.analysis.parser;
 
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 
 /**
- * The Class MtasElanParser.
+ * The Class MtasChatParser.
  */
-final public class MtasElanParser extends MtasXMLParser {
+final public class MtasChatParser extends MtasXMLParser {
 
   /**
-   * Instantiates a new mtas elan parser.
+   * Instantiates a new mtas chat parser.
    *
    * @param config the config
    */
-  public MtasElanParser(MtasConfiguration config) {
+  public MtasChatParser(MtasConfiguration config) {
     super(config);
   }
 
@@ -27,11 +24,9 @@ final public class MtasElanParser extends MtasXMLParser {
    */
   @Override
   protected void initParser() throws MtasConfigException {
-    namespaceURI = null;
+    namespaceURI = "http://www.talkbank.org/ns/talkbank";
     namespaceURI_id = null;
-    rootTag = "ELAN";
-    contentTag = null;
-    allowNonContent = true;
+    rootTag = "CHAT";
     super.initParser();
   }
 

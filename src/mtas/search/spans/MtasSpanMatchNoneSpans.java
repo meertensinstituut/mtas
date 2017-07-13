@@ -2,13 +2,19 @@ package mtas.search.spans;
 
 import java.io.IOException;
 
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
+
+import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.util.MtasSpans;
 
 /**
  * The Class MtasSpanMatchNoneSpans.
  */
 public class MtasSpanMatchNoneSpans extends MtasSpans {
+
+  /** The query. */
+  private MtasSpanQuery query;
 
   /** The current start position. */
   private int currentStartPosition;
@@ -22,13 +28,13 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span match none spans.
    *
-   * @param field
-   *          the field
+   * @param query the query
    */
-  public MtasSpanMatchNoneSpans() {
+  public MtasSpanMatchNoneSpans(MtasSpanQuery query) {
     currentStartPosition = NO_MORE_POSITIONS;
     currentEndPosition = NO_MORE_POSITIONS;
     docId = -1;
+    this.query = query;
   }
 
   /*
@@ -137,6 +143,19 @@ public class MtasSpanMatchNoneSpans extends MtasSpans {
   @Override
   public float positionsCost() {
     return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (!query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

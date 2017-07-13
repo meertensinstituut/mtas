@@ -33,10 +33,10 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
 
   /** The sort type. */
   private String sortType;
-  
+
   /** The sort direction. */
   private String sortDirection;
-  
+
   /** The collector type. */
   private String collectorType;
 
@@ -45,7 +45,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
 
   /** The start key. */
   String startKey;
-  
+
   /** The end key. */
   String endKey;
 
@@ -61,8 +61,9 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasDataCollectorResult(String collectorType, String sortType,
-      String sortDirection, NavigableMap<String, MtasDataItem<T1, T2>> basicList,
-      Integer start, Integer number) throws IOException {
+      String sortDirection,
+      NavigableMap<String, MtasDataItem<T1, T2>> basicList, Integer start,
+      Integer number) throws IOException {
     this(collectorType, sortType, sortDirection);
     if (sortType == null || sortType.equals(CodecUtil.SORT_TERM)) {
       if (sortDirection == null || sortDirection.equals(CodecUtil.SORT_ASC)) {
@@ -100,7 +101,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
         if (listStart == counter) {
           startKey = entry.getKey();
         } else if (listStart + number <= counter) {
-          if (sortType==null || sortType.equals(CodecUtil.SORT_TERM)) {
+          if (sortType == null || sortType.equals(CodecUtil.SORT_TERM)) {
             endKey = entry.getKey();
             boundaryEndKey = entry.getKey();
             break;
@@ -200,8 +201,9 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
       throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
       LinkedHashMap<String, MtasDataItemNumberComparator> comparatorList = new LinkedHashMap<>();
-      for (Entry<String, MtasDataItem<T1,T2>> entry: list.entrySet()) {
-        comparatorList.put(entry.getKey(), entry.getValue().getComparableValue());
+      for (Entry<String, MtasDataItem<T1, T2>> entry : list.entrySet()) {
+        comparatorList.put(entry.getKey(),
+            entry.getValue().getComparableValue());
       }
       return comparatorList;
     } else {
@@ -232,15 +234,17 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
       throw new IOException("type " + collectorType + " not supported");
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     StringBuilder buffer = new StringBuilder();
     buffer.append(this.getClass().getSimpleName() + "(");
-    buffer.append(collectorType+","+sortType+","+sortDirection);
+    buffer.append(collectorType + "," + sortType + "," + sortDirection);
     buffer.append(")");
     return buffer.toString();
   }

@@ -10,13 +10,13 @@ public abstract class MtasCQLParserBasicSentencePartCondition {
 
   /** The minimum occurence. */
   protected int minimumOccurence;
-  
+
   /** The maximum occurence. */
   protected int maximumOccurence;
 
   /** The optional. */
   protected boolean optional;
-  
+
   /** The not. */
   protected boolean not;
 

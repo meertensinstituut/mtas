@@ -118,7 +118,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
           }
         }
         // get MtasFieldsProducer using terms
-        return new MtasSpanMatchNoneSpans();
+        return new MtasSpanMatchNoneSpans(MtasSpanMatchNoneQuery.this);
       } catch (InvocationTargetException | IllegalAccessException e) {
         throw new IOException("Can't get reader", e);
       }

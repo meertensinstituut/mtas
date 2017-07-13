@@ -37,7 +37,9 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
     return ref.compareTo(o.ref);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -52,8 +54,10 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
     return ref.equals(that.ref) && additionalId == that.additionalId
         && additionalRef == that.additionalRef;
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -63,6 +67,6 @@ public class MtasTreeNodeId implements Comparable<MtasTreeNodeId> {
     h = (h * 5) ^ additionalId;
     h = (h * 7) ^ (int) additionalRef;
     return h;
-  }  
+  }
 
 }

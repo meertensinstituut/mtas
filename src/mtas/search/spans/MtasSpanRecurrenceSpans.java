@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
@@ -20,6 +21,9 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
 
   /** The log. */
   private static Log log = LogFactory.getLog(MtasSpanRecurrenceSpans.class);
+
+  /** The query. */
+  private MtasSpanRecurrenceQuery query;
 
   /** The spans. */
   private Spans spans;
@@ -54,16 +58,19 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span recurrence spans.
    *
+   * @param query the query
    * @param spans the spans
    * @param minimumRecurrence the minimum recurrence
    * @param maximumRecurrence the maximum recurrence
    * @param ignoreSpans the ignore spans
    * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasSpanRecurrenceSpans(Spans spans, int minimumRecurrence,
-      int maximumRecurrence, Spans ignoreSpans, Integer maximumIgnoreLength) {
+  public MtasSpanRecurrenceSpans(MtasSpanRecurrenceQuery query, Spans spans,
+      int minimumRecurrence, int maximumRecurrence, Spans ignoreSpans,
+      Integer maximumIgnoreLength) {
     assert minimumRecurrence <= maximumRecurrence : "minimumRecurrence > maximumRecurrence";
     assert minimumRecurrence > 0 : "minimumRecurrence < 1 not supported";
+    this.query = query;
     this.spans = spans;
     this.minimumRecurrence = minimumRecurrence;
     this.maximumRecurrence = maximumRecurrence;
@@ -450,6 +457,19 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
   @Override
   public float positionsCost() {
     return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (spans == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

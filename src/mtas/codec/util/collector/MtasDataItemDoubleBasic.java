@@ -74,7 +74,8 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
   public MtasDataItemNumberComparator<Double> getCompareValue2() {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_MEAN:
-      return new MtasDataItemNumberComparator<Double>(getValue(sortType), sortDirection);
+      return new MtasDataItemNumberComparator<Double>(getValue(sortType),
+          sortDirection);
     default:
       return null;
     }
@@ -89,8 +90,10 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
     return this.getClass().getSimpleName() + "[" + valueSum + "," + valueN
         + "]";
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -104,10 +107,12 @@ public class MtasDataItemDoubleBasic extends MtasDataItemBasic<Double, Double> {
     MtasDataItemDoubleBasic that = (MtasDataItemDoubleBasic) obj;
     MtasDataItemNumberComparator<?> c1 = getComparableValue();
     MtasDataItemNumberComparator<?> c2 = that.getComparableValue();
-    return (c1!=null&&c2!=null&&c1.equals(c2));    
+    return (c1 != null && c2 != null && c1.equals(c2));
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

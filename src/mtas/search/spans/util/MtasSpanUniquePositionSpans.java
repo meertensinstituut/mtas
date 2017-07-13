@@ -9,38 +9,44 @@ import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
 /**
- * The Class MtasSpanUniquePosition.
+ * The Class MtasSpanUniquePositionSpans.
  */
 public class MtasSpanUniquePositionSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanUniquePositionQuery query;
+
   /** The spans. */
-  Spans spans;
+  private Spans spans;
 
   /** The queue spans. */
-  List<Match> queueSpans;
+  private List<Match> queueSpans;
 
   /** The queue matches. */
-  List<Match> queueMatches;
+  private List<Match> queueMatches;
 
   /** The current match. */
-  Match currentMatch;
+  private Match currentMatch;
 
   /** The last start position. */
-  int lastStartPosition; // startPosition of last retrieved span
+  private int lastStartPosition; // startPosition of last retrieved span
 
   /** The last span. */
-  boolean lastSpan; // last span for this document added to queue
+  private boolean lastSpan; // last span for this document added to queue
 
   /** The no more positions. */
-  boolean noMorePositions;
+  private boolean noMorePositions;
 
   /**
-   * Instantiates a new mtas span unique position.
+   * Instantiates a new mtas span unique position spans.
    *
+   * @param query the query
    * @param spans the spans
    */
-  public MtasSpanUniquePositionSpans(Spans spans) {
+  public MtasSpanUniquePositionSpans(MtasSpanUniquePositionQuery query,
+      Spans spans) {
     super();
+    this.query = query;
     this.spans = spans;
     queueSpans = new ArrayList<>();
     queueMatches = new ArrayList<>();
@@ -73,15 +79,15 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int startPosition() {
-    if (currentMatch == null) {      
-      if(noMorePositions) {
+    if (currentMatch == null) {
+      if (noMorePositions) {
         return NO_MORE_POSITIONS;
       } else {
         return -1;
       }
-    } else {  
+    } else {
       return currentMatch.startPosition();
-    } 
+    }
   }
 
   /*
@@ -91,15 +97,15 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
    */
   @Override
   public int endPosition() {
-    if (currentMatch == null) {      
-      if(noMorePositions) {
+    if (currentMatch == null) {
+      if (noMorePositions) {
         return NO_MORE_POSITIONS;
       } else {
         return -1;
       }
-    } else {  
+    } else {
       return currentMatch.endPosition();
-    }    
+    }
   }
 
   /*
@@ -159,10 +165,19 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
     return (spans.advance(target) == NO_MORE_DOCS) ? NO_MORE_DOCS
         : toMatchDoc();
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-    return spans.asTwoPhaseIterator();     
+    if (spans == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      return spans.asTwoPhaseIterator();
+    }
   }
 
   /**
@@ -317,8 +332,10 @@ public class MtasSpanUniquePositionSpans extends MtasSpans {
       return startPosition == that.startPosition
           && endPosition == that.endPosition;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override

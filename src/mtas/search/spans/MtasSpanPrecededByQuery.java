@@ -12,7 +12,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
@@ -29,10 +28,10 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
   private String field;
 
   /** The q 1. */
-  private SpanQuery q1;
+  private MtasSpanQuery q1;
 
   /** The q 2. */
-  private SpanQuery q2;
+  private MtasSpanQuery q2;
 
   /**
    * Instantiates a new mtas span preceded by query.
@@ -74,8 +73,8 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
    * IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     if (q1 == null || q2 == null) {
       return null;
     } else {
@@ -183,6 +182,16 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     }
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    q1.disableTwoPhaseIterator();
+    q2.disableTwoPhaseIterator();
+  }
+
   /**
    * The Class SpanPrecededByWeight.
    */
@@ -233,17 +242,19 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       Terms terms = context.reader().terms(field);
       if (terms == null) {
         return null; // field does not exist
       }
       MtasSpanPrecededByQuerySpans s1 = new MtasSpanPrecededByQuerySpans(
+          MtasSpanPrecededByQuery.this,
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanPrecededByQuerySpans s2 = new MtasSpanPrecededByQuerySpans(
+          MtasSpanPrecededByQuery.this,
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanPrecededBySpans(s1, s2);
+      return new MtasSpanPrecededBySpans(MtasSpanPrecededByQuery.this, s1, s2);
     }
 
     /*
@@ -270,10 +281,12 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span preceded by query spans.
      *
+     * @param query the query
      * @param spans the spans
      */
-    public MtasSpanPrecededByQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
+    public MtasSpanPrecededByQuerySpans(MtasSpanPrecededByQuery query,
+        Spans spans) {
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
     }
 
   }

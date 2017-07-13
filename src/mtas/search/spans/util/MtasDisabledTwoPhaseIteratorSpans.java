@@ -24,7 +24,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     this.subSpans = subSpans;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
@@ -32,7 +34,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.nextStartPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
@@ -40,7 +44,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.startPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
@@ -48,7 +54,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.endPosition();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
@@ -56,15 +64,21 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.width();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     subSpans.collect(collector);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
@@ -72,7 +86,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.positionsCost();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -80,7 +96,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.docID();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
@@ -88,7 +106,9 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.nextDoc();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
@@ -96,28 +116,36 @@ public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
     return subSpans.advance(target);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
    */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-    return subSpans.asTwoPhaseIterator();
-    // return null;
+    return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
   public long cost() {
     return subSpans.cost();
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#toString()
+   */
   @Override
   public String toString() {
     StringBuilder buffer = new StringBuilder();
     buffer.append(this.getClass().getSimpleName() + "([");
-    buffer.append(subSpans!=null?subSpans.toString():"null");
+    buffer.append(subSpans != null ? subSpans.toString() : "null");
     buffer.append("])");
     return buffer.toString();
   }

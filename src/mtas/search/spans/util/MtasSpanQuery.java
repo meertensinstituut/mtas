@@ -13,15 +13,18 @@ public abstract class MtasSpanQuery extends SpanQuery {
 
   /** The minimum span width. */
   private Integer minimumSpanWidth;
-  
+
   /** The maximum span width. */
   private Integer maximumSpanWidth;
-  
+
   /** The span width. */
   private Integer spanWidth;
 
   /** The single position query. */
   private boolean singlePositionQuery;
+
+  /** The allow two phase iterator. */
+  private boolean allowTwoPhaseIterator;
 
   /**
    * Instantiates a new mtas span query.
@@ -32,6 +35,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
   public MtasSpanQuery(Integer minimum, Integer maximum) {
     super();
     initialize(minimum, maximum);
+    allowTwoPhaseIterator = true;
   }
 
   /**
@@ -82,7 +86,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
    *
    * @return the width
    */
-  public Integer getWidth() {
+  public final Integer getWidth() {
     return spanWidth;
   }
 
@@ -91,7 +95,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
    *
    * @return the minimum width
    */
-  public Integer getMinimumWidth() {
+  public final Integer getMinimumWidth() {
     return minimumSpanWidth;
   }
 
@@ -100,8 +104,24 @@ public abstract class MtasSpanQuery extends SpanQuery {
    *
    * @return the maximum width
    */
-  public Integer getMaximumWidth() {
+  public final Integer getMaximumWidth() {
     return maximumSpanWidth;
+  }
+
+  /**
+   * Disable two phase iterator.
+   */
+  public void disableTwoPhaseIterator() {
+    allowTwoPhaseIterator = false;
+  }
+
+  /**
+   * Two phase iterator allowed.
+   *
+   * @return true, if successful
+   */
+  public final boolean twoPhaseIteratorAllowed() {
+    return allowTwoPhaseIterator;
   }
 
   /**
@@ -109,17 +129,21 @@ public abstract class MtasSpanQuery extends SpanQuery {
    *
    * @return true, if is single position query
    */
-  public boolean isSinglePositionQuery() {
+  public final boolean isSinglePositionQuery() {
     return singlePositionQuery;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#equals(java.lang.Object)
    */
   @Override
   public abstract boolean equals(Object object);
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override

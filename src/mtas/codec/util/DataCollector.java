@@ -21,12 +21,12 @@ public class DataCollector {
 
   /** The Constant COLLECTOR_TYPE_DATA. */
   public static final String COLLECTOR_TYPE_DATA = "data";
-  
+
   /**
    * Instantiates a new data collector.
    */
   private DataCollector() {
-    //don't do anything
+    // don't do anything
   }
 
   /**
@@ -128,6 +128,5 @@ public class DataCollector {
       throw new IOException("unknown dataType " + dataType);
     }
   }
-
 
 }

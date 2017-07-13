@@ -135,8 +135,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
               configs = MtasConfiguration.readMtasCharFilterConfigurations(
                   resourceLoader, configArgument);
             } catch (IOException e) {
-              throw new IOException("problem loading configurations from "
-                  + configArgument, e);
+              throw new IOException(
+                  "problem loading configurations from " + configArgument, e);
             }
           }
         }

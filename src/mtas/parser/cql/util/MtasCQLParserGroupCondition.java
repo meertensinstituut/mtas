@@ -51,13 +51,16 @@ public class MtasCQLParserGroupCondition {
   public boolean equals(Object object) {
     if (object != null && object instanceof MtasCQLParserGroupCondition) {
       MtasCQLParserGroupCondition groupCondition = (MtasCQLParserGroupCondition) object;
-      return field.equals(groupCondition.field) && condition.equals(groupCondition.condition);      
+      return field.equals(groupCondition.field)
+          && condition.equals(groupCondition.condition);
     } else {
       return false;
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

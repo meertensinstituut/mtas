@@ -364,49 +364,49 @@ public class MtasFieldsConsumer extends FieldsConsumer {
 
   /** The mtas tmp field file name. */
   private String mtasTmpFieldFileName;
-  
+
   /** The mtas tmp object file name. */
   private String mtasTmpObjectFileName;
-  
+
   /** The mtas tmp docs file name. */
   private String mtasTmpDocsFileName;
-  
+
   /** The mtas tmp doc file name. */
   private String mtasTmpDocFileName;
-  
+
   /** The mtas tmp docs chained file name. */
   private String mtasTmpDocsChainedFileName;
 
   /** The mtas object file name. */
   private String mtasObjectFileName;
-  
+
   /** The mtas term file name. */
   private String mtasTermFileName;
-  
+
   /** The mtas index field file name. */
   private String mtasIndexFieldFileName;
-  
+
   /** The mtas prefix file name. */
   private String mtasPrefixFileName;
-  
+
   /** The mtas doc file name. */
   private String mtasDocFileName;
-  
+
   /** The mtas index doc id file name. */
   private String mtasIndexDocIdFileName;
-  
+
   /** The mtas index object id file name. */
   private String mtasIndexObjectIdFileName;
-  
+
   /** The mtas index object position file name. */
   private String mtasIndexObjectPositionFileName;
-  
+
   /** The mtas index object parent file name. */
   private String mtasIndexObjectParentFileName;
 
   /** The name. */
   private String name;
-  
+
   /** The delegate postings format name. */
   private String delegatePostingsFormatName;
 
@@ -1507,7 +1507,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   private Long storeTree(MtasTreeNode<?> node, boolean isSinglePoint,
       boolean storeAdditionalInformation, IndexOutput out,
       Long nodeRefApproxOffset, long refApproxOffset) throws IOException {
-    Long localNodeRefApproxOffset = nodeRefApproxOffset; 
+    Long localNodeRefApproxOffset = nodeRefApproxOffset;
     if (node != null) {
       Boolean isRoot = false;
       if (localNodeRefApproxOffset == null) {
@@ -1518,15 +1518,15 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       Long fpIndexObjectPositionRightChild;
       if (node.leftChild != null) {
         fpIndexObjectPositionLeftChild = storeTree(node.leftChild,
-            isSinglePoint, storeAdditionalInformation, out, localNodeRefApproxOffset,
-            refApproxOffset);
+            isSinglePoint, storeAdditionalInformation, out,
+            localNodeRefApproxOffset, refApproxOffset);
       } else {
         fpIndexObjectPositionLeftChild = (long) 0; // tmp
       }
       if (node.rightChild != null) {
         fpIndexObjectPositionRightChild = storeTree(node.rightChild,
-            isSinglePoint, storeAdditionalInformation, out, localNodeRefApproxOffset,
-            refApproxOffset);
+            isSinglePoint, storeAdditionalInformation, out,
+            localNodeRefApproxOffset, refApproxOffset);
       } else {
         fpIndexObjectPositionRightChild = (long) 0; // tmp
       }
@@ -1558,10 +1558,13 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       out.writeVInt(node.max);
       assert fpIndexObjectPositionLeftChild >= localNodeRefApproxOffset : "fpIndexObjectPositionLeftChild<nodeRefApproxOffset : "
           + fpIndexObjectPositionLeftChild + " and " + localNodeRefApproxOffset;
-      out.writeVLong((fpIndexObjectPositionLeftChild - localNodeRefApproxOffset));
+      out.writeVLong(
+          (fpIndexObjectPositionLeftChild - localNodeRefApproxOffset));
       assert fpIndexObjectPositionRightChild >= localNodeRefApproxOffset : "fpIndexObjectPositionRightChild<nodeRefApproxOffset"
-          + fpIndexObjectPositionRightChild + " and " + localNodeRefApproxOffset;
-      out.writeVLong((fpIndexObjectPositionRightChild - localNodeRefApproxOffset));
+          + fpIndexObjectPositionRightChild + " and "
+          + localNodeRefApproxOffset;
+      out.writeVLong(
+          (fpIndexObjectPositionRightChild - localNodeRefApproxOffset));
       if (!isSinglePoint) {
         out.writeVInt(node.ids.size());
       }

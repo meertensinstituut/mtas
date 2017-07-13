@@ -16,7 +16,7 @@ public class MtasCQLParserSentencePartCondition {
 
   /** The first minimum occurence. */
   private int firstMinimumOccurence;
-  
+
   /** The first maximum occurence. */
   private int firstMaximumOccurence;
 
@@ -34,10 +34,10 @@ public class MtasCQLParserSentencePartCondition {
 
   /** The ignore clause. */
   private MtasSpanQuery ignoreClause;
-  
+
   /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
-  
+
   /**
    * Instantiates a new mtas CQL parser sentence part condition.
    *
@@ -46,7 +46,8 @@ public class MtasCQLParserSentencePartCondition {
    * @param maximumIgnoreLength the maximum ignore length
    */
   public MtasCQLParserSentencePartCondition(
-      MtasCQLParserBasicSentenceCondition bs, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
+      MtasCQLParserBasicSentenceCondition bs, MtasSpanQuery ignore,
+      Integer maximumIgnoreLength) {
     firstMinimumOccurence = 1;
     firstMaximumOccurence = 1;
     firstOptional = false;
@@ -62,7 +63,8 @@ public class MtasCQLParserSentencePartCondition {
    * @param ignore the ignore
    * @param maximumIgnoreLength the maximum ignore length
    */
-  public MtasCQLParserSentencePartCondition(MtasCQLParserSentenceCondition s, MtasSpanQuery ignore, Integer maximumIgnoreLength) {
+  public MtasCQLParserSentencePartCondition(MtasCQLParserSentenceCondition s,
+      MtasSpanQuery ignore, Integer maximumIgnoreLength) {
     firstMinimumOccurence = 1;
     firstMaximumOccurence = 1;
     firstOptional = false;
@@ -70,8 +72,6 @@ public class MtasCQLParserSentencePartCondition {
     this.ignoreClause = ignore;
     this.maximumIgnoreLength = maximumIgnoreLength;
   }
-
-  
 
   /**
    * Sets the first occurence.
@@ -103,7 +103,7 @@ public class MtasCQLParserSentencePartCondition {
    */
   public void setFirstOptional(boolean status) throws ParseException {
     if (fullCondition == null) {
-      firstOptional = status;      
+      firstOptional = status;
     } else {
       throw new ParseException("fullCondition already generated");
     }
@@ -149,15 +149,15 @@ public class MtasCQLParserSentencePartCondition {
     if (fullCondition == null) {
       if (secondSentencePart == null) {
         if (firstBasicSentence != null) {
-          fullCondition = new MtasCQLParserSentenceCondition(
-              firstBasicSentence, ignoreClause, maximumIgnoreLength);
-          
+          fullCondition = new MtasCQLParserSentenceCondition(firstBasicSentence,
+              ignoreClause, maximumIgnoreLength);
+
         } else {
-          fullCondition = firstSentence;          
+          fullCondition = firstSentence;
         }
         fullCondition.setOccurence(firstMinimumOccurence,
             firstMaximumOccurence);
-        if(firstOptional) {
+        if (firstOptional) {
           fullCondition.setOptional(firstOptional);
         }
         return fullCondition;
@@ -173,21 +173,23 @@ public class MtasCQLParserSentencePartCondition {
             firstSentence.setOccurence(firstMinimumOccurence,
                 firstMaximumOccurence);
             firstSentence.setOptional(firstOptional);
-            fullCondition = new MtasCQLParserSentenceCondition(firstSentence, ignoreClause, maximumIgnoreLength);
+            fullCondition = new MtasCQLParserSentenceCondition(firstSentence,
+                ignoreClause, maximumIgnoreLength);
           }
           fullCondition.addSentenceToEndLatestSequence(
-              secondSentencePart.createFullSentence());          
+              secondSentencePart.createFullSentence());
         } else {
           MtasCQLParserSentenceCondition sentence = secondSentencePart
               .createFullSentence();
           if (firstBasicSentence != null) {
             sentence.addSentenceAsFirstOption(
-                new MtasCQLParserSentenceCondition(firstBasicSentence, ignoreClause, maximumIgnoreLength));
+                new MtasCQLParserSentenceCondition(firstBasicSentence,
+                    ignoreClause, maximumIgnoreLength));
           } else {
             sentence.addSentenceAsFirstOption(firstSentence);
           }
           fullCondition = sentence;
-        }        
+        }
         return fullCondition;
       }
     } else {

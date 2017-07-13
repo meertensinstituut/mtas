@@ -97,8 +97,8 @@ public class MtasRBTree extends MtasTree<MtasRBTreeNode> {
             additionalRef, id, ref);
         updateMax(localN, localN.leftChild);
       } else {
-        localN.rightChild = addRange(localN.rightChild, left, right, additionalId,
-            additionalRef, id, ref);
+        localN.rightChild = addRange(localN.rightChild, left, right,
+            additionalId, additionalRef, id, ref);
         updateMax(localN, localN.rightChild);
       }
       if (isRed(localN.rightChild) && !isRed(localN.leftChild)) {

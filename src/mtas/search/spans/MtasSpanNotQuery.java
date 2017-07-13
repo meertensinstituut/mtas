@@ -13,7 +13,6 @@ import org.apache.lucene.index.TermContext;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanNotQuery;
-import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
@@ -33,10 +32,10 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
   private SpanNotQuery baseQuery;
 
   /** The q 1. */
-  private SpanQuery q1;
+  private MtasSpanQuery q1;
 
   /** The q 2. */
-  private SpanQuery q2;
+  private MtasSpanQuery q2;
 
   /**
    * Instantiates a new mtas span not query.
@@ -183,6 +182,16 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
     return baseQuery.hashCode();
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    q1.disableTwoPhaseIterator();
+    q2.disableTwoPhaseIterator();
+  }
+
   /**
    * The Class SpanNotWeight.
    */
@@ -240,10 +249,12 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
         return null; // field does not exist
       }
       MtasSpanNotQuerySpans s1 = new MtasSpanNotQuerySpans(
+          MtasSpanNotQuery.this,
           w1.spanWeight.getSpans(context, requiredPostings));
       MtasSpanNotQuerySpans s2 = new MtasSpanNotQuerySpans(
+          MtasSpanNotQuery.this,
           w2.spanWeight.getSpans(context, requiredPostings));
-      return new MtasSpanNotSpans(s1, s2);
+      return new MtasSpanNotSpans(MtasSpanNotQuery.this, s1, s2);
     }
 
     /*
@@ -270,10 +281,11 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span not query spans.
      *
+     * @param query the query
      * @param spans the spans
      */
-    public MtasSpanNotQuerySpans(Spans spans) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
+    public MtasSpanNotQuerySpans(MtasSpanNotQuery query, Spans spans) {
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
     }
 
   }

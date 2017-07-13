@@ -25,8 +25,7 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   /**
    * Instantiates a new mtas span or query.
    *
-   * @param initialClauses
-   *          the initial clauses
+   * @param initialClauses the initial clauses
    */
   public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
@@ -44,12 +43,12 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
           } else {
             minimum = null;
           }
-          if(maximum != null && item.getMaximumWidth() != null) {
+          if (maximum != null && item.getMaximumWidth() != null) {
             maximum = Math.max(maximum, item.getMaximumWidth());
           } else {
             maximum = null;
           }
-        }        
+        }
         clauses.add(item);
       }
     }
@@ -200,6 +199,17 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ clauses.hashCode();
     return h;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    for (MtasSpanQuery item : clauses) {
+      item.disableTwoPhaseIterator();
+    }
   }
 
 }

@@ -69,7 +69,7 @@ public class MtasSolrResultUtil {
       } else if (al.get(i) instanceof ArrayList) {
         rewrite((ArrayList) al.get(i));
       }
-    }        
+    }
   }
 
   /**
@@ -79,7 +79,7 @@ public class MtasSolrResultUtil {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void rewrite(NamedList<Object> nl) throws IOException {
-    rewrite(nl, true);    
+    rewrite(nl, true);
   }
 
   /**
@@ -121,9 +121,9 @@ public class MtasSolrResultUtil {
                 nnl.setVal(j, mdi);
               }
             }
-            //System.out.println("rewrite -- "+nnl);
+            // System.out.println("rewrite -- "+nnl);
             nl.setVal(i, rewriteToArray(nnl));
-            //System.out.println("rewrite! "+nl.getVal(i));
+            // System.out.println("rewrite! "+nl.getVal(i));
           } else {
             NamedList<Object> tmpResponse = new SimpleOrderedMap<>();
             tmpResponse.add(nl.getName(i) + "Total", o.dataCollector.getSize());
@@ -425,7 +425,7 @@ public class MtasSolrResultUtil {
         MtasCQLParser ip = new MtasCQLParser(queryIgnoreReader);
         try {
           ignore = ip.parse(field, null, null, null, null);
-        } catch (mtas.parser.cql.ParseException e) {          
+        } catch (mtas.parser.cql.ParseException e) {
           throw new IOException("couldn't parse " + queryType + " query "
               + queryIgnore + " (" + e.getMessage() + ")", e);
         } catch (TokenMgrError e) {

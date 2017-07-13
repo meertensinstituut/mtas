@@ -10,28 +10,28 @@ import org.apache.solr.schema.PreAnalyzedField;
  */
 public class MtasPreAnalyzedField extends PreAnalyzedField {
 
-  /** The follow index analyzer. */
+  /** The Constant FOLLOW_INDEX_ANALYZER. */
   private final static String FOLLOW_INDEX_ANALYZER = "followIndexAnalyzer";
 
-  /** The default configuration. */
+  /** The Constant DEFAULT_CONFIGURATION. */
   private final static String DEFAULT_CONFIGURATION = "defaultConfiguration";
 
-  /** The configuration from field. */
+  /** The Constant CONFIGURATION_FROM_FIELD. */
   private final static String CONFIGURATION_FROM_FIELD = "configurationFromField";
 
-  /** The set number of tokens. */
+  /** The Constant SET_NUMBER_OF_TOKENS. */
   private final static String SET_NUMBER_OF_TOKENS = "setNumberOfTokens";
 
-  /** The set number of positions. */
+  /** The Constant SET_NUMBER_OF_POSITIONS. */
   private final static String SET_NUMBER_OF_POSITIONS = "setNumberOfPositions";
 
-  /** The set size. */
+  /** The Constant SET_SIZE. */
   private final static String SET_SIZE = "setSize";
 
-  /** The set error. */
+  /** The Constant SET_ERROR. */
   private final static String SET_ERROR = "setError";
 
-  /** The set prefix. */
+  /** The Constant SET_PREFIX. */
   private final static String SET_PREFIX = "setPrefix";
 
   /** The follow index analyzer. */

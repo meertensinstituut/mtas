@@ -98,7 +98,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
   public final void error(String key, String error) throws IOException {
     if (key != null) {
       add(key, false);
-      setError(newCurrentPosition, error, newCurrentExisting);      
+      setError(newCurrentPosition, error, newCurrentExisting);
     }
   }
 
@@ -196,7 +196,9 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
         tmpOldSize);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
    */
   @Override
@@ -320,7 +322,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
         || !statsType.equals(newDataCollector.getStatsType())
         || !(newDataCollector instanceof MtasDataBasic)) {
       throw new IOException("cannot merge different dataCollectors");
-    } else {      
+    } else {
       segmentRegistration = null;
       @SuppressWarnings("unchecked")
       MtasDataBasic<T1, T2> newMtasDataBasic = (MtasDataBasic<T1, T2>) newDataCollector;
@@ -342,7 +344,7 @@ abstract class MtasDataBasic<T1 extends Number & Comparable<T1>, T2 extends Numb
                 newMtasDataBasic.subCollectorListNextLevel[i], map,
                 increaseSourceNumber);
           }
-        } 
+        }
         closeNewList();
       } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
         map.put(newDataCollector, this);

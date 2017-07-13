@@ -5,6 +5,8 @@ import java.io.IOException;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.search.spans.util.MtasSpans;
+
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 
 /**
@@ -12,14 +14,25 @@ import org.apache.lucene.search.spans.SpanCollector;
  */
 public class MtasSpanMatchAllSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanMatchAllQuery query;
+
   /** The field. */
   private String field;
 
-  /** The doc id. */
+  /** The min position. */
   private int minPosition;
+
+  /** The max position. */
   private int maxPosition;
+
+  /** The current start position. */
   private int currentStartPosition;
+
+  /** The current end position. */
   private int currentEndPosition;
+
+  /** The doc id. */
   private int docId;
 
   /** The mtas codec info. */
@@ -28,13 +41,14 @@ public class MtasSpanMatchAllSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span match all spans.
    *
-   * @param mtasCodecInfo
-   *          the mtas codec info
-   * @param field
-   *          the field
+   * @param query the query
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
    */
-  public MtasSpanMatchAllSpans(CodecInfo mtasCodecInfo, String field) {
+  public MtasSpanMatchAllSpans(MtasSpanMatchAllQuery query,
+      CodecInfo mtasCodecInfo, String field) {
     super();
+    this.query = query;
     this.mtasCodecInfo = mtasCodecInfo;
     this.field = field;
     minPosition = NO_MORE_POSITIONS;
@@ -183,6 +197,21 @@ public class MtasSpanMatchAllSpans extends MtasSpans {
   @Override
   public float positionsCost() {
     return 0;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.apache.lucene.search.spans.Spans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (!query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

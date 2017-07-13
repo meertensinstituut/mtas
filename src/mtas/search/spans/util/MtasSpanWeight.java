@@ -16,22 +16,17 @@ public abstract class MtasSpanWeight extends SpanWeight {
   /**
    * Instantiates a new mtas span weight.
    *
-   * @param query
-   *          the query
-   * @param searcher
-   *          the searcher
-   * @param termContexts
-   *          the term contexts
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param query the query
+   * @param searcher the searcher
+   * @param termContexts the term contexts
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasSpanWeight(SpanQuery query, IndexSearcher searcher,
       Map<Term, TermContext> termContexts) throws IOException {
     super(query, searcher, termContexts);
   }
-  
-//  abstract public MtasSpans getSpans(LeafReaderContext context,
-//      Postings requiredPostings) throws IOException;
 
+  // abstract public MtasSpans getSpans(LeafReaderContext context,
+  // Postings requiredPostings) throws IOException;
 
 }

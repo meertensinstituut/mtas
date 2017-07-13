@@ -1,6 +1,10 @@
 package mtas.search.spans.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
@@ -10,15 +14,15 @@ import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 
 /**
- * The Class MtasMaximumExpandSpans.
+ * The Class MtasExpandSpans.
  */
-public class MtasMaximumExpandSpans extends MtasSpans {
+public class MtasExpandSpans extends MtasSpans {
 
   /** The sub spans. */
   Spans subSpans;
 
   /** The query. */
-  MtasMaximumExpandSpanQuery query;
+  MtasExpandSpanQuery query;
 
   /** The min position. */
   int minPosition;
@@ -38,6 +42,12 @@ public class MtasMaximumExpandSpans extends MtasSpans {
   /** The end position. */
   int endPosition;
 
+  /** The collected positions. */
+  SortedMap<Integer, List<Integer>> collectedPositions;
+
+  /** The last collected start position. */
+  int lastCollectedStartPosition;
+
   /** The called next start position. */
   private boolean calledNextStartPosition;
 
@@ -45,21 +55,22 @@ public class MtasMaximumExpandSpans extends MtasSpans {
   int docId;
 
   /**
-   * Instantiates a new mtas maximum expand spans.
+   * Instantiates a new mtas expand spans.
    *
    * @param query the query
    * @param mtasCodecInfo the mtas codec info
    * @param field the field
    * @param subSpans the sub spans
    */
-  public MtasMaximumExpandSpans(MtasMaximumExpandSpanQuery query,
-      CodecInfo mtasCodecInfo, String field, Spans subSpans) {
+  public MtasExpandSpans(MtasExpandSpanQuery query, CodecInfo mtasCodecInfo,
+      String field, Spans subSpans) {
     super();
     this.subSpans = subSpans;
     this.field = field;
     this.mtasCodecInfo = mtasCodecInfo;
     this.query = query;
     docId = -1;
+    collectedPositions = new TreeMap<>();
     reset();
   }
 
@@ -224,7 +235,6 @@ public class MtasMaximumExpandSpans extends MtasSpans {
         };
       } else {
         return new TwoPhaseIterator(subSpans) {
-
           @Override
           public boolean matches() throws IOException {
             return twoPhaseCurrentDocMatches();
@@ -308,24 +318,53 @@ public class MtasMaximumExpandSpans extends MtasSpans {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean goToNextStartPosition() throws IOException {
-    int basicStartPosition;
+    int basicStartPositionMin;
+    int basicStartPositionMax;
     int basicEndPosition;
+    int basicEndPositionMin;
+    int basicEndPositionMax;
     if (docId == -1 || docId == NO_MORE_DOCS) {
       throw new IOException("no document");
     } else {
-      while ((basicStartPosition = subSpans
-          .nextStartPosition()) != NO_MORE_POSITIONS) {
-        basicEndPosition = subSpans.endPosition();
-        startPosition = Math.max(minPosition,
-            (basicStartPosition - query.maximumLeft));
-        endPosition = Math.min(maxPosition + 1,
-            (basicEndPosition + query.maximumRight));
-        if (startPosition <= (basicStartPosition - query.minimumLeft)
-            && endPosition >= (basicEndPosition + query.minimumRight)) {
-          return true;
+      if (lastCollectedStartPosition < NO_MORE_POSITIONS
+          && (collectedPositions.isEmpty()
+              || (collectedPositions.firstKey() >= (lastCollectedStartPosition
+                  - query.maximumLeft)))) {
+        // collect new positions
+        while ((lastCollectedStartPosition = subSpans
+            .nextStartPosition()) != NO_MORE_POSITIONS) {
+          basicEndPosition = subSpans.endPosition();
+          basicStartPositionMin = Math.max(minPosition,
+              lastCollectedStartPosition - query.maximumLeft);
+          basicStartPositionMax = lastCollectedStartPosition
+              - query.minimumLeft;
+          basicEndPositionMin = basicEndPosition + query.minimumRight;
+          basicEndPositionMax = Math.min(maxPosition + 1,
+              basicEndPosition + query.maximumRight);
+          for (int cLeft = basicStartPositionMin; cLeft <= basicStartPositionMax; cLeft++) {
+            for (int cRight = basicEndPositionMin; cRight <= basicEndPositionMax; cRight++) {
+              if (!collectedPositions.containsKey(cLeft)) {
+                collectedPositions.put(cLeft, new ArrayList<Integer>());
+              }
+              collectedPositions.get(cLeft).add(cRight);
+            }
+          }
+          if (!collectedPositions.isEmpty() && (collectedPositions
+              .firstKey() < (lastCollectedStartPosition - query.maximumLeft))) {
+            break;
+          }
         }
       }
-      return false;
+      if (collectedPositions.isEmpty()) {
+        return false;
+      } else {
+        startPosition = collectedPositions.firstKey();
+        endPosition = collectedPositions.get(startPosition).remove(0);
+        if (collectedPositions.get(startPosition).isEmpty()) {
+          collectedPositions.remove(startPosition);
+        }
+        return true;
+      }
     }
   }
 
@@ -338,6 +377,8 @@ public class MtasMaximumExpandSpans extends MtasSpans {
     maxPosition = 0;
     startPosition = -1;
     endPosition = -1;
+    collectedPositions.clear();
+    lastCollectedStartPosition = -1;
   }
 
   /*

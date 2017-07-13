@@ -35,34 +35,34 @@ public class MtasSolrJoinCache {
 
   /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasSolrJoinCache.class);
-  
+
   /** The Constant DEFAULT_LIFETIME. */
   private static final long DEFAULT_LIFETIME = 86400;
-  
+
   /** The Constant DEFAULT_MAXIMUM_NUMBER. */
   private static final int DEFAULT_MAXIMUM_NUMBER = 1000;
-  
+
   /** The Constant DEFAULT_MAXIMUM_OVERFLOW. */
   private static final int DEFAULT_MAXIMUM_OVERFLOW = 10;
-  
+
   /** The administration. */
   private HashMap<MtasSolrJoinCacheItem, String> administration;
-  
+
   /** The index. */
   private HashMap<String, MtasSolrJoinCacheItem> index;
-  
+
   /** The expiration. */
   private HashMap<String, Long> expiration;
-  
+
   /** The join cache path. */
   private Path joinCachePath;
-  
+
   /** The life time. */
   private long lifeTime;
-  
+
   /** The maximum number. */
   private int maximumNumber;
-  
+
   /** The maximum overflow. */
   private int maximumOverflow;
 

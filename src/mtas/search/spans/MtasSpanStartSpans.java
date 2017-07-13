@@ -13,16 +13,21 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanStartSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanStartQuery query;
+
   /** The spans. */
-  Spans spans;
+  private Spans spans;
 
   /**
    * Instantiates a new mtas span start spans.
    *
+   * @param query the query
    * @param spans the spans
    */
-  public MtasSpanStartSpans(Spans spans) {
+  public MtasSpanStartSpans(MtasSpanStartQuery query, Spans spans) {
     super();
+    this.query = query;
     this.spans = spans;
   }
 
@@ -109,13 +114,16 @@ public class MtasSpanStartSpans extends MtasSpans {
   public int advance(int target) throws IOException {
     return (spans == null) ? NO_MORE_DOCS : spans.advance(target);
   }
-  
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-    if(spans == null) {
+    if (spans == null || !query.twoPhaseIteratorAllowed()) {
       return null;
     } else {
-      return spans.asTwoPhaseIterator();     
+      return spans.asTwoPhaseIterator();
     }
   }
 

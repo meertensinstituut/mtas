@@ -263,8 +263,8 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public MtasSpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
-      throws IOException {
+  public MtasSpanWeight createWeight(IndexSearcher searcher,
+      boolean needsScores) throws IOException {
     SpanWeight subWeight = query.createWeight(searcher, false);
     SpanWeight ignoreWeight = null;
     if (ignoreQuery != null) {
@@ -273,6 +273,18 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     return new SpanRecurrenceWeight(subWeight, ignoreWeight,
         maximumIgnoreLength, searcher,
         needsScores ? getTermContexts(subWeight) : null);
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    query.disableTwoPhaseIterator();
+    if (ignoreQuery != null) {
+      ignoreQuery.disableTwoPhaseIterator();
+    }
   }
 
   /**
@@ -329,8 +341,8 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
      * org.apache.lucene.search.spans.SpanWeight.Postings)
      */
     @Override
-    public MtasSpans getSpans(LeafReaderContext context, Postings requiredPostings)
-        throws IOException {
+    public MtasSpans getSpans(LeafReaderContext context,
+        Postings requiredPostings) throws IOException {
       if (field == null) {
         return null;
       } else {
@@ -346,7 +358,7 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
           if (ignoreWeight != null) {
             ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);
           }
-          return new MtasSpanRecurrenceSpans(
+          return new MtasSpanRecurrenceSpans(MtasSpanRecurrenceQuery.this,
               subSpans, minimumRecurrence, maximumRecurrence, ignoreSpans,
               maximumIgnoreLength);
         }

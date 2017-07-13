@@ -36,7 +36,8 @@ public class MtasSolrComponentFacet
     implements MtasSolrComponent<ComponentFacet> {
 
   /** The Constant log. */
-  private static final Log log = LogFactory.getLog(MtasSolrComponentFacet.class);
+  private static final Log log = LogFactory
+      .getLog(MtasSolrComponentFacet.class);
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;

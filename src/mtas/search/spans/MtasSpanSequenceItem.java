@@ -20,10 +20,8 @@ public class MtasSpanSequenceItem {
   /**
    * Instantiates a new mtas span sequence item.
    *
-   * @param spanQuery
-   *          the span query
-   * @param optional
-   *          the optional
+   * @param spanQuery the span query
+   * @param optional the optional
    */
   public MtasSpanSequenceItem(MtasSpanQuery spanQuery, boolean optional) {
     this.spanQuery = spanQuery;
@@ -42,8 +40,7 @@ public class MtasSpanSequenceItem {
   /**
    * Sets the query.
    *
-   * @param spanQuery
-   *          the new query
+   * @param spanQuery the new query
    */
   public void setQuery(MtasSpanQuery spanQuery) {
     this.spanQuery = spanQuery;
@@ -90,11 +87,9 @@ public class MtasSpanSequenceItem {
   /**
    * Rewrite.
    *
-   * @param reader
-   *          the reader
+   * @param reader the reader
    * @return the mtas span sequence item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasSpanSequenceItem rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);
@@ -119,14 +114,10 @@ public class MtasSpanSequenceItem {
   /**
    * Merge.
    *
-   * @param item1
-   *          the item 1
-   * @param item2
-   *          the item 2
-   * @param ignoreQuery
-   *          the ignore query
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
+   * @param item1 the item 1
+   * @param item2 the item 2
+   * @param ignoreQuery the ignore query
+   * @param maximumIgnoreLength the maximum ignore length
    * @return the mtas span sequence item
    */
   public static MtasSpanSequenceItem merge(MtasSpanSequenceItem item1,

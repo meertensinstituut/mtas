@@ -32,7 +32,7 @@ public class MtasSolrResultMerge {
    * @param rb the rb
    */
   @SuppressWarnings("unchecked")
-  public void merge(ResponseBuilder rb) { 
+  public void merge(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
       // mtas response
       NamedList<Object> mtasResponse = null;
@@ -263,7 +263,7 @@ public class MtasSolrResultMerge {
         log.error(e);
       }
     }
-   
+
     try {
       for (ArrayList<Object> mtasListShardResponse : mtasListShardResponses
           .values()) {
@@ -271,10 +271,10 @@ public class MtasSolrResultMerge {
       }
       for (ArrayList<Object> mtasListShardResponse : mtasListShardResponsesExtra) {
         mergeResponsesArrayList(mtasListResponse, mtasListShardResponse);
-      }      
+      }
     } catch (IOException e) {
       log.error(e);
-    }    
+    }
   }
 
   /**
@@ -308,7 +308,7 @@ public class MtasSolrResultMerge {
         Object key = itemList.get("key");
         if ((key != null) && (key instanceof String)) {
           originalKeyList.put((String) key, item);
-        }                
+        }
       }
     }
     for (Object item : shardList) {
@@ -322,7 +322,7 @@ public class MtasSolrResultMerge {
             Object originalItem = originalKeyList.get(key);
             if (originalItem.getClass().equals(item.getClass())) {
               mergeResponsesNamedList((NamedList<Object>) originalItem,
-                  (NamedList<Object>) item);              
+                  (NamedList<Object>) item);
             } else {
               // ignore?
             }
@@ -365,7 +365,7 @@ public class MtasSolrResultMerge {
           original = adjustablePartsCloned(shardValue);
         } else if (shardValue != null
             && original.getClass().equals(shardValue.getClass())) {
-          // merge ArrayList 
+          // merge ArrayList
           if (original instanceof ArrayList) {
             ArrayList originalList = (ArrayList) original;
             ArrayList shardList = (ArrayList) shardValue;
@@ -380,7 +380,7 @@ public class MtasSolrResultMerge {
                 (SortedSet<Object>) shardValue);
           } else if (original instanceof MtasSolrMtasResult) {
             MtasSolrMtasResult originalComponentResult = (MtasSolrMtasResult) original;
-            originalComponentResult.merge((MtasSolrMtasResult) shardValue);            
+            originalComponentResult.merge((MtasSolrMtasResult) shardValue);
           } else if (original instanceof MtasSolrJoinResult) {
             MtasSolrJoinResult originalComponentResult = (MtasSolrJoinResult) original;
             originalComponentResult.merge((MtasSolrJoinResult) shardValue);

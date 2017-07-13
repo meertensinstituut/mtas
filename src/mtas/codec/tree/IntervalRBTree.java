@@ -95,7 +95,7 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
     if (localN == null) {
       String key = left.toString() + "_" + right.toString();
       localN = new IntervalRBTreeNode<>(left, right, IntervalRBTreeNode.RED, 1);
-      localN.addList(list);      
+      localN.addList(list);
       index.put(key, localN);
     } else {
       if (left <= localN.left) {
@@ -114,8 +114,8 @@ public class IntervalRBTree<T> extends IntervalTree<T, IntervalRBTreeNode<T>> {
       if (isRed(localN.leftChild) && isRed(localN.rightChild)) {
         flipColors(localN);
       }
-      localN.n = size(localN.leftChild) + size(localN.rightChild) + 1;      
-    }    
+      localN.n = size(localN.leftChild) + size(localN.rightChild) + 1;
+    }
     return localN;
   }
 

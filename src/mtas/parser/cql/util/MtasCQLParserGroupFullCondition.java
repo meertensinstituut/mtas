@@ -149,13 +149,16 @@ public class MtasCQLParserGroupFullCondition
       return false;
     if (object instanceof MtasCQLParserGroupFullCondition) {
       MtasCQLParserGroupFullCondition word = (MtasCQLParserGroupFullCondition) object;
-      return groupCondition.equals(word.groupCondition) && type.equals(word.type);      
+      return groupCondition.equals(word.groupCondition)
+          && type.equals(word.type);
     } else {
       return false;
     }
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -165,7 +168,5 @@ public class MtasCQLParserGroupFullCondition
     h = (h * 7) ^ type.hashCode();
     return h;
   }
-  
-  
 
 }

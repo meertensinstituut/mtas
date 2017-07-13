@@ -44,7 +44,7 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
    * @param singlePosition the single position
    */
   public MtasSpanTermQuery(SpanTermQuery query, boolean singlePosition) {
-    super(singlePosition?1:null, singlePosition?1:null);
+    super(singlePosition ? 1 : null, singlePosition ? 1 : null);
     baseQuery = new MtasExtendedSpanTermQuery(query, singlePosition);
   }
 
@@ -60,9 +60,12 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores);
   }
-  
-  /* (non-Javadoc)
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.IndexReader)
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
+   * IndexReader)
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
@@ -98,7 +101,9 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
     return baseQuery.equals(other.baseQuery);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.SpanQuery#getField()
    */
   @Override
@@ -106,7 +111,9 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
     return baseQuery.getField();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.Query#hashCode()
    */
   @Override

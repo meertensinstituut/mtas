@@ -62,8 +62,8 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
           advancedValueSumOfLogsList[i], advancedValueSumOfSquaresList[i],
           advancedValueMinList[i], advancedValueMaxList[i],
           advancedValueNList[i], hasSub() ? subCollectorListNextLevel[i] : null,
-          getStatsItems(), sortType, sortDirection, errorNumber[i], errorList[i],
-          sourceNumberList[i]);
+          getStatsItems(), sortType, sortDirection, errorNumber[i],
+          errorList[i], sourceNumberList[i]);
     } else {
       return null;
     }
@@ -129,8 +129,8 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * long, long)
    */
   @Override
-  public MtasDataCollector<?, ?> add(String key, long valueSum,
-      long valueN) throws IOException {
+  public MtasDataCollector<?, ?> add(String key, long valueSum, long valueN)
+      throws IOException {
     throw new IOException("not supported");
   }
 
@@ -149,7 +149,7 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
       for (int i = 0; i < values.length; i++)
         newValues[i] = Long.valueOf(values[i]).doubleValue();
       MtasDataCollector<?, ?> subCollector = add(key, false);
-        setValue(newCurrentPosition, newValues, number, newCurrentExisting);      
+      setValue(newCurrentPosition, newValues, number, newCurrentExisting);
       return subCollector;
     } else {
       return null;
@@ -164,8 +164,8 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * double, long)
    */
   @Override
-  public MtasDataCollector<?, ?> add(String key, double valueSum,
-      long valueN) throws IOException {
+  public MtasDataCollector<?, ?> add(String key, double valueSum, long valueN)
+      throws IOException {
     throw new IOException("not supported");
   }
 
@@ -177,12 +177,12 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
    * double[], int)
    */
   @Override
-  public MtasDataCollector<?, ?> add(String key, double[] values,
-      int number) throws IOException {
+  public MtasDataCollector<?, ?> add(String key, double[] values, int number)
+      throws IOException {
     if (key != null) {
       MtasDataCollector<?, ?> subCollector = add(key, false);
-        setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
-            newCurrentExisting);      
+      setValue(newCurrentPosition, ArrayUtils.toObject(values), number,
+          newCurrentExisting);
       return subCollector;
     } else {
       return null;
@@ -305,10 +305,10 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
       if (thisLast == null) {
         return null;
       } else if (segmentRegistration.equals(SEGMENT_SORT_ASC)) {
-        return thisLast * segmentNumber;        
+        return thisLast * segmentNumber;
       } else {
         return thisLast / segmentNumber;
-      } 
+      }
     } else {
       throw new IOException("can't compute boundary for segmentRegistration "
           + segmentRegistration);
@@ -325,7 +325,8 @@ public class MtasDataDoubleAdvanced extends MtasDataAdvanced<Double, Double> {
   @Override
   protected Double stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException {
-    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)||segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
+    if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)
+        || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
       if (segmentNumber == null) {
         return Double.valueOf(boundary);
       } else {

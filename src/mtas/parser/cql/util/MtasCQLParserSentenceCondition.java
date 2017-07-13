@@ -25,16 +25,16 @@ public class MtasCQLParserSentenceCondition {
 
   /** The minimum occurence. */
   private int minimumOccurence;
-  
+
   /** The maximum occurence. */
   private int maximumOccurence;
 
   /** The basic. */
   private boolean basic;
-  
+
   /** The simplified. */
   private boolean simplified;
-  
+
   /** The optional. */
   private boolean optional;
 
@@ -392,7 +392,7 @@ public class MtasCQLParserSentenceCondition {
           }
           sequenceList = newSequenceList;
         }
-      } 
+      }
       simplified = true;
     }
   }

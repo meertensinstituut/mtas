@@ -168,4 +168,13 @@ public class MtasCQLParserGroupQuery extends MtasSpanQuery {
     return h;
   }
 
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    query.disableTwoPhaseIterator();
+  }
+
 }

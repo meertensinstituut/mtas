@@ -48,8 +48,6 @@ public class MtasPayloadDecoder {
   /** The mtas real offset. */
   private MtasOffset mtasRealOffset;
 
-  
-
   /**
    * Inits the.
    *
@@ -108,12 +106,15 @@ public class MtasPayloadDecoder {
     // get id
     mtasId = byteStream.readEliasGammaCodingNonNegativeInteger();
     // get position info
-    if (mtasPositionType!=null && mtasPositionType.equals(MtasPosition.POSITION_SINGLE)) {
+    if (mtasPositionType != null
+        && mtasPositionType.equals(MtasPosition.POSITION_SINGLE)) {
       mtasPosition = new MtasPosition(mtasStartPosition);
-    } else if (mtasPositionType!=null && mtasPositionType.equals(MtasPosition.POSITION_RANGE)) {
+    } else if (mtasPositionType != null
+        && mtasPositionType.equals(MtasPosition.POSITION_RANGE)) {
       mtasPosition = new MtasPosition(mtasStartPosition, (mtasStartPosition
           + byteStream.readEliasGammaCodingPositiveInteger() - 1));
-    } else if (mtasPositionType!=null && mtasPositionType.equals(MtasPosition.POSITION_SET)) {
+    } else if (mtasPositionType != null
+        && mtasPositionType.equals(MtasPosition.POSITION_SET)) {
       mtasPositions = new TreeSet<>();
       mtasPositions.add(mtasStartPosition);
       int numberOfPoints = byteStream.readEliasGammaCodingPositiveInteger();

@@ -1,6 +1,8 @@
 package mtas.search.spans;
 
 import java.io.IOException;
+
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import mtas.search.spans.MtasSpanIntersectingQuery.MtasSpanIntersectingQuerySpans;
 import mtas.search.spans.util.MtasSpans;
@@ -10,21 +12,24 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanIntersectingSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanIntersectingQuery query;
+
   /** The spans 1. */
   private MtasSpanIntersectingQuerySpans spans1;
-  
+
   /** The spans 2. */
   private MtasSpanIntersectingQuerySpans spans2;
 
   /** The called next start position. */
   private boolean calledNextStartPosition;
-  
+
   /** The no more positions. */
   private boolean noMorePositions;
 
   /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-  
+
   /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
 
@@ -34,15 +39,16 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span intersecting spans.
    *
-   * @param mtasSpanIntersectingQuery the mtas span intersecting query
+   * @param query the query
    * @param spans1 the spans 1
    * @param spans2 the spans 2
    */
-  public MtasSpanIntersectingSpans(
+  public MtasSpanIntersectingSpans(MtasSpanIntersectingQuery query,
       MtasSpanIntersectingQuerySpans spans1,
       MtasSpanIntersectingQuerySpans spans2) {
     super();
     docId = -1;
+    this.query = query;
     this.spans1 = spans1;
     this.spans2 = spans2;
   }
@@ -302,6 +308,19 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
   @Override
   public long cost() {
     return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

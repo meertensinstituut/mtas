@@ -66,8 +66,7 @@ final public class MtasSketchParser extends MtasBasicParser {
     if (config != null) {
 
       // always word, no mappings
-      wordType = new MtasParserType<>(MAPPING_TYPE_WORD,
-          null, false);
+      wordType = new MtasParserType<>(MAPPING_TYPE_WORD, null, false);
 
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);

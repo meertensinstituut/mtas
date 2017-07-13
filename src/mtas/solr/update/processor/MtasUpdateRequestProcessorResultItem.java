@@ -14,7 +14,7 @@ public class MtasUpdateRequestProcessorResultItem implements Serializable {
 
   /** The token term. */
   public String tokenTerm;
- 
+
   /** The token offset start. */
   public Integer tokenOffsetStart;
 

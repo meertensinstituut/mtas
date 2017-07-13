@@ -167,13 +167,17 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUM:
-      return new MtasDataItemNumberComparator<>(Math.round(stats.getSum()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getSum()),
+          sortDirection);
     case CodecUtil.STATS_TYPE_MAX:
-      return new MtasDataItemNumberComparator<>(Math.round(stats.getMax()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getMax()),
+          sortDirection);
     case CodecUtil.STATS_TYPE_MIN:
-      return new MtasDataItemNumberComparator<>(Math.round(stats.getMin()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getMin()),
+          sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
-      return new MtasDataItemNumberComparator<>(Math.round(stats.getSumsq()), sortDirection);
+      return new MtasDataItemNumberComparator<>(Math.round(stats.getSumsq()),
+          sortDirection);
     default:
       return null;
     }
@@ -194,21 +198,29 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     case CodecUtil.STATS_TYPE_MEAN:
       return new MtasDataItemNumberComparator<>(stats.getMean(), sortDirection);
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-      return new MtasDataItemNumberComparator<>(stats.getGeometricMean(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getGeometricMean(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-      return new MtasDataItemNumberComparator<>(stats.getStandardDeviation(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getStandardDeviation(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_VARIANCE:
-      return new MtasDataItemNumberComparator<>(stats.getVariance(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getVariance(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-      return new MtasDataItemNumberComparator<>(stats.getPopulationVariance(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getPopulationVariance(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-      return new MtasDataItemNumberComparator<>(stats.getQuadraticMean(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getQuadraticMean(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
-      return new MtasDataItemNumberComparator<>(stats.getKurtosis(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getKurtosis(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_MEDIAN:
-      return new MtasDataItemNumberComparator<>(stats.getPercentile(50), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getPercentile(50),
+          sortDirection);
     case CodecUtil.STATS_TYPE_SKEWNESS:
-      return new MtasDataItemNumberComparator<>(stats.getSkewness(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getSkewness(),
+          sortDirection);
     default:
       return null;
     }
@@ -222,8 +234,10 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
   public String toString() {
     return this.getClass().getSimpleName() + "[" + fullValues.length + "]";
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -237,10 +251,12 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     MtasDataItemLongFull that = (MtasDataItemLongFull) obj;
     MtasDataItemNumberComparator<?> c1 = getComparableValue();
     MtasDataItemNumberComparator<?> c2 = that.getComparableValue();
-    return (c1!=null&&c2!=null&&c1.equals(c2));    
+    return (c1 != null && c2 != null && c1.equals(c2));
   }
-  
-  /* (non-Javadoc)
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override

@@ -32,7 +32,6 @@ public class MtasCQLQParser extends QParser {
   /** The Constant MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH. */
   public static final String MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
 
-  
   /** The Constant MTAS_CQL_QPARSER_PREFIX. */
   public static final String MTAS_CQL_QPARSER_PREFIX = "prefix";
 
@@ -41,10 +40,10 @@ public class MtasCQLQParser extends QParser {
 
   /** The cql. */
   String cql = null;
-  
+
   /** The ignore query. */
   String ignoreQuery = null;
-  
+
   /** The maximum ignore length. */
   Integer maximumIgnoreLength = null;
 
@@ -79,37 +78,42 @@ public class MtasCQLQParser extends QParser {
       ignoreQuery = localParams.getParams(MTAS_CQL_QPARSER_IGNORE)[0];
     }
     if ((localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH) != null)
-        && (localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH).length == 1)) {
+        && (localParams
+            .getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH).length == 1)) {
       try {
-        maximumIgnoreLength = Integer.parseInt(localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH)[0]);
+        maximumIgnoreLength = Integer.parseInt(
+            localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH)[0]);
       } catch (NumberFormatException e) {
         maximumIgnoreLength = null;
       }
     }
     if ((localParams.getParams(MTAS_CQL_QPARSER_PREFIX) != null)
-        && (localParams
-            .getParams(MTAS_CQL_QPARSER_PREFIX).length == 1)) {
+        && (localParams.getParams(MTAS_CQL_QPARSER_PREFIX).length == 1)) {
       defaultPrefix = localParams.getParams(MTAS_CQL_QPARSER_PREFIX)[0];
     }
     variables = new HashMap<>();
     Iterator<String> it = localParams.getParameterNamesIterator();
     while (it.hasNext()) {
-      String item = it.next();      
-      if (item.startsWith("variable_")) {       
-        if(localParams.getParams(item).length==0 || (localParams.getParams(item).length==1 && localParams.getParams(item)[0].isEmpty())) {
-          variables.put(item.substring(9),new String[0]);
+      String item = it.next();
+      if (item.startsWith("variable_")) {
+        if (localParams.getParams(item).length == 0
+            || (localParams.getParams(item).length == 1
+                && localParams.getParams(item)[0].isEmpty())) {
+          variables.put(item.substring(9), new String[0]);
         } else {
           ArrayList<String> list = new ArrayList<>();
-          for(int i=0; i<localParams.getParams(item).length; i++) {
-            String[] subList = localParams.getParams(item)[i].split("(?<!\\\\),");
-            for(int j=0; j<subList.length; j++) {
+          for (int i = 0; i < localParams.getParams(item).length; i++) {
+            String[] subList = localParams.getParams(item)[i]
+                .split("(?<!\\\\),");
+            for (int j = 0; j < subList.length; j++) {
               list.add(subList[j].replace("\\,", ",").replace("\\\\", "\\"));
             }
           }
-          variables.put(item.substring(9), list.toArray(new String[list.size()]));
+          variables.put(item.substring(9),
+              list.toArray(new String[list.size()]));
         }
       }
-    }    
+    }
   }
 
   /*
@@ -125,21 +129,24 @@ public class MtasCQLQParser extends QParser {
       throw new SyntaxError("no " + MTAS_CQL_QPARSER_QUERY);
     } else {
       MtasSpanQuery q = null;
-      MtasSpanQuery iq =null;
-      if(ignoreQuery!=null) {
+      MtasSpanQuery iq = null;
+      if (ignoreQuery != null) {
         Reader ignoreReader = new BufferedReader(new StringReader(ignoreQuery));
         MtasCQLParser ignoreParser = new MtasCQLParser(ignoreReader);
         try {
           iq = ignoreParser.parse(field, null, null, null, null);
-        } catch (mtas.parser.cql.TokenMgrError | mtas.parser.cql.ParseException e) {
+        } catch (mtas.parser.cql.TokenMgrError
+            | mtas.parser.cql.ParseException e) {
           throw new SyntaxError(e);
         }
       }
       Reader queryReader = new BufferedReader(new StringReader(cql));
       MtasCQLParser queryParser = new MtasCQLParser(queryReader);
       try {
-        q = queryParser.parse(field, defaultPrefix, variables, iq, maximumIgnoreLength);
-      } catch (mtas.parser.cql.TokenMgrError | mtas.parser.cql.ParseException e) {
+        q = queryParser.parse(field, defaultPrefix, variables, iq,
+            maximumIgnoreLength);
+      } catch (mtas.parser.cql.TokenMgrError
+          | mtas.parser.cql.ParseException e) {
         throw new SyntaxError(e);
       }
       return q;

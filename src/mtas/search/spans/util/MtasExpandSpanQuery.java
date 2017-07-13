@@ -20,9 +20,9 @@ import mtas.codec.util.CodecInfo;
 import mtas.search.spans.MtasSpanMatchNoneSpans;
 
 /**
- * The Class MtasMaximumExpandSpanQuery.
+ * The Class MtasExpandSpanQuery.
  */
-public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
+public class MtasExpandSpanQuery extends MtasSpanQuery {
 
   /** The query. */
   MtasSpanQuery query;
@@ -40,7 +40,7 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
   int maximumRight;
 
   /**
-   * Instantiates a new mtas maximum expand span query.
+   * Instantiates a new mtas expand span query.
    *
    * @param query the query
    * @param minimumLeft the minimum left
@@ -48,7 +48,7 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
    * @param minimumRight the minimum right
    * @param maximumRight the maximum right
    */
-  public MtasMaximumExpandSpanQuery(MtasSpanQuery query, int minimumLeft,
+  public MtasExpandSpanQuery(MtasSpanQuery query, int minimumLeft,
       int maximumLeft, int minimumRight, int maximumRight) {
     super(null, null);
     this.query = query;
@@ -85,7 +85,7 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
     if (maximumLeft == 0 && maximumRight == 0) {
       return subWeight;
     } else {
-      return new MtasMaximumExpandWeight(subWeight, searcher, needsScores);
+      return new MtasExpandWeight(subWeight, searcher, needsScores);
     }
   }
 
@@ -126,7 +126,7 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    final MtasMaximumExpandSpanQuery that = (MtasMaximumExpandSpanQuery) obj;
+    final MtasExpandSpanQuery that = (MtasExpandSpanQuery) obj;
     boolean isEqual;
     isEqual = query.equals(that.query);
     isEqual &= minimumLeft == that.minimumLeft;
@@ -166,8 +166,13 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
     MtasSpanQuery newQuery = query.rewrite(reader);
     if (maximumLeft == 0 && maximumRight == 0) {
       return newQuery;
+    } else if (((maximumLeft == 0) || (maximumLeft == minimumLeft))
+        && ((maximumRight == 0) || (maximumRight == minimumRight))) {
+      MtasSpanQuery maximumExpandedQuery = new MtasMaximumExpandSpanQuery(
+          newQuery, minimumLeft, maximumLeft, minimumRight, maximumRight);
+      return maximumExpandedQuery.rewrite(reader);
     } else if (!query.equals(newQuery)) {
-      return new MtasMaximumExpandSpanQuery(newQuery, minimumLeft, maximumLeft,
+      return new MtasExpandSpanQuery(newQuery, minimumLeft, maximumLeft,
           minimumRight, maximumRight);
     } else {
       return super.rewrite(reader);
@@ -186,9 +191,9 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
   }
 
   /**
-   * The Class MtasMaximumExpandWeight.
+   * The Class MtasExpandWeight.
    */
-  private class MtasMaximumExpandWeight extends MtasSpanWeight {
+  private class MtasExpandWeight extends MtasSpanWeight {
 
     /** The Constant METHOD_GET_DELEGATE. */
     private static final String METHOD_GET_DELEGATE = "getDelegate";
@@ -200,16 +205,16 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
     SpanWeight subWeight;
 
     /**
-     * Instantiates a new mtas maximum expand weight.
+     * Instantiates a new mtas expand weight.
      *
      * @param subWeight the sub weight
      * @param searcher the searcher
      * @param needsScores the needs scores
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public MtasMaximumExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
+    public MtasExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
         boolean needsScores) throws IOException {
-      super(MtasMaximumExpandSpanQuery.this, searcher,
+      super(MtasExpandSpanQuery.this, searcher,
           needsScores ? getTermContexts(subWeight) : null);
       this.subWeight = subWeight;
     }
@@ -263,11 +268,11 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
           // get MtasFieldsProducer using terms
           Terms t = fp.terms(field);
           if (t == null) {
-            return new MtasSpanMatchNoneSpans(MtasMaximumExpandSpanQuery.this);
+            return new MtasSpanMatchNoneSpans(MtasExpandSpanQuery.this);
           } else {
             CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);
-            return new MtasMaximumExpandSpans(MtasMaximumExpandSpanQuery.this,
-                mtasCodecInfo, query.getField(), spans);
+            return new MtasExpandSpans(MtasExpandSpanQuery.this, mtasCodecInfo,
+                query.getField(), spans);
           }
         } catch (Exception e) {
           throw new IOException("Can't get reader", e);

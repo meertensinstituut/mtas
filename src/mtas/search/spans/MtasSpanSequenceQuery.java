@@ -16,6 +16,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
+import mtas.search.spans.util.MtasExpandSpanQuery;
 import mtas.search.spans.util.MtasIgnoreItem;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.util.MtasSpanWeight;
@@ -28,6 +29,18 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
 
   /** The items. */
   private List<MtasSpanSequenceItem> items;
+
+  /** The left minimum. */
+  private int leftMinimum;
+
+  /** The left maximum. */
+  private int leftMaximum;
+
+  /** The right minimum. */
+  private int rightMinimum;
+
+  /** The right maximum. */
+  private int rightMaximum;
 
   /** The ignore query. */
   private MtasSpanQuery ignoreQuery;
@@ -47,11 +60,32 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    */
   public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
       MtasSpanQuery ignoreQuery, Integer maximumIgnoreLength) {
+    this(items, 0, 0, 0, 0, ignoreQuery, maximumIgnoreLength);
+  }
+
+  /**
+   * Instantiates a new mtas span sequence query.
+   *
+   * @param items the items
+   * @param leftMinimum the left minimum
+   * @param leftMaximum the left maximum
+   * @param rightMinimum the right minimum
+   * @param rightMaximum the right maximum
+   * @param ignoreQuery the ignore query
+   * @param maximumIgnoreLength the maximum ignore length
+   */
+  public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
+      int leftMinimum, int leftMaximum, int rightMinimum, int rightMaximum,
+      MtasSpanQuery ignoreQuery, Integer maximumIgnoreLength) {
     super(null, null);
-    Integer minimum = 0;
-    Integer maximum = 0;
     this.items = items;
+    this.leftMinimum = leftMinimum;
+    this.leftMaximum = leftMaximum;
+    this.rightMinimum = rightMinimum;
+    this.rightMaximum = rightMaximum;
     // get field and do checks
+    Integer minimum = leftMinimum + rightMinimum;
+    Integer maximum = leftMaximum + rightMaximum;
     for (MtasSpanSequenceItem item : items) {
       if (field == null) {
         field = item.getQuery().getField();
@@ -143,11 +177,20 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     if (items.size() == 1) {
-      return items.get(0).getQuery().rewrite(reader);
+      MtasSpanQuery singleQuery = items.get(0).getQuery();
+      if (leftMaximum != 0 || rightMaximum != 0) {
+        singleQuery = new MtasExpandSpanQuery(singleQuery, leftMinimum,
+            leftMaximum, rightMinimum, rightMaximum);
+      }
+      return singleQuery.rewrite(reader);
     } else {
       MtasSpanSequenceItem newItem;
       MtasSpanSequenceItem previousNewItem = null;
       ArrayList<MtasSpanSequenceItem> newItems = new ArrayList<>(items.size());
+      int newLeftMinimum = leftMinimum;
+      int newLeftMaximum = leftMaximum;
+      int newRightMinimum = rightMinimum;
+      int newRightMaximum = rightMaximum;
       MtasSpanQuery newIgnoreClause = ignoreQuery != null
           ? ignoreQuery.rewrite(reader) : null;
       boolean actuallyRewritten = ignoreQuery != null
@@ -173,11 +216,98 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
           previousNewItem = newItem;
         }
       }
+      // check first and last
+      if (ignoreQuery == null) {
+        ArrayList<MtasSpanSequenceItem> possibleTrimmedItems = new ArrayList<>(
+            newItems.size());
+        MtasSpanSequenceItem firstItem = newItems.get(0);
+        MtasSpanQuery firstQuery = firstItem.getQuery();
+        if (firstQuery instanceof MtasSpanMatchAllQuery) {
+          newLeftMaximum++;
+          if (!firstItem.isOptional()) {
+            newLeftMinimum++;
+          }
+        } else if (firstQuery instanceof MtasSpanRecurrenceQuery) {
+          MtasSpanRecurrenceQuery firstRecurrenceQuery = (MtasSpanRecurrenceQuery) firstQuery;
+          if (firstRecurrenceQuery.getQuery() instanceof MtasSpanMatchAllQuery
+              && firstRecurrenceQuery.getIgnoreQuery() == null) {
+            if (!firstItem.isOptional()) {
+              newLeftMinimum += firstRecurrenceQuery.getMinimumRecurrence();
+              newLeftMaximum += firstRecurrenceQuery.getMaximumRecurrence();
+            } else {
+              if (firstRecurrenceQuery.getMinimumRecurrence() == 1
+                  || firstRecurrenceQuery
+                      .getMinimumRecurrence() <= newLeftMinimum) {
+                newLeftMinimum += 0;
+                newLeftMaximum += firstRecurrenceQuery.getMaximumRecurrence();
+              } else {
+                possibleTrimmedItems.add(firstItem);
+              }
+            }
+          } else {
+            possibleTrimmedItems.add(firstItem);
+          }
+        } else {
+          possibleTrimmedItems.add(firstItem);
+        }
+        for (int i = 1; i < (newItems.size() - 1); i++) {
+          possibleTrimmedItems.add(newItems.get(i));
+        }
+        if (newItems.size() > 1) {
+          MtasSpanSequenceItem lastItem = newItems.get((newItems.size() - 1));
+          MtasSpanQuery lastQuery = lastItem.getQuery();
+          if (lastQuery instanceof MtasSpanMatchAllQuery) {
+            newRightMaximum++;
+            if (!lastItem.isOptional()) {
+              newRightMinimum++;
+            }
+          } else if (lastQuery instanceof MtasSpanRecurrenceQuery) {
+            MtasSpanRecurrenceQuery lastRecurrenceQuery = (MtasSpanRecurrenceQuery) lastQuery;
+            if (lastRecurrenceQuery.getQuery() instanceof MtasSpanMatchAllQuery
+                && lastRecurrenceQuery.getIgnoreQuery() == null) {
+              if (!lastItem.isOptional()) {
+                newRightMinimum += lastRecurrenceQuery.getMinimumRecurrence();
+                newRightMaximum += lastRecurrenceQuery.getMaximumRecurrence();
+              } else if (lastRecurrenceQuery.getMinimumRecurrence() == 1
+                  || lastRecurrenceQuery
+                      .getMinimumRecurrence() <= newRightMinimum) {
+                newRightMinimum += 0;
+                newRightMaximum += lastRecurrenceQuery.getMaximumRecurrence();
+              } else {
+                possibleTrimmedItems.add(lastItem);
+              }
+            } else {
+              possibleTrimmedItems.add(lastItem);
+            }
+          } else {
+            possibleTrimmedItems.add(lastItem);
+          }
+        }
+        if (possibleTrimmedItems.size() < newItems.size()) {
+          actuallyRewritten = true;
+          newItems = possibleTrimmedItems;
+        }
+      }
       if (!actuallyRewritten) {
-        return super.rewrite(reader);
+        if (leftMaximum != 0 || rightMaximum != 0) {
+          newLeftMinimum = leftMinimum;
+          newLeftMaximum = leftMaximum;
+          newRightMinimum = rightMinimum;
+          newRightMaximum = rightMaximum;
+          leftMinimum = 0;
+          leftMaximum = 0;
+          rightMinimum = 0;
+          rightMaximum = 0;
+          MtasSpanQuery finalQuery = new MtasExpandSpanQuery(this,
+              newLeftMinimum, newLeftMaximum, newRightMinimum, newRightMaximum);
+          return finalQuery.rewrite(reader);
+        } else {
+          return super.rewrite(reader);
+        }
       } else {
         if (!newItems.isEmpty()) {
-          return new MtasSpanSequenceQuery(newItems, newIgnoreClause,
+          return new MtasSpanSequenceQuery(newItems, newLeftMinimum,
+              newLeftMaximum, newRightMinimum, newRightMaximum, newIgnoreClause,
               maximumIgnoreLength).rewrite(reader);
         } else {
           return new MtasSpanMatchNoneQuery(field);
@@ -207,6 +337,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
         buffer.append(", ");
       }
     }
+    buffer.append("[" + leftMinimum + "," + leftMaximum + "]");
+    buffer.append("[" + rightMinimum + "," + rightMaximum + "]");
     buffer.append("]");
     buffer.append(", ");
     buffer.append(ignoreQuery);
@@ -228,10 +360,17 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     if (getClass() != obj.getClass())
       return false;
     MtasSpanSequenceQuery other = (MtasSpanSequenceQuery) obj;
-    return field.equals(other.field) && items.equals(other.items)
-        && ((ignoreQuery == null && other.ignoreQuery == null)
-            || ignoreQuery != null && other.ignoreQuery != null
-                && ignoreQuery.equals(other.ignoreQuery));
+    boolean isEqual;
+    isEqual = field.equals(other.field);
+    isEqual &= items.equals(other.items);
+    isEqual &= leftMinimum == other.leftMinimum;
+    isEqual &= leftMaximum == other.leftMaximum;
+    isEqual &= rightMinimum == other.rightMinimum;
+    isEqual &= rightMaximum == other.rightMaximum;
+    isEqual &= ((ignoreQuery == null && other.ignoreQuery == null)
+        || (ignoreQuery != null && other.ignoreQuery != null
+            && ignoreQuery.equals(other.ignoreQuery)));
+    return isEqual;
   }
 
   /*
@@ -244,6 +383,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 3) ^ field.hashCode();
     h = (h * 5) ^ items.hashCode();
+    h = Integer.rotateLeft(h, leftMinimum) + leftMinimum;
+    h ^= 11;
+    h = Integer.rotateLeft(h, leftMaximum) + leftMaximum;
+    h ^= 13;
+    h = Integer.rotateLeft(h, rightMinimum) + rightMinimum;
+    h ^= 17;
+    h = Integer.rotateLeft(h, rightMaximum) + rightMaximum;
     if (ignoreQuery != null) {
       h = (h * 7) ^ ignoreQuery.hashCode();
       h = (h * 11) ^ maximumIgnoreLength.hashCode();
@@ -287,6 +433,20 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       weights.add(item.spanWeight);
     }
     return getTermContexts(weights);
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
+   */
+  @Override
+  public void disableTwoPhaseIterator() {
+    super.disableTwoPhaseIterator();
+    for (MtasSpanSequenceItem item : items) {
+      item.getQuery().disableTwoPhaseIterator();
+    }
+    if (ignoreQuery != null) {
+      ignoreQuery.disableTwoPhaseIterator();
+    }
   }
 
   /**
@@ -366,13 +526,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
           Spans sequenceSpans = w.spanWeight.getSpans(context,
               requiredPostings);
           if (sequenceSpans != null) {
-            setSequenceSpans
-                .add(new MtasSpanSequenceQuerySpans(sequenceSpans, w.optional));
+            setSequenceSpans.add(new MtasSpanSequenceQuerySpans(
+                MtasSpanSequenceQuery.this, sequenceSpans, w.optional));
             allSpansEmpty = false;
           } else {
             if (w.optional) {
-              setSequenceSpans
-                  .add(new MtasSpanSequenceQuerySpans(null, w.optional));
+              setSequenceSpans.add(new MtasSpanSequenceQuerySpans(
+                  MtasSpanSequenceQuery.this, null, w.optional));
             } else {
               return null;
             }
@@ -383,8 +543,8 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
         } else if (ignoreWeight != null) {
           ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);
         }
-        return new MtasSpanSequenceSpans(setSequenceSpans, ignoreSpans,
-            maximumIgnoreLength);
+        return new MtasSpanSequenceSpans(MtasSpanSequenceQuery.this,
+            setSequenceSpans, ignoreSpans, maximumIgnoreLength);
       }
     }
 
@@ -419,11 +579,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     /**
      * Instantiates a new mtas span sequence query spans.
      *
+     * @param query the query
      * @param spans the spans
      * @param optional the optional
      */
-    public MtasSpanSequenceQuerySpans(Spans spans, boolean optional) {
-      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans();
+    public MtasSpanSequenceQuerySpans(MtasSpanSequenceQuery query, Spans spans,
+        boolean optional) {
+      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
       this.optional = optional;
     }
   }

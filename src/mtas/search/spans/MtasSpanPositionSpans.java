@@ -5,6 +5,8 @@ import java.io.IOException;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.search.spans.util.MtasSpans;
+
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 
 /**
@@ -12,16 +14,31 @@ import org.apache.lucene.search.spans.SpanCollector;
  */
 public class MtasSpanPositionSpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanPositionQuery query;
+
   /** The field. */
   private String field;
 
-  /** The doc id. */
+  /** The start. */
   private int start;
+  
+  /** The end. */
   private int end;
+  
+  /** The min position. */
   private int minPosition;
+  
+  /** The max position. */
   private int maxPosition;
+  
+  /** The current start position. */
   private int currentStartPosition;
+  
+  /** The current end position. */
   private int currentEndPosition;
+  
+  /** The doc id. */
   private int docId;
 
   /** The mtas codec info. */
@@ -30,18 +47,16 @@ public class MtasSpanPositionSpans extends MtasSpans {
   /**
    * Instantiates a new mtas span position spans.
    *
-   * @param mtasCodecInfo
-   *          the mtas codec info
-   * @param field
-   *          the field
-   * @param start
-   *          the start
-   * @param end
-   *          the end
+   * @param query the query
+   * @param mtasCodecInfo the mtas codec info
+   * @param field the field
+   * @param start the start
+   * @param end the end
    */
-  public MtasSpanPositionSpans(CodecInfo mtasCodecInfo, String field, int start,
-      int end) {
+  public MtasSpanPositionSpans(MtasSpanPositionQuery query,
+      CodecInfo mtasCodecInfo, String field, int start, int end) {
     super();
+    this.query = query;
     this.mtasCodecInfo = mtasCodecInfo;
     this.field = field;
     this.start = start;
@@ -198,6 +213,19 @@ public class MtasSpanPositionSpans extends MtasSpans {
   @Override
   public float positionsCost() {
     return 0;
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (!query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }

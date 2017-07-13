@@ -3,6 +3,8 @@ package mtas.search.spans;
 import java.io.IOException;
 import java.util.HashSet;
 
+import org.apache.lucene.search.ConjunctionDISI;
+import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import mtas.search.spans.MtasSpanFollowedByQuery.MtasSpanFollowedByQuerySpans;
 import mtas.search.spans.util.MtasSpans;
@@ -12,22 +14,24 @@ import mtas.search.spans.util.MtasSpans;
  */
 public class MtasSpanFollowedBySpans extends MtasSpans {
 
+  /** The query. */
+  private MtasSpanFollowedByQuery query;
+
   /** The spans 1. */
   private MtasSpanFollowedByQuerySpans spans1;
-  
+
   /** The spans 2. */
   private MtasSpanFollowedByQuerySpans spans2;
 
   /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-  
+
   /** The previous spans 2 start positions. */
   private HashSet<Integer> previousSpans2StartPositions;
 
-
   /** The called next start position. */
   private boolean calledNextStartPosition;
-  
+
   /** The no more positions. */
   private boolean noMorePositions;
 
@@ -37,22 +41,27 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
   /**
    * Instantiates a new mtas span followed by spans.
    *
-   * @param mtasSpanFollowedByQuery the mtas span followed by query
+   * @param query the query
    * @param spans1 the spans 1
    * @param spans2 the spans 2
    */
-  public MtasSpanFollowedBySpans(
+  public MtasSpanFollowedBySpans(MtasSpanFollowedByQuery query,
       MtasSpanFollowedByQuerySpans spans1,
       MtasSpanFollowedByQuerySpans spans2) {
     super();
     docId = -1;
+    this.query = query;
     this.spans1 = spans1;
-    this.spans2 = spans2;   
+    this.spans2 = spans2;
     previousSpans2StartPositions = new HashSet<>();
   }
 
-  /* (non-Javadoc)
-   * @see org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans.SpanCollector)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
+   * .SpanCollector)
    */
   @Override
   public void collect(SpanCollector collector) throws IOException {
@@ -60,7 +69,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     spans2.spans.collect(collector);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#endPosition()
    */
   @Override
@@ -70,7 +81,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
         : -1;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
    */
   @Override
@@ -89,7 +102,7 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
       // compute next match
     } else {
       if (goToNextStartPosition()) {
-        // match found        
+        // match found
         return spans1.spans.startPosition();
       } else {
         // no more matches: document finished
@@ -98,7 +111,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#positionsCost()
    */
   @Override
@@ -106,7 +121,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#startPosition()
    */
   @Override
@@ -116,7 +133,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
         : -1;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.spans.Spans#width()
    */
   @Override
@@ -125,7 +144,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
         : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
    */
   @Override
@@ -173,7 +194,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#cost()
    */
   @Override
@@ -181,7 +204,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#docID()
    */
   @Override
@@ -189,7 +214,9 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     return docId;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
    */
   @Override
@@ -247,32 +274,33 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
       if (nextSpans1EndPosition == lastSpans2StartPosition) {
         return true;
       } else {
-        //clean up
-        if(lastSpans2StartPosition<nextSpans1StartPosition) {
+        // clean up
+        if (lastSpans2StartPosition < nextSpans1StartPosition) {
           previousSpans2StartPositions.clear();
-        } else if(previousSpans2StartPositions.contains(nextSpans1EndPosition)) {
+        } else if (previousSpans2StartPositions
+            .contains(nextSpans1EndPosition)) {
           return true;
         }
-        //try to find match
+        // try to find match
         while (lastSpans2StartPosition < nextSpans1EndPosition) {
           if (lastSpans2StartPosition != NO_MORE_POSITIONS) {
             lastSpans2StartPosition = spans2.spans.nextStartPosition();
-          }  
+          }
           if (lastSpans2StartPosition == NO_MORE_POSITIONS) {
-            if(previousSpans2StartPositions.isEmpty()) {
+            if (previousSpans2StartPositions.isEmpty()) {
               noMorePositions = true;
               return false;
-            }            
+            }
           } else {
-            if(lastSpans2StartPosition>=nextSpans1StartPosition) {
+            if (lastSpans2StartPosition >= nextSpans1StartPosition) {
               previousSpans2StartPositions.add(lastSpans2StartPosition);
-            } 
+            }
             if (nextSpans1EndPosition == lastSpans2StartPosition) {
               return true;
-            } 
+            }
           }
         }
-      }      
+      }
     }
     return false;
   }
@@ -285,6 +313,19 @@ public class MtasSpanFollowedBySpans extends MtasSpans {
     noMorePositions = false;
     lastSpans2StartPosition = -1;
     previousSpans2StartPositions.clear();
+  }
+
+  /* (non-Javadoc)
+   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
+   */
+  @Override
+  public TwoPhaseIterator asTwoPhaseIterator() {
+    if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
+      return null;
+    } else {
+      // TODO
+      return null;
+    }
   }
 
 }
