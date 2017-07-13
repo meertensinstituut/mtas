@@ -32,7 +32,7 @@ RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binarie
     tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 && \
     rm lib/commons-math3-3.6.1-bin.tar.gz
     
-RUN svn export https://github.com/meertensinstituut/mtas/trunk/docker/ data
+RUN svn export https://github.com/meertensinstituut/mtas/trunk/docker/ data 
 
 RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get update && \
