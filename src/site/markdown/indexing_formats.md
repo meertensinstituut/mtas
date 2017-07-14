@@ -4,8 +4,8 @@ To configure the mapping from resources to the index structure, several parsers 
 
 * [MtasFoliaParser](indexing_formats_folia.html) : mapping [FoLiA](https://proycon.github.io/folia/) resources
 * [MtasTEIParser](indexing_formats_tei.html): mapping [ISO-TEI](http://www.tei-c.org/) resources
-* [MtasSketchParser](indexing_formats_sketch.html): mapping [Sketch Engine](https://www.sketchengine.co.uk/word-sketch-index-format/) resources
 * [MtasChatParser](indexing_formats_chat.html): mapping [CHAT transcription format](http://talkbank.org/manuals/CHAT.pdf) resources converted to [XML](http://talkbank.org/software/xsddoc/)
+* [MtasSketchParser](indexing_formats_sketch.html): mapping [Sketch Engine](https://www.sketchengine.co.uk/word-sketch-index-format/) resources
 * [MtasCRMParser](indexing_formats_crm.html): mapping resources with format Corpus Van Reenen-Mulder/Adelheid
 
 For XML-based formats, these parsers often just slightly extend the abstract MtasXMLParser by defining the correct namespaces and root tags. 
