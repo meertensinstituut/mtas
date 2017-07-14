@@ -33,6 +33,7 @@
           <item name="FoLiA" href="indexing_formats_folia.html" collapse="true"/>
           <item name="TEI" href="indexing_formats_tei.html" collapse="true"/>
           <item name="Sketch" href="indexing_formats_sketch.html" collapse="true"/>
+          <item name="CHAT" href="indexing_formats_chat.html" collapse="true"/>
           <item name="CRM" href="indexing_formats_crm.html" collapse="true"/>
         </item>        
       </item>

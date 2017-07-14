@@ -135,7 +135,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_POPULATIONVARIANCE)) {
         response.put(statsItem, stats.getPopulationVariance());
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_QUADRATICMEAN)) {
-        response.put(statsItem, stats.getQuadraticMean());
+        response.put(statsItem, Math.sqrt(stats.getSumsq()/stats.getN()));
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_KURTOSIS)) {
         response.put(statsItem, stats.getKurtosis());
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_MEDIAN)) {
@@ -153,7 +153,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
       }
     }
     if (errorNumber > 0) {
-      Map<String, Object> errorResponse = new HashMap<String, Object>();
+      Map<String, Object> errorResponse = new HashMap<>();
       for (Entry<String, Integer> entry : getErrorList().entrySet()) {
         errorResponse.put(entry.getKey(), entry.getValue());
       }
@@ -178,31 +178,19 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     case CodecUtil.STATS_TYPE_N:
       return 0;
     case CodecUtil.STATS_TYPE_SUM:
-      return 1;
     case CodecUtil.STATS_TYPE_MAX:
-      return 1;
     case CodecUtil.STATS_TYPE_MIN:
-      return 1;
     case CodecUtil.STATS_TYPE_SUMSQ:
       return 1;
     case CodecUtil.STATS_TYPE_SUMOFLOGS:
-      return 2;
     case CodecUtil.STATS_TYPE_MEAN:
-      return 2;
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-      return 2;
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-      return 2;
     case CodecUtil.STATS_TYPE_VARIANCE:
-      return 2;
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-      return 2;
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-      return 2;
     case CodecUtil.STATS_TYPE_KURTOSIS:
-      return 2;
     case CodecUtil.STATS_TYPE_MEDIAN:
-      return 2;
     case CodecUtil.STATS_TYPE_SKEWNESS:
       return 2;
     default:
@@ -219,7 +207,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
-      return new MtasDataItemNumberComparator<Long>(stats.getN(),
+      return new MtasDataItemNumberComparator<>(stats.getN(),
           sortDirection);
     default:
       return null;

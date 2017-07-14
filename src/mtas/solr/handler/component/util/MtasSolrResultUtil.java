@@ -93,7 +93,7 @@ public class MtasSolrResultUtil {
   private static void rewrite(NamedList<Object> nl, boolean doCollapse)
       throws IOException {
     boolean showDebugInfo = false;
-    HashMap<String, NamedList<Object>> collapseNamedList = new HashMap<String, NamedList<Object>>();
+    HashMap<String, NamedList<Object>> collapseNamedList = new HashMap<>();
     int length = nl.size();
     for (int i = 0; i < length; i++) {
       if (nl.getVal(i) instanceof NamedList) {
@@ -172,7 +172,7 @@ public class MtasSolrResultUtil {
    */
   private static ArrayList<NamedList<Object>> rewriteToArray(
       NamedList<Object> nnl) {
-    ArrayList<NamedList<Object>> al = new ArrayList<NamedList<Object>>();
+    ArrayList<NamedList<Object>> al = new ArrayList<>();
     String key;
     Iterator<Entry<String, Object>> it = nnl.iterator();
     while (it.hasNext()) {
@@ -384,7 +384,7 @@ public class MtasSolrResultUtil {
             "unequal size " + nameNew + " and " + nameOriginal);
       }
       if (unique) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (int i = 0; i < list.length; i++) {
           set.add(list[i]);
         }
