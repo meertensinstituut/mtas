@@ -210,7 +210,7 @@ class MtasDataItemLongFull extends MtasDataItemFull&lt;Long, Double&gt; {
 <span class="nc" id="L210">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPopulationVariance(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-<span class="nc" id="L213">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getQuadraticMean(),</span>
+<span class="nc" id="L213">      return new MtasDataItemNumberComparator&lt;&gt;(Math.sqrt(stats.getSumsq()/stats.getN()),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
 <span class="nc" id="L216">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getKurtosis(),</span>

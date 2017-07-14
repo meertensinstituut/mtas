@@ -62,7 +62,7 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull&lt;Double, Double&g
    */
   @Override
   protected HashMap&lt;String, Object&gt; getDistribution(String argument) {
-<span class="nc" id="L65">    HashMap&lt;String, Object&gt; result = new LinkedHashMap&lt;String, Object&gt;();</span>
+<span class="nc" id="L65">    HashMap&lt;String, Object&gt; result = new LinkedHashMap&lt;&gt;();</span>
 <span class="nc" id="L66">    Double start = null;</span>
 <span class="nc" id="L67">    Double end = null;</span>
 <span class="nc" id="L68">    Double step = null;</span>
@@ -202,16 +202,16 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull&lt;Double, Double&g
 <span class="nc" id="L202">    createStats();</span>
 <span class="nc bnc" id="L203" title="All 18 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_SUM:
-<span class="nc" id="L205">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getSum(),</span>
+<span class="nc" id="L205">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getSum(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_MAX:
-<span class="nc" id="L208">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getMax(),</span>
+<span class="nc" id="L208">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getMax(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_MIN:
-<span class="nc" id="L211">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getMin(),</span>
+<span class="nc" id="L211">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getMin(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
-<span class="nc" id="L214">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getSumsq(),</span>
+<span class="nc" id="L214">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getSumsq(),</span>
           sortDirection);
     default:
 <span class="nc" id="L217">      return null;</span>
@@ -228,34 +228,34 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull&lt;Double, Double&g
 <span class="nc" id="L228">    createStats();</span>
 <span class="nc bnc" id="L229" title="All 42 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_SUMOFLOGS:
-<span class="nc" id="L231">      return new MtasDataItemNumberComparator&lt;Double&gt;(</span>
+<span class="nc" id="L231">      return new MtasDataItemNumberComparator&lt;&gt;(</span>
 <span class="nc" id="L232">          stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);</span>
     case CodecUtil.STATS_TYPE_MEAN:
-<span class="nc" id="L234">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getMean(),</span>
+<span class="nc" id="L234">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getMean(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
-<span class="nc" id="L237">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getGeometricMean(),</span>
+<span class="nc" id="L237">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getGeometricMean(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-<span class="nc" id="L240">      return new MtasDataItemNumberComparator&lt;Double&gt;(</span>
+<span class="nc" id="L240">      return new MtasDataItemNumberComparator&lt;&gt;(</span>
 <span class="nc" id="L241">          stats.getStandardDeviation(), sortDirection);</span>
     case CodecUtil.STATS_TYPE_VARIANCE:
-<span class="nc" id="L243">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getVariance(),</span>
+<span class="nc" id="L243">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getVariance(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-<span class="nc" id="L246">      return new MtasDataItemNumberComparator&lt;Double&gt;(</span>
+<span class="nc" id="L246">      return new MtasDataItemNumberComparator&lt;&gt;(</span>
 <span class="nc" id="L247">          stats.getPopulationVariance(), sortDirection);</span>
     case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-<span class="nc" id="L249">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getQuadraticMean(),</span>
+<span class="nc" id="L249">      return new MtasDataItemNumberComparator&lt;&gt;(Math.sqrt(stats.getSumsq()/stats.getN()),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
-<span class="nc" id="L252">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getKurtosis(),</span>
+<span class="nc" id="L252">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getKurtosis(),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_MEDIAN:
-<span class="nc" id="L255">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getPercentile(50),</span>
+<span class="nc" id="L255">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getPercentile(50),</span>
           sortDirection);
     case CodecUtil.STATS_TYPE_SKEWNESS:
-<span class="nc" id="L258">      return new MtasDataItemNumberComparator&lt;Double&gt;(stats.getSkewness(),</span>
+<span class="nc" id="L258">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getSkewness(),</span>
           sortDirection);
     default:
 <span class="nc" id="L261">      return null;</span>

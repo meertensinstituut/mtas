@@ -93,7 +93,7 @@ public class MtasSolrResultUtil {
   private static void rewrite(NamedList&lt;Object&gt; nl, boolean doCollapse)
       throws IOException {
 <span class="fc" id="L95">    boolean showDebugInfo = false;</span>
-<span class="fc" id="L96">    HashMap&lt;String, NamedList&lt;Object&gt;&gt; collapseNamedList = new HashMap&lt;String, NamedList&lt;Object&gt;&gt;();</span>
+<span class="fc" id="L96">    HashMap&lt;String, NamedList&lt;Object&gt;&gt; collapseNamedList = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L97">    int length = nl.size();</span>
 <span class="fc bfc" id="L98" title="All 2 branches covered.">    for (int i = 0; i &lt; length; i++) {</span>
 <span class="pc bpc" id="L99" title="1 of 2 branches missed.">      if (nl.getVal(i) instanceof NamedList) {</span>
@@ -172,7 +172,7 @@ public class MtasSolrResultUtil {
    */
   private static ArrayList&lt;NamedList&lt;Object&gt;&gt; rewriteToArray(
       NamedList&lt;Object&gt; nnl) {
-<span class="fc" id="L175">    ArrayList&lt;NamedList&lt;Object&gt;&gt; al = new ArrayList&lt;NamedList&lt;Object&gt;&gt;();</span>
+<span class="fc" id="L175">    ArrayList&lt;NamedList&lt;Object&gt;&gt; al = new ArrayList&lt;&gt;();</span>
     String key;
 <span class="fc" id="L177">    Iterator&lt;Entry&lt;String, Object&gt;&gt; it = nnl.iterator();</span>
 <span class="fc bfc" id="L178" title="All 2 branches covered.">    while (it.hasNext()) {</span>
@@ -384,7 +384,7 @@ public class MtasSolrResultUtil {
             &quot;unequal size &quot; + nameNew + &quot; and &quot; + nameOriginal);
       }
 <span class="fc bfc" id="L386" title="All 2 branches covered.">      if (unique) {</span>
-<span class="fc" id="L387">        Set&lt;String&gt; set = new HashSet&lt;String&gt;();</span>
+<span class="fc" id="L387">        Set&lt;String&gt; set = new HashSet&lt;&gt;();</span>
 <span class="fc bfc" id="L388" title="All 2 branches covered.">        for (int i = 0; i &lt; list.length; i++) {</span>
 <span class="fc" id="L389">          set.add(list[i]);</span>
         }

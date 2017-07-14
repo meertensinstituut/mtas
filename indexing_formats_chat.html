@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Date-Revision-yyyymmdd" content="20170714" />
     <meta http-equiv="Content-Language" content="en" />
-    <title>Multi Tier Annotation Search &#x2013; Multi Tier Annotation Search</title>
+    <title>Multi Tier Annotation Search &#x2013; CHAT</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-1.5.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -47,7 +47,7 @@
         Mtas</a>
                     <span class="divider">/</span>
       </li>
-        <li class="active ">Multi Tier Annotation Search</li>
+        <li class="active ">CHAT</li>
                 
               
                   <li id="publishDate" class="pull-right">Last Published: 2017-07-14</li>
@@ -63,10 +63,12 @@
                 <ul class="nav nav-list">
                     <li class="nav-header">Mtas</li>
                               
-      <li class="active">
+      <li>
   
-            <a href="#"><span class="none"></span>Introduction</a>
-          </li>
+                          <a href="index.html" title="Introduction">
+          <span class="none"></span>
+        Introduction</a>
+            </li>
                 
       <li>
   
@@ -81,13 +83,71 @@
           <span class="icon-chevron-right"></span>
         Getting started</a>
                   </li>
-                                                                                                                                                                                                      
+                                                                                                                                                                                                                
       <li>
   
                           <a href="indexing.html" title="Indexing">
-          <span class="icon-chevron-right"></span>
+          <span class="icon-chevron-down"></span>
         Indexing</a>
-                  </li>
+                    <ul class="nav nav-list">
+                    
+      <li>
+  
+                          <a href="indexing_configuration.html" title="Configuration">
+          <span class="none"></span>
+        Configuration</a>
+            </li>
+                    
+      <li>
+  
+                          <a href="indexing_mapping.html" title="Mapping">
+          <span class="none"></span>
+        Mapping</a>
+            </li>
+                                                                                                                                                  
+      <li>
+  
+                          <a href="indexing_formats.html" title="Formats">
+          <span class="icon-chevron-down"></span>
+        Formats</a>
+                    <ul class="nav nav-list">
+                    
+      <li>
+  
+                          <a href="indexing_formats_folia.html" title="FoLiA">
+          <span class="none"></span>
+        FoLiA</a>
+            </li>
+                    
+      <li>
+  
+                          <a href="indexing_formats_tei.html" title="TEI">
+          <span class="none"></span>
+        TEI</a>
+            </li>
+                    
+      <li class="active">
+  
+            <a href="#"><span class="none"></span>CHAT</a>
+          </li>
+                    
+      <li>
+  
+                          <a href="indexing_formats_sketch.html" title="Sketch">
+          <span class="none"></span>
+        Sketch</a>
+            </li>
+                    
+      <li>
+  
+                          <a href="indexing_formats_crm.html" title="CRM">
+          <span class="none"></span>
+        CRM</a>
+            </li>
+              </ul>
+        </li>
+              </ul>
+        </li>
                                                                                                                                                                                                                                                                                                                                                                               
       <li>
   
@@ -137,113 +197,23 @@
                 
         <div id="bodyColumn"  class="span10" >
                                   
-            <h1>Multi Tier Annotation Search</h1>
-<p>In recent years, multiple solutions have come available providing search on huge amounts of plain text and metadata. Scalable searchability on annotated text however still appears to be problematic. Using Mtas, we not only take advantage of the strength from Lucene and Solr, but extend queries with <a href="search_cql.html">CQL</a> conditions on annotated text</p>
+            <h1>CHAT</h1>
+<p>For indexing <a class="externalLink" href="http://talkbank.org/manuals/CHAT.pdf">CHAT transcription format</a> resources converted to <a class="externalLink" href="http://talkbank.org/software/xsddoc/">XML</a>, the <i>mtas.analysis.parser.MtasChatParser</i> extending the abstract <i>MtasXMLParser</i> is available; full examples of configuration files are provided on <a class="externalLink" href="https://github.com/meertensinstituut/mtas/tree/master/conf/parser/mtas">GitHub</a>.</p>
 
-<blockquote>
-<p><tt>[pos=&quot;LID&quot;] [pos=&quot;ADJ&quot;]? [lemma=&quot;amsterdam&quot;]</tt></p>
-<p><tt>&lt;entity=&quot;location/&gt; within (&lt;s/&gt; containing [lemma=&quot;utrecht&quot;])</tt></p>
-</blockquote>
-<p>Parsers for several <a href="indexing_formats.html">document formats</a> are provided, each with extended possibilities for <a href="indexing_configuration.html">configuration</a>, and advanced query <a href="features.html">features</a> like <a href="search_query_stats.html">statistics</a>, <a href="search_query_termvector.html">termvectors</a> and <a href="search_query_kwic.html">kwic</a> are available.</p>
-<p>Source code and releases are available on <a class="externalLink" href="https://github.com/meertensinstituut/mtas/">GitHub</a>, see <a href="installation.html">installation instructions</a> on how to get started.</p>
-<hr />
-<p><b>Nederlab</b> </p>
-<p>One of the primary use cases for Mtas, the <a class="externalLink" href="http://www.nederlab.nl/">Nederlab project</a>, currently<sup>1</sup> provides access, both in terms of metadata and annotated text, to over 15 million items for search and analysis as specified below. </p>
-
-<table border="0" class="table table-striped">
-  <thead>
-    
-<tr class="a">
-      
-<th> </th>
-      
-<th align="right">Total </th>
-      
-<th align="right">Mean </th>
-      
-<th align="right">Min </th>
-      
-<th align="right">Max </th>
-    </tr>
-  </thead>
-  <tbody>
-    
-<tr class="b">
-      
-<td>Solr index size </td>
-      
-<td align="right">1,146 G </td>
-      
-<td align="right">49.8 G </td>
-      
-<td align="right">268 k </td>
-      
-<td align="right">163 G </td>
-    </tr>
-    
-<tr class="a">
-      
-<td>Solr documents </td>
-      
-<td align="right">15,859,099 </td>
-      
-<td align="right">689,526 </td>
-      
-<td align="right">201 </td>
-      
-<td align="right">3,616,544 </td>
-    </tr>
-  </tbody>
-</table>
-<p>Collections are added and updated regularly by adding new cores, replacing cores and/or merging new cores with existing ones. Currently, the data is divided over 23 separate cores. For 14,663,457 of these documents, annotated text varying in size from 1 to over 3.5 million words is included:</p>
-
-<table border="0" class="table table-striped">
-  <thead>
-    
-<tr class="a">
-      
-<th> </th>
-      
-<th align="right">Total </th>
-      
-<th align="right">Mean </th>
-      
-<th align="right">Min </th>
-      
-<th align="right">Max </th>
-    </tr>
-  </thead>
-  <tbody>
-    
-<tr class="b">
-      
-<td>Words </td>
-      
-<td align="right">9,584,448,067 </td>
-      
-<td align="right">654 </td>
-      
-<td align="right">1 </td>
-      
-<td align="right">3,537,883 </td>
-    </tr>
-    
-<tr class="a">
-      
-<td>Annotations </td>
-      
-<td align="right">36,486,292,912 </td>
-      
-<td align="right">2,488 </td>
-      
-<td align="right">4 </td>
-      
-<td align="right">23,589,831 </td>
-    </tr>
-  </tbody>
-</table>
-<hr />
-<p><a name="footnote"><sup>1</sup></a> <small>situation january 2017</small></p>
+<div class="source">
+<div class="source"><pre class="prettyprint">&lt;!-- START CONFIGURATION MTAS PARSER --&gt;
+&lt;parser name=&quot;mtas.analysis.parser.MtasChatParser&quot;&gt;
+...
+  &lt;!-- START MAPPINGS --&gt;
+  &lt;mappings&gt;
+  ...
+  &lt;/mapping&gt;
+  &lt;!-- END MAPPINGS ---&gt;
+  ...
+&lt;/parser&gt;
+&lt;!-- END CONFIGURATION MTAS PARSER --&gt;
+</pre></div></div>
+<p>The syntax of the parser part in the <a href="indexing_configuration.html#configuration">configuration file</a> is, besides from the <i>name</i> attribute, almost identical to the configuration of the <a href="indexing_formats_folia.html">FoLiA-parser</a> and <a href="indexing_formats_tei.html">TEI-parser</a>. </p>
                   </div>
             </div>
           </div>
