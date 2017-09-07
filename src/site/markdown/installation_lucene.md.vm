@@ -57,7 +57,7 @@ indexReader.close();
 **Advanced search**
 
 By using the provided `collect` method, also more advanced 
-options are available, like computing the [termvector](search_query_termvector.html)
+options are available, like computing the [termvector](search_component_termvector.html)
 
 ```java
 IndexReader indexReader = DirectoryReader.open(directory);

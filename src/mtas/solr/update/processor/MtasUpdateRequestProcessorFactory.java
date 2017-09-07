@@ -21,6 +21,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -161,7 +162,7 @@ public class MtasUpdateRequestProcessorFactory
                       Class<?> cls = Class.forName((String) className);
                       if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
                         Class<?>[] types = { Map.class,
-                            SolrResourceLoader.class };
+                            ResourceLoader.class };
                         Constructor<?> cnstr = cls.getConstructor(types);
                         Object cff = cnstr.newInstance(args, resourceLoader);
                         if (cff instanceof MtasCharFilterFactory) {
@@ -216,7 +217,7 @@ public class MtasUpdateRequestProcessorFactory
                 if (className != null) {
                   try {
                     Class<?> cls = Class.forName((String) className);
-                    Class<?>[] types = { Map.class, SolrResourceLoader.class };
+                    Class<?>[] types = { Map.class, ResourceLoader.class };
                     Constructor<?> cnstr = cls.getConstructor(types);
                     Object cff = cnstr.newInstance(args, resourceLoader);
                     if (cff instanceof MtasTokenizerFactory) {

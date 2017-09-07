@@ -136,7 +136,7 @@ public class MtasSolrComponentPrefix
    * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap<Object> create(ComponentPrefix prefix,
-      Boolean encode) {
+      Boolean encode) throws IOException {
     SimpleOrderedMap<Object> mtasPrefixResponse = new SimpleOrderedMap<>();
     mtasPrefixResponse.add("key", prefix.key);
     if (encode) {
@@ -219,7 +219,7 @@ public class MtasSolrComponentPrefix
           for (Object mtasResponsePrefixItemRaw : mtasResponsePrefix) {
             mtasResponsePrefixItem = (NamedList<Object>) mtasResponsePrefixItemRaw;
             repairPrefixItems(mtasResponsePrefixItem);
-            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem);
+            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem, searchComponent);
           }
         }
       } catch (ClassCastException e) {

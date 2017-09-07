@@ -1,4 +1,4 @@
-# Query
+# Search Component
 
 To perform specific Mtas queries in Solr requests, the following parameter should be used.
 
@@ -6,8 +6,8 @@ To perform specific Mtas queries in Solr requests, the following parameter shoul
 |-------------|--------|-------------|
 | mtas        | true   | yes         |
 
-See [statistics](search_query_stats.html), 
-[kwic](search_query_kwic.html), [list](search_query_list.html), [document](search_query_document.html), [termvector](search_query_termvector.html), [facet](search_query_facet.html), [group](search_query_group.html) and [prefix](search_query_prefix.html) for more details and examples.
+See [statistics](search_component_stats.html), 
+[kwic](search_component_kwic.html), [list](search_component_list.html), [document](search_component_document.html), [termvector](search_component_termvector.html), [facet](search_component_facet.html), [group](search_component_group.html), [prefix](search_component_prefix.html) and [collection](search_component_collection.html) for more details and examples.
 
 ---
 

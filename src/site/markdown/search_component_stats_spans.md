@@ -1,6 +1,6 @@
 #Statistics - spans
 
-To get statistics on the occurrence of a span within a set of documents in Solr requests, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the occurrence of a span within a set of documents in Solr requests, besides the parameter to enable [statistics](search_component_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -29,8 +29,8 @@ The query may contain one or more variables, and the value(s) of these variables
 
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
-| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.variable\<identifier variable\>.name      | \<string\>   | name of variable                 | yes        |
-| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.variable\<identifier variable\>.value      | \<string\>   | comma separated list of values  | yes        |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.variable.\<identifier variable\>.name      | \<string\>   | name of variable                 | yes        |
+| mtas.stats.spans.\<identifier\>.query.\<identifier query\>.variable.\<identifier variable\>.value      | \<string\>   | comma separated list of values  | yes        |
 
 ## Functions
 

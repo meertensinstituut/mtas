@@ -225,7 +225,7 @@ public class MtasSolrTestDistributedSearchConsistency {
         list.get(COLLECTION_DISTRIBUTED).getResponse(), "tv",
         new String[] { "n", "sum" });
     for (Entry<String, QueryResponse> entry : list.entrySet()) {
-      List<NamedList> tv = MtasSolrBase
+      List<NamedList<Object>> tv = MtasSolrBase
           .getFromMtasTermvector(entry.getValue().getResponse(), "tv");
       for (NamedList<Object> item : tv) {
         String key = item.get("key").toString();
@@ -311,6 +311,310 @@ public class MtasSolrTestDistributedSearchConsistency {
   }
 
   /**
+   * Mtas request handler collection 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @org.junit.Test
+  public void mtasRequestHandlerCollection1() throws IOException {
+    String[] collections = new String[] { COLLECTION_ALL_OPTIMIZED,
+        COLLECTION_ALL_MULTIPLE_SEGMENTS, COLLECTION_DISTRIBUTED };
+    String[] collectionsParts = new String[] { COLLECTION_PART1_OPTIMIZED,
+        COLLECTION_PART2_MULTIPLE_SEGMENTS };
+    Map<String, String> listCreateVersion = new HashMap<>();
+    Map<String, Number> listCreateSize = new HashMap<>();
+    Map<String, String> listPostVersion = new HashMap<>();
+    Map<String, Number> listPostSize = new HashMap<>();
+    // create
+    ModifiableSolrParams paramsCreate = new ModifiableSolrParams();
+    paramsCreate.set("q", "*:*");
+    paramsCreate.set("rows", "0");
+    paramsCreate.set("mtas", "true");
+    paramsCreate.set("mtas.collection", "true");
+    paramsCreate.set("mtas.collection.0.key", "create");
+    paramsCreate.set("mtas.collection.0.action", "create");
+    paramsCreate.set("mtas.collection.0.id", "idCreate");
+    paramsCreate.set("mtas.collection.0.field", MtasSolrBase.FIELD_ID);
+    Map<String, QueryResponse> listCreate = createResults(paramsCreate,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listCreate.entrySet()) {
+      long size = MtasSolrBase.getNumFound(entry.getValue().getResponse());
+      NamedList<Object> create = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "create");
+      createCollectionAssertions(create, entry.getKey(), "idCreate", null, size,
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      listCreateVersion.put(entry.getKey(), (String) create.get("version"));
+      listCreateSize.put(entry.getKey(), (Number) create.get("size"));
+    }
+    // post
+    ModifiableSolrParams paramsPost = new ModifiableSolrParams();
+    paramsPost.set("q", "*:*");
+    paramsPost.set("rows", "0");
+    paramsPost.set("mtas", "true");
+    paramsPost.set("mtas.collection", "true");
+    paramsPost.set("mtas.collection.0.key", "post");
+    paramsPost.set("mtas.collection.0.action", "post");
+    paramsPost.set("mtas.collection.0.id", "idPost");
+    paramsPost.set("mtas.collection.0.post", "[1,2,3,4]");
+    Map<String, QueryResponse> listPost = createResults(paramsPost,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listPost.entrySet()) {
+      long size = 4;
+      NamedList<Object> post = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "post");
+      createCollectionAssertions(post, entry.getKey(), "idPost", null, size,
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      listPostVersion.put(entry.getKey(), (String) post.get("version"));
+      listPostSize.put(entry.getKey(), (Number) post.get("size"));
+    }
+    // list
+    ModifiableSolrParams paramsList = new ModifiableSolrParams();
+    paramsList.set("q", "*:*");
+    paramsList.set("rows", "0");
+    paramsList.set("mtas", "true");
+    paramsList.set("mtas.collection", "true");
+    paramsList.set("mtas.collection.0.key", "list");
+    paramsList.set("mtas.collection.0.action", "list");
+    Map<String, QueryResponse> listList = createResults(paramsList,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listList.entrySet()) {
+      // check create
+      NamedList<Object> listCreateItem1 = MtasSolrBase
+          .getFromMtasCollectionList(entry.getValue().getResponse(), "list",
+              "idCreate");
+      createCollectionAssertions(listCreateItem1, entry.getKey(), "idCreate",
+          listCreateVersion.get(entry.getKey()),
+          listCreateSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      // check post
+      NamedList<Object> listPostItem1 = MtasSolrBase.getFromMtasCollectionList(
+          entry.getValue().getResponse(), "list", "idPost");
+      createCollectionAssertions(listPostItem1, entry.getKey(), "idPost",
+          listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+    }
+    // check
+    ModifiableSolrParams paramsCheck = new ModifiableSolrParams();
+    paramsCheck.set("q", "*:*");
+    paramsCheck.set("rows", "0");
+    paramsCheck.set("mtas", "true");
+    paramsCheck.set("mtas.collection", "true");
+    paramsCheck.set("mtas.collection.0.key", "check1");
+    paramsCheck.set("mtas.collection.0.action", "check");
+    paramsCheck.set("mtas.collection.0.id", "idCreate");
+    paramsCheck.set("mtas.collection.1.key", "check2");
+    paramsCheck.set("mtas.collection.1.action", "check");
+    paramsCheck.set("mtas.collection.1.id", "idPost");
+    // check on all
+    Map<String, QueryResponse> listCheck = createResults(paramsCheck,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listCheck.entrySet()) {
+      NamedList<Object> listItemCheck1 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check1");
+      createCollectionAssertions(listItemCheck1, entry.getKey(), "idCreate",
+          listCreateVersion.get(entry.getKey()),
+          listCreateSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      NamedList<Object> listItemCheck2 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check2");
+      createCollectionAssertions(listItemCheck2, entry.getKey(), "idPost",
+          listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+    }
+    // check on parts
+    createResults(paramsCheck, Arrays.asList(collectionsParts));
+    for (Entry<String, QueryResponse> entry : listCheck.entrySet()) {
+      NamedList<Object> listItemCheck1 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check1");
+      createCollectionAssertions(listItemCheck1, entry.getKey(), "idCreate",
+          listCreateVersion.get(entry.getKey()),
+          listCreateSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      NamedList<Object> listItemCheck2 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check2");
+      createCollectionAssertions(listItemCheck2, entry.getKey(), "idPost",
+          listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+    }
+    // delete
+    ModifiableSolrParams paramsDelete = new ModifiableSolrParams();
+    paramsDelete.set("q", "*:*");
+    paramsDelete.set("rows", "0");
+    paramsDelete.set("mtas", "true");
+    paramsDelete.set("mtas.collection", "true");
+    paramsDelete.set("mtas.collection.0.key", "delete1");
+    paramsDelete.set("mtas.collection.0.action", "delete");
+    paramsDelete.set("mtas.collection.0.id", "idCreate");
+    paramsDelete.set("mtas.collection.1.key", "delete2");
+    paramsDelete.set("mtas.collection.1.action", "delete");
+    paramsDelete.set("mtas.collection.1.id", "idPost");
+    // delete on parts
+    createResults(paramsDelete, Arrays.asList(collectionsParts));
+    // recheck on parts
+    Map<String, QueryResponse> listCheckParts = createResults(paramsCheck,
+        Arrays.asList(collectionsParts));
+    for (Entry<String, QueryResponse> entry : listCheckParts.entrySet()) {
+      NamedList<Object> listItemCheck1 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check1");
+      assertTrue(
+          entry.getKey() + " - create - should be removed: " + listItemCheck1,
+          listItemCheck1 != null && listItemCheck1.get("id") == null);
+      NamedList<Object> listItemCheck2 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check2");
+      assertTrue(
+          entry.getKey() + " - post - should be removed: " + listItemCheck2,
+          listItemCheck2 != null && listItemCheck2.get("id") == null);
+    }
+    // list with empty parts
+    listList = createResults(paramsList, Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listList.entrySet()) {
+      // check create
+      NamedList<Object> listCreateItem1 = MtasSolrBase
+          .getFromMtasCollectionList(entry.getValue().getResponse(), "list",
+              "idCreate");
+      createCollectionAssertions(listCreateItem1, entry.getKey(), "idCreate",
+          listCreateVersion.get(entry.getKey()),
+          listCreateSize.get(entry.getKey()), 0);
+      // check post
+      NamedList<Object> listPostItem1 = MtasSolrBase.getFromMtasCollectionList(
+          entry.getValue().getResponse(), "list", "idPost");
+      createCollectionAssertions(listPostItem1, entry.getKey(), "idPost",
+          listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
+          0);
+    }
+    // recheck on all, assuming empty parts, autofix
+    listCheck = createResults(paramsCheck, Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listCheck.entrySet()) {
+      NamedList<Object> listItemCheck1 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check1");
+      createCollectionAssertions(listItemCheck1, entry.getKey(), "idCreate",
+          listCreateVersion.get(entry.getKey()),
+          listCreateSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      NamedList<Object> listItemCheck2 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check2");
+      createCollectionAssertions(listItemCheck2, entry.getKey(), "idPost",
+          listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+    }
+    // recheck on parts
+    listCheckParts = createResults(paramsCheck,
+        Arrays.asList(collectionsParts));
+    for (Entry<String, QueryResponse> entry : listCheck.entrySet()) {
+      NamedList<Object> listItemCheck1 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check1");
+      createCollectionAssertions(listItemCheck1, entry.getKey(), "idCreate",
+          listCreateVersion.get(entry.getKey()),
+          listCreateSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+      NamedList<Object> listItemCheck2 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check2");
+      createCollectionAssertions(listItemCheck2, entry.getKey(), "idPost",
+          listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
+    }
+    // full delete
+    createResults(paramsDelete, Arrays.asList(collections));
+    // final check
+    listCheck = createResults(paramsCheck, Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listCheck.entrySet()) {
+      NamedList<Object> listItemCheck1 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check1");
+      assertTrue(
+          entry.getKey() + " - create - should be removed: " + listItemCheck1,
+          listItemCheck1 != null && listItemCheck1.get("id") == null);
+      NamedList<Object> listItemCheck2 = MtasSolrBase
+          .getFromMtasCollection(entry.getValue().getResponse(), "check2");
+      assertTrue(
+          entry.getKey() + " - post - should be removed: " + listItemCheck2,
+          listItemCheck2 != null && listItemCheck2.get("id") == null);
+    }
+  }
+
+  /**
+   * Mtas request handler collection 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @org.junit.Test
+  public void mtasRequestHandlerCollection2() throws IOException {
+    String[] collections = new String[] { COLLECTION_ALL_OPTIMIZED,
+        COLLECTION_ALL_MULTIPLE_SEGMENTS, COLLECTION_DISTRIBUTED };
+    // post
+    ModifiableSolrParams paramsPost = new ModifiableSolrParams();
+    paramsPost.set("q", "*:*");
+    paramsPost.set("mtas", "true");
+    paramsPost.set("mtas.collection", "true");
+    paramsPost.set("mtas.collection.0.key", "postKey1");
+    paramsPost.set("mtas.collection.0.action", "post");
+    paramsPost.set("mtas.collection.0.id", "postSet1");
+    paramsPost.set("mtas.collection.0.post", "[1,3,4]");
+    paramsPost.set("mtas.collection.1.key", "postKey2");
+    paramsPost.set("mtas.collection.1.action", "post");
+    paramsPost.set("mtas.collection.1.id", "postSet2");
+    paramsPost.set("mtas.collection.1.post", "[2]");
+    paramsPost.set("mtas.collection.2.key", "createKey1");
+    paramsPost.set("mtas.collection.2.action", "create");
+    paramsPost.set("mtas.collection.2.id", "createSet1");
+    paramsPost.set("mtas.collection.2.field", MtasSolrBase.FIELD_ID);
+    createResults(paramsPost, Arrays.asList(collections));
+    // query set1
+    ModifiableSolrParams paramsSelect1 = new ModifiableSolrParams();
+    paramsSelect1.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"postSet1\"}");
+    paramsSelect1.set("rows", "0");
+    Map<String, QueryResponse> listPost1 = createResults(paramsSelect1,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listPost1.entrySet()) {
+      long n = MtasSolrBase.getNumFound(entry.getValue().getResponse());
+      assertTrue(
+          entry.getKey() + " - incorrect number of matching documents : " + n,
+          n == 2);
+    }
+    // query set2
+    ModifiableSolrParams paramsSelect2 = new ModifiableSolrParams();
+    paramsSelect2.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"postSet2\"}");
+    paramsSelect2.set("rows", "0");
+    Map<String, QueryResponse> listPost2 = createResults(paramsSelect2,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listPost2.entrySet()) {
+      long n = MtasSolrBase.getNumFound(entry.getValue().getResponse());
+      assertTrue(
+          entry.getKey() + " - incorrect number of matching documents : " + n,
+          n == 1);
+    }
+    // query set3
+    ModifiableSolrParams paramsSelect3 = new ModifiableSolrParams();
+    paramsSelect3.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"createSet1\"}");
+    paramsSelect3.set("rows", "0");
+    Map<String, QueryResponse> listPost3 = createResults(paramsSelect3,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listPost3.entrySet()) {
+      long n = MtasSolrBase.getNumFound(entry.getValue().getResponse());
+      assertTrue(
+          entry.getKey() + " - incorrect number of matching documents : " + n,
+          n == 3);
+    }
+    // query set1 or set2
+    ModifiableSolrParams paramsSelect4 = new ModifiableSolrParams();
+    paramsSelect4.set("q",
+        "({!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+            + "\" collection=\"postSet1\"}) OR ({!mtas_join field=\""
+            + MtasSolrBase.FIELD_ID + "\" collection=\"postSet2\"})");
+    paramsSelect4.set("rows", "0");
+    Map<String, QueryResponse> listPost4 = createResults(paramsSelect4,
+        Arrays.asList(collections));
+    for (Entry<String, QueryResponse> entry : listPost4.entrySet()) {
+      long n = MtasSolrBase.getNumFound(entry.getValue().getResponse());
+      assertTrue(
+          entry.getKey() + " - incorrect number of matching documents : " + n,
+          n == 3);
+    }
+  }
+
+  /**
    * Mtas request handler prefix.
    *
    * @throws IOException Signals that an I/O exception has occurred.
@@ -336,12 +640,16 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the results.
    *
-   * @param params the params
+   * @param initialParams the initial params
    * @param collections the collections
    * @return the hash map
    */
   private static HashMap<String, QueryResponse> createResults(
-      final ModifiableSolrParams params, List<String> collections) {
+      final ModifiableSolrParams initialParams, List<String> collections) {
+    // use initial params
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    params.add(initialParams);
+    // continue
     HashMap<String, QueryResponse> list = new HashMap<>();
     CloudSolrClient client = cloudCluster.getSolrClient();
     try {
@@ -450,8 +758,10 @@ public class MtasSolrTestDistributedSearchConsistency {
    */
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
-    List<NamedList> list1 = MtasSolrBase.getFromMtasTermvector(response1, key);
-    List<NamedList> list2 = MtasSolrBase.getFromMtasTermvector(response2, key);
+    List<NamedList<Object>> list1 = MtasSolrBase
+        .getFromMtasTermvector(response1, key);
+    List<NamedList<Object>> list2 = MtasSolrBase
+        .getFromMtasTermvector(response2, key);
     assertFalse("list should be defined", list1 == null || list2 == null);
     if (list1 != null && list2 != null) {
       assertEquals("lists should have equal size", list1.size(), list2.size());
@@ -475,6 +785,57 @@ public class MtasSolrTestDistributedSearchConsistency {
               value2);
         }
       }
+    }
+  }
+
+  /**
+   * Creates the collection assertions.
+   *
+   * @param create the create
+   * @param collection the collection
+   * @param id the id
+   * @param version the version
+   * @param size the size
+   * @param shards the shards
+   */
+  private static void createCollectionAssertions(NamedList<Object> create,
+      String collection, String id, String version, Number size, int shards) {
+    assertFalse(collection + ": create - not found", create == null);
+    assertTrue(collection + ": create - no valid version",
+        create.get("id") != null && create.get("id") instanceof String);
+    assertTrue(collection + ": create - id incorrect, '" + id
+        + "' not equal to '" + create.get("id") + "'",
+        ((String) create.get("id")).equals(id));
+    assertTrue(
+        collection + ": create - no valid version, '" + version
+            + "' not equal to '" + create.get("version") + "'",
+        create.get("version") != null
+            && create.get("version") instanceof String);
+    if (version != null) {
+      assertTrue(collection + ": create - version incorrect",
+          ((String) create.get("version")).equals(version));
+    }
+    assertTrue(collection + ": create - no valid size",
+        create.get("size") != null && create.get("size") instanceof Number);
+    Number createSize = (Number) create.get("size");
+    assertEquals(collection + ": number of values", size.longValue(),
+        createSize.longValue());
+    if (shards > 0) {
+      assertTrue("no (valid) shards",
+          create.get("shards") != null && create.get("shards") instanceof List
+              && ((List) create.get("shards")).size() == shards);
+      for (Object shardItem : (List<Object>) create.get("shards")) {
+        assertTrue(collection + ": invalid shardItem",
+            shardItem instanceof NamedList);
+        Object sizeRaw = ((NamedList<Object>) shardItem).get("size");
+        assertTrue(collection + ": incorrect size",
+            sizeRaw != null && sizeRaw instanceof Number
+                && ((Number) sizeRaw).longValue() == createSize.longValue());
+      }
+    } else {
+      assertFalse(collection + ": shards found : " + create.get("shards"),
+          create.get("shards") != null && create.get("shards") instanceof List
+              && !((List) create.get("shards")).isEmpty());
     }
   }
 

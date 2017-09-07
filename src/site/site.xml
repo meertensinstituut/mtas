@@ -39,20 +39,27 @@
       </item>
       <item name="Search" href="search.html" collapse="true">
         <item name="Configuration" href="search_configuration.html"/>
-        <item name="Query" href="search_query.html">
-          <item name="Statistics" href="search_query_stats.html" collapse="true">
-            <item name="Positions" href="search_query_stats_positions.html"/>
-            <item name="Tokens" href="search_query_stats_tokens.html"/>
-            <item name="Spans" href="search_query_stats_spans.html"/>
+        <item name="Component" href="search_component.html">
+          <item name="Statistics" href="search_component_stats.html" collapse="true">
+            <item name="Positions" href="search_component_stats_positions.html"/>
+            <item name="Tokens" href="search_component_stats_tokens.html"/>
+            <item name="Spans" href="search_component_stats_spans.html"/>
           </item>
-          <item name="Kwic" href="search_query_kwic.html"/>
-          <item name="List" href="search_query_list.html"/>
-          <item name="Document" href="search_query_document.html"/>
-          <item name="Termvector" href="search_query_termvector.html"/>
-          <item name="Facet" href="search_query_facet.html"/>
-          <item name="Group" href="search_query_group.html"/>          
-          <item name="Prefix" href="search_query_prefix.html"/>          
+          <item name="Kwic" href="search_component_kwic.html"/>
+          <item name="List" href="search_component_list.html"/>
+          <item name="Document" href="search_component_document.html"/>
+          <item name="Termvector" href="search_component_termvector.html"/>
+          <item name="Facet" href="search_component_facet.html"/>
+          <item name="Group" href="search_component_group.html"/>         
+          <item name="Prefix" href="search_component_prefix.html"/>        
+          <item name="Collection" href="search_component_collection.html"/>          
         </item> 
+        <item name="Parser" href="search_parser.html">
+          <item name="CQL query" href="search_parser_cql.html"/>
+          <item name="Join query" href="search_parser_join.html"/>  
+        </item>
+        <item name="Handler" href="search_handler.html">
+        </item>
         <item name="Type of statistics" href="search_stats.html"/>
         <item name="Functions" href="search_functions.html"/>
         <item name="CQL" href="search_cql.html"/>

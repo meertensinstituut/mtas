@@ -476,7 +476,7 @@ public class MtasSolrComponentTermvector
           MtasSolrResultUtil.encode(data));
     } else {
       mtasTermVectorResponse.add("list", data);
-      MtasSolrResultUtil.rewrite(mtasTermVectorResponse);
+      MtasSolrResultUtil.rewrite(mtasTermVectorResponse, searchComponent);
     }
     return mtasTermVectorResponse;
   }
@@ -627,7 +627,7 @@ public class MtasSolrComponentTermvector
       if ((mtasResponseTermvectorRaw = mtasResponse.get("termvector")) != null
           && mtasResponseTermvectorRaw instanceof ArrayList) {
         MtasSolrResultUtil
-            .rewrite((ArrayList<Object>) mtasResponseTermvectorRaw);
+            .rewrite((ArrayList<Object>) mtasResponseTermvectorRaw, searchComponent);
       }
     }
   }

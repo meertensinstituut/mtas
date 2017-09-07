@@ -11,10 +11,10 @@ Annotational layers and structure are added to the existing [Lucene](https://luc
 **Extension of search capabilities**:
 
 * Supports [CQL](search_cql.html) query language.
-* [Statistics](search_stats.html) on number of [words](search_query_stats_positions.html), [tokens](search_query_stats_tokens.html) and [spans](search_query_stats_spans.html).
+* [Statistics](search_stats.html) on number of [words](search_component_stats_positions.html), [tokens](search_component_stats_tokens.html) and [spans](search_component_stats_spans.html).
 * Usage of [functions](search_functions.html) to produce statistics for custom defined relations between multiple spans and/or number of words.
-* [Facets](search_query_facet.html) with [statistics](search_stats.html) on hits.
-* [Kwic](search_query_kwic.html), [Lists](search_query_list.html), [Document](search_query_document.html), [termvectors](search_query_termvector.html) and [grouping](search_query_group.html) for spans.
+* [Facets](search_component_facet.html) with [statistics](search_stats.html) on hits.
+* [Kwic](search_component_kwic.html), [Lists](search_component_list.html), [Document](search_component_document.html), [termvectors](search_component_termvector.html) and [grouping](search_component_group.html) for spans.
 
 
 **Supports existing Solr capabilities**:

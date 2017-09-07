@@ -1,7 +1,7 @@
 #Type of statistics
 
-Mtas can produce several type of statistics, e.g. for [positions](search_query_stats_positions.html), 
-[tokens](search_query_stats_tokens.html) or [spans](search_query_stats_spans.html).
+Mtas can produce several type of statistics, e.g. for [positions](search_component_stats_positions.html), 
+[tokens](search_component_stats_tokens.html) or [spans](search_component_stats_spans.html).
 
 In general, statistics of type *basic* will require less resources than statistics of type *advanced*, whereas
 statistics of type *advanced* will require less than these of type *full*. If multiple 

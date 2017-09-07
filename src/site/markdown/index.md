@@ -6,7 +6,7 @@ In recent years, multiple solutions have come available providing search on huge
 >
 > `<entity="location/> within (<s/> containing [lemma="utrecht"])`
 
-Parsers for several [document formats](indexing_formats.html) are provided, each with extended possibilities for [configuration](indexing_configuration.html), and advanced query [features](features.html) like [statistics](search_query_stats.html), [termvectors](search_query_termvector.html) and [kwic](search_query_kwic.html) are available.
+Parsers for several [document formats](indexing_formats.html) are provided, each with extended possibilities for [configuration](indexing_configuration.html), and advanced query [features](features.html) like [statistics](search_component_stats.html), [termvectors](search_component_termvector.html) and [kwic](search_component_kwic.html) are available.
 
 Source code and releases are available on [GitHub](https://github.com/meertensinstituut/mtas/), see [installation instructions](installation.html) on how to get started.
 

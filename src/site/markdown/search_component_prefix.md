@@ -1,6 +1,6 @@
 #Prefix
 
-Mtas can produce a list of available prefixes. To get this information, in Solr requests, besides the parameter to enable [Mtas queries](search_query.html), the following parameter should be provided.
+Mtas can produce a list of available prefixes. To get this information, in Solr requests, besides the parameter to enable the [Mtas query component](search_component.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|

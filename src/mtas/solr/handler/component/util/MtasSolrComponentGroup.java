@@ -333,9 +333,10 @@ public class MtasSolrComponentGroup
    * @param name the name
    * @param positions the positions
    * @param prefixes the prefixes
+   * @throws IOException 
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
-      String name, String[] positions, String[] prefixes) {
+      String name, String[] positions, String[] prefixes) throws IOException {
     if (!gids.isEmpty()) {
       int tmpSubCounter = 0;
       for (String gid : gids) {
@@ -343,6 +344,11 @@ public class MtasSolrComponentGroup
             name + "." + gid + "." + NAME_MTAS_GROUP_GROUPING_POSITION, null);
         prefixes[tmpSubCounter] = solrParams.get(
             name + "." + gid + "." + NAME_MTAS_GROUP_GROUPING_PREFIXES, null);
+        if(positions[tmpSubCounter]==null) {
+          throw new IOException("no position for "+gid);
+        } else if(prefixes[tmpSubCounter]==null) {
+          throw new IOException("no prefix for "+gid);
+        }
         tmpSubCounter++;
       }
     }
@@ -465,7 +471,7 @@ public class MtasSolrComponentGroup
       mtasGroupResponse.add("_encoded_list", MtasSolrResultUtil.encode(data));
     } else {
       mtasGroupResponse.add("list", data);
-      MtasSolrResultUtil.rewrite(mtasGroupResponse);
+      MtasSolrResultUtil.rewrite(mtasGroupResponse, searchComponent);
     }
     return mtasGroupResponse;
   }
@@ -528,7 +534,7 @@ public class MtasSolrComponentGroup
       try {
         mtasResponseGroup = (ArrayList<Object>) mtasResponse.get("group");
         if (mtasResponseGroup != null) {
-          MtasSolrResultUtil.rewrite(mtasResponseGroup);
+          MtasSolrResultUtil.rewrite(mtasResponseGroup, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);

@@ -878,7 +878,7 @@ public class MtasSolrComponentStats
           MtasSolrResultUtil.encode(data));
     } else {
       mtasPositionResponse.add(position.dataCollector.getCollectorType(), data);
-      MtasSolrResultUtil.rewrite(mtasPositionResponse);
+      MtasSolrResultUtil.rewrite(mtasPositionResponse, searchComponent);
     }
     return mtasPositionResponse;
   }
@@ -903,7 +903,7 @@ public class MtasSolrComponentStats
       mtasTokenResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));
     } else {
       mtasTokenResponse.add(token.dataCollector.getCollectorType(), data);
-      MtasSolrResultUtil.rewrite(mtasTokenResponse);
+      MtasSolrResultUtil.rewrite(mtasTokenResponse, searchComponent);
     }
     return mtasTokenResponse;
   }
@@ -944,7 +944,7 @@ public class MtasSolrComponentStats
       mtasSpanResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));
     } else {
       mtasSpanResponse.add(span.dataCollector.getCollectorType(), data);
-      MtasSolrResultUtil.rewrite(mtasSpanResponse);
+      MtasSolrResultUtil.rewrite(mtasSpanResponse, searchComponent);
     }
     return mtasSpanResponse;
   }
@@ -1007,7 +1007,7 @@ public class MtasSolrComponentStats
       try {
         mtasResponseStats = (NamedList<Object>) mtasResponse.get("stats");
         if (mtasResponseStats != null) {
-          MtasSolrResultUtil.rewrite(mtasResponseStats);
+          MtasSolrResultUtil.rewrite(mtasResponseStats, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);

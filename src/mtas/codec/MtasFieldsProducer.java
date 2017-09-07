@@ -1,6 +1,9 @@
 package mtas.codec;
 
+import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,8 +55,8 @@ public class MtasFieldsProducer extends FieldsProducer {
   public MtasFieldsProducer(SegmentReadState state, String name)
       throws IOException {
     String postingsFormatName = null;
-    indexInputList = new HashMap<String, IndexInput>();
-    indexInputOffsetList = new HashMap<String, Long>();
+    indexInputList = new HashMap<>();
+    indexInputOffsetList = new HashMap<>();
     version = MtasCodecPostingsFormat.VERSION_CURRENT;
 
     postingsFormatName = addIndexInputToList("object", openMtasFile(state, name,
@@ -109,20 +112,25 @@ public class MtasFieldsProducer extends FieldsProducer {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private String addIndexInputToList(String name, IndexInput in,
-      String postingsFormatName) throws IOException {
+      String postingsFormatName) throws IOException {    
     if (indexInputList.get(name) != null) {
       indexInputList.get(name).close();
     }
-    String localPostingsFormatName = postingsFormatName;
-    if (localPostingsFormatName == null) {
-      localPostingsFormatName = in.readString();
-    } else if (!in.readString().equals(localPostingsFormatName)) {
-      throw new IOException("delegate codec " + name + " doesn't equal "
-          + localPostingsFormatName);
+    if(in!=null) {
+      String localPostingsFormatName = postingsFormatName;
+      if (localPostingsFormatName == null) {
+        localPostingsFormatName = in.readString();
+      } else if (!in.readString().equals(localPostingsFormatName)) {
+        throw new IOException("delegate codec " + name + " doesn't equal "
+            + localPostingsFormatName);
+      }
+      indexInputList.put(name, in);
+      indexInputOffsetList.put(name, in.getFilePointer());
+      return localPostingsFormatName;
+    } else {
+      log.debug("no "+name+" registered");
+      return null;
     }
-    indexInputList.put(name, in);
-    indexInputOffsetList.put(name, in.getFilePointer());
-    return localPostingsFormatName;
   }
 
   /*
@@ -232,7 +240,13 @@ public class MtasFieldsProducer extends FieldsProducer {
     String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,
         state.segmentSuffix, extension);
     IndexInput object;
-    object = state.directory.openInput(fileName, state.context);
+    try {
+      object = state.directory.openInput(fileName, state.context);
+    } catch (FileNotFoundException | NoSuchFileException e) {
+      log.debug(e);
+      //throw new NoSuchFileException(e.getMessage());
+      return null;
+    }
     int minVersion = (minimum == null) ? MtasCodecPostingsFormat.VERSION_START
         : minimum.intValue();
     int maxVersion = (maximum == null) ? MtasCodecPostingsFormat.VERSION_CURRENT
@@ -245,7 +259,12 @@ public class MtasFieldsProducer extends FieldsProducer {
       log.debug(e);
       throw new IndexFormatTooOldException(e.getMessage(), e.getVersion(),
           e.getMinVersion(), e.getMaxVersion());
-    }
+    } catch (EOFException e) {
+      object.close();
+      log.debug(e);
+      //throw new EOFException(e.getMessage());
+      return null;
+    } 
     return object;
   }
 

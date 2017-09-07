@@ -126,7 +126,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     super(config);
     try {
       initParser();
-      // System.out.print(printConfig());
+      //System.out.print(printConfig());
     } catch (MtasConfigException e) {
       log.error(e);
     }

@@ -221,13 +221,13 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas", "true");
     params.set("mtas.stats", "true");
     params.set("mtas.stats.spans", "true");
-    params.set("mtas.stats.spans.0.field", "mtas");
+    params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.stats.spans.0.key", "statsKey");
     params.set("mtas.stats.spans.0.query.0.type", "cql");
     params.set("mtas.stats.spans.0.query.0.value", "[]");
     params.set("mtas.stats.spans.0.type", "n,sum,mean");
     params.set("mtas.stats.positions", "true");
-    params.set("mtas.stats.positions.0.field", "mtas");
+    params.set("mtas.stats.positions.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.stats.positions.0.key", "statsKey");
     params.set("mtas.stats.positions.0.type", "n,sum,mean");
     params.set("rows", "0");
@@ -264,7 +264,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas", "true");
     params.set("mtas.stats", "true");
     params.set("mtas.stats.tokens", "true");
-    params.set("mtas.stats.tokens.0.field", "mtas");
+    params.set("mtas.stats.tokens.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.stats.tokens.0.key", "statsKey");
     params.set("mtas.stats.tokens.0.type", String.join(",", types));
     params.set("mtas.stats.tokens.0.minimum", 1);
@@ -293,7 +293,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("rows", 0);
     params.set("mtas", "true");
     params.set("mtas.termvector", "true");
-    params.set("mtas.termvector.0.field", "mtas");
+    params.set("mtas.termvector.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.termvector.0.prefix", "t_lc");
     params.set("mtas.termvector.0.key", "tv");
     params.set("mtas.termvector.0.sort.type", "sum");
@@ -342,7 +342,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("rows", 0);
     params.set("mtas", "true");
     params.set("mtas.termvector", "true");
-    params.set("mtas.termvector.0.field", "mtas");
+    params.set("mtas.termvector.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.termvector.0.prefix", "t_lc");
     params.set("mtas.termvector.0.key", "tv");
     params.set("mtas.termvector.0.type", String.join(",", types));
@@ -355,7 +355,8 @@ public class MtasSolrTestSearchConsistency {
     } catch (SolrServerException e) {
       throw new IOException(e);
     }
-    List<NamedList> tv = MtasSolrBase.getFromMtasTermvector(response, "tv");
+    List<NamedList<Object>> tv = MtasSolrBase.getFromMtasTermvector(response,
+        "tv");
     for (String key : list) {
       params.clear();
       params.set("q", "*:*");
@@ -363,13 +364,13 @@ public class MtasSolrTestSearchConsistency {
       params.set("mtas", "true");
       params.set("mtas.stats", "true");
       params.set("mtas.stats.spans", "true");
-      params.set("mtas.stats.spans.0.field", "mtas");
+      params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
       params.set("mtas.stats.spans.0.key", "statsKey0");
       params.set("mtas.stats.spans.0.minimum", 1);
       params.set("mtas.stats.spans.0.query.0.type", "cql");
       params.set("mtas.stats.spans.0.query.0.value", "[t_lc=\"" + key + "\"]");
       params.set("mtas.stats.spans.0.type", String.join(",", types));
-      params.set("mtas.stats.spans.1.field", "mtas");
+      params.set("mtas.stats.spans.1.field", MtasSolrBase.FIELD_MTAS);
       params.set("mtas.stats.spans.1.key", "statsKey1");
       params.set("mtas.stats.spans.1.minimum", 0);
       params.set("mtas.stats.spans.1.query.0.type", "cql");
@@ -419,7 +420,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("rows", 0);
     params.set("mtas", "true");
     params.set("mtas.termvector", "true");
-    params.set("mtas.termvector.0.field", "mtas");
+    params.set("mtas.termvector.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.termvector.0.prefix", "t_lc");
     params.set("mtas.termvector.0.key", "tv");
     params.set("mtas.termvector.0.regexp", "een[a-z]*");
@@ -435,7 +436,8 @@ public class MtasSolrTestSearchConsistency {
     } catch (SolrServerException e) {
       throw new IOException(e);
     }
-    List<NamedList> tv = MtasSolrBase.getFromMtasTermvector(response, "tv");
+    List<NamedList<Object>> tv = MtasSolrBase.getFromMtasTermvector(response,
+        "tv");
     Set<String> keys = new HashSet<>();
     for (NamedList<Object> item : tv) {
       if (item != null && item.get("key") != null
@@ -455,6 +457,350 @@ public class MtasSolrTestSearchConsistency {
   }
 
   /**
+   * Mtas request handler collection 1.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @org.junit.Test
+  public void mtasRequestHandlerCollection1() throws IOException {
+    // create
+    ModifiableSolrParams paramsCreate = new ModifiableSolrParams();
+    paramsCreate.set("q", "*:*");
+    paramsCreate.set("mtas", "true");
+    paramsCreate.set("mtas.collection", "true");
+    paramsCreate.set("mtas.collection.0.key", "create");
+    paramsCreate.set("mtas.collection.0.action", "create");
+    paramsCreate.set("mtas.collection.0.id", "idCreate");
+    paramsCreate.set("mtas.collection.0.field", "id");
+    SolrRequest<?> requestCreate = new QueryRequest(paramsCreate, METHOD.POST);
+    NamedList<Object> responseCreate;
+    try {
+      responseCreate = server.request(requestCreate, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n = MtasSolrBase.getNumFound(responseCreate);
+    NamedList<Object> create = MtasSolrBase
+        .getFromMtasCollection(responseCreate, "create");
+    assertFalse("create - id not found", create == null);
+    assertTrue("create - no valid version", create.get("version") != null
+        && create.get("version") instanceof String);
+    assertTrue("create - no valid size",
+        create.get("size") != null && create.get("size") instanceof Number);
+    String createVersion = (String) create.get("version");
+    Number createSize = (Number) create.get("size");
+    assertEquals("number of values", n, createSize.longValue());
+    // post
+    ModifiableSolrParams paramsPost = new ModifiableSolrParams();
+    paramsPost.set("q", "*:*");
+    paramsPost.set("mtas", "true");
+    paramsPost.set("mtas.collection", "true");
+    paramsPost.set("mtas.collection.0.key", "post");
+    paramsPost.set("mtas.collection.0.action", "post");
+    paramsPost.set("mtas.collection.0.id", "idPost");
+    paramsPost.set("mtas.collection.0.post", "[1,2,3,4]");
+    SolrRequest<?> requestPost = new QueryRequest(paramsPost, METHOD.POST);
+    NamedList<Object> responsePost;
+    try {
+      responsePost = server.request(requestPost, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    NamedList<Object> post = MtasSolrBase.getFromMtasCollection(responsePost,
+        "post");
+    assertFalse("post - id not found", post == null);
+    assertTrue("post - no valid version",
+        post.get("version") != null && post.get("version") instanceof String);
+    assertTrue("post - no valid size",
+        post.get("size") != null && post.get("size") instanceof Number);
+    String postVersion = (String) post.get("version");
+    Number postSize = (Number) post.get("size");
+    assertTrue("post - incorrect size", postSize.longValue() == 4);
+    // list
+    ModifiableSolrParams paramsList = new ModifiableSolrParams();
+    paramsList.set("q", "*:*");
+    paramsList.set("mtas", "true");
+    paramsList.set("mtas.collection", "true");
+    paramsList.set("mtas.collection.0.key", "list");
+    paramsList.set("mtas.collection.0.action", "list");
+    SolrRequest<?> requestList1 = new QueryRequest(paramsList, METHOD.POST);
+    NamedList<Object> responseList1;
+    try {
+      responseList1 = server.request(requestList1, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    // check create
+    NamedList<Object> listCreateItem1 = MtasSolrBase
+        .getFromMtasCollectionList(responseList1, "list", "idCreate");
+    assertFalse("list - create - id not found", listCreateItem1 == null);
+    assertTrue("list - create - incorrect version",
+        listCreateItem1.get("version") != null
+            && listCreateItem1.get("version") instanceof String
+            && listCreateItem1.get("version").equals(createVersion));
+    assertTrue("list - create - incorrect size",
+        listCreateItem1.get("size") != null
+            && listCreateItem1.get("size") instanceof Number
+            && ((Number) listCreateItem1.get("size")).longValue() == createSize
+                .longValue());
+    // check post
+    NamedList<Object> listPostItem1 = MtasSolrBase
+        .getFromMtasCollectionList(responseList1, "list", "idPost");
+    assertFalse("list - post - id not found", listPostItem1 == null);
+    assertTrue("list - post - incorrect version",
+        listPostItem1.get("version") != null
+            && listPostItem1.get("version") instanceof String
+            && listPostItem1.get("version").equals(postVersion));
+    assertTrue("list - post - incorrect size",
+        listPostItem1.get("size") != null
+            && listPostItem1.get("size") instanceof Number
+            && ((Number) listPostItem1.get("size")).longValue() == postSize
+                .longValue());
+    // check
+    ModifiableSolrParams paramsCheck = new ModifiableSolrParams();
+    paramsCheck.set("q", "*:*");
+    paramsCheck.set("mtas", "true");
+    paramsCheck.set("mtas.collection", "true");
+    paramsCheck.set("mtas.collection.0.key", "check1");
+    paramsCheck.set("mtas.collection.0.action", "check");
+    paramsCheck.set("mtas.collection.0.id", "idCreate");
+    paramsCheck.set("mtas.collection.1.key", "check2");
+    paramsCheck.set("mtas.collection.1.action", "check");
+    paramsCheck.set("mtas.collection.1.id", "idPost");
+    SolrRequest<?> requestCheck = new QueryRequest(paramsCheck, METHOD.POST);
+    NamedList<Object> responseCheck;
+    try {
+      responseCheck = server.request(requestCheck, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    // check create
+    NamedList<Object> check1 = MtasSolrBase.getFromMtasCollection(responseCheck,
+        "check1");
+    assertFalse("check - create - no response", check1 == null);
+    assertTrue("check - create - no valid version",
+        check1.get("version") != null
+            && check1.get("version") instanceof String);
+    assertTrue("check - create - no valid size",
+        check1.get("size") != null && check1.get("size") instanceof Number);
+    String check1Version = (String) check1.get("version");
+    Number check1Size = (Number) check1.get("size");
+    assertEquals("check - create - version", check1Version, createVersion);
+    assertEquals("check - create - number of values", check1Size.longValue(),
+        createSize.longValue());
+    // check post
+    NamedList<Object> check2 = MtasSolrBase.getFromMtasCollection(responseCheck,
+        "check2");
+    assertFalse("check - post - no response", check2 == null);
+    assertTrue("check - post - no valid version", check2.get("version") != null
+        && check2.get("version") instanceof String);
+    assertTrue("check - post - no valid size",
+        check2.get("size") != null && check2.get("size") instanceof Number);
+    String check2Version = (String) check2.get("version");
+    Number check2Size = (Number) check2.get("size");
+    assertEquals("check - post - version", check2Version, postVersion);
+    assertEquals("check - post - number of values", check2Size.longValue(), 4);
+    // delete
+    ModifiableSolrParams paramsDelete = new ModifiableSolrParams();
+    paramsDelete.set("q", "*:*");
+    paramsDelete.set("mtas", "true");
+    paramsDelete.set("mtas.collection", "true");
+    paramsDelete.set("mtas.collection.0.key", "delete1");
+    paramsDelete.set("mtas.collection.0.action", "delete");
+    paramsDelete.set("mtas.collection.0.id", "idCreate");
+    paramsDelete.set("mtas.collection.1.key", "delete2");
+    paramsDelete.set("mtas.collection.1.action", "delete");
+    paramsDelete.set("mtas.collection.1.id", "idPost");
+    SolrRequest<?> requestDelete = new QueryRequest(paramsDelete, METHOD.POST);
+    NamedList<Object> responseDelete;
+    try {
+      responseDelete = server.request(requestDelete, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    // check create
+    NamedList<Object> delete1 = MtasSolrBase
+        .getFromMtasCollection(responseDelete, "delete1");
+    assertFalse("delete - create - no response", delete1 == null);
+    // check post
+    NamedList<Object> delete2 = MtasSolrBase
+        .getFromMtasCollection(responseDelete, "delete2");
+    assertFalse("delete - post - no response", delete2 == null);
+    // list (again)
+    SolrRequest<?> requestList2 = new QueryRequest(paramsList, METHOD.POST);
+    NamedList<Object> responseList2;
+    try {
+      responseList2 = server.request(requestList2, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    // check create
+    NamedList<Object> listCreateItem2 = MtasSolrBase
+        .getFromMtasCollectionList(responseList2, "list", "idCreate");
+    assertTrue("list - create - id found", listCreateItem2 == null);
+    // check post
+    NamedList<Object> listPostItem2 = MtasSolrBase
+        .getFromMtasCollectionList(responseList2, "list", "idPost");
+    assertTrue("list - post - id found", listPostItem2 == null);
+  }
+
+  /**
+   * Mtas request handler collection 2.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @org.junit.Test
+  public void mtasRequestHandlerCollection2() throws IOException {
+    // post
+    ModifiableSolrParams paramsPost = new ModifiableSolrParams();
+    paramsPost.set("q", "*:*");
+    paramsPost.set("mtas", "true");
+    paramsPost.set("mtas.collection", "true");
+    paramsPost.set("mtas.collection.0.key", "postKey1");
+    paramsPost.set("mtas.collection.0.action", "post");
+    paramsPost.set("mtas.collection.0.id", "postSet1");
+    paramsPost.set("mtas.collection.0.post", "[1,3,4]");
+    paramsPost.set("mtas.collection.1.key", "postKey2");
+    paramsPost.set("mtas.collection.1.action", "post");
+    paramsPost.set("mtas.collection.1.id", "postSet2");
+    paramsPost.set("mtas.collection.1.post", "[2]");
+    paramsPost.set("mtas.collection.2.key", "createKey1");
+    paramsPost.set("mtas.collection.2.action", "create");
+    paramsPost.set("mtas.collection.2.id", "createSet1");
+    paramsPost.set("mtas.collection.2.field", MtasSolrBase.FIELD_ID);
+    SolrRequest<?> requestPost = new QueryRequest(paramsPost, METHOD.POST);
+    NamedList<Object> responsePost;
+    try {
+      responsePost = server.request(requestPost, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    MtasSolrBase.getFromMtasCollection(responsePost, "post");
+    // query set1
+    ModifiableSolrParams paramsSelect1 = new ModifiableSolrParams();
+    paramsSelect1.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"postSet1\"}");
+    paramsSelect1.set("rows", "0");
+    SolrRequest<?> request1 = new QueryRequest(paramsSelect1, METHOD.POST);
+    NamedList<Object> response1;
+    try {
+      response1 = server.request(request1, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n1 = MtasSolrBase.getNumFound(response1);
+    assertTrue("incorrect number of matching documents : " + n1, n1 == 2);
+    // query set2
+    ModifiableSolrParams paramsSelect2 = new ModifiableSolrParams();
+    paramsSelect2.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"postSet2\"}");
+    paramsSelect2.set("rows", "0");
+    SolrRequest<?> request2 = new QueryRequest(paramsSelect2, METHOD.POST);
+    NamedList<Object> response2;
+    try {
+      response2 = server.request(request2, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n2 = MtasSolrBase.getNumFound(response2);
+    assertTrue("incorrect number of matching documents : " + n2, n2 == 1);
+    // query set3
+    ModifiableSolrParams paramsSelect3 = new ModifiableSolrParams();
+    paramsSelect3.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"createSet1\"}");
+    paramsSelect3.set("rows", "0");
+    SolrRequest<?> request3 = new QueryRequest(paramsSelect3, METHOD.POST);
+    NamedList<Object> response3;
+    try {
+      response3 = server.request(request3, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n3 = MtasSolrBase.getNumFound(response3);
+    assertTrue("incorrect number of matching documents : " + n3, n3 == 3);
+    // query set1 or set2
+    ModifiableSolrParams paramsSelect4 = new ModifiableSolrParams();
+    paramsSelect4.set("q",
+        "({!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+            + "\" collection=\"postSet1\"}) OR ({!mtas_join field=\""
+            + MtasSolrBase.FIELD_ID + "\" collection=\"postSet2\"})");
+    paramsSelect4.set("rows", "0");
+    SolrRequest<?> request4 = new QueryRequest(paramsSelect4, METHOD.POST);
+    NamedList<Object> response4;
+    try {
+      response4 = server.request(request4, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n4 = MtasSolrBase.getNumFound(response4);
+    assertTrue("incorrect number of matching documents : " + n4, n4 == 3);
+  }
+  
+  @org.junit.Test
+  public void mtasRequestHandlerCollection3() throws IOException {
+    // post
+    ModifiableSolrParams paramsPost = new ModifiableSolrParams();
+    paramsPost.set("q", "*:*");
+    paramsPost.set("mtas", "true");
+    paramsPost.set("mtas.collection", "true");
+    paramsPost.set("mtas.collection.0.key", "setCreatedByPost");
+    paramsPost.set("mtas.collection.0.action", "post");
+    paramsPost.set("mtas.collection.0.id", "setCreatedByPost");
+    paramsPost.set("mtas.collection.0.post", "[1,3,4]");
+    SolrRequest<?> requestPost = new QueryRequest(paramsPost, METHOD.POST);
+    try {
+      server.request(requestPost, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+   // import
+    ModifiableSolrParams paramsImport = new ModifiableSolrParams();
+    paramsImport.set("q", "*:*");
+    paramsImport.set("mtas", "true");
+    paramsImport.set("mtas.collection", "true");
+    paramsImport.set("mtas.collection.0.key", "setCreatedByImport");
+    paramsImport.set("mtas.collection.0.action", "post");
+    paramsImport.set("mtas.collection.0.id", "setCreatedByImport");
+    paramsImport.set("mtas.collection.0.post", "[1,3,4]");
+    SolrRequest<?> requestImport = new QueryRequest(paramsImport, METHOD.POST);
+    try {
+      server.request(requestImport, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    // query post
+    ModifiableSolrParams paramsSelect1 = new ModifiableSolrParams();
+    paramsSelect1.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"setCreatedByPost\"}");
+    paramsSelect1.set("rows", "0");
+    SolrRequest<?> request1 = new QueryRequest(paramsSelect1, METHOD.POST);
+    NamedList<Object> response1;
+    try {
+      response1 = server.request(request1, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n1 = MtasSolrBase.getNumFound(response1);
+    assertTrue ("no matching documents for posted set: " + n1, n1>0); 
+    // query import
+    ModifiableSolrParams paramsSelect2 = new ModifiableSolrParams();
+    paramsSelect2.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
+        + "\" collection=\"setCreatedByImport\"}");
+    paramsSelect2.set("rows", "0");
+    SolrRequest<?> request2 = new QueryRequest(paramsSelect2, METHOD.POST);
+    NamedList<Object> response2;
+    try {
+      response2 = server.request(request2, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }
+    long n2 = MtasSolrBase.getNumFound(response2);
+    assertTrue ("no matching documents for imported set: " + n2, n2>0); 
+    //compare
+    assertTrue("posted set and imported set give different results : "+n1+" and "+n2, n1==n2);
+  }
+  
+  /**
    * Mtas solr schema pre analyzed parser and field.
    *
    * @throws IOException Signals that an I/O exception has occurred.
@@ -468,17 +814,17 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas", "true");
     params.set("mtas.stats", "true");
     params.set("mtas.stats.spans", "true");
-    params.set("mtas.stats.spans.0.field", "mtas");
+    params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.stats.spans.0.key", "statsKey");
     params.set("mtas.stats.spans.0.query.0.type", "cql");
     params.set("mtas.stats.spans.0.query.0.value", "[]");
     params.set("mtas.stats.spans.0.type", "n,sum,sumsq");
     params.set("mtas.stats.positions", "true");
-    params.set("mtas.stats.positions.0.field", "mtas");
+    params.set("mtas.stats.positions.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.stats.positions.0.key", "statsKey");
     params.set("mtas.stats.positions.0.type", "n,sum,sumsq");
     params.set("mtas.stats.tokens", "true");
-    params.set("mtas.stats.tokens.0.field", "mtas");
+    params.set("mtas.stats.tokens.0.field", MtasSolrBase.FIELD_MTAS);
     params.set("mtas.stats.tokens.0.key", "statsKey");
     params.set("mtas.stats.tokens.0.type", "n,sum,sumsq");
     params.set("rows", "0");
@@ -493,9 +839,10 @@ public class MtasSolrTestSearchConsistency {
     params.remove("mtas.stats.spans.0.field");
     params.remove("mtas.stats.positions.0.field");
     params.remove("mtas.stats.tokens.0.field");
-    params.set("mtas.stats.spans.0.field", "mtasAdvanced");
-    params.set("mtas.stats.positions.0.field", "mtasAdvanced");
-    params.set("mtas.stats.tokens.0.field", "mtasAdvanced");
+    params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS_ADVANCED);
+    params.set("mtas.stats.positions.0.field",
+        MtasSolrBase.FIELD_MTAS_ADVANCED);
+    params.set("mtas.stats.tokens.0.field", MtasSolrBase.FIELD_MTAS_ADVANCED);
     try {
       response2 = server.request(request, "collection1");
     } catch (SolrServerException e) {
@@ -523,8 +870,10 @@ public class MtasSolrTestSearchConsistency {
    */
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
-    List<NamedList> list1 = MtasSolrBase.getFromMtasTermvector(response1, key);
-    List<NamedList> list2 = MtasSolrBase.getFromMtasTermvector(response2, key);
+    List<NamedList<Object>> list1 = MtasSolrBase
+        .getFromMtasTermvector(response1, key);
+    List<NamedList<Object>> list2 = MtasSolrBase
+        .getFromMtasTermvector(response2, key);
     assertFalse("list should be defined", list1 == null || list2 == null);
     if (list1 != null && list2 != null) {
       assertFalse("first list should not be longer",

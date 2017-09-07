@@ -103,15 +103,6 @@
 						<item type="text" />
 					</post>
 				</token>
-				<token type="string" offset="false">
-          <pre>
-            <item type="name" />
-            <item type="string" value="_lc" />
-          </pre>
-          <post>
-            <item type="text" filter="ascii,lowercase" />
-          </post>
-        </token>
 			</mapping>
 			<mapping type="word" name="t">
 				<token type="string" offset="false">

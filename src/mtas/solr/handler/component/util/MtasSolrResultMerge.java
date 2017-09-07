@@ -15,7 +15,6 @@ import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 
-import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 
 /**
@@ -64,20 +63,21 @@ public class MtasSolrResultMerge {
               .getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
             mergeArrayList(sreq, mtasResponse, "facet", null, false);
           }
-          // merge join
-          if (rb.req.getParams().getBool(MtasSolrComponentJoin.PARAM_MTAS_JOIN,
+          // merge collection
+          if (rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION,
               false)) {
-            ComponentFields componentFields = (ComponentFields) rb.req
-                .getContext().get(ComponentFields.class);
-            mtasResponse.add("join",
-                new MtasSolrJoinResult(componentFields.join));
-            mergeJoinResult(sreq, mtasResponse, "join", null);
-
+            mergeArrayList(sreq, mtasResponse, "collection", null, false);            
           }
           // merge prefix
           if (rb.req.getParams()
               .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
             mergeArrayList(sreq, mtasResponse, "prefix", null, false);
+          }
+        } else if (rb.stage == MtasSolrSearchComponent.STAGE_COLLECTION_INIT) {
+          // merge collection
+          if (rb.req.getParams().getBool(
+              MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+            mergeArrayList(sreq, mtasResponse, "collection", null, false);
           }
         } else if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_MISSING_KEY) {
           // merge termvector
@@ -109,57 +109,7 @@ public class MtasSolrResultMerge {
       }
     }
   }
-
-  /**
-   * Merge join result.
-   *
-   * @param sreq the sreq
-   * @param mtasResponse the mtas response
-   * @param key the key
-   * @param preferredPurpose the preferred purpose
-   */
-  @SuppressWarnings("unchecked")
-  private void mergeJoinResult(ShardRequest sreq,
-      NamedList<Object> mtasResponse, String key, Integer preferredPurpose) {
-    Object o = mtasResponse.get(key);
-    MtasSolrJoinResult mtasJoinResponse;
-    if (o instanceof MtasSolrJoinResult) {
-      mtasJoinResponse = (MtasSolrJoinResult) o;
-    } else {
-      mtasJoinResponse = null;
-    }
-    // collect responses for each shard
-    HashMap<String, NamedList<Object>> mtasListShardResponses = new HashMap<>();
-    for (ShardResponse response : sreq.responses) {
-      // only continue if new shard or preferred purpose
-      if (mtasListShardResponses.containsKey(response.getShard())
-          && ((preferredPurpose == null)
-              || (sreq.purpose != preferredPurpose))) {
-        break;
-      }
-      // update
-      try {
-        NamedList<Object> result = response.getSolrResponse().getResponse();
-        String data = (String) result.findRecursive("mtas", key);
-        if (data != null) {
-          MtasSolrJoinResult decodedData = (MtasSolrJoinResult) MtasSolrResultUtil
-              .decode(data);
-          if (mtasJoinResponse == null) {
-            mtasJoinResponse = decodedData;
-          } else {
-            mtasJoinResponse.merge(decodedData);
-          }
-        }
-      } catch (ClassCastException e) {
-        log.debug(e);
-      }
-    }
-    if (mtasJoinResponse != null) {
-      mtasResponse.removeAll(key);
-      mtasResponse.add(key, mtasJoinResponse);
-    }
-  }
-
+ 
   /**
    * Merge named list.
    *
@@ -381,9 +331,9 @@ public class MtasSolrResultMerge {
           } else if (original instanceof MtasSolrMtasResult) {
             MtasSolrMtasResult originalComponentResult = (MtasSolrMtasResult) original;
             originalComponentResult.merge((MtasSolrMtasResult) shardValue);
-          } else if (original instanceof MtasSolrJoinResult) {
-            MtasSolrJoinResult originalComponentResult = (MtasSolrJoinResult) original;
-            originalComponentResult.merge((MtasSolrJoinResult) shardValue);
+          } else if (original instanceof MtasSolrCollectionResult) {
+            MtasSolrCollectionResult originalComponentResult = (MtasSolrCollectionResult) original;
+            originalComponentResult.merge((MtasSolrCollectionResult) shardValue);
           } else if (original instanceof String) {
             // ignore?
           } else if (original instanceof Integer) {

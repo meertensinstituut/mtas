@@ -27,7 +27,7 @@ import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentGroup;
-import mtas.codec.util.CodecComponent.ComponentJoin;
+import mtas.codec.util.CodecComponent.ComponentCollection;
 import mtas.codec.util.CodecComponent.ComponentKwic;
 import mtas.codec.util.CodecComponent.ComponentList;
 import mtas.codec.util.CodecComponent.ComponentPosition;
@@ -203,40 +203,52 @@ public class CodecCollector {
   }
 
   /**
-   * Collect join.
+   * Collect collection.
    *
    * @param reader the reader
    * @param docSet the doc set
-   * @param joinInfo the join info
+   * @param collectionInfo the collection info
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static void collectJoin(IndexReader reader, List<Integer> docSet,
-      ComponentJoin joinInfo) throws IOException {
-    BytesRef term = null;
-    PostingsEnum postingsEnum = null;
-    Integer docId;
-    Integer termDocId = -1;
-    Terms terms;
-    LeafReaderContext lrc;
-    LeafReader r;
-    ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
-    while (iterator.hasNext()) {
-      lrc = iterator.next();
-      r = lrc.reader();
-      for (String field : joinInfo.fields()) {
-        if ((terms = r.fields().terms(field)) != null) {
-          TermsEnum termsEnum = terms.iterator();
-          termDocId = -1;
-          while ((term = termsEnum.next()) != null) {
-            Iterator<Integer> docIterator = docSet.iterator();
-            postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.NONE);
-            while (docIterator.hasNext()) {
-              docId = docIterator.next() - lrc.docBase;
-              if ((docId >= termDocId) && ((docId.equals(termDocId))
-                  || ((termDocId = postingsEnum.advance(docId))
-                      .equals(docId)))) {
-                joinInfo.add(term.utf8ToString());
-                break;
+  public static void collectCollection(IndexReader reader, List<Integer> docSet,
+      ComponentCollection collectionInfo) throws IOException {
+    if (collectionInfo.action().equals(ComponentCollection.ACTION_CHECK)) {
+      // can't do anything in lucene for check
+    } else if (collectionInfo.action()
+        .equals(ComponentCollection.ACTION_LIST)) {
+      // can't do anything in lucene for list
+    } else if (collectionInfo.action()
+        .equals(ComponentCollection.ACTION_CREATE)) {
+      BytesRef term = null;
+      PostingsEnum postingsEnum = null;
+      Integer docId;
+      Integer termDocId = -1;
+      Terms terms;
+      LeafReaderContext lrc;
+      LeafReader r;
+      ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
+      while (iterator.hasNext()) {
+        lrc = iterator.next();
+        r = lrc.reader();
+        for (String field : collectionInfo.fields()) {
+          if ((terms = r.fields().terms(field)) != null) {
+            TermsEnum termsEnum = terms.iterator();
+            while ((term = termsEnum.next()) != null) {
+              Iterator<Integer> docIterator = docSet.iterator();
+              postingsEnum = termsEnum.postings(postingsEnum,
+                  PostingsEnum.NONE);
+              termDocId = -1;
+              while (docIterator.hasNext()) {
+                docId = docIterator.next() - lrc.docBase;
+                if ((docId >= termDocId) && ((docId.equals(termDocId))
+                    || ((termDocId = postingsEnum.advance(docId))
+                        .equals(docId)))) {
+                  collectionInfo.addValue(term.utf8ToString());
+                  break;
+                }
+                if (termDocId.equals(PostingsEnum.NO_MORE_DOCS)) {
+                  break;
+                }
               }
             }
           }
@@ -270,7 +282,7 @@ public class CodecCollector {
     boolean needSpans = false;
     boolean needPositions = false;
     boolean needTokens = false;
-
+    
     // results
     Map<Integer, Integer> positionsData = null;
     Map<Integer, Integer> tokensData = null;
@@ -1517,7 +1529,6 @@ public class CodecCollector {
                 }
               }
             }
-
           } else {
             int maximumNumberOfDocuments = 0;
             int boundaryMinimumNumberOfDocuments = 1;
@@ -1671,9 +1682,9 @@ public class CodecCollector {
           m.endPosition - 1);
     }
     if (group.hitRight != null) {
-      start = Math.min(m.endPosition - group.hitRight.length + 1,
+      start = Math.min(m.endPosition - group.hitRight.length,
           m.startPosition);
-      end = end == null ? m.endPosition : Math.max(end, m.endPosition);
+      end = end == null ? (m.endPosition - 1) : Math.max(end, (m.endPosition - 1));
     }
     if (group.left != null) {
       start = start == null ? m.startPosition - group.left.length
@@ -1683,8 +1694,8 @@ public class CodecCollector {
     }
     if (group.right != null) {
       start = start == null ? m.endPosition : Math.min(m.endPosition, start);
-      end = end == null ? m.endPosition + group.right.length
-          : Math.max(m.endPosition + group.right.length, end);
+      end = end == null ? m.endPosition + group.right.length - 1
+          : Math.max(m.endPosition + group.right.length - 1, end);
     }
     return new IntervalTreeNodeData<>(start, end, m.startPosition,
         m.endPosition - 1);

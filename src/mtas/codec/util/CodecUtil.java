@@ -16,7 +16,7 @@ import mtas.codec.MtasCodecPostingsFormat;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.codec.util.CodecComponent.ComponentField;
-import mtas.codec.util.CodecComponent.ComponentJoin;
+import mtas.codec.util.CodecComponent.ComponentCollection;
 
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
@@ -247,18 +247,18 @@ public class CodecUtil {
   }
 
   /**
-   * Collect join.
+   * Collect collection.
    *
    * @param reader the reader
    * @param fullDocSet the full doc set
-   * @param joinInfo the join info
+   * @param collectionInfo the collection info
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static void collectJoin(IndexReader reader,
-      ArrayList<Integer> fullDocSet, ComponentJoin joinInfo)
+  public static void collectCollection(IndexReader reader,
+      List<Integer> fullDocSet, ComponentCollection collectionInfo)
       throws IOException {
-    if (joinInfo != null) {
-      CodecCollector.collectJoin(reader, fullDocSet, joinInfo);
+    if (collectionInfo != null) {
+      CodecCollector.collectCollection(reader, fullDocSet, collectionInfo);
     }
   }
 

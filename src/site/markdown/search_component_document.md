@@ -1,6 +1,6 @@
 # Document
 
-Mtas can produce statistics on used terms for the individual listed documents. To get this information, in Solr requests, besides the parameter to enable [Mtas queries](search_query.html), the following parameter should be provided.
+Mtas can produce statistics on used terms for the individual listed documents. To get this information, in Solr requests, besides the parameter to enable the [Mtas query component](search_component.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -27,7 +27,7 @@ A list can be provided, specifying the set of terms to consider when computing t
 | mtas.document.\<identifier\>.list         | \<string\>   | comma separated list of values           | yes          | 
 | mtas.document.\<identifier\>.listRegexp  | \<boolean\>   | list of values are to be interpreted as regular expressions           | no          |
 | mtas.document.\<identifier\>.listExpand  | \<boolean\>   | expand the matches on values from list | no          |
-| mtas.document.\<identifier\>.listExpandNumber  | \<boolean\>   | number of expansions of matches on values from list | no          | 
+| mtas.document.\<identifier\>.listExpandNumber  | \<double\>   | number of expansions of matches on values from list | no          | 
 
 ## Ignore list
 

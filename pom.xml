@@ -144,7 +144,8 @@
 				<artifactId>maven-site-plugin</artifactId>
 				<version>3.6</version>
 				<configuration>
-					<outputDirectory>${project.basedir}/gh-pages/</outputDirectory>
+					<siteDirectory>${project.basedir}/src/site/</siteDirectory>
+          <outputDirectory>${project.basedir}/gh-pages/</outputDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -306,7 +307,7 @@
 			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>versions-maven-plugin</artifactId> 
 				<version>2.2</version> <reportSets> <reportSet> <reports> <report>dependency-updates-report</report> 
 				<report>plugin-updates-report</report> <report>property-updates-report</report> 
-				</reports> </reportSet> </reportSets> </plugin> -->			
+				</reports> </reportSet> </reportSets> </plugin> -->
 		</plugins>
 	</reporting>
 	<repositories>

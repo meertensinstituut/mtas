@@ -1,6 +1,6 @@
 #Sharding
 
-All [Mtas queries](search_query.html) support sharding.
+All [Mtas queries](search_component.html) support sharding.
 
 **Example**
 

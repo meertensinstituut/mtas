@@ -1,6 +1,6 @@
 #Statistics - positions
 
-To get statistics on the number of positions within a set of documents in Solr requests, besides the parameter to enable [statistics](search_query_stats.html), the following parameter should be provided.
+To get statistics on the number of positions within a set of documents in Solr requests, besides the parameter to enable [statistics](search_component_stats.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|

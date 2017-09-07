@@ -1,6 +1,6 @@
 # Kwic
 
-Mtas can produce keywords in context (kwic) for Mtas queries within the listed documents. To get this information, in Solr requests, besides the parameter to enable [Mtas queries](search_query.html), the following parameter should be provided.
+Mtas can produce keywords in context (kwic) for Mtas queries within the listed documents. To get this information, in Solr requests, besides the parameter to enable the [Mtas query component](search_component.html), the following parameter should be provided.
 
 | Parameter             | Value  | Obligatory  |
 |-----------------------|--------|-------------|
@@ -31,8 +31,8 @@ The query may contain one or more variables, and the value(s) of these variables
 
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
-| mtas.kwic.\<identifier\>.query.variable\<identifier variable\>.name      | \<string\>   | name of variable                 | yes        |
-| mtas.kwic.\<identifier\>.query.variable\<identifier variable\>.value      | \<string\>   | comma separated list of values  | yes        |
+| mtas.kwic.\<identifier\>.query.variable.\<identifier variable\>.name      | \<string\>   | name of variable                 | yes        |
+| mtas.kwic.\<identifier\>.query.variable.\<identifier variable\>.value      | \<string\>   | comma separated list of values  | yes        |
 
 ---
 

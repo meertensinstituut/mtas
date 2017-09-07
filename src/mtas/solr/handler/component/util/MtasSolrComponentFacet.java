@@ -573,7 +573,7 @@ public class MtasSolrComponentFacet
       mtasFacetResponse.add("_encoded_list", MtasSolrResultUtil.encode(data));
     } else {
       mtasFacetResponse.add("list", data);
-      MtasSolrResultUtil.rewrite(mtasFacetResponse);
+      MtasSolrResultUtil.rewrite(mtasFacetResponse, searchComponent);
     }
     return mtasFacetResponse;
   }
@@ -636,7 +636,7 @@ public class MtasSolrComponentFacet
       try {
         mtasResponseFacet = (ArrayList<Object>) mtasResponse.get("facet");
         if (mtasResponseFacet != null) {
-          MtasSolrResultUtil.rewrite(mtasResponseFacet);
+          MtasSolrResultUtil.rewrite(mtasResponseFacet, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);

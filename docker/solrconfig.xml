@@ -1246,10 +1246,10 @@
 
   <!-- MTAS: searchComponent -->
   <searchComponent name="mtas" class="mtas.solr.handler.component.MtasSolrSearchComponent">
-    <!-- <str name="joinCacheDirectory">${solr.core.instanceDir}/cache/join</str>
-    <long name="joinLifetime">86400</long>
-    <int name="joinMaximumNumber">1000</int>
-    <int name="joinMaximumOverflow">10</int> -->
+    <str name="collectionCacheDirectory">${solr.core.instanceDir}/cache/collection</str>
+    <long name="collectionLifetime">86400</long>
+    <int name="collectionMaximumNumber">1000</int>
+    <int name="collectionMaximumOverflow">10</int>
   </searchComponent>
 
 

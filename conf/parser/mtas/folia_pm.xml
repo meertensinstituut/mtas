@@ -25,7 +25,7 @@
 		<!-- START REFERENCES -->
 		<references>
 			<reference name="wref" ref="id" />
-		</references>
+		</references> 
 		<!-- END REFERENCES -->
 
 		<!-- START MAPPINGS -->
@@ -284,6 +284,7 @@
         <token type="string" offset="false" realoffset="false" parent="false">
           <pre>
             <item type="name" />
+            <item type="ancestorGroupAttribute" name="class" prefix="." />
             <item type="attribute" name="subset" prefix="." />
           </pre>
           <post>

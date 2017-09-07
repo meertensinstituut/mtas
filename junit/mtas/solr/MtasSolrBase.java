@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
 
@@ -21,6 +22,24 @@ import org.apache.solr.common.util.NamedList;
  * The Class MtasSolrBase.
  */
 public class MtasSolrBase {
+
+  /** The field id. */
+  public static String FIELD_ID = "id";
+  
+  /** The field title. */
+  public static String FIELD_TITLE = "title";
+  
+  /** The field text. */
+  public static String FIELD_TEXT = "text";
+  
+  /** The field mtas. */
+  public static String FIELD_MTAS = "mtas";
+  
+  /** The field mtas advanced. */
+  public static String FIELD_MTAS_ADVANCED = "mtasAdvanced";
+  
+  /** The field source. */
+  public static String FIELD_SOURCE = "source";
 
   /**
    * Instantiates a new mtas solr base.
@@ -31,6 +50,28 @@ public class MtasSolrBase {
 
   /** The log. */
   private static Log log = LogFactory.getLog(MtasSolrBase.class);
+
+  /**
+   * Gets the num found.
+   *
+   * @param response the response
+   * @return the num found
+   */
+  public static long getNumFound(NamedList<Object> response) {
+    if (response == null) {
+      log.error("no (valid); response");
+    } else {
+      Object mtasResponseRaw = response.get("response");
+      if (mtasResponseRaw != null
+          && mtasResponseRaw instanceof SolrDocumentList) {
+        SolrDocumentList mtasResponse = (SolrDocumentList) mtasResponseRaw;
+        return mtasResponse.getNumFound();
+      } else {
+        log.error("unexpected " + mtasResponseRaw);
+      }
+    }
+    return 0;
+  }
 
   /**
    * Gets the from stats.
@@ -52,11 +93,11 @@ public class MtasSolrBase {
         Object mtasStatsFieldsRaw = mtasStats.get("stats_fields");
         if (mtasStatsFieldsRaw != null
             && mtasStatsFieldsRaw instanceof NamedList) {
-          NamedList<Object> mtasStatsFields = (NamedList) mtasStatsFieldsRaw;
+          NamedList<Object> mtasStatsFields = (NamedList<Object>) mtasStatsFieldsRaw;
           Object mtasStatsFieldsFieldRaw = mtasStatsFields.get(field);
           if (mtasStatsFieldsFieldRaw != null
               && mtasStatsFieldsFieldRaw instanceof NamedList) {
-            NamedList<Object> mtasStatsFieldsField = (NamedList) mtasStatsFieldsFieldRaw;
+            NamedList<Object> mtasStatsFieldsField = (NamedList<Object>) mtasStatsFieldsFieldRaw;
             Object mtasStatsFieldsFieldNameRaw = mtasStatsFieldsField.get(name);
             if (mtasStatsFieldsFieldNameRaw != null
                 && mtasStatsFieldsFieldNameRaw instanceof Number) {
@@ -148,18 +189,19 @@ public class MtasSolrBase {
    * @param key the key
    * @return the from mtas termvector
    */
-  public static List<NamedList> getFromMtasTermvector(
+  public static List<NamedList<Object>> getFromMtasTermvector(
       NamedList<Object> response, String key) {
     if (response == null) {
       log.error("no (valid); response");
     } else {
       Object mtasResponseRaw = response.get("mtas");
       if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
-        NamedList<Object> mtasResponse = (NamedList) response.get("mtas");
+        NamedList<Object> mtasResponse = (NamedList<Object>) response
+            .get("mtas");
         Object mtasTermvectorResponseRaw = mtasResponse.get("termvector");
         if (mtasTermvectorResponseRaw != null
             && mtasTermvectorResponseRaw instanceof List) {
-          List<NamedList> mtasTermvectorResponse = (List) mtasTermvectorResponseRaw;
+          List<NamedList<Object>> mtasTermvectorResponse = (List) mtasTermvectorResponseRaw;
           if (mtasTermvectorResponse.isEmpty()) {
             log.error("no (valid) mtas termvector response");
           } else {
@@ -173,9 +215,9 @@ public class MtasSolrBase {
               }
             }
             assertFalse("no item with key " + key, item == null);
-            if (item.get("list") != null
+            if (item != null && item.get("list") != null
                 && (item.get("list") instanceof List)) {
-              return (List<NamedList>) item.get("list");
+              return (List<NamedList<Object>>) item.get("list");
             }
           }
         } else {
@@ -221,20 +263,94 @@ public class MtasSolrBase {
             }
             assertFalse("no item with key " + key, item == null);
             Map<String, List<String>> result = new HashMap<>();
-            Iterator<Entry<String, Object>> it = item.iterator();
-            Entry<String, Object> entry;
-            while (it.hasNext()) {
-              entry = it.next();
-              if (!entry.getKey().equals("key")) {
-                assertTrue("invalid entry prefix",
-                    entry.getValue() instanceof List);
-                result.put(entry.getKey(), (List) entry.getValue());
+            if (item != null) {
+              Iterator<Entry<String, Object>> it = item.iterator();
+              Entry<String, Object> entry;
+              while (it.hasNext()) {
+                entry = it.next();
+                if (!entry.getKey().equals("key")) {
+                  assertTrue("invalid entry prefix",
+                      entry.getValue() instanceof List);
+                  result.put(entry.getKey(), (List) entry.getValue());
+                }
               }
             }
             return result;
           }
         }
       }
+    }
+    return null;
+  }
+
+  /**
+   * Gets the from mtas collection.
+   *
+   * @param response the response
+   * @param key the key
+   * @return the from mtas collection
+   */
+  public static NamedList<Object> getFromMtasCollection(
+      NamedList<Object> response, String key) {
+    if (response == null) {
+      log.error("no (valid); response");
+    } else {
+      Object mtasResponseRaw = response.get("mtas");
+      if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
+        NamedList<Object> mtasResponse = (NamedList<Object>) response
+            .get("mtas");
+        Object mtasCollectionResponseRaw = mtasResponse.get("collection");
+        if (mtasCollectionResponseRaw != null
+            && mtasCollectionResponseRaw instanceof List) {
+          List<NamedList<Object>> mtasCollectionResponse = (List<NamedList<Object>>) mtasCollectionResponseRaw;
+          if (mtasCollectionResponse.isEmpty()) {
+            log.error("no (valid) mtas join response");
+          } else {
+            for (NamedList<Object> mtasCollectionResponseItem : mtasCollectionResponse) {
+              if (mtasCollectionResponseItem.get("key") != null
+                  && (mtasCollectionResponseItem.get("key") instanceof String)
+                  && mtasCollectionResponseItem.get("key").equals(key)) {
+                return mtasCollectionResponseItem;
+              }
+            }
+          }
+        } else {
+          log.error("unexpected " + mtasCollectionResponseRaw);
+        }
+      } else {
+        log.error("unexpected " + mtasResponseRaw);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Gets the from mtas collection list.
+   *
+   * @param response the response
+   * @param key the key
+   * @param id the id
+   * @return the from mtas collection list
+   */
+  public static NamedList<Object> getFromMtasCollectionList(
+      NamedList<Object> response, String key, String id) {
+    NamedList<Object> collectionResponse = getFromMtasCollection(response, key);
+    if (collectionResponse != null) {
+      Object collectionResponseListRaw = collectionResponse.get("list");
+      if (collectionResponseListRaw != null && collectionResponseListRaw instanceof List) {
+        List<NamedList<Object>> collectionResponseList = (List<NamedList<Object>>) collectionResponseListRaw;
+        for (NamedList<Object> item : collectionResponseList) {
+          if (item.get("id") != null && item.get("id") instanceof String) {
+            if (id.equals((String) item.get("id"))) {
+              return item;
+            }
+          }
+        }
+      } else {
+        log.error("unexpected " + collectionResponseListRaw + " (searching list)");
+      }
+    } else {
+      log.error("no collectionResponse (searching key " + key + ")");
     }
     return null;
   }
@@ -273,38 +389,38 @@ public class MtasSolrBase {
     Path dataPath = Paths.get("junit").resolve("data");
     // data
     SolrInputDocument newDoc1 = new SolrInputDocument();
-    newDoc1.addField("id", "1");
-    newDoc1.addField("title", "Een onaangenaam mens in de Haarlemmerhout");
-    newDoc1.addField("text", "Een onaangenaam mens in de Haarlemmerhout");
-    newDoc1.addField("mtas", dataPath.resolve("resources")
+    newDoc1.addField(FIELD_ID, "1");
+    newDoc1.addField(FIELD_TITLE, "Een onaangenaam mens in de Haarlemmerhout");
+    newDoc1.addField(FIELD_TEXT, "Een onaangenaam mens in de Haarlemmerhout");
+    newDoc1.addField(FIELD_MTAS, dataPath.resolve("resources")
         .resolve("beets1.xml.gz").toFile().getAbsolutePath());
     if (includeAdvanced) {
-      newDoc1.addField("source", "source1");
-      newDoc1.addField("mtasAdvanced", dataPath.resolve("resources")
+      newDoc1.addField(FIELD_SOURCE, "source1");
+      newDoc1.addField(FIELD_MTAS_ADVANCED, dataPath.resolve("resources")
           .resolve("beets1").toFile().getAbsolutePath());
     }
     solrDocuments.put(1, newDoc1);
     SolrInputDocument newDoc2 = new SolrInputDocument();
-    newDoc2.addField("id", "2");
-    newDoc2.addField("title", "Een oude kennis");
-    newDoc2.addField("text", "Een oude kennis");
-    newDoc2.addField("mtas", dataPath.resolve("resources")
+    newDoc2.addField(FIELD_ID, "2");
+    newDoc2.addField(FIELD_TITLE, "Een oude kennis");
+    newDoc2.addField(FIELD_TEXT, "Een oude kennis");
+    newDoc2.addField(FIELD_MTAS, dataPath.resolve("resources")
         .resolve("beets2.xml.gz").toFile().getAbsolutePath());
     if (includeAdvanced) {
-      newDoc2.addField("source", "source2");
-      newDoc2.addField("mtasAdvanced", dataPath.resolve("resources")
+      newDoc2.addField(FIELD_SOURCE, "source2");
+      newDoc2.addField(FIELD_MTAS_ADVANCED, dataPath.resolve("resources")
           .resolve("beets2.xml").toFile().getAbsolutePath());
     }
     SolrInputDocument newDoc3 = new SolrInputDocument();
     solrDocuments.put(2, newDoc2);
-    newDoc3.addField("id", "3");
-    newDoc3.addField("title", "Varen en Rijden");
-    newDoc3.addField("text", "Varen en Rijden");
-    newDoc3.addField("mtas", dataPath.resolve("resources")
+    newDoc3.addField(FIELD_ID, "3");
+    newDoc3.addField(FIELD_TITLE, "Varen en Rijden");
+    newDoc3.addField(FIELD_TEXT, "Varen en Rijden");
+    newDoc3.addField(FIELD_MTAS, dataPath.resolve("resources")
         .resolve("beets3.xml.gz").toFile().getAbsolutePath());
     if (includeAdvanced) {
-      newDoc3.addField("source", "source3");
-      newDoc3.addField("mtasAdvanced", dataPath.resolve("resources")
+      newDoc3.addField(FIELD_SOURCE, "source3");
+      newDoc3.addField(FIELD_MTAS_ADVANCED, dataPath.resolve("resources")
           .resolve("beets3.xml.gz").toFile().getAbsolutePath());
     }
     solrDocuments.put(3, newDoc3);

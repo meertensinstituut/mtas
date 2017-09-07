@@ -8,13 +8,13 @@ To describe sets of tokens matching some condition, a query language is needed. 
 
 #### Prefix
 
-For each field containing Mtas tokenized text, every token is associated with a prefix. Within the field, only a limited set of prefixes is used to distinguish between the different types of annotation. By using a [prefix query](search_query_prefix.html) a full list of used prefixes can be produced.
+For each field containing Mtas tokenized text, every token is associated with a prefix. Within the field, only a limited set of prefixes is used to distinguish between the different types of annotation. By using a [prefix query](search_component_prefix.html) a full list of used prefixes can be produced.
 
 <a name="value"></a>
 
 #### Value
 
-The optional postfix associated with a token can be queried within CQL by providing a *value*. This is a regular expression, the supported syntax is documented in the RegExp class provided by Lucene. By using a [termvector query](search_query_termvector.html), for each [prefix](#prefix) a list of postfix values can be produced. 
+The optional postfix associated with a token can be queried within CQL by providing a *value*. This is a regular expression, the supported syntax is documented in the RegExp class provided by Lucene. By using a [termvector query](search_component_termvector.html), for each [prefix](#prefix) a list of postfix values can be produced. 
 
 <a name="variable"></a>
 

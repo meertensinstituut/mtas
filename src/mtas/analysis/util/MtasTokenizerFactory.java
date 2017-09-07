@@ -9,8 +9,6 @@ import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeFactory;
-import org.apache.solr.core.SolrResourceLoader;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +64,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasTokenizerFactory(Map<String, String> args,
-      SolrResourceLoader resourceLoader) throws IOException {
+      ResourceLoader resourceLoader) throws IOException {
     super(args);
     configFileArgument = get(args, ARGUMENT_CONFIGFILE);
     configArgument = get(args, ARGUMENT_CONFIG);

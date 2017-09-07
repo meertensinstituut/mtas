@@ -71,12 +71,14 @@ public class MtasSolrComponentDocument
 
   /** The Constant NAME_MTAS_DOCUMENT_NUMBER. */
   public static final String NAME_MTAS_DOCUMENT_NUMBER = "number";
+  
+  private MtasSolrSearchComponent searchComponent;
 
   /**
    * Instantiates a new mtas solr component document.
    */
-  public MtasSolrComponentDocument() {
-    // do nothing for now
+  public MtasSolrComponentDocument(MtasSolrSearchComponent searchComponent) {
+    this.searchComponent = searchComponent;
   }
 
   /*
@@ -257,7 +259,7 @@ public class MtasSolrComponentDocument
       mtasDocumentItemResponses.add(mtasDocumentItemResponse);
     }
     mtasDocumentResponse.add("list", mtasDocumentItemResponses);
-    MtasSolrResultUtil.rewrite(mtasDocumentResponse);
+    MtasSolrResultUtil.rewrite(mtasDocumentResponse, searchComponent);
     return mtasDocumentResponse;
   }
 
@@ -337,7 +339,7 @@ public class MtasSolrComponentDocument
       try {
         mtasResponseDocument = (ArrayList<Object>) mtasResponse.get("document");
         if (mtasResponseDocument != null) {
-          MtasSolrResultUtil.rewrite(mtasResponseDocument);
+          MtasSolrResultUtil.rewrite(mtasResponseDocument, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);
