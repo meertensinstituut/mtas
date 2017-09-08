@@ -135,7 +135,7 @@ abstract class MtasDataItemFull&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
 <span class="fc bfc" id="L135" title="All 2 branches covered.">      } else if (statsItem.equals(CodecUtil.STATS_TYPE_POPULATIONVARIANCE)) {</span>
 <span class="fc" id="L136">        response.put(statsItem, stats.getPopulationVariance());</span>
 <span class="fc bfc" id="L137" title="All 2 branches covered.">      } else if (statsItem.equals(CodecUtil.STATS_TYPE_QUADRATICMEAN)) {</span>
-<span class="fc" id="L138">        response.put(statsItem, Math.sqrt(stats.getSumsq()/stats.getN()));</span>
+<span class="fc" id="L138">        response.put(statsItem, Math.sqrt(stats.getSumsq() / stats.getN()));</span>
 <span class="fc bfc" id="L139" title="All 2 branches covered.">      } else if (statsItem.equals(CodecUtil.STATS_TYPE_KURTOSIS)) {</span>
 <span class="fc" id="L140">        response.put(statsItem, stats.getKurtosis());</span>
 <span class="fc bfc" id="L141" title="All 2 branches covered.">      } else if (statsItem.equals(CodecUtil.STATS_TYPE_MEDIAN)) {</span>
@@ -207,10 +207,9 @@ abstract class MtasDataItemFull&lt;T1 extends Number &amp; Comparable&lt;T1&gt;,
 <span class="nc" id="L207">    createStats();</span>
 <span class="nc bnc" id="L208" title="All 6 branches missed.">    switch (sortType) {</span>
     case CodecUtil.STATS_TYPE_N:
-<span class="nc" id="L210">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getN(),</span>
-          sortDirection);
+<span class="nc" id="L210">      return new MtasDataItemNumberComparator&lt;&gt;(stats.getN(), sortDirection);</span>
     default:
-<span class="nc" id="L213">      return null;</span>
+<span class="nc" id="L212">      return null;</span>
     }
   }
 

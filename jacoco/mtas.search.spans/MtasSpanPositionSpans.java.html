@@ -22,22 +22,22 @@ public class MtasSpanPositionSpans extends MtasSpans {
 
   /** The start. */
   private int start;
-  
+
   /** The end. */
   private int end;
-  
+
   /** The min position. */
   private int minPosition;
-  
+
   /** The max position. */
   private int maxPosition;
-  
+
   /** The current start position. */
   private int currentStartPosition;
-  
+
   /** The current end position. */
   private int currentEndPosition;
-  
+
   /** The doc id. */
   private int docId;
 
@@ -215,16 +215,18 @@ public class MtasSpanPositionSpans extends MtasSpans {
 <span class="nc" id="L215">    return 0;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-<span class="nc bnc" id="L223" title="All 2 branches missed.">    if (!query.twoPhaseIteratorAllowed()) {</span>
-<span class="nc" id="L224">      return null;</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">    if (!query.twoPhaseIteratorAllowed()) {</span>
+<span class="nc" id="L226">      return null;</span>
     } else {
       // TODO
-<span class="nc" id="L227">      return null;</span>
+<span class="nc" id="L229">      return null;</span>
     }
   }
 

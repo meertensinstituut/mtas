@@ -182,15 +182,17 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L190">    super.disableTwoPhaseIterator();</span>
-<span class="fc" id="L191">    q1.disableTwoPhaseIterator();</span>
-<span class="fc" id="L192">    q2.disableTwoPhaseIterator();</span>
-<span class="fc" id="L193">  }</span>
+<span class="fc" id="L192">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L193">    q1.disableTwoPhaseIterator();</span>
+<span class="fc" id="L194">    q2.disableTwoPhaseIterator();</span>
+<span class="fc" id="L195">  }</span>
 
   /**
    * The Class SpanPrecededByWeight.
@@ -214,11 +216,11 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      */
     public SpanPrecededByWeight(MtasSpanPrecededByQueryWeight w1,
         MtasSpanPrecededByQueryWeight w2, IndexSearcher searcher,
-<span class="fc" id="L217">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L218">      super(MtasSpanPrecededByQuery.this, searcher, terms);</span>
-<span class="fc" id="L219">      this.w1 = w1;</span>
-<span class="fc" id="L220">      this.w2 = w2;</span>
-<span class="fc" id="L221">    }</span>
+<span class="fc" id="L219">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
+<span class="fc" id="L220">      super(MtasSpanPrecededByQuery.this, searcher, terms);</span>
+<span class="fc" id="L221">      this.w1 = w1;</span>
+<span class="fc" id="L222">      this.w2 = w2;</span>
+<span class="fc" id="L223">    }</span>
 
     /*
      * (non-Javadoc)
@@ -229,9 +231,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L232">      w1.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L233">      w2.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L234">    }</span>
+<span class="nc" id="L234">      w1.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L235">      w2.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L236">    }</span>
 
     /*
      * (non-Javadoc)
@@ -244,17 +246,17 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-<span class="fc" id="L247">      Terms terms = context.reader().terms(field);</span>
-<span class="pc bpc" id="L248" title="1 of 2 branches missed.">      if (terms == null) {</span>
-<span class="nc" id="L249">        return null; // field does not exist</span>
+<span class="fc" id="L249">      Terms terms = context.reader().terms(field);</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">      if (terms == null) {</span>
+<span class="nc" id="L251">        return null; // field does not exist</span>
       }
-<span class="fc" id="L251">      MtasSpanPrecededByQuerySpans s1 = new MtasSpanPrecededByQuerySpans(</span>
+<span class="fc" id="L253">      MtasSpanPrecededByQuerySpans s1 = new MtasSpanPrecededByQuerySpans(</span>
           MtasSpanPrecededByQuery.this,
-<span class="fc" id="L253">          w1.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L254">      MtasSpanPrecededByQuerySpans s2 = new MtasSpanPrecededByQuerySpans(</span>
+<span class="fc" id="L255">          w1.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L256">      MtasSpanPrecededByQuerySpans s2 = new MtasSpanPrecededByQuerySpans(</span>
           MtasSpanPrecededByQuery.this,
-<span class="fc" id="L256">          w2.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L257">      return new MtasSpanPrecededBySpans(MtasSpanPrecededByQuery.this, s1, s2);</span>
+<span class="fc" id="L258">          w2.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L259">      return new MtasSpanPrecededBySpans(MtasSpanPrecededByQuery.this, s1, s2);</span>
     }
 
     /*
@@ -264,9 +266,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L267">      w1.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L268">      w2.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L269">    }</span>
+<span class="nc" id="L269">      w1.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L270">      w2.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L271">    }</span>
 
   }
 
@@ -285,9 +287,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      * @param spans the spans
      */
     public MtasSpanPrecededByQuerySpans(MtasSpanPrecededByQuery query,
-<span class="fc" id="L288">        Spans spans) {</span>
-<span class="pc bpc" id="L289" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
-<span class="fc" id="L290">    }</span>
+<span class="fc" id="L290">        Spans spans) {</span>
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
+<span class="fc" id="L292">    }</span>
 
   }
 
@@ -304,9 +306,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
      *
      * @param spanWeight the span weight
      */
-<span class="fc" id="L307">    public MtasSpanPrecededByQueryWeight(SpanWeight spanWeight) {</span>
-<span class="fc" id="L308">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L309">    }</span>
+<span class="fc" id="L309">    public MtasSpanPrecededByQueryWeight(SpanWeight spanWeight) {</span>
+<span class="fc" id="L310">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L311">    }</span>
   }
 
 }

@@ -16,7 +16,7 @@ import mtas.codec.MtasCodecPostingsFormat;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.codec.util.CodecComponent.ComponentField;
-import mtas.codec.util.CodecComponent.ComponentJoin;
+import mtas.codec.util.CodecComponent.ComponentCollection;
 
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
@@ -247,18 +247,18 @@ public class CodecUtil {
 <span class="fc" id="L247">  }</span>
 
   /**
-   * Collect join.
+   * Collect collection.
    *
    * @param reader the reader
    * @param fullDocSet the full doc set
-   * @param joinInfo the join info
+   * @param collectionInfo the collection info
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static void collectJoin(IndexReader reader,
-      ArrayList&lt;Integer&gt; fullDocSet, ComponentJoin joinInfo)
+  public static void collectCollection(IndexReader reader,
+      List&lt;Integer&gt; fullDocSet, ComponentCollection collectionInfo)
       throws IOException {
-<span class="pc bpc" id="L260" title="1 of 2 branches missed.">    if (joinInfo != null) {</span>
-<span class="nc" id="L261">      CodecCollector.collectJoin(reader, fullDocSet, joinInfo);</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">    if (collectionInfo != null) {</span>
+<span class="fc" id="L261">      CodecCollector.collectCollection(reader, fullDocSet, collectionInfo);</span>
     }
 <span class="fc" id="L263">  }</span>
 

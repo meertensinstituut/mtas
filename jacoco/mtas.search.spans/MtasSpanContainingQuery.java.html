@@ -155,15 +155,17 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
 <span class="nc" id="L155">    return baseQuery.hashCode();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L163">    super.disableTwoPhaseIterator();</span>
-<span class="fc" id="L164">    bigQuery.disableTwoPhaseIterator();</span>
-<span class="fc" id="L165">    smallQuery.disableTwoPhaseIterator();</span>
-<span class="fc" id="L166">  }</span>
+<span class="fc" id="L165">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L166">    bigQuery.disableTwoPhaseIterator();</span>
+<span class="fc" id="L167">    smallQuery.disableTwoPhaseIterator();</span>
+<span class="fc" id="L168">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

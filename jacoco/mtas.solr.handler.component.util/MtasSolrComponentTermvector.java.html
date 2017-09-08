@@ -476,7 +476,7 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L476">          MtasSolrResultUtil.encode(data));</span>
     } else {
 <span class="fc" id="L478">      mtasTermVectorResponse.add(&quot;list&quot;, data);</span>
-<span class="fc" id="L479">      MtasSolrResultUtil.rewrite(mtasTermVectorResponse);</span>
+<span class="fc" id="L479">      MtasSolrResultUtil.rewrite(mtasTermVectorResponse, searchComponent);</span>
     }
 <span class="fc" id="L481">    return mtasTermVectorResponse;</span>
   }
@@ -626,8 +626,8 @@ public class MtasSolrComponentTermvector
       Object mtasResponseTermvectorRaw;
 <span class="pc bpc" id="L627" title="2 of 4 branches missed.">      if ((mtasResponseTermvectorRaw = mtasResponse.get(&quot;termvector&quot;)) != null</span>
           &amp;&amp; mtasResponseTermvectorRaw instanceof ArrayList) {
-<span class="fc" id="L629">        MtasSolrResultUtil</span>
-<span class="fc" id="L630">            .rewrite((ArrayList&lt;Object&gt;) mtasResponseTermvectorRaw);</span>
+<span class="fc" id="L629">        MtasSolrResultUtil.rewrite(</span>
+            (ArrayList&lt;Object&gt;) mtasResponseTermvectorRaw, searchComponent);
       }
     }
 <span class="fc" id="L633">  }</span>

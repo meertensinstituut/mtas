@@ -573,7 +573,7 @@ public class MtasSolrComponentFacet
 <span class="nc" id="L573">      mtasFacetResponse.add(&quot;_encoded_list&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
 <span class="nc" id="L575">      mtasFacetResponse.add(&quot;list&quot;, data);</span>
-<span class="nc" id="L576">      MtasSolrResultUtil.rewrite(mtasFacetResponse);</span>
+<span class="nc" id="L576">      MtasSolrResultUtil.rewrite(mtasFacetResponse, searchComponent);</span>
     }
 <span class="nc" id="L578">    return mtasFacetResponse;</span>
   }
@@ -636,7 +636,7 @@ public class MtasSolrComponentFacet
       try {
 <span class="nc" id="L637">        mtasResponseFacet = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;facet&quot;);</span>
 <span class="nc bnc" id="L638" title="All 2 branches missed.">        if (mtasResponseFacet != null) {</span>
-<span class="nc" id="L639">          MtasSolrResultUtil.rewrite(mtasResponseFacet);</span>
+<span class="nc" id="L639">          MtasSolrResultUtil.rewrite(mtasResponseFacet, searchComponent);</span>
         }
 <span class="nc" id="L641">      } catch (ClassCastException e) {</span>
 <span class="nc" id="L642">        log.debug(e);</span>

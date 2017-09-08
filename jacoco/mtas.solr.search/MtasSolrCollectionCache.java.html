@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasSolrCollectionCache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.solr.search</a> &gt; <span class="el_source">MtasSolrCollectionCache.java</span></div><h1>MtasSolrCollectionCache.java</h1><pre class="source lang-java linenums">package mtas.solr.search;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.automaton.Automata;
+import org.apache.lucene.util.automaton.Automaton;
+import org.apache.solr.common.util.Base64;
+import org.apache.solr.common.util.SimpleOrderedMap;
+
+/**
+ * The Class MtasSolrCollectionCache.
+ */
+public class MtasSolrCollectionCache {
+
+  /** The Constant log. */
+<span class="fc" id="L44">  private static final Log log = LogFactory</span>
+<span class="fc" id="L45">      .getLog(MtasSolrCollectionCache.class);</span>
+
+  /** The Constant DEFAULT_LIFETIME. */
+  private static final long DEFAULT_LIFETIME = 86400;
+
+  /** The Constant DEFAULT_MAXIMUM_NUMBER. */
+  private static final int DEFAULT_MAXIMUM_NUMBER = 1000;
+
+  /** The Constant DEFAULT_MAXIMUM_OVERFLOW. */
+  private static final int DEFAULT_MAXIMUM_OVERFLOW = 10;
+
+  /** The id to version. */
+  private Map&lt;String, String&gt; idToVersion;
+
+  /** The version to item. */
+  private Map&lt;String, MtasSolrCollectionCacheItem&gt; versionToItem;
+
+  /** The expiration version. */
+  private Map&lt;String, Long&gt; expirationVersion;
+
+  /** The collection cache path. */
+  private Path collectionCachePath;
+
+  /** The life time. */
+  private long lifeTime;
+
+  /** The maximum number. */
+  private int maximumNumber;
+
+  /** The maximum overflow. */
+  private int maximumOverflow;
+
+  /**
+   * Instantiates a new mtas solr collection cache.
+   *
+   * @param cacheDirectory the cache directory
+   * @param lifeTime the life time
+   * @param maximumNumber the maximum number
+   * @param maximumOverflow the maximum overflow
+   */
+  public MtasSolrCollectionCache(String cacheDirectory, Long lifeTime,
+<span class="fc" id="L86">      Integer maximumNumber, Integer maximumOverflow) {</span>
+<span class="pc bpc" id="L87" title="2 of 4 branches missed.">    this.lifeTime = (lifeTime != null &amp;&amp; lifeTime &gt; 0) ? lifeTime</span>
+        : DEFAULT_LIFETIME;
+<span class="pc bpc" id="L89" title="2 of 4 branches missed.">    this.maximumNumber = (maximumNumber != null &amp;&amp; maximumNumber &gt; 0)</span>
+<span class="pc" id="L90">        ? maximumNumber : DEFAULT_MAXIMUM_NUMBER;</span>
+<span class="pc bpc" id="L91" title="3 of 4 branches missed.">    this.maximumOverflow = (maximumOverflow != null &amp;&amp; maximumOverflow &gt; 0)</span>
+<span class="pc" id="L92">        ? maximumOverflow : DEFAULT_MAXIMUM_OVERFLOW;</span>
+<span class="fc" id="L93">    idToVersion = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L94">    expirationVersion = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L95">    versionToItem = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (cacheDirectory != null) {</span>
+      try {
+<span class="fc" id="L98">        collectionCachePath = Files</span>
+<span class="fc" id="L99">            .createDirectories(Paths.get(cacheDirectory));</span>
+        // reconstruct administration
+<span class="fc" id="L101">        File[] fileList = collectionCachePath.toFile().listFiles();</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (fileList != null) {</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">          for (File file : fileList) {</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (file.isFile()) {</span>
+<span class="nc" id="L105">              String version = file.getName();</span>
+<span class="nc" id="L106">              MtasSolrCollectionCacheItem item = read(version, null);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">              if (item != null) {</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">                if (idToVersion.containsKey(item.id)) {</span>
+<span class="nc" id="L109">                  expirationVersion.remove(idToVersion.get(item.id));</span>
+<span class="nc" id="L110">                  versionToItem.remove(idToVersion.get(item.id));</span>
+<span class="nc" id="L111">                  idToVersion.remove(item.id);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">                  if (!file.delete()) {</span>
+<span class="nc" id="L113">                    log.error(&quot;couldn't delete &quot; + file);</span>
+                  }
+                }
+                // don't keep data or automaton in memory
+<span class="nc" id="L117">                item.data = null;</span>
+                // store in memory
+<span class="nc" id="L119">                idToVersion.put(item.id, version);</span>
+<span class="nc" id="L120">                expirationVersion.put(version,</span>
+<span class="nc" id="L121">                    file.lastModified() + (1000 * lifeTime));</span>
+<span class="nc" id="L122">                versionToItem.put(version, item);</span>
+              } else {
+<span class="nc bnc" id="L124" title="All 2 branches missed.">                if (!file.delete()) {</span>
+<span class="nc" id="L125">                  log.error(&quot;couldn't delete &quot; + file);</span>
+                }
+              }
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            } else if (file.isDirectory()) {</span>
+<span class="nc" id="L129">              log.info(&quot;unexpected directory &quot; + file.getName());</span>
+            }
+          }
+<span class="fc" id="L132">          clear();</span>
+        }
+<span class="nc" id="L134">      } catch (IOException e) {</span>
+<span class="nc" id="L135">        collectionCachePath = null;</span>
+<span class="nc" id="L136">        log.error(&quot;couldn't create cache directory &quot; + cacheDirectory, e);</span>
+<span class="fc" id="L137">      }</span>
+    }
+<span class="fc" id="L139">  }</span>
+
+  /**
+   * Creates the.
+   *
+   * @param size the size
+   * @param data the data
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String create(Integer size, HashSet&lt;String&gt; data) throws IOException {
+<span class="nc" id="L150">    return create(null, size, data);</span>
+  }
+
+  /**
+   * Creates the.
+   *
+   * @param id the id
+   * @param size the size
+   * @param data the data
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public String create(String id, Integer size, HashSet&lt;String&gt; data)
+      throws IOException {
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (collectionCachePath != null) {</span>
+      // initialization
+<span class="fc" id="L166">      Date date = clear();</span>
+      // create always new version
+      String version;
+      do {
+<span class="fc" id="L170">        version = UUID.randomUUID().toString();</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">      } while (versionToItem.containsKey(version));</span>
+      // create new item
+      MtasSolrCollectionCacheItem item;
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">      if (id != null) {</span>
+<span class="fc" id="L175">        item = new MtasSolrCollectionCacheItem(id, size, data);</span>
+        // remove if item with id already exists
+<span class="fc" id="L177">        deleteById(id);</span>
+      } else {
+<span class="nc" id="L179">        item = new MtasSolrCollectionCacheItem(version, size, data);</span>
+      }
+      // register
+<span class="fc" id="L182">      idToVersion.put(id, version);</span>
+<span class="fc" id="L183">      expirationVersion.put(version, date.getTime() + (1000 * lifeTime));</span>
+<span class="fc" id="L184">      versionToItem.put(version, item);</span>
+      // store data in file
+<span class="fc" id="L186">      File file = collectionCachePath.resolve(version).toFile();</span>
+<span class="pc" id="L187">      try (OutputStream outputStream = new FileOutputStream(file);</span>
+<span class="fc" id="L188">          Writer outputStreamWriter = new OutputStreamWriter(outputStream,</span>
+              StandardCharsets.UTF_8);) {
+<span class="fc" id="L190">        outputStreamWriter.write(encode(item));</span>
+        // set correct time to reconstruct administration on restart
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (!file.setLastModified(date.getTime())) {</span>
+<span class="nc" id="L193">          log.debug(&quot;couldn't change filetime &quot; + file.getAbsolutePath());</span>
+        }
+        // don't store data in memory
+<span class="fc" id="L196">        item.data = null;</span>
+        // return version
+        // System.out.println(&quot;STORED: &quot; + version + &quot; - &quot; + item.size);
+<span class="fc" id="L199">        return version;</span>
+<span class="pc bpc" id="L200" title="12 of 16 branches missed.">      } catch (IOException e) {</span>
+<span class="nc" id="L201">        idToVersion.remove(id);</span>
+<span class="nc" id="L202">        expirationVersion.remove(version);</span>
+<span class="nc" id="L203">        versionToItem.remove(version);</span>
+<span class="nc" id="L204">        throw new IOException(&quot;couldn't create &quot; + version, e);</span>
+      }
+    } else {
+<span class="nc" id="L207">      throw new IOException(&quot;no cachePath available, can't store data&quot;);</span>
+    }
+  }
+
+  /**
+   * List.
+   *
+   * @return the list
+   */
+  public List&lt;SimpleOrderedMap&lt;Object&gt;&gt; list() {
+<span class="fc" id="L217">    List&lt;SimpleOrderedMap&lt;Object&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">    for (Entry&lt;String, String&gt; entry : idToVersion.entrySet()) {</span>
+<span class="fc" id="L219">      SimpleOrderedMap&lt;Object&gt; item = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L220">      item.add(&quot;id&quot;, entry.getKey());</span>
+<span class="fc" id="L221">      item.add(&quot;size&quot;, versionToItem.get(entry.getValue()).size);</span>
+<span class="fc" id="L222">      item.add(&quot;version&quot;, entry.getValue());</span>
+<span class="fc" id="L223">      item.add(&quot;expiration&quot;, expirationVersion.get(entry.getValue()));</span>
+<span class="fc" id="L224">      list.add(item);</span>
+<span class="fc" id="L225">    }</span>
+<span class="fc" id="L226">    return list;</span>
+  }
+
+  /**
+   * Check.
+   *
+   * @param id the id
+   * @return the simple ordered map
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public SimpleOrderedMap&lt;Object&gt; check(String id) throws IOException {
+<span class="fc bfc" id="L237" title="All 2 branches covered.">    if (idToVersion.containsKey(id)) {</span>
+<span class="fc" id="L238">      String version = idToVersion.get(id);</span>
+<span class="fc" id="L239">      MtasSolrCollectionCacheItem item = versionToItem.get(version);</span>
+<span class="fc" id="L240">      Date date = new Date();</span>
+<span class="fc" id="L241">      long now = date.getTime();</span>
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">      if (verify(version, now)) {</span>
+<span class="fc" id="L243">        SimpleOrderedMap&lt;Object&gt; data = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L244">        data.add(&quot;now&quot;, now);</span>
+<span class="fc" id="L245">        data.add(&quot;id&quot;, item.id);</span>
+<span class="fc" id="L246">        data.add(&quot;size&quot;, item.size);</span>
+<span class="fc" id="L247">        data.add(&quot;version&quot;, version);</span>
+<span class="fc" id="L248">        data.add(&quot;expiration&quot;, expirationVersion.get(version));</span>
+<span class="fc" id="L249">        return data;</span>
+      } else {
+<span class="nc" id="L251">        idToVersion.remove(id);</span>
+<span class="nc" id="L252">        versionToItem.remove(version);</span>
+<span class="nc" id="L253">        expirationVersion.remove(version);</span>
+<span class="nc" id="L254">        return null;</span>
+      }
+    } else {
+<span class="fc" id="L257">      return null;</span>
+    }
+  }
+
+  /**
+   * Now.
+   *
+   * @return the long
+   */
+  public long now() {
+<span class="fc" id="L267">    return clear().getTime();</span>
+  }
+
+  /**
+   * Gets the data by id.
+   *
+   * @param id the id
+   * @return the data by id
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public HashSet&lt;String&gt; getDataById(String id) throws IOException {
+<span class="fc bfc" id="L278" title="All 2 branches covered.">    if (idToVersion.containsKey(id)) {</span>
+<span class="fc" id="L279">      return get(id);</span>
+    } else {
+<span class="fc" id="L281">      return null;</span>
+    }
+  }
+
+  /**
+   * Gets the automaton by id.
+   *
+   * @param id the id
+   * @return the automaton by id
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Automaton getAutomatonById(String id) throws IOException {
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">    if (idToVersion.containsKey(id)) {</span>
+<span class="fc" id="L294">      List&lt;BytesRef&gt; bytesArray = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L295">      Set&lt;String&gt; data = get(id);</span>
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">      if (data != null) {</span>
+        Term term;
+<span class="fc bfc" id="L298" title="All 2 branches covered.">        for (String item : data) {</span>
+<span class="fc" id="L299">          term = new Term(&quot;dummy&quot;, item);</span>
+<span class="fc" id="L300">          bytesArray.add(term.bytes());</span>
+<span class="fc" id="L301">        }</span>
+<span class="fc" id="L302">        Collections.sort(bytesArray);</span>
+<span class="fc" id="L303">        return Automata.makeStringUnion(bytesArray);</span>
+      }
+    }
+<span class="nc" id="L306">    return null;</span>
+  }
+
+  /**
+   * Delete by id.
+   *
+   * @param id the id
+   */
+  public void deleteById(String id) {
+<span class="fc bfc" id="L315" title="All 2 branches covered.">    if (idToVersion.containsKey(id)) {</span>
+<span class="fc" id="L316">      String version = idToVersion.remove(id);</span>
+<span class="fc" id="L317">      expirationVersion.remove(version);</span>
+<span class="fc" id="L318">      versionToItem.remove(version);</span>
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">      if (collectionCachePath != null</span>
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">          &amp;&amp; !collectionCachePath.resolve(version).toFile().delete()) {</span>
+<span class="nc" id="L321">        log.debug(&quot;couldn't delete &quot; + version);</span>
+      }
+    }
+<span class="fc" id="L324">  }</span>
+
+  /**
+   * Gets the.
+   *
+   * @param id the id
+   * @return the hash set
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private HashSet&lt;String&gt; get(String id) throws IOException {
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">    if (collectionCachePath != null) {</span>
+<span class="fc" id="L335">      Date date = clear();</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">      if (idToVersion.containsKey(id)) {</span>
+<span class="fc" id="L337">        String version = idToVersion.get(id);</span>
+<span class="fc" id="L338">        expirationVersion.put(version, date.getTime() + (1000 * lifeTime));</span>
+<span class="fc" id="L339">        MtasSolrCollectionCacheItem newItem = read(version, date.getTime());</span>
+<span class="pc bpc" id="L340" title="2 of 4 branches missed.">        if (newItem != null &amp;&amp; newItem.id.equals(id)) {</span>
+<span class="fc" id="L341">          return newItem.data;</span>
+        } else {
+<span class="nc" id="L343">          log.error(&quot;couldn't get &quot; + version);</span>
+          // delete file and remove from index
+<span class="nc bnc" id="L345" title="All 2 branches missed.">          if (!collectionCachePath.resolve(version).toFile().delete()) {</span>
+<span class="nc" id="L346">            log.debug(&quot;couldn't delete &quot; + version);</span>
+          }
+<span class="nc" id="L348">          idToVersion.remove(id);</span>
+<span class="nc" id="L349">          expirationVersion.remove(version);</span>
+<span class="nc" id="L350">          versionToItem.remove(version);</span>
+        }
+<span class="nc" id="L352">      } else {</span>
+<span class="nc" id="L353">        log.error(&quot;doesn't exist anymore&quot;);</span>
+      }
+<span class="nc" id="L355">      return null;</span>
+    } else
+
+    {
+<span class="nc" id="L359">      throw new IOException(&quot;no cachePath available, can't get data&quot;);</span>
+    }
+  }
+
+  /**
+   * Read.
+   *
+   * @param version the version
+   * @param time the time
+   * @return the mtas solr collection cache item
+   */
+  private MtasSolrCollectionCacheItem read(String version, Long time) {
+    try {
+<span class="fc" id="L372">      Path path = collectionCachePath.resolve(version);</span>
+<span class="fc" id="L373">      String data = new String(Files.readAllBytes(path),</span>
+          StandardCharsets.UTF_8);
+<span class="fc" id="L375">      MtasSolrCollectionCacheItem decodedData = decode(data);</span>
+
+      // set correct time to reconstruct administration on restart
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">      if (time != null) {</span>
+<span class="fc" id="L379">        File file = path.toFile();</span>
+<span class="pc bpc" id="L380" title="1 of 2 branches missed.">        if (!file.setLastModified(time)) {</span>
+<span class="nc" id="L381">          log.debug(&quot;couldn't change filetime &quot; + file.getAbsolutePath());</span>
+        }
+      }
+<span class="fc" id="L384">      return decodedData;</span>
+<span class="nc" id="L385">    } catch (IOException e) {</span>
+<span class="nc" id="L386">      log.error(&quot;couldn't read &quot; + version, e);</span>
+    }
+<span class="nc" id="L388">    return null;</span>
+  }
+
+  /**
+   * Verify.
+   *
+   * @param version the version
+   * @param time the time
+   * @return true, if successful
+   */
+  private boolean verify(String version, Long time) {
+<span class="pc bpc" id="L399" title="1 of 2 branches missed.">    if (versionToItem.containsKey(version)) {</span>
+<span class="fc" id="L400">      Path path = collectionCachePath.resolve(version);</span>
+<span class="fc" id="L401">      File file = path.toFile();</span>
+<span class="pc bpc" id="L402" title="3 of 6 branches missed.">      if (file.exists() &amp;&amp; file.canRead() &amp;&amp; file.canWrite()) {</span>
+<span class="pc bpc" id="L403" title="1 of 2 branches missed.">        if (time != null) {</span>
+<span class="pc bpc" id="L404" title="1 of 2 branches missed.">          if (!file.setLastModified(time)) {</span>
+<span class="nc" id="L405">            log.debug(&quot;couldn't change filetime &quot; + file.getAbsolutePath());</span>
+          } else {
+<span class="fc" id="L407">            expirationVersion.put(version, time + (1000 * lifeTime));</span>
+          }
+        }
+<span class="fc" id="L410">        return true;</span>
+      } else {
+<span class="nc" id="L412">        return false;</span>
+      }
+    } else {
+<span class="nc" id="L415">      return false;</span>
+    }
+  }
+
+  /**
+   * Clear.
+   *
+   * @return the date
+   */
+  private Date clear() {
+<span class="fc" id="L425">    Date date = new Date();</span>
+<span class="fc" id="L426">    Long timestamp = date.getTime();</span>
+<span class="fc" id="L427">    HashSet&lt;String&gt; idsToBeRemoved = new HashSet&lt;&gt;();</span>
+    // check expiration
+<span class="fc bfc" id="L429" title="All 2 branches covered.">    for (Entry&lt;String, Long&gt; entry : expirationVersion.entrySet()) {</span>
+<span class="pc bpc" id="L430" title="1 of 2 branches missed.">      if (entry.getValue() &lt; timestamp) {</span>
+<span class="nc" id="L431">        String version = entry.getKey();</span>
+<span class="nc bnc" id="L432" title="All 2 branches missed.">        if (versionToItem.containsKey(version)) {</span>
+<span class="nc" id="L433">          idsToBeRemoved.add(versionToItem.get(version).id);</span>
+        } else {
+<span class="nc" id="L435">          log.debug(&quot;could not remove &quot; + version);</span>
+        }
+      }
+<span class="fc" id="L438">    }</span>
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">    for (String id : idsToBeRemoved) {</span>
+<span class="nc" id="L440">      deleteById(id);</span>
+<span class="nc" id="L441">    }</span>
+<span class="fc" id="L442">    idsToBeRemoved.clear();</span>
+    // check size
+<span class="pc bpc" id="L444" title="1 of 2 branches missed.">    if (expirationVersion.size() &gt; maximumNumber + maximumOverflow) {</span>
+<span class="nc" id="L445">      Set&lt;Entry&lt;String, Long&gt;&gt; mapEntries = expirationVersion.entrySet();</span>
+<span class="nc" id="L446">      List&lt;Entry&lt;String, Long&gt;&gt; aList = new LinkedList&lt;&gt;(mapEntries);</span>
+<span class="nc" id="L447">      Collections.sort(aList,</span>
+          (Entry&lt;String, Long&gt; ele1, Entry&lt;String, Long&gt; ele2) -&gt; ele2
+<span class="nc" id="L449">              .getValue().compareTo(ele1.getValue()));</span>
+<span class="nc" id="L450">      aList.subList(maximumNumber, aList.size()).clear();</span>
+<span class="nc bnc" id="L451" title="All 2 branches missed.">      for (Entry&lt;String, MtasSolrCollectionCacheItem&gt; entry : versionToItem</span>
+<span class="nc" id="L452">          .entrySet()) {</span>
+<span class="nc bnc" id="L453" title="All 2 branches missed.">        if (!expirationVersion.containsKey(entry.getKey())) {</span>
+<span class="nc" id="L454">          idsToBeRemoved.add(entry.getValue().id);</span>
+        }
+<span class="nc" id="L456">      }</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">      for (String id : idsToBeRemoved) {</span>
+<span class="nc" id="L458">        deleteById(id);</span>
+<span class="nc" id="L459">      }</span>
+<span class="nc" id="L460">      idsToBeRemoved.clear();</span>
+    }
+<span class="fc" id="L462">    return date;</span>
+  }
+
+  /**
+   * Encode.
+   *
+   * @param o the o
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private String encode(MtasSolrCollectionCacheItem o) throws IOException {
+<span class="pc bpc" id="L473" title="1 of 2 branches missed.">    if (o != null) {</span>
+<span class="fc" id="L474">      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();</span>
+      ObjectOutputStream objectOutputStream;
+<span class="fc" id="L476">      objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);</span>
+<span class="fc" id="L477">      objectOutputStream.writeObject(o);</span>
+<span class="fc" id="L478">      objectOutputStream.close();</span>
+<span class="fc" id="L479">      byte[] byteArray = byteArrayOutputStream.toByteArray();</span>
+<span class="fc" id="L480">      return Base64.byteArrayToBase64(byteArray);</span>
+    } else {
+<span class="nc" id="L482">      throw new IOException(&quot;nothing to encode&quot;);</span>
+    }
+  }
+
+  /**
+   * Decode.
+   *
+   * @param s the s
+   * @return the mtas solr collection cache item
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private MtasSolrCollectionCacheItem decode(String s) throws IOException {
+<span class="fc" id="L494">    byte[] bytes = Base64.base64ToByteArray(s);</span>
+    ObjectInputStream objectInputStream;
+<span class="fc" id="L496">    objectInputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));</span>
+    try {
+<span class="fc" id="L498">      Object o = objectInputStream.readObject();</span>
+<span class="pc bpc" id="L499" title="1 of 2 branches missed.">      if (o instanceof MtasSolrCollectionCacheItem) {</span>
+<span class="fc" id="L500">        return (MtasSolrCollectionCacheItem) o;</span>
+      } else {
+<span class="nc" id="L502">        throw new IOException(&quot;unexpected &quot; + o.getClass().getSimpleName());</span>
+      }
+<span class="nc" id="L504">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L505">      throw new IOException(e);</span>
+    }
+  }
+
+  /**
+   * Empty.
+   */
+  public void empty() {
+<span class="nc bnc" id="L513" title="All 2 branches missed.">    for (Entry&lt;String, String&gt; entry : idToVersion.entrySet()) {</span>
+<span class="nc" id="L514">      expirationVersion.remove(entry.getValue());</span>
+<span class="nc" id="L515">      versionToItem.remove(entry.getValue());</span>
+<span class="nc bnc" id="L516" title="All 2 branches missed.">      if (collectionCachePath != null</span>
+<span class="nc bnc" id="L517" title="All 2 branches missed.">          &amp;&amp; !collectionCachePath.resolve(entry.getValue()).toFile().delete()) {</span>
+<span class="nc" id="L518">        log.debug(&quot;couldn't delete &quot; + entry.getValue());</span>
+      }
+<span class="nc" id="L520">    }</span>
+<span class="nc" id="L521">    idToVersion.clear();</span>
+<span class="nc" id="L522">  }</span>
+
+}
+
+class MtasSolrCollectionCacheItem implements Serializable {
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+  public String id;
+  public Integer size;
+<span class="fc" id="L534">  public HashSet&lt;String&gt; data = null;</span>
+
+  public MtasSolrCollectionCacheItem(String id, Integer size,
+<span class="fc" id="L537">      HashSet&lt;String&gt; data) throws IOException {</span>
+<span class="pc bpc" id="L538" title="1 of 2 branches missed.">    if (id != null) {</span>
+<span class="fc" id="L539">      this.id = id;</span>
+<span class="fc" id="L540">      this.size = size;</span>
+<span class="fc" id="L541">      this.data = data;</span>
+    } else {
+<span class="nc" id="L543">      throw new IOException(&quot;no id provided&quot;);</span>
+    }
+<span class="fc" id="L545">  }</span>
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L549">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L550">    h = (h * 3) ^ id.hashCode();</span>
+<span class="nc" id="L551">    return h;</span>
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+<span class="nc bnc" id="L556" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L557">      return true;</span>
+<span class="nc bnc" id="L558" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L559">      return false;</span>
+<span class="nc bnc" id="L560" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L561">      return false;</span>
+<span class="nc" id="L562">    final MtasSolrCollectionCacheItem that = (MtasSolrCollectionCacheItem) obj;</span>
+<span class="nc" id="L563">    return (id.equals(that.id));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

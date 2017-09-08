@@ -135,8 +135,8 @@ public class MtasSolrComponentPrefix
    * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
    * CodecComponent.BasicComponent, java.lang.Boolean)
    */
-  public SimpleOrderedMap&lt;Object&gt; create(ComponentPrefix prefix,
-      Boolean encode) {
+  public SimpleOrderedMap&lt;Object&gt; create(ComponentPrefix prefix, Boolean encode)
+      throws IOException {
 <span class="fc" id="L140">    SimpleOrderedMap&lt;Object&gt; mtasPrefixResponse = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="fc" id="L141">    mtasPrefixResponse.add(&quot;key&quot;, prefix.key);</span>
 <span class="fc bfc" id="L142" title="All 2 branches covered.">    if (encode) {</span>
@@ -219,7 +219,7 @@ public class MtasSolrComponentPrefix
 <span class="fc bfc" id="L219" title="All 2 branches covered.">          for (Object mtasResponsePrefixItemRaw : mtasResponsePrefix) {</span>
 <span class="fc" id="L220">            mtasResponsePrefixItem = (NamedList&lt;Object&gt;) mtasResponsePrefixItemRaw;</span>
 <span class="fc" id="L221">            repairPrefixItems(mtasResponsePrefixItem);</span>
-<span class="fc" id="L222">            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem);</span>
+<span class="fc" id="L222">            MtasSolrResultUtil.rewrite(mtasResponsePrefixItem, searchComponent);</span>
 <span class="fc" id="L223">          }</span>
         }
 <span class="nc" id="L225">      } catch (ClassCastException e) {</span>

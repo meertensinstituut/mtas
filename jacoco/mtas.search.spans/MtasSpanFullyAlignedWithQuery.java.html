@@ -201,15 +201,17 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L209">    super.disableTwoPhaseIterator();</span>
-<span class="fc" id="L210">    q1.disableTwoPhaseIterator();</span>
-<span class="fc" id="L211">    q2.disableTwoPhaseIterator();</span>
-<span class="fc" id="L212">  }</span>
+<span class="fc" id="L211">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L212">    q1.disableTwoPhaseIterator();</span>
+<span class="fc" id="L213">    q2.disableTwoPhaseIterator();</span>
+<span class="fc" id="L214">  }</span>
 
   /**
    * The Class SpanFullyAlignedWithWeight.
@@ -233,11 +235,11 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      */
     public SpanFullyAlignedWithWeight(MtasSpanFullyAlignedWithQueryWeight w1,
         MtasSpanFullyAlignedWithQueryWeight w2, IndexSearcher searcher,
-<span class="fc" id="L236">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L237">      super(MtasSpanFullyAlignedWithQuery.this, searcher, terms);</span>
-<span class="fc" id="L238">      this.w1 = w1;</span>
-<span class="fc" id="L239">      this.w2 = w2;</span>
-<span class="fc" id="L240">    }</span>
+<span class="fc" id="L238">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
+<span class="fc" id="L239">      super(MtasSpanFullyAlignedWithQuery.this, searcher, terms);</span>
+<span class="fc" id="L240">      this.w1 = w1;</span>
+<span class="fc" id="L241">      this.w2 = w2;</span>
+<span class="fc" id="L242">    }</span>
 
     /*
      * (non-Javadoc)
@@ -248,9 +250,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L251">      w1.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L252">      w2.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L253">    }</span>
+<span class="nc" id="L253">      w1.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L254">      w2.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L255">    }</span>
 
     /*
      * (non-Javadoc)
@@ -263,17 +265,17 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-<span class="fc" id="L266">      Terms terms = context.reader().terms(field);</span>
-<span class="pc bpc" id="L267" title="1 of 2 branches missed.">      if (terms == null) {</span>
-<span class="nc" id="L268">        return null; // field does not exist</span>
+<span class="fc" id="L268">      Terms terms = context.reader().terms(field);</span>
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">      if (terms == null) {</span>
+<span class="nc" id="L270">        return null; // field does not exist</span>
       }
-<span class="fc" id="L270">      MtasSpanFullyAlignedWithQuerySpans s1 = new MtasSpanFullyAlignedWithQuerySpans(</span>
+<span class="fc" id="L272">      MtasSpanFullyAlignedWithQuerySpans s1 = new MtasSpanFullyAlignedWithQuerySpans(</span>
           MtasSpanFullyAlignedWithQuery.this,
-<span class="fc" id="L272">          w1.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L273">      MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(</span>
+<span class="fc" id="L274">          w1.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L275">      MtasSpanFullyAlignedWithQuerySpans s2 = new MtasSpanFullyAlignedWithQuerySpans(</span>
           MtasSpanFullyAlignedWithQuery.this,
-<span class="fc" id="L275">          w2.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L276">      return new MtasSpanFullyAlignedWithSpans(</span>
+<span class="fc" id="L277">          w2.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L278">      return new MtasSpanFullyAlignedWithSpans(</span>
           MtasSpanFullyAlignedWithQuery.this, s1, s2);
     }
 
@@ -284,9 +286,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L287">      w1.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L288">      w2.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L289">    }</span>
+<span class="nc" id="L289">      w1.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L290">      w2.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L291">    }</span>
 
   }
 
@@ -305,9 +307,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      * @param spans the spans
      */
     public MtasSpanFullyAlignedWithQuerySpans(
-<span class="fc" id="L308">        MtasSpanFullyAlignedWithQuery query, Spans spans) {</span>
-<span class="pc bpc" id="L309" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
-<span class="fc" id="L310">    }</span>
+<span class="fc" id="L310">        MtasSpanFullyAlignedWithQuery query, Spans spans) {</span>
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
+<span class="fc" id="L312">    }</span>
 
   }
 
@@ -324,9 +326,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      *
      * @param spanWeight the span weight
      */
-<span class="fc" id="L327">    public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {</span>
-<span class="fc" id="L328">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L329">    }</span>
+<span class="fc" id="L329">    public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {</span>
+<span class="fc" id="L330">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L331">    }</span>
   }
 
 }

@@ -182,15 +182,17 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
 <span class="nc" id="L182">    return baseQuery.hashCode();</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L190">    super.disableTwoPhaseIterator();</span>
-<span class="fc" id="L191">    q1.disableTwoPhaseIterator();</span>
-<span class="fc" id="L192">    q2.disableTwoPhaseIterator();</span>
-<span class="fc" id="L193">  }</span>
+<span class="fc" id="L192">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L193">    q1.disableTwoPhaseIterator();</span>
+<span class="fc" id="L194">    q2.disableTwoPhaseIterator();</span>
+<span class="fc" id="L195">  }</span>
 
   /**
    * The Class SpanNotWeight.
@@ -214,11 +216,11 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
      */
     public SpanNotWeight(MtasSpanNotQueryWeight w1, MtasSpanNotQueryWeight w2,
         IndexSearcher searcher, Map&lt;Term, TermContext&gt; termContexts)
-<span class="fc" id="L217">        throws IOException {</span>
-<span class="fc" id="L218">      super(MtasSpanNotQuery.this, searcher, termContexts);</span>
-<span class="fc" id="L219">      this.w1 = w1;</span>
-<span class="fc" id="L220">      this.w2 = w2;</span>
-<span class="fc" id="L221">    }</span>
+<span class="fc" id="L219">        throws IOException {</span>
+<span class="fc" id="L220">      super(MtasSpanNotQuery.this, searcher, termContexts);</span>
+<span class="fc" id="L221">      this.w1 = w1;</span>
+<span class="fc" id="L222">      this.w2 = w2;</span>
+<span class="fc" id="L223">    }</span>
 
     /*
      * (non-Javadoc)
@@ -229,9 +231,9 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L232">      w1.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L233">      w2.spanWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L234">    }</span>
+<span class="nc" id="L234">      w1.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L235">      w2.spanWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L236">    }</span>
 
     /*
      * (non-Javadoc)
@@ -244,17 +246,17 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-<span class="fc" id="L247">      Terms terms = context.reader().terms(field);</span>
-<span class="pc bpc" id="L248" title="1 of 2 branches missed.">      if (terms == null) {</span>
-<span class="nc" id="L249">        return null; // field does not exist</span>
+<span class="fc" id="L249">      Terms terms = context.reader().terms(field);</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">      if (terms == null) {</span>
+<span class="nc" id="L251">        return null; // field does not exist</span>
       }
-<span class="fc" id="L251">      MtasSpanNotQuerySpans s1 = new MtasSpanNotQuerySpans(</span>
+<span class="fc" id="L253">      MtasSpanNotQuerySpans s1 = new MtasSpanNotQuerySpans(</span>
           MtasSpanNotQuery.this,
-<span class="fc" id="L253">          w1.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L254">      MtasSpanNotQuerySpans s2 = new MtasSpanNotQuerySpans(</span>
+<span class="fc" id="L255">          w1.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L256">      MtasSpanNotQuerySpans s2 = new MtasSpanNotQuerySpans(</span>
           MtasSpanNotQuery.this,
-<span class="fc" id="L256">          w2.spanWeight.getSpans(context, requiredPostings));</span>
-<span class="fc" id="L257">      return new MtasSpanNotSpans(MtasSpanNotQuery.this, s1, s2);</span>
+<span class="fc" id="L258">          w2.spanWeight.getSpans(context, requiredPostings));</span>
+<span class="fc" id="L259">      return new MtasSpanNotSpans(MtasSpanNotQuery.this, s1, s2);</span>
     }
 
     /*
@@ -264,9 +266,9 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L267">      w1.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L268">      w2.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L269">    }</span>
+<span class="nc" id="L269">      w1.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L270">      w2.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L271">    }</span>
 
   }
 
@@ -284,9 +286,9 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
      * @param query the query
      * @param spans the spans
      */
-<span class="fc" id="L287">    public MtasSpanNotQuerySpans(MtasSpanNotQuery query, Spans spans) {</span>
-<span class="pc bpc" id="L288" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
-<span class="fc" id="L289">    }</span>
+<span class="fc" id="L289">    public MtasSpanNotQuerySpans(MtasSpanNotQuery query, Spans spans) {</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
+<span class="fc" id="L291">    }</span>
 
   }
 
@@ -303,9 +305,9 @@ public class MtasSpanNotQuery extends MtasSpanQuery {
      *
      * @param spanWeight the span weight
      */
-<span class="fc" id="L306">    public MtasSpanNotQueryWeight(SpanWeight spanWeight) {</span>
-<span class="fc" id="L307">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L308">    }</span>
+<span class="fc" id="L308">    public MtasSpanNotQueryWeight(SpanWeight spanWeight) {</span>
+<span class="fc" id="L309">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L310">    }</span>
   }
 
 }

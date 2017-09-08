@@ -187,16 +187,18 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
 <span class="fc" id="L187">    return h;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="nc" id="L195">    super.disableTwoPhaseIterator();</span>
-<span class="nc bnc" id="L196" title="All 2 branches missed.">    for (MtasSpanQuery item : clauses) {</span>
-<span class="nc" id="L197">      item.disableTwoPhaseIterator();</span>
-<span class="nc" id="L198">    }</span>
-<span class="nc" id="L199">  }</span>
+<span class="nc" id="L197">    super.disableTwoPhaseIterator();</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">    for (MtasSpanQuery item : clauses) {</span>
+<span class="nc" id="L199">      item.disableTwoPhaseIterator();</span>
+<span class="nc" id="L200">    }</span>
+<span class="nc" id="L201">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

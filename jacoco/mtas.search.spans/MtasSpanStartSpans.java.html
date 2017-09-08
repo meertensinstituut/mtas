@@ -115,15 +115,17 @@ public class MtasSpanStartSpans extends MtasSpans {
 <span class="pc bpc" id="L115" title="1 of 2 branches missed.">    return (spans == null) ? NO_MORE_DOCS : spans.advance(target);</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-<span class="pc bpc" id="L123" title="1 of 4 branches missed.">    if (spans == null || !query.twoPhaseIteratorAllowed()) {</span>
-<span class="fc" id="L124">      return null;</span>
+<span class="pc bpc" id="L125" title="1 of 4 branches missed.">    if (spans == null || !query.twoPhaseIteratorAllowed()) {</span>
+<span class="fc" id="L126">      return null;</span>
     } else {
-<span class="fc" id="L126">      return spans.asTwoPhaseIterator();</span>
+<span class="fc" id="L128">      return spans.asTwoPhaseIterator();</span>
     }
   }
 
@@ -134,7 +136,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public long cost() {
-<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.cost();</span>
   }
 
   /*
@@ -144,7 +146,7 @@ public class MtasSpanStartSpans extends MtasSpans {
    */
   @Override
   public float positionsCost() {
-<span class="pc bpc" id="L147" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    return (spans == null) ? 0 : spans.positionsCost();</span>
   }
 
 }

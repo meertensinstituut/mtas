@@ -878,7 +878,7 @@ public class MtasSolrComponentStats
 <span class="fc" id="L878">          MtasSolrResultUtil.encode(data));</span>
     } else {
 <span class="fc" id="L880">      mtasPositionResponse.add(position.dataCollector.getCollectorType(), data);</span>
-<span class="fc" id="L881">      MtasSolrResultUtil.rewrite(mtasPositionResponse);</span>
+<span class="fc" id="L881">      MtasSolrResultUtil.rewrite(mtasPositionResponse, searchComponent);</span>
     }
 <span class="fc" id="L883">    return mtasPositionResponse;</span>
   }
@@ -903,7 +903,7 @@ public class MtasSolrComponentStats
 <span class="fc" id="L903">      mtasTokenResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
 <span class="fc" id="L905">      mtasTokenResponse.add(token.dataCollector.getCollectorType(), data);</span>
-<span class="fc" id="L906">      MtasSolrResultUtil.rewrite(mtasTokenResponse);</span>
+<span class="fc" id="L906">      MtasSolrResultUtil.rewrite(mtasTokenResponse, searchComponent);</span>
     }
 <span class="fc" id="L908">    return mtasTokenResponse;</span>
   }
@@ -944,7 +944,7 @@ public class MtasSolrComponentStats
 <span class="fc" id="L944">      mtasSpanResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
 <span class="fc" id="L946">      mtasSpanResponse.add(span.dataCollector.getCollectorType(), data);</span>
-<span class="fc" id="L947">      MtasSolrResultUtil.rewrite(mtasSpanResponse);</span>
+<span class="fc" id="L947">      MtasSolrResultUtil.rewrite(mtasSpanResponse, searchComponent);</span>
     }
 <span class="fc" id="L949">    return mtasSpanResponse;</span>
   }
@@ -1007,7 +1007,7 @@ public class MtasSolrComponentStats
       try {
 <span class="fc" id="L1008">        mtasResponseStats = (NamedList&lt;Object&gt;) mtasResponse.get(&quot;stats&quot;);</span>
 <span class="pc bpc" id="L1009" title="1 of 2 branches missed.">        if (mtasResponseStats != null) {</span>
-<span class="fc" id="L1010">          MtasSolrResultUtil.rewrite(mtasResponseStats);</span>
+<span class="fc" id="L1010">          MtasSolrResultUtil.rewrite(mtasResponseStats, searchComponent);</span>
         }
 <span class="nc" id="L1012">      } catch (ClassCastException e) {</span>
 <span class="nc" id="L1013">        log.debug(e);</span>

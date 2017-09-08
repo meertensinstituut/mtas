@@ -435,19 +435,21 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
 <span class="nc" id="L435">    return getTermContexts(weights);</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L443">    super.disableTwoPhaseIterator();</span>
-<span class="fc bfc" id="L444" title="All 2 branches covered.">    for (MtasSpanSequenceItem item : items) {</span>
-<span class="fc" id="L445">      item.getQuery().disableTwoPhaseIterator();</span>
-<span class="fc" id="L446">    }</span>
-<span class="fc bfc" id="L447" title="All 2 branches covered.">    if (ignoreQuery != null) {</span>
-<span class="fc" id="L448">      ignoreQuery.disableTwoPhaseIterator();</span>
+<span class="fc" id="L445">    super.disableTwoPhaseIterator();</span>
+<span class="fc bfc" id="L446" title="All 2 branches covered.">    for (MtasSpanSequenceItem item : items) {</span>
+<span class="fc" id="L447">      item.getQuery().disableTwoPhaseIterator();</span>
+<span class="fc" id="L448">    }</span>
+<span class="fc bfc" id="L449" title="All 2 branches covered.">    if (ignoreQuery != null) {</span>
+<span class="fc" id="L450">      ignoreQuery.disableTwoPhaseIterator();</span>
     }
-<span class="fc" id="L450">  }</span>
+<span class="fc" id="L452">  }</span>
 
   /**
    * The Class SpanSequenceWeight.
@@ -476,12 +478,12 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     public SpanSequenceWeight(List&lt;MtasSpanSequenceQueryWeight&gt; subWeights,
         SpanWeight ignoreWeight, Integer maximumIgnoreLength,
         IndexSearcher searcher, Map&lt;Term, TermContext&gt; terms)
-<span class="fc" id="L479">        throws IOException {</span>
-<span class="fc" id="L480">      super(MtasSpanSequenceQuery.this, searcher, terms);</span>
-<span class="fc" id="L481">      this.subWeights = subWeights;</span>
-<span class="fc" id="L482">      this.ignoreWeight = ignoreWeight;</span>
-<span class="fc" id="L483">      this.maximumIgnoreLength = maximumIgnoreLength;</span>
-<span class="fc" id="L484">    }</span>
+<span class="fc" id="L481">        throws IOException {</span>
+<span class="fc" id="L482">      super(MtasSpanSequenceQuery.this, searcher, terms);</span>
+<span class="fc" id="L483">      this.subWeights = subWeights;</span>
+<span class="fc" id="L484">      this.ignoreWeight = ignoreWeight;</span>
+<span class="fc" id="L485">      this.maximumIgnoreLength = maximumIgnoreLength;</span>
+<span class="fc" id="L486">    }</span>
 
     /*
      * (non-Javadoc)
@@ -492,13 +494,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="fc bfc" id="L495" title="All 2 branches covered.">      for (MtasSpanSequenceQueryWeight w : subWeights) {</span>
-<span class="fc" id="L496">        w.spanWeight.extractTermContexts(contexts);</span>
-<span class="fc" id="L497">      }</span>
-<span class="pc bpc" id="L498" title="1 of 2 branches missed.">      if (ignoreWeight != null) {</span>
-<span class="nc" id="L499">        ignoreWeight.extractTermContexts(contexts);</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">      for (MtasSpanSequenceQueryWeight w : subWeights) {</span>
+<span class="fc" id="L498">        w.spanWeight.extractTermContexts(contexts);</span>
+<span class="fc" id="L499">      }</span>
+<span class="pc bpc" id="L500" title="1 of 2 branches missed.">      if (ignoreWeight != null) {</span>
+<span class="nc" id="L501">        ignoreWeight.extractTermContexts(contexts);</span>
       }
-<span class="fc" id="L501">    }</span>
+<span class="fc" id="L503">    }</span>
 
     /*
      * (non-Javadoc)
@@ -511,39 +513,39 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-<span class="pc bpc" id="L514" title="1 of 2 branches missed.">      if (field == null) {</span>
-<span class="nc" id="L515">        return null;</span>
+<span class="pc bpc" id="L516" title="1 of 2 branches missed.">      if (field == null) {</span>
+<span class="nc" id="L517">        return null;</span>
       } else {
-<span class="fc" id="L517">        Terms terms = context.reader().terms(field);</span>
-<span class="pc bpc" id="L518" title="1 of 2 branches missed.">        if (terms == null) {</span>
-<span class="nc" id="L519">          return null; // field does not exist</span>
+<span class="fc" id="L519">        Terms terms = context.reader().terms(field);</span>
+<span class="pc bpc" id="L520" title="1 of 2 branches missed.">        if (terms == null) {</span>
+<span class="nc" id="L521">          return null; // field does not exist</span>
         }
-<span class="fc" id="L521">        List&lt;MtasSpanSequenceQuerySpans&gt; setSequenceSpans = new ArrayList&lt;&gt;(</span>
-<span class="fc" id="L522">            items.size());</span>
-<span class="fc" id="L523">        Spans ignoreSpans = null;</span>
-<span class="fc" id="L524">        boolean allSpansEmpty = true;</span>
-<span class="fc bfc" id="L525" title="All 2 branches covered.">        for (MtasSpanSequenceQueryWeight w : subWeights) {</span>
-<span class="fc" id="L526">          Spans sequenceSpans = w.spanWeight.getSpans(context,</span>
+<span class="fc" id="L523">        List&lt;MtasSpanSequenceQuerySpans&gt; setSequenceSpans = new ArrayList&lt;&gt;(</span>
+<span class="fc" id="L524">            items.size());</span>
+<span class="fc" id="L525">        Spans ignoreSpans = null;</span>
+<span class="fc" id="L526">        boolean allSpansEmpty = true;</span>
+<span class="fc bfc" id="L527" title="All 2 branches covered.">        for (MtasSpanSequenceQueryWeight w : subWeights) {</span>
+<span class="fc" id="L528">          Spans sequenceSpans = w.spanWeight.getSpans(context,</span>
               requiredPostings);
-<span class="pc bpc" id="L528" title="1 of 2 branches missed.">          if (sequenceSpans != null) {</span>
-<span class="fc" id="L529">            setSequenceSpans.add(new MtasSpanSequenceQuerySpans(</span>
+<span class="pc bpc" id="L530" title="1 of 2 branches missed.">          if (sequenceSpans != null) {</span>
+<span class="fc" id="L531">            setSequenceSpans.add(new MtasSpanSequenceQuerySpans(</span>
                 MtasSpanSequenceQuery.this, sequenceSpans, w.optional));
-<span class="fc" id="L531">            allSpansEmpty = false;</span>
+<span class="fc" id="L533">            allSpansEmpty = false;</span>
           } else {
-<span class="nc bnc" id="L533" title="All 2 branches missed.">            if (w.optional) {</span>
-<span class="nc" id="L534">              setSequenceSpans.add(new MtasSpanSequenceQuerySpans(</span>
+<span class="nc bnc" id="L535" title="All 2 branches missed.">            if (w.optional) {</span>
+<span class="nc" id="L536">              setSequenceSpans.add(new MtasSpanSequenceQuerySpans(</span>
                   MtasSpanSequenceQuery.this, null, w.optional));
             } else {
-<span class="nc" id="L537">              return null;</span>
+<span class="nc" id="L539">              return null;</span>
             }
           }
-<span class="fc" id="L540">        }</span>
-<span class="pc bpc" id="L541" title="1 of 2 branches missed.">        if (allSpansEmpty) {</span>
-<span class="nc" id="L542">          return null; // at least one required</span>
-<span class="fc bfc" id="L543" title="All 2 branches covered.">        } else if (ignoreWeight != null) {</span>
-<span class="fc" id="L544">          ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);</span>
+<span class="fc" id="L542">        }</span>
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">        if (allSpansEmpty) {</span>
+<span class="nc" id="L544">          return null; // at least one required</span>
+<span class="fc bfc" id="L545" title="All 2 branches covered.">        } else if (ignoreWeight != null) {</span>
+<span class="fc" id="L546">          ignoreSpans = ignoreWeight.getSpans(context, requiredPostings);</span>
         }
-<span class="fc" id="L546">        return new MtasSpanSequenceSpans(MtasSpanSequenceQuery.this,</span>
+<span class="fc" id="L548">        return new MtasSpanSequenceSpans(MtasSpanSequenceQuery.this,</span>
             setSequenceSpans, ignoreSpans, maximumIgnoreLength);
       }
     }
@@ -555,13 +557,13 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc bnc" id="L558" title="All 2 branches missed.">      for (MtasSpanSequenceQueryWeight w : subWeights) {</span>
-<span class="nc" id="L559">        w.spanWeight.extractTerms(terms);</span>
-<span class="nc" id="L560">      }</span>
-<span class="nc bnc" id="L561" title="All 2 branches missed.">      if (ignoreWeight != null) {</span>
-<span class="nc" id="L562">        ignoreWeight.extractTerms(terms);</span>
+<span class="nc bnc" id="L560" title="All 2 branches missed.">      for (MtasSpanSequenceQueryWeight w : subWeights) {</span>
+<span class="nc" id="L561">        w.spanWeight.extractTerms(terms);</span>
+<span class="nc" id="L562">      }</span>
+<span class="nc bnc" id="L563" title="All 2 branches missed.">      if (ignoreWeight != null) {</span>
+<span class="nc" id="L564">        ignoreWeight.extractTerms(terms);</span>
       }
-<span class="nc" id="L564">    }</span>
+<span class="nc" id="L566">    }</span>
 
   }
 
@@ -584,10 +586,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      * @param optional the optional
      */
     public MtasSpanSequenceQuerySpans(MtasSpanSequenceQuery query, Spans spans,
-<span class="fc" id="L587">        boolean optional) {</span>
-<span class="pc bpc" id="L588" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
-<span class="fc" id="L589">      this.optional = optional;</span>
-<span class="fc" id="L590">    }</span>
+<span class="fc" id="L589">        boolean optional) {</span>
+<span class="pc bpc" id="L590" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
+<span class="fc" id="L591">      this.optional = optional;</span>
+<span class="fc" id="L592">    }</span>
   }
 
   /**
@@ -608,10 +610,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      * @param optional the optional
      */
     public MtasSpanSequenceQueryWeight(SpanWeight spanWeight,
-<span class="fc" id="L611">        boolean optional) {</span>
-<span class="fc" id="L612">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L613">      this.optional = optional;</span>
-<span class="fc" id="L614">    }</span>
+<span class="fc" id="L613">        boolean optional) {</span>
+<span class="fc" id="L614">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L615">      this.optional = optional;</span>
+<span class="fc" id="L616">    }</span>
   }
 
 }

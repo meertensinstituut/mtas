@@ -333,20 +333,26 @@ public class MtasSolrComponentGroup
    * @param name the name
    * @param positions the positions
    * @param prefixes the prefixes
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepare(SolrParams solrParams, SortedSet&lt;String&gt; gids,
-      String name, String[] positions, String[] prefixes) {
-<span class="nc bnc" id="L339" title="All 2 branches missed.">    if (!gids.isEmpty()) {</span>
-<span class="nc" id="L340">      int tmpSubCounter = 0;</span>
-<span class="nc bnc" id="L341" title="All 2 branches missed.">      for (String gid : gids) {</span>
-<span class="nc" id="L342">        positions[tmpSubCounter] = solrParams.get(</span>
+      String name, String[] positions, String[] prefixes) throws IOException {
+<span class="nc bnc" id="L340" title="All 2 branches missed.">    if (!gids.isEmpty()) {</span>
+<span class="nc" id="L341">      int tmpSubCounter = 0;</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">      for (String gid : gids) {</span>
+<span class="nc" id="L343">        positions[tmpSubCounter] = solrParams.get(</span>
             name + &quot;.&quot; + gid + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_POSITION, null);
-<span class="nc" id="L344">        prefixes[tmpSubCounter] = solrParams.get(</span>
+<span class="nc" id="L345">        prefixes[tmpSubCounter] = solrParams.get(</span>
             name + &quot;.&quot; + gid + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_PREFIXES, null);
-<span class="nc" id="L346">        tmpSubCounter++;</span>
-<span class="nc" id="L347">      }</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        if (positions[tmpSubCounter] == null) {</span>
+<span class="nc" id="L348">          throw new IOException(&quot;no position for &quot; + gid);</span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">        } else if (prefixes[tmpSubCounter] == null) {</span>
+<span class="nc" id="L350">          throw new IOException(&quot;no prefix for &quot; + gid);</span>
+        }
+<span class="nc" id="L352">        tmpSubCounter++;</span>
+<span class="nc" id="L353">      }</span>
     }
-<span class="nc" id="L349">  }</span>
+<span class="nc" id="L355">  }</span>
 
   /*
    * (non-Javadoc)
@@ -359,90 +365,90 @@ public class MtasSolrComponentGroup
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="nc bnc" id="L362" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L363" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_GROUP, false)) {</span>
-<span class="nc bnc" id="L364" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">        &amp;&amp; sreq.params.getBool(PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc bnc" id="L370" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
         // do nothing
       } else {
         // remove prefix for other requests
-<span class="nc" id="L368">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="nc" id="L369">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);</span>
-<span class="nc" id="L370">        sreq.params.remove(PARAM_MTAS_GROUP);</span>
+<span class="nc" id="L374">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="nc" id="L375">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);</span>
+<span class="nc" id="L376">        sreq.params.remove(PARAM_MTAS_GROUP);</span>
         Set&lt;String&gt; subKeys;
-<span class="nc bnc" id="L372" title="All 2 branches missed.">        for (String key : keys) {</span>
-<span class="nc" id="L373">          sreq.params.remove(</span>
-              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_FIELD);
-<span class="nc" id="L375">          sreq.params</span>
-<span class="nc" id="L376">              .remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_KEY);</span>
-<span class="nc" id="L377">          sreq.params.remove(</span>
-              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_TYPE);
+<span class="nc bnc" id="L378" title="All 2 branches missed.">        for (String key : keys) {</span>
 <span class="nc" id="L379">          sreq.params.remove(</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_FIELD);
+<span class="nc" id="L381">          sreq.params</span>
+<span class="nc" id="L382">              .remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_KEY);</span>
+<span class="nc" id="L383">          sreq.params.remove(</span>
+              PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_TYPE);
+<span class="nc" id="L385">          sreq.params.remove(</span>
               PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_GROUP_QUERY_VALUE);
-<span class="nc" id="L381">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L387">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_GROUP_QUERY_PREFIX);
-<span class="nc" id="L383">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L389">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_GROUP_QUERY_IGNORE);
-<span class="nc" id="L385">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L391">          sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH);
-<span class="nc" id="L387">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L393">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
               PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_GROUP_GROUPING_LEFT);
-<span class="nc bnc" id="L390" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L391">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L396" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L397">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_POSITION);
-<span class="nc" id="L394">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L400">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-<span class="nc" id="L397">          }</span>
-<span class="nc" id="L398">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L403">          }</span>
+<span class="nc" id="L404">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
               PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_GROUP_GROUPING_RIGHT);
-<span class="nc bnc" id="L401" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L402">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L407" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L408">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_POSITION);
-<span class="nc" id="L405">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L411">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-<span class="nc" id="L408">          }</span>
-<span class="nc" id="L409">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L414">          }</span>
+<span class="nc" id="L415">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
               PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE);
-<span class="nc bnc" id="L412" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L413">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L419">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_POSITION);
-<span class="nc" id="L416">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L422">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-<span class="nc" id="L419">          }</span>
-<span class="nc" id="L420">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L425">          }</span>
+<span class="nc" id="L426">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
               PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT);
-<span class="nc bnc" id="L423" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L424">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L429" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L430">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_POSITION);
-<span class="nc" id="L427">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L433">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-<span class="nc" id="L430">          }</span>
-<span class="nc" id="L431">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L436">          }</span>
+<span class="nc" id="L437">          subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
               PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT);
-<span class="nc bnc" id="L434" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
-<span class="nc" id="L435">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
+<span class="nc" id="L441">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_POSITION);
-<span class="nc" id="L438">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L444">            sreq.params.remove(PARAM_MTAS_GROUP + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT + &quot;.&quot; + subKey + &quot;.&quot;
                 + NAME_MTAS_GROUP_GROUPING_PREFIXES);
-<span class="nc" id="L441">          }</span>
-<span class="nc" id="L442">        }</span>
+<span class="nc" id="L447">          }</span>
+<span class="nc" id="L448">        }</span>
       }
     }
-<span class="nc" id="L445">  }</span>
+<span class="nc" id="L451">  }</span>
 
   /*
    * (non-Javadoc)
@@ -454,20 +460,20 @@ public class MtasSolrComponentGroup
   @SuppressWarnings(&quot;unchecked&quot;)
   public SimpleOrderedMap&lt;Object&gt; create(ComponentGroup group, Boolean encode)
       throws IOException {
-<span class="nc" id="L457">    SimpleOrderedMap&lt;Object&gt; mtasGroupResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L458">    mtasGroupResponse.add(&quot;key&quot;, group.key);</span>
-<span class="nc" id="L459">    MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,</span>
+<span class="nc" id="L463">    SimpleOrderedMap&lt;Object&gt; mtasGroupResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L464">    mtasGroupResponse.add(&quot;key&quot;, group.key);</span>
+<span class="nc" id="L465">    MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,</span>
         new String[] { group.dataType }, new String[] { group.statsType },
         new SortedSet[] { group.statsItems }, new String[] { group.sortType },
         new String[] { group.sortDirection }, new Integer[] { group.start },
         new Integer[] { group.number }, null);
-<span class="nc bnc" id="L464" title="All 2 branches missed.">    if (encode) {</span>
-<span class="nc" id="L465">      mtasGroupResponse.add(&quot;_encoded_list&quot;, MtasSolrResultUtil.encode(data));</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">    if (encode) {</span>
+<span class="nc" id="L471">      mtasGroupResponse.add(&quot;_encoded_list&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
-<span class="nc" id="L467">      mtasGroupResponse.add(&quot;list&quot;, data);</span>
-<span class="nc" id="L468">      MtasSolrResultUtil.rewrite(mtasGroupResponse);</span>
+<span class="nc" id="L473">      mtasGroupResponse.add(&quot;list&quot;, data);</span>
+<span class="nc" id="L474">      MtasSolrResultUtil.rewrite(mtasGroupResponse, searchComponent);</span>
     }
-<span class="nc" id="L470">    return mtasGroupResponse;</span>
+<span class="nc" id="L476">    return mtasGroupResponse;</span>
   }
 
   /*
@@ -479,30 +485,30 @@ public class MtasSolrComponentGroup
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
-<span class="nc bnc" id="L482" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L488" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
         &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
         &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
-<span class="nc bnc" id="L485" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
-<span class="nc bnc" id="L486" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L487" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_GROUP, false)) {</span>
-<span class="nc bnc" id="L488" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
-<span class="nc" id="L489">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
-<span class="nc" id="L490">                .getResponse();</span>
+<span class="nc bnc" id="L491" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="nc bnc" id="L492" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L493" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc bnc" id="L494" title="All 2 branches missed.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="nc" id="L495">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="nc" id="L496">                .getResponse();</span>
             try {
-<span class="nc" id="L492">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
-<span class="nc" id="L493">                  .findRecursive(&quot;mtas&quot;, &quot;group&quot;);</span>
-<span class="nc bnc" id="L494" title="All 2 branches missed.">              if (data != null) {</span>
-<span class="nc" id="L495">                MtasSolrResultUtil.decode(data);</span>
+<span class="nc" id="L498">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
+<span class="nc" id="L499">                  .findRecursive(&quot;mtas&quot;, &quot;group&quot;);</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">              if (data != null) {</span>
+<span class="nc" id="L501">                MtasSolrResultUtil.decode(data);</span>
               }
-<span class="nc" id="L497">            } catch (ClassCastException e) {</span>
-<span class="nc" id="L498">              log.debug(e);</span>
+<span class="nc" id="L503">            } catch (ClassCastException e) {</span>
+<span class="nc" id="L504">              log.debug(e);</span>
               // shouldn't happen
-<span class="nc" id="L500">            }</span>
-<span class="nc" id="L501">          }</span>
+<span class="nc" id="L506">            }</span>
+<span class="nc" id="L507">          }</span>
         }
-<span class="nc" id="L503">      }</span>
+<span class="nc" id="L509">      }</span>
     }
-<span class="nc" id="L505">  }</span>
+<span class="nc" id="L511">  }</span>
 
   /*
    * (non-Javadoc)
@@ -516,26 +522,26 @@ public class MtasSolrComponentGroup
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // rewrite
-<span class="nc" id="L519">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+<span class="nc" id="L525">    NamedList&lt;Object&gt; mtasResponse = null;</span>
     try {
-<span class="nc" id="L521">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
-<span class="nc" id="L522">    } catch (ClassCastException e) {</span>
-<span class="nc" id="L523">      log.debug(e);</span>
-<span class="nc" id="L524">      mtasResponse = null;</span>
-<span class="nc" id="L525">    }</span>
-<span class="nc bnc" id="L526" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
+<span class="nc" id="L527">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L528">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L529">      log.debug(e);</span>
+<span class="nc" id="L530">      mtasResponse = null;</span>
+<span class="nc" id="L531">    }</span>
+<span class="nc bnc" id="L532" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
       ArrayList&lt;Object&gt; mtasResponseGroup;
       try {
-<span class="nc" id="L529">        mtasResponseGroup = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;group&quot;);</span>
-<span class="nc bnc" id="L530" title="All 2 branches missed.">        if (mtasResponseGroup != null) {</span>
-<span class="nc" id="L531">          MtasSolrResultUtil.rewrite(mtasResponseGroup);</span>
+<span class="nc" id="L535">        mtasResponseGroup = (ArrayList&lt;Object&gt;) mtasResponse.get(&quot;group&quot;);</span>
+<span class="nc bnc" id="L536" title="All 2 branches missed.">        if (mtasResponseGroup != null) {</span>
+<span class="nc" id="L537">          MtasSolrResultUtil.rewrite(mtasResponseGroup, searchComponent);</span>
         }
-<span class="nc" id="L533">      } catch (ClassCastException e) {</span>
-<span class="nc" id="L534">        log.debug(e);</span>
-<span class="nc" id="L535">        mtasResponse.remove(&quot;group&quot;);</span>
-<span class="nc" id="L536">      }</span>
+<span class="nc" id="L539">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L540">        log.debug(e);</span>
+<span class="nc" id="L541">        mtasResponse.remove(&quot;group&quot;);</span>
+<span class="nc" id="L542">      }</span>
     }
-<span class="nc" id="L538">  }</span>
+<span class="nc" id="L544">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

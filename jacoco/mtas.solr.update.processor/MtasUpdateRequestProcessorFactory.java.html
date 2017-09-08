@@ -21,6 +21,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -44,15 +45,15 @@ import mtas.solr.schema.MtasPreAnalyzedField;
 /**
  * A factory for creating MtasUpdateRequestProcessor objects.
  */
-<span class="fc" id="L47">public class MtasUpdateRequestProcessorFactory</span>
+<span class="fc" id="L48">public class MtasUpdateRequestProcessorFactory</span>
     extends UpdateRequestProcessorFactory {
 
   /** The Constant log. */
-<span class="fc" id="L51">  private static final Log log = LogFactory</span>
-<span class="fc" id="L52">      .getLog(MtasUpdateRequestProcessorFactory.class);</span>
+<span class="fc" id="L52">  private static final Log log = LogFactory</span>
+<span class="fc" id="L53">      .getLog(MtasUpdateRequestProcessorFactory.class);</span>
 
   /** The config. */
-<span class="fc" id="L55">  private MtasUpdateRequestProcessorConfig config = null;</span>
+<span class="fc" id="L56">  private MtasUpdateRequestProcessorConfig config = null;</span>
 
   /*
    * (non-Javadoc)
@@ -64,8 +65,8 @@ import mtas.solr.schema.MtasPreAnalyzedField;
   @Override
   @SuppressWarnings(&quot;rawtypes&quot;)
   public void init(NamedList args) {
-<span class="fc" id="L67">    super.init(args);</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L68">    super.init(args);</span>
+<span class="fc" id="L69">  }</span>
 
   /**
    * Inits the.
@@ -75,93 +76,92 @@ import mtas.solr.schema.MtasPreAnalyzedField;
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   private void init(SolrQueryRequest req) throws IOException {
-<span class="fc bfc" id="L78" title="All 2 branches covered.">    if (config == null) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (config == null) {</span>
       // initialise
-<span class="fc" id="L80">      config = new MtasUpdateRequestProcessorConfig();</span>
+<span class="fc" id="L81">      config = new MtasUpdateRequestProcessorConfig();</span>
       // required info
-<span class="fc" id="L82">      Map&lt;String, FieldType&gt; fieldTypes = req.getSchema().getFieldTypes();</span>
-<span class="fc" id="L83">      Map&lt;String, SchemaField&gt; fields = req.getSchema().getFields();</span>
-<span class="fc" id="L84">      SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()</span>
-<span class="fc" id="L85">          .getResourceLoader();</span>
+<span class="fc" id="L83">      Map&lt;String, FieldType&gt; fieldTypes = req.getSchema().getFieldTypes();</span>
+<span class="fc" id="L84">      Map&lt;String, SchemaField&gt; fields = req.getSchema().getFields();</span>
+<span class="fc" id="L85">      SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()</span>
+<span class="fc" id="L86">          .getResourceLoader();</span>
       // check fieldTypes
       // for (String name : fieldTypes.keySet()) {
-<span class="fc bfc" id="L88" title="All 2 branches covered.">      for (Entry&lt;String, FieldType&gt; entry : fieldTypes.entrySet()) {</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">      for (Entry&lt;String, FieldType&gt; entry : fieldTypes.entrySet()) {</span>
         // only for MtasPreAnalyzedField
-<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (entry.getValue() instanceof MtasPreAnalyzedField) {</span>
-<span class="fc" id="L91">          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) entry.getValue();</span>
-<span class="fc" id="L92">          config.fieldTypeDefaultConfiguration.put(entry.getKey(),</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (entry.getValue() instanceof MtasPreAnalyzedField) {</span>
+<span class="fc" id="L92">          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) entry.getValue();</span>
+<span class="fc" id="L93">          config.fieldTypeDefaultConfiguration.put(entry.getKey(),</span>
               mpaf.defaultConfiguration);
-<span class="fc" id="L94">          config.fieldTypeConfigurationFromField.put(entry.getKey(),</span>
+<span class="fc" id="L95">          config.fieldTypeConfigurationFromField.put(entry.getKey(),</span>
               mpaf.configurationFromField);
-<span class="fc" id="L96">          config.fieldTypeNumberOfTokensField.put(entry.getKey(),</span>
+<span class="fc" id="L97">          config.fieldTypeNumberOfTokensField.put(entry.getKey(),</span>
               mpaf.setNumberOfTokens);
-<span class="fc" id="L98">          config.fieldTypeNumberOfPositionsField.put(entry.getKey(),</span>
+<span class="fc" id="L99">          config.fieldTypeNumberOfPositionsField.put(entry.getKey(),</span>
               mpaf.setNumberOfPositions);
-<span class="fc" id="L100">          config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);</span>
-<span class="fc" id="L101">          config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);</span>
-<span class="fc" id="L102">          config.fieldTypePrefixField.put(entry.getKey(), mpaf.setPrefix);</span>
-<span class="pc bpc" id="L103" title="1 of 2 branches missed.">          if (mpaf.followIndexAnalyzer == null</span>
-<span class="pc bpc" id="L104" title="1 of 2 branches missed.">              || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {</span>
-<span class="nc" id="L105">            throw new IOException(</span>
-<span class="nc" id="L106">                entry.getKey() + &quot; can't follow &quot; + mpaf.followIndexAnalyzer);</span>
+<span class="fc" id="L101">          config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);</span>
+<span class="fc" id="L102">          config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);</span>
+<span class="fc" id="L103">          config.fieldTypePrefixField.put(entry.getKey(), mpaf.setPrefix);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">          if (mpaf.followIndexAnalyzer == null</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">              || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {</span>
+<span class="nc" id="L106">            throw new IOException(</span>
+<span class="nc" id="L107">                entry.getKey() + &quot; can't follow &quot; + mpaf.followIndexAnalyzer);</span>
           } else {
-<span class="fc" id="L108">            FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);</span>
-<span class="fc" id="L109">            SimpleOrderedMap&lt;?&gt; analyzer = null;</span>
-<span class="fc" id="L110">            Object tmpObj1 = fieldType.getNamedPropertyValues(false)</span>
-<span class="fc" id="L111">                .get(FieldType.INDEX_ANALYZER);</span>
-<span class="pc bpc" id="L112" title="3 of 4 branches missed.">            if (tmpObj1 != null &amp;&amp; tmpObj1 instanceof SimpleOrderedMap) {</span>
-<span class="nc" id="L113">              analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj1;</span>
+<span class="fc" id="L109">            FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);</span>
+<span class="fc" id="L110">            SimpleOrderedMap&lt;?&gt; analyzer = null;</span>
+<span class="fc" id="L111">            Object tmpObj1 = fieldType.getNamedPropertyValues(false)</span>
+<span class="fc" id="L112">                .get(FieldType.INDEX_ANALYZER);</span>
+<span class="pc bpc" id="L113" title="3 of 4 branches missed.">            if (tmpObj1 != null &amp;&amp; tmpObj1 instanceof SimpleOrderedMap) {</span>
+<span class="nc" id="L114">              analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj1;</span>
             }
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">            if (analyzer == null) {</span>
-<span class="fc" id="L116">              Object tmpObj2 = fieldType.getNamedPropertyValues(false)</span>
-<span class="fc" id="L117">                  .get(FieldType.ANALYZER);</span>
-<span class="pc bpc" id="L118" title="2 of 4 branches missed.">              if (tmpObj2 != null &amp;&amp; tmpObj2 instanceof SimpleOrderedMap) {</span>
-<span class="fc" id="L119">                analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj2;</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">            if (analyzer == null) {</span>
+<span class="fc" id="L117">              Object tmpObj2 = fieldType.getNamedPropertyValues(false)</span>
+<span class="fc" id="L118">                  .get(FieldType.ANALYZER);</span>
+<span class="pc bpc" id="L119" title="2 of 4 branches missed.">              if (tmpObj2 != null &amp;&amp; tmpObj2 instanceof SimpleOrderedMap) {</span>
+<span class="fc" id="L120">                analyzer = (SimpleOrderedMap&lt;?&gt;) tmpObj2;</span>
               }
             }
-<span class="pc bpc" id="L122" title="1 of 2 branches missed.">            if (analyzer == null) {</span>
-<span class="nc" id="L123">              throw new IOException(&quot;no analyzer&quot;);</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">            if (analyzer == null) {</span>
+<span class="nc" id="L124">              throw new IOException(&quot;no analyzer&quot;);</span>
             } else {
               // charfilters
-<span class="fc" id="L126">              ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt; listCharFilters = null;</span>
-<span class="fc" id="L127">              SimpleOrderedMap&lt;Object&gt; configTokenizer = null;</span>
+<span class="fc" id="L127">              ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt; listCharFilters = null;</span>
+<span class="fc" id="L128">              SimpleOrderedMap&lt;Object&gt; configTokenizer = null;</span>
               try {
-<span class="fc" id="L129">                listCharFilters = (ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt;) analyzer</span>
-<span class="fc" id="L130">                    .findRecursive(FieldType.CHAR_FILTERS);</span>
+<span class="fc" id="L130">                listCharFilters = (ArrayList&lt;SimpleOrderedMap&lt;Object&gt;&gt;) analyzer</span>
+<span class="fc" id="L131">                    .findRecursive(FieldType.CHAR_FILTERS);</span>
                 ;
-<span class="fc" id="L132">                configTokenizer = (SimpleOrderedMap&lt;Object&gt;) analyzer</span>
-<span class="fc" id="L133">                    .findRecursive(FieldType.TOKENIZER);</span>
-<span class="nc" id="L134">              } catch (ClassCastException e) {</span>
-<span class="nc" id="L135">                throw new IOException(</span>
+<span class="fc" id="L133">                configTokenizer = (SimpleOrderedMap&lt;Object&gt;) analyzer</span>
+<span class="fc" id="L134">                    .findRecursive(FieldType.TOKENIZER);</span>
+<span class="nc" id="L135">              } catch (ClassCastException e) {</span>
+<span class="nc" id="L136">                throw new IOException(</span>
                     &quot;could not cast charFilters and/or tokenizer from analyzer&quot;,
                     e);
-<span class="fc" id="L138">              }</span>
-<span class="pc bpc" id="L139" title="2 of 4 branches missed.">              if (listCharFilters != null &amp;&amp; !listCharFilters.isEmpty()) {</span>
-<span class="fc" id="L140">                CharFilterFactory[] charFilterFactories = new CharFilterFactory[listCharFilters</span>
-<span class="fc" id="L141">                    .size()];</span>
-<span class="fc" id="L142">                int number = 0;</span>
-<span class="fc bfc" id="L143" title="All 2 branches covered.">                for (SimpleOrderedMap&lt;Object&gt; configCharFilter : listCharFilters) {</span>
-<span class="fc" id="L144">                  String className = null;</span>
-<span class="fc" id="L145">                  Map&lt;String, String&gt; args = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L146">                  Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; it = configCharFilter</span>
-<span class="fc" id="L147">                      .iterator();</span>
+<span class="fc" id="L139">              }</span>
+<span class="pc bpc" id="L140" title="2 of 4 branches missed.">              if (listCharFilters != null &amp;&amp; !listCharFilters.isEmpty()) {</span>
+<span class="fc" id="L141">                CharFilterFactory[] charFilterFactories = new CharFilterFactory[listCharFilters</span>
+<span class="fc" id="L142">                    .size()];</span>
+<span class="fc" id="L143">                int number = 0;</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                for (SimpleOrderedMap&lt;Object&gt; configCharFilter : listCharFilters) {</span>
+<span class="fc" id="L145">                  String className = null;</span>
+<span class="fc" id="L146">                  Map&lt;String, String&gt; args = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L147">                  Iterator&lt;Map.Entry&lt;String, Object&gt;&gt; it = configCharFilter</span>
+<span class="fc" id="L148">                      .iterator();</span>
                   // get className and args
-<span class="fc bfc" id="L149" title="All 2 branches covered.">                  while (it.hasNext()) {</span>
-<span class="fc" id="L150">                    Map.Entry&lt;String, Object&gt; obj = it.next();</span>
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">                    if (obj.getValue() instanceof String) {</span>
-<span class="fc bfc" id="L152" title="All 2 branches covered.">                      if (obj.getKey().equals(FieldType.CLASS_NAME)) {</span>
-<span class="fc" id="L153">                        className = (String) obj.getValue();</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                  while (it.hasNext()) {</span>
+<span class="fc" id="L151">                    Map.Entry&lt;String, Object&gt; obj = it.next();</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">                    if (obj.getValue() instanceof String) {</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">                      if (obj.getKey().equals(FieldType.CLASS_NAME)) {</span>
+<span class="fc" id="L154">                        className = (String) obj.getValue();</span>
                       } else {
-<span class="fc" id="L155">                        args.put(obj.getKey(), (String) obj.getValue());</span>
+<span class="fc" id="L156">                        args.put(obj.getKey(), (String) obj.getValue());</span>
                       }
                     }
-<span class="fc" id="L158">                  }</span>
-<span class="pc bpc" id="L159" title="1 of 2 branches missed.">                  if (className != null) {</span>
+<span class="fc" id="L159">                  }</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">                  if (className != null) {</span>
                     try {
-<span class="fc" id="L161">                      Class&lt;?&gt; cls = Class.forName((String) className);</span>
-<span class="pc bpc" id="L162" title="1 of 2 branches missed.">                      if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {</span>
-<span class="fc" id="L163">                        Class&lt;?&gt;[] types = { Map.class,</span>
-                            SolrResourceLoader.class };
+<span class="fc" id="L162">                      Class&lt;?&gt; cls = Class.forName((String) className);</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">                      if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {</span>
+<span class="fc" id="L164">                        Class&lt;?&gt;[] types = { Map.class, ResourceLoader.class };</span>
 <span class="fc" id="L165">                        Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
 <span class="fc" id="L166">                        Object cff = cnstr.newInstance(args, resourceLoader);</span>
 <span class="pc bpc" id="L167" title="1 of 2 branches missed.">                        if (cff instanceof MtasCharFilterFactory) {</span>
@@ -216,7 +216,7 @@ import mtas.solr.schema.MtasPreAnalyzedField;
 <span class="pc bpc" id="L216" title="1 of 2 branches missed.">                if (className != null) {</span>
                   try {
 <span class="fc" id="L218">                    Class&lt;?&gt; cls = Class.forName((String) className);</span>
-<span class="fc" id="L219">                    Class&lt;?&gt;[] types = { Map.class, SolrResourceLoader.class };</span>
+<span class="fc" id="L219">                    Class&lt;?&gt;[] types = { Map.class, ResourceLoader.class };</span>
 <span class="fc" id="L220">                    Constructor&lt;?&gt; cnstr = cls.getConstructor(types);</span>
 <span class="fc" id="L221">                    Object cff = cnstr.newInstance(args, resourceLoader);</span>
 <span class="pc bpc" id="L222" title="1 of 2 branches missed.">                    if (cff instanceof MtasTokenizerFactory) {</span>

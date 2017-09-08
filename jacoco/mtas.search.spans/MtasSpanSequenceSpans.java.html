@@ -951,16 +951,18 @@ import org.apache.lucene.search.spans.Spans;
 <span class="fc" id="L951">    return 0;</span>
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
-<span class="pc bpc" id="L959" title="1 of 4 branches missed.">    if (queueSpans == null || !query.twoPhaseIteratorAllowed()) {</span>
-<span class="fc" id="L960">      return null;</span>
+<span class="pc bpc" id="L961" title="1 of 4 branches missed.">    if (queueSpans == null || !query.twoPhaseIteratorAllowed()) {</span>
+<span class="fc" id="L962">      return null;</span>
     } else {
       // TODO
-<span class="fc" id="L963">      return null;</span>
+<span class="fc" id="L965">      return null;</span>
     }
   }
 
