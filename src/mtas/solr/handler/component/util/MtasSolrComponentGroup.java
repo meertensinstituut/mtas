@@ -333,7 +333,7 @@ public class MtasSolrComponentGroup
    * @param name the name
    * @param positions the positions
    * @param prefixes the prefixes
-   * @throws IOException 
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) throws IOException {
@@ -344,10 +344,10 @@ public class MtasSolrComponentGroup
             name + "." + gid + "." + NAME_MTAS_GROUP_GROUPING_POSITION, null);
         prefixes[tmpSubCounter] = solrParams.get(
             name + "." + gid + "." + NAME_MTAS_GROUP_GROUPING_PREFIXES, null);
-        if(positions[tmpSubCounter]==null) {
-          throw new IOException("no position for "+gid);
-        } else if(prefixes[tmpSubCounter]==null) {
-          throw new IOException("no prefix for "+gid);
+        if (positions[tmpSubCounter] == null) {
+          throw new IOException("no position for " + gid);
+        } else if (prefixes[tmpSubCounter] == null) {
+          throw new IOException("no prefix for " + gid);
         }
         tmpSubCounter++;
       }

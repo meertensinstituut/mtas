@@ -135,7 +135,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_POPULATIONVARIANCE)) {
         response.put(statsItem, stats.getPopulationVariance());
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_QUADRATICMEAN)) {
-        response.put(statsItem, Math.sqrt(stats.getSumsq()/stats.getN()));
+        response.put(statsItem, Math.sqrt(stats.getSumsq() / stats.getN()));
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_KURTOSIS)) {
         response.put(statsItem, stats.getKurtosis());
       } else if (statsItem.equals(CodecUtil.STATS_TYPE_MEDIAN)) {
@@ -207,8 +207,7 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
-      return new MtasDataItemNumberComparator<>(stats.getN(),
-          sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getN(), sortDirection);
     default:
       return null;
     }

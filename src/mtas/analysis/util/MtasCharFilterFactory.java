@@ -66,10 +66,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Instantiates a new mtas char filter factory.
    *
-   * @param args
-   *          the args
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param args the args
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasCharFilterFactory(Map<String, String> args) throws IOException {
     this(args, null);
@@ -78,12 +76,9 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Instantiates a new mtas char filter factory.
    *
-   * @param args
-   *          the args
-   * @param resourceLoader
-   *          the resource loader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param args the args
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasCharFilterFactory(Map<String, String> args,
       ResourceLoader resourceLoader) throws IOException {
@@ -115,10 +110,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Inits the.
    *
-   * @param resourceLoader
-   *          the resource loader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param resourceLoader the resource loader
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void init(ResourceLoader resourceLoader) throws IOException {
     if (config == null && configs == null) {
@@ -171,13 +164,10 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Creates the.
    *
-   * @param input
-   *          the input
-   * @param configuration
-   *          the configuration
+   * @param input the input
+   * @param configuration the configuration
    * @return the reader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public Reader create(Reader input, String configuration) throws IOException {
     if (configs != null && configs.size() > 0) {
@@ -220,13 +210,10 @@ public class MtasCharFilterFactory extends CharFilterFactory
   /**
    * Creates the.
    *
-   * @param input
-   *          the input
-   * @param config
-   *          the config
+   * @param input the input
+   * @param config the config
    * @return the reader
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public Reader create(Reader input, MtasConfiguration config)
       throws IOException {

@@ -153,7 +153,14 @@ public class MtasSolrCollectionResult implements Serializable {
       throw new IOException("not allowed with action '" + action + "'");
     }
   }
-  
+
+  /**
+   * Sets the import.
+   *
+   * @param now the now
+   * @param status the status
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public void setImport(long now, SimpleOrderedMap<Object> status)
       throws IOException {
     if (action.equals(ComponentCollection.ACTION_IMPORT)) {
@@ -217,8 +224,8 @@ public class MtasSolrCollectionResult implements Serializable {
       break;
     case ComponentCollection.ACTION_CREATE:
     case ComponentCollection.ACTION_POST:
-    case ComponentCollection.ACTION_IMPORT:      
-        if (componentCollection != null && status != null) {
+    case ComponentCollection.ACTION_IMPORT:
+      if (componentCollection != null && status != null) {
         it = status.iterator();
         while (it.hasNext()) {
           Entry<String, Object> entry = it.next();

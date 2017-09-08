@@ -39,7 +39,7 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
 
   /** The no more positions. */
   private boolean noMorePositions;
-  
+
   /** The no more positions span 2. */
   private boolean noMorePositionsSpan2;
 
@@ -359,7 +359,9 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override

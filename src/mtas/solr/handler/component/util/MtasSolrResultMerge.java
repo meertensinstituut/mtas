@@ -64,9 +64,9 @@ public class MtasSolrResultMerge {
             mergeArrayList(sreq, mtasResponse, "facet", null, false);
           }
           // merge collection
-          if (rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION,
-              false)) {
-            mergeArrayList(sreq, mtasResponse, "collection", null, false);            
+          if (rb.req.getParams().getBool(
+              MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+            mergeArrayList(sreq, mtasResponse, "collection", null, false);
           }
           // merge prefix
           if (rb.req.getParams()
@@ -109,7 +109,7 @@ public class MtasSolrResultMerge {
       }
     }
   }
- 
+
   /**
    * Merge named list.
    *
@@ -333,7 +333,8 @@ public class MtasSolrResultMerge {
             originalComponentResult.merge((MtasSolrMtasResult) shardValue);
           } else if (original instanceof MtasSolrCollectionResult) {
             MtasSolrCollectionResult originalComponentResult = (MtasSolrCollectionResult) original;
-            originalComponentResult.merge((MtasSolrCollectionResult) shardValue);
+            originalComponentResult
+                .merge((MtasSolrCollectionResult) shardValue);
           } else if (original instanceof String) {
             // ignore?
           } else if (original instanceof Integer) {

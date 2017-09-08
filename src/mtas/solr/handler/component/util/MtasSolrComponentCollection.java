@@ -68,8 +68,7 @@ public class MtasSolrComponentCollection
   /**
    * Instantiates a new mtas solr component collection.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentCollection(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -119,9 +118,8 @@ public class MtasSolrComponentCollection
         urls[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_URL,
             null);
-        collections[tmpCounter] = rb.req.getParams().get(
-            PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_COLLECTION,
-            null);
+        collections[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_COLLECTION
+            + "." + id + "." + NAME_MTAS_COLLECTION_COLLECTION, null);
         tmpCounter++;
       }
       mtasFields.doCollection = true;
@@ -135,8 +133,8 @@ public class MtasSolrComponentCollection
           NAME_MTAS_COLLECTION_POST, false);
       MtasSolrResultUtil.compareAndCheck(keys, urls, NAME_MTAS_COLLECTION_KEY,
           NAME_MTAS_COLLECTION_URL, false);
-      MtasSolrResultUtil.compareAndCheck(keys, collections, NAME_MTAS_COLLECTION_KEY,
-          NAME_MTAS_COLLECTION_COLLECTION, false);
+      MtasSolrResultUtil.compareAndCheck(keys, collections,
+          NAME_MTAS_COLLECTION_KEY, NAME_MTAS_COLLECTION_COLLECTION, false);
       for (int i = 0; i < actions.length; i++) {
         if (actions[i] != null) {
           ComponentCollection componentCollection;
@@ -197,12 +195,12 @@ public class MtasSolrComponentCollection
                   "no post defined for collection (" + actions[i] + ")");
             }
             break;
-          case ComponentCollection.ACTION_IMPORT: 
-            if (urls[i] != null && collections[i]!=null) {
+          case ComponentCollection.ACTION_IMPORT:
+            if (urls[i] != null && collections[i] != null) {
               componentCollection = new ComponentCollection(keys[i],
                   ComponentCollection.ACTION_IMPORT);
-              componentCollection.setImportVariables(collectionIds[i],
-                  urls[i], collections[i]);
+              componentCollection.setImportVariables(collectionIds[i], urls[i],
+                  collections[i]);
               mtasFields.collection.add(componentCollection);
             } else {
               throw new IOException(
@@ -408,7 +406,8 @@ public class MtasSolrComponentCollection
    */
   public void finishStage(ResponseBuilder rb) {
     // System.out.println(
-    // "collection: " + System.nanoTime() + " - " + Thread.currentThread().getId()
+    // "collection: " + System.nanoTime() + " - " +
+    // Thread.currentThread().getId()
     // + " - " + rb.req.getParams().getBool("isShard", false)
     // + " FINISHSTAGE " + rb.stage + " " + rb.req.getParamString());
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
@@ -432,7 +431,8 @@ public class MtasSolrComponentCollection
             ArrayList<Object> mtasCollectionResponses;
             if (mtasResponse.get("collection") != null
                 && mtasResponse.get("collection") instanceof ArrayList) {
-              mtasCollectionResponses = (ArrayList<Object>) mtasResponse.get("collection");
+              mtasCollectionResponses = (ArrayList<Object>) mtasResponse
+                  .get("collection");
             } else {
               mtasCollectionResponses = new ArrayList<>();
               mtasResponse.add("collection", mtasCollectionResponses);
@@ -440,8 +440,8 @@ public class MtasSolrComponentCollection
             MtasSolrCollectionResult collectionResult;
             for (ComponentCollection componentCollection : mtasFields.collection) {
               try {
-                collectionResult = createMtasSolrCollectionResult(componentCollection,
-                    false);
+                collectionResult = createMtasSolrCollectionResult(
+                    componentCollection, false);
                 // Create response
                 SimpleOrderedMap<Object> mtasCollectionResponse = new SimpleOrderedMap<>();
                 mtasCollectionResponse.add("key", componentCollection.key);
@@ -484,7 +484,8 @@ public class MtasSolrComponentCollection
                             if (!collectionResult.action()
                                 .equals(ComponentCollection.ACTION_POST)
                                 && !collectionResult.action()
-                                    .equals(ComponentCollection.ACTION_IMPORT) && !collectionResult.action()
+                                    .equals(ComponentCollection.ACTION_IMPORT)
+                                && !collectionResult.action()
                                     .equals(ComponentCollection.ACTION_CHECK)) {
                               filteredData.add(dataItem);
                             }
@@ -538,7 +539,8 @@ public class MtasSolrComponentCollection
         Map<String, MtasSolrCollectionResult> index = new HashMap<>();
         ArrayList<Object> mtasResponseCollection;
         try {
-          mtasResponseCollection = (ArrayList<Object>) mtasResponse.get("collection");
+          mtasResponseCollection = (ArrayList<Object>) mtasResponse
+              .get("collection");
           for (Object item : mtasResponseCollection) {
             if (item instanceof SimpleOrderedMap) {
               SimpleOrderedMap<Object> itemMap = (SimpleOrderedMap<Object>) item;
@@ -600,7 +602,8 @@ public class MtasSolrComponentCollection
         HashMap<String, ModifiableSolrParams> requestParamList = new HashMap<>();
         int id = 0;
         for (ComponentCollection componentCollection : mtasFields.collection) {
-          if (componentCollection.action().equals(ComponentCollection.ACTION_CHECK)) {
+          if (componentCollection.action()
+              .equals(ComponentCollection.ACTION_CHECK)) {
             for (String shardAddress : rb.shards) {
               if (createPostAfterMissingCheckResult.containsKey(shardAddress)) {
                 if (createPostAfterMissingCheckResult.get(shardAddress)
@@ -615,8 +618,10 @@ public class MtasSolrComponentCollection
                     } else {
                       paramsNewRequest = requestParamList.get(shardAddress);
                     }
-                    paramsNewRequest.add(PARAM_MTAS_COLLECTION + "." + id + "."
-                        + NAME_MTAS_COLLECTION_KEY, componentCollection.key);
+                    paramsNewRequest.add(
+                        PARAM_MTAS_COLLECTION + "." + id + "."
+                            + NAME_MTAS_COLLECTION_KEY,
+                        componentCollection.key);
                     paramsNewRequest.add(PARAM_MTAS_COLLECTION + "." + id + "."
                         + NAME_MTAS_COLLECTION_ID, componentCollection.id);
                     paramsNewRequest.add(
@@ -636,13 +641,14 @@ public class MtasSolrComponentCollection
               .equals(ComponentCollection.ACTION_CREATE)) {
             if (componentCollection.version == null) {
               componentCollection.version = searchComponent.getCollectionCache()
-                  .create(componentCollection.id, componentCollection.values().size(),
+                  .create(componentCollection.id,
+                      componentCollection.values().size(),
                       componentCollection.values());
             }
             if (index.containsKey(componentCollection.id)) {
               index.get(componentCollection.id).setCreate(
-                  searchComponent.getCollectionCache().now(),
-                  searchComponent.getCollectionCache().check(componentCollection.id));
+                  searchComponent.getCollectionCache().now(), searchComponent
+                      .getCollectionCache().check(componentCollection.id));
             }
             for (String shardAddress : rb.shards) {
               ModifiableSolrParams paramsNewRequest;
@@ -688,7 +694,8 @@ public class MtasSolrComponentCollection
         // just rewrite
         ArrayList<Object> mtasResponseCollection;
         try {
-          mtasResponseCollection = (ArrayList<Object>) mtasResponse.get("collection");
+          mtasResponseCollection = (ArrayList<Object>) mtasResponse
+              .get("collection");
           if (mtasResponseCollection != null) {
             MtasSolrResultUtil.rewrite(mtasResponseCollection, searchComponent);
           }
@@ -703,8 +710,7 @@ public class MtasSolrComponentCollection
   /**
    * Gets the mtas fields.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    * @return the mtas fields
    */
   private ComponentFields getMtasFields(ResponseBuilder rb) {
@@ -714,8 +720,7 @@ public class MtasSolrComponentCollection
   /**
    * String values to string.
    *
-   * @param stringValues
-   *          the string values
+   * @param stringValues the string values
    * @return the string
    */
   private static String stringValuesToString(HashSet<String> stringValues) {
@@ -725,11 +730,9 @@ public class MtasSolrComponentCollection
   /**
    * String to string values.
    *
-   * @param stringValue
-   *          the string value
+   * @param stringValue the string value
    * @return the hash set
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private static HashSet<String> stringToStringValues(String stringValue)
       throws IOException {

@@ -459,7 +459,9 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override

@@ -112,11 +112,11 @@ public class MtasFieldsProducer extends FieldsProducer {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private String addIndexInputToList(String name, IndexInput in,
-      String postingsFormatName) throws IOException {    
+      String postingsFormatName) throws IOException {
     if (indexInputList.get(name) != null) {
       indexInputList.get(name).close();
     }
-    if(in!=null) {
+    if (in != null) {
       String localPostingsFormatName = postingsFormatName;
       if (localPostingsFormatName == null) {
         localPostingsFormatName = in.readString();
@@ -128,7 +128,7 @@ public class MtasFieldsProducer extends FieldsProducer {
       indexInputOffsetList.put(name, in.getFilePointer());
       return localPostingsFormatName;
     } else {
-      log.debug("no "+name+" registered");
+      log.debug("no " + name + " registered");
       return null;
     }
   }
@@ -244,7 +244,7 @@ public class MtasFieldsProducer extends FieldsProducer {
       object = state.directory.openInput(fileName, state.context);
     } catch (FileNotFoundException | NoSuchFileException e) {
       log.debug(e);
-      //throw new NoSuchFileException(e.getMessage());
+      // throw new NoSuchFileException(e.getMessage());
       return null;
     }
     int minVersion = (minimum == null) ? MtasCodecPostingsFormat.VERSION_START
@@ -262,9 +262,9 @@ public class MtasFieldsProducer extends FieldsProducer {
     } catch (EOFException e) {
       object.close();
       log.debug(e);
-      //throw new EOFException(e.getMessage());
+      // throw new EOFException(e.getMessage());
       return null;
-    } 
+    }
     return object;
   }
 

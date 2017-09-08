@@ -275,7 +275,9 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
         needsScores ? getTermContexts(subWeight) : null);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override

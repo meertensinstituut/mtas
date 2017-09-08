@@ -22,7 +22,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasJoinQParser extends QParser {
 
-  /** The Constant MTAS_JOIN_QPARSER_ID. */
+  /** The Constant MTAS_JOIN_QPARSER_COLLECTION. */
   public static final String MTAS_JOIN_QPARSER_COLLECTION = "collection";
 
   /** The Constant MTAS_JOIN_QPARSER_FIELD. */
@@ -89,14 +89,14 @@ public class MtasJoinQParser extends QParser {
           if (automaton != null) {
             for (String field : fields) {
               booleanQueryBuilder.add(
-                  new AutomatonQuery(new Term(field), automaton),
-                  Occur.SHOULD);
+                  new AutomatonQuery(new Term(field), automaton), Occur.SHOULD);
             }
           } else {
-            throw new IOException("no data for collection '"+id+"'");
+            throw new IOException("no data for collection '" + id + "'");
           }
         } catch (IOException e) {
-          throw new SyntaxError("could not construct automaton: "+e.getMessage(), e);
+          throw new SyntaxError(
+              "could not construct automaton: " + e.getMessage(), e);
         }
         return booleanQueryBuilder.build();
       } else {

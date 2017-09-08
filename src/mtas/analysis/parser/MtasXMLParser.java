@@ -126,7 +126,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     super(config);
     try {
       initParser();
-      //System.out.print(printConfig());
+      // System.out.print(printConfig());
     } catch (MtasConfigException e) {
       log.error(e);
     }
@@ -848,7 +848,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
       String encodedPrefix = token.getPrefix();
       String encodedPostfix = token.getPostfix();
       token.setValue(decodeAndUpdateWithVariables(encodedPrefix, encodedPostfix,
-          variables));      
+          variables));
     }
     // update tokens with offset
     for (Entry<Integer, Set<String>> updateItem : updateList

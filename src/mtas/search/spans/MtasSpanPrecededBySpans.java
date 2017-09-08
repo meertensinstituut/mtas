@@ -331,7 +331,9 @@ public class MtasSpanPrecededBySpans extends MtasSpans {
     previousSpans2EndPositions.clear();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override

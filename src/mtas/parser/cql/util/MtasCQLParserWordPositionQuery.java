@@ -120,7 +120,9 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
     return h;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override

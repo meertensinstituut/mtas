@@ -22,22 +22,22 @@ public class MtasSpanPositionSpans extends MtasSpans {
 
   /** The start. */
   private int start;
-  
+
   /** The end. */
   private int end;
-  
+
   /** The min position. */
   private int minPosition;
-  
+
   /** The max position. */
   private int maxPosition;
-  
+
   /** The current start position. */
   private int currentStartPosition;
-  
+
   /** The current end position. */
   private int currentEndPosition;
-  
+
   /** The doc id. */
   private int docId;
 
@@ -215,7 +215,9 @@ public class MtasSpanPositionSpans extends MtasSpans {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override

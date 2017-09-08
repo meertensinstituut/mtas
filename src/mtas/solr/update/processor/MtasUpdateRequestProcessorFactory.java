@@ -161,8 +161,7 @@ public class MtasUpdateRequestProcessorFactory
                     try {
                       Class<?> cls = Class.forName((String) className);
                       if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
-                        Class<?>[] types = { Map.class,
-                            ResourceLoader.class };
+                        Class<?>[] types = { Map.class, ResourceLoader.class };
                         Constructor<?> cnstr = cls.getConstructor(types);
                         Object cff = cnstr.newInstance(args, resourceLoader);
                         if (cff instanceof MtasCharFilterFactory) {

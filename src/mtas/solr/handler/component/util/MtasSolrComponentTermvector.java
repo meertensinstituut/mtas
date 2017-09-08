@@ -626,8 +626,8 @@ public class MtasSolrComponentTermvector
       Object mtasResponseTermvectorRaw;
       if ((mtasResponseTermvectorRaw = mtasResponse.get("termvector")) != null
           && mtasResponseTermvectorRaw instanceof ArrayList) {
-        MtasSolrResultUtil
-            .rewrite((ArrayList<Object>) mtasResponseTermvectorRaw, searchComponent);
+        MtasSolrResultUtil.rewrite(
+            (ArrayList<Object>) mtasResponseTermvectorRaw, searchComponent);
       }
     }
   }

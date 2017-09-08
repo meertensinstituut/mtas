@@ -202,14 +202,11 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
     createStats();
     switch (sortType) {
     case CodecUtil.STATS_TYPE_SUM:
-      return new MtasDataItemNumberComparator<>(stats.getSum(),
-          sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getSum(), sortDirection);
     case CodecUtil.STATS_TYPE_MAX:
-      return new MtasDataItemNumberComparator<>(stats.getMax(),
-          sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getMax(), sortDirection);
     case CodecUtil.STATS_TYPE_MIN:
-      return new MtasDataItemNumberComparator<>(stats.getMin(),
-          sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getMin(), sortDirection);
     case CodecUtil.STATS_TYPE_SUMSQ:
       return new MtasDataItemNumberComparator<>(stats.getSumsq(),
           sortDirection);
@@ -231,23 +228,22 @@ public class MtasDataItemDoubleFull extends MtasDataItemFull<Double, Double> {
       return new MtasDataItemNumberComparator<>(
           stats.getN() * Math.log(stats.getGeometricMean()), sortDirection);
     case CodecUtil.STATS_TYPE_MEAN:
-      return new MtasDataItemNumberComparator<>(stats.getMean(),
-          sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getMean(), sortDirection);
     case CodecUtil.STATS_TYPE_GEOMETRICMEAN:
       return new MtasDataItemNumberComparator<>(stats.getGeometricMean(),
           sortDirection);
     case CodecUtil.STATS_TYPE_STANDARDDEVIATION:
-      return new MtasDataItemNumberComparator<>(
-          stats.getStandardDeviation(), sortDirection);
+      return new MtasDataItemNumberComparator<>(stats.getStandardDeviation(),
+          sortDirection);
     case CodecUtil.STATS_TYPE_VARIANCE:
       return new MtasDataItemNumberComparator<>(stats.getVariance(),
           sortDirection);
     case CodecUtil.STATS_TYPE_POPULATIONVARIANCE:
-      return new MtasDataItemNumberComparator<>(
-          stats.getPopulationVariance(), sortDirection);
-    case CodecUtil.STATS_TYPE_QUADRATICMEAN:
-      return new MtasDataItemNumberComparator<>(Math.sqrt(stats.getSumsq()/stats.getN()),
+      return new MtasDataItemNumberComparator<>(stats.getPopulationVariance(),
           sortDirection);
+    case CodecUtil.STATS_TYPE_QUADRATICMEAN:
+      return new MtasDataItemNumberComparator<>(
+          Math.sqrt(stats.getSumsq() / stats.getN()), sortDirection);
     case CodecUtil.STATS_TYPE_KURTOSIS:
       return new MtasDataItemNumberComparator<>(stats.getKurtosis(),
           sortDirection);

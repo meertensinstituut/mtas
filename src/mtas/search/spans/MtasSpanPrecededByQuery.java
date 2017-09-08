@@ -182,7 +182,9 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override

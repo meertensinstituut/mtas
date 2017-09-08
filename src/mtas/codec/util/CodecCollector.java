@@ -282,7 +282,7 @@ public class CodecCollector {
     boolean needSpans = false;
     boolean needPositions = false;
     boolean needTokens = false;
-    
+
     // results
     Map<Integer, Integer> positionsData = null;
     Map<Integer, Integer> tokensData = null;
@@ -1682,9 +1682,9 @@ public class CodecCollector {
           m.endPosition - 1);
     }
     if (group.hitRight != null) {
-      start = Math.min(m.endPosition - group.hitRight.length,
-          m.startPosition);
-      end = end == null ? (m.endPosition - 1) : Math.max(end, (m.endPosition - 1));
+      start = Math.min(m.endPosition - group.hitRight.length, m.startPosition);
+      end = end == null ? (m.endPosition - 1)
+          : Math.max(end, (m.endPosition - 1));
     }
     if (group.left != null) {
       start = start == null ? m.startPosition - group.left.length

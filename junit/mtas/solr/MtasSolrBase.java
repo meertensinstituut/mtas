@@ -23,23 +23,23 @@ import org.apache.solr.common.util.NamedList;
  */
 public class MtasSolrBase {
 
-  /** The field id. */
-  public static String FIELD_ID = "id";
+  /** The Constant FIELD_ID. */
+  public final static String FIELD_ID = "id";
   
-  /** The field title. */
-  public static String FIELD_TITLE = "title";
+  /** The Constant FIELD_TITLE. */
+  public final static String FIELD_TITLE = "title";
   
-  /** The field text. */
-  public static String FIELD_TEXT = "text";
+  /** The Constant FIELD_TEXT. */
+  public final static String FIELD_TEXT = "text";
   
-  /** The field mtas. */
-  public static String FIELD_MTAS = "mtas";
+  /** The Constant FIELD_MTAS. */
+  public final static String FIELD_MTAS = "mtas";
   
-  /** The field mtas advanced. */
-  public static String FIELD_MTAS_ADVANCED = "mtasAdvanced";
+  /** The Constant FIELD_MTAS_ADVANCED. */
+  public final static String FIELD_MTAS_ADVANCED = "mtasAdvanced";
   
-  /** The field source. */
-  public static String FIELD_SOURCE = "source";
+  /** The Constant FIELD_SOURCE. */
+  public final static String FIELD_SOURCE = "source";
 
   /**
    * Instantiates a new mtas solr base.

@@ -155,7 +155,9 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
     return baseQuery.hashCode();
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override

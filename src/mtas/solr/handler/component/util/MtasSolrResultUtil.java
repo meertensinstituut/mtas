@@ -60,13 +60,13 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite.
    *
-   * @param al
-   *          the al
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param al the al
+   * @param searchComponent the search component
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static void rewrite(ArrayList<?> al, MtasSolrSearchComponent searchComponent) throws IOException {
+  public static void rewrite(ArrayList<?> al,
+      MtasSolrSearchComponent searchComponent) throws IOException {
     for (int i = 0; i < al.size(); i++) {
       if (al.get(i) instanceof NamedList) {
         rewrite((NamedList) al.get(i), searchComponent);
@@ -79,27 +79,26 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite.
    *
-   * @param nl
-   *          the nl
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param nl the nl
+   * @param searchComponent the search component
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static void rewrite(NamedList<Object> nl, MtasSolrSearchComponent searchComponent) throws IOException {
+  public static void rewrite(NamedList<Object> nl,
+      MtasSolrSearchComponent searchComponent) throws IOException {
     rewrite(nl, searchComponent, true);
   }
 
   /**
    * Rewrite.
    *
-   * @param nl
-   *          the nl
-   * @param doCollapse
-   *          the do collapse
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param nl the nl
+   * @param searchComponent the search component
+   * @param doCollapse the do collapse
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private static void rewrite(NamedList<Object> nl, MtasSolrSearchComponent searchComponent, boolean doCollapse)
+  private static void rewrite(NamedList<Object> nl,
+      MtasSolrSearchComponent searchComponent, boolean doCollapse)
       throws IOException {
     boolean showDebugInfo = false;
     HashMap<String, NamedList<Object>> collapseNamedList = new HashMap<>();
@@ -117,7 +116,7 @@ public class MtasSolrResultUtil {
         MtasDataItem dataItem = (MtasDataItem) nl.getVal(i);
         nl.setVal(i, dataItem.rewrite(showDebugInfo));
       } else if (nl.getVal(i) instanceof MtasSolrCollectionResult) {
-        MtasSolrCollectionResult o = (MtasSolrCollectionResult) nl.getVal(i);        
+        MtasSolrCollectionResult o = (MtasSolrCollectionResult) nl.getVal(i);
         collapseNamedList.put(nl.getName(i), o.rewrite(searchComponent));
       } else if (nl.getVal(i) instanceof MtasSolrMtasResult) {
         MtasSolrMtasResult o = (MtasSolrMtasResult) nl.getVal(i);
@@ -173,14 +172,13 @@ public class MtasSolrResultUtil {
       for (NamedList<Object> items : collapseNamedList.values()) {
         nl.addAll(items);
       }
-    }    
+    }
   }
 
   /**
    * Rewrite to array.
    *
-   * @param nnl
-   *          the nnl
+   * @param nnl the nnl
    * @return the array list
    */
   private static ArrayList<NamedList<Object>> rewriteToArray(
@@ -207,14 +205,10 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite merge list.
    *
-   * @param key
-   *          the key
-   * @param subKey
-   *          the sub key
-   * @param snl
-   *          the snl
-   * @param tnl
-   *          the tnl
+   * @param key the key
+   * @param subKey the sub key
+   * @param snl the snl
+   * @param tnl the tnl
    */
   @SuppressWarnings({ "unchecked", "unused" })
   private static void rewriteMergeList(String key, String subKey,
@@ -239,14 +233,10 @@ public class MtasSolrResultUtil {
   /**
    * Rewrite merge data.
    *
-   * @param key
-   *          the key
-   * @param subKey
-   *          the sub key
-   * @param snl
-   *          the snl
-   * @param tnl
-   *          the tnl
+   * @param key the key
+   * @param subKey the sub key
+   * @param snl the snl
+   * @param tnl the tnl
    */
   @SuppressWarnings({ "unused", "unchecked" })
   private static void rewriteMergeData(String key, String subKey,
@@ -267,10 +257,9 @@ public class MtasSolrResultUtil {
   /**
    * Encode.
    *
-   * @param o
-   *          the o
+   * @param o the o
    * @return the string
-   * @throws IOException
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static String encode(Object o) throws IOException {
     if (o instanceof Serializable) {
@@ -295,8 +284,7 @@ public class MtasSolrResultUtil {
   /**
    * Decode.
    *
-   * @param s
-   *          the s
+   * @param s the s
    * @return the object
    */
   static Object decode(String s) {
@@ -315,8 +303,7 @@ public class MtasSolrResultUtil {
   /**
    * Decode.
    *
-   * @param l
-   *          the l
+   * @param l the l
    * @return the array list
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -334,8 +321,7 @@ public class MtasSolrResultUtil {
   /**
    * Decode.
    *
-   * @param nl
-   *          the nl
+   * @param nl the nl
    * @return the named list
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -377,10 +363,8 @@ public class MtasSolrResultUtil {
   /**
    * Gets the ids from parameters.
    *
-   * @param params
-   *          the params
-   * @param prefix
-   *          the prefix
+   * @param params the params
+   * @param prefix the prefix
    * @return the ids from parameters
    */
   public static SortedSet<String> getIdsFromParameters(SolrParams params,
@@ -402,18 +386,12 @@ public class MtasSolrResultUtil {
   /**
    * Compare and check.
    *
-   * @param list
-   *          the list
-   * @param original
-   *          the original
-   * @param nameNew
-   *          the name new
-   * @param nameOriginal
-   *          the name original
-   * @param unique
-   *          the unique
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param list the list
+   * @param original the original
+   * @param nameNew the name new
+   * @param nameOriginal the name original
+   * @param unique the unique
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void compareAndCheck(String[] list, String[] original,
       String nameNew, String nameOriginal, Boolean unique) throws IOException {
@@ -437,23 +415,15 @@ public class MtasSolrResultUtil {
   /**
    * Construct query.
    *
-   * @param queryValue
-   *          the query value
-   * @param queryType
-   *          the query type
-   * @param queryPrefix
-   *          the query prefix
-   * @param queryVariables
-   *          the query variables
-   * @param field
-   *          the field
-   * @param queryIgnore
-   *          the query ignore
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
+   * @param queryValue the query value
+   * @param queryType the query type
+   * @param queryPrefix the query prefix
+   * @param queryVariables the query variables
+   * @param field the field
+   * @param queryIgnore the query ignore
+   * @param maximumIgnoreLength the maximum ignore length
    * @return the mtas span query
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static MtasSpanQuery constructQuery(String queryValue,
       String queryType, String queryPrefix,

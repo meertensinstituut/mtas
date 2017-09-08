@@ -71,11 +71,14 @@ public class MtasSolrComponentDocument
 
   /** The Constant NAME_MTAS_DOCUMENT_NUMBER. */
   public static final String NAME_MTAS_DOCUMENT_NUMBER = "number";
-  
+
+  /** The search component. */
   private MtasSolrSearchComponent searchComponent;
 
   /**
    * Instantiates a new mtas solr component document.
+   *
+   * @param searchComponent the search component
    */
   public MtasSolrComponentDocument(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;

@@ -135,8 +135,8 @@ public class MtasSolrComponentPrefix
    * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
    * CodecComponent.BasicComponent, java.lang.Boolean)
    */
-  public SimpleOrderedMap<Object> create(ComponentPrefix prefix,
-      Boolean encode) throws IOException {
+  public SimpleOrderedMap<Object> create(ComponentPrefix prefix, Boolean encode)
+      throws IOException {
     SimpleOrderedMap<Object> mtasPrefixResponse = new SimpleOrderedMap<>();
     mtasPrefixResponse.add("key", prefix.key);
     if (encode) {

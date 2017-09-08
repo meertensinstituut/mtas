@@ -736,6 +736,11 @@ public class MtasSolrTestSearchConsistency {
     assertTrue("incorrect number of matching documents : " + n4, n4 == 3);
   }
   
+  /**
+   * Mtas request handler collection 3.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   @org.junit.Test
   public void mtasRequestHandlerCollection3() throws IOException {
     // post

@@ -435,7 +435,9 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return getTermContexts(weights);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
    */
   @Override

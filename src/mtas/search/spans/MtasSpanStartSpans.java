@@ -115,7 +115,9 @@ public class MtasSpanStartSpans extends MtasSpans {
     return (spans == null) ? NO_MORE_DOCS : spans.advance(target);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
    */
   @Override
