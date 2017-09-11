@@ -1,7 +1,6 @@
 package mtas.solr.handler.component.util;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -204,7 +202,7 @@ public class MtasSolrComponentCollection
               mtasFields.collection.add(componentCollection);
             } else {
               throw new IOException(
-                  "no post defined for collection (" + actions[i] + ")");
+                  "no url or collection defined for collection (" + actions[i] + ")");
             }
             break;
           case ComponentCollection.ACTION_DELETE:

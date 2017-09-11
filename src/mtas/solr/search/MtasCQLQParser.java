@@ -113,7 +113,7 @@ public class MtasCQLQParser extends QParser {
               list.toArray(new String[list.size()]));
         }
       }
-    }
+    }    
   }
 
   /*
@@ -154,3 +154,4 @@ public class MtasCQLQParser extends QParser {
   }
 
 }
+ 
