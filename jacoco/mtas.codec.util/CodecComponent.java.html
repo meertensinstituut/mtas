@@ -741,7 +741,7 @@ public class CodecComponent {
      * @param groupingRightPrefixes the grouping right prefixes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public ComponentGroup(MtasSpanQuery spanQuery, String key, int number,
+    public ComponentGroup(MtasSpanQuery spanQuery, String key, int number, int start,
         String groupingHitInsidePrefixes,
         String[] groupingHitInsideLeftPosition,
         String[] groupingHitInsideLeftPrefixes,
@@ -760,7 +760,7 @@ public class CodecComponent {
 <span class="fc" id="L760">      this.statsItems = CodecUtil.createStatsItems(&quot;n,sum,mean&quot;);</span>
 <span class="fc" id="L761">      this.statsType = CodecUtil.createStatsType(this.statsItems, this.sortType,</span>
           null);
-<span class="fc" id="L763">      this.start = 0;</span>
+<span class="fc" id="L763">      this.start = start;</span>
 <span class="fc" id="L764">      this.number = number;</span>
 <span class="fc" id="L765">      HashSet&lt;String&gt; tmpPrefixes = new HashSet&lt;&gt;();</span>
       // analyze grouping condition
@@ -810,13 +810,13 @@ public class CodecComponent {
         throws IOException {
 <span class="fc" id="L811">      Pattern p = Pattern.compile(&quot;^([0-9]+)(\\-([0-9]+))?$&quot;);</span>
       Matcher m;
-<span class="pc bpc" id="L813" title="2 of 4 branches missed.">      if (position == null &amp;&amp; prefixes == null) {</span>
+<span class="pc bpc" id="L813" title="1 of 4 branches missed.">      if (position == null &amp;&amp; prefixes == null) {</span>
 <span class="fc" id="L814">        return null;</span>
-<span class="nc bnc" id="L815" title="All 6 branches missed.">      } else if (prefixes == null || position == null</span>
+<span class="pc bpc" id="L815" title="3 of 6 branches missed.">      } else if (prefixes == null || position == null</span>
           || position.length != prefixes.length) {
 <span class="nc" id="L817">        throw new IOException(&quot;incorrect position/prefixes&quot;);</span>
-<span class="nc bnc" id="L818" title="All 2 branches missed.">      } else if (position.length == 0) {</span>
-<span class="nc" id="L819">        return null;</span>
+<span class="pc bpc" id="L818" title="1 of 2 branches missed.">      } else if (position.length == 0) {</span>
+<span class="fc" id="L819">        return null;</span>
       } else {
         // analyze positions
 <span class="nc" id="L822">        int[][] tmpPosition = new int[position.length][];</span>

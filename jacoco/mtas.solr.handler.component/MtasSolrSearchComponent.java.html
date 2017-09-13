@@ -229,10 +229,10 @@ import org.apache.solr.search.SolrIndexSearcher;
    */
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
-    // System.out
-    // .println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
-    // + &quot; - &quot; + rb.req.getParams().getBool(&quot;isShard&quot;, false) + &quot; PREPARE &quot;
-    // + rb.stage + &quot; &quot; + rb.req.getParamString());
+    //System.out
+    //.println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
+    //+ &quot; - &quot; + rb.req.getParams().getBool(&quot;isShard&quot;, false) + &quot; PREPARE &quot;
+    //+ rb.stage + &quot; &quot; + rb.req.getParamString());
 <span class="fc bfc" id="L236" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
 <span class="fc" id="L237">      mtasSolrResultMerge = new MtasSolrResultMerge();</span>
 <span class="fc" id="L238">      ComponentFields mtasFields = new ComponentFields();</span>
@@ -252,9 +252,9 @@ import org.apache.solr.search.SolrIndexSearcher;
 <span class="nc" id="L252">        searchList.prepare(rb, mtasFields);</span>
       }
       // get settings group
-<span class="pc bpc" id="L255" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,</span>
           false)) {
-<span class="nc" id="L257">        searchGroup.prepare(rb, mtasFields);</span>
+<span class="fc" id="L257">        searchGroup.prepare(rb, mtasFields);</span>
       }
       // get settings termvector
 <span class="fc" id="L260">      if (rb.req.getParams()</span>
@@ -302,7 +302,7 @@ import org.apache.solr.search.SolrIndexSearcher;
 <span class="fc bfc" id="L302" title="All 2 branches covered.">    if (mtasFields != null) {</span>
 <span class="fc" id="L303">      DocSet docSet = rb.getResults().docSet;</span>
 <span class="fc" id="L304">      DocList docList = rb.getResults().docList;</span>
-<span class="pc bpc" id="L305" title="5 of 18 branches missed.">      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic</span>
+<span class="pc bpc" id="L305" title="4 of 18 branches missed.">      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic</span>
           || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
           || mtasFields.doCollection || mtasFields.doTermVector
           || mtasFields.doPrefix) {
@@ -399,19 +399,19 @@ import org.apache.solr.search.SolrIndexSearcher;
           // add to response
 <span class="nc" id="L400">          mtasResponse.add(&quot;list&quot;, mtasListResponses);</span>
         }
-<span class="pc bpc" id="L402" title="1 of 2 branches missed.">        if (mtasFields.doGroup) {</span>
-<span class="nc" id="L403">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasGroupResponses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L404" title="All 2 branches missed.">          for (String field : mtasFields.list.keySet()) {</span>
-<span class="nc bnc" id="L405" title="All 2 branches missed.">            for (ComponentGroup group : mtasFields.list.get(field).groupList) {</span>
-<span class="nc bnc" id="L406" title="All 2 branches missed.">              if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
+<span class="fc bfc" id="L402" title="All 2 branches covered.">        if (mtasFields.doGroup) {</span>
+<span class="fc" id="L403">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasGroupResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L404" title="All 2 branches covered.">          for (String field : mtasFields.list.keySet()) {</span>
+<span class="fc bfc" id="L405" title="All 2 branches covered.">            for (ComponentGroup group : mtasFields.list.get(field).groupList) {</span>
+<span class="pc bpc" id="L406" title="1 of 2 branches missed.">              if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
 <span class="nc" id="L407">                mtasGroupResponses.add(searchGroup.create(group, true));</span>
               } else {
-<span class="nc" id="L409">                mtasGroupResponses.add(searchGroup.create(group, false));</span>
+<span class="fc" id="L409">                mtasGroupResponses.add(searchGroup.create(group, false));</span>
               }
-<span class="nc" id="L411">            }</span>
-<span class="nc" id="L412">          }</span>
+<span class="fc" id="L411">            }</span>
+<span class="fc" id="L412">          }</span>
           // add to response
-<span class="nc" id="L414">          mtasResponse.add(&quot;group&quot;, mtasGroupResponses);</span>
+<span class="fc" id="L414">          mtasResponse.add(&quot;group&quot;, mtasGroupResponses);</span>
         }
 <span class="fc bfc" id="L416" title="All 2 branches covered.">        if (mtasFields.doTermVector) {</span>
 <span class="fc" id="L417">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasTermVectorResponses = new ArrayList&lt;&gt;();</span>

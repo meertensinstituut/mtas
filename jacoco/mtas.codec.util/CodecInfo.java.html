@@ -473,7 +473,7 @@ public class CodecInfo {
   private LinkedHashMap&lt;String, Long&gt; getPrefixes(String field) {
 <span class="pc bpc" id="L474" title="1 of 2 branches missed.">    if (fieldReferences.containsKey(field)) {</span>
 <span class="fc" id="L475">      FieldReferences fr = fieldReferences.get(field);</span>
-<span class="pc bpc" id="L476" title="1 of 2 branches missed.">      if (!prefixReferences.containsKey(field)) {</span>
+<span class="fc bfc" id="L476" title="All 2 branches covered.">      if (!prefixReferences.containsKey(field)) {</span>
 <span class="fc" id="L477">        LinkedHashMap&lt;String, Long&gt; refs = new LinkedHashMap&lt;String, Long&gt;();</span>
         try {
 <span class="fc" id="L479">          IndexInput inPrefix = indexInputList.get(&quot;prefix&quot;);</span>
@@ -490,7 +490,7 @@ public class CodecInfo {
 <span class="fc" id="L490">        prefixReferences.put(field, refs);</span>
 <span class="fc" id="L491">        return refs;</span>
       } else {
-<span class="nc" id="L493">        return prefixReferences.get(field);</span>
+<span class="fc" id="L493">        return prefixReferences.get(field);</span>
       }
     } else {
 <span class="nc" id="L496">      return null;</span>

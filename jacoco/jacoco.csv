@@ -45,7 +45,7 @@ MTAS,mtas.parser.function,TokenMgrError,175,0,17,0,37,0,18,0,6,0
 MTAS,mtas.parser.function,MtasFunctionParserTokenManager,366,701,82,71,84,149,62,45,7,14
 MTAS,mtas.parser.function,SimpleCharStream,797,269,45,15,136,61,53,16,26,12
 MTAS,mtas.codec.util,CodecComponent.ComponentFields,0,49,0,0,0,16,0,1,0,1
-MTAS,mtas.codec.util,CodecInfo,523,647,56,48,116,135,47,28,10,13
+MTAS,mtas.codec.util,CodecInfo,517,653,55,49,115,136,46,29,10,13
 MTAS,mtas.codec.util,CodecComponent.ComponentFacet,764,0,70,0,107,0,40,0,5,0
 MTAS,mtas.codec.util,CodecInfo.FieldReferences,0,18,0,0,0,7,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.Match,54,9,10,0,12,4,7,1,2,1
@@ -64,9 +64,9 @@ MTAS,mtas.codec.util,CodecComponent.ComponentPrefix,20,98,7,13,4,24,7,8,0,5
 MTAS,mtas.codec.util,DataCollector,117,98,13,7,13,8,9,4,1,2
 MTAS,mtas.codec.util,CodecComponent.ComponentField,0,59,0,0,0,14,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.KwicToken,16,0,0,0,5,0,1,0,1,0
-MTAS,mtas.codec.util,CodecComponent.ComponentGroup,250,156,34,6,41,31,19,3,0,2
+MTAS,mtas.codec.util,CodecComponent.ComponentGroup,236,170,29,11,38,34,18,4,0,2
 MTAS,mtas.codec.util,CodecComponent.ComponentDocument,134,0,20,0,32,0,11,0,1,0
-MTAS,mtas.codec.util,CodecCollector,6129,3846,982,556,1148,856,595,215,14,27
+MTAS,mtas.codec.util,CodecCollector,6100,3875,972,566,1143,861,587,223,14,27
 MTAS,mtas.codec.util,CodecComponent.KwicHit,16,0,0,0,5,0,1,0,1,0
 MTAS,mtas.codec.util,CodecComponent.ComponentKwic,151,0,26,0,29,0,14,0,1,0
 MTAS,mtas.codec.util,CodecCollector.RegisterStatus,0,9,0,0,0,4,0,1,0,1
@@ -108,7 +108,7 @@ MTAS,mtas.analysis.token,MtasTokenCollection.new Comparator() {...},54,84,8,10,3
 MTAS,mtas.analysis.token,MtasTokenCollection.new Iterator() {...},4,25,0,0,1,4,1,3,1,3
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionResponseDouble,39,54,7,7,8,17,8,5,2,4
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionResponse,0,6,0,0,0,3,0,1,0,1
-MTAS,mtas.parser.function.util,MtasFunctionParserFunctionBasic,1269,1665,353,245,171,269,280,109,0,12
+MTAS,mtas.parser.function.util,MtasFunctionParserFunctionBasic,1233,1701,347,251,167,273,276,113,0,12
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionDefault,28,58,6,6,5,13,5,4,1,2
 MTAS,mtas.parser.function.util,MtasFunctionParserItem,60,218,5,7,5,45,5,12,0,11
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionResponseLong,55,39,9,5,12,13,9,4,2,4
@@ -158,16 +158,16 @@ MTAS,mtas.parser.cql,SimpleCharStream,797,269,46,14,136,61,54,15,26,12
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentList,2593,10,178,0,372,4,94,2,5,2
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentStats,941,2441,103,119,131,352,77,52,5,13
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentFacet,2493,10,118,0,306,5,67,2,8,2
-MTAS,mtas.solr.handler.component.util,MtasSolrComponentGroup,1816,10,88,0,224,5,50,2,6,2
+MTAS,mtas.solr.handler.component.util,MtasSolrComponentGroup,972,927,72,20,111,124,46,8,3,5
 MTAS,mtas.solr.handler.component.util,MtasSolrResultMerge,147,643,44,84,36,159,36,37,0,9
-MTAS,mtas.solr.handler.component.util,MtasSolrResultUtil,464,557,52,68,79,126,41,34,3,12
+MTAS,mtas.solr.handler.component.util,MtasSolrResultUtil,446,575,51,69,75,130,40,35,3,12
 MTAS,mtas.solr.handler.component.util,MtasSolrCollectionResult,322,513,71,85,40,104,61,38,3,9
-MTAS,mtas.solr.handler.component.util,MtasSolrMtasResult,488,372,55,39,86,81,42,14,2,7
+MTAS,mtas.solr.handler.component.util,MtasSolrMtasResult,488,372,54,40,86,81,41,15,2,7
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentDocument,1020,10,66,0,156,5,38,2,5,2
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentPrefix,83,436,26,38,22,93,21,19,0,8
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentTermvector,1047,3126,126,246,127,550,107,92,0,13
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentKwic,1574,3,108,0,260,2,60,1,6,1
-MTAS,mtas.solr.handler.component.util,MtasSolrComponentCollection,366,1660,84,140,67,320,73,58,0,11
+MTAS,mtas.solr.handler.component.util,MtasSolrComponentCollection,425,1695,89,149,73,323,78,60,0,11
 MTAS,mtas.solr.schema,MtasPreAnalyzedField,13,126,1,1,2,31,1,3,0,3
 MTAS,mtas.solr.schema,MtasPreAnalyzedParser,84,150,17,15,8,38,14,6,1,3
 MTAS,mtas.search.spans,MtasSpanIntersectingQuery,149,184,28,26,29,40,26,10,3,6
@@ -267,7 +267,7 @@ MTAS,mtas.codec.util.collector,MtasDataLongAdvanced,227,319,34,38,37,51,32,21,7,
 MTAS,mtas.codec.util.collector,MtasDataItemDoubleBasic,178,0,32,0,29,0,23,0,7,0
 MTAS,mtas.codec.util.collector,MtasDataItemAdvanced,443,172,80,22,73,33,56,12,2,4
 MTAS,mtas.codec.util.collector,MtasDataLongFull,445,76,69,3,79,8,50,3,14,3
-MTAS,mtas.codec.util.collector,MtasDataCollectorResult,120,287,16,40,11,67,17,20,1,8
+MTAS,mtas.codec.util.collector,MtasDataCollectorResult,133,287,18,42,13,68,19,20,1,8
 MTAS,mtas.codec.util.collector,MtasDataBasic,277,538,35,27,46,103,24,23,4,12
 MTAS,mtas.codec.util.collector,MtasDataItemNumberComparator,239,88,42,8,36,17,28,7,4,6
 MTAS,mtas.codec.util.collector,MtasDataLongOperations,69,85,22,12,21,18,23,11,6,11
@@ -277,7 +277,7 @@ MTAS,mtas.codec.util.collector,MtasDataDoubleFull,527,0,72,0,89,0,53,0,17,0
 MTAS,mtas.codec.util.collector,MtasDataLongBasic,274,306,39,37,48,51,34,21,7,10
 MTAS,mtas.codec.util.collector,MtasDataItem,19,67,3,3,7,26,5,6,2,5
 MTAS,mtas.codec.util.collector,MtasDataDoubleBasic,572,0,72,0,99,0,53,0,17,0
-MTAS,mtas.codec.util.collector,MtasDataCollector,910,1782,101,191,128,388,84,95,4,29
+MTAS,mtas.codec.util.collector,MtasDataCollector,876,1782,101,191,126,388,84,95,4,29
 MTAS,mtas.codec.util.collector,MtasDataItemDoubleFull,996,0,164,0,133,0,104,0,10,0
 MTAS,mtas.analysis,MtasTokenizer,359,343,18,18,64,69,22,11,9,6
 MTAS,mtas.solr.search,MtasSolrCollectionCache,568,604,76,50,86,128,60,21,3,15
@@ -287,4 +287,4 @@ MTAS,mtas.solr.search,MtasCQLQParser,174,133,27,13,32,33,19,3,0,2
 MTAS,mtas.solr.search,MtasJoinQParser,45,138,8,14,7,30,8,5,0,2
 MTAS,mtas.solr.search,MtasSolrCQLQParserPlugin,0,12,0,0,0,3,0,3,0,3
 MTAS,mtas.solr.handler,MtasRequestHandler,451,9,60,0,89,3,33,3,3,3
-MTAS,mtas.solr.handler.component,MtasSolrSearchComponent,398,1282,70,202,70,261,59,90,1,12
+MTAS,mtas.solr.handler.component,MtasSolrSearchComponent,340,1340,62,210,61,270,54,95,1,12

@@ -317,7 +317,7 @@ public class CodecCollector {
 <span class="fc" id="L317">      facetData = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L318">      facetDataType = new HashMap&lt;&gt;();</span>
       // spans
-<span class="pc bpc" id="L320" title="1 of 2 branches missed.">      if (!fieldInfo.statsSpanList.isEmpty()) {</span>
+<span class="fc bfc" id="L320" title="All 2 branches covered.">      if (!fieldInfo.statsSpanList.isEmpty()) {</span>
 <span class="fc bfc" id="L321" title="All 2 branches covered.">        for (ComponentSpan cs : fieldInfo.statsSpanList) {</span>
 <span class="fc bfc" id="L322" title="All 2 branches covered.">          needPositions = (!needPositions) ? cs.parser.needPositions()</span>
               : needPositions;
@@ -497,17 +497,17 @@ public class CodecCollector {
 
 <span class="fc bfc" id="L498" title="All 2 branches covered.">      for (MtasSpanQuery sq : fieldInfo.spanQueryList) {</span>
         // what to collect
-<span class="pc bpc" id="L500" title="1 of 2 branches missed.">        if (spansNumberData.containsKey(sq)) {</span>
+<span class="fc bfc" id="L500" title="All 2 branches covered.">        if (spansNumberData.containsKey(sq)) {</span>
 <span class="fc" id="L501">          numberData = spansNumberData.get(sq);</span>
         } else {
-<span class="nc" id="L503">          numberData = null;</span>
+<span class="fc" id="L503">          numberData = null;</span>
         }
 <span class="fc bfc" id="L505" title="All 2 branches covered.">        if (spansMatchData.containsKey(sq)) {</span>
 <span class="fc" id="L506">          matchData = spansMatchData.get(sq);</span>
         } else {
 <span class="fc" id="L508">          matchData = null;</span>
         }
-<span class="pc bpc" id="L510" title="3 of 4 branches missed.">        if ((numberData != null) || (matchData != null)) {</span>
+<span class="pc bpc" id="L510" title="1 of 4 branches missed.">        if ((numberData != null) || (matchData != null)) {</span>
 <span class="fc" id="L511">          Spans spans = spansQueryWeight.get(sq).getSpans(lrc,</span>
               SpanWeight.Postings.POSITIONS);
 <span class="fc bfc" id="L513" title="All 2 branches covered.">          if (spans != null) {</span>
@@ -547,7 +547,7 @@ public class CodecCollector {
 <span class="fc" id="L547">                      matchDataList.add(m);</span>
 <span class="fc" id="L548">                    }</span>
                   }
-<span class="pc bpc" id="L550" title="1 of 2 branches missed.">                  if ((numberData != null)) {</span>
+<span class="fc bfc" id="L550" title="All 2 branches covered.">                  if ((numberData != null)) {</span>
 <span class="fc" id="L551">                    numberData.put(spansDocId, number);</span>
                   }
 <span class="fc bfc" id="L553" title="All 2 branches covered.">                  if ((matchData != null)) {</span>
@@ -637,7 +637,7 @@ public class CodecCollector {
           searcher, t, lrc);
     }
 <span class="fc bfc" id="L639" title="All 2 branches covered.">    if (!fieldInfo.spanQueryList.isEmpty()) {</span>
-<span class="pc bpc" id="L640" title="1 of 2 branches missed.">      if (!fieldInfo.statsSpanList.isEmpty()) {</span>
+<span class="fc bfc" id="L640" title="All 2 branches covered.">      if (!fieldInfo.statsSpanList.isEmpty()) {</span>
         // create stats
 <span class="fc" id="L642">        createStats(fieldInfo.statsSpanList, positionsData, spansNumberData,</span>
 <span class="fc" id="L643">            docSet.toArray(new Integer[docSet.size()]));</span>
@@ -1112,7 +1112,7 @@ public class CodecCollector {
             span.queries, docSet);
 <span class="pc bpc" id="L1113" title="1 of 2 branches missed.">        if (span.dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
           // try to call functionParser as little as possible
-<span class="pc bpc" id="L1115" title="2 of 8 branches missed.">          if (span.statsType.equals(CodecUtil.STATS_BASIC)</span>
+<span class="pc bpc" id="L1115" title="1 of 8 branches missed.">          if (span.statsType.equals(CodecUtil.STATS_BASIC)</span>
               &amp;&amp; (span.minimumLong == null) &amp;&amp; (span.maximumLong == null)
               &amp;&amp; (span.functions == null
 <span class="pc bpc" id="L1118" title="2 of 4 branches missed.">                  || (span.functionBasic() &amp;&amp; span.functionSumRule()</span>
@@ -1567,13 +1567,13 @@ public class CodecCollector {
 <span class="fc" id="L1567">                    occurencesInCurrentDocument.add(hit);</span>
                   } else {
 <span class="fc" id="L1569">                    occurencesSum.put(hitKey, occurencesSum.get(hitKey) + 1);</span>
-<span class="pc bpc" id="L1570" title="1 of 2 branches missed.">                    if (!occurencesInCurrentDocument.contains(hitKey)) {</span>
-<span class="nc bnc" id="L1571" title="All 2 branches missed.">                      if (occurencesN.containsKey(hitKey)) {</span>
-<span class="nc" id="L1572">                        occurencesN.put(hitKey, occurencesN.get(hitKey) + 1);</span>
+<span class="fc bfc" id="L1570" title="All 2 branches covered.">                    if (!occurencesInCurrentDocument.contains(hitKey)) {</span>
+<span class="pc bpc" id="L1571" title="1 of 2 branches missed.">                      if (occurencesN.containsKey(hitKey)) {</span>
+<span class="fc" id="L1572">                        occurencesN.put(hitKey, occurencesN.get(hitKey) + 1);</span>
                       } else {
 <span class="nc" id="L1574">                        occurencesN.put(hitKey, 1);</span>
                       }
-<span class="nc" id="L1576">                      occurencesInCurrentDocument.add(hitKey);</span>
+<span class="fc" id="L1576">                      occurencesInCurrentDocument.add(hitKey);</span>
                     }
                   }
 <span class="fc" id="L1579">                }</span>
@@ -1582,8 +1582,8 @@ public class CodecCollector {
 <span class="fc" id="L1582">                    int tmpNumber = occurencesN.get(groupHit);</span>
 <span class="fc" id="L1583">                    maximumNumberOfDocuments = Math</span>
 <span class="fc" id="L1584">                        .max(maximumNumberOfDocuments, tmpNumber);</span>
-<span class="pc bpc" id="L1585" title="1 of 2 branches missed.">                    if (tmpNumber &gt; boundaryMinimumNumberOfDocuments) {</span>
-<span class="nc" id="L1586">                      administrationOccurrences.add(groupHit);</span>
+<span class="fc bfc" id="L1585" title="All 2 branches covered.">                    if (tmpNumber &gt; boundaryMinimumNumberOfDocuments) {</span>
+<span class="fc" id="L1586">                      administrationOccurrences.add(groupHit);</span>
                     }
 <span class="fc" id="L1588">                  }</span>
                   // collect spans

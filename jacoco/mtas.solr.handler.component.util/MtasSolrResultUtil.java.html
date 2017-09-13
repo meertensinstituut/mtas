@@ -190,11 +190,11 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L190">      Entry&lt;String, Object&gt; entry = it.next();</span>
 <span class="fc" id="L191">      NamedList&lt;Object&gt; item = (NamedList&lt;Object&gt;) entry.getValue();</span>
 <span class="fc" id="L192">      key = entry.getKey();</span>
-<span class="pc bpc" id="L193" title="1 of 2 branches missed.">      if (key.startsWith(GroupHit.KEY_START)) {</span>
-<span class="nc" id="L194">        StringBuilder newKey = new StringBuilder(&quot;&quot;);</span>
-<span class="nc" id="L195">        item.add(&quot;group&quot;, GroupHit.keyToObject(key, newKey));</span>
-<span class="nc" id="L196">        item.add(&quot;key&quot;, newKey.toString().trim());</span>
-<span class="nc" id="L197">      } else {</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">      if (key.startsWith(GroupHit.KEY_START)) {</span>
+<span class="fc" id="L194">        StringBuilder newKey = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L195">        item.add(&quot;group&quot;, GroupHit.keyToObject(key, newKey));</span>
+<span class="fc" id="L196">        item.add(&quot;key&quot;, newKey.toString().trim());</span>
+<span class="fc" id="L197">      } else {</span>
 <span class="fc" id="L198">        item.add(&quot;key&quot;, key);</span>
       }
 <span class="fc" id="L200">      al.add(item);</span>
