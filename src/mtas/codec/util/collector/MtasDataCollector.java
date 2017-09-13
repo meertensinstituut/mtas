@@ -1335,10 +1335,8 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
         + " " + hasSub + " ===\n");
     text.append("\tclosed: " + closed + "\n");
     text.append("\tkeylist: " + Arrays.asList(keyList) + "\n");
-    text.append("\tkeylist: " + Arrays.asList(keyList).contains("1") + "\n");
     text.append("\tsegmentKeys: "
         + (segmentKeys != null ? segmentKeys.contains("1") : "null") + "\n");
-    text.append("\tnewKeys: " + Arrays.asList(newKeyList).contains("1") + "\n");
     return text.toString().trim();
   }
 

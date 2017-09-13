@@ -229,10 +229,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
-    // System.out
-    // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
-    // + rb.stage + " " + rb.req.getParamString());
+    //System.out
+    //.println(System.nanoTime() + " - " + Thread.currentThread().getId()
+    //+ " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
+    //+ rb.stage + " " + rb.req.getParamString());
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
       mtasSolrResultMerge = new MtasSolrResultMerge();
       ComponentFields mtasFields = new ComponentFields();

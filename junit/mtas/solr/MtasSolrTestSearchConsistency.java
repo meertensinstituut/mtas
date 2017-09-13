@@ -805,6 +805,111 @@ public class MtasSolrTestSearchConsistency {
     assertTrue("posted set and imported set give different results : "+n1+" and "+n2, n1==n2);
   }
   
+  @org.junit.Test
+  public void mtasRequestHandlerGroup1() throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    int maxNumber = 1000;
+    String cql = "[pos=\"LID\"]";
+    String prefix = "t_lc";
+    //get group
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.group", "true");
+    params.set("mtas.group.0.key", "groupKey");
+    params.set("mtas.group.0.number", maxNumber);
+    params.set("mtas.group.0.field", MtasSolrBase.FIELD_MTAS);
+    params.set("mtas.group.0.query.type", "cql");
+    params.set("mtas.group.0.query.value", cql);
+    params.set("mtas.group.0.grouping.hit.inside.prefixes", prefix);
+    SolrRequest<?> requestGroup = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> responseGroup = null;
+    try {
+      responseGroup = server.request(requestGroup, "collection1");                               
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    }    
+    //get stats
+    params.clear();
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.stats", "true");
+    params.set("mtas.stats.spans", "true");
+    params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
+    params.set("mtas.stats.spans.0.key", "statsKey");
+    params.set("mtas.stats.spans.0.minimum", 1);
+    params.set("mtas.stats.spans.0.query.0.type", "cql");
+    params.set("mtas.stats.spans.0.query.0.value", cql);
+    params.set("mtas.stats.spans.0.type", "n,sum");
+    params.set("rows", "0");
+    SolrRequest<?> requestStats = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> responseStats = null;
+    try {
+      responseStats = server.request(requestStats, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    } 
+    //get group list
+    List<NamedList<Object>> groupList = MtasSolrBase.getFromMtasGroup(responseGroup, "groupKey");
+    long groupSum = 0;
+    long statsSum = MtasSolrBase.getFromMtasStats(responseStats, "spans", "statsKey", "sum").longValue();
+    for(NamedList<Object> groupListItem : groupList) {
+      if(groupListItem.get("sum") instanceof Number) {
+        groupSum+= (Long) groupListItem.get("sum");
+      } else {
+        throw new IOException("no sum for item in grouping " + groupListItem);
+      }
+      Object subListRaw = groupListItem.get("group");
+      if(subListRaw!=null && subListRaw instanceof Map) {
+        Object subSubListRaw = ((Map<String, Object>)subListRaw).get("hit");    
+        if(subSubListRaw!=null && subSubListRaw instanceof Map) {
+          Object subSubSubListRaw = ((Map<String, Object>)subSubListRaw).get(0);    
+          if(subSubSubListRaw!=null && subSubSubListRaw instanceof List) {
+            Object subSubSubSubListRaw = ((List<Object>)subSubSubListRaw).get(0);
+            if(subSubSubSubListRaw!=null && subSubSubSubListRaw instanceof Map) {
+              String subKey = (String) ((Map<String, Object>)subSubSubSubListRaw).get("value");    
+              String subcql = "["+prefix+"=\""+subKey+"\"] within "+cql;
+              //get stats
+              params.clear();
+              params.set("q", "*:*");
+              params.set("rows", 0);
+              params.set("mtas", "true");
+              params.set("mtas.stats", "true");
+              params.set("mtas.stats.spans", "true");
+              params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
+              params.set("mtas.stats.spans.0.key", "statsKey");
+              params.set("mtas.stats.spans.0.minimum", 1);
+              params.set("mtas.stats.spans.0.query.0.type", "cql");
+              params.set("mtas.stats.spans.0.query.0.value", subcql);
+              params.set("mtas.stats.spans.0.type", "n,sum");
+              params.set("rows", "0");
+              SolrRequest<?> requestSubStats = new QueryRequest(params, METHOD.POST);
+              NamedList<Object> responseSubStats = null;
+              try {
+                responseSubStats = server.request(requestSubStats, "collection1");
+              } catch (SolrServerException e) {
+                throw new IOException(e);
+              } 
+              long subStatsSum = MtasSolrBase.getFromMtasStats(responseSubStats, "spans", "statsKey", "sum").longValue();
+              long subGroupSum = (Long) groupListItem.get("sum");
+              assertEquals("Sum of hit "+subKey+" not equal to sum for cql expression "+subcql, subGroupSum, subStatsSum);              
+            } else {
+              throw new IOException("problem parsing response (4)");
+            }
+          } else {
+            throw new IOException("problem parsing response (3)");         
+          }
+        } else {
+          throw new IOException("problem parsing response (2)");
+        }
+      } else {
+        throw new IOException("problem parsing response (1)");
+      }
+    }
+    assertEquals("Sum of hits grouping not equal to sum for cql expression", groupSum, statsSum);        
+  }
+  
   /**
    * Mtas solr schema pre analyzed parser and field.
    *

@@ -741,7 +741,7 @@ public class CodecComponent {
      * @param groupingRightPrefixes the grouping right prefixes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public ComponentGroup(MtasSpanQuery spanQuery, String key, int number,
+    public ComponentGroup(MtasSpanQuery spanQuery, String key, int number, int start,
         String groupingHitInsidePrefixes,
         String[] groupingHitInsideLeftPosition,
         String[] groupingHitInsideLeftPrefixes,
@@ -760,7 +760,7 @@ public class CodecComponent {
       this.statsItems = CodecUtil.createStatsItems("n,sum,mean");
       this.statsType = CodecUtil.createStatsType(this.statsItems, this.sortType,
           null);
-      this.start = 0;
+      this.start = start;
       this.number = number;
       HashSet<String> tmpPrefixes = new HashSet<>();
       // analyze grouping condition

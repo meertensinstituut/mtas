@@ -72,6 +72,9 @@ public class MtasSolrComponentGroup
   /** The Constant NAME_MTAS_GROUP_NUMBER. */
   public static final String NAME_MTAS_GROUP_NUMBER = "number";
 
+  /** The Constant NAME_MTAS_GROUP_START. */
+  public static final String NAME_MTAS_GROUP_START = "start";
+
   /** The Constant NAME_MTAS_GROUP_GROUPING_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_LEFT = "grouping.left";
 
@@ -105,7 +108,8 @@ public class MtasSolrComponentGroup
   /**
    * Instantiates a new mtas solr component group.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentGroup(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -134,6 +138,7 @@ public class MtasSolrComponentGroup
       HashMap<String, String[]>[] queryVariables = new HashMap[ids.size()];
       String[] keys = new String[ids.size()];
       String[] numbers = new String[ids.size()];
+      String[] starts = new String[ids.size()];
       String[][] groupingLeftPosition = new String[ids.size()][];
       String[][] groupingLeftPrefixes = new String[ids.size()][];
       String[][] groupingRightPosition = new String[ids.size()][];
@@ -156,6 +161,8 @@ public class MtasSolrComponentGroup
             .trim();
         numbers[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_NUMBER, null);
+        starts[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_START, null);
         queryTypes[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_GROUP + "." + id + "." + NAME_MTAS_GROUP_QUERY_TYPE,
             null);
@@ -312,8 +319,10 @@ public class MtasSolrComponentGroup
             : keys[i].trim();
         int number = (numbers[i] == null) || (numbers[i].isEmpty())
             ? DEFAULT_NUMBER : Integer.parseInt(numbers[i]);
+        int start = (starts[i] == null) || (starts[i].isEmpty()) ? 0
+            : Integer.parseInt(starts[i]);
         mtasFields.list.get(fields[i]).groupList.add(new ComponentGroup(q, key,
-            number, groupingHitInsidePrefixes[i],
+            number, start, groupingHitInsidePrefixes[i],
             groupingHitInsideLeftPosition[i], groupingHitInsideLeftPrefixes[i],
             groupingHitInsideRightPosition[i],
             groupingHitInsideRightPrefixes[i], groupingHitLeftPosition[i],
@@ -328,12 +337,18 @@ public class MtasSolrComponentGroup
   /**
    * Prepare.
    *
-   * @param solrParams the solr params
-   * @param gids the gids
-   * @param name the name
-   * @param positions the positions
-   * @param prefixes the prefixes
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param solrParams
+   *          the solr params
+   * @param gids
+   *          the gids
+   * @param name
+   *          the name
+   * @param positions
+   *          the positions
+   * @param prefixes
+   *          the prefixes
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) throws IOException {
@@ -368,7 +383,15 @@ public class MtasSolrComponentGroup
     if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
         && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
       if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-        // do nothing
+        //do nothing
+//        Set<String> keys = MtasSolrResultUtil
+//            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);
+//        for (String key : keys) {
+//          sreq.params.remove(
+//              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_NUMBER);
+//          sreq.params.remove(
+//              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_START);
+//        }
       } else {
         // remove prefix for other requests
         Set<String> keys = MtasSolrResultUtil
@@ -380,6 +403,10 @@ public class MtasSolrComponentGroup
               PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_FIELD);
           sreq.params
               .remove(PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_KEY);
+          sreq.params.remove(
+              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_NUMBER);
+          sreq.params.remove(
+              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_START);
           sreq.params.remove(
               PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_QUERY_TYPE);
           sreq.params.remove(
@@ -484,10 +511,11 @@ public class MtasSolrComponentGroup
    * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
-  public void finishStage(ResponseBuilder rb) {
+  public void finishStage(ResponseBuilder rb) {   
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
         && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
         && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+      //decode finished results
       for (ShardRequest sreq : rb.finished) {
         if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
             && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {

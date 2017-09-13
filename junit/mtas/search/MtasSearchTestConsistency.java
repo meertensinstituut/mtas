@@ -1051,7 +1051,7 @@ public class MtasSearchTestConsistency {
       fieldStats.statsSpanList.add(new ComponentSpan(new MtasSpanQuery[] { q },
           "total", null, null, "sum", null, null, null));
       fieldStats.groupList.add(new ComponentGroup(q, "articles",
-          Integer.MAX_VALUE, "t_lc", null, null, null, null, null, null, null,
+          Integer.MAX_VALUE, 0, "t_lc", null, null, null, null, null, null, null,
           null, null, null, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
           fullDocSet, fieldStats);

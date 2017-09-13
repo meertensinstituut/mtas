@@ -91,7 +91,7 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     }
     int listStart = start == null ? 0 : start;
     if (number == null || (start == 0 && number >= list.size())) {
-      // do nothing, full list is ok
+      // do nothing, full list is ok      
     } else if (listStart < list.size() && number > 0) {
       // subset
       String boundaryEndKey = null;
@@ -107,21 +107,30 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
             break;
           } else if (previous != null) {
             if (previous.compareTo(entry.getValue()) != 0) {
+              //ready, previous not equal to this item
               break;
             } else {
+              //register this as possible boundaryEndKey, but continue
               boundaryEndKey = entry.getKey();
             }
           } else {
+            //possibly ready, but check next
             endKey = entry.getKey();
             boundaryEndKey = entry.getKey();
             previous = entry.getValue();
           }
-        } else {
-          endKey = entry.getKey();
-        }
+        } 
         counter++;
+      }            
+      if(startKey!=null) {
+        if(boundaryEndKey!=null) {
+          list = list.subMap(startKey, boundaryEndKey);
+        } else {
+          list = list.tailMap(startKey);
+        }
+      } else {
+        list = new TreeMap<>();
       }
-      list = list.subMap(startKey, boundaryEndKey);
     } else {
       list = new TreeMap<>();
     }

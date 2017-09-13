@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
@@ -82,11 +83,11 @@ public class MtasSolrComponentCollection
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-    // System.out.println(
-    // "collection: " + System.nanoTime() + " - " +
-    // Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
-    // + rb.stage + " " + rb.req.getParamString());
+    //System.out.println(
+    //"collection: " + System.nanoTime() + " - " +
+    //Thread.currentThread().getId()
+    //+ " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
+    //+ rb.stage + " " + rb.req.getParamString());
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_COLLECTION);
     if (!ids.isEmpty()) {
@@ -118,6 +119,16 @@ public class MtasSolrComponentCollection
             null);
         collections[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_COLLECTION
             + "." + id + "." + NAME_MTAS_COLLECTION_COLLECTION, null);
+        //always id for post
+        if(actions[tmpCounter]!=null && (actions[tmpCounter].equals(ComponentCollection.ACTION_POST) || actions[tmpCounter].equals(ComponentCollection.ACTION_IMPORT) || actions[tmpCounter].equals(ComponentCollection.ACTION_CREATE))) {
+          if(collectionIds[tmpCounter]==null || collectionIds[tmpCounter].isEmpty()) {
+            collectionIds[tmpCounter] = UUID.randomUUID().toString();
+            ModifiableSolrParams changedParams = new ModifiableSolrParams(rb.req.getParams());
+            changedParams.remove(PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_ID);
+            changedParams.set(PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_ID, collectionIds[tmpCounter]);            
+            rb.req.setParams(changedParams);
+          }          
+        }
         tmpCounter++;
       }
       mtasFields.doCollection = true;
@@ -166,6 +177,9 @@ public class MtasSolrComponentCollection
             }
             break;
           case ComponentCollection.ACTION_CREATE:
+            if(collectionIds[i]==null) {
+              collectionIds[i] = UUID.randomUUID().toString();
+            }
             if (fields[i] != null) {
               Set<String> fieldList = new HashSet<>(
                   Arrays.asList(fields[i].split(",")));
@@ -251,7 +265,7 @@ public class MtasSolrComponentCollection
     if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
         && sreq.params.getBool(PARAM_MTAS_COLLECTION, false)) {
       if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-        // do nothing
+        //do nothing
       } else {
         // remove for other requests
         Set<String> keys = MtasSolrResultUtil
@@ -501,7 +515,6 @@ public class MtasSolrComponentCollection
                   // shouldn't happen
                 }
               }
-
             }
           }
         }
@@ -669,7 +682,7 @@ public class MtasSolrComponentCollection
                       + NAME_MTAS_COLLECTION_POST,
                   stringValuesToString(componentCollection.values()));
             }
-          }
+          } 
           id++;
         }
         // add new requests

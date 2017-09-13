@@ -229,6 +229,47 @@ public class MtasSolrBase {
     }
     return null;
   }
+  
+  public static List<NamedList<Object>> getFromMtasGroup(
+      NamedList<Object> response, String key) {
+    if (response == null) {
+      log.error("no (valid); response");
+    } else {
+      Object mtasResponseRaw = response.get("mtas");
+      if (mtasResponseRaw != null && mtasResponseRaw instanceof NamedList) {
+        NamedList<Object> mtasResponse = (NamedList<Object>) response
+            .get("mtas");
+        Object mtasGroupResponseRaw = mtasResponse.get("group");
+        if (mtasGroupResponseRaw != null
+            && mtasGroupResponseRaw instanceof List) {
+          List<NamedList<Object>> mtasGroupResponse = (List) mtasGroupResponseRaw;
+          if (mtasGroupResponse.isEmpty()) {
+            log.error("no (valid) mtas group response");
+          } else {
+            NamedList<Object> item = null;
+            for (NamedList<Object> mtasGroupResponseItem : mtasGroupResponse) {
+              if (mtasGroupResponseItem.get("key") != null
+                  && (mtasGroupResponseItem.get("key") instanceof String)
+                  && mtasGroupResponseItem.get("key").equals(key)) {
+                item = mtasGroupResponseItem;
+                break;
+              }
+            }
+            assertFalse("no item with key " + key, item == null);
+            if (item != null && item.get("list") != null
+                && (item.get("list") instanceof List)) {
+              return (List<NamedList<Object>>) item.get("list");
+            }
+          }
+        } else {
+          log.error("unexpected " + mtasGroupResponseRaw);
+        }
+      } else {
+        log.error("unexpected " + mtasResponseRaw);
+      }
+    }
+    return null;
+  }
 
   /**
    * Gets the from mtas prefix.
@@ -425,6 +466,6 @@ public class MtasSolrBase {
     }
     solrDocuments.put(3, newDoc3);
     return solrDocuments;
-  }
+  }  
 
 }

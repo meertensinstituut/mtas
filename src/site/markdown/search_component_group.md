@@ -13,6 +13,7 @@ Multiple group results can be produced within the same request. To distinguish t
 | mtas.group.\<identifier\>.key         | \<string\>   | key used in response           | no          |
 | mtas.group.\<identifier\>.field       | \<string\>   | Mtas field                      | yes         |
 | mtas.group.\<identifier\>.number      | \<integer\>   | number of results                      | no         |
+| mtas.group.\<identifier\>.start      | \<integer\>   | offset list of results                      | no         |
 
 ## Query
 
