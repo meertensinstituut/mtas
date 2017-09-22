@@ -15,9 +15,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -808,7 +810,7 @@ public class MtasSolrTestSearchConsistency {
   @org.junit.Test
   public void mtasRequestHandlerGroup1() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
-    int maxNumber = 1000;
+    final int maxNumber = 1000;
     String cql = "[pos=\"LID\"]";
     String prefix = "t_lc";
     //get group
@@ -908,6 +910,94 @@ public class MtasSolrTestSearchConsistency {
       }
     }
     assertEquals("Sum of hits grouping not equal to sum for cql expression", groupSum, statsSum);        
+  }
+  
+  @org.junit.Test
+  public void mtasRequestHandlerGroup2() throws IOException {
+    Map<String,String> params = new HashMap<>();
+    String cql;
+    //test hit inside
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("hit.inside.prefixes", "t,lemma");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test hit left
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("hit.left.0.prefixes", "t");
+    params.put("hit.left.0.position", "0-3");
+    params.put("hit.left.1.prefixes", "lemma");
+    params.put("hit.left.1.position", "2");
+    params.put("hit.left.2.prefixes", "pos");
+    params.put("hit.left.2.position", "3");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test hit insideLeft
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("hit.insideLeft.0.prefixes", "t");
+    params.put("hit.insideLeft.0.position", "0-3");
+    params.put("hit.insideLeft.1.prefixes", "lemma");
+    params.put("hit.insideLeft.1.position", "2");
+    params.put("hit.insideLeft.2.prefixes", "pos");
+    params.put("hit.insideLeft.2.position", "4-5");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test hit right
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("hit.right.0.prefixes", "t");
+    params.put("hit.right.0.position", "0-3");
+    params.put("hit.right.1.prefixes", "lemma");
+    params.put("hit.right.1.position", "2");
+    params.put("hit.right.2.prefixes", "pos");
+    params.put("hit.right.2.position", "3");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test hit insideRight
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("hit.insideRight.0.prefixes", "t");
+    params.put("hit.insideRight.0.position", "0-3");
+    params.put("hit.insideRight.1.prefixes", "lemma");
+    params.put("hit.insideRight.1.position", "2");
+    params.put("hit.insideRight.2.prefixes", "pos");
+    params.put("hit.insideRight.2.position", "4-5");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test left
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("left.0.prefixes", "t");
+    params.put("left.0.position", "0-3");
+    params.put("left.1.prefixes", "lemma");
+    params.put("left.1.position", "2");
+    params.put("left.2.prefixes", "pos");
+    params.put("left.2.position", "3");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test right
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("right.0.prefixes", "t");
+    params.put("right.0.position", "0-3");
+    params.put("right.1.prefixes", "lemma");
+    params.put("right.1.position", "2");
+    params.put("right.2.prefixes", "pos");
+    params.put("right.2.position", "3");
+    createGroupTest(cql,params); 
+    params.clear();
+    //test combi
+    cql = "[pos=\"LID\"][pos=\"ADJ\"]";
+    params.put("hit.inside.prefixes", "t");
+    params.put("hit.insideLeft.0.prefixes", "t_lc");
+    params.put("hit.insideLeft.0.position", "0-3");
+    params.put("hit.insideRight.0.prefixes", "t_lc");
+    params.put("hit.insideRight.0.position", "1");
+    params.put("hit.left.0.prefixes", "pos");
+    params.put("hit.left.0.position", "0-3");
+    params.put("hit.right.0.prefixes", "lemma");
+    params.put("hit.right.0.position", "1");
+    params.put("left.0.prefixes", "s");
+    params.put("left.0.position", "2");
+    params.put("right.2.prefixes", "p");
+    params.put("right.2.position", "3");
+    createGroupTest(cql,params); 
+    params.clear();
   }
   
   /**
@@ -1010,4 +1100,65 @@ public class MtasSolrTestSearchConsistency {
       }
     }
   }
+  
+  private static void createGroupTest(String cql, Map<String,String> grouping) throws IOException {
+    ModifiableSolrParams params = new ModifiableSolrParams();
+    final int maxNumber = Integer.MAX_VALUE;
+    String prefix = "t_lc";
+    //get group
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.group", "true");
+    params.set("mtas.group.0.key", "groupKey");
+    params.set("mtas.group.0.number", maxNumber);
+    params.set("mtas.group.0.field", MtasSolrBase.FIELD_MTAS);
+    params.set("mtas.group.0.query.type", "cql");
+    params.set("mtas.group.0.query.value", cql);
+    for(Entry<String,String> entry : grouping.entrySet()) {
+      params.set("mtas.group.0.grouping."+entry.getKey() , entry.getValue());
+    }
+    SolrRequest<?> requestGroup = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> responseGroup = null;
+    try {
+      responseGroup = server.request(requestGroup, "collection1");                               
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    } 
+    //System.out.println(responseGroup);
+    //get stats
+    params.clear();
+    params.set("q", "*:*");
+    params.set("rows", 0);
+    params.set("mtas", "true");
+    params.set("mtas.stats", "true");
+    params.set("mtas.stats.spans", "true");
+    params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
+    params.set("mtas.stats.spans.0.key", "statsKey");
+    params.set("mtas.stats.spans.0.minimum", 1);
+    params.set("mtas.stats.spans.0.query.0.type", "cql");
+    params.set("mtas.stats.spans.0.query.0.value", cql);
+    params.set("mtas.stats.spans.0.type", "n,sum");
+    params.set("rows", "0");
+    SolrRequest<?> requestStats = new QueryRequest(params, METHOD.POST);
+    NamedList<Object> responseStats = null;
+    try {
+      responseStats = server.request(requestStats, "collection1");
+    } catch (SolrServerException e) {
+      throw new IOException(e);
+    } 
+    //get group list
+    List<NamedList<Object>> groupList = MtasSolrBase.getFromMtasGroup(responseGroup, "groupKey");
+    long groupSum = 0;
+    long statsSum = MtasSolrBase.getFromMtasStats(responseStats, "spans", "statsKey", "sum").longValue();
+    for(NamedList<Object> groupListItem : groupList) {
+      if(groupListItem.get("sum") instanceof Number) {
+        groupSum+= (Long) groupListItem.get("sum");
+      } else {
+        throw new IOException("no sum for item in grouping " + groupListItem);
+      }
+    }  
+    assertEquals("Sum of hits grouping not equal to sum for cql expression "+cql+" and grouping "+grouping, groupSum, statsSum); 
+  }
+  
 }
