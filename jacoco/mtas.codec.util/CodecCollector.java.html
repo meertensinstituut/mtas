@@ -1668,34 +1668,34 @@ public class CodecCollector {
       ComponentGroup group) {
 <span class="fc" id="L1669">    Integer start = null;</span>
 <span class="fc" id="L1670">    Integer end = null;</span>
-<span class="pc bpc" id="L1671" title="5 of 6 branches missed.">    if (group.hitInside != null || group.hitInsideLeft != null</span>
+<span class="fc bfc" id="L1671" title="All 6 branches covered.">    if (group.hitInside != null || group.hitInsideLeft != null</span>
         || group.hitInsideRight != null) {
 <span class="fc" id="L1673">      start = m.startPosition;</span>
 <span class="fc" id="L1674">      end = m.endPosition - 1;</span>
     } else {
-<span class="nc" id="L1676">      start = null;</span>
-<span class="nc" id="L1677">      end = null;</span>
+<span class="fc" id="L1676">      start = null;</span>
+<span class="fc" id="L1677">      end = null;</span>
     }
-<span class="pc bpc" id="L1679" title="1 of 2 branches missed.">    if (group.hitLeft != null) {</span>
-<span class="nc" id="L1680">      start = m.startPosition;</span>
-<span class="nc" id="L1681">      end = Math.max(m.startPosition + group.hitLeft.length - 1,</span>
+<span class="fc bfc" id="L1679" title="All 2 branches covered.">    if (group.hitLeft != null) {</span>
+<span class="fc" id="L1680">      start = m.startPosition;</span>
+<span class="fc" id="L1681">      end = Math.max(m.startPosition + group.hitLeft.length - 1,</span>
           m.endPosition - 1);
     }
-<span class="pc bpc" id="L1684" title="1 of 2 branches missed.">    if (group.hitRight != null) {</span>
-<span class="nc" id="L1685">      start = Math.min(m.endPosition - group.hitRight.length, m.startPosition);</span>
-<span class="nc bnc" id="L1686" title="All 2 branches missed.">      end = end == null ? (m.endPosition - 1)</span>
-<span class="nc" id="L1687">          : Math.max(end, (m.endPosition - 1));</span>
+<span class="fc bfc" id="L1684" title="All 2 branches covered.">    if (group.hitRight != null) {</span>
+<span class="fc" id="L1685">      start = Math.min(m.endPosition - group.hitRight.length, m.startPosition);</span>
+<span class="fc bfc" id="L1686" title="All 2 branches covered.">      end = end == null ? (m.endPosition - 1)</span>
+<span class="fc" id="L1687">          : Math.max(end, (m.endPosition - 1));</span>
     }
-<span class="pc bpc" id="L1689" title="1 of 2 branches missed.">    if (group.left != null) {</span>
-<span class="nc bnc" id="L1690" title="All 2 branches missed.">      start = start == null ? m.startPosition - group.left.length</span>
-<span class="nc" id="L1691">          : Math.min(m.startPosition - group.left.length, start);</span>
-<span class="nc bnc" id="L1692" title="All 2 branches missed.">      end = end == null ? m.startPosition - 1</span>
-<span class="nc" id="L1693">          : Math.max(m.startPosition - 1, end);</span>
+<span class="fc bfc" id="L1689" title="All 2 branches covered.">    if (group.left != null) {</span>
+<span class="fc bfc" id="L1690" title="All 2 branches covered.">      start = start == null ? m.startPosition - group.left.length</span>
+<span class="fc" id="L1691">          : Math.min(m.startPosition - group.left.length, start);</span>
+<span class="fc bfc" id="L1692" title="All 2 branches covered.">      end = end == null ? m.startPosition - 1</span>
+<span class="fc" id="L1693">          : Math.max(m.startPosition - 1, end);</span>
     }
-<span class="pc bpc" id="L1695" title="1 of 2 branches missed.">    if (group.right != null) {</span>
-<span class="nc bnc" id="L1696" title="All 2 branches missed.">      start = start == null ? m.endPosition : Math.min(m.endPosition, start);</span>
-<span class="nc bnc" id="L1697" title="All 2 branches missed.">      end = end == null ? m.endPosition + group.right.length - 1</span>
-<span class="nc" id="L1698">          : Math.max(m.endPosition + group.right.length - 1, end);</span>
+<span class="fc bfc" id="L1695" title="All 2 branches covered.">    if (group.right != null) {</span>
+<span class="fc bfc" id="L1696" title="All 2 branches covered.">      start = start == null ? m.endPosition : Math.min(m.endPosition, start);</span>
+<span class="fc bfc" id="L1697" title="All 2 branches covered.">      end = end == null ? m.endPosition + group.right.length - 1</span>
+<span class="fc" id="L1698">          : Math.max(m.endPosition + group.right.length - 1, end);</span>
     }
 <span class="fc" id="L1700">    return new IntervalTreeNodeData&lt;&gt;(start, end, m.startPosition,</span>
         m.endPosition - 1);

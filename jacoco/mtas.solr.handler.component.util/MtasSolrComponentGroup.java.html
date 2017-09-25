@@ -352,20 +352,20 @@ public class MtasSolrComponentGroup
    */
   private void prepare(SolrParams solrParams, SortedSet&lt;String&gt; gids,
       String name, String[] positions, String[] prefixes) throws IOException {
-<span class="pc bpc" id="L355" title="1 of 2 branches missed.">    if (!gids.isEmpty()) {</span>
-<span class="nc" id="L356">      int tmpSubCounter = 0;</span>
-<span class="nc bnc" id="L357" title="All 2 branches missed.">      for (String gid : gids) {</span>
-<span class="nc" id="L358">        positions[tmpSubCounter] = solrParams.get(</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">    if (!gids.isEmpty()) {</span>
+<span class="fc" id="L356">      int tmpSubCounter = 0;</span>
+<span class="fc bfc" id="L357" title="All 2 branches covered.">      for (String gid : gids) {</span>
+<span class="fc" id="L358">        positions[tmpSubCounter] = solrParams.get(</span>
             name + &quot;.&quot; + gid + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_POSITION, null);
-<span class="nc" id="L360">        prefixes[tmpSubCounter] = solrParams.get(</span>
+<span class="fc" id="L360">        prefixes[tmpSubCounter] = solrParams.get(</span>
             name + &quot;.&quot; + gid + &quot;.&quot; + NAME_MTAS_GROUP_GROUPING_PREFIXES, null);
-<span class="nc bnc" id="L362" title="All 2 branches missed.">        if (positions[tmpSubCounter] == null) {</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">        if (positions[tmpSubCounter] == null) {</span>
 <span class="nc" id="L363">          throw new IOException(&quot;no position for &quot; + gid);</span>
-<span class="nc bnc" id="L364" title="All 2 branches missed.">        } else if (prefixes[tmpSubCounter] == null) {</span>
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">        } else if (prefixes[tmpSubCounter] == null) {</span>
 <span class="nc" id="L365">          throw new IOException(&quot;no prefix for &quot; + gid);</span>
         }
-<span class="nc" id="L367">        tmpSubCounter++;</span>
-<span class="nc" id="L368">      }</span>
+<span class="fc" id="L367">        tmpSubCounter++;</span>
+<span class="fc" id="L368">      }</span>
     }
 <span class="fc" id="L370">  }</span>
 

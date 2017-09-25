@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
-import mtas.analysis.parser.MtasBasicParser;
+import mtas.analysis.parser.MtasParser;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
@@ -222,8 +222,8 @@ public final class MtasTokenizer extends Tokenizer {
 <span class="fc" id="L222">          .getDeclaredConstructor(MtasConfiguration.class);</span>
       // try {
 <span class="fc" id="L224">      Object p = c.newInstance(parserConfiguration);</span>
-<span class="pc bpc" id="L225" title="1 of 2 branches missed.">      if (p instanceof MtasBasicParser) {</span>
-<span class="fc" id="L226">        MtasBasicParser parser = (MtasBasicParser) p;</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">      if (p instanceof MtasParser) {</span>
+<span class="fc" id="L226">        MtasParser parser = (MtasParser) p;</span>
 <span class="fc" id="L227">        tokenCollection = parser.createTokenCollection(reader);</span>
 <span class="fc" id="L228">        return;</span>
       } else {

@@ -764,7 +764,7 @@ public class CodecComponent {
 <span class="fc" id="L764">      this.number = number;</span>
 <span class="fc" id="L765">      HashSet&lt;String&gt; tmpPrefixes = new HashSet&lt;&gt;();</span>
       // analyze grouping condition
-<span class="pc bpc" id="L767" title="1 of 2 branches missed.">      if (groupingHitInsidePrefixes != null) {</span>
+<span class="fc bfc" id="L767" title="All 2 branches covered.">      if (groupingHitInsidePrefixes != null) {</span>
 <span class="fc" id="L768">        hitInside = new HashSet&lt;&gt;();</span>
 <span class="fc" id="L769">        String[] tmpList = groupingHitInsidePrefixes.split(&quot;,&quot;);</span>
 <span class="fc bfc" id="L770" title="All 2 branches covered.">        for (String tmpItem : tmpList) {</span>
@@ -774,7 +774,7 @@ public class CodecComponent {
         }
 <span class="fc" id="L775">        tmpPrefixes.addAll(hitInside);</span>
 <span class="fc" id="L776">      } else {</span>
-<span class="nc" id="L777">        hitInside = null;</span>
+<span class="fc" id="L777">        hitInside = null;</span>
       }
 <span class="fc" id="L779">      hitInsideLeft = createPositionedPrefixes(tmpPrefixes,</span>
           groupingHitInsideLeftPosition, groupingHitInsideLeftPrefixes);
@@ -815,60 +815,60 @@ public class CodecComponent {
 <span class="pc bpc" id="L815" title="3 of 6 branches missed.">      } else if (prefixes == null || position == null</span>
           || position.length != prefixes.length) {
 <span class="nc" id="L817">        throw new IOException(&quot;incorrect position/prefixes&quot;);</span>
-<span class="pc bpc" id="L818" title="1 of 2 branches missed.">      } else if (position.length == 0) {</span>
+<span class="fc bfc" id="L818" title="All 2 branches covered.">      } else if (position.length == 0) {</span>
 <span class="fc" id="L819">        return null;</span>
       } else {
         // analyze positions
-<span class="nc" id="L822">        int[][] tmpPosition = new int[position.length][];</span>
-<span class="nc" id="L823">        int maxPosition = -1;</span>
-<span class="nc bnc" id="L824" title="All 2 branches missed.">        for (int i = 0; i &lt; position.length; i++) {</span>
-<span class="nc" id="L825">          m = p.matcher(position[i]);</span>
-<span class="nc bnc" id="L826" title="All 2 branches missed.">          if (m.find()) {</span>
-<span class="nc bnc" id="L827" title="All 2 branches missed.">            if (m.group(3) == null) {</span>
-<span class="nc" id="L828">              int start = Integer.parseInt(m.group(1));</span>
-<span class="nc" id="L829">              tmpPosition[i] = new int[] { start };</span>
-<span class="nc" id="L830">              maxPosition = Math.max(maxPosition, start);</span>
-<span class="nc" id="L831">            } else {</span>
-<span class="nc" id="L832">              int start = Integer.parseInt(m.group(1));</span>
-<span class="nc" id="L833">              int end = Integer.parseInt(m.group(3));</span>
-<span class="nc bnc" id="L834" title="All 2 branches missed.">              if (start &gt; end) {</span>
+<span class="fc" id="L822">        int[][] tmpPosition = new int[position.length][];</span>
+<span class="fc" id="L823">        int maxPosition = -1;</span>
+<span class="fc bfc" id="L824" title="All 2 branches covered.">        for (int i = 0; i &lt; position.length; i++) {</span>
+<span class="fc" id="L825">          m = p.matcher(position[i]);</span>
+<span class="pc bpc" id="L826" title="1 of 2 branches missed.">          if (m.find()) {</span>
+<span class="fc bfc" id="L827" title="All 2 branches covered.">            if (m.group(3) == null) {</span>
+<span class="fc" id="L828">              int start = Integer.parseInt(m.group(1));</span>
+<span class="fc" id="L829">              tmpPosition[i] = new int[] { start };</span>
+<span class="fc" id="L830">              maxPosition = Math.max(maxPosition, start);</span>
+<span class="fc" id="L831">            } else {</span>
+<span class="fc" id="L832">              int start = Integer.parseInt(m.group(1));</span>
+<span class="fc" id="L833">              int end = Integer.parseInt(m.group(3));</span>
+<span class="pc bpc" id="L834" title="1 of 2 branches missed.">              if (start &gt; end) {</span>
 <span class="nc" id="L835">                throw new IOException(&quot;incorrect position &quot; + position[i]);</span>
               } else {
-<span class="nc" id="L837">                tmpPosition[i] = new int[end - start + 1];</span>
-<span class="nc bnc" id="L838" title="All 2 branches missed.">                for (int t = start; t &lt;= end; t++)</span>
-<span class="nc" id="L839">                  tmpPosition[i][t - start] = t;</span>
-<span class="nc" id="L840">                maxPosition = Math.max(maxPosition, end);</span>
+<span class="fc" id="L837">                tmpPosition[i] = new int[end - start + 1];</span>
+<span class="fc bfc" id="L838" title="All 2 branches covered.">                for (int t = start; t &lt;= end; t++)</span>
+<span class="fc" id="L839">                  tmpPosition[i][t - start] = t;</span>
+<span class="fc" id="L840">                maxPosition = Math.max(maxPosition, end);</span>
               }
-<span class="nc" id="L842">            }</span>
+<span class="fc" id="L842">            }</span>
           } else {
 <span class="nc" id="L844">            throw new IOException(&quot;incorrect position &quot; + position[i]);</span>
           }
         }
         @SuppressWarnings(&quot;unchecked&quot;)
-<span class="nc" id="L848">        HashSet&lt;String&gt;[] result = new HashSet[maxPosition + 1];</span>
-<span class="nc" id="L849">        Arrays.fill(result, null);</span>
+<span class="fc" id="L848">        HashSet&lt;String&gt;[] result = new HashSet[maxPosition + 1];</span>
+<span class="fc" id="L849">        Arrays.fill(result, null);</span>
         List&lt;String&gt; tmpPrefixList;
         String[] tmpList;
-<span class="nc bnc" id="L852" title="All 2 branches missed.">        for (int i = 0; i &lt; tmpPosition.length; i++) {</span>
-<span class="nc" id="L853">          tmpList = prefixes[i].split(&quot;,&quot;);</span>
-<span class="nc" id="L854">          tmpPrefixList = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L855" title="All 2 branches missed.">          for (String tmpItem : tmpList) {</span>
-<span class="nc bnc" id="L856" title="All 2 branches missed.">            if (!tmpItem.trim().isEmpty()) {</span>
-<span class="nc" id="L857">              tmpPrefixList.add(tmpItem.trim());</span>
+<span class="fc bfc" id="L852" title="All 2 branches covered.">        for (int i = 0; i &lt; tmpPosition.length; i++) {</span>
+<span class="fc" id="L853">          tmpList = prefixes[i].split(&quot;,&quot;);</span>
+<span class="fc" id="L854">          tmpPrefixList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L855" title="All 2 branches covered.">          for (String tmpItem : tmpList) {</span>
+<span class="pc bpc" id="L856" title="1 of 2 branches missed.">            if (!tmpItem.trim().isEmpty()) {</span>
+<span class="fc" id="L857">              tmpPrefixList.add(tmpItem.trim());</span>
             }
           }
-<span class="nc bnc" id="L860" title="All 2 branches missed.">          if (tmpPrefixList.isEmpty()) {</span>
+<span class="pc bpc" id="L860" title="1 of 2 branches missed.">          if (tmpPrefixList.isEmpty()) {</span>
 <span class="nc" id="L861">            throw new IOException(&quot;incorrect prefixes &quot; + prefixes[i]);</span>
           }
-<span class="nc bnc" id="L863" title="All 2 branches missed.">          for (int t = 0; t &lt; tmpPosition[i].length; t++) {</span>
-<span class="nc bnc" id="L864" title="All 2 branches missed.">            if (result[tmpPosition[i][t]] == null) {</span>
-<span class="nc" id="L865">              result[tmpPosition[i][t]] = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L863" title="All 2 branches covered.">          for (int t = 0; t &lt; tmpPosition[i].length; t++) {</span>
+<span class="fc bfc" id="L864" title="All 2 branches covered.">            if (result[tmpPosition[i][t]] == null) {</span>
+<span class="fc" id="L865">              result[tmpPosition[i][t]] = new HashSet&lt;&gt;();</span>
             }
-<span class="nc" id="L867">            result[tmpPosition[i][t]].addAll(tmpPrefixList);</span>
+<span class="fc" id="L867">            result[tmpPosition[i][t]].addAll(tmpPrefixList);</span>
           }
-<span class="nc" id="L869">          prefixList.addAll(tmpPrefixList);</span>
+<span class="fc" id="L869">          prefixList.addAll(tmpPrefixList);</span>
         }
-<span class="nc" id="L871">        return result;</span>
+<span class="fc" id="L871">        return result;</span>
       }
     }
 
@@ -2272,10 +2272,10 @@ public class CodecComponent {
 <span class="fc" id="L2272">      Collections.sort(data, new Comparator&lt;MtasTreeHit&lt;String&gt;&gt;() {</span>
         @Override
         public int compare(MtasTreeHit&lt;String&gt; hit1, MtasTreeHit&lt;String&gt; hit2) {
-<span class="nc" id="L2275">          int compare = Integer.compare(hit1.additionalId, hit2.additionalId);</span>
-<span class="nc bnc" id="L2276" title="All 2 branches missed.">          compare = (compare == 0)</span>
-<span class="nc" id="L2277">              ? Long.compare(hit1.additionalRef, hit2.additionalRef) : compare;</span>
-<span class="nc" id="L2278">          return compare;</span>
+<span class="fc" id="L2275">          int compare = Integer.compare(hit1.additionalId, hit2.additionalId);</span>
+<span class="fc bfc" id="L2276" title="All 2 branches covered.">          compare = (compare == 0)</span>
+<span class="fc" id="L2277">              ? Long.compare(hit1.additionalRef, hit2.additionalRef) : compare;</span>
+<span class="fc" id="L2278">          return compare;</span>
         }
       });
 <span class="fc" id="L2281">      return data;</span>
@@ -2306,15 +2306,15 @@ public class CodecComponent {
 <span class="fc" id="L2306">      int rightRangeEnd = end;</span>
 <span class="fc" id="L2307">      int rightRangeLength = Math.max(0, 1 + rightRangeEnd - rightRangeStart);</span>
       // create initial arrays
-<span class="pc bpc" id="L2309" title="1 of 2 branches missed.">      if (leftRangeLength &gt; 0) {</span>
-<span class="nc" id="L2310">        keyLeft = &quot;&quot;;</span>
-<span class="nc" id="L2311">        dataLeft = (ArrayList&lt;String&gt;[]) new ArrayList[leftRangeLength];</span>
-<span class="nc" id="L2312">        missingLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
-<span class="nc" id="L2313">        unknownLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
-<span class="nc bnc" id="L2314" title="All 2 branches missed.">        for (int p = 0; p &lt; leftRangeLength; p++) {</span>
-<span class="nc" id="L2315">          dataLeft[p] = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L2316">          missingLeft[p] = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L2317">          unknownLeft[p] = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L2309" title="All 2 branches covered.">      if (leftRangeLength &gt; 0) {</span>
+<span class="fc" id="L2310">        keyLeft = &quot;&quot;;</span>
+<span class="fc" id="L2311">        dataLeft = (ArrayList&lt;String&gt;[]) new ArrayList[leftRangeLength];</span>
+<span class="fc" id="L2312">        missingLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
+<span class="fc" id="L2313">        unknownLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
+<span class="fc bfc" id="L2314" title="All 2 branches covered.">        for (int p = 0; p &lt; leftRangeLength; p++) {</span>
+<span class="fc" id="L2315">          dataLeft[p] = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L2316">          missingLeft[p] = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L2317">          unknownLeft[p] = new HashSet&lt;&gt;();</span>
         }
       } else {
 <span class="fc" id="L2320">        keyLeft = null;</span>
@@ -2338,15 +2338,15 @@ public class CodecComponent {
 <span class="nc" id="L2338">        missingHit = null;</span>
 <span class="nc" id="L2339">        unknownHit = null;</span>
       }
-<span class="pc bpc" id="L2341" title="1 of 2 branches missed.">      if (rightRangeLength &gt; 0) {</span>
-<span class="nc" id="L2342">        keyRight = &quot;&quot;;</span>
-<span class="nc" id="L2343">        dataRight = (ArrayList&lt;String&gt;[]) new ArrayList[rightRangeLength];</span>
-<span class="nc" id="L2344">        missingRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
-<span class="nc" id="L2345">        unknownRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
-<span class="nc bnc" id="L2346" title="All 2 branches missed.">        for (int p = 0; p &lt; rightRangeLength; p++) {</span>
-<span class="nc" id="L2347">          dataRight[p] = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L2348">          missingRight[p] = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L2349">          unknownRight[p] = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L2341" title="All 2 branches covered.">      if (rightRangeLength &gt; 0) {</span>
+<span class="fc" id="L2342">        keyRight = &quot;&quot;;</span>
+<span class="fc" id="L2343">        dataRight = (ArrayList&lt;String&gt;[]) new ArrayList[rightRangeLength];</span>
+<span class="fc" id="L2344">        missingRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
+<span class="fc" id="L2345">        unknownRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
+<span class="fc bfc" id="L2346" title="All 2 branches covered.">        for (int p = 0; p &lt; rightRangeLength; p++) {</span>
+<span class="fc" id="L2347">          dataRight[p] = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L2348">          missingRight[p] = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L2349">          unknownRight[p] = new HashSet&lt;&gt;();</span>
         }
       } else {
 <span class="fc" id="L2352">        keyRight = null;</span>
@@ -2356,71 +2356,71 @@ public class CodecComponent {
       }
 
       // construct missing sets
-<span class="pc bpc" id="L2359" title="1 of 2 branches missed.">      if (group.hitInside != null) {</span>
+<span class="fc bfc" id="L2359" title="All 2 branches covered.">      if (group.hitInside != null) {</span>
 <span class="fc bfc" id="L2360" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= hitEnd; p++) {</span>
 <span class="fc" id="L2361">          missingHit[p - hitStart].addAll(group.hitInside);</span>
         }
       }
-<span class="pc bpc" id="L2364" title="1 of 2 branches missed.">      if (group.hitInsideLeft != null) {</span>
-<span class="nc bnc" id="L2365" title="All 2 branches missed.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
-<span class="nc" id="L2366">            hitStart + group.hitInsideLeft.length - 1); p++) {</span>
-<span class="nc bnc" id="L2367" title="All 2 branches missed.">          if (group.hitInsideLeft[p - hitStart] != null) {</span>
-<span class="nc" id="L2368">            missingHit[p - hitStart].addAll(group.hitInsideLeft[p - hitStart]);</span>
+<span class="fc bfc" id="L2364" title="All 2 branches covered.">      if (group.hitInsideLeft != null) {</span>
+<span class="fc bfc" id="L2365" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
+<span class="fc" id="L2366">            hitStart + group.hitInsideLeft.length - 1); p++) {</span>
+<span class="pc bpc" id="L2367" title="1 of 2 branches missed.">          if (group.hitInsideLeft[p - hitStart] != null) {</span>
+<span class="fc" id="L2368">            missingHit[p - hitStart].addAll(group.hitInsideLeft[p - hitStart]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2372" title="1 of 2 branches missed.">      if (group.hitLeft != null) {</span>
-<span class="nc bnc" id="L2373" title="All 2 branches missed.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
-<span class="nc" id="L2374">            hitStart + group.hitLeft.length - 1); p++) {</span>
-<span class="nc bnc" id="L2375" title="All 2 branches missed.">          if (group.hitLeft[p - hitStart] != null) {</span>
-<span class="nc" id="L2376">            missingHit[p - hitStart].addAll(group.hitLeft[p - hitStart]);</span>
+<span class="fc bfc" id="L2372" title="All 2 branches covered.">      if (group.hitLeft != null) {</span>
+<span class="fc bfc" id="L2373" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
+<span class="fc" id="L2374">            hitStart + group.hitLeft.length - 1); p++) {</span>
+<span class="pc bpc" id="L2375" title="1 of 2 branches missed.">          if (group.hitLeft[p - hitStart] != null) {</span>
+<span class="fc" id="L2376">            missingHit[p - hitStart].addAll(group.hitLeft[p - hitStart]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2380" title="1 of 2 branches missed.">      if (group.hitInsideRight != null) {</span>
-<span class="nc" id="L2381">        for (int p = Math.max(hitStart,</span>
-<span class="nc bnc" id="L2382" title="All 2 branches missed.">            hitEnd - group.hitInsideRight.length + 1); p &lt;= hitEnd; p++) {</span>
-<span class="nc bnc" id="L2383" title="All 2 branches missed.">          if (group.hitInsideRight[hitEnd - p] != null) {</span>
-<span class="nc" id="L2384">            missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);</span>
+<span class="fc bfc" id="L2380" title="All 2 branches covered.">      if (group.hitInsideRight != null) {</span>
+<span class="fc" id="L2381">        for (int p = Math.max(hitStart,</span>
+<span class="fc bfc" id="L2382" title="All 2 branches covered.">            hitEnd - group.hitInsideRight.length + 1); p &lt;= hitEnd; p++) {</span>
+<span class="fc bfc" id="L2383" title="All 2 branches covered.">          if (group.hitInsideRight[hitEnd - p] != null) {</span>
+<span class="fc" id="L2384">            missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2388" title="1 of 2 branches missed.">      if (group.hitRight != null) {</span>
-<span class="nc bnc" id="L2389" title="All 2 branches missed.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
-<span class="nc" id="L2390">            hitStart + group.hitRight.length - 1); p++) {</span>
-<span class="nc bnc" id="L2391" title="All 2 branches missed.">          if (group.hitRight[p - hitStart] != null) {</span>
-<span class="nc" id="L2392">            missingHit[p - hitStart].addAll(group.hitRight[p - hitStart]);</span>
+<span class="fc bfc" id="L2388" title="All 2 branches covered.">      if (group.hitRight != null) {</span>
+<span class="fc bfc" id="L2389" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
+<span class="fc" id="L2390">            hitStart + group.hitRight.length - 1); p++) {</span>
+<span class="fc bfc" id="L2391" title="All 2 branches covered.">          if (group.hitRight[p - hitStart] != null) {</span>
+<span class="fc" id="L2392">            missingHit[p - hitStart].addAll(group.hitRight[p - hitStart]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2396" title="1 of 2 branches missed.">      if (group.left != null) {</span>
-<span class="nc bnc" id="L2397" title="All 2 branches missed.">        for (int p = 0; p &lt; Math.min(leftRangeLength, group.left.length); p++) {</span>
-<span class="nc bnc" id="L2398" title="All 2 branches missed.">          if (group.left[p] != null) {</span>
-<span class="nc" id="L2399">            missingLeft[p].addAll(group.left[p]);</span>
+<span class="fc bfc" id="L2396" title="All 2 branches covered.">      if (group.left != null) {</span>
+<span class="fc bfc" id="L2397" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(leftRangeLength, group.left.length); p++) {</span>
+<span class="fc bfc" id="L2398" title="All 2 branches covered.">          if (group.left[p] != null) {</span>
+<span class="fc" id="L2399">            missingLeft[p].addAll(group.left[p]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2403" title="1 of 2 branches missed.">      if (group.hitRight != null) {</span>
-<span class="nc bnc" id="L2404" title="All 2 branches missed.">        for (int p = 0; p &lt; Math.min(leftRangeLength,</span>
-<span class="nc" id="L2405">            group.hitRight.length - dataHit.length); p++) {</span>
-<span class="nc bnc" id="L2406" title="All 2 branches missed.">          if (group.hitRight[p + dataHit.length] != null) {</span>
-<span class="nc" id="L2407">            missingLeft[p].addAll(group.hitRight[p + dataHit.length]);</span>
+<span class="fc bfc" id="L2403" title="All 2 branches covered.">      if (group.hitRight != null) {</span>
+<span class="fc bfc" id="L2404" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(leftRangeLength,</span>
+<span class="fc" id="L2405">            group.hitRight.length - dataHit.length); p++) {</span>
+<span class="pc bpc" id="L2406" title="1 of 2 branches missed.">          if (group.hitRight[p + dataHit.length] != null) {</span>
+<span class="fc" id="L2407">            missingLeft[p].addAll(group.hitRight[p + dataHit.length]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2411" title="1 of 2 branches missed.">      if (group.right != null) {</span>
-<span class="nc bnc" id="L2412" title="All 2 branches missed.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
-<span class="nc" id="L2413">            group.right.length); p++) {</span>
-<span class="nc bnc" id="L2414" title="All 2 branches missed.">          if (group.right[p] != null) {</span>
-<span class="nc" id="L2415">            missingRight[p].addAll(group.right[p]);</span>
+<span class="fc bfc" id="L2411" title="All 2 branches covered.">      if (group.right != null) {</span>
+<span class="fc bfc" id="L2412" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
+<span class="fc" id="L2413">            group.right.length); p++) {</span>
+<span class="fc bfc" id="L2414" title="All 2 branches covered.">          if (group.right[p] != null) {</span>
+<span class="fc" id="L2415">            missingRight[p].addAll(group.right[p]);</span>
           }
         }
       }
-<span class="pc bpc" id="L2419" title="1 of 2 branches missed.">      if (group.hitLeft != null) {</span>
-<span class="nc bnc" id="L2420" title="All 2 branches missed.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
-<span class="nc" id="L2421">            group.hitLeft.length - dataHit.length); p++) {</span>
-<span class="nc bnc" id="L2422" title="All 2 branches missed.">          if (group.hitLeft[p + dataHit.length] != null) {</span>
-<span class="nc" id="L2423">            missingRight[p].addAll(group.hitLeft[p + dataHit.length]);</span>
+<span class="fc bfc" id="L2419" title="All 2 branches covered.">      if (group.hitLeft != null) {</span>
+<span class="fc bfc" id="L2420" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
+<span class="fc" id="L2421">            group.hitLeft.length - dataHit.length); p++) {</span>
+<span class="pc bpc" id="L2422" title="1 of 2 branches missed.">          if (group.hitLeft[p + dataHit.length] != null) {</span>
+<span class="fc" id="L2423">            missingRight[p].addAll(group.hitLeft[p + dataHit.length]);</span>
           }
         }
       }
@@ -2429,129 +2429,129 @@ public class CodecComponent {
 <span class="fc" id="L2429">      List&lt;MtasTreeHit&lt;String&gt;&gt; sortedList = sort(list);</span>
 <span class="fc bfc" id="L2430" title="All 2 branches covered.">      for (MtasTreeHit&lt;String&gt; hit : sortedList) {</span>
         // inside hit
-<span class="pc bpc" id="L2432" title="2 of 4 branches missed.">        if (group.hitInside != null &amp;&amp; hit.idData != null</span>
-<span class="pc bpc" id="L2433" title="1 of 2 branches missed.">            &amp;&amp; group.hitInside.contains(hit.idData)) {</span>
+<span class="pc bpc" id="L2432" title="1 of 4 branches missed.">        if (group.hitInside != null &amp;&amp; hit.idData != null</span>
+<span class="fc bfc" id="L2433" title="All 2 branches covered.">            &amp;&amp; group.hitInside.contains(hit.idData)) {</span>
 <span class="fc" id="L2434">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
 <span class="fc bfc" id="L2435" title="All 2 branches covered.">              .min(hitEnd, hit.endPosition); p++) {</span>
 <span class="fc" id="L2436">            dataHit[p - hitStart].add(hit.refData);</span>
 <span class="fc" id="L2437">            missingHit[p - hitStart]</span>
 <span class="fc" id="L2438">                .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
           }
-<span class="nc bnc" id="L2440" title="All 10 branches missed.">        } else if ((group.hitInsideLeft != null || group.hitLeft != null</span>
+<span class="pc bpc" id="L2440" title="1 of 10 branches missed.">        } else if ((group.hitInsideLeft != null || group.hitLeft != null</span>
             || group.hitInsideRight != null || group.hitRight != null)
             &amp;&amp; hit.idData != null) {
-<span class="nc" id="L2443">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
-<span class="nc bnc" id="L2444" title="All 2 branches missed.">              .min(hitEnd, hit.endPosition); p++) {</span>
-<span class="nc" id="L2445">            int pHitLeft = p - hitStart;</span>
-<span class="nc" id="L2446">            int pHitRight = hitEnd - p;</span>
-<span class="nc bnc" id="L2447" title="All 6 branches missed.">            if (group.hitInsideLeft != null</span>
+<span class="fc" id="L2443">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
+<span class="fc bfc" id="L2444" title="All 2 branches covered.">              .min(hitEnd, hit.endPosition); p++) {</span>
+<span class="fc" id="L2445">            int pHitLeft = p - hitStart;</span>
+<span class="fc" id="L2446">            int pHitRight = hitEnd - p;</span>
+<span class="pc bpc" id="L2447" title="2 of 6 branches missed.">            if (group.hitInsideLeft != null</span>
                 &amp;&amp; pHitLeft &lt;= (group.hitInsideLeft.length - 1)
                 &amp;&amp; group.hitInsideLeft[pHitLeft] != null
-<span class="nc bnc" id="L2450" title="All 2 branches missed.">                &amp;&amp; group.hitInsideLeft[pHitLeft].contains(hit.idData)) {</span>
+<span class="fc bfc" id="L2450" title="All 2 branches covered.">                &amp;&amp; group.hitInsideLeft[pHitLeft].contains(hit.idData)) {</span>
               // keyHit += hit.refData;
-<span class="nc" id="L2452">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="nc" id="L2453">              missingHit[p - hitStart]</span>
-<span class="nc" id="L2454">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="nc bnc" id="L2455" title="All 6 branches missed.">            } else if (group.hitLeft != null</span>
+<span class="fc" id="L2452">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2453">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2454">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2455" title="2 of 6 branches missed.">            } else if (group.hitLeft != null</span>
                 &amp;&amp; pHitLeft &lt;= (group.hitLeft.length - 1)
                 &amp;&amp; group.hitLeft[pHitLeft] != null
-<span class="nc bnc" id="L2458" title="All 2 branches missed.">                &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
+<span class="fc bfc" id="L2458" title="All 2 branches covered.">                &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
               // keyHit += hit.refData;
-<span class="nc" id="L2460">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="nc" id="L2461">              missingHit[p - hitStart]</span>
-<span class="nc" id="L2462">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="nc bnc" id="L2463" title="All 6 branches missed.">            } else if (group.hitInsideRight != null</span>
+<span class="fc" id="L2460">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2461">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2462">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2463" title="1 of 6 branches missed.">            } else if (group.hitInsideRight != null</span>
                 &amp;&amp; pHitRight &lt;= (group.hitInsideRight.length - 1)
                 &amp;&amp; group.hitInsideRight[pHitRight] != null
-<span class="nc bnc" id="L2466" title="All 2 branches missed.">                &amp;&amp; group.hitInsideRight[pHitRight].contains(hit.idData)) {</span>
-<span class="nc" id="L2467">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="nc" id="L2468">              missingHit[p - hitStart]</span>
-<span class="nc" id="L2469">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="nc bnc" id="L2470" title="All 6 branches missed.">            } else if (group.hitRight != null</span>
+<span class="fc bfc" id="L2466" title="All 2 branches covered.">                &amp;&amp; group.hitInsideRight[pHitRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2467">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2468">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2469">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2470" title="1 of 6 branches missed.">            } else if (group.hitRight != null</span>
                 &amp;&amp; pHitRight &lt;= (group.hitRight.length - 1)
                 &amp;&amp; group.hitRight[pHitRight] != null
-<span class="nc bnc" id="L2473" title="All 2 branches missed.">                &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
-<span class="nc" id="L2474">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="nc" id="L2475">              missingHit[p - hitStart]</span>
-<span class="nc" id="L2476">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="fc bfc" id="L2473" title="All 2 branches covered.">                &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2474">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2475">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2476">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
             }
           }
         }
         // left
-<span class="pc bpc" id="L2481" title="1 of 2 branches missed.">        if (hit.startPosition &lt; hitStart) {</span>
-<span class="nc bnc" id="L2482" title="All 8 branches missed.">          if ((group.left != null || (group.hitRight != null</span>
+<span class="fc bfc" id="L2481" title="All 2 branches covered.">        if (hit.startPosition &lt; hitStart) {</span>
+<span class="pc bpc" id="L2482" title="3 of 8 branches missed.">          if ((group.left != null || (group.hitRight != null</span>
               &amp;&amp; group.hitRight.length &gt; (1 + hitEnd - hitStart)))
               &amp;&amp; hit.idData != null) {
-<span class="nc" id="L2485">            for (int p = Math.min(hit.endPosition,</span>
-<span class="nc bnc" id="L2486" title="All 2 branches missed.">                hitStart - 1); p &gt;= hit.startPosition; p--) {</span>
-<span class="nc" id="L2487">              int pLeft = hitStart - 1 - p;</span>
-<span class="nc" id="L2488">              int pHitRight = hitEnd - p;</span>
-<span class="nc bnc" id="L2489" title="All 6 branches missed.">              if (group.left != null &amp;&amp; pLeft &lt;= (group.left.length - 1)</span>
+<span class="fc" id="L2485">            for (int p = Math.min(hit.endPosition,</span>
+<span class="fc bfc" id="L2486" title="All 2 branches covered.">                hitStart - 1); p &gt;= hit.startPosition; p--) {</span>
+<span class="fc" id="L2487">              int pLeft = hitStart - 1 - p;</span>
+<span class="fc" id="L2488">              int pHitRight = hitEnd - p;</span>
+<span class="fc bfc" id="L2489" title="All 6 branches covered.">              if (group.left != null &amp;&amp; pLeft &lt;= (group.left.length - 1)</span>
                   &amp;&amp; group.left[pLeft] != null
-<span class="nc bnc" id="L2491" title="All 2 branches missed.">                  &amp;&amp; group.left[pLeft].contains(hit.idData)) {</span>
-<span class="nc" id="L2492">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
-<span class="nc" id="L2493">                missingLeft[hitStart - 1 - p]</span>
-<span class="nc" id="L2494">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="nc bnc" id="L2495" title="All 6 branches missed.">              } else if (group.hitRight != null</span>
+<span class="fc bfc" id="L2491" title="All 2 branches covered.">                  &amp;&amp; group.left[pLeft].contains(hit.idData)) {</span>
+<span class="fc" id="L2492">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
+<span class="fc" id="L2493">                missingLeft[hitStart - 1 - p]</span>
+<span class="fc" id="L2494">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2495" title="1 of 6 branches missed.">              } else if (group.hitRight != null</span>
                   &amp;&amp; pHitRight &lt;= (group.hitRight.length - 1)
                   &amp;&amp; group.hitRight[pHitRight] != null
-<span class="nc bnc" id="L2498" title="All 2 branches missed.">                  &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
-<span class="nc" id="L2499">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
-<span class="nc" id="L2500">                missingLeft[hitStart - 1 - p]</span>
-<span class="nc" id="L2501">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="fc bfc" id="L2498" title="All 2 branches covered.">                  &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2499">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
+<span class="fc" id="L2500">                missingLeft[hitStart - 1 - p]</span>
+<span class="fc" id="L2501">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
               }
             }
           }
         }
         // right
-<span class="pc bpc" id="L2507" title="1 of 2 branches missed.">        if (hit.endPosition &gt; hitEnd) {</span>
-<span class="nc bnc" id="L2508" title="All 8 branches missed.">          if ((group.right != null || (group.hitLeft != null</span>
+<span class="fc bfc" id="L2507" title="All 2 branches covered.">        if (hit.endPosition &gt; hitEnd) {</span>
+<span class="pc bpc" id="L2508" title="3 of 8 branches missed.">          if ((group.right != null || (group.hitLeft != null</span>
               &amp;&amp; group.hitLeft.length &gt; (1 + hitEnd - hitStart)))
               &amp;&amp; hit.idData != null) {
-<span class="nc" id="L2511">            for (int p = Math.max(hit.startPosition,</span>
-<span class="nc bnc" id="L2512" title="All 2 branches missed.">                hitEnd + 1); p &lt;= hit.endPosition; p++) {</span>
-<span class="nc" id="L2513">              int pRight = p - hitEnd - 1;</span>
-<span class="nc" id="L2514">              int pHitLeft = p - hitStart;</span>
-<span class="nc bnc" id="L2515" title="All 6 branches missed.">              if (group.right != null &amp;&amp; pRight &lt;= (group.right.length - 1)</span>
+<span class="fc" id="L2511">            for (int p = Math.max(hit.startPosition,</span>
+<span class="fc bfc" id="L2512" title="All 2 branches covered.">                hitEnd + 1); p &lt;= hit.endPosition; p++) {</span>
+<span class="fc" id="L2513">              int pRight = p - hitEnd - 1;</span>
+<span class="fc" id="L2514">              int pHitLeft = p - hitStart;</span>
+<span class="fc bfc" id="L2515" title="All 6 branches covered.">              if (group.right != null &amp;&amp; pRight &lt;= (group.right.length - 1)</span>
                   &amp;&amp; group.right[pRight] != null
-<span class="nc bnc" id="L2517" title="All 2 branches missed.">                  &amp;&amp; group.right[pRight].contains(hit.idData)) {</span>
-<span class="nc" id="L2518">                dataRight[p - rightRangeStart].add(hit.refData);</span>
-<span class="nc" id="L2519">                missingRight[p - rightRangeStart]</span>
-<span class="nc" id="L2520">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="nc bnc" id="L2521" title="All 6 branches missed.">              } else if (group.hitLeft != null</span>
+<span class="fc bfc" id="L2517" title="All 2 branches covered.">                  &amp;&amp; group.right[pRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2518">                dataRight[p - rightRangeStart].add(hit.refData);</span>
+<span class="fc" id="L2519">                missingRight[p - rightRangeStart]</span>
+<span class="fc" id="L2520">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2521" title="1 of 6 branches missed.">              } else if (group.hitLeft != null</span>
                   &amp;&amp; pHitLeft &lt;= (group.hitLeft.length - 1)
                   &amp;&amp; group.hitLeft[pHitLeft] != null
-<span class="nc bnc" id="L2524" title="All 2 branches missed.">                  &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
-<span class="nc" id="L2525">                dataRight[p - rightRangeStart].add(hit.refData);</span>
-<span class="nc" id="L2526">                missingRight[p - rightRangeStart]</span>
-<span class="nc" id="L2527">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="fc bfc" id="L2524" title="All 2 branches covered.">                  &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
+<span class="fc" id="L2525">                dataRight[p - rightRangeStart].add(hit.refData);</span>
+<span class="fc" id="L2526">                missingRight[p - rightRangeStart]</span>
+<span class="fc" id="L2527">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
               }
             }
           }
         }
 <span class="fc" id="L2532">      }</span>
       // register unknown
-<span class="pc bpc" id="L2534" title="1 of 2 branches missed.">      if (missingLeft != null) {</span>
-<span class="nc bnc" id="L2535" title="All 2 branches missed.">        for (int i = 0; i &lt; missingLeft.length; i++) {</span>
-<span class="nc bnc" id="L2536" title="All 2 branches missed.">          for (String prefix : missingLeft[i]) {</span>
-<span class="nc bnc" id="L2537" title="All 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
+<span class="fc bfc" id="L2534" title="All 2 branches covered.">      if (missingLeft != null) {</span>
+<span class="fc bfc" id="L2535" title="All 2 branches covered.">        for (int i = 0; i &lt; missingLeft.length; i++) {</span>
+<span class="fc bfc" id="L2536" title="All 2 branches covered.">          for (String prefix : missingLeft[i]) {</span>
+<span class="pc bpc" id="L2537" title="1 of 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
 <span class="nc" id="L2538">              unknownLeft[i].add(prefix);</span>
             }
-<span class="nc" id="L2540">          }</span>
+<span class="fc" id="L2540">          }</span>
         }
       }
 <span class="pc bpc" id="L2543" title="1 of 2 branches missed.">      if (missingHit != null) {</span>
 <span class="fc bfc" id="L2544" title="All 2 branches covered.">        for (int i = 0; i &lt; missingHit.length; i++) {</span>
-<span class="pc bpc" id="L2545" title="1 of 2 branches missed.">          for (String prefix : missingHit[i]) {</span>
-<span class="nc bnc" id="L2546" title="All 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
+<span class="fc bfc" id="L2545" title="All 2 branches covered.">          for (String prefix : missingHit[i]) {</span>
+<span class="pc bpc" id="L2546" title="1 of 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
 <span class="nc" id="L2547">              unknownHit[i].add(prefix);</span>
             }
-<span class="nc" id="L2549">          }</span>
+<span class="fc" id="L2549">          }</span>
         }
       }
-<span class="pc bpc" id="L2552" title="1 of 2 branches missed.">      if (missingRight != null) {</span>
-<span class="nc bnc" id="L2553" title="All 2 branches missed.">        for (int i = 0; i &lt; missingRight.length; i++) {</span>
-<span class="nc bnc" id="L2554" title="All 2 branches missed.">          for (String prefix : missingRight[i]) {</span>
+<span class="fc bfc" id="L2552" title="All 2 branches covered.">      if (missingRight != null) {</span>
+<span class="fc bfc" id="L2553" title="All 2 branches covered.">        for (int i = 0; i &lt; missingRight.length; i++) {</span>
+<span class="pc bpc" id="L2554" title="1 of 2 branches missed.">          for (String prefix : missingRight[i]) {</span>
 <span class="nc bnc" id="L2555" title="All 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
 <span class="nc" id="L2556">              unknownRight[i].add(prefix);</span>
             }
@@ -2563,9 +2563,9 @@ public class CodecComponent {
 <span class="fc" id="L2563">      keyHit = dataToString(dataHit, missingHit);</span>
 <span class="fc" id="L2564">      keyRight = dataToString(dataRight, missingRight);</span>
 <span class="fc" id="L2565">      key = KEY_START;</span>
-<span class="pc bpc" id="L2566" title="1 of 2 branches missed.">      if (keyLeft != null) {</span>
-<span class="nc" id="L2567">        key += keyLeft;</span>
-<span class="nc" id="L2568">        hashLeft = keyLeft.hashCode();</span>
+<span class="fc bfc" id="L2566" title="All 2 branches covered.">      if (keyLeft != null) {</span>
+<span class="fc" id="L2567">        key += keyLeft;</span>
+<span class="fc" id="L2568">        hashLeft = keyLeft.hashCode();</span>
       } else {
 <span class="fc" id="L2570">        hashLeft = 1;</span>
       }
@@ -2577,9 +2577,9 @@ public class CodecComponent {
 <span class="nc" id="L2577">        hashHit = 1;</span>
       }
 <span class="fc" id="L2579">      key += &quot;|&quot;;</span>
-<span class="pc bpc" id="L2580" title="1 of 2 branches missed.">      if (keyRight != null) {</span>
-<span class="nc" id="L2581">        key += keyRight;</span>
-<span class="nc" id="L2582">        hashRight = keyRight.hashCode();</span>
+<span class="fc bfc" id="L2580" title="All 2 branches covered.">      if (keyRight != null) {</span>
+<span class="fc" id="L2581">        key += keyRight;</span>
+<span class="fc" id="L2582">        hashRight = keyRight.hashCode();</span>
       } else {
 <span class="fc" id="L2584">        hashRight = 1;</span>
       }
@@ -2674,20 +2674,20 @@ public class CodecComponent {
       String postfix;
 <span class="pc bpc" id="L2675" title="2 of 6 branches missed.">      if (data != null &amp;&amp; missing != null &amp;&amp; data.length == missing.length) {</span>
 <span class="fc bfc" id="L2676" title="All 2 branches covered.">        for (int i = 0; i &lt; data.length; i++) {</span>
-<span class="pc bpc" id="L2677" title="1 of 2 branches missed.">          if (i &gt; 0) {</span>
-<span class="nc" id="L2678">            text.append(&quot;,&quot;);</span>
+<span class="fc bfc" id="L2677" title="All 2 branches covered.">          if (i &gt; 0) {</span>
+<span class="fc" id="L2678">            text.append(&quot;,&quot;);</span>
           } else {
 <span class="fc" id="L2680">            text = new StringBuilder();</span>
           }
 <span class="fc bfc" id="L2682" title="All 2 branches covered.">          for (int j = 0; j &lt; data[i].size(); j++) {</span>
-<span class="pc bpc" id="L2683" title="1 of 2 branches missed.">            if (j &gt; 0) {</span>
-<span class="nc" id="L2684">              text.append(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L2683" title="All 2 branches covered.">            if (j &gt; 0) {</span>
+<span class="fc" id="L2684">              text.append(&quot;&amp;&quot;);</span>
             }
 <span class="fc" id="L2686">            prefix = MtasToken.getPrefixFromValue(data[i].get(j));</span>
 <span class="fc" id="L2687">            postfix = MtasToken.getPostfixFromValue(data[i].get(j));</span>
 <span class="fc" id="L2688">            text.append(encoder</span>
 <span class="fc" id="L2689">                .encodeToString(prefix.getBytes(StandardCharsets.UTF_8)));</span>
-<span class="pc bpc" id="L2690" title="1 of 2 branches missed.">            if (!postfix.isEmpty()) {</span>
+<span class="fc bfc" id="L2690" title="All 2 branches covered.">            if (!postfix.isEmpty()) {</span>
 <span class="fc" id="L2691">              text.append(&quot;.&quot;);</span>
 <span class="fc" id="L2692">              text.append(encoder</span>
 <span class="fc" id="L2693">                  .encodeToString(postfix.getBytes(StandardCharsets.UTF_8)));</span>
@@ -2696,12 +2696,12 @@ public class CodecComponent {
 <span class="pc bpc" id="L2696" title="1 of 2 branches missed.">          if (missing[i] != null) {</span>
 <span class="fc" id="L2697">            String[] tmpMissing = missing[i]</span>
 <span class="fc" id="L2698">                .toArray(new String[missing[i].size()]);</span>
-<span class="pc bpc" id="L2699" title="1 of 2 branches missed.">            for (int j = 0; j &lt; tmpMissing.length; j++) {</span>
-<span class="nc bnc" id="L2700" title="All 4 branches missed.">              if (j &gt; 0 || !data[i].isEmpty()) {</span>
-<span class="nc" id="L2701">                text.append(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L2699" title="All 2 branches covered.">            for (int j = 0; j &lt; tmpMissing.length; j++) {</span>
+<span class="fc bfc" id="L2700" title="All 4 branches covered.">              if (j &gt; 0 || !data[i].isEmpty()) {</span>
+<span class="fc" id="L2701">                text.append(&quot;&amp;&quot;);</span>
               }
-<span class="nc" id="L2703">              text.append(encoder.encodeToString(</span>
-<span class="nc" id="L2704">                  (&quot;!&quot; + tmpMissing[j]).getBytes(StandardCharsets.UTF_8)));</span>
+<span class="fc" id="L2703">              text.append(encoder.encodeToString(</span>
+<span class="fc" id="L2704">                  (&quot;!&quot; + tmpMissing[j]).getBytes(StandardCharsets.UTF_8)));</span>
             }
           }
         }
@@ -2727,7 +2727,7 @@ public class CodecComponent {
      */
     private static Map&lt;String, String&gt;[] keyToSubSubObject(String key,
         StringBuilder newKey) {
-<span class="pc bpc" id="L2730" title="1 of 2 branches missed.">      if (!key.isEmpty()) {</span>
+<span class="fc bfc" id="L2730" title="All 2 branches covered.">      if (!key.isEmpty()) {</span>
 <span class="fc" id="L2731">        newKey.append(&quot; [&quot;);</span>
         String prefix;
         String postfix;
@@ -2743,12 +2743,12 @@ public class CodecComponent {
           } else {
 <span class="fc" id="L2744">            HashMap&lt;String, String&gt; subResult = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L2745">            matcher = pattern.matcher(parts[i]);</span>
-<span class="pc bpc" id="L2746" title="1 of 2 branches missed.">            if (tmpNewKey != null) {</span>
-<span class="nc" id="L2747">              tmpNewKey.append(&quot; &amp; &quot;);</span>
+<span class="fc bfc" id="L2746" title="All 2 branches covered.">            if (tmpNewKey != null) {</span>
+<span class="fc" id="L2747">              tmpNewKey.append(&quot; &amp; &quot;);</span>
             } else {
 <span class="fc" id="L2749">              tmpNewKey = new StringBuilder();</span>
             }
-<span class="pc bpc" id="L2751" title="1 of 2 branches missed.">            if (matcher.matches()) {</span>
+<span class="fc bfc" id="L2751" title="All 2 branches covered.">            if (matcher.matches()) {</span>
 <span class="fc" id="L2752">              prefix = new String(</span>
 <span class="fc" id="L2753">                  decoder.decode(</span>
 <span class="fc" id="L2754">                      matcher.group(1).getBytes(StandardCharsets.UTF_8)),</span>
@@ -2762,14 +2762,14 @@ public class CodecComponent {
 <span class="fc" id="L2762">              subResult.put(&quot;prefix&quot;, prefix);</span>
 <span class="fc" id="L2763">              subResult.put(&quot;value&quot;, postfix);</span>
             } else {
-<span class="nc" id="L2765">              prefix = new String(</span>
-<span class="nc" id="L2766">                  decoder.decode(parts[i].getBytes(StandardCharsets.UTF_8)),</span>
+<span class="fc" id="L2765">              prefix = new String(</span>
+<span class="fc" id="L2766">                  decoder.decode(parts[i].getBytes(StandardCharsets.UTF_8)),</span>
                   StandardCharsets.UTF_8);
-<span class="nc" id="L2768">              tmpNewKey.append(prefix.replace(&quot;=&quot;, &quot;\\=&quot;));</span>
-<span class="nc bnc" id="L2769" title="All 2 branches missed.">              if (prefix.startsWith(&quot;!&quot;)) {</span>
-<span class="nc" id="L2770">                subResult.put(&quot;missing&quot;, prefix.substring(1));</span>
+<span class="fc" id="L2768">              tmpNewKey.append(prefix.replace(&quot;=&quot;, &quot;\\=&quot;));</span>
+<span class="fc bfc" id="L2769" title="All 2 branches covered.">              if (prefix.startsWith(&quot;!&quot;)) {</span>
+<span class="fc" id="L2770">                subResult.put(&quot;missing&quot;, prefix.substring(1));</span>
               } else {
-<span class="nc" id="L2772">                subResult.put(&quot;prefix&quot;, prefix);</span>
+<span class="fc" id="L2772">                subResult.put(&quot;prefix&quot;, prefix);</span>
               }
             }
 <span class="fc" id="L2775">            result[i] = subResult;</span>
@@ -2781,8 +2781,8 @@ public class CodecComponent {
 <span class="fc" id="L2781">        newKey.append(&quot;]&quot;);</span>
 <span class="fc" id="L2782">        return result;</span>
       } else {
-<span class="nc" id="L2784">        newKey.append(&quot; []&quot;);</span>
-<span class="nc" id="L2785">        return null;</span>
+<span class="fc" id="L2784">        newKey.append(&quot; []&quot;);</span>
+<span class="fc" id="L2785">        return null;</span>
       }
     }
 
@@ -2837,12 +2837,12 @@ public class CodecComponent {
 <span class="nc bnc" id="L2837" title="All 2 branches missed.">        } else if (parts.length == 1) {</span>
 <span class="nc" id="L2838">          resultHit = keyToSubObject(parts[0].trim(), keyHit);</span>
         }
-<span class="pc bpc" id="L2840" title="1 of 2 branches missed.">        if (resultLeft != null) {</span>
-<span class="nc" id="L2841">          result.put(&quot;left&quot;, resultLeft);</span>
+<span class="fc bfc" id="L2840" title="All 2 branches covered.">        if (resultLeft != null) {</span>
+<span class="fc" id="L2841">          result.put(&quot;left&quot;, resultLeft);</span>
         }
 <span class="fc" id="L2843">        result.put(&quot;hit&quot;, resultHit);</span>
-<span class="pc bpc" id="L2844" title="1 of 2 branches missed.">        if (resultRight != null) {</span>
-<span class="nc" id="L2845">          result.put(&quot;right&quot;, resultRight);</span>
+<span class="fc bfc" id="L2844" title="All 2 branches covered.">        if (resultRight != null) {</span>
+<span class="fc" id="L2845">          result.put(&quot;right&quot;, resultRight);</span>
         }
 <span class="fc" id="L2847">        newKey.append(keyLeft);</span>
 <span class="fc" id="L2848">        newKey.append(&quot; |&quot;);</span>

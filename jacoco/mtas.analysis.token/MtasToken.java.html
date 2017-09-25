@@ -538,7 +538,7 @@ public abstract class MtasToken {
   public static String getPostfixFromValue(String value) {
 <span class="fc" id="L539">    String postfix = &quot;&quot;;</span>
 <span class="fc" id="L540">    Matcher m = patternPrePostFix.matcher(value);</span>
-<span class="pc bpc" id="L541" title="1 of 2 branches missed.">    if (m.find()) {</span>
+<span class="fc bfc" id="L541" title="All 2 branches covered.">    if (m.find()) {</span>
 <span class="fc" id="L542">      postfix = m.group(2);</span>
 
     }

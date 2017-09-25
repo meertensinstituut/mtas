@@ -2,6 +2,7 @@
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -87,8 +88,8 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
    *
    * @param searchComponent the search component
    */
-<span class="fc" id="L90">  public MtasSolrComponentKwic(MtasSolrSearchComponent searchComponent) {</span>
-<span class="fc" id="L91">  }</span>
+<span class="fc" id="L91">  public MtasSolrComponentKwic(MtasSolrSearchComponent searchComponent) {</span>
+<span class="fc" id="L92">  }</span>
 
   /**
    * Gets the positive integer.
@@ -98,9 +99,9 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
    */
   private int getPositiveInteger(String number) {
     try {
-<span class="nc" id="L101">      return Math.max(0, Integer.parseInt(number));</span>
-<span class="nc" id="L102">    } catch (NumberFormatException e) {</span>
-<span class="nc" id="L103">      return 0;</span>
+<span class="nc" id="L102">      return Math.max(0, Integer.parseInt(number));</span>
+<span class="nc" id="L103">    } catch (NumberFormatException e) {</span>
+<span class="nc" id="L104">      return 0;</span>
     }
   }
 
@@ -114,160 +115,160 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="nc" id="L117">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
-<span class="nc" id="L118">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);</span>
-<span class="nc bnc" id="L119" title="All 2 branches missed.">    if (!ids.isEmpty()) {</span>
-<span class="nc" id="L120">      int tmpCounter = 0;</span>
-<span class="nc" id="L121">      String[] fields = new String[ids.size()];</span>
-<span class="nc" id="L122">      String[] queryTypes = new String[ids.size()];</span>
-<span class="nc" id="L123">      String[] queryValues = new String[ids.size()];</span>
-<span class="nc" id="L124">      String[] queryPrefixes = new String[ids.size()];</span>
-<span class="nc" id="L125">      String[] queryIgnores = new String[ids.size()];</span>
-<span class="nc" id="L126">      String[] queryMaximumIgnoreLengths = new String[ids.size()];</span>
-<span class="nc" id="L127">      HashMap&lt;String, String[]&gt;[] queryVariables = new HashMap[ids.size()];</span>
-<span class="nc" id="L128">      String[] keys = new String[ids.size()];</span>
-<span class="nc" id="L129">      String[] prefixes = new String[ids.size()];</span>
-<span class="nc" id="L130">      String[] numbers = new String[ids.size()];</span>
-<span class="nc" id="L131">      String[] starts = new String[ids.size()];</span>
-<span class="nc" id="L132">      String[] lefts = new String[ids.size()];</span>
-<span class="nc" id="L133">      String[] rights = new String[ids.size()];</span>
-<span class="nc" id="L134">      String[] outputs = new String[ids.size()];</span>
-<span class="nc bnc" id="L135" title="All 2 branches missed.">      for (String id : ids) {</span>
-<span class="nc" id="L136">        fields[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L137">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_FIELD, null);</span>
-<span class="nc" id="L138">        queryTypes[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L118">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="nc" id="L119">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="nc" id="L121">      int tmpCounter = 0;</span>
+<span class="nc" id="L122">      String[] fields = new String[ids.size()];</span>
+<span class="nc" id="L123">      String[] queryTypes = new String[ids.size()];</span>
+<span class="nc" id="L124">      String[] queryValues = new String[ids.size()];</span>
+<span class="nc" id="L125">      String[] queryPrefixes = new String[ids.size()];</span>
+<span class="nc" id="L126">      String[] queryIgnores = new String[ids.size()];</span>
+<span class="nc" id="L127">      String[] queryMaximumIgnoreLengths = new String[ids.size()];</span>
+<span class="nc" id="L128">      HashMap&lt;String, String[]&gt;[] queryVariables = new HashMap[ids.size()];</span>
+<span class="nc" id="L129">      String[] keys = new String[ids.size()];</span>
+<span class="nc" id="L130">      String[] prefixes = new String[ids.size()];</span>
+<span class="nc" id="L131">      String[] numbers = new String[ids.size()];</span>
+<span class="nc" id="L132">      String[] starts = new String[ids.size()];</span>
+<span class="nc" id="L133">      String[] lefts = new String[ids.size()];</span>
+<span class="nc" id="L134">      String[] rights = new String[ids.size()];</span>
+<span class="nc" id="L135">      String[] outputs = new String[ids.size()];</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">      for (String id : ids) {</span>
+<span class="nc" id="L137">        fields[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L138">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_FIELD, null);</span>
+<span class="nc" id="L139">        queryTypes[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_TYPE, null);
-<span class="nc" id="L140">        queryValues[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L141">        queryValues[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_VALUE,
             null);
-<span class="nc" id="L143">        queryPrefixes[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L144">        queryPrefixes[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_PREFIX,
             null);
-<span class="nc" id="L146">        queryIgnores[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L147">        queryIgnores[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_IGNORE,
             null);
-<span class="nc" id="L149">        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L150">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="nc" id="L150">        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L151">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot;</span>
                 + NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH, null);
-<span class="nc" id="L152">        Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="nc" id="L153">            rb.req.getParams(),</span>
+<span class="nc" id="L153">        Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="nc" id="L154">            rb.req.getParams(),</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_VARIABLE);
-<span class="nc" id="L155">        queryVariables[tmpCounter] = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L156" title="All 2 branches missed.">        if (!vIds.isEmpty()) {</span>
-<span class="nc" id="L157">          HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">          for (String vId : vIds) {</span>
-<span class="nc" id="L159">            String name = rb.req.getParams().get(</span>
+<span class="nc" id="L156">        queryVariables[tmpCounter] = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (!vIds.isEmpty()) {</span>
+<span class="nc" id="L158">          HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">          for (String vId : vIds) {</span>
+<span class="nc" id="L160">            String name = rb.req.getParams().get(</span>
                 PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_VARIABLE
                     + &quot;.&quot; + vId + &quot;.&quot; + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME,
                 null);
-<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (name != null) {</span>
-<span class="nc bnc" id="L164" title="All 2 branches missed.">              if (!tmpVariables.containsKey(name)) {</span>
-<span class="nc" id="L165">                tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">            if (name != null) {</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">              if (!tmpVariables.containsKey(name)) {</span>
+<span class="nc" id="L166">                tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
               }
-<span class="nc" id="L167">              String value = rb.req.getParams()</span>
-<span class="nc" id="L168">                  .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="nc" id="L168">              String value = rb.req.getParams()</span>
+<span class="nc" id="L169">                  .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot;</span>
                       + NAME_MTAS_KWIC_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;
                       + SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE, null);
-<span class="nc bnc" id="L171" title="All 2 branches missed.">              if (value != null) {</span>
-<span class="nc" id="L172">                ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L173">                String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
-<span class="nc bnc" id="L174" title="All 2 branches missed.">                for (int i = 0; i &lt; subList.length; i++) {</span>
-<span class="nc" id="L175">                  list.add(</span>
-<span class="nc" id="L176">                      subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">              if (value != null) {</span>
+<span class="nc" id="L173">                ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L174">                String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">                for (int i = 0; i &lt; subList.length; i++) {</span>
+<span class="nc" id="L176">                  list.add(</span>
+<span class="nc" id="L177">                      subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
                 }
-<span class="nc" id="L178">                tmpVariables.get(name).addAll(list);</span>
+<span class="nc" id="L179">                tmpVariables.get(name).addAll(list);</span>
               }
             }
-<span class="nc" id="L181">          }</span>
-<span class="nc bnc" id="L182" title="All 2 branches missed.">          for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
-<span class="nc" id="L183">              .entrySet()) {</span>
-<span class="nc" id="L184">            queryVariables[tmpCounter].put(entry.getKey(),</span>
-<span class="nc" id="L185">                entry.getValue().toArray(new String[entry.getValue().size()]));</span>
-<span class="nc" id="L186">          }</span>
+<span class="nc" id="L182">          }</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">          for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
+<span class="nc" id="L184">              .entrySet()) {</span>
+<span class="nc" id="L185">            queryVariables[tmpCounter].put(entry.getKey(),</span>
+<span class="nc" id="L186">                entry.getValue().toArray(new String[entry.getValue().size()]));</span>
+<span class="nc" id="L187">          }</span>
         }
-<span class="nc" id="L188">        keys[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L189">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_KEY,</span>
-<span class="nc" id="L190">                String.valueOf(tmpCounter))</span>
-<span class="nc" id="L191">            .trim();</span>
-<span class="nc" id="L192">        prefixes[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L189">        keys[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L190">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_KEY,</span>
+<span class="nc" id="L191">                String.valueOf(tmpCounter))</span>
+<span class="nc" id="L192">            .trim();</span>
+<span class="nc" id="L193">        prefixes[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_PREFIX, null);
-<span class="nc" id="L194">        numbers[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L195">        numbers[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_NUMBER, null);
-<span class="nc" id="L196">        starts[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L197">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_START, null);</span>
-<span class="nc" id="L198">        lefts[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L199">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_LEFT, null);</span>
-<span class="nc" id="L200">        rights[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L201">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_RIGHT, null);</span>
-<span class="nc" id="L202">        starts[tmpCounter] = rb.req.getParams()</span>
-<span class="nc" id="L203">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_START, null);</span>
-<span class="nc" id="L204">        outputs[tmpCounter] = rb.req.getParams().get(</span>
+<span class="nc" id="L197">        starts[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L198">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_START, null);</span>
+<span class="nc" id="L199">        lefts[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L200">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_LEFT, null);</span>
+<span class="nc" id="L201">        rights[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L202">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_RIGHT, null);</span>
+<span class="nc" id="L203">        starts[tmpCounter] = rb.req.getParams()</span>
+<span class="nc" id="L204">            .get(PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_START, null);</span>
+<span class="nc" id="L205">        outputs[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_KWIC + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_KWIC_OUTPUT, null);
-<span class="nc" id="L206">        tmpCounter++;</span>
-<span class="nc" id="L207">      }</span>
-<span class="nc" id="L208">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
-<span class="nc" id="L209">      mtasFields.doKwic = true;</span>
-<span class="nc" id="L210">      rb.setNeedDocList(true);</span>
-<span class="nc bnc" id="L211" title="All 2 branches missed.">      for (String field : fields) {</span>
-<span class="nc bnc" id="L212" title="All 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
-<span class="nc" id="L213">          throw new IOException(&quot;no (valid) field in mtas kwic&quot;);</span>
-<span class="nc bnc" id="L214" title="All 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
-<span class="nc" id="L215">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+<span class="nc" id="L207">        tmpCounter++;</span>
+<span class="nc" id="L208">      }</span>
+<span class="nc" id="L209">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="nc" id="L210">      mtasFields.doKwic = true;</span>
+<span class="nc" id="L211">      rb.setNeedDocList(true);</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">      for (String field : fields) {</span>
+<span class="nc bnc" id="L213" title="All 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L214">          throw new IOException(&quot;no (valid) field in mtas kwic&quot;);</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="nc" id="L216">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
-<span class="nc" id="L218">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_KWIC_KEY,</span>
-<span class="nc" id="L219">          NAME_MTAS_KWIC_FIELD, true);</span>
-<span class="nc" id="L220">      MtasSolrResultUtil.compareAndCheck(queryValues, fields,</span>
-<span class="nc" id="L221">          NAME_MTAS_KWIC_QUERY_VALUE, NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L222">      MtasSolrResultUtil.compareAndCheck(queryTypes, fields,</span>
-<span class="nc" id="L223">          NAME_MTAS_KWIC_QUERY_TYPE, NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L224">      MtasSolrResultUtil.compareAndCheck(queryPrefixes, fields,</span>
-<span class="nc" id="L225">          NAME_MTAS_KWIC_QUERY_PREFIX, NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L226">      MtasSolrResultUtil.compareAndCheck(queryIgnores, fields,</span>
-<span class="nc" id="L227">          NAME_MTAS_KWIC_QUERY_IGNORE, NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L228">      MtasSolrResultUtil.compareAndCheck(queryMaximumIgnoreLengths, fields,</span>
+<span class="nc" id="L219">      MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_KWIC_KEY,</span>
+<span class="nc" id="L220">          NAME_MTAS_KWIC_FIELD, true);</span>
+<span class="nc" id="L221">      MtasSolrResultUtil.compareAndCheck(queryValues, fields,</span>
+<span class="nc" id="L222">          NAME_MTAS_KWIC_QUERY_VALUE, NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L223">      MtasSolrResultUtil.compareAndCheck(queryTypes, fields,</span>
+<span class="nc" id="L224">          NAME_MTAS_KWIC_QUERY_TYPE, NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L225">      MtasSolrResultUtil.compareAndCheck(queryPrefixes, fields,</span>
+<span class="nc" id="L226">          NAME_MTAS_KWIC_QUERY_PREFIX, NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L227">      MtasSolrResultUtil.compareAndCheck(queryIgnores, fields,</span>
+<span class="nc" id="L228">          NAME_MTAS_KWIC_QUERY_IGNORE, NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L229">      MtasSolrResultUtil.compareAndCheck(queryMaximumIgnoreLengths, fields,</span>
           NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH, NAME_MTAS_KWIC_FIELD,
-<span class="nc" id="L230">          false);</span>
-<span class="nc" id="L231">      MtasSolrResultUtil.compareAndCheck(prefixes, fields,</span>
-<span class="nc" id="L232">          NAME_MTAS_KWIC_PREFIX, NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L233">      MtasSolrResultUtil.compareAndCheck(numbers, fields, NAME_MTAS_KWIC_NUMBER,</span>
-<span class="nc" id="L234">          NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L235">      MtasSolrResultUtil.compareAndCheck(starts, fields, NAME_MTAS_KWIC_START,</span>
-<span class="nc" id="L236">          NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L237">      MtasSolrResultUtil.compareAndCheck(lefts, fields, NAME_MTAS_KWIC_LEFT,</span>
-<span class="nc" id="L238">          NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L239">      MtasSolrResultUtil.compareAndCheck(rights, fields, NAME_MTAS_KWIC_RIGHT,</span>
-<span class="nc" id="L240">          NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc" id="L241">      MtasSolrResultUtil.compareAndCheck(outputs, fields, NAME_MTAS_KWIC_OUTPUT,</span>
-<span class="nc" id="L242">          NAME_MTAS_KWIC_FIELD, false);</span>
-<span class="nc bnc" id="L243" title="All 2 branches missed.">      for (int i = 0; i &lt; fields.length; i++) {</span>
-<span class="nc" id="L244">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
-<span class="nc bnc" id="L245" title="All 2 branches missed.">        Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i] == null)</span>
-<span class="nc" id="L246">            ? null : Integer.parseInt(queryMaximumIgnoreLengths[i]);</span>
-<span class="nc" id="L247">        MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],</span>
+<span class="nc" id="L231">          false);</span>
+<span class="nc" id="L232">      MtasSolrResultUtil.compareAndCheck(prefixes, fields,</span>
+<span class="nc" id="L233">          NAME_MTAS_KWIC_PREFIX, NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L234">      MtasSolrResultUtil.compareAndCheck(numbers, fields, NAME_MTAS_KWIC_NUMBER,</span>
+<span class="nc" id="L235">          NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L236">      MtasSolrResultUtil.compareAndCheck(starts, fields, NAME_MTAS_KWIC_START,</span>
+<span class="nc" id="L237">          NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L238">      MtasSolrResultUtil.compareAndCheck(lefts, fields, NAME_MTAS_KWIC_LEFT,</span>
+<span class="nc" id="L239">          NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L240">      MtasSolrResultUtil.compareAndCheck(rights, fields, NAME_MTAS_KWIC_RIGHT,</span>
+<span class="nc" id="L241">          NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc" id="L242">      MtasSolrResultUtil.compareAndCheck(outputs, fields, NAME_MTAS_KWIC_OUTPUT,</span>
+<span class="nc" id="L243">          NAME_MTAS_KWIC_FIELD, false);</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="nc" id="L245">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">        Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i] == null)</span>
+<span class="nc" id="L247">            ? null : Integer.parseInt(queryMaximumIgnoreLengths[i]);</span>
+<span class="nc" id="L248">        MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],</span>
             queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i],
             queryIgnores[i], maximumIgnoreLength);
         // minimize number of queries
-<span class="nc bnc" id="L251" title="All 2 branches missed.">        if (cf.spanQueryList.contains(q)) {</span>
-<span class="nc" id="L252">          q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">        if (cf.spanQueryList.contains(q)) {</span>
+<span class="nc" id="L253">          q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
         } else {
-<span class="nc" id="L254">          cf.spanQueryList.add(q);</span>
+<span class="nc" id="L255">          cf.spanQueryList.add(q);</span>
         }
-<span class="nc bnc" id="L256" title="All 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
-<span class="nc" id="L257">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryValues[i]</span>
-<span class="nc" id="L258">            : keys[i].trim();</span>
-<span class="nc" id="L259">        String prefix = prefixes[i];</span>
-<span class="nc bnc" id="L260" title="All 2 branches missed.">        Integer number = (numbers[i] != null) ? getPositiveInteger(numbers[i])</span>
+<span class="nc bnc" id="L257" title="All 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
+<span class="nc" id="L258">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryValues[i]</span>
+<span class="nc" id="L259">            : keys[i].trim();</span>
+<span class="nc" id="L260">        String prefix = prefixes[i];</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">        Integer number = (numbers[i] != null) ? getPositiveInteger(numbers[i])</span>
             : null;
-<span class="nc" id="L262">        int start = getPositiveInteger(starts[i]);</span>
-<span class="nc" id="L263">        int left = getPositiveInteger(lefts[i]);</span>
-<span class="nc" id="L264">        int right = getPositiveInteger(rights[i]);</span>
-<span class="nc" id="L265">        String output = outputs[i];</span>
-<span class="nc" id="L266">        mtasFields.list.get(fields[i]).kwicList.add(new ComponentKwic(q, key,</span>
+<span class="nc" id="L263">        int start = getPositiveInteger(starts[i]);</span>
+<span class="nc" id="L264">        int left = getPositiveInteger(lefts[i]);</span>
+<span class="nc" id="L265">        int right = getPositiveInteger(rights[i]);</span>
+<span class="nc" id="L266">        String output = outputs[i];</span>
+<span class="nc" id="L267">        mtasFields.list.get(fields[i]).kwicList.add(new ComponentKwic(q, key,</span>
             prefix, number, start, left, right, output));
       }
     }
-<span class="nc" id="L270">  }</span>
+<span class="nc" id="L271">  }</span>
 
   /*
    * (non-Javadoc)
@@ -277,131 +278,131 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
    * CodecComponent.BasicComponent, java.lang.Boolean)
    */
   public SimpleOrderedMap&lt;Object&gt; create(ComponentKwic kwic, Boolean encode) {
-<span class="nc" id="L280">    SimpleOrderedMap&lt;Object&gt; mtasKwicResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L281">    mtasKwicResponse.add(&quot;key&quot;, kwic.key);</span>
-<span class="nc" id="L282">    ArrayList&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L283" title="All 2 branches missed.">    if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_HIT)) {</span>
-<span class="nc bnc" id="L284" title="All 2 branches missed.">      for (int docId : kwic.hits.keySet()) {</span>
-<span class="nc" id="L285">        NamedList&lt;Object&gt; mtasKwicItemResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L286">        List&lt;KwicHit&gt; list = kwic.hits.get(docId);</span>
-<span class="nc" id="L287">        List&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponseItems = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L288" title="All 2 branches missed.">        for (KwicHit h : list) {</span>
-<span class="nc" id="L289">          NamedList&lt;Object&gt; mtasKwicItemResponseItem = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L290">          SortedMap&lt;Integer, List&lt;List&lt;String&gt;&gt;&gt; hitData = new TreeMap&lt;&gt;();</span>
-<span class="nc" id="L291">          SortedMap&lt;Integer, List&lt;List&lt;String&gt;&gt;&gt; leftData = null;</span>
-<span class="nc" id="L292">          SortedMap&lt;Integer, List&lt;List&lt;String&gt;&gt;&gt; rightData = null;</span>
-<span class="nc bnc" id="L293" title="All 2 branches missed.">          if (kwic.left &gt; 0) {</span>
-<span class="nc" id="L294">            leftData = new TreeMap&lt;&gt;();</span>
+<span class="nc" id="L281">    SimpleOrderedMap&lt;Object&gt; mtasKwicResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L282">    mtasKwicResponse.add(&quot;key&quot;, kwic.key);</span>
+<span class="nc" id="L283">    ArrayList&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">    if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_HIT)) {</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">      for (int docId : kwic.hits.keySet()) {</span>
+<span class="nc" id="L286">        NamedList&lt;Object&gt; mtasKwicItemResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L287">        List&lt;KwicHit&gt; list = kwic.hits.get(docId);</span>
+<span class="nc" id="L288">        List&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponseItems = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">        for (KwicHit h : list) {</span>
+<span class="nc" id="L290">          NamedList&lt;Object&gt; mtasKwicItemResponseItem = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L291">          SortedMap&lt;Integer, List&lt;List&lt;String&gt;&gt;&gt; hitData = new TreeMap&lt;&gt;();</span>
+<span class="nc" id="L292">          SortedMap&lt;Integer, List&lt;List&lt;String&gt;&gt;&gt; leftData = null;</span>
+<span class="nc" id="L293">          SortedMap&lt;Integer, List&lt;List&lt;String&gt;&gt;&gt; rightData = null;</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">          if (kwic.left &gt; 0) {</span>
+<span class="nc" id="L295">            leftData = new TreeMap&lt;&gt;();</span>
           }
-<span class="nc bnc" id="L296" title="All 2 branches missed.">          if (kwic.right &gt; 0) {</span>
-<span class="nc" id="L297">            rightData = new TreeMap&lt;&gt;();</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">          if (kwic.right &gt; 0) {</span>
+<span class="nc" id="L298">            rightData = new TreeMap&lt;&gt;();</span>
           }
-<span class="nc" id="L299">          for (int position = Math.max(0,</span>
-<span class="nc bnc" id="L300" title="All 2 branches missed.">              h.startPosition - kwic.left); position &lt;= (h.endPosition</span>
-<span class="nc" id="L301">                  + kwic.right); position++) {</span>
-<span class="nc bnc" id="L302" title="All 2 branches missed.">            if (h.hits.containsKey(position)) {</span>
-<span class="nc" id="L303">              List&lt;List&lt;String&gt;&gt; hitDataItem = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L304" title="All 2 branches missed.">              for (String term : h.hits.get(position)) {</span>
-<span class="nc" id="L305">                List&lt;String&gt; hitDataSubItem = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L306">                hitDataSubItem.add(CodecUtil.termPrefix(term));</span>
-<span class="nc" id="L307">                hitDataSubItem.add(CodecUtil.termValue(term));</span>
-<span class="nc" id="L308">                hitDataItem.add(hitDataSubItem);</span>
-<span class="nc" id="L309">              }</span>
-<span class="nc bnc" id="L310" title="All 2 branches missed.">              if (position &lt; h.startPosition) {</span>
-<span class="nc bnc" id="L311" title="All 2 branches missed.">                if (leftData != null) {</span>
-<span class="nc" id="L312">                  leftData.put(position, hitDataItem);</span>
+<span class="nc" id="L300">          for (int position = Math.max(0,</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">              h.startPosition - kwic.left); position &lt;= (h.endPosition</span>
+<span class="nc" id="L302">                  + kwic.right); position++) {</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">            if (h.hits.containsKey(position)) {</span>
+<span class="nc" id="L304">              List&lt;List&lt;String&gt;&gt; hitDataItem = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">              for (String term : h.hits.get(position)) {</span>
+<span class="nc" id="L306">                List&lt;String&gt; hitDataSubItem = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L307">                hitDataSubItem.add(CodecUtil.termPrefix(term));</span>
+<span class="nc" id="L308">                hitDataSubItem.add(CodecUtil.termValue(term));</span>
+<span class="nc" id="L309">                hitDataItem.add(hitDataSubItem);</span>
+<span class="nc" id="L310">              }</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">              if (position &lt; h.startPosition) {</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">                if (leftData != null) {</span>
+<span class="nc" id="L313">                  leftData.put(position, hitDataItem);</span>
                 }
-<span class="nc bnc" id="L314" title="All 2 branches missed.">              } else if (position &gt; h.endPosition) {</span>
-<span class="nc bnc" id="L315" title="All 2 branches missed.">                if (rightData != null) {</span>
-<span class="nc" id="L316">                  rightData.put(position, hitDataItem);</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">              } else if (position &gt; h.endPosition) {</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                if (rightData != null) {</span>
+<span class="nc" id="L317">                  rightData.put(position, hitDataItem);</span>
                 }
               } else {
-<span class="nc" id="L319">                hitData.put(position, hitDataItem);</span>
+<span class="nc" id="L320">                hitData.put(position, hitDataItem);</span>
               }
             }
           }
-<span class="nc bnc" id="L323" title="All 2 branches missed.">          if (kwic.left &gt; 0) {</span>
-<span class="nc" id="L324">            mtasKwicItemResponseItem.add(&quot;left&quot;, leftData);</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">          if (kwic.left &gt; 0) {</span>
+<span class="nc" id="L325">            mtasKwicItemResponseItem.add(&quot;left&quot;, leftData);</span>
           }
-<span class="nc" id="L326">          mtasKwicItemResponseItem.add(&quot;hit&quot;, hitData);</span>
-<span class="nc bnc" id="L327" title="All 2 branches missed.">          if (kwic.right &gt; 0) {</span>
-<span class="nc" id="L328">            mtasKwicItemResponseItem.add(&quot;right&quot;, rightData);</span>
+<span class="nc" id="L327">          mtasKwicItemResponseItem.add(&quot;hit&quot;, hitData);</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">          if (kwic.right &gt; 0) {</span>
+<span class="nc" id="L329">            mtasKwicItemResponseItem.add(&quot;right&quot;, rightData);</span>
           }
-<span class="nc" id="L330">          mtasKwicItemResponseItems.add(mtasKwicItemResponseItem);</span>
-<span class="nc" id="L331">        }</span>
-<span class="nc" id="L332">        mtasKwicItemResponse.add(&quot;documentKey&quot;, kwic.uniqueKey.get(docId));</span>
-<span class="nc" id="L333">        mtasKwicItemResponse.add(&quot;documentTotal&quot;, kwic.subTotal.get(docId));</span>
-<span class="nc" id="L334">        mtasKwicItemResponse.add(&quot;documentMinPosition&quot;,</span>
-<span class="nc" id="L335">            kwic.minPosition.get(docId));</span>
-<span class="nc" id="L336">        mtasKwicItemResponse.add(&quot;documentMaxPosition&quot;,</span>
-<span class="nc" id="L337">            kwic.maxPosition.get(docId));</span>
-<span class="nc" id="L338">        mtasKwicItemResponse.add(&quot;list&quot;, mtasKwicItemResponseItems);</span>
-<span class="nc" id="L339">        mtasKwicItemResponses.add(mtasKwicItemResponse);</span>
-<span class="nc" id="L340">      }</span>
-<span class="nc bnc" id="L341" title="All 2 branches missed.">    } else if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_TOKEN)) {</span>
-<span class="nc bnc" id="L342" title="All 2 branches missed.">      for (int docId : kwic.tokens.keySet()) {</span>
-<span class="nc" id="L343">        NamedList&lt;Object&gt; mtasKwicItemResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L344">        List&lt;KwicToken&gt; list = kwic.tokens.get(docId);</span>
-<span class="nc" id="L345">        List&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponseItems = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L346" title="All 2 branches missed.">        for (KwicToken k : list) {</span>
-<span class="nc" id="L347">          NamedList&lt;Object&gt; mtasKwicItemResponseItem = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L348">          mtasKwicItemResponseItem.add(&quot;startPosition&quot;, k.startPosition);</span>
-<span class="nc" id="L349">          mtasKwicItemResponseItem.add(&quot;endPosition&quot;, k.endPosition);</span>
-<span class="nc" id="L350">          ArrayList&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponseItemTokens = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L351" title="All 2 branches missed.">          for (MtasToken token : k.tokens) {</span>
-<span class="nc" id="L352">            NamedList&lt;Object&gt; mtasKwicItemResponseItemToken = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc bnc" id="L353" title="All 2 branches missed.">            if (token.getId() != null) {</span>
-<span class="nc" id="L354">              mtasKwicItemResponseItemToken.add(&quot;mtasId&quot;, token.getId());</span>
+<span class="nc" id="L331">          mtasKwicItemResponseItems.add(mtasKwicItemResponseItem);</span>
+<span class="nc" id="L332">        }</span>
+<span class="nc" id="L333">        mtasKwicItemResponse.add(&quot;documentKey&quot;, kwic.uniqueKey.get(docId));</span>
+<span class="nc" id="L334">        mtasKwicItemResponse.add(&quot;documentTotal&quot;, kwic.subTotal.get(docId));</span>
+<span class="nc" id="L335">        mtasKwicItemResponse.add(&quot;documentMinPosition&quot;,</span>
+<span class="nc" id="L336">            kwic.minPosition.get(docId));</span>
+<span class="nc" id="L337">        mtasKwicItemResponse.add(&quot;documentMaxPosition&quot;,</span>
+<span class="nc" id="L338">            kwic.maxPosition.get(docId));</span>
+<span class="nc" id="L339">        mtasKwicItemResponse.add(&quot;list&quot;, mtasKwicItemResponseItems);</span>
+<span class="nc" id="L340">        mtasKwicItemResponses.add(mtasKwicItemResponse);</span>
+<span class="nc" id="L341">      }</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">    } else if (kwic.output.equals(ComponentKwic.KWIC_OUTPUT_TOKEN)) {</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">      for (int docId : kwic.tokens.keySet()) {</span>
+<span class="nc" id="L344">        NamedList&lt;Object&gt; mtasKwicItemResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L345">        List&lt;KwicToken&gt; list = kwic.tokens.get(docId);</span>
+<span class="nc" id="L346">        List&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponseItems = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        for (KwicToken k : list) {</span>
+<span class="nc" id="L348">          NamedList&lt;Object&gt; mtasKwicItemResponseItem = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L349">          mtasKwicItemResponseItem.add(&quot;startPosition&quot;, k.startPosition);</span>
+<span class="nc" id="L350">          mtasKwicItemResponseItem.add(&quot;endPosition&quot;, k.endPosition);</span>
+<span class="nc" id="L351">          ArrayList&lt;NamedList&lt;Object&gt;&gt; mtasKwicItemResponseItemTokens = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">          for (MtasToken token : k.tokens) {</span>
+<span class="nc" id="L353">            NamedList&lt;Object&gt; mtasKwicItemResponseItemToken = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc bnc" id="L354" title="All 2 branches missed.">            if (token.getId() != null) {</span>
+<span class="nc" id="L355">              mtasKwicItemResponseItemToken.add(&quot;mtasId&quot;, token.getId());</span>
             }
-<span class="nc" id="L356">            mtasKwicItemResponseItemToken.add(&quot;prefix&quot;, token.getPrefix());</span>
-<span class="nc" id="L357">            mtasKwicItemResponseItemToken.add(&quot;value&quot;, token.getPostfix());</span>
-<span class="nc bnc" id="L358" title="All 2 branches missed.">            if (token.getPositionStart() != null) {</span>
-<span class="nc" id="L359">              mtasKwicItemResponseItemToken.add(&quot;positionStart&quot;,</span>
-<span class="nc" id="L360">                  token.getPositionStart());</span>
-<span class="nc" id="L361">              mtasKwicItemResponseItemToken.add(&quot;positionEnd&quot;,</span>
-<span class="nc" id="L362">                  token.getPositionEnd());</span>
+<span class="nc" id="L357">            mtasKwicItemResponseItemToken.add(&quot;prefix&quot;, token.getPrefix());</span>
+<span class="nc" id="L358">            mtasKwicItemResponseItemToken.add(&quot;value&quot;, token.getPostfix());</span>
+<span class="nc bnc" id="L359" title="All 2 branches missed.">            if (token.getPositionStart() != null) {</span>
+<span class="nc" id="L360">              mtasKwicItemResponseItemToken.add(&quot;positionStart&quot;,</span>
+<span class="nc" id="L361">                  token.getPositionStart());</span>
+<span class="nc" id="L362">              mtasKwicItemResponseItemToken.add(&quot;positionEnd&quot;,</span>
+<span class="nc" id="L363">                  token.getPositionEnd());</span>
             }
-<span class="nc bnc" id="L364" title="All 2 branches missed.">            if (token.getPositions() != null) {</span>
-<span class="nc" id="L365">              mtasKwicItemResponseItemToken.add(&quot;positions&quot;,</span>
-<span class="nc" id="L366">                  token.getPositions());</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">            if (token.getPositions() != null) {</span>
+<span class="nc" id="L366">              mtasKwicItemResponseItemToken.add(&quot;positions&quot;,</span>
+<span class="nc" id="L367">                  Arrays.toString(token.getPositions()));</span>
             }
-<span class="nc bnc" id="L368" title="All 2 branches missed.">            if (token.getParentId() != null) {</span>
-<span class="nc" id="L369">              mtasKwicItemResponseItemToken.add(&quot;parentMtasId&quot;,</span>
-<span class="nc" id="L370">                  token.getParentId());</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">            if (token.getParentId() != null) {</span>
+<span class="nc" id="L370">              mtasKwicItemResponseItemToken.add(&quot;parentMtasId&quot;,</span>
+<span class="nc" id="L371">                  token.getParentId());</span>
             }
-<span class="nc bnc" id="L372" title="All 2 branches missed.">            if (token.getPayload() != null) {</span>
-<span class="nc" id="L373">              mtasKwicItemResponseItemToken.add(&quot;payload&quot;, token.getPayload());</span>
+<span class="nc bnc" id="L373" title="All 2 branches missed.">            if (token.getPayload() != null) {</span>
+<span class="nc" id="L374">              mtasKwicItemResponseItemToken.add(&quot;payload&quot;, token.getPayload());</span>
             }
-<span class="nc bnc" id="L375" title="All 2 branches missed.">            if (token.getOffsetStart() != null) {</span>
-<span class="nc" id="L376">              mtasKwicItemResponseItemToken.add(&quot;offsetStart&quot;,</span>
-<span class="nc" id="L377">                  token.getOffsetStart());</span>
-<span class="nc" id="L378">              mtasKwicItemResponseItemToken.add(&quot;offsetEnd&quot;,</span>
-<span class="nc" id="L379">                  token.getOffsetEnd());</span>
+<span class="nc bnc" id="L376" title="All 2 branches missed.">            if (token.getOffsetStart() != null) {</span>
+<span class="nc" id="L377">              mtasKwicItemResponseItemToken.add(&quot;offsetStart&quot;,</span>
+<span class="nc" id="L378">                  token.getOffsetStart());</span>
+<span class="nc" id="L379">              mtasKwicItemResponseItemToken.add(&quot;offsetEnd&quot;,</span>
+<span class="nc" id="L380">                  token.getOffsetEnd());</span>
             }
-<span class="nc bnc" id="L381" title="All 2 branches missed.">            if (token.getRealOffsetStart() != null) {</span>
-<span class="nc" id="L382">              mtasKwicItemResponseItemToken.add(&quot;realOffsetStart&quot;,</span>
-<span class="nc" id="L383">                  token.getRealOffsetStart());</span>
-<span class="nc" id="L384">              mtasKwicItemResponseItemToken.add(&quot;realOffsetEnd&quot;,</span>
-<span class="nc" id="L385">                  token.getRealOffsetEnd());</span>
+<span class="nc bnc" id="L382" title="All 2 branches missed.">            if (token.getRealOffsetStart() != null) {</span>
+<span class="nc" id="L383">              mtasKwicItemResponseItemToken.add(&quot;realOffsetStart&quot;,</span>
+<span class="nc" id="L384">                  token.getRealOffsetStart());</span>
+<span class="nc" id="L385">              mtasKwicItemResponseItemToken.add(&quot;realOffsetEnd&quot;,</span>
+<span class="nc" id="L386">                  token.getRealOffsetEnd());</span>
             }
-<span class="nc" id="L387">            mtasKwicItemResponseItemTokens.add(mtasKwicItemResponseItemToken);</span>
-<span class="nc" id="L388">          }</span>
-<span class="nc" id="L389">          mtasKwicItemResponseItem.add(&quot;tokens&quot;,</span>
+<span class="nc" id="L388">            mtasKwicItemResponseItemTokens.add(mtasKwicItemResponseItemToken);</span>
+<span class="nc" id="L389">          }</span>
+<span class="nc" id="L390">          mtasKwicItemResponseItem.add(&quot;tokens&quot;,</span>
               mtasKwicItemResponseItemTokens);
-<span class="nc" id="L391">          mtasKwicItemResponseItems.add(mtasKwicItemResponseItem);</span>
-<span class="nc" id="L392">        }</span>
-<span class="nc" id="L393">        mtasKwicItemResponse.add(&quot;documentKey&quot;, kwic.uniqueKey.get(docId));</span>
-<span class="nc" id="L394">        mtasKwicItemResponse.add(&quot;documentTotal&quot;, kwic.subTotal.get(docId));</span>
-<span class="nc" id="L395">        mtasKwicItemResponse.add(&quot;documentMinPosition&quot;,</span>
-<span class="nc" id="L396">            kwic.minPosition.get(docId));</span>
-<span class="nc" id="L397">        mtasKwicItemResponse.add(&quot;documentMaxPosition&quot;,</span>
-<span class="nc" id="L398">            kwic.maxPosition.get(docId));</span>
-<span class="nc" id="L399">        mtasKwicItemResponse.add(&quot;list&quot;, mtasKwicItemResponseItems);</span>
-<span class="nc" id="L400">        mtasKwicItemResponses.add(mtasKwicItemResponse);</span>
-<span class="nc" id="L401">      }</span>
+<span class="nc" id="L392">          mtasKwicItemResponseItems.add(mtasKwicItemResponseItem);</span>
+<span class="nc" id="L393">        }</span>
+<span class="nc" id="L394">        mtasKwicItemResponse.add(&quot;documentKey&quot;, kwic.uniqueKey.get(docId));</span>
+<span class="nc" id="L395">        mtasKwicItemResponse.add(&quot;documentTotal&quot;, kwic.subTotal.get(docId));</span>
+<span class="nc" id="L396">        mtasKwicItemResponse.add(&quot;documentMinPosition&quot;,</span>
+<span class="nc" id="L397">            kwic.minPosition.get(docId));</span>
+<span class="nc" id="L398">        mtasKwicItemResponse.add(&quot;documentMaxPosition&quot;,</span>
+<span class="nc" id="L399">            kwic.maxPosition.get(docId));</span>
+<span class="nc" id="L400">        mtasKwicItemResponse.add(&quot;list&quot;, mtasKwicItemResponseItems);</span>
+<span class="nc" id="L401">        mtasKwicItemResponses.add(mtasKwicItemResponse);</span>
+<span class="nc" id="L402">      }</span>
     }
-<span class="nc" id="L403">    mtasKwicResponse.add(&quot;list&quot;, mtasKwicItemResponses);</span>
-<span class="nc" id="L404">    return mtasKwicResponse;</span>
+<span class="nc" id="L404">    mtasKwicResponse.add(&quot;list&quot;, mtasKwicItemResponses);</span>
+<span class="nc" id="L405">    return mtasKwicResponse;</span>
   }
 
   /*
@@ -415,43 +416,43 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="nc bnc" id="L418" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
-<span class="nc bnc" id="L419" title="All 4 branches missed.">      if (sreq.params.getBool(PARAM_MTAS_KWIC, false)</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">    if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
+<span class="nc bnc" id="L420" title="All 4 branches missed.">      if (sreq.params.getBool(PARAM_MTAS_KWIC, false)</span>
           &amp;&amp; (sreq.purpose &amp; ShardRequest.PURPOSE_GET_FIELDS) != 0) {
         // do nothing
       } else {
-<span class="nc" id="L423">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="nc" id="L424">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);</span>
-<span class="nc" id="L425">        sreq.params.remove(PARAM_MTAS_KWIC);</span>
-<span class="nc bnc" id="L426" title="All 2 branches missed.">        for (String key : keys) {</span>
-<span class="nc" id="L427">          sreq.params</span>
-<span class="nc" id="L428">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_FIELD);</span>
-<span class="nc" id="L429">          sreq.params.remove(</span>
+<span class="nc" id="L424">        Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="nc" id="L425">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_KWIC);</span>
+<span class="nc" id="L426">        sreq.params.remove(PARAM_MTAS_KWIC);</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">        for (String key : keys) {</span>
+<span class="nc" id="L428">          sreq.params</span>
+<span class="nc" id="L429">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_FIELD);</span>
+<span class="nc" id="L430">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_TYPE);
-<span class="nc" id="L431">          sreq.params.remove(</span>
+<span class="nc" id="L432">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_VALUE);
-<span class="nc" id="L433">          sreq.params.remove(</span>
+<span class="nc" id="L434">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_PREFIX);
-<span class="nc" id="L435">          sreq.params.remove(</span>
+<span class="nc" id="L436">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_QUERY_IGNORE);
-<span class="nc" id="L437">          sreq.params.remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L438">          sreq.params.remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH);
-<span class="nc" id="L439">          sreq.params</span>
-<span class="nc" id="L440">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_KEY);</span>
-<span class="nc" id="L441">          sreq.params.remove(</span>
+<span class="nc" id="L440">          sreq.params</span>
+<span class="nc" id="L441">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_KEY);</span>
+<span class="nc" id="L442">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_PREFIX);
-<span class="nc" id="L443">          sreq.params.remove(</span>
+<span class="nc" id="L444">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_NUMBER);
-<span class="nc" id="L445">          sreq.params</span>
-<span class="nc" id="L446">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_LEFT);</span>
-<span class="nc" id="L447">          sreq.params</span>
-<span class="nc" id="L448">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_RIGHT);</span>
-<span class="nc" id="L449">          sreq.params.remove(</span>
+<span class="nc" id="L446">          sreq.params</span>
+<span class="nc" id="L447">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_LEFT);</span>
+<span class="nc" id="L448">          sreq.params</span>
+<span class="nc" id="L449">              .remove(PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_RIGHT);</span>
+<span class="nc" id="L450">          sreq.params.remove(</span>
               PARAM_MTAS_KWIC + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_KWIC_OUTPUT);
-<span class="nc" id="L451">        }</span>
+<span class="nc" id="L452">        }</span>
       }
     }
-<span class="nc" id="L454">  }</span>
+<span class="nc" id="L455">  }</span>
 
   /*
    * (non-Javadoc)
@@ -461,17 +462,17 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
    * solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
-<span class="nc bnc" id="L464" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L465" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
         &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
         &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
-<span class="nc bnc" id="L467" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
-<span class="nc bnc" id="L468" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L469" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_KWIC, false)) {</span>
+<span class="nc bnc" id="L468" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="nc bnc" id="L469" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_KWIC, false)) {</span>
           // nothing to do
         }
-<span class="nc" id="L472">      }</span>
+<span class="nc" id="L473">      }</span>
     }
-<span class="nc" id="L474">  }</span>
+<span class="nc" id="L475">  }</span>
 
   /*
    * (non-Javadoc)
@@ -484,7 +485,7 @@ public class MtasSolrComponentKwic implements MtasSolrComponent&lt;ComponentKwic
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // nothing to do
-<span class="nc" id="L487">  }</span>
+<span class="nc" id="L488">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
