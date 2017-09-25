@@ -2,6 +2,7 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -605,7 +606,7 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
             }
             if (token.getPositions() != null) {
               mtasListItemResponseItemToken.add("positions",
-                  token.getPositions());
+                  Arrays.toString(token.getPositions()));
             }
             if (token.getParentId() != null) {
               mtasListItemResponseItemToken.add("parentMtasId",

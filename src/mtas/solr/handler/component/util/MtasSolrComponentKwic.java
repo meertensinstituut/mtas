@@ -2,6 +2,7 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -363,7 +364,7 @@ public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
             }
             if (token.getPositions() != null) {
               mtasKwicItemResponseItemToken.add("positions",
-                  token.getPositions());
+                  Arrays.toString(token.getPositions()));
             }
             if (token.getParentId() != null) {
               mtasKwicItemResponseItemToken.add("parentMtasId",
