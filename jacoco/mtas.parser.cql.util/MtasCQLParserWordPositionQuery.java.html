@@ -75,9 +75,9 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
-<span class="nc" id="L80">    return query.createWeight(searcher, needsScores);</span>
+<span class="nc" id="L80">    return query.createWeight(searcher, needsScores, boost);</span>
   }
 
   /*

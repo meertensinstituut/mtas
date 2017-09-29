@@ -406,18 +406,18 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
 <span class="fc" id="L410">    List&lt;MtasSpanSequenceQueryWeight&gt; subWeights = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L411">    SpanWeight ignoreWeight = null;</span>
 <span class="fc bfc" id="L412" title="All 2 branches covered.">    for (MtasSpanSequenceItem item : items) {</span>
 <span class="fc" id="L413">      subWeights.add(new MtasSpanSequenceQueryWeight(</span>
-<span class="fc" id="L414">          item.getQuery().createWeight(searcher, false), item.isOptional()));</span>
+<span class="fc" id="L414">          item.getQuery().createWeight(searcher, false, boost), item.isOptional()));</span>
 <span class="fc" id="L415">    }</span>
 <span class="fc bfc" id="L416" title="All 2 branches covered.">    if (ignoreQuery != null) {</span>
-<span class="fc" id="L417">      ignoreWeight = ignoreQuery.createWeight(searcher, false);</span>
+<span class="fc" id="L417">      ignoreWeight = ignoreQuery.createWeight(searcher, false, boost);</span>
     }
 <span class="pc bpc" id="L419" title="1 of 2 branches missed.">    return new SpanSequenceWeight(subWeights, ignoreWeight, maximumIgnoreLength,</span>
-<span class="pc" id="L420">        searcher, needsScores ? getTermContexts(subWeights) : null);</span>
+<span class="pc" id="L420">        searcher, needsScores ? getTermContexts(subWeights) : null, boost);</span>
   }
 
   /**
@@ -477,9 +477,9 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      */
     public SpanSequenceWeight(List&lt;MtasSpanSequenceQueryWeight&gt; subWeights,
         SpanWeight ignoreWeight, Integer maximumIgnoreLength,
-        IndexSearcher searcher, Map&lt;Term, TermContext&gt; terms)
+        IndexSearcher searcher, Map&lt;Term, TermContext&gt; terms, float boost)
 <span class="fc" id="L481">        throws IOException {</span>
-<span class="fc" id="L482">      super(MtasSpanSequenceQuery.this, searcher, terms);</span>
+<span class="fc" id="L482">      super(MtasSpanSequenceQuery.this, searcher, terms, boost);</span>
 <span class="fc" id="L483">      this.subWeights = subWeights;</span>
 <span class="fc" id="L484">      this.ignoreWeight = ignoreWeight;</span>
 <span class="fc" id="L485">      this.maximumIgnoreLength = maximumIgnoreLength;</span>

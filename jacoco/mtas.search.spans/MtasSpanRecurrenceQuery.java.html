@@ -264,15 +264,15 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-<span class="fc" id="L268">    SpanWeight subWeight = query.createWeight(searcher, false);</span>
+      boolean needsScores, float boost) throws IOException {
+<span class="fc" id="L268">    SpanWeight subWeight = query.createWeight(searcher, false, boost);</span>
 <span class="fc" id="L269">    SpanWeight ignoreWeight = null;</span>
 <span class="pc bpc" id="L270" title="1 of 2 branches missed.">    if (ignoreQuery != null) {</span>
-<span class="nc" id="L271">      ignoreWeight = ignoreQuery.createWeight(searcher, false);</span>
+<span class="nc" id="L271">      ignoreWeight = ignoreQuery.createWeight(searcher, false, boost);</span>
     }
 <span class="pc bpc" id="L273" title="1 of 2 branches missed.">    return new SpanRecurrenceWeight(subWeight, ignoreWeight,</span>
         maximumIgnoreLength, searcher,
-<span class="pc" id="L275">        needsScores ? getTermContexts(subWeight) : null);</span>
+<span class="pc" id="L275">        needsScores ? getTermContexts(subWeight) : null, boost);</span>
   }
 
   /*
@@ -315,8 +315,8 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
      */
     public SpanRecurrenceWeight(SpanWeight subWeight, SpanWeight ignoreWeight,
         Integer maximumIgnoreLength, IndexSearcher searcher,
-<span class="fc" id="L318">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L319">      super(MtasSpanRecurrenceQuery.this, searcher, terms);</span>
+<span class="fc" id="L318">        Map&lt;Term, TermContext&gt; terms, float boost) throws IOException {</span>
+<span class="fc" id="L319">      super(MtasSpanRecurrenceQuery.this, searcher, terms, boost);</span>
 <span class="fc" id="L320">      this.subWeight = subWeight;</span>
 <span class="fc" id="L321">      this.ignoreWeight = ignoreWeight;</span>
 <span class="fc" id="L322">      this.maximumIgnoreLength = maximumIgnoreLength;</span>

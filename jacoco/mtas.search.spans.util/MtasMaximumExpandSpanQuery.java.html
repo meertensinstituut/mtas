@@ -79,13 +79,13 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
    * IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
-<span class="fc" id="L84">    SpanWeight subWeight = query.createWeight(searcher, needsScores);</span>
+<span class="fc" id="L84">    SpanWeight subWeight = query.createWeight(searcher, needsScores, boost);</span>
 <span class="pc bpc" id="L85" title="1 of 4 branches missed.">    if (maximumLeft == 0 &amp;&amp; maximumRight == 0) {</span>
 <span class="nc" id="L86">      return subWeight;</span>
     } else {
-<span class="fc" id="L88">      return new MtasMaximumExpandWeight(subWeight, searcher, needsScores);</span>
+<span class="fc" id="L88">      return new MtasMaximumExpandWeight(subWeight, searcher, needsScores, boost);</span>
     }
   }
 
@@ -208,9 +208,9 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public MtasMaximumExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
-<span class="fc" id="L211">        boolean needsScores) throws IOException {</span>
+<span class="fc" id="L211">        boolean needsScores, float boost) throws IOException {</span>
 <span class="pc bpc" id="L212" title="1 of 2 branches missed.">      super(MtasMaximumExpandSpanQuery.this, searcher,</span>
-<span class="pc" id="L213">          needsScores ? getTermContexts(subWeight) : null);</span>
+<span class="pc" id="L213">          needsScores ? getTermContexts(subWeight) : null, boost);</span>
 <span class="fc" id="L214">      this.subWeight = subWeight;</span>
 <span class="fc" id="L215">    }</span>
 

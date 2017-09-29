@@ -50,7 +50,7 @@ public class CodecComponent {
   /**
    * Instantiates a new codec component.
    */
-<span class="nc" id="L53">  private CodecComponent() {</span>
+<span class="nc" id="L53">  private CodecComponent() {       </span>
 <span class="nc" id="L54">  }</span>
 
   /**
@@ -948,18 +948,6 @@ public class CodecComponent {
     /** The base function parser functions. */
     public MtasFunctionParserFunction[][] baseFunctionParserFunctions;
 
-    /** The Constant TYPE_INTEGER. */
-    public static final String TYPE_INTEGER = &quot;integer&quot;;
-
-    /** The Constant TYPE_DOUBLE. */
-    public static final String TYPE_DOUBLE = &quot;double&quot;;
-
-    /** The Constant TYPE_LONG. */
-    public static final String TYPE_LONG = &quot;long&quot;;
-
-    /** The Constant TYPE_FLOAT. */
-    public static final String TYPE_FLOAT = &quot;float&quot;;
-
     /** The Constant TYPE_STRING. */
     public static final String TYPE_STRING = &quot;string&quot;;
 
@@ -993,130 +981,130 @@ public class CodecComponent {
         Integer[] baseNumbers, Double[] baseMinimumDoubles,
         Double[] baseMaximumDoubles, String[][] baseFunctionKeys,
         String[][] baseFunctionExpressions, String[][] baseFunctionTypes)
-<span class="nc" id="L996">        throws IOException, ParseException {</span>
-<span class="nc" id="L997">      this.spanQueries = (MtasSpanQuery[]) spanQueries.clone();</span>
-<span class="nc" id="L998">      this.key = key;</span>
-<span class="nc" id="L999">      this.baseFields = (String[]) baseFields.clone();</span>
-<span class="nc" id="L1000">      this.baseFieldTypes = (String[]) baseFieldTypes.clone();</span>
-<span class="nc" id="L1001">      this.baseTypes = (String[]) baseTypes.clone();</span>
-<span class="nc" id="L1002">      this.baseRangeSizes = (Double[]) baseRangeSizes.clone();</span>
-<span class="nc" id="L1003">      this.baseRangeBases = (Double[]) baseRangeBases.clone();</span>
-<span class="nc" id="L1004">      this.baseSortTypes = (String[]) baseSortTypes.clone();</span>
-<span class="nc" id="L1005">      this.baseSortDirections = (String[]) baseSortDirections.clone();</span>
-<span class="nc" id="L1006">      this.baseNumbers = (Integer[]) baseNumbers.clone();</span>
+<span class="nc" id="L984">        throws IOException, ParseException {</span>
+<span class="nc" id="L985">      this.spanQueries = (MtasSpanQuery[]) spanQueries.clone();</span>
+<span class="nc" id="L986">      this.key = key;</span>
+<span class="nc" id="L987">      this.baseFields = (String[]) baseFields.clone();</span>
+<span class="nc" id="L988">      this.baseFieldTypes = (String[]) baseFieldTypes.clone();</span>
+<span class="nc" id="L989">      this.baseTypes = (String[]) baseTypes.clone();</span>
+<span class="nc" id="L990">      this.baseRangeSizes = (Double[]) baseRangeSizes.clone();</span>
+<span class="nc" id="L991">      this.baseRangeBases = (Double[]) baseRangeBases.clone();</span>
+<span class="nc" id="L992">      this.baseSortTypes = (String[]) baseSortTypes.clone();</span>
+<span class="nc" id="L993">      this.baseSortDirections = (String[]) baseSortDirections.clone();</span>
+<span class="nc" id="L994">      this.baseNumbers = (Integer[]) baseNumbers.clone();</span>
       // compute types
-<span class="nc" id="L1008">      this.baseMinimumLongs = new Long[baseFields.length];</span>
-<span class="nc" id="L1009">      this.baseMaximumLongs = new Long[baseFields.length];</span>
-<span class="nc" id="L1010">      this.baseCollectorTypes = new String[baseFields.length];</span>
-<span class="nc" id="L1011">      this.baseStatsItems = new SortedSet[baseFields.length];</span>
-<span class="nc" id="L1012">      this.baseStatsTypes = new String[baseFields.length];</span>
-<span class="nc" id="L1013">      this.baseDataTypes = new String[baseFields.length];</span>
-<span class="nc" id="L1014">      this.baseParsers = new MtasFunctionParserFunction[baseFields.length];</span>
-<span class="nc" id="L1015">      this.baseFunctionList = new HashMap[baseFields.length];</span>
-<span class="nc" id="L1016">      this.baseFunctionParserFunctions = new MtasFunctionParserFunction[baseFields.length][];</span>
-<span class="nc bnc" id="L1017" title="All 2 branches missed.">      for (int i = 0; i &lt; baseFields.length; i++) {</span>
-<span class="nc bnc" id="L1018" title="All 2 branches missed.">        if (baseMinimumDoubles[i] != null) {</span>
-<span class="nc" id="L1019">          this.baseMinimumLongs[i] = baseMinimumDoubles[i].longValue();</span>
+<span class="nc" id="L996">      this.baseMinimumLongs = new Long[baseFields.length];</span>
+<span class="nc" id="L997">      this.baseMaximumLongs = new Long[baseFields.length];</span>
+<span class="nc" id="L998">      this.baseCollectorTypes = new String[baseFields.length];</span>
+<span class="nc" id="L999">      this.baseStatsItems = new SortedSet[baseFields.length];</span>
+<span class="nc" id="L1000">      this.baseStatsTypes = new String[baseFields.length];</span>
+<span class="nc" id="L1001">      this.baseDataTypes = new String[baseFields.length];</span>
+<span class="nc" id="L1002">      this.baseParsers = new MtasFunctionParserFunction[baseFields.length];</span>
+<span class="nc" id="L1003">      this.baseFunctionList = new HashMap[baseFields.length];</span>
+<span class="nc" id="L1004">      this.baseFunctionParserFunctions = new MtasFunctionParserFunction[baseFields.length][];</span>
+<span class="nc bnc" id="L1005" title="All 2 branches missed.">      for (int i = 0; i &lt; baseFields.length; i++) {</span>
+<span class="nc bnc" id="L1006" title="All 2 branches missed.">        if (baseMinimumDoubles[i] != null) {</span>
+<span class="nc" id="L1007">          this.baseMinimumLongs[i] = baseMinimumDoubles[i].longValue();</span>
         } else {
-<span class="nc" id="L1021">          this.baseMinimumLongs[i] = null;</span>
+<span class="nc" id="L1009">          this.baseMinimumLongs[i] = null;</span>
         }
-<span class="nc bnc" id="L1023" title="All 2 branches missed.">        if (baseMaximumDoubles[i] != null) {</span>
-<span class="nc" id="L1024">          this.baseMaximumLongs[i] = baseMaximumDoubles[i].longValue();</span>
+<span class="nc bnc" id="L1011" title="All 2 branches missed.">        if (baseMaximumDoubles[i] != null) {</span>
+<span class="nc" id="L1012">          this.baseMaximumLongs[i] = baseMaximumDoubles[i].longValue();</span>
         } else {
-<span class="nc" id="L1026">          this.baseMaximumLongs[i] = null;</span>
+<span class="nc" id="L1014">          this.baseMaximumLongs[i] = null;</span>
         }
-<span class="nc" id="L1028">        baseDataTypes[i] = CodecUtil.DATA_TYPE_LONG;</span>
-<span class="nc" id="L1029">        baseFunctionList[i] = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L1030">        baseFunctionParserFunctions[i] = null;</span>
-<span class="nc" id="L1031">        baseParsers[i] = new MtasFunctionParserFunctionDefault(</span>
+<span class="nc" id="L1016">        baseDataTypes[i] = CodecUtil.DATA_TYPE_LONG;</span>
+<span class="nc" id="L1017">        baseFunctionList[i] = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L1018">        baseFunctionParserFunctions[i] = null;</span>
+<span class="nc" id="L1019">        baseParsers[i] = new MtasFunctionParserFunctionDefault(</span>
             this.spanQueries.length);
-<span class="nc bnc" id="L1033" title="All 2 branches missed.">        if (this.baseSortDirections[i] == null) {</span>
-<span class="nc" id="L1034">          this.baseSortDirections[i] = CodecUtil.SORT_ASC;</span>
-<span class="nc bnc" id="L1035" title="All 2 branches missed.">        } else if (!this.baseSortDirections[i].equals(CodecUtil.SORT_ASC)</span>
-<span class="nc bnc" id="L1036" title="All 2 branches missed.">            &amp;&amp; !this.baseSortDirections[i].equals(CodecUtil.SORT_DESC)) {</span>
-<span class="nc" id="L1037">          throw new IOException(</span>
+<span class="nc bnc" id="L1021" title="All 2 branches missed.">        if (this.baseSortDirections[i] == null) {</span>
+<span class="nc" id="L1022">          this.baseSortDirections[i] = CodecUtil.SORT_ASC;</span>
+<span class="nc bnc" id="L1023" title="All 2 branches missed.">        } else if (!this.baseSortDirections[i].equals(CodecUtil.SORT_ASC)</span>
+<span class="nc bnc" id="L1024" title="All 2 branches missed.">            &amp;&amp; !this.baseSortDirections[i].equals(CodecUtil.SORT_DESC)) {</span>
+<span class="nc" id="L1025">          throw new IOException(</span>
               &quot;unrecognized sortDirection &quot; + this.baseSortDirections[i]);
         }
-<span class="nc bnc" id="L1040" title="All 2 branches missed.">        if (this.baseSortTypes[i] == null) {</span>
-<span class="nc" id="L1041">          this.baseSortTypes[i] = CodecUtil.SORT_TERM;</span>
-<span class="nc bnc" id="L1042" title="All 2 branches missed.">        } else if (!this.baseSortTypes[i].equals(CodecUtil.SORT_TERM)</span>
-<span class="nc bnc" id="L1043" title="All 2 branches missed.">            &amp;&amp; !CodecUtil.isStatsType(this.baseSortTypes[i])) {</span>
-<span class="nc" id="L1044">          throw new IOException(</span>
+<span class="nc bnc" id="L1028" title="All 2 branches missed.">        if (this.baseSortTypes[i] == null) {</span>
+<span class="nc" id="L1029">          this.baseSortTypes[i] = CodecUtil.SORT_TERM;</span>
+<span class="nc bnc" id="L1030" title="All 2 branches missed.">        } else if (!this.baseSortTypes[i].equals(CodecUtil.SORT_TERM)</span>
+<span class="nc bnc" id="L1031" title="All 2 branches missed.">            &amp;&amp; !CodecUtil.isStatsType(this.baseSortTypes[i])) {</span>
+<span class="nc" id="L1032">          throw new IOException(</span>
               &quot;unrecognized sortType &quot; + this.baseSortTypes[i]);
         }
-<span class="nc" id="L1047">        this.baseCollectorTypes[i] = DataCollector.COLLECTOR_TYPE_LIST;</span>
-<span class="nc" id="L1048">        this.baseStatsItems[i] = CodecUtil.createStatsItems(this.baseTypes[i]);</span>
-<span class="nc" id="L1049">        this.baseStatsTypes[i] = CodecUtil.createStatsType(baseStatsItems[i],</span>
+<span class="nc" id="L1035">        this.baseCollectorTypes[i] = DataCollector.COLLECTOR_TYPE_LIST;</span>
+<span class="nc" id="L1036">        this.baseStatsItems[i] = CodecUtil.createStatsItems(this.baseTypes[i]);</span>
+<span class="nc" id="L1037">        this.baseStatsTypes[i] = CodecUtil.createStatsType(baseStatsItems[i],</span>
             this.baseSortTypes[i], new MtasFunctionParserFunctionDefault(1));
       }
       boolean doFunctions;
-<span class="nc bnc" id="L1053" title="All 6 branches missed.">      doFunctions = baseFunctionKeys != null &amp;&amp; baseFunctionExpressions != null</span>
+<span class="nc bnc" id="L1041" title="All 6 branches missed.">      doFunctions = baseFunctionKeys != null &amp;&amp; baseFunctionExpressions != null</span>
           &amp;&amp; baseFunctionTypes != null;
-<span class="nc bnc" id="L1055" title="All 4 branches missed.">      doFunctions = doFunctions ? baseFunctionKeys.length == baseFields.length</span>
+<span class="nc bnc" id="L1043" title="All 4 branches missed.">      doFunctions = doFunctions ? baseFunctionKeys.length == baseFields.length</span>
           : false;
-<span class="nc bnc" id="L1057" title="All 4 branches missed.">      doFunctions = doFunctions ? baseFunctionTypes.length == baseFields.length</span>
+<span class="nc bnc" id="L1045" title="All 4 branches missed.">      doFunctions = doFunctions ? baseFunctionTypes.length == baseFields.length</span>
           : false;
-<span class="nc bnc" id="L1059" title="All 2 branches missed.">      if (doFunctions) {</span>
-<span class="nc" id="L1060">        this.baseFunctionKeys = new String[baseFields.length][];</span>
-<span class="nc" id="L1061">        this.baseFunctionExpressions = new String[baseFields.length][];</span>
-<span class="nc" id="L1062">        this.baseFunctionTypes = new String[baseFields.length][];</span>
-<span class="nc bnc" id="L1063" title="All 2 branches missed.">        for (int i = 0; i &lt; baseFields.length; i++) {</span>
-<span class="nc bnc" id="L1064" title="All 4 branches missed.">          if (baseFunctionKeys[i].length == baseFunctionExpressions[i].length</span>
+<span class="nc bnc" id="L1047" title="All 2 branches missed.">      if (doFunctions) {</span>
+<span class="nc" id="L1048">        this.baseFunctionKeys = new String[baseFields.length][];</span>
+<span class="nc" id="L1049">        this.baseFunctionExpressions = new String[baseFields.length][];</span>
+<span class="nc" id="L1050">        this.baseFunctionTypes = new String[baseFields.length][];</span>
+<span class="nc bnc" id="L1051" title="All 2 branches missed.">        for (int i = 0; i &lt; baseFields.length; i++) {</span>
+<span class="nc bnc" id="L1052" title="All 4 branches missed.">          if (baseFunctionKeys[i].length == baseFunctionExpressions[i].length</span>
               &amp;&amp; baseFunctionKeys[i].length == baseFunctionTypes[i].length) {
-<span class="nc" id="L1066">            this.baseFunctionKeys[i] = new String[baseFunctionKeys[i].length];</span>
-<span class="nc" id="L1067">            this.baseFunctionExpressions[i] = new String[baseFunctionExpressions[i].length];</span>
-<span class="nc" id="L1068">            this.baseFunctionTypes[i] = new String[baseFunctionTypes[i].length];</span>
-<span class="nc" id="L1069">            baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[baseFunctionExpressions[i].length];</span>
-<span class="nc bnc" id="L1070" title="All 2 branches missed.">            for (int j = 0; j &lt; baseFunctionKeys[i].length; j++) {</span>
-<span class="nc" id="L1071">              this.baseFunctionKeys[i][j] = baseFunctionKeys[i][j];</span>
-<span class="nc" id="L1072">              this.baseFunctionExpressions[i][j] = baseFunctionExpressions[i][j];</span>
-<span class="nc" id="L1073">              this.baseFunctionTypes[i][j] = baseFunctionTypes[i][j];</span>
-<span class="nc" id="L1074">              baseFunctionParserFunctions[i][j] = new MtasFunctionParser(</span>
+<span class="nc" id="L1054">            this.baseFunctionKeys[i] = new String[baseFunctionKeys[i].length];</span>
+<span class="nc" id="L1055">            this.baseFunctionExpressions[i] = new String[baseFunctionExpressions[i].length];</span>
+<span class="nc" id="L1056">            this.baseFunctionTypes[i] = new String[baseFunctionTypes[i].length];</span>
+<span class="nc" id="L1057">            baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[baseFunctionExpressions[i].length];</span>
+<span class="nc bnc" id="L1058" title="All 2 branches missed.">            for (int j = 0; j &lt; baseFunctionKeys[i].length; j++) {</span>
+<span class="nc" id="L1059">              this.baseFunctionKeys[i][j] = baseFunctionKeys[i][j];</span>
+<span class="nc" id="L1060">              this.baseFunctionExpressions[i][j] = baseFunctionExpressions[i][j];</span>
+<span class="nc" id="L1061">              this.baseFunctionTypes[i][j] = baseFunctionTypes[i][j];</span>
+<span class="nc" id="L1062">              baseFunctionParserFunctions[i][j] = new MtasFunctionParser(</span>
                   new BufferedReader(
-<span class="nc" id="L1076">                      new StringReader(baseFunctionExpressions[i][j]))).parse();</span>
+<span class="nc" id="L1064">                      new StringReader(baseFunctionExpressions[i][j]))).parse();</span>
             }
           } else {
-<span class="nc" id="L1079">            this.baseFunctionKeys[i] = new String[0];</span>
-<span class="nc" id="L1080">            this.baseFunctionExpressions[i] = new String[0];</span>
-<span class="nc" id="L1081">            this.baseFunctionTypes[i] = new String[0];</span>
-<span class="nc" id="L1082">            baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[0];</span>
+<span class="nc" id="L1067">            this.baseFunctionKeys[i] = new String[0];</span>
+<span class="nc" id="L1068">            this.baseFunctionExpressions[i] = new String[0];</span>
+<span class="nc" id="L1069">            this.baseFunctionTypes[i] = new String[0];</span>
+<span class="nc" id="L1070">            baseFunctionParserFunctions[i] = new MtasFunctionParserFunction[0];</span>
           }
         }
       }
-<span class="nc bnc" id="L1086" title="All 2 branches missed.">      if (baseFields.length &gt; 0) {</span>
-<span class="nc bnc" id="L1087" title="All 2 branches missed.">        if (baseFields.length == 1) {</span>
-<span class="nc" id="L1088">          dataCollector = DataCollector.getCollector(this.baseCollectorTypes[0],</span>
+<span class="nc bnc" id="L1074" title="All 2 branches missed.">      if (baseFields.length &gt; 0) {</span>
+<span class="nc bnc" id="L1075" title="All 2 branches missed.">        if (baseFields.length == 1) {</span>
+<span class="nc" id="L1076">          dataCollector = DataCollector.getCollector(this.baseCollectorTypes[0],</span>
               this.baseDataTypes[0], this.baseStatsTypes[0],
               this.baseStatsItems[0], this.baseSortTypes[0],
-<span class="nc" id="L1091">              this.baseSortDirections[0], 0, this.baseNumbers[0], null, null);</span>
+<span class="nc" id="L1079">              this.baseSortDirections[0], 0, this.baseNumbers[0], null, null);</span>
         } else {
-<span class="nc" id="L1093">          String[] subBaseCollectorTypes = Arrays</span>
-<span class="nc" id="L1094">              .copyOfRange(baseCollectorTypes, 1, baseDataTypes.length);</span>
-<span class="nc" id="L1095">          String[] subBaseDataTypes = Arrays.copyOfRange(baseDataTypes, 1,</span>
+<span class="nc" id="L1081">          String[] subBaseCollectorTypes = Arrays</span>
+<span class="nc" id="L1082">              .copyOfRange(baseCollectorTypes, 1, baseDataTypes.length);</span>
+<span class="nc" id="L1083">          String[] subBaseDataTypes = Arrays.copyOfRange(baseDataTypes, 1,</span>
               baseDataTypes.length);
-<span class="nc" id="L1097">          String[] subBaseStatsTypes = Arrays.copyOfRange(baseStatsTypes, 1,</span>
+<span class="nc" id="L1085">          String[] subBaseStatsTypes = Arrays.copyOfRange(baseStatsTypes, 1,</span>
               baseStatsTypes.length);
-<span class="nc" id="L1099">          SortedSet&lt;String&gt;[] subBaseStatsItems = Arrays</span>
-<span class="nc" id="L1100">              .copyOfRange(baseStatsItems, 1, baseStatsItems.length);</span>
-<span class="nc" id="L1101">          String[] subBaseSortTypes = Arrays.copyOfRange(baseSortTypes, 1,</span>
+<span class="nc" id="L1087">          SortedSet&lt;String&gt;[] subBaseStatsItems = Arrays</span>
+<span class="nc" id="L1088">              .copyOfRange(baseStatsItems, 1, baseStatsItems.length);</span>
+<span class="nc" id="L1089">          String[] subBaseSortTypes = Arrays.copyOfRange(baseSortTypes, 1,</span>
               baseSortTypes.length);
-<span class="nc" id="L1103">          String[] subBaseSortDirections = Arrays</span>
-<span class="nc" id="L1104">              .copyOfRange(baseSortDirections, 1, baseSortDirections.length);</span>
-<span class="nc" id="L1105">          Integer[] subNumbers = Arrays.copyOfRange(baseNumbers, 1,</span>
+<span class="nc" id="L1091">          String[] subBaseSortDirections = Arrays</span>
+<span class="nc" id="L1092">              .copyOfRange(baseSortDirections, 1, baseSortDirections.length);</span>
+<span class="nc" id="L1093">          Integer[] subNumbers = Arrays.copyOfRange(baseNumbers, 1,</span>
               baseNumbers.length);
-<span class="nc" id="L1107">          Integer[] subStarts = ArrayUtils.toObject(new int[subNumbers.length]);</span>
-<span class="nc" id="L1108">          dataCollector = DataCollector.getCollector(this.baseCollectorTypes[0],</span>
+<span class="nc" id="L1095">          Integer[] subStarts = ArrayUtils.toObject(new int[subNumbers.length]);</span>
+<span class="nc" id="L1096">          dataCollector = DataCollector.getCollector(this.baseCollectorTypes[0],</span>
               this.baseDataTypes[0], this.baseStatsTypes[0],
               this.baseStatsItems[0], this.baseSortTypes[0],
-<span class="nc" id="L1111">              this.baseSortDirections[0], 0, this.baseNumbers[0],</span>
+<span class="nc" id="L1099">              this.baseSortDirections[0], 0, this.baseNumbers[0],</span>
               subBaseCollectorTypes, subBaseDataTypes, subBaseStatsTypes,
               subBaseStatsItems, subBaseSortTypes, subBaseSortDirections,
               subStarts, subNumbers, null, null);
-<span class="nc" id="L1115">        }</span>
+<span class="nc" id="L1103">        }</span>
       } else {
-<span class="nc" id="L1117">        throw new IOException(&quot;no baseFields&quot;);</span>
+<span class="nc" id="L1105">        throw new IOException(&quot;no baseFields&quot;);</span>
       }
-<span class="nc" id="L1119">    }</span>
+<span class="nc" id="L1107">    }</span>
 
     /**
      * Function sum rule.
@@ -1124,16 +1112,16 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionSumRule() {
-<span class="nc bnc" id="L1127" title="All 2 branches missed.">      if (baseFunctionParserFunctions != null) {</span>
-<span class="nc bnc" id="L1128" title="All 2 branches missed.">        for (int i = 0; i &lt; baseFields.length; i++) {</span>
-<span class="nc bnc" id="L1129" title="All 2 branches missed.">          for (MtasFunctionParserFunction function : baseFunctionParserFunctions[i]) {</span>
-<span class="nc bnc" id="L1130" title="All 2 branches missed.">            if (!function.sumRule()) {</span>
-<span class="nc" id="L1131">              return false;</span>
+<span class="nc bnc" id="L1115" title="All 2 branches missed.">      if (baseFunctionParserFunctions != null) {</span>
+<span class="nc bnc" id="L1116" title="All 2 branches missed.">        for (int i = 0; i &lt; baseFields.length; i++) {</span>
+<span class="nc bnc" id="L1117" title="All 2 branches missed.">          for (MtasFunctionParserFunction function : baseFunctionParserFunctions[i]) {</span>
+<span class="nc bnc" id="L1118" title="All 2 branches missed.">            if (!function.sumRule()) {</span>
+<span class="nc" id="L1119">              return false;</span>
             }
           }
         }
       }
-<span class="nc" id="L1136">      return true;</span>
+<span class="nc" id="L1124">      return true;</span>
     }
 
     /**
@@ -1142,16 +1130,16 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionNeedPositions() {
-<span class="nc bnc" id="L1145" title="All 2 branches missed.">      if (baseFunctionParserFunctions != null) {</span>
-<span class="nc bnc" id="L1146" title="All 2 branches missed.">        for (int i = 0; i &lt; baseFields.length; i++) {</span>
-<span class="nc bnc" id="L1147" title="All 2 branches missed.">          for (MtasFunctionParserFunction function : baseFunctionParserFunctions[i]) {</span>
-<span class="nc bnc" id="L1148" title="All 2 branches missed.">            if (function.needPositions()) {</span>
-<span class="nc" id="L1149">              return true;</span>
+<span class="nc bnc" id="L1133" title="All 2 branches missed.">      if (baseFunctionParserFunctions != null) {</span>
+<span class="nc bnc" id="L1134" title="All 2 branches missed.">        for (int i = 0; i &lt; baseFields.length; i++) {</span>
+<span class="nc bnc" id="L1135" title="All 2 branches missed.">          for (MtasFunctionParserFunction function : baseFunctionParserFunctions[i]) {</span>
+<span class="nc bnc" id="L1136" title="All 2 branches missed.">            if (function.needPositions()) {</span>
+<span class="nc" id="L1137">              return true;</span>
             }
           }
         }
       }
-<span class="nc" id="L1154">      return false;</span>
+<span class="nc" id="L1142">      return false;</span>
     }
 
     /**
@@ -1160,12 +1148,12 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean baseParserSumRule() {
-<span class="nc bnc" id="L1163" title="All 2 branches missed.">      for (int i = 0; i &lt; baseFields.length; i++) {</span>
-<span class="nc bnc" id="L1164" title="All 2 branches missed.">        if (!baseParsers[i].sumRule()) {</span>
-<span class="nc" id="L1165">          return false;</span>
+<span class="nc bnc" id="L1151" title="All 2 branches missed.">      for (int i = 0; i &lt; baseFields.length; i++) {</span>
+<span class="nc bnc" id="L1152" title="All 2 branches missed.">        if (!baseParsers[i].sumRule()) {</span>
+<span class="nc" id="L1153">          return false;</span>
         }
       }
-<span class="nc" id="L1168">      return true;</span>
+<span class="nc" id="L1156">      return true;</span>
     }
 
     /**
@@ -1174,12 +1162,12 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean baseParserNeedPositions() {
-<span class="nc bnc" id="L1177" title="All 2 branches missed.">      for (int i = 0; i &lt; baseFields.length; i++) {</span>
-<span class="nc bnc" id="L1178" title="All 2 branches missed.">        if (baseParsers[i].needPositions()) {</span>
-<span class="nc" id="L1179">          return true;</span>
+<span class="nc bnc" id="L1165" title="All 2 branches missed.">      for (int i = 0; i &lt; baseFields.length; i++) {</span>
+<span class="nc bnc" id="L1166" title="All 2 branches missed.">        if (baseParsers[i].needPositions()) {</span>
+<span class="nc" id="L1167">          return true;</span>
         }
       }
-<span class="nc" id="L1182">      return false;</span>
+<span class="nc" id="L1170">      return false;</span>
     }
 
   }
@@ -1271,125 +1259,125 @@ public class CodecComponent {
         String[] functionExpression, String[] functionType, String boundary,
         String[] list, Boolean listRegexp, String ignoreRegexp,
         String[] ignoreList, Boolean ignoreListRegexp)
-<span class="fc" id="L1274">        throws IOException, ParseException {</span>
-<span class="fc" id="L1275">      this.key = key;</span>
-<span class="fc" id="L1276">      this.prefix = prefix;</span>
-<span class="fc" id="L1277">      this.regexp = regexp;</span>
-<span class="pc bpc" id="L1278" title="1 of 4 branches missed.">      this.full = (full != null &amp;&amp; full) ? true : false;</span>
-<span class="fc bfc" id="L1279" title="All 2 branches covered.">      if (sortType == null) {</span>
-<span class="fc" id="L1280">        this.sortType = CodecUtil.SORT_TERM;</span>
+<span class="fc" id="L1262">        throws IOException, ParseException {</span>
+<span class="fc" id="L1263">      this.key = key;</span>
+<span class="fc" id="L1264">      this.prefix = prefix;</span>
+<span class="fc" id="L1265">      this.regexp = regexp;</span>
+<span class="pc bpc" id="L1266" title="1 of 4 branches missed.">      this.full = (full != null &amp;&amp; full) ? true : false;</span>
+<span class="fc bfc" id="L1267" title="All 2 branches covered.">      if (sortType == null) {</span>
+<span class="fc" id="L1268">        this.sortType = CodecUtil.SORT_TERM;</span>
       } else {
-<span class="fc" id="L1282">        this.sortType = sortType;</span>
+<span class="fc" id="L1270">        this.sortType = sortType;</span>
       }
-<span class="fc bfc" id="L1284" title="All 2 branches covered.">      if (sortDirection == null) {</span>
-<span class="pc bpc" id="L1285" title="1 of 2 branches missed.">        if (this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="fc" id="L1286">          this.sortDirection = CodecUtil.SORT_ASC;</span>
+<span class="fc bfc" id="L1272" title="All 2 branches covered.">      if (sortDirection == null) {</span>
+<span class="pc bpc" id="L1273" title="1 of 2 branches missed.">        if (this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="fc" id="L1274">          this.sortDirection = CodecUtil.SORT_ASC;</span>
         } else {
-<span class="nc" id="L1288">          this.sortDirection = CodecUtil.SORT_DESC;</span>
+<span class="nc" id="L1276">          this.sortDirection = CodecUtil.SORT_DESC;</span>
         }
       } else {
-<span class="fc" id="L1291">        this.sortDirection = sortDirection;</span>
+<span class="fc" id="L1279">        this.sortDirection = sortDirection;</span>
       }
-<span class="pc bpc" id="L1293" title="1 of 4 branches missed.">      if (list != null &amp;&amp; list.length &gt; 0) {</span>
-<span class="fc" id="L1294">        this.list = new HashSet(Arrays.asList(list));</span>
-<span class="pc bpc" id="L1295" title="1 of 2 branches missed.">        this.listRegexp = listRegexp != null ? listRegexp : false;</span>
-<span class="fc" id="L1296">        this.boundary = null;</span>
-<span class="fc" id="L1297">        this.number = Integer.MAX_VALUE;</span>
-<span class="pc bpc" id="L1298" title="1 of 2 branches missed.">        if (!this.full) {</span>
-<span class="fc" id="L1299">          this.sortType = CodecUtil.SORT_TERM;</span>
-<span class="fc" id="L1300">          this.sortDirection = CodecUtil.SORT_ASC;</span>
+<span class="pc bpc" id="L1281" title="1 of 4 branches missed.">      if (list != null &amp;&amp; list.length &gt; 0) {</span>
+<span class="fc" id="L1282">        this.list = new HashSet(Arrays.asList(list));</span>
+<span class="pc bpc" id="L1283" title="1 of 2 branches missed.">        this.listRegexp = listRegexp != null ? listRegexp : false;</span>
+<span class="fc" id="L1284">        this.boundary = null;</span>
+<span class="fc" id="L1285">        this.number = Integer.MAX_VALUE;</span>
+<span class="pc bpc" id="L1286" title="1 of 2 branches missed.">        if (!this.full) {</span>
+<span class="fc" id="L1287">          this.sortType = CodecUtil.SORT_TERM;</span>
+<span class="fc" id="L1288">          this.sortDirection = CodecUtil.SORT_ASC;</span>
         }
       } else {
-<span class="fc" id="L1303">        this.list = null;</span>
-<span class="fc" id="L1304">        this.listRegexp = false;</span>
-<span class="pc bpc" id="L1305" title="1 of 2 branches missed.">        this.startValue = (startValue != null)</span>
+<span class="fc" id="L1291">        this.list = null;</span>
+<span class="fc" id="L1292">        this.listRegexp = false;</span>
+<span class="pc bpc" id="L1293" title="1 of 2 branches missed.">        this.startValue = (startValue != null)</span>
             ? new BytesRef(prefix + MtasToken.DELIMITER + startValue) : null;
-<span class="pc bpc" id="L1307" title="1 of 2 branches missed.">        if (boundary == null) {</span>
-<span class="fc" id="L1308">          this.boundary = null;</span>
-<span class="pc bpc" id="L1309" title="1 of 2 branches missed.">          if (number &lt; -1) {</span>
-<span class="nc" id="L1310">            throw new IOException(&quot;number should not be &quot; + number);</span>
-<span class="fc bfc" id="L1311" title="All 2 branches covered.">          } else if (number &gt;= 0) {</span>
-<span class="fc" id="L1312">            this.number = number;</span>
+<span class="pc bpc" id="L1295" title="1 of 2 branches missed.">        if (boundary == null) {</span>
+<span class="fc" id="L1296">          this.boundary = null;</span>
+<span class="pc bpc" id="L1297" title="1 of 2 branches missed.">          if (number &lt; -1) {</span>
+<span class="nc" id="L1298">            throw new IOException(&quot;number should not be &quot; + number);</span>
+<span class="fc bfc" id="L1299" title="All 2 branches covered.">          } else if (number &gt;= 0) {</span>
+<span class="fc" id="L1300">            this.number = number;</span>
           } else {
-<span class="pc bpc" id="L1314" title="1 of 2 branches missed.">            if (!full) {</span>
-<span class="nc" id="L1315">              throw new IOException(</span>
+<span class="pc bpc" id="L1302" title="1 of 2 branches missed.">            if (!full) {</span>
+<span class="nc" id="L1303">              throw new IOException(</span>
                   &quot;number &quot; + number + &quot; only supported for full termvector&quot;);
             } else {
-<span class="fc" id="L1318">              this.number = Integer.MAX_VALUE;</span>
+<span class="fc" id="L1306">              this.number = Integer.MAX_VALUE;</span>
             }
           }
         } else {
-<span class="nc" id="L1322">          this.boundary = boundary;</span>
-<span class="nc" id="L1323">          this.number = Integer.MAX_VALUE;</span>
+<span class="nc" id="L1310">          this.boundary = boundary;</span>
+<span class="nc" id="L1311">          this.number = Integer.MAX_VALUE;</span>
         }
       }
-<span class="fc" id="L1326">      this.ignoreRegexp = ignoreRegexp;</span>
-<span class="pc bpc" id="L1327" title="1 of 4 branches missed.">      if (ignoreList != null &amp;&amp; ignoreList.length &gt; 0) {</span>
-<span class="fc" id="L1328">        this.ignoreList = new HashSet(Arrays.asList(ignoreList));</span>
-<span class="pc bpc" id="L1329" title="1 of 2 branches missed.">        this.ignoreListRegexp = ignoreListRegexp != null ? ignoreListRegexp</span>
+<span class="fc" id="L1314">      this.ignoreRegexp = ignoreRegexp;</span>
+<span class="pc bpc" id="L1315" title="1 of 4 branches missed.">      if (ignoreList != null &amp;&amp; ignoreList.length &gt; 0) {</span>
+<span class="fc" id="L1316">        this.ignoreList = new HashSet(Arrays.asList(ignoreList));</span>
+<span class="pc bpc" id="L1317" title="1 of 2 branches missed.">        this.ignoreListRegexp = ignoreListRegexp != null ? ignoreListRegexp</span>
             : false;
       } else {
-<span class="fc" id="L1332">        this.ignoreList = null;</span>
-<span class="fc" id="L1333">        this.ignoreListRegexp = false;</span>
+<span class="fc" id="L1320">        this.ignoreList = null;</span>
+<span class="fc" id="L1321">        this.ignoreListRegexp = false;</span>
       }
-<span class="fc" id="L1335">      functions = new ArrayList&lt;&gt;();</span>
-<span class="pc bpc" id="L1336" title="2 of 6 branches missed.">      if (functionKey != null &amp;&amp; functionExpression != null</span>
+<span class="fc" id="L1323">      functions = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L1324" title="2 of 6 branches missed.">      if (functionKey != null &amp;&amp; functionExpression != null</span>
           &amp;&amp; functionType != null) {
-<span class="pc bpc" id="L1338" title="2 of 4 branches missed.">        if (functionKey.length == functionExpression.length</span>
+<span class="pc bpc" id="L1326" title="2 of 4 branches missed.">        if (functionKey.length == functionExpression.length</span>
             &amp;&amp; functionKey.length == functionType.length) {
-<span class="pc bpc" id="L1340" title="1 of 2 branches missed.">          for (int i = 0; i &lt; functionKey.length; i++) {</span>
-<span class="nc" id="L1341">            functions</span>
-<span class="nc" id="L1342">                .add(new SubComponentFunction(DataCollector.COLLECTOR_TYPE_LIST,</span>
+<span class="pc bpc" id="L1328" title="1 of 2 branches missed.">          for (int i = 0; i &lt; functionKey.length; i++) {</span>
+<span class="nc" id="L1329">            functions</span>
+<span class="nc" id="L1330">                .add(new SubComponentFunction(DataCollector.COLLECTOR_TYPE_LIST,</span>
                     functionKey[i], functionExpression[i], functionType[i]));
           }
         }
       }
-<span class="fc bfc" id="L1347" title="All 2 branches covered.">      if (!this.sortType.equals(CodecUtil.SORT_TERM)</span>
-<span class="pc bpc" id="L1348" title="1 of 2 branches missed.">          &amp;&amp; !CodecUtil.isStatsType(this.sortType)) {</span>
-<span class="nc" id="L1349">        throw new IOException(&quot;unknown sortType '&quot; + this.sortType + &quot;'&quot;);</span>
-<span class="fc bfc" id="L1350" title="All 4 branches covered.">      } else if (!full &amp;&amp; !this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="pc bpc" id="L1351" title="1 of 2 branches missed.">        if (!(this.sortType.equals(CodecUtil.STATS_TYPE_SUM)</span>
-<span class="nc bnc" id="L1352" title="All 2 branches missed.">            || this.sortType.equals(CodecUtil.STATS_TYPE_N))) {</span>
-<span class="nc" id="L1353">          throw new IOException(&quot;sortType '&quot; + this.sortType</span>
+<span class="fc bfc" id="L1335" title="All 2 branches covered.">      if (!this.sortType.equals(CodecUtil.SORT_TERM)</span>
+<span class="pc bpc" id="L1336" title="1 of 2 branches missed.">          &amp;&amp; !CodecUtil.isStatsType(this.sortType)) {</span>
+<span class="nc" id="L1337">        throw new IOException(&quot;unknown sortType '&quot; + this.sortType + &quot;'&quot;);</span>
+<span class="fc bfc" id="L1338" title="All 4 branches covered.">      } else if (!full &amp;&amp; !this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="pc bpc" id="L1339" title="1 of 2 branches missed.">        if (!(this.sortType.equals(CodecUtil.STATS_TYPE_SUM)</span>
+<span class="nc bnc" id="L1340" title="All 2 branches missed.">            || this.sortType.equals(CodecUtil.STATS_TYPE_N))) {</span>
+<span class="nc" id="L1341">          throw new IOException(&quot;sortType '&quot; + this.sortType</span>
               + &quot;' only supported with full termVector&quot;);
         }
       }
-<span class="fc bfc" id="L1357" title="All 2 branches covered.">      if (!this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="pc bpc" id="L1358" title="1 of 2 branches missed.">        if (startValue != null) {</span>
-<span class="nc" id="L1359">          throw new IOException(&quot;startValue '&quot; + startValue</span>
+<span class="fc bfc" id="L1345" title="All 2 branches covered.">      if (!this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="pc bpc" id="L1346" title="1 of 2 branches missed.">        if (startValue != null) {</span>
+<span class="nc" id="L1347">          throw new IOException(&quot;startValue '&quot; + startValue</span>
               + &quot;' only supported with termVector sorted on &quot;
               + CodecUtil.SORT_TERM);
         }
       }
-<span class="fc bfc" id="L1364" title="All 2 branches covered.">      if (!this.sortDirection.equals(CodecUtil.SORT_ASC)</span>
-<span class="pc bpc" id="L1365" title="1 of 2 branches missed.">          &amp;&amp; !this.sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
-<span class="nc" id="L1366">        throw new IOException(</span>
+<span class="fc bfc" id="L1352" title="All 2 branches covered.">      if (!this.sortDirection.equals(CodecUtil.SORT_ASC)</span>
+<span class="pc bpc" id="L1353" title="1 of 2 branches missed.">          &amp;&amp; !this.sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
+<span class="nc" id="L1354">        throw new IOException(</span>
             &quot;unrecognized sortDirection '&quot; + this.sortDirection + &quot;'&quot;);
       }
-<span class="pc bpc" id="L1369" title="1 of 2 branches missed.">      boundaryRegistration = this.boundary != null;</span>
-<span class="fc" id="L1370">      String segmentRegistration = null;</span>
-<span class="fc bfc" id="L1371" title="All 2 branches covered.">      if (this.full) {</span>
-<span class="fc" id="L1372">        this.boundary = null;</span>
-<span class="fc" id="L1373">        segmentRegistration = null;</span>
-<span class="pc bpc" id="L1374" title="1 of 2 branches missed.">      } else if (this.boundary != null) {</span>
-<span class="nc bnc" id="L1375" title="All 2 branches missed.">        if (this.sortDirection.equals(CodecUtil.SORT_ASC)) {</span>
-<span class="nc" id="L1376">          segmentRegistration = MtasDataCollector.SEGMENT_BOUNDARY_ASC;</span>
-<span class="nc bnc" id="L1377" title="All 2 branches missed.">        } else if (this.sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
-<span class="nc" id="L1378">          segmentRegistration = MtasDataCollector.SEGMENT_BOUNDARY_DESC;</span>
+<span class="pc bpc" id="L1357" title="1 of 2 branches missed.">      boundaryRegistration = this.boundary != null;</span>
+<span class="fc" id="L1358">      String segmentRegistration = null;</span>
+<span class="fc bfc" id="L1359" title="All 2 branches covered.">      if (this.full) {</span>
+<span class="fc" id="L1360">        this.boundary = null;</span>
+<span class="fc" id="L1361">        segmentRegistration = null;</span>
+<span class="pc bpc" id="L1362" title="1 of 2 branches missed.">      } else if (this.boundary != null) {</span>
+<span class="nc bnc" id="L1363" title="All 2 branches missed.">        if (this.sortDirection.equals(CodecUtil.SORT_ASC)) {</span>
+<span class="nc" id="L1364">          segmentRegistration = MtasDataCollector.SEGMENT_BOUNDARY_ASC;</span>
+<span class="nc bnc" id="L1365" title="All 2 branches missed.">        } else if (this.sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
+<span class="nc" id="L1366">          segmentRegistration = MtasDataCollector.SEGMENT_BOUNDARY_DESC;</span>
         }
-<span class="fc bfc" id="L1380" title="All 2 branches covered.">      } else if (!this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="fc bfc" id="L1381" title="All 2 branches covered.">        if (this.sortDirection.equals(CodecUtil.SORT_ASC)) {</span>
-<span class="fc" id="L1382">          segmentRegistration = MtasDataCollector.SEGMENT_SORT_ASC;</span>
-<span class="pc bpc" id="L1383" title="1 of 2 branches missed.">        } else if (this.sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
-<span class="fc" id="L1384">          segmentRegistration = MtasDataCollector.SEGMENT_SORT_DESC;</span>
+<span class="fc bfc" id="L1368" title="All 2 branches covered.">      } else if (!this.sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="fc bfc" id="L1369" title="All 2 branches covered.">        if (this.sortDirection.equals(CodecUtil.SORT_ASC)) {</span>
+<span class="fc" id="L1370">          segmentRegistration = MtasDataCollector.SEGMENT_SORT_ASC;</span>
+<span class="pc bpc" id="L1371" title="1 of 2 branches missed.">        } else if (this.sortDirection.equals(CodecUtil.SORT_DESC)) {</span>
+<span class="fc" id="L1372">          segmentRegistration = MtasDataCollector.SEGMENT_SORT_DESC;</span>
         }
       }
       // create main subComponentFunction
-<span class="fc" id="L1388">      this.subComponentFunction = new SubComponentFunction(</span>
+<span class="fc" id="L1376">      this.subComponentFunction = new SubComponentFunction(</span>
           DataCollector.COLLECTOR_TYPE_LIST, key, type,
           new MtasFunctionParserFunctionDefault(1), this.sortType,
-<span class="fc" id="L1391">          this.sortDirection, 0, this.number, segmentRegistration, boundary);</span>
-<span class="fc" id="L1392">    }</span>
+<span class="fc" id="L1379">          this.sortDirection, 0, this.number, segmentRegistration, boundary);</span>
+<span class="fc" id="L1380">    }</span>
 
     /**
      * Function sum rule.
@@ -1397,14 +1385,14 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionSumRule() {
-<span class="nc bnc" id="L1400" title="All 2 branches missed.">      if (functions != null) {</span>
-<span class="nc bnc" id="L1401" title="All 2 branches missed.">        for (SubComponentFunction function : functions) {</span>
-<span class="nc bnc" id="L1402" title="All 2 branches missed.">          if (!function.parserFunction.sumRule()) {</span>
-<span class="nc" id="L1403">            return false;</span>
+<span class="nc bnc" id="L1388" title="All 2 branches missed.">      if (functions != null) {</span>
+<span class="nc bnc" id="L1389" title="All 2 branches missed.">        for (SubComponentFunction function : functions) {</span>
+<span class="nc bnc" id="L1390" title="All 2 branches missed.">          if (!function.parserFunction.sumRule()) {</span>
+<span class="nc" id="L1391">            return false;</span>
           }
-<span class="nc" id="L1405">        }</span>
+<span class="nc" id="L1393">        }</span>
       }
-<span class="nc" id="L1407">      return true;</span>
+<span class="nc" id="L1395">      return true;</span>
     }
 
     /**
@@ -1413,14 +1401,14 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionNeedPositions() {
-<span class="pc bpc" id="L1416" title="1 of 2 branches missed.">      if (functions != null) {</span>
-<span class="pc bpc" id="L1417" title="1 of 2 branches missed.">        for (SubComponentFunction function : functions) {</span>
-<span class="nc bnc" id="L1418" title="All 2 branches missed.">          if (function.parserFunction.needPositions()) {</span>
-<span class="nc" id="L1419">            return true;</span>
+<span class="pc bpc" id="L1404" title="1 of 2 branches missed.">      if (functions != null) {</span>
+<span class="pc bpc" id="L1405" title="1 of 2 branches missed.">        for (SubComponentFunction function : functions) {</span>
+<span class="nc bnc" id="L1406" title="All 2 branches missed.">          if (function.parserFunction.needPositions()) {</span>
+<span class="nc" id="L1407">            return true;</span>
           }
-<span class="nc" id="L1421">        }</span>
+<span class="nc" id="L1409">        }</span>
       }
-<span class="fc" id="L1423">      return false;</span>
+<span class="fc" id="L1411">      return false;</span>
     }
 
   }
@@ -1483,39 +1471,39 @@ public class CodecComponent {
     public ComponentSpan(MtasSpanQuery[] queries, String key,
         Double minimumDouble, Double maximumDouble, String type,
         String[] functionKey, String[] functionExpression,
-<span class="fc" id="L1486">        String[] functionType) throws IOException, ParseException {</span>
-<span class="fc" id="L1487">      this.queries = (MtasSpanQuery[]) queries.clone();</span>
-<span class="fc" id="L1488">      this.key = key;</span>
-<span class="fc" id="L1489">      functions = new ArrayList&lt;&gt;();</span>
-<span class="pc bpc" id="L1490" title="2 of 6 branches missed.">      if (functionKey != null &amp;&amp; functionExpression != null</span>
+<span class="fc" id="L1474">        String[] functionType) throws IOException, ParseException {</span>
+<span class="fc" id="L1475">      this.queries = (MtasSpanQuery[]) queries.clone();</span>
+<span class="fc" id="L1476">      this.key = key;</span>
+<span class="fc" id="L1477">      functions = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L1478" title="2 of 6 branches missed.">      if (functionKey != null &amp;&amp; functionExpression != null</span>
           &amp;&amp; functionType != null) {
-<span class="pc bpc" id="L1492" title="2 of 4 branches missed.">        if (functionKey.length == functionExpression.length</span>
+<span class="pc bpc" id="L1480" title="2 of 4 branches missed.">        if (functionKey.length == functionExpression.length</span>
             &amp;&amp; functionKey.length == functionType.length) {
-<span class="fc bfc" id="L1494" title="All 2 branches covered.">          for (int i = 0; i &lt; functionKey.length; i++) {</span>
-<span class="fc" id="L1495">            functions</span>
-<span class="fc" id="L1496">                .add(new SubComponentFunction(DataCollector.COLLECTOR_TYPE_DATA,</span>
+<span class="fc bfc" id="L1482" title="All 2 branches covered.">          for (int i = 0; i &lt; functionKey.length; i++) {</span>
+<span class="fc" id="L1483">            functions</span>
+<span class="fc" id="L1484">                .add(new SubComponentFunction(DataCollector.COLLECTOR_TYPE_DATA,</span>
                     functionKey[i], functionExpression[i], functionType[i]));
           }
         }
       }
-<span class="fc" id="L1501">      parser = new MtasFunctionParserFunctionDefault(queries.length);</span>
-<span class="fc" id="L1502">      dataType = parser.getType();</span>
-<span class="fc" id="L1503">      statsItems = CodecUtil.createStatsItems(type);</span>
-<span class="fc" id="L1504">      statsType = CodecUtil.createStatsType(this.statsItems, null, parser);</span>
-<span class="fc bfc" id="L1505" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
-<span class="fc" id="L1506">        this.minimumLong = minimumDouble.longValue();</span>
+<span class="fc" id="L1489">      parser = new MtasFunctionParserFunctionDefault(queries.length);</span>
+<span class="fc" id="L1490">      dataType = parser.getType();</span>
+<span class="fc" id="L1491">      statsItems = CodecUtil.createStatsItems(type);</span>
+<span class="fc" id="L1492">      statsType = CodecUtil.createStatsType(this.statsItems, null, parser);</span>
+<span class="fc bfc" id="L1493" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
+<span class="fc" id="L1494">        this.minimumLong = minimumDouble.longValue();</span>
       } else {
-<span class="fc" id="L1508">        this.minimumLong = null;</span>
+<span class="fc" id="L1496">        this.minimumLong = null;</span>
       }
-<span class="fc bfc" id="L1510" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
-<span class="fc" id="L1511">        this.maximumLong = maximumDouble.longValue();</span>
+<span class="fc bfc" id="L1498" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
+<span class="fc" id="L1499">        this.maximumLong = maximumDouble.longValue();</span>
       } else {
-<span class="fc" id="L1513">        this.maximumLong = null;</span>
+<span class="fc" id="L1501">        this.maximumLong = null;</span>
       }
-<span class="fc" id="L1515">      dataCollector = DataCollector.getCollector(</span>
+<span class="fc" id="L1503">      dataCollector = DataCollector.getCollector(</span>
           DataCollector.COLLECTOR_TYPE_DATA, dataType, this.statsType,
           this.statsItems, null, null, null, null, null, null);
-<span class="fc" id="L1518">    }</span>
+<span class="fc" id="L1506">    }</span>
 
     /**
      * Function sum rule.
@@ -1523,14 +1511,14 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionSumRule() {
-<span class="pc bpc" id="L1526" title="1 of 2 branches missed.">      if (functions != null) {</span>
-<span class="fc bfc" id="L1527" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
-<span class="pc bpc" id="L1528" title="1 of 2 branches missed.">          if (!function.parserFunction.sumRule()) {</span>
-<span class="nc" id="L1529">            return false;</span>
+<span class="pc bpc" id="L1514" title="1 of 2 branches missed.">      if (functions != null) {</span>
+<span class="fc bfc" id="L1515" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
+<span class="pc bpc" id="L1516" title="1 of 2 branches missed.">          if (!function.parserFunction.sumRule()) {</span>
+<span class="nc" id="L1517">            return false;</span>
           }
-<span class="fc" id="L1531">        }</span>
+<span class="fc" id="L1519">        }</span>
       }
-<span class="fc" id="L1533">      return true;</span>
+<span class="fc" id="L1521">      return true;</span>
     }
 
     /**
@@ -1539,14 +1527,14 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionBasic() {
-<span class="pc bpc" id="L1542" title="1 of 2 branches missed.">      if (functions != null) {</span>
-<span class="fc bfc" id="L1543" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
-<span class="pc bpc" id="L1544" title="1 of 2 branches missed.">          if (!function.statsType.equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="nc" id="L1545">            return false;</span>
+<span class="pc bpc" id="L1530" title="1 of 2 branches missed.">      if (functions != null) {</span>
+<span class="fc bfc" id="L1531" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
+<span class="pc bpc" id="L1532" title="1 of 2 branches missed.">          if (!function.statsType.equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="nc" id="L1533">            return false;</span>
           }
-<span class="fc" id="L1547">        }</span>
+<span class="fc" id="L1535">        }</span>
       }
-<span class="fc" id="L1549">      return true;</span>
+<span class="fc" id="L1537">      return true;</span>
     }
 
     /**
@@ -1555,14 +1543,14 @@ public class CodecComponent {
      * @return true, if successful
      */
     public boolean functionNeedPositions() {
-<span class="pc bpc" id="L1558" title="1 of 2 branches missed.">      if (functions != null) {</span>
-<span class="fc bfc" id="L1559" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
-<span class="pc bpc" id="L1560" title="1 of 2 branches missed.">          if (function.parserFunction.needPositions()) {</span>
-<span class="nc" id="L1561">            return true;</span>
+<span class="pc bpc" id="L1546" title="1 of 2 branches missed.">      if (functions != null) {</span>
+<span class="fc bfc" id="L1547" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
+<span class="pc bpc" id="L1548" title="1 of 2 branches missed.">          if (function.parserFunction.needPositions()) {</span>
+<span class="nc" id="L1549">            return true;</span>
           }
-<span class="fc" id="L1563">        }</span>
+<span class="fc" id="L1551">        }</span>
       }
-<span class="fc" id="L1565">      return false;</span>
+<span class="fc" id="L1553">      return false;</span>
     }
 
     /**
@@ -1571,13 +1559,13 @@ public class CodecComponent {
      * @return the sets the
      */
     public Set&lt;Integer&gt; functionNeedArguments() {
-<span class="fc" id="L1574">      Set&lt;Integer&gt; list = new HashSet&lt;&gt;();</span>
-<span class="pc bpc" id="L1575" title="1 of 2 branches missed.">      if (functions != null) {</span>
-<span class="fc bfc" id="L1576" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
-<span class="fc" id="L1577">          list.addAll(function.parserFunction.needArgument());</span>
-<span class="fc" id="L1578">        }</span>
+<span class="fc" id="L1562">      Set&lt;Integer&gt; list = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L1563" title="1 of 2 branches missed.">      if (functions != null) {</span>
+<span class="fc bfc" id="L1564" title="All 2 branches covered.">        for (SubComponentFunction function : functions) {</span>
+<span class="fc" id="L1565">          list.addAll(function.parserFunction.needArgument());</span>
+<span class="fc" id="L1566">        }</span>
       }
-<span class="fc" id="L1580">      return list;</span>
+<span class="fc" id="L1568">      return list;</span>
     }
 
   }
@@ -1620,25 +1608,25 @@ public class CodecComponent {
      */
     public ComponentPosition(String key, Double minimumDouble,
         Double maximumDouble, String statsType)
-<span class="fc" id="L1623">        throws IOException, ParseException {</span>
-<span class="fc" id="L1624">      this.key = key;</span>
-<span class="fc" id="L1625">      dataType = CodecUtil.DATA_TYPE_LONG;</span>
-<span class="fc" id="L1626">      this.statsItems = CodecUtil.createStatsItems(statsType);</span>
-<span class="fc" id="L1627">      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);</span>
-<span class="fc bfc" id="L1628" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
-<span class="fc" id="L1629">        this.minimumLong = minimumDouble.longValue();</span>
+<span class="fc" id="L1611">        throws IOException, ParseException {</span>
+<span class="fc" id="L1612">      this.key = key;</span>
+<span class="fc" id="L1613">      dataType = CodecUtil.DATA_TYPE_LONG;</span>
+<span class="fc" id="L1614">      this.statsItems = CodecUtil.createStatsItems(statsType);</span>
+<span class="fc" id="L1615">      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);</span>
+<span class="fc bfc" id="L1616" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
+<span class="fc" id="L1617">        this.minimumLong = minimumDouble.longValue();</span>
       } else {
-<span class="fc" id="L1631">        this.minimumLong = null;</span>
+<span class="fc" id="L1619">        this.minimumLong = null;</span>
       }
-<span class="fc bfc" id="L1633" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
-<span class="fc" id="L1634">        this.maximumLong = maximumDouble.longValue();</span>
+<span class="fc bfc" id="L1621" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
+<span class="fc" id="L1622">        this.maximumLong = maximumDouble.longValue();</span>
       } else {
-<span class="fc" id="L1636">        this.maximumLong = null;</span>
+<span class="fc" id="L1624">        this.maximumLong = null;</span>
       }
-<span class="fc" id="L1638">      dataCollector = DataCollector.getCollector(</span>
+<span class="fc" id="L1626">      dataCollector = DataCollector.getCollector(</span>
           DataCollector.COLLECTOR_TYPE_DATA, dataType, this.statsType,
           this.statsItems, null, null, null, null, null, null);
-<span class="fc" id="L1641">    }</span>
+<span class="fc" id="L1629">    }</span>
   }
 
   /**
@@ -1679,25 +1667,25 @@ public class CodecComponent {
      */
     public ComponentToken(String key, Double minimumDouble,
         Double maximumDouble, String statsType)
-<span class="fc" id="L1682">        throws IOException, ParseException {</span>
-<span class="fc" id="L1683">      this.key = key;</span>
-<span class="fc" id="L1684">      dataType = CodecUtil.DATA_TYPE_LONG;</span>
-<span class="fc" id="L1685">      this.statsItems = CodecUtil.createStatsItems(statsType);</span>
-<span class="fc" id="L1686">      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);</span>
-<span class="fc bfc" id="L1687" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
-<span class="fc" id="L1688">        this.minimumLong = minimumDouble.longValue();</span>
+<span class="fc" id="L1670">        throws IOException, ParseException {</span>
+<span class="fc" id="L1671">      this.key = key;</span>
+<span class="fc" id="L1672">      dataType = CodecUtil.DATA_TYPE_LONG;</span>
+<span class="fc" id="L1673">      this.statsItems = CodecUtil.createStatsItems(statsType);</span>
+<span class="fc" id="L1674">      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);</span>
+<span class="fc bfc" id="L1675" title="All 2 branches covered.">      if (minimumDouble != null) {</span>
+<span class="fc" id="L1676">        this.minimumLong = minimumDouble.longValue();</span>
       } else {
-<span class="fc" id="L1690">        this.minimumLong = null;</span>
+<span class="fc" id="L1678">        this.minimumLong = null;</span>
       }
-<span class="fc bfc" id="L1692" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
-<span class="fc" id="L1693">        this.maximumLong = maximumDouble.longValue();</span>
+<span class="fc bfc" id="L1680" title="All 2 branches covered.">      if (maximumDouble != null) {</span>
+<span class="fc" id="L1681">        this.maximumLong = maximumDouble.longValue();</span>
       } else {
-<span class="fc" id="L1695">        this.maximumLong = null;</span>
+<span class="fc" id="L1683">        this.maximumLong = null;</span>
       }
-<span class="fc" id="L1697">      dataCollector = DataCollector.getCollector(</span>
+<span class="fc" id="L1685">      dataCollector = DataCollector.getCollector(</span>
           DataCollector.COLLECTOR_TYPE_DATA, dataType, this.statsType,
           this.statsItems, null, null, null, null, null, null);
-<span class="fc" id="L1700">    }</span>
+<span class="fc" id="L1688">    }</span>
   }
 
   /**
@@ -1753,12 +1741,12 @@ public class CodecComponent {
      * @param key the key
      * @param action the action
      */
-<span class="fc" id="L1756">    public ComponentCollection(String key, String action) {</span>
-<span class="fc" id="L1757">      this.key = key;</span>
-<span class="fc" id="L1758">      this.action = action;</span>
-<span class="fc" id="L1759">      this.version = null;</span>
-<span class="fc" id="L1760">      values = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L1761">    }</span>
+<span class="fc" id="L1744">    public ComponentCollection(String key, String action) {</span>
+<span class="fc" id="L1745">      this.key = key;</span>
+<span class="fc" id="L1746">      this.action = action;</span>
+<span class="fc" id="L1747">      this.version = null;</span>
+<span class="fc" id="L1748">      values = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L1749">    }</span>
 
     /**
      * Sets the list variables.
@@ -1766,12 +1754,12 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public void setListVariables() throws IOException {
-<span class="pc bpc" id="L1769" title="1 of 2 branches missed.">      if (action.equals(ACTION_LIST)) {</span>
+<span class="pc bpc" id="L1757" title="1 of 2 branches missed.">      if (action.equals(ACTION_LIST)) {</span>
         // do nothing
       } else {
-<span class="nc" id="L1772">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1760">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="fc" id="L1774">    }</span>
+<span class="fc" id="L1762">    }</span>
 
     /**
      * Sets the create variables.
@@ -1782,13 +1770,13 @@ public class CodecComponent {
      */
     public void setCreateVariables(String id, Set&lt;String&gt; fields)
         throws IOException {
-<span class="pc bpc" id="L1785" title="1 of 2 branches missed.">      if (action.equals(ACTION_CREATE)) {</span>
-<span class="fc" id="L1786">        this.id = id;</span>
-<span class="fc" id="L1787">        this.fields = fields;</span>
+<span class="pc bpc" id="L1773" title="1 of 2 branches missed.">      if (action.equals(ACTION_CREATE)) {</span>
+<span class="fc" id="L1774">        this.id = id;</span>
+<span class="fc" id="L1775">        this.fields = fields;</span>
       } else {
-<span class="nc" id="L1789">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1777">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="fc" id="L1791">    }</span>
+<span class="fc" id="L1779">    }</span>
 
     /**
      * Sets the check variables.
@@ -1797,12 +1785,12 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public void setCheckVariables(String id) throws IOException {
-<span class="pc bpc" id="L1800" title="1 of 2 branches missed.">      if (action.equals(ACTION_CHECK)) {</span>
-<span class="fc" id="L1801">        this.id = id;</span>
+<span class="pc bpc" id="L1788" title="1 of 2 branches missed.">      if (action.equals(ACTION_CHECK)) {</span>
+<span class="fc" id="L1789">        this.id = id;</span>
       } else {
-<span class="nc" id="L1803">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1791">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="fc" id="L1805">    }</span>
+<span class="fc" id="L1793">    }</span>
 
     /**
      * Sets the gets the variables.
@@ -1811,12 +1799,12 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public void setGetVariables(String id) throws IOException {
-<span class="nc bnc" id="L1814" title="All 2 branches missed.">      if (action.equals(ACTION_GET)) {</span>
-<span class="nc" id="L1815">        this.id = id;</span>
+<span class="nc bnc" id="L1802" title="All 2 branches missed.">      if (action.equals(ACTION_GET)) {</span>
+<span class="nc" id="L1803">        this.id = id;</span>
       } else {
-<span class="nc" id="L1817">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1805">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="nc" id="L1819">    }</span>
+<span class="nc" id="L1807">    }</span>
 
     /**
      * Sets the post variables.
@@ -1827,13 +1815,13 @@ public class CodecComponent {
      */
     public void setPostVariables(String id, HashSet&lt;String&gt; values)
         throws IOException {
-<span class="pc bpc" id="L1830" title="1 of 2 branches missed.">      if (action.equals(ACTION_POST)) {</span>
-<span class="fc" id="L1831">        this.id = id;</span>
-<span class="fc" id="L1832">        this.values = values;</span>
+<span class="pc bpc" id="L1818" title="1 of 2 branches missed.">      if (action.equals(ACTION_POST)) {</span>
+<span class="fc" id="L1819">        this.id = id;</span>
+<span class="fc" id="L1820">        this.values = values;</span>
       } else {
-<span class="nc" id="L1834">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1822">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="fc" id="L1836">    }</span>
+<span class="fc" id="L1824">    }</span>
 
     /**
      * Sets the import variables.
@@ -1845,56 +1833,56 @@ public class CodecComponent {
      */
     public void setImportVariables(String id, String url, String collection)
         throws IOException {
-<span class="nc bnc" id="L1848" title="All 2 branches missed.">      if (action.equals(ACTION_IMPORT)) {</span>
-<span class="nc" id="L1849">        this.id = id;</span>
-<span class="nc" id="L1850">        StringBuilder importUrlBuffer = new StringBuilder(url);</span>
-<span class="nc" id="L1851">        importUrlBuffer.append(&quot;select&quot;);</span>
-<span class="nc" id="L1852">        importUrlBuffer.append(&quot;?q=*:*&amp;rows=0&amp;wt=json&quot;);</span>
-<span class="nc" id="L1853">        importUrlBuffer.append(&quot;&amp;mtas=true&amp;mtas.collection=true&quot;);</span>
-<span class="nc" id="L1854">        importUrlBuffer.append(&quot;&amp;mtas.collection.0.key=0&quot;);</span>
-<span class="nc" id="L1855">        importUrlBuffer.append(&quot;&amp;mtas.collection.0.action=get&quot;);</span>
-<span class="nc" id="L1856">        importUrlBuffer.append(</span>
-<span class="nc" id="L1857">            &quot;&amp;mtas.collection.0.id=&quot; + URLEncoder.encode(collection, &quot;UTF-8&quot;));</span>
-<span class="nc" id="L1858">        Map&lt;String, Object&gt; params = getImport(importUrlBuffer.toString());</span>
+<span class="nc bnc" id="L1836" title="All 2 branches missed.">      if (action.equals(ACTION_IMPORT)) {</span>
+<span class="nc" id="L1837">        this.id = id;</span>
+<span class="nc" id="L1838">        StringBuilder importUrlBuffer = new StringBuilder(url);</span>
+<span class="nc" id="L1839">        importUrlBuffer.append(&quot;select&quot;);</span>
+<span class="nc" id="L1840">        importUrlBuffer.append(&quot;?q=*:*&amp;rows=0&amp;wt=json&quot;);</span>
+<span class="nc" id="L1841">        importUrlBuffer.append(&quot;&amp;mtas=true&amp;mtas.collection=true&quot;);</span>
+<span class="nc" id="L1842">        importUrlBuffer.append(&quot;&amp;mtas.collection.0.key=0&quot;);</span>
+<span class="nc" id="L1843">        importUrlBuffer.append(&quot;&amp;mtas.collection.0.action=get&quot;);</span>
+<span class="nc" id="L1844">        importUrlBuffer.append(</span>
+<span class="nc" id="L1845">            &quot;&amp;mtas.collection.0.id=&quot; + URLEncoder.encode(collection, &quot;UTF-8&quot;));</span>
+<span class="nc" id="L1846">        Map&lt;String, Object&gt; params = getImport(importUrlBuffer.toString());</span>
         try {
-<span class="nc bnc" id="L1860" title="All 4 branches missed.">          if (params.containsKey(&quot;mtas&quot;) &amp;&amp; params.get(&quot;mtas&quot;) instanceof Map) {</span>
-<span class="nc" id="L1861">            Map&lt;String, Object&gt; mtasParams = (Map&lt;String, Object&gt;) params</span>
-<span class="nc" id="L1862">                .get(&quot;mtas&quot;);</span>
-<span class="nc bnc" id="L1863" title="All 2 branches missed.">            if (mtasParams.containsKey(&quot;collection&quot;)</span>
-<span class="nc bnc" id="L1864" title="All 2 branches missed.">                &amp;&amp; mtasParams.get(&quot;collection&quot;) instanceof List) {</span>
-<span class="nc" id="L1865">              List&lt;Object&gt; mtasCollectionList = (List&lt;Object&gt;) mtasParams</span>
-<span class="nc" id="L1866">                  .get(&quot;collection&quot;);</span>
-<span class="nc bnc" id="L1867" title="All 2 branches missed.">              if (mtasCollectionList.size() == 1</span>
-<span class="nc bnc" id="L1868" title="All 2 branches missed.">                  &amp;&amp; mtasCollectionList.get(0) instanceof Map) {</span>
-<span class="nc" id="L1869">                Map&lt;String, Object&gt; collectionData = (Map&lt;String, Object&gt;) mtasCollectionList</span>
-<span class="nc" id="L1870">                    .get(0);</span>
-<span class="nc bnc" id="L1871" title="All 2 branches missed.">                if (collectionData.containsKey(&quot;values&quot;)</span>
-<span class="nc bnc" id="L1872" title="All 2 branches missed.">                    &amp;&amp; collectionData.get(&quot;values&quot;) instanceof List) {</span>
-<span class="nc" id="L1873">                  List&lt;String&gt; valuesList = (List&lt;String&gt;) collectionData</span>
-<span class="nc" id="L1874">                      .get(&quot;values&quot;);</span>
-<span class="nc bnc" id="L1875" title="All 2 branches missed.">                  for (String valueItem : valuesList) {</span>
-<span class="nc" id="L1876">                    values.add(valueItem);</span>
-<span class="nc" id="L1877">                  }</span>
-<span class="nc" id="L1878">                } else {</span>
-<span class="nc" id="L1879">                  throw new IOException(&quot;no values in response&quot;);</span>
+<span class="nc bnc" id="L1848" title="All 4 branches missed.">          if (params.containsKey(&quot;mtas&quot;) &amp;&amp; params.get(&quot;mtas&quot;) instanceof Map) {</span>
+<span class="nc" id="L1849">            Map&lt;String, Object&gt; mtasParams = (Map&lt;String, Object&gt;) params</span>
+<span class="nc" id="L1850">                .get(&quot;mtas&quot;);</span>
+<span class="nc bnc" id="L1851" title="All 2 branches missed.">            if (mtasParams.containsKey(&quot;collection&quot;)</span>
+<span class="nc bnc" id="L1852" title="All 2 branches missed.">                &amp;&amp; mtasParams.get(&quot;collection&quot;) instanceof List) {</span>
+<span class="nc" id="L1853">              List&lt;Object&gt; mtasCollectionList = (List&lt;Object&gt;) mtasParams</span>
+<span class="nc" id="L1854">                  .get(&quot;collection&quot;);</span>
+<span class="nc bnc" id="L1855" title="All 2 branches missed.">              if (mtasCollectionList.size() == 1</span>
+<span class="nc bnc" id="L1856" title="All 2 branches missed.">                  &amp;&amp; mtasCollectionList.get(0) instanceof Map) {</span>
+<span class="nc" id="L1857">                Map&lt;String, Object&gt; collectionData = (Map&lt;String, Object&gt;) mtasCollectionList</span>
+<span class="nc" id="L1858">                    .get(0);</span>
+<span class="nc bnc" id="L1859" title="All 2 branches missed.">                if (collectionData.containsKey(&quot;values&quot;)</span>
+<span class="nc bnc" id="L1860" title="All 2 branches missed.">                    &amp;&amp; collectionData.get(&quot;values&quot;) instanceof List) {</span>
+<span class="nc" id="L1861">                  List&lt;String&gt; valuesList = (List&lt;String&gt;) collectionData</span>
+<span class="nc" id="L1862">                      .get(&quot;values&quot;);</span>
+<span class="nc bnc" id="L1863" title="All 2 branches missed.">                  for (String valueItem : valuesList) {</span>
+<span class="nc" id="L1864">                    values.add(valueItem);</span>
+<span class="nc" id="L1865">                  }</span>
+<span class="nc" id="L1866">                } else {</span>
+<span class="nc" id="L1867">                  throw new IOException(&quot;no values in response&quot;);</span>
                 }
-<span class="nc" id="L1881">              } else {</span>
-<span class="nc" id="L1882">                throw new IOException(</span>
+<span class="nc" id="L1869">              } else {</span>
+<span class="nc" id="L1870">                throw new IOException(</span>
                     &quot;no valid mtas collection item in response&quot;);
               }
-<span class="nc" id="L1885">            } else {</span>
-<span class="nc" id="L1886">              throw new IOException(&quot;no valid mtas collection in response&quot;);</span>
+<span class="nc" id="L1873">            } else {</span>
+<span class="nc" id="L1874">              throw new IOException(&quot;no valid mtas collection in response&quot;);</span>
             }
-<span class="nc" id="L1888">          } else {</span>
-<span class="nc" id="L1889">            throw new IOException(&quot;no valid mtas in response&quot;);</span>
+<span class="nc" id="L1876">          } else {</span>
+<span class="nc" id="L1877">            throw new IOException(&quot;no valid mtas in response&quot;);</span>
           }
-<span class="nc" id="L1891">        } catch (ClassCastException e) {</span>
-<span class="nc" id="L1892">          throw new IOException(&quot;unexpected response&quot;, e);</span>
-<span class="nc" id="L1893">        }</span>
-<span class="nc" id="L1894">      } else {</span>
-<span class="nc" id="L1895">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1879">        } catch (ClassCastException e) {</span>
+<span class="nc" id="L1880">          throw new IOException(&quot;unexpected response&quot;, e);</span>
+<span class="nc" id="L1881">        }</span>
+<span class="nc" id="L1882">      } else {</span>
+<span class="nc" id="L1883">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="nc" id="L1897">    }</span>
+<span class="nc" id="L1885">    }</span>
 
     /**
      * Gets the import.
@@ -1906,28 +1894,28 @@ public class CodecComponent {
     private Map&lt;String, Object&gt; getImport(String collectionGetUrl)
         throws IOException {
       // get data
-<span class="nc" id="L1909">      URL url = new URL(collectionGetUrl);</span>
-<span class="nc" id="L1910">      HttpURLConnection connection = (HttpURLConnection) url.openConnection();</span>
-<span class="nc" id="L1911">      connection.setDoOutput(false);</span>
-<span class="nc" id="L1912">      connection.setDoInput(true);</span>
-<span class="nc" id="L1913">      connection.setInstanceFollowRedirects(false);</span>
-<span class="nc" id="L1914">      connection.setRequestMethod(&quot;GET&quot;);</span>
-<span class="nc" id="L1915">      connection.setRequestProperty(&quot;Content-Type&quot;,</span>
+<span class="nc" id="L1897">      URL url = new URL(collectionGetUrl);</span>
+<span class="nc" id="L1898">      HttpURLConnection connection = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L1899">      connection.setDoOutput(false);</span>
+<span class="nc" id="L1900">      connection.setDoInput(true);</span>
+<span class="nc" id="L1901">      connection.setInstanceFollowRedirects(false);</span>
+<span class="nc" id="L1902">      connection.setRequestMethod(&quot;GET&quot;);</span>
+<span class="nc" id="L1903">      connection.setRequestProperty(&quot;Content-Type&quot;,</span>
           &quot;application/json; charset=UTF-8&quot;);
-<span class="nc" id="L1917">      connection.setRequestProperty(&quot;charset&quot;, &quot;utf-8&quot;);</span>
-<span class="nc" id="L1918">      connection.setUseCaches(false);</span>
+<span class="nc" id="L1905">      connection.setRequestProperty(&quot;charset&quot;, &quot;utf-8&quot;);</span>
+<span class="nc" id="L1906">      connection.setUseCaches(false);</span>
       // process response
-<span class="nc" id="L1920">      InputStream is = null;</span>
+<span class="nc" id="L1908">      InputStream is = null;</span>
       try {
-<span class="nc" id="L1922">        is = connection.getInputStream();</span>
-<span class="nc" id="L1923">      } catch (IOException ioe) {</span>
-<span class="nc" id="L1924">        throw new IOException(&quot;Couldn't get data from url&quot;);</span>
-<span class="nc" id="L1925">      }</span>
-<span class="nc" id="L1926">      InputStreamReader in = new InputStreamReader((InputStream) is, &quot;UTF8&quot;);</span>
-<span class="nc" id="L1927">      Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L1928">      getParamsFromJSON(params, IOUtils.toString(in));</span>
-<span class="nc" id="L1929">      connection.disconnect();</span>
-<span class="nc" id="L1930">      return params;</span>
+<span class="nc" id="L1910">        is = connection.getInputStream();</span>
+<span class="nc" id="L1911">      } catch (IOException ioe) {</span>
+<span class="nc" id="L1912">        throw new IOException(&quot;Couldn't get data from url&quot;);</span>
+<span class="nc" id="L1913">      }</span>
+<span class="nc" id="L1914">      InputStreamReader in = new InputStreamReader((InputStream) is, &quot;UTF8&quot;);</span>
+<span class="nc" id="L1915">      Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L1916">      getParamsFromJSON(params, IOUtils.toString(in));</span>
+<span class="nc" id="L1917">      connection.disconnect();</span>
+<span class="nc" id="L1918">      return params;</span>
     }
 
     /**
@@ -1937,12 +1925,12 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public void setDeleteVariables(String id) throws IOException {
-<span class="pc bpc" id="L1940" title="1 of 2 branches missed.">      if (action.equals(ACTION_DELETE)) {</span>
-<span class="fc" id="L1941">        this.id = id;</span>
+<span class="pc bpc" id="L1928" title="1 of 2 branches missed.">      if (action.equals(ACTION_DELETE)) {</span>
+<span class="fc" id="L1929">        this.id = id;</span>
       } else {
-<span class="nc" id="L1943">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
+<span class="nc" id="L1931">        throw new IOException(&quot;not allowed with action &quot; + action);</span>
       }
-<span class="fc" id="L1945">    }</span>
+<span class="fc" id="L1933">    }</span>
 
     /**
      * Action.
@@ -1950,7 +1938,7 @@ public class CodecComponent {
      * @return the string
      */
     public String action() {
-<span class="fc" id="L1953">      return action;</span>
+<span class="fc" id="L1941">      return action;</span>
     }
 
     /**
@@ -1959,7 +1947,7 @@ public class CodecComponent {
      * @return the hash set
      */
     public HashSet&lt;String&gt; values() {
-<span class="fc" id="L1962">      return values;</span>
+<span class="fc" id="L1950">      return values;</span>
     }
 
     /**
@@ -1968,7 +1956,7 @@ public class CodecComponent {
      * @return the sets the
      */
     public Set&lt;String&gt; fields() {
-<span class="fc" id="L1971">      return fields;</span>
+<span class="fc" id="L1959">      return fields;</span>
     }
 
     /**
@@ -1978,16 +1966,16 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public void addValue(String value) throws IOException {
-<span class="pc bpc" id="L1981" title="1 of 2 branches missed.">      if (action.equals(ACTION_CREATE)) {</span>
-<span class="pc bpc" id="L1982" title="1 of 2 branches missed.">        if (version == null) {</span>
-<span class="fc" id="L1983">          values.add(value);</span>
+<span class="pc bpc" id="L1969" title="1 of 2 branches missed.">      if (action.equals(ACTION_CREATE)) {</span>
+<span class="pc bpc" id="L1970" title="1 of 2 branches missed.">        if (version == null) {</span>
+<span class="fc" id="L1971">          values.add(value);</span>
         } else {
-<span class="nc" id="L1985">          throw new IOException(&quot;version already set&quot;);</span>
+<span class="nc" id="L1973">          throw new IOException(&quot;version already set&quot;);</span>
         }
       } else {
-<span class="nc" id="L1988">        throw new IOException(&quot;not allowed for action '&quot; + action + &quot;'&quot;);</span>
+<span class="nc" id="L1976">        throw new IOException(&quot;not allowed for action '&quot; + action + &quot;'&quot;);</span>
       }
-<span class="fc" id="L1990">    }</span>
+<span class="fc" id="L1978">    }</span>
 
     /**
      * Gets the params from JSON.
@@ -1998,39 +1986,39 @@ public class CodecComponent {
      */
     private static void getParamsFromJSON(Map&lt;String, Object&gt; params,
         String json) {
-<span class="nc" id="L2001">      JSONParser parser = new JSONParser(json);</span>
+<span class="nc" id="L1989">      JSONParser parser = new JSONParser(json);</span>
       try {
-<span class="nc" id="L2003">        Object o = ObjectBuilder.getVal(parser);</span>
-<span class="nc bnc" id="L2004" title="All 2 branches missed.">        if (!(o instanceof Map))</span>
-<span class="nc" id="L2005">          return;</span>
-<span class="nc" id="L2006">        Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) o;</span>
+<span class="nc" id="L1991">        Object o = ObjectBuilder.getVal(parser);</span>
+<span class="nc bnc" id="L1992" title="All 2 branches missed.">        if (!(o instanceof Map))</span>
+<span class="nc" id="L1993">          return;</span>
+<span class="nc" id="L1994">        Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) o;</span>
         // To make consistent with json.param handling, we should make query
         // params come after json params (i.e. query params should
         // appear to overwrite json params.
 
         // Solr params are based on String though, so we need to convert
-<span class="nc bnc" id="L2012" title="All 2 branches missed.">        for (Map.Entry&lt;String, Object&gt; entry : map.entrySet()) {</span>
-<span class="nc" id="L2013">          String key = entry.getKey();</span>
-<span class="nc" id="L2014">          Object val = entry.getValue();</span>
-<span class="nc bnc" id="L2015" title="All 2 branches missed.">          if (params.get(key) != null) {</span>
-<span class="nc" id="L2016">            continue;</span>
+<span class="nc bnc" id="L2000" title="All 2 branches missed.">        for (Map.Entry&lt;String, Object&gt; entry : map.entrySet()) {</span>
+<span class="nc" id="L2001">          String key = entry.getKey();</span>
+<span class="nc" id="L2002">          Object val = entry.getValue();</span>
+<span class="nc bnc" id="L2003" title="All 2 branches missed.">          if (params.get(key) != null) {</span>
+<span class="nc" id="L2004">            continue;</span>
           }
 
-<span class="nc bnc" id="L2019" title="All 2 branches missed.">          if (val == null) {</span>
-<span class="nc" id="L2020">            params.remove(key);</span>
+<span class="nc bnc" id="L2007" title="All 2 branches missed.">          if (val == null) {</span>
+<span class="nc" id="L2008">            params.remove(key);</span>
           } else {
-<span class="nc" id="L2022">            params.put(key, val);</span>
+<span class="nc" id="L2010">            params.put(key, val);</span>
           }
-<span class="nc" id="L2024">        }</span>
+<span class="nc" id="L2012">        }</span>
 
-<span class="nc" id="L2026">      } catch (Exception e) {</span>
+<span class="nc" id="L2014">      } catch (Exception e) {</span>
         // ignore parse exceptions at this stage, they may be caused by
         // incomplete
         // macro expansions
-<span class="nc" id="L2030">        return;</span>
-<span class="nc" id="L2031">      }</span>
+<span class="nc" id="L2018">        return;</span>
+<span class="nc" id="L2019">      }</span>
 
-<span class="nc" id="L2033">    }</span>
+<span class="nc" id="L2021">    }</span>
 
   }
 
@@ -2089,29 +2077,29 @@ public class CodecComponent {
         MtasFunctionParserFunction parserFunction, String sortType,
         String sortDirection, Integer start, Integer number,
         String segmentRegistration, String boundary)
-<span class="fc" id="L2092">        throws ParseException, IOException {</span>
-<span class="fc" id="L2093">      this.key = key;</span>
-<span class="fc" id="L2094">      this.expression = null;</span>
-<span class="fc" id="L2095">      this.type = type;</span>
-<span class="fc" id="L2096">      this.parserFunction = parserFunction;</span>
-<span class="fc" id="L2097">      this.sortType = sortType;</span>
-<span class="fc" id="L2098">      this.sortDirection = sortDirection;</span>
-<span class="fc" id="L2099">      this.dataType = parserFunction.getType();</span>
-<span class="fc" id="L2100">      this.statsItems = CodecUtil.createStatsItems(this.type);</span>
-<span class="fc" id="L2101">      this.statsType = CodecUtil.createStatsType(statsItems, sortType,</span>
+<span class="fc" id="L2080">        throws ParseException, IOException {</span>
+<span class="fc" id="L2081">      this.key = key;</span>
+<span class="fc" id="L2082">      this.expression = null;</span>
+<span class="fc" id="L2083">      this.type = type;</span>
+<span class="fc" id="L2084">      this.parserFunction = parserFunction;</span>
+<span class="fc" id="L2085">      this.sortType = sortType;</span>
+<span class="fc" id="L2086">      this.sortDirection = sortDirection;</span>
+<span class="fc" id="L2087">      this.dataType = parserFunction.getType();</span>
+<span class="fc" id="L2088">      this.statsItems = CodecUtil.createStatsItems(this.type);</span>
+<span class="fc" id="L2089">      this.statsType = CodecUtil.createStatsType(statsItems, sortType,</span>
           parserFunction);
-<span class="pc bpc" id="L2103" title="1 of 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="fc" id="L2104">        dataCollector = DataCollector.getCollector(</span>
+<span class="pc bpc" id="L2091" title="1 of 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="fc" id="L2092">        dataCollector = DataCollector.getCollector(</span>
             DataCollector.COLLECTOR_TYPE_LIST, dataType, statsType, statsItems,
             sortType, sortDirection, start, number, null, null, null, null,
             null, null, null, null, segmentRegistration, boundary);
-<span class="nc bnc" id="L2108" title="All 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="nc" id="L2109">        dataCollector = DataCollector.getCollector(</span>
+<span class="nc bnc" id="L2096" title="All 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="nc" id="L2097">        dataCollector = DataCollector.getCollector(</span>
             DataCollector.COLLECTOR_TYPE_DATA, dataType, statsType, statsItems,
             sortType, sortDirection, start, number, segmentRegistration,
             boundary);
       }
-<span class="fc" id="L2114">    }</span>
+<span class="fc" id="L2102">    }</span>
 
     /**
      * Instantiates a new sub component function.
@@ -2124,27 +2112,27 @@ public class CodecComponent {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SubComponentFunction(String collectorType, String key,
-<span class="fc" id="L2127">        String expression, String type) throws ParseException, IOException {</span>
-<span class="fc" id="L2128">      this.key = key;</span>
-<span class="fc" id="L2129">      this.expression = expression;</span>
-<span class="fc" id="L2130">      this.type = type;</span>
-<span class="fc" id="L2131">      this.sortType = null;</span>
-<span class="fc" id="L2132">      this.sortDirection = null;</span>
-<span class="fc" id="L2133">      parserFunction = new MtasFunctionParser(</span>
-<span class="fc" id="L2134">          new BufferedReader(new StringReader(this.expression))).parse();</span>
-<span class="fc" id="L2135">      dataType = parserFunction.getType();</span>
-<span class="fc" id="L2136">      statsItems = CodecUtil.createStatsItems(this.type);</span>
-<span class="fc" id="L2137">      statsType = CodecUtil.createStatsType(statsItems, null, parserFunction);</span>
-<span class="pc bpc" id="L2138" title="1 of 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
-<span class="nc" id="L2139">        dataCollector = DataCollector.getCollector(</span>
+<span class="fc" id="L2115">        String expression, String type) throws ParseException, IOException {</span>
+<span class="fc" id="L2116">      this.key = key;</span>
+<span class="fc" id="L2117">      this.expression = expression;</span>
+<span class="fc" id="L2118">      this.type = type;</span>
+<span class="fc" id="L2119">      this.sortType = null;</span>
+<span class="fc" id="L2120">      this.sortDirection = null;</span>
+<span class="fc" id="L2121">      parserFunction = new MtasFunctionParser(</span>
+<span class="fc" id="L2122">          new BufferedReader(new StringReader(this.expression))).parse();</span>
+<span class="fc" id="L2123">      dataType = parserFunction.getType();</span>
+<span class="fc" id="L2124">      statsItems = CodecUtil.createStatsItems(this.type);</span>
+<span class="fc" id="L2125">      statsType = CodecUtil.createStatsType(statsItems, null, parserFunction);</span>
+<span class="pc bpc" id="L2126" title="1 of 2 branches missed.">      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {</span>
+<span class="nc" id="L2127">        dataCollector = DataCollector.getCollector(</span>
             DataCollector.COLLECTOR_TYPE_LIST, dataType, statsType, statsItems,
-<span class="nc" id="L2141">            sortType, sortDirection, 0, Integer.MAX_VALUE, null, null);</span>
-<span class="pc bpc" id="L2142" title="1 of 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
-<span class="fc" id="L2143">        dataCollector = DataCollector.getCollector(</span>
+<span class="nc" id="L2129">            sortType, sortDirection, 0, Integer.MAX_VALUE, null, null);</span>
+<span class="pc bpc" id="L2130" title="1 of 2 branches missed.">      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
+<span class="fc" id="L2131">        dataCollector = DataCollector.getCollector(</span>
             DataCollector.COLLECTOR_TYPE_DATA, dataType, statsType, statsItems,
             sortType, sortDirection, null, null, null, null);
       }
-<span class="fc" id="L2147">    }</span>
+<span class="fc" id="L2135">    }</span>
   }
 
   /**
@@ -2167,11 +2155,11 @@ public class CodecComponent {
      * @param match the match
      * @param tokens the tokens
      */
-<span class="nc" id="L2170">    public KwicToken(Match match, List&lt;MtasTokenString&gt; tokens) {</span>
-<span class="nc" id="L2171">      startPosition = match.startPosition;</span>
-<span class="nc" id="L2172">      endPosition = match.endPosition - 1;</span>
-<span class="nc" id="L2173">      this.tokens = tokens;</span>
-<span class="nc" id="L2174">    }</span>
+<span class="nc" id="L2158">    public KwicToken(Match match, List&lt;MtasTokenString&gt; tokens) {</span>
+<span class="nc" id="L2159">      startPosition = match.startPosition;</span>
+<span class="nc" id="L2160">      endPosition = match.endPosition - 1;</span>
+<span class="nc" id="L2161">      this.tokens = tokens;</span>
+<span class="nc" id="L2162">    }</span>
 
   }
 
@@ -2195,11 +2183,11 @@ public class CodecComponent {
      * @param match the match
      * @param hits the hits
      */
-<span class="nc" id="L2198">    public KwicHit(Match match, Map&lt;Integer, List&lt;String&gt;&gt; hits) {</span>
-<span class="nc" id="L2199">      startPosition = match.startPosition;</span>
-<span class="nc" id="L2200">      endPosition = match.endPosition - 1;</span>
-<span class="nc" id="L2201">      this.hits = hits;</span>
-<span class="nc" id="L2202">    }</span>
+<span class="nc" id="L2186">    public KwicHit(Match match, Map&lt;Integer, List&lt;String&gt;&gt; hits) {</span>
+<span class="nc" id="L2187">      startPosition = match.startPosition;</span>
+<span class="nc" id="L2188">      endPosition = match.endPosition - 1;</span>
+<span class="nc" id="L2189">      this.hits = hits;</span>
+<span class="nc" id="L2190">    }</span>
   }
 
   /**
@@ -2269,16 +2257,16 @@ public class CodecComponent {
      * @return the list
      */
     private List&lt;MtasTreeHit&lt;String&gt;&gt; sort(List&lt;MtasTreeHit&lt;String&gt;&gt; data) {
-<span class="fc" id="L2272">      Collections.sort(data, new Comparator&lt;MtasTreeHit&lt;String&gt;&gt;() {</span>
+<span class="fc" id="L2260">      Collections.sort(data, new Comparator&lt;MtasTreeHit&lt;String&gt;&gt;() {</span>
         @Override
         public int compare(MtasTreeHit&lt;String&gt; hit1, MtasTreeHit&lt;String&gt; hit2) {
-<span class="fc" id="L2275">          int compare = Integer.compare(hit1.additionalId, hit2.additionalId);</span>
-<span class="fc bfc" id="L2276" title="All 2 branches covered.">          compare = (compare == 0)</span>
-<span class="fc" id="L2277">              ? Long.compare(hit1.additionalRef, hit2.additionalRef) : compare;</span>
-<span class="fc" id="L2278">          return compare;</span>
+<span class="fc" id="L2263">          int compare = Integer.compare(hit1.additionalId, hit2.additionalId);</span>
+<span class="fc bfc" id="L2264" title="All 2 branches covered.">          compare = (compare == 0)</span>
+<span class="fc" id="L2265">              ? Long.compare(hit1.additionalRef, hit2.additionalRef) : compare;</span>
+<span class="fc" id="L2266">          return compare;</span>
         }
       });
-<span class="fc" id="L2281">      return data;</span>
+<span class="fc" id="L2269">      return data;</span>
     }
 
     /**
@@ -2296,296 +2284,296 @@ public class CodecComponent {
     @SuppressWarnings(&quot;unchecked&quot;)
     public GroupHit(List&lt;MtasTreeHit&lt;String&gt;&gt; list, int start, int end,
         int hitStart, int hitEnd, ComponentGroup group,
-<span class="fc" id="L2299">        Set&lt;String&gt; knownPrefixes) throws UnsupportedEncodingException {</span>
+<span class="fc" id="L2287">        Set&lt;String&gt; knownPrefixes) throws UnsupportedEncodingException {</span>
       // compute dimensions
-<span class="fc" id="L2301">      int leftRangeStart = start;</span>
-<span class="fc" id="L2302">      int leftRangeEnd = Math.min(end, hitStart - 1);</span>
-<span class="fc" id="L2303">      int leftRangeLength = Math.max(0, 1 + leftRangeEnd - leftRangeStart);</span>
-<span class="fc" id="L2304">      int hitLength = 1 + hitEnd - hitStart;</span>
-<span class="fc" id="L2305">      int rightRangeStart = Math.max(start, hitEnd + 1);</span>
-<span class="fc" id="L2306">      int rightRangeEnd = end;</span>
-<span class="fc" id="L2307">      int rightRangeLength = Math.max(0, 1 + rightRangeEnd - rightRangeStart);</span>
+<span class="fc" id="L2289">      int leftRangeStart = start;</span>
+<span class="fc" id="L2290">      int leftRangeEnd = Math.min(end, hitStart - 1);</span>
+<span class="fc" id="L2291">      int leftRangeLength = Math.max(0, 1 + leftRangeEnd - leftRangeStart);</span>
+<span class="fc" id="L2292">      int hitLength = 1 + hitEnd - hitStart;</span>
+<span class="fc" id="L2293">      int rightRangeStart = Math.max(start, hitEnd + 1);</span>
+<span class="fc" id="L2294">      int rightRangeEnd = end;</span>
+<span class="fc" id="L2295">      int rightRangeLength = Math.max(0, 1 + rightRangeEnd - rightRangeStart);</span>
       // create initial arrays
-<span class="fc bfc" id="L2309" title="All 2 branches covered.">      if (leftRangeLength &gt; 0) {</span>
-<span class="fc" id="L2310">        keyLeft = &quot;&quot;;</span>
-<span class="fc" id="L2311">        dataLeft = (ArrayList&lt;String&gt;[]) new ArrayList[leftRangeLength];</span>
-<span class="fc" id="L2312">        missingLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
-<span class="fc" id="L2313">        unknownLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
-<span class="fc bfc" id="L2314" title="All 2 branches covered.">        for (int p = 0; p &lt; leftRangeLength; p++) {</span>
-<span class="fc" id="L2315">          dataLeft[p] = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L2316">          missingLeft[p] = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L2317">          unknownLeft[p] = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L2297" title="All 2 branches covered.">      if (leftRangeLength &gt; 0) {</span>
+<span class="fc" id="L2298">        keyLeft = &quot;&quot;;</span>
+<span class="fc" id="L2299">        dataLeft = (ArrayList&lt;String&gt;[]) new ArrayList[leftRangeLength];</span>
+<span class="fc" id="L2300">        missingLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
+<span class="fc" id="L2301">        unknownLeft = (HashSet&lt;String&gt;[]) new HashSet[leftRangeLength];</span>
+<span class="fc bfc" id="L2302" title="All 2 branches covered.">        for (int p = 0; p &lt; leftRangeLength; p++) {</span>
+<span class="fc" id="L2303">          dataLeft[p] = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L2304">          missingLeft[p] = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L2305">          unknownLeft[p] = new HashSet&lt;&gt;();</span>
         }
       } else {
-<span class="fc" id="L2320">        keyLeft = null;</span>
-<span class="fc" id="L2321">        dataLeft = null;</span>
-<span class="fc" id="L2322">        missingLeft = null;</span>
-<span class="fc" id="L2323">        unknownLeft = null;</span>
+<span class="fc" id="L2308">        keyLeft = null;</span>
+<span class="fc" id="L2309">        dataLeft = null;</span>
+<span class="fc" id="L2310">        missingLeft = null;</span>
+<span class="fc" id="L2311">        unknownLeft = null;</span>
       }
-<span class="pc bpc" id="L2325" title="1 of 2 branches missed.">      if (hitLength &gt; 0) {</span>
-<span class="fc" id="L2326">        keyHit = &quot;&quot;;</span>
-<span class="fc" id="L2327">        dataHit = (ArrayList&lt;String&gt;[]) new ArrayList[hitLength];</span>
-<span class="fc" id="L2328">        missingHit = (HashSet&lt;String&gt;[]) new HashSet[hitLength];</span>
-<span class="fc" id="L2329">        unknownHit = (HashSet&lt;String&gt;[]) new HashSet[hitLength];</span>
-<span class="fc bfc" id="L2330" title="All 2 branches covered.">        for (int p = 0; p &lt; hitLength; p++) {</span>
-<span class="fc" id="L2331">          dataHit[p] = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L2332">          missingHit[p] = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L2333">          unknownHit[p] = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L2313" title="1 of 2 branches missed.">      if (hitLength &gt; 0) {</span>
+<span class="fc" id="L2314">        keyHit = &quot;&quot;;</span>
+<span class="fc" id="L2315">        dataHit = (ArrayList&lt;String&gt;[]) new ArrayList[hitLength];</span>
+<span class="fc" id="L2316">        missingHit = (HashSet&lt;String&gt;[]) new HashSet[hitLength];</span>
+<span class="fc" id="L2317">        unknownHit = (HashSet&lt;String&gt;[]) new HashSet[hitLength];</span>
+<span class="fc bfc" id="L2318" title="All 2 branches covered.">        for (int p = 0; p &lt; hitLength; p++) {</span>
+<span class="fc" id="L2319">          dataHit[p] = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L2320">          missingHit[p] = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L2321">          unknownHit[p] = new HashSet&lt;&gt;();</span>
         }
       } else {
-<span class="nc" id="L2336">        keyHit = null;</span>
-<span class="nc" id="L2337">        dataHit = null;</span>
-<span class="nc" id="L2338">        missingHit = null;</span>
-<span class="nc" id="L2339">        unknownHit = null;</span>
+<span class="nc" id="L2324">        keyHit = null;</span>
+<span class="nc" id="L2325">        dataHit = null;</span>
+<span class="nc" id="L2326">        missingHit = null;</span>
+<span class="nc" id="L2327">        unknownHit = null;</span>
       }
-<span class="fc bfc" id="L2341" title="All 2 branches covered.">      if (rightRangeLength &gt; 0) {</span>
-<span class="fc" id="L2342">        keyRight = &quot;&quot;;</span>
-<span class="fc" id="L2343">        dataRight = (ArrayList&lt;String&gt;[]) new ArrayList[rightRangeLength];</span>
-<span class="fc" id="L2344">        missingRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
-<span class="fc" id="L2345">        unknownRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
-<span class="fc bfc" id="L2346" title="All 2 branches covered.">        for (int p = 0; p &lt; rightRangeLength; p++) {</span>
-<span class="fc" id="L2347">          dataRight[p] = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L2348">          missingRight[p] = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L2349">          unknownRight[p] = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L2329" title="All 2 branches covered.">      if (rightRangeLength &gt; 0) {</span>
+<span class="fc" id="L2330">        keyRight = &quot;&quot;;</span>
+<span class="fc" id="L2331">        dataRight = (ArrayList&lt;String&gt;[]) new ArrayList[rightRangeLength];</span>
+<span class="fc" id="L2332">        missingRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
+<span class="fc" id="L2333">        unknownRight = (HashSet&lt;String&gt;[]) new HashSet[rightRangeLength];</span>
+<span class="fc bfc" id="L2334" title="All 2 branches covered.">        for (int p = 0; p &lt; rightRangeLength; p++) {</span>
+<span class="fc" id="L2335">          dataRight[p] = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L2336">          missingRight[p] = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L2337">          unknownRight[p] = new HashSet&lt;&gt;();</span>
         }
       } else {
-<span class="fc" id="L2352">        keyRight = null;</span>
-<span class="fc" id="L2353">        dataRight = null;</span>
-<span class="fc" id="L2354">        missingRight = null;</span>
-<span class="fc" id="L2355">        unknownRight = null;</span>
+<span class="fc" id="L2340">        keyRight = null;</span>
+<span class="fc" id="L2341">        dataRight = null;</span>
+<span class="fc" id="L2342">        missingRight = null;</span>
+<span class="fc" id="L2343">        unknownRight = null;</span>
       }
 
       // construct missing sets
-<span class="fc bfc" id="L2359" title="All 2 branches covered.">      if (group.hitInside != null) {</span>
-<span class="fc bfc" id="L2360" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= hitEnd; p++) {</span>
-<span class="fc" id="L2361">          missingHit[p - hitStart].addAll(group.hitInside);</span>
+<span class="fc bfc" id="L2347" title="All 2 branches covered.">      if (group.hitInside != null) {</span>
+<span class="fc bfc" id="L2348" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= hitEnd; p++) {</span>
+<span class="fc" id="L2349">          missingHit[p - hitStart].addAll(group.hitInside);</span>
         }
       }
-<span class="fc bfc" id="L2364" title="All 2 branches covered.">      if (group.hitInsideLeft != null) {</span>
-<span class="fc bfc" id="L2365" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
-<span class="fc" id="L2366">            hitStart + group.hitInsideLeft.length - 1); p++) {</span>
-<span class="pc bpc" id="L2367" title="1 of 2 branches missed.">          if (group.hitInsideLeft[p - hitStart] != null) {</span>
-<span class="fc" id="L2368">            missingHit[p - hitStart].addAll(group.hitInsideLeft[p - hitStart]);</span>
+<span class="fc bfc" id="L2352" title="All 2 branches covered.">      if (group.hitInsideLeft != null) {</span>
+<span class="fc bfc" id="L2353" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
+<span class="fc" id="L2354">            hitStart + group.hitInsideLeft.length - 1); p++) {</span>
+<span class="pc bpc" id="L2355" title="1 of 2 branches missed.">          if (group.hitInsideLeft[p - hitStart] != null) {</span>
+<span class="fc" id="L2356">            missingHit[p - hitStart].addAll(group.hitInsideLeft[p - hitStart]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2372" title="All 2 branches covered.">      if (group.hitLeft != null) {</span>
-<span class="fc bfc" id="L2373" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
-<span class="fc" id="L2374">            hitStart + group.hitLeft.length - 1); p++) {</span>
-<span class="pc bpc" id="L2375" title="1 of 2 branches missed.">          if (group.hitLeft[p - hitStart] != null) {</span>
-<span class="fc" id="L2376">            missingHit[p - hitStart].addAll(group.hitLeft[p - hitStart]);</span>
+<span class="fc bfc" id="L2360" title="All 2 branches covered.">      if (group.hitLeft != null) {</span>
+<span class="fc bfc" id="L2361" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
+<span class="fc" id="L2362">            hitStart + group.hitLeft.length - 1); p++) {</span>
+<span class="pc bpc" id="L2363" title="1 of 2 branches missed.">          if (group.hitLeft[p - hitStart] != null) {</span>
+<span class="fc" id="L2364">            missingHit[p - hitStart].addAll(group.hitLeft[p - hitStart]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2380" title="All 2 branches covered.">      if (group.hitInsideRight != null) {</span>
-<span class="fc" id="L2381">        for (int p = Math.max(hitStart,</span>
-<span class="fc bfc" id="L2382" title="All 2 branches covered.">            hitEnd - group.hitInsideRight.length + 1); p &lt;= hitEnd; p++) {</span>
-<span class="fc bfc" id="L2383" title="All 2 branches covered.">          if (group.hitInsideRight[hitEnd - p] != null) {</span>
-<span class="fc" id="L2384">            missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);</span>
+<span class="fc bfc" id="L2368" title="All 2 branches covered.">      if (group.hitInsideRight != null) {</span>
+<span class="fc" id="L2369">        for (int p = Math.max(hitStart,</span>
+<span class="fc bfc" id="L2370" title="All 2 branches covered.">            hitEnd - group.hitInsideRight.length + 1); p &lt;= hitEnd; p++) {</span>
+<span class="fc bfc" id="L2371" title="All 2 branches covered.">          if (group.hitInsideRight[hitEnd - p] != null) {</span>
+<span class="fc" id="L2372">            missingHit[p - hitStart].addAll(group.hitInsideRight[hitEnd - p]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2388" title="All 2 branches covered.">      if (group.hitRight != null) {</span>
-<span class="fc bfc" id="L2389" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
-<span class="fc" id="L2390">            hitStart + group.hitRight.length - 1); p++) {</span>
-<span class="fc bfc" id="L2391" title="All 2 branches covered.">          if (group.hitRight[p - hitStart] != null) {</span>
-<span class="fc" id="L2392">            missingHit[p - hitStart].addAll(group.hitRight[p - hitStart]);</span>
+<span class="fc bfc" id="L2376" title="All 2 branches covered.">      if (group.hitRight != null) {</span>
+<span class="fc bfc" id="L2377" title="All 2 branches covered.">        for (int p = hitStart; p &lt;= Math.min(hitEnd,</span>
+<span class="fc" id="L2378">            hitStart + group.hitRight.length - 1); p++) {</span>
+<span class="fc bfc" id="L2379" title="All 2 branches covered.">          if (group.hitRight[p - hitStart] != null) {</span>
+<span class="fc" id="L2380">            missingHit[p - hitStart].addAll(group.hitRight[p - hitStart]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2396" title="All 2 branches covered.">      if (group.left != null) {</span>
-<span class="fc bfc" id="L2397" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(leftRangeLength, group.left.length); p++) {</span>
-<span class="fc bfc" id="L2398" title="All 2 branches covered.">          if (group.left[p] != null) {</span>
-<span class="fc" id="L2399">            missingLeft[p].addAll(group.left[p]);</span>
+<span class="fc bfc" id="L2384" title="All 2 branches covered.">      if (group.left != null) {</span>
+<span class="fc bfc" id="L2385" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(leftRangeLength, group.left.length); p++) {</span>
+<span class="fc bfc" id="L2386" title="All 2 branches covered.">          if (group.left[p] != null) {</span>
+<span class="fc" id="L2387">            missingLeft[p].addAll(group.left[p]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2403" title="All 2 branches covered.">      if (group.hitRight != null) {</span>
-<span class="fc bfc" id="L2404" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(leftRangeLength,</span>
-<span class="fc" id="L2405">            group.hitRight.length - dataHit.length); p++) {</span>
-<span class="pc bpc" id="L2406" title="1 of 2 branches missed.">          if (group.hitRight[p + dataHit.length] != null) {</span>
-<span class="fc" id="L2407">            missingLeft[p].addAll(group.hitRight[p + dataHit.length]);</span>
+<span class="fc bfc" id="L2391" title="All 2 branches covered.">      if (group.hitRight != null) {</span>
+<span class="fc bfc" id="L2392" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(leftRangeLength,</span>
+<span class="fc" id="L2393">            group.hitRight.length - dataHit.length); p++) {</span>
+<span class="pc bpc" id="L2394" title="1 of 2 branches missed.">          if (group.hitRight[p + dataHit.length] != null) {</span>
+<span class="fc" id="L2395">            missingLeft[p].addAll(group.hitRight[p + dataHit.length]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2411" title="All 2 branches covered.">      if (group.right != null) {</span>
-<span class="fc bfc" id="L2412" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
-<span class="fc" id="L2413">            group.right.length); p++) {</span>
-<span class="fc bfc" id="L2414" title="All 2 branches covered.">          if (group.right[p] != null) {</span>
-<span class="fc" id="L2415">            missingRight[p].addAll(group.right[p]);</span>
+<span class="fc bfc" id="L2399" title="All 2 branches covered.">      if (group.right != null) {</span>
+<span class="fc bfc" id="L2400" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
+<span class="fc" id="L2401">            group.right.length); p++) {</span>
+<span class="fc bfc" id="L2402" title="All 2 branches covered.">          if (group.right[p] != null) {</span>
+<span class="fc" id="L2403">            missingRight[p].addAll(group.right[p]);</span>
           }
         }
       }
-<span class="fc bfc" id="L2419" title="All 2 branches covered.">      if (group.hitLeft != null) {</span>
-<span class="fc bfc" id="L2420" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
-<span class="fc" id="L2421">            group.hitLeft.length - dataHit.length); p++) {</span>
-<span class="pc bpc" id="L2422" title="1 of 2 branches missed.">          if (group.hitLeft[p + dataHit.length] != null) {</span>
-<span class="fc" id="L2423">            missingRight[p].addAll(group.hitLeft[p + dataHit.length]);</span>
+<span class="fc bfc" id="L2407" title="All 2 branches covered.">      if (group.hitLeft != null) {</span>
+<span class="fc bfc" id="L2408" title="All 2 branches covered.">        for (int p = 0; p &lt; Math.min(rightRangeLength,</span>
+<span class="fc" id="L2409">            group.hitLeft.length - dataHit.length); p++) {</span>
+<span class="pc bpc" id="L2410" title="1 of 2 branches missed.">          if (group.hitLeft[p + dataHit.length] != null) {</span>
+<span class="fc" id="L2411">            missingRight[p].addAll(group.hitLeft[p + dataHit.length]);</span>
           }
         }
       }
 
       // fill arrays and update missing administration
-<span class="fc" id="L2429">      List&lt;MtasTreeHit&lt;String&gt;&gt; sortedList = sort(list);</span>
-<span class="fc bfc" id="L2430" title="All 2 branches covered.">      for (MtasTreeHit&lt;String&gt; hit : sortedList) {</span>
+<span class="fc" id="L2417">      List&lt;MtasTreeHit&lt;String&gt;&gt; sortedList = sort(list);</span>
+<span class="fc bfc" id="L2418" title="All 2 branches covered.">      for (MtasTreeHit&lt;String&gt; hit : sortedList) {</span>
         // inside hit
-<span class="pc bpc" id="L2432" title="1 of 4 branches missed.">        if (group.hitInside != null &amp;&amp; hit.idData != null</span>
-<span class="fc bfc" id="L2433" title="All 2 branches covered.">            &amp;&amp; group.hitInside.contains(hit.idData)) {</span>
-<span class="fc" id="L2434">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
-<span class="fc bfc" id="L2435" title="All 2 branches covered.">              .min(hitEnd, hit.endPosition); p++) {</span>
-<span class="fc" id="L2436">            dataHit[p - hitStart].add(hit.refData);</span>
-<span class="fc" id="L2437">            missingHit[p - hitStart]</span>
-<span class="fc" id="L2438">                .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2420" title="1 of 4 branches missed.">        if (group.hitInside != null &amp;&amp; hit.idData != null</span>
+<span class="fc bfc" id="L2421" title="All 2 branches covered.">            &amp;&amp; group.hitInside.contains(hit.idData)) {</span>
+<span class="fc" id="L2422">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
+<span class="fc bfc" id="L2423" title="All 2 branches covered.">              .min(hitEnd, hit.endPosition); p++) {</span>
+<span class="fc" id="L2424">            dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2425">            missingHit[p - hitStart]</span>
+<span class="fc" id="L2426">                .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
           }
-<span class="pc bpc" id="L2440" title="1 of 10 branches missed.">        } else if ((group.hitInsideLeft != null || group.hitLeft != null</span>
+<span class="pc bpc" id="L2428" title="1 of 10 branches missed.">        } else if ((group.hitInsideLeft != null || group.hitLeft != null</span>
             || group.hitInsideRight != null || group.hitRight != null)
             &amp;&amp; hit.idData != null) {
-<span class="fc" id="L2443">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
-<span class="fc bfc" id="L2444" title="All 2 branches covered.">              .min(hitEnd, hit.endPosition); p++) {</span>
-<span class="fc" id="L2445">            int pHitLeft = p - hitStart;</span>
-<span class="fc" id="L2446">            int pHitRight = hitEnd - p;</span>
-<span class="pc bpc" id="L2447" title="2 of 6 branches missed.">            if (group.hitInsideLeft != null</span>
+<span class="fc" id="L2431">          for (int p = Math.max(hitStart, hit.startPosition); p &lt;= Math</span>
+<span class="fc bfc" id="L2432" title="All 2 branches covered.">              .min(hitEnd, hit.endPosition); p++) {</span>
+<span class="fc" id="L2433">            int pHitLeft = p - hitStart;</span>
+<span class="fc" id="L2434">            int pHitRight = hitEnd - p;</span>
+<span class="pc bpc" id="L2435" title="2 of 6 branches missed.">            if (group.hitInsideLeft != null</span>
                 &amp;&amp; pHitLeft &lt;= (group.hitInsideLeft.length - 1)
                 &amp;&amp; group.hitInsideLeft[pHitLeft] != null
-<span class="fc bfc" id="L2450" title="All 2 branches covered.">                &amp;&amp; group.hitInsideLeft[pHitLeft].contains(hit.idData)) {</span>
+<span class="fc bfc" id="L2438" title="All 2 branches covered.">                &amp;&amp; group.hitInsideLeft[pHitLeft].contains(hit.idData)) {</span>
               // keyHit += hit.refData;
-<span class="fc" id="L2452">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="fc" id="L2453">              missingHit[p - hitStart]</span>
-<span class="fc" id="L2454">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="pc bpc" id="L2455" title="2 of 6 branches missed.">            } else if (group.hitLeft != null</span>
+<span class="fc" id="L2440">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2441">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2442">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2443" title="2 of 6 branches missed.">            } else if (group.hitLeft != null</span>
                 &amp;&amp; pHitLeft &lt;= (group.hitLeft.length - 1)
                 &amp;&amp; group.hitLeft[pHitLeft] != null
-<span class="fc bfc" id="L2458" title="All 2 branches covered.">                &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
+<span class="fc bfc" id="L2446" title="All 2 branches covered.">                &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
               // keyHit += hit.refData;
-<span class="fc" id="L2460">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="fc" id="L2461">              missingHit[p - hitStart]</span>
-<span class="fc" id="L2462">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="pc bpc" id="L2463" title="1 of 6 branches missed.">            } else if (group.hitInsideRight != null</span>
+<span class="fc" id="L2448">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2449">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2450">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2451" title="1 of 6 branches missed.">            } else if (group.hitInsideRight != null</span>
                 &amp;&amp; pHitRight &lt;= (group.hitInsideRight.length - 1)
                 &amp;&amp; group.hitInsideRight[pHitRight] != null
-<span class="fc bfc" id="L2466" title="All 2 branches covered.">                &amp;&amp; group.hitInsideRight[pHitRight].contains(hit.idData)) {</span>
-<span class="fc" id="L2467">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="fc" id="L2468">              missingHit[p - hitStart]</span>
-<span class="fc" id="L2469">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="pc bpc" id="L2470" title="1 of 6 branches missed.">            } else if (group.hitRight != null</span>
+<span class="fc bfc" id="L2454" title="All 2 branches covered.">                &amp;&amp; group.hitInsideRight[pHitRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2455">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2456">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2457">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2458" title="1 of 6 branches missed.">            } else if (group.hitRight != null</span>
                 &amp;&amp; pHitRight &lt;= (group.hitRight.length - 1)
                 &amp;&amp; group.hitRight[pHitRight] != null
-<span class="fc bfc" id="L2473" title="All 2 branches covered.">                &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
-<span class="fc" id="L2474">              dataHit[p - hitStart].add(hit.refData);</span>
-<span class="fc" id="L2475">              missingHit[p - hitStart]</span>
-<span class="fc" id="L2476">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="fc bfc" id="L2461" title="All 2 branches covered.">                &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2462">              dataHit[p - hitStart].add(hit.refData);</span>
+<span class="fc" id="L2463">              missingHit[p - hitStart]</span>
+<span class="fc" id="L2464">                  .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
             }
           }
         }
         // left
-<span class="fc bfc" id="L2481" title="All 2 branches covered.">        if (hit.startPosition &lt; hitStart) {</span>
-<span class="pc bpc" id="L2482" title="3 of 8 branches missed.">          if ((group.left != null || (group.hitRight != null</span>
+<span class="fc bfc" id="L2469" title="All 2 branches covered.">        if (hit.startPosition &lt; hitStart) {</span>
+<span class="pc bpc" id="L2470" title="3 of 8 branches missed.">          if ((group.left != null || (group.hitRight != null</span>
               &amp;&amp; group.hitRight.length &gt; (1 + hitEnd - hitStart)))
               &amp;&amp; hit.idData != null) {
-<span class="fc" id="L2485">            for (int p = Math.min(hit.endPosition,</span>
-<span class="fc bfc" id="L2486" title="All 2 branches covered.">                hitStart - 1); p &gt;= hit.startPosition; p--) {</span>
-<span class="fc" id="L2487">              int pLeft = hitStart - 1 - p;</span>
-<span class="fc" id="L2488">              int pHitRight = hitEnd - p;</span>
-<span class="fc bfc" id="L2489" title="All 6 branches covered.">              if (group.left != null &amp;&amp; pLeft &lt;= (group.left.length - 1)</span>
+<span class="fc" id="L2473">            for (int p = Math.min(hit.endPosition,</span>
+<span class="fc bfc" id="L2474" title="All 2 branches covered.">                hitStart - 1); p &gt;= hit.startPosition; p--) {</span>
+<span class="fc" id="L2475">              int pLeft = hitStart - 1 - p;</span>
+<span class="fc" id="L2476">              int pHitRight = hitEnd - p;</span>
+<span class="fc bfc" id="L2477" title="All 6 branches covered.">              if (group.left != null &amp;&amp; pLeft &lt;= (group.left.length - 1)</span>
                   &amp;&amp; group.left[pLeft] != null
-<span class="fc bfc" id="L2491" title="All 2 branches covered.">                  &amp;&amp; group.left[pLeft].contains(hit.idData)) {</span>
-<span class="fc" id="L2492">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
-<span class="fc" id="L2493">                missingLeft[hitStart - 1 - p]</span>
-<span class="fc" id="L2494">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="pc bpc" id="L2495" title="1 of 6 branches missed.">              } else if (group.hitRight != null</span>
+<span class="fc bfc" id="L2479" title="All 2 branches covered.">                  &amp;&amp; group.left[pLeft].contains(hit.idData)) {</span>
+<span class="fc" id="L2480">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
+<span class="fc" id="L2481">                missingLeft[hitStart - 1 - p]</span>
+<span class="fc" id="L2482">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2483" title="1 of 6 branches missed.">              } else if (group.hitRight != null</span>
                   &amp;&amp; pHitRight &lt;= (group.hitRight.length - 1)
                   &amp;&amp; group.hitRight[pHitRight] != null
-<span class="fc bfc" id="L2498" title="All 2 branches covered.">                  &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
-<span class="fc" id="L2499">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
-<span class="fc" id="L2500">                missingLeft[hitStart - 1 - p]</span>
-<span class="fc" id="L2501">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="fc bfc" id="L2486" title="All 2 branches covered.">                  &amp;&amp; group.hitRight[pHitRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2487">                dataLeft[hitStart - 1 - p].add(hit.refData);</span>
+<span class="fc" id="L2488">                missingLeft[hitStart - 1 - p]</span>
+<span class="fc" id="L2489">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
               }
             }
           }
         }
         // right
-<span class="fc bfc" id="L2507" title="All 2 branches covered.">        if (hit.endPosition &gt; hitEnd) {</span>
-<span class="pc bpc" id="L2508" title="3 of 8 branches missed.">          if ((group.right != null || (group.hitLeft != null</span>
+<span class="fc bfc" id="L2495" title="All 2 branches covered.">        if (hit.endPosition &gt; hitEnd) {</span>
+<span class="pc bpc" id="L2496" title="3 of 8 branches missed.">          if ((group.right != null || (group.hitLeft != null</span>
               &amp;&amp; group.hitLeft.length &gt; (1 + hitEnd - hitStart)))
               &amp;&amp; hit.idData != null) {
-<span class="fc" id="L2511">            for (int p = Math.max(hit.startPosition,</span>
-<span class="fc bfc" id="L2512" title="All 2 branches covered.">                hitEnd + 1); p &lt;= hit.endPosition; p++) {</span>
-<span class="fc" id="L2513">              int pRight = p - hitEnd - 1;</span>
-<span class="fc" id="L2514">              int pHitLeft = p - hitStart;</span>
-<span class="fc bfc" id="L2515" title="All 6 branches covered.">              if (group.right != null &amp;&amp; pRight &lt;= (group.right.length - 1)</span>
+<span class="fc" id="L2499">            for (int p = Math.max(hit.startPosition,</span>
+<span class="fc bfc" id="L2500" title="All 2 branches covered.">                hitEnd + 1); p &lt;= hit.endPosition; p++) {</span>
+<span class="fc" id="L2501">              int pRight = p - hitEnd - 1;</span>
+<span class="fc" id="L2502">              int pHitLeft = p - hitStart;</span>
+<span class="fc bfc" id="L2503" title="All 6 branches covered.">              if (group.right != null &amp;&amp; pRight &lt;= (group.right.length - 1)</span>
                   &amp;&amp; group.right[pRight] != null
-<span class="fc bfc" id="L2517" title="All 2 branches covered.">                  &amp;&amp; group.right[pRight].contains(hit.idData)) {</span>
-<span class="fc" id="L2518">                dataRight[p - rightRangeStart].add(hit.refData);</span>
-<span class="fc" id="L2519">                missingRight[p - rightRangeStart]</span>
-<span class="fc" id="L2520">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
-<span class="pc bpc" id="L2521" title="1 of 6 branches missed.">              } else if (group.hitLeft != null</span>
+<span class="fc bfc" id="L2505" title="All 2 branches covered.">                  &amp;&amp; group.right[pRight].contains(hit.idData)) {</span>
+<span class="fc" id="L2506">                dataRight[p - rightRangeStart].add(hit.refData);</span>
+<span class="fc" id="L2507">                missingRight[p - rightRangeStart]</span>
+<span class="fc" id="L2508">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="pc bpc" id="L2509" title="1 of 6 branches missed.">              } else if (group.hitLeft != null</span>
                   &amp;&amp; pHitLeft &lt;= (group.hitLeft.length - 1)
                   &amp;&amp; group.hitLeft[pHitLeft] != null
-<span class="fc bfc" id="L2524" title="All 2 branches covered.">                  &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
-<span class="fc" id="L2525">                dataRight[p - rightRangeStart].add(hit.refData);</span>
-<span class="fc" id="L2526">                missingRight[p - rightRangeStart]</span>
-<span class="fc" id="L2527">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
+<span class="fc bfc" id="L2512" title="All 2 branches covered.">                  &amp;&amp; group.hitLeft[pHitLeft].contains(hit.idData)) {</span>
+<span class="fc" id="L2513">                dataRight[p - rightRangeStart].add(hit.refData);</span>
+<span class="fc" id="L2514">                missingRight[p - rightRangeStart]</span>
+<span class="fc" id="L2515">                    .remove(MtasToken.getPrefixFromValue(hit.refData));</span>
               }
             }
           }
         }
-<span class="fc" id="L2532">      }</span>
+<span class="fc" id="L2520">      }</span>
       // register unknown
-<span class="fc bfc" id="L2534" title="All 2 branches covered.">      if (missingLeft != null) {</span>
-<span class="fc bfc" id="L2535" title="All 2 branches covered.">        for (int i = 0; i &lt; missingLeft.length; i++) {</span>
-<span class="fc bfc" id="L2536" title="All 2 branches covered.">          for (String prefix : missingLeft[i]) {</span>
-<span class="pc bpc" id="L2537" title="1 of 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
-<span class="nc" id="L2538">              unknownLeft[i].add(prefix);</span>
+<span class="fc bfc" id="L2522" title="All 2 branches covered.">      if (missingLeft != null) {</span>
+<span class="fc bfc" id="L2523" title="All 2 branches covered.">        for (int i = 0; i &lt; missingLeft.length; i++) {</span>
+<span class="fc bfc" id="L2524" title="All 2 branches covered.">          for (String prefix : missingLeft[i]) {</span>
+<span class="pc bpc" id="L2525" title="1 of 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
+<span class="nc" id="L2526">              unknownLeft[i].add(prefix);</span>
             }
-<span class="fc" id="L2540">          }</span>
+<span class="fc" id="L2528">          }</span>
         }
       }
-<span class="pc bpc" id="L2543" title="1 of 2 branches missed.">      if (missingHit != null) {</span>
-<span class="fc bfc" id="L2544" title="All 2 branches covered.">        for (int i = 0; i &lt; missingHit.length; i++) {</span>
-<span class="fc bfc" id="L2545" title="All 2 branches covered.">          for (String prefix : missingHit[i]) {</span>
-<span class="pc bpc" id="L2546" title="1 of 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
-<span class="nc" id="L2547">              unknownHit[i].add(prefix);</span>
+<span class="pc bpc" id="L2531" title="1 of 2 branches missed.">      if (missingHit != null) {</span>
+<span class="fc bfc" id="L2532" title="All 2 branches covered.">        for (int i = 0; i &lt; missingHit.length; i++) {</span>
+<span class="fc bfc" id="L2533" title="All 2 branches covered.">          for (String prefix : missingHit[i]) {</span>
+<span class="pc bpc" id="L2534" title="1 of 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
+<span class="nc" id="L2535">              unknownHit[i].add(prefix);</span>
             }
-<span class="fc" id="L2549">          }</span>
+<span class="fc" id="L2537">          }</span>
         }
       }
-<span class="fc bfc" id="L2552" title="All 2 branches covered.">      if (missingRight != null) {</span>
-<span class="fc bfc" id="L2553" title="All 2 branches covered.">        for (int i = 0; i &lt; missingRight.length; i++) {</span>
-<span class="pc bpc" id="L2554" title="1 of 2 branches missed.">          for (String prefix : missingRight[i]) {</span>
-<span class="nc bnc" id="L2555" title="All 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
-<span class="nc" id="L2556">              unknownRight[i].add(prefix);</span>
+<span class="fc bfc" id="L2540" title="All 2 branches covered.">      if (missingRight != null) {</span>
+<span class="fc bfc" id="L2541" title="All 2 branches covered.">        for (int i = 0; i &lt; missingRight.length; i++) {</span>
+<span class="pc bpc" id="L2542" title="1 of 2 branches missed.">          for (String prefix : missingRight[i]) {</span>
+<span class="nc bnc" id="L2543" title="All 2 branches missed.">            if (!knownPrefixes.contains(prefix)) {</span>
+<span class="nc" id="L2544">              unknownRight[i].add(prefix);</span>
             }
-<span class="nc" id="L2558">          }</span>
+<span class="nc" id="L2546">          }</span>
         }
       }
       // construct keys
-<span class="fc" id="L2562">      keyLeft = dataToString(dataLeft, missingLeft);</span>
-<span class="fc" id="L2563">      keyHit = dataToString(dataHit, missingHit);</span>
-<span class="fc" id="L2564">      keyRight = dataToString(dataRight, missingRight);</span>
-<span class="fc" id="L2565">      key = KEY_START;</span>
-<span class="fc bfc" id="L2566" title="All 2 branches covered.">      if (keyLeft != null) {</span>
-<span class="fc" id="L2567">        key += keyLeft;</span>
-<span class="fc" id="L2568">        hashLeft = keyLeft.hashCode();</span>
+<span class="fc" id="L2550">      keyLeft = dataToString(dataLeft, missingLeft);</span>
+<span class="fc" id="L2551">      keyHit = dataToString(dataHit, missingHit);</span>
+<span class="fc" id="L2552">      keyRight = dataToString(dataRight, missingRight);</span>
+<span class="fc" id="L2553">      key = KEY_START;</span>
+<span class="fc bfc" id="L2554" title="All 2 branches covered.">      if (keyLeft != null) {</span>
+<span class="fc" id="L2555">        key += keyLeft;</span>
+<span class="fc" id="L2556">        hashLeft = keyLeft.hashCode();</span>
       } else {
-<span class="fc" id="L2570">        hashLeft = 1;</span>
+<span class="fc" id="L2558">        hashLeft = 1;</span>
       }
-<span class="fc" id="L2572">      key += &quot;|&quot;;</span>
-<span class="pc bpc" id="L2573" title="1 of 2 branches missed.">      if (keyHit != null) {</span>
-<span class="fc" id="L2574">        key += keyHit;</span>
-<span class="fc" id="L2575">        hashHit = keyHit.hashCode();</span>
+<span class="fc" id="L2560">      key += &quot;|&quot;;</span>
+<span class="pc bpc" id="L2561" title="1 of 2 branches missed.">      if (keyHit != null) {</span>
+<span class="fc" id="L2562">        key += keyHit;</span>
+<span class="fc" id="L2563">        hashHit = keyHit.hashCode();</span>
       } else {
-<span class="nc" id="L2577">        hashHit = 1;</span>
+<span class="nc" id="L2565">        hashHit = 1;</span>
       }
-<span class="fc" id="L2579">      key += &quot;|&quot;;</span>
-<span class="fc bfc" id="L2580" title="All 2 branches covered.">      if (keyRight != null) {</span>
-<span class="fc" id="L2581">        key += keyRight;</span>
-<span class="fc" id="L2582">        hashRight = keyRight.hashCode();</span>
+<span class="fc" id="L2567">      key += &quot;|&quot;;</span>
+<span class="fc bfc" id="L2568" title="All 2 branches covered.">      if (keyRight != null) {</span>
+<span class="fc" id="L2569">        key += keyRight;</span>
+<span class="fc" id="L2570">        hashRight = keyRight.hashCode();</span>
       } else {
-<span class="fc" id="L2584">        hashRight = 1;</span>
+<span class="fc" id="L2572">        hashRight = 1;</span>
       }
       // compute hash
-<span class="fc" id="L2587">      hash = hashHit * (hashLeft ^ 3) * (hashRight ^ 5);</span>
-<span class="fc" id="L2588">    }</span>
+<span class="fc" id="L2575">      hash = hashHit * (hashLeft ^ 3) * (hashRight ^ 5);</span>
+<span class="fc" id="L2576">    }</span>
 
     /*
      * (non-Javadoc)
@@ -2594,7 +2582,7 @@ public class CodecComponent {
      */
     @Override
     public int hashCode() {
-<span class="fc" id="L2597">      return hash;</span>
+<span class="fc" id="L2585">      return hash;</span>
     }
 
     /**
@@ -2607,28 +2595,28 @@ public class CodecComponent {
     private boolean dataEquals(List&lt;String&gt;[] d1, List&lt;String&gt;[] d2) {
       List&lt;String&gt; a1;
       List&lt;String&gt; a2;
-<span class="pc bpc" id="L2610" title="1 of 4 branches missed.">      if (d1 == null &amp;&amp; d2 == null) {</span>
-<span class="fc" id="L2611">        return true;</span>
-<span class="pc bpc" id="L2612" title="2 of 4 branches missed.">      } else if (d1 == null || d2 == null) {</span>
-<span class="nc" id="L2613">        return false;</span>
+<span class="pc bpc" id="L2598" title="1 of 4 branches missed.">      if (d1 == null &amp;&amp; d2 == null) {</span>
+<span class="fc" id="L2599">        return true;</span>
+<span class="pc bpc" id="L2600" title="2 of 4 branches missed.">      } else if (d1 == null || d2 == null) {</span>
+<span class="nc" id="L2601">        return false;</span>
       } else {
-<span class="pc bpc" id="L2615" title="1 of 2 branches missed.">        if (d1.length == d2.length) {</span>
-<span class="fc bfc" id="L2616" title="All 2 branches covered.">          for (int i = 0; i &lt; d1.length; i++) {</span>
-<span class="fc" id="L2617">            a1 = d1[i];</span>
-<span class="fc" id="L2618">            a2 = d2[i];</span>
-<span class="pc bpc" id="L2619" title="3 of 6 branches missed.">            if (a1 != null &amp;&amp; a2 != null &amp;&amp; a1.size() == a2.size()) {</span>
-<span class="fc bfc" id="L2620" title="All 2 branches covered.">              for (int j = 0; j &lt; a1.size(); j++) {</span>
-<span class="pc bpc" id="L2621" title="1 of 2 branches missed.">                if (!a1.get(j).equals(a2.get(j))) {</span>
-<span class="nc" id="L2622">                  return false;</span>
+<span class="pc bpc" id="L2603" title="1 of 2 branches missed.">        if (d1.length == d2.length) {</span>
+<span class="fc bfc" id="L2604" title="All 2 branches covered.">          for (int i = 0; i &lt; d1.length; i++) {</span>
+<span class="fc" id="L2605">            a1 = d1[i];</span>
+<span class="fc" id="L2606">            a2 = d2[i];</span>
+<span class="pc bpc" id="L2607" title="3 of 6 branches missed.">            if (a1 != null &amp;&amp; a2 != null &amp;&amp; a1.size() == a2.size()) {</span>
+<span class="fc bfc" id="L2608" title="All 2 branches covered.">              for (int j = 0; j &lt; a1.size(); j++) {</span>
+<span class="pc bpc" id="L2609" title="1 of 2 branches missed.">                if (!a1.get(j).equals(a2.get(j))) {</span>
+<span class="nc" id="L2610">                  return false;</span>
                 }
               }
             } else {
-<span class="nc" id="L2626">              return false;</span>
+<span class="nc" id="L2614">              return false;</span>
             }
           }
-<span class="fc" id="L2629">          return true;</span>
+<span class="fc" id="L2617">          return true;</span>
         } else {
-<span class="nc" id="L2631">          return false;</span>
+<span class="nc" id="L2619">          return false;</span>
         }
       }
     }
@@ -2640,22 +2628,22 @@ public class CodecComponent {
      */
     @Override
     public boolean equals(Object obj) {
-<span class="pc bpc" id="L2643" title="1 of 2 branches missed.">      if (this == obj)</span>
-<span class="nc" id="L2644">        return true;</span>
-<span class="pc bpc" id="L2645" title="1 of 2 branches missed.">      if (obj == null)</span>
-<span class="nc" id="L2646">        return false;</span>
-<span class="pc bpc" id="L2647" title="1 of 2 branches missed.">      if (getClass() != obj.getClass())</span>
-<span class="nc" id="L2648">        return false;</span>
-<span class="fc" id="L2649">      GroupHit other = (GroupHit) obj;</span>
-<span class="fc bfc" id="L2650" title="All 2 branches covered.">      if (hashCode() != other.hashCode())</span>
-<span class="fc" id="L2651">        return false;</span>
-<span class="pc bpc" id="L2652" title="1 of 2 branches missed.">      if (!dataEquals(dataHit, other.dataHit))</span>
-<span class="nc" id="L2653">        return false;</span>
-<span class="pc bpc" id="L2654" title="1 of 2 branches missed.">      if (!dataEquals(dataLeft, other.dataLeft))</span>
-<span class="nc" id="L2655">        return false;</span>
-<span class="pc bpc" id="L2656" title="1 of 2 branches missed.">      if (!dataEquals(dataRight, other.dataRight))</span>
-<span class="nc" id="L2657">        return false;</span>
-<span class="fc" id="L2658">      return true;</span>
+<span class="pc bpc" id="L2631" title="1 of 2 branches missed.">      if (this == obj)</span>
+<span class="nc" id="L2632">        return true;</span>
+<span class="pc bpc" id="L2633" title="1 of 2 branches missed.">      if (obj == null)</span>
+<span class="nc" id="L2634">        return false;</span>
+<span class="pc bpc" id="L2635" title="1 of 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc" id="L2636">        return false;</span>
+<span class="fc" id="L2637">      GroupHit other = (GroupHit) obj;</span>
+<span class="fc bfc" id="L2638" title="All 2 branches covered.">      if (hashCode() != other.hashCode())</span>
+<span class="fc" id="L2639">        return false;</span>
+<span class="pc bpc" id="L2640" title="1 of 2 branches missed.">      if (!dataEquals(dataHit, other.dataHit))</span>
+<span class="nc" id="L2641">        return false;</span>
+<span class="pc bpc" id="L2642" title="1 of 2 branches missed.">      if (!dataEquals(dataLeft, other.dataLeft))</span>
+<span class="nc" id="L2643">        return false;</span>
+<span class="pc bpc" id="L2644" title="1 of 2 branches missed.">      if (!dataEquals(dataRight, other.dataRight))</span>
+<span class="nc" id="L2645">        return false;</span>
+<span class="fc" id="L2646">      return true;</span>
     }
 
     /**
@@ -2668,45 +2656,45 @@ public class CodecComponent {
      */
     private String dataToString(List&lt;String&gt;[] data, Set&lt;String&gt;[] missing)
         throws UnsupportedEncodingException {
-<span class="fc" id="L2671">      StringBuilder text = null;</span>
-<span class="fc" id="L2672">      Encoder encoder = Base64.getEncoder();</span>
+<span class="fc" id="L2659">      StringBuilder text = null;</span>
+<span class="fc" id="L2660">      Encoder encoder = Base64.getEncoder();</span>
       String prefix;
       String postfix;
-<span class="pc bpc" id="L2675" title="2 of 6 branches missed.">      if (data != null &amp;&amp; missing != null &amp;&amp; data.length == missing.length) {</span>
-<span class="fc bfc" id="L2676" title="All 2 branches covered.">        for (int i = 0; i &lt; data.length; i++) {</span>
-<span class="fc bfc" id="L2677" title="All 2 branches covered.">          if (i &gt; 0) {</span>
-<span class="fc" id="L2678">            text.append(&quot;,&quot;);</span>
+<span class="pc bpc" id="L2663" title="2 of 6 branches missed.">      if (data != null &amp;&amp; missing != null &amp;&amp; data.length == missing.length) {</span>
+<span class="fc bfc" id="L2664" title="All 2 branches covered.">        for (int i = 0; i &lt; data.length; i++) {</span>
+<span class="fc bfc" id="L2665" title="All 2 branches covered.">          if (i &gt; 0) {</span>
+<span class="fc" id="L2666">            text.append(&quot;,&quot;);</span>
           } else {
-<span class="fc" id="L2680">            text = new StringBuilder();</span>
+<span class="fc" id="L2668">            text = new StringBuilder();</span>
           }
-<span class="fc bfc" id="L2682" title="All 2 branches covered.">          for (int j = 0; j &lt; data[i].size(); j++) {</span>
-<span class="fc bfc" id="L2683" title="All 2 branches covered.">            if (j &gt; 0) {</span>
-<span class="fc" id="L2684">              text.append(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L2670" title="All 2 branches covered.">          for (int j = 0; j &lt; data[i].size(); j++) {</span>
+<span class="fc bfc" id="L2671" title="All 2 branches covered.">            if (j &gt; 0) {</span>
+<span class="fc" id="L2672">              text.append(&quot;&amp;&quot;);</span>
             }
-<span class="fc" id="L2686">            prefix = MtasToken.getPrefixFromValue(data[i].get(j));</span>
-<span class="fc" id="L2687">            postfix = MtasToken.getPostfixFromValue(data[i].get(j));</span>
-<span class="fc" id="L2688">            text.append(encoder</span>
-<span class="fc" id="L2689">                .encodeToString(prefix.getBytes(StandardCharsets.UTF_8)));</span>
-<span class="fc bfc" id="L2690" title="All 2 branches covered.">            if (!postfix.isEmpty()) {</span>
-<span class="fc" id="L2691">              text.append(&quot;.&quot;);</span>
-<span class="fc" id="L2692">              text.append(encoder</span>
-<span class="fc" id="L2693">                  .encodeToString(postfix.getBytes(StandardCharsets.UTF_8)));</span>
+<span class="fc" id="L2674">            prefix = MtasToken.getPrefixFromValue(data[i].get(j));</span>
+<span class="fc" id="L2675">            postfix = MtasToken.getPostfixFromValue(data[i].get(j));</span>
+<span class="fc" id="L2676">            text.append(encoder</span>
+<span class="fc" id="L2677">                .encodeToString(prefix.getBytes(StandardCharsets.UTF_8)));</span>
+<span class="fc bfc" id="L2678" title="All 2 branches covered.">            if (!postfix.isEmpty()) {</span>
+<span class="fc" id="L2679">              text.append(&quot;.&quot;);</span>
+<span class="fc" id="L2680">              text.append(encoder</span>
+<span class="fc" id="L2681">                  .encodeToString(postfix.getBytes(StandardCharsets.UTF_8)));</span>
             }
           }
-<span class="pc bpc" id="L2696" title="1 of 2 branches missed.">          if (missing[i] != null) {</span>
-<span class="fc" id="L2697">            String[] tmpMissing = missing[i]</span>
-<span class="fc" id="L2698">                .toArray(new String[missing[i].size()]);</span>
-<span class="fc bfc" id="L2699" title="All 2 branches covered.">            for (int j = 0; j &lt; tmpMissing.length; j++) {</span>
-<span class="fc bfc" id="L2700" title="All 4 branches covered.">              if (j &gt; 0 || !data[i].isEmpty()) {</span>
-<span class="fc" id="L2701">                text.append(&quot;&amp;&quot;);</span>
+<span class="pc bpc" id="L2684" title="1 of 2 branches missed.">          if (missing[i] != null) {</span>
+<span class="fc" id="L2685">            String[] tmpMissing = missing[i]</span>
+<span class="fc" id="L2686">                .toArray(new String[missing[i].size()]);</span>
+<span class="fc bfc" id="L2687" title="All 2 branches covered.">            for (int j = 0; j &lt; tmpMissing.length; j++) {</span>
+<span class="fc bfc" id="L2688" title="All 4 branches covered.">              if (j &gt; 0 || !data[i].isEmpty()) {</span>
+<span class="fc" id="L2689">                text.append(&quot;&amp;&quot;);</span>
               }
-<span class="fc" id="L2703">              text.append(encoder.encodeToString(</span>
-<span class="fc" id="L2704">                  (&quot;!&quot; + tmpMissing[j]).getBytes(StandardCharsets.UTF_8)));</span>
+<span class="fc" id="L2691">              text.append(encoder.encodeToString(</span>
+<span class="fc" id="L2692">                  (&quot;!&quot; + tmpMissing[j]).getBytes(StandardCharsets.UTF_8)));</span>
             }
           }
         }
       }
-<span class="fc bfc" id="L2709" title="All 2 branches covered.">      return text != null ? text.toString() : null;</span>
+<span class="fc bfc" id="L2697" title="All 2 branches covered.">      return text != null ? text.toString() : null;</span>
     }
 
     /*
@@ -2715,7 +2703,7 @@ public class CodecComponent {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-<span class="fc" id="L2718">      return key;</span>
+<span class="fc" id="L2706">      return key;</span>
     }
 
     /**
@@ -2727,62 +2715,62 @@ public class CodecComponent {
      */
     private static Map&lt;String, String&gt;[] keyToSubSubObject(String key,
         StringBuilder newKey) {
-<span class="fc bfc" id="L2730" title="All 2 branches covered.">      if (!key.isEmpty()) {</span>
-<span class="fc" id="L2731">        newKey.append(&quot; [&quot;);</span>
+<span class="fc bfc" id="L2718" title="All 2 branches covered.">      if (!key.isEmpty()) {</span>
+<span class="fc" id="L2719">        newKey.append(&quot; [&quot;);</span>
         String prefix;
         String postfix;
-<span class="fc" id="L2734">        String[] parts = key.split(Pattern.quote(&quot;&amp;&quot;));</span>
-<span class="fc" id="L2735">        Map&lt;String, String&gt;[] result = new HashMap[parts.length];</span>
-<span class="fc" id="L2736">        Pattern pattern = Pattern.compile(&quot;^([^\\.]*)\\.([^\\.]*)$&quot;);</span>
-<span class="fc" id="L2737">        Decoder decoder = Base64.getDecoder();</span>
+<span class="fc" id="L2722">        String[] parts = key.split(Pattern.quote(&quot;&amp;&quot;));</span>
+<span class="fc" id="L2723">        Map&lt;String, String&gt;[] result = new HashMap[parts.length];</span>
+<span class="fc" id="L2724">        Pattern pattern = Pattern.compile(&quot;^([^\\.]*)\\.([^\\.]*)$&quot;);</span>
+<span class="fc" id="L2725">        Decoder decoder = Base64.getDecoder();</span>
         Matcher matcher;
-<span class="fc" id="L2739">        StringBuilder tmpNewKey = null;</span>
-<span class="fc bfc" id="L2740" title="All 2 branches covered.">        for (int i = 0; i &lt; parts.length; i++) {</span>
-<span class="pc bpc" id="L2741" title="1 of 2 branches missed.">          if (parts[i].isEmpty()) {</span>
-<span class="nc" id="L2742">            result[i] = null;</span>
+<span class="fc" id="L2727">        StringBuilder tmpNewKey = null;</span>
+<span class="fc bfc" id="L2728" title="All 2 branches covered.">        for (int i = 0; i &lt; parts.length; i++) {</span>
+<span class="pc bpc" id="L2729" title="1 of 2 branches missed.">          if (parts[i].isEmpty()) {</span>
+<span class="nc" id="L2730">            result[i] = null;</span>
           } else {
-<span class="fc" id="L2744">            HashMap&lt;String, String&gt; subResult = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L2745">            matcher = pattern.matcher(parts[i]);</span>
-<span class="fc bfc" id="L2746" title="All 2 branches covered.">            if (tmpNewKey != null) {</span>
-<span class="fc" id="L2747">              tmpNewKey.append(&quot; &amp; &quot;);</span>
+<span class="fc" id="L2732">            HashMap&lt;String, String&gt; subResult = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L2733">            matcher = pattern.matcher(parts[i]);</span>
+<span class="fc bfc" id="L2734" title="All 2 branches covered.">            if (tmpNewKey != null) {</span>
+<span class="fc" id="L2735">              tmpNewKey.append(&quot; &amp; &quot;);</span>
             } else {
-<span class="fc" id="L2749">              tmpNewKey = new StringBuilder();</span>
+<span class="fc" id="L2737">              tmpNewKey = new StringBuilder();</span>
             }
-<span class="fc bfc" id="L2751" title="All 2 branches covered.">            if (matcher.matches()) {</span>
-<span class="fc" id="L2752">              prefix = new String(</span>
-<span class="fc" id="L2753">                  decoder.decode(</span>
-<span class="fc" id="L2754">                      matcher.group(1).getBytes(StandardCharsets.UTF_8)),</span>
+<span class="fc bfc" id="L2739" title="All 2 branches covered.">            if (matcher.matches()) {</span>
+<span class="fc" id="L2740">              prefix = new String(</span>
+<span class="fc" id="L2741">                  decoder.decode(</span>
+<span class="fc" id="L2742">                      matcher.group(1).getBytes(StandardCharsets.UTF_8)),</span>
                   StandardCharsets.UTF_8);
-<span class="fc" id="L2756">              postfix = new String(</span>
-<span class="fc" id="L2757">                  decoder.decode(</span>
-<span class="fc" id="L2758">                      matcher.group(2).getBytes(StandardCharsets.UTF_8)),</span>
+<span class="fc" id="L2744">              postfix = new String(</span>
+<span class="fc" id="L2745">                  decoder.decode(</span>
+<span class="fc" id="L2746">                      matcher.group(2).getBytes(StandardCharsets.UTF_8)),</span>
                   StandardCharsets.UTF_8);
-<span class="fc" id="L2760">              tmpNewKey.append(prefix.replace(&quot;=&quot;, &quot;\\=&quot;));</span>
-<span class="fc" id="L2761">              tmpNewKey.append(&quot;=\&quot;&quot; + postfix.replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;) + &quot;\&quot;&quot;);</span>
-<span class="fc" id="L2762">              subResult.put(&quot;prefix&quot;, prefix);</span>
-<span class="fc" id="L2763">              subResult.put(&quot;value&quot;, postfix);</span>
+<span class="fc" id="L2748">              tmpNewKey.append(prefix.replace(&quot;=&quot;, &quot;\\=&quot;));</span>
+<span class="fc" id="L2749">              tmpNewKey.append(&quot;=\&quot;&quot; + postfix.replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;) + &quot;\&quot;&quot;);</span>
+<span class="fc" id="L2750">              subResult.put(&quot;prefix&quot;, prefix);</span>
+<span class="fc" id="L2751">              subResult.put(&quot;value&quot;, postfix);</span>
             } else {
-<span class="fc" id="L2765">              prefix = new String(</span>
-<span class="fc" id="L2766">                  decoder.decode(parts[i].getBytes(StandardCharsets.UTF_8)),</span>
+<span class="fc" id="L2753">              prefix = new String(</span>
+<span class="fc" id="L2754">                  decoder.decode(parts[i].getBytes(StandardCharsets.UTF_8)),</span>
                   StandardCharsets.UTF_8);
-<span class="fc" id="L2768">              tmpNewKey.append(prefix.replace(&quot;=&quot;, &quot;\\=&quot;));</span>
-<span class="fc bfc" id="L2769" title="All 2 branches covered.">              if (prefix.startsWith(&quot;!&quot;)) {</span>
-<span class="fc" id="L2770">                subResult.put(&quot;missing&quot;, prefix.substring(1));</span>
+<span class="fc" id="L2756">              tmpNewKey.append(prefix.replace(&quot;=&quot;, &quot;\\=&quot;));</span>
+<span class="fc bfc" id="L2757" title="All 2 branches covered.">              if (prefix.startsWith(&quot;!&quot;)) {</span>
+<span class="fc" id="L2758">                subResult.put(&quot;missing&quot;, prefix.substring(1));</span>
               } else {
-<span class="fc" id="L2772">                subResult.put(&quot;prefix&quot;, prefix);</span>
+<span class="fc" id="L2760">                subResult.put(&quot;prefix&quot;, prefix);</span>
               }
             }
-<span class="fc" id="L2775">            result[i] = subResult;</span>
+<span class="fc" id="L2763">            result[i] = subResult;</span>
           }
         }
-<span class="pc bpc" id="L2778" title="1 of 2 branches missed.">        if (tmpNewKey != null) {</span>
-<span class="fc" id="L2779">          newKey.append(tmpNewKey);</span>
+<span class="pc bpc" id="L2766" title="1 of 2 branches missed.">        if (tmpNewKey != null) {</span>
+<span class="fc" id="L2767">          newKey.append(tmpNewKey);</span>
         }
-<span class="fc" id="L2781">        newKey.append(&quot;]&quot;);</span>
-<span class="fc" id="L2782">        return result;</span>
+<span class="fc" id="L2769">        newKey.append(&quot;]&quot;);</span>
+<span class="fc" id="L2770">        return result;</span>
       } else {
-<span class="fc" id="L2784">        newKey.append(&quot; []&quot;);</span>
-<span class="fc" id="L2785">        return null;</span>
+<span class="fc" id="L2772">        newKey.append(&quot; []&quot;);</span>
+<span class="fc" id="L2773">        return null;</span>
       }
     }
 
@@ -2795,18 +2783,18 @@ public class CodecComponent {
      */
     private static Map&lt;Integer, Map&lt;String, String&gt;[]&gt; keyToSubObject(
         String key, StringBuilder newKey) {
-<span class="fc" id="L2798">      Map&lt;Integer, Map&lt;String, String&gt;[]&gt; result = new HashMap&lt;&gt;();</span>
-<span class="pc bpc" id="L2799" title="1 of 4 branches missed.">      if (key == null || key.trim().isEmpty()) {</span>
-<span class="fc" id="L2800">        return null;</span>
+<span class="fc" id="L2786">      Map&lt;Integer, Map&lt;String, String&gt;[]&gt; result = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L2787" title="1 of 4 branches missed.">      if (key == null || key.trim().isEmpty()) {</span>
+<span class="fc" id="L2788">        return null;</span>
       } else {
-<span class="fc" id="L2802">        String[] parts = key.split(Pattern.quote(&quot;,&quot;), -1);</span>
-<span class="pc bpc" id="L2803" title="1 of 2 branches missed.">        if (parts.length &gt; 0) {</span>
-<span class="fc bfc" id="L2804" title="All 2 branches covered.">          for (int i = 0; i &lt; parts.length; i++) {</span>
-<span class="fc" id="L2805">            result.put(i, keyToSubSubObject(parts[i].trim(), newKey));</span>
+<span class="fc" id="L2790">        String[] parts = key.split(Pattern.quote(&quot;,&quot;), -1);</span>
+<span class="pc bpc" id="L2791" title="1 of 2 branches missed.">        if (parts.length &gt; 0) {</span>
+<span class="fc bfc" id="L2792" title="All 2 branches covered.">          for (int i = 0; i &lt; parts.length; i++) {</span>
+<span class="fc" id="L2793">            result.put(i, keyToSubSubObject(parts[i].trim(), newKey));</span>
           }
-<span class="fc" id="L2807">          return result;</span>
+<span class="fc" id="L2795">          return result;</span>
         } else {
-<span class="nc" id="L2809">          return null;</span>
+<span class="nc" id="L2797">          return null;</span>
         }
       }
     }
@@ -2820,38 +2808,38 @@ public class CodecComponent {
      */
     public static Map&lt;String, Map&lt;Integer, Map&lt;String, String&gt;[]&gt;&gt; keyToObject(
         String key, StringBuilder newKey) {
-<span class="pc bpc" id="L2823" title="1 of 2 branches missed.">      if (key.startsWith(KEY_START)) {</span>
-<span class="fc" id="L2824">        String content = key.substring(KEY_START.length());</span>
-<span class="fc" id="L2825">        StringBuilder keyLeft = new StringBuilder(&quot;&quot;);</span>
-<span class="fc" id="L2826">        StringBuilder keyHit = new StringBuilder(&quot;&quot;);</span>
-<span class="fc" id="L2827">        StringBuilder keyRight = new StringBuilder(&quot;&quot;);</span>
-<span class="fc" id="L2828">        Map&lt;String, Map&lt;Integer, Map&lt;String, String&gt;[]&gt;&gt; result = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L2829">        Map&lt;Integer, Map&lt;String, String&gt;[]&gt; resultLeft = null;</span>
-<span class="fc" id="L2830">        Map&lt;Integer, Map&lt;String, String&gt;[]&gt; resultHit = null;</span>
-<span class="fc" id="L2831">        Map&lt;Integer, Map&lt;String, String&gt;[]&gt; resultRight = null;</span>
-<span class="fc" id="L2832">        String[] parts = content.split(Pattern.quote(&quot;|&quot;), -1);</span>
-<span class="pc bpc" id="L2833" title="1 of 2 branches missed.">        if (parts.length == 3) {</span>
-<span class="fc" id="L2834">          resultLeft = keyToSubObject(parts[0].trim(), keyLeft);</span>
-<span class="fc" id="L2835">          resultHit = keyToSubObject(parts[1].trim(), keyHit);</span>
-<span class="fc" id="L2836">          resultRight = keyToSubObject(parts[2].trim(), keyRight);</span>
-<span class="nc bnc" id="L2837" title="All 2 branches missed.">        } else if (parts.length == 1) {</span>
-<span class="nc" id="L2838">          resultHit = keyToSubObject(parts[0].trim(), keyHit);</span>
+<span class="pc bpc" id="L2811" title="1 of 2 branches missed.">      if (key.startsWith(KEY_START)) {</span>
+<span class="fc" id="L2812">        String content = key.substring(KEY_START.length());</span>
+<span class="fc" id="L2813">        StringBuilder keyLeft = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L2814">        StringBuilder keyHit = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L2815">        StringBuilder keyRight = new StringBuilder(&quot;&quot;);</span>
+<span class="fc" id="L2816">        Map&lt;String, Map&lt;Integer, Map&lt;String, String&gt;[]&gt;&gt; result = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L2817">        Map&lt;Integer, Map&lt;String, String&gt;[]&gt; resultLeft = null;</span>
+<span class="fc" id="L2818">        Map&lt;Integer, Map&lt;String, String&gt;[]&gt; resultHit = null;</span>
+<span class="fc" id="L2819">        Map&lt;Integer, Map&lt;String, String&gt;[]&gt; resultRight = null;</span>
+<span class="fc" id="L2820">        String[] parts = content.split(Pattern.quote(&quot;|&quot;), -1);</span>
+<span class="pc bpc" id="L2821" title="1 of 2 branches missed.">        if (parts.length == 3) {</span>
+<span class="fc" id="L2822">          resultLeft = keyToSubObject(parts[0].trim(), keyLeft);</span>
+<span class="fc" id="L2823">          resultHit = keyToSubObject(parts[1].trim(), keyHit);</span>
+<span class="fc" id="L2824">          resultRight = keyToSubObject(parts[2].trim(), keyRight);</span>
+<span class="nc bnc" id="L2825" title="All 2 branches missed.">        } else if (parts.length == 1) {</span>
+<span class="nc" id="L2826">          resultHit = keyToSubObject(parts[0].trim(), keyHit);</span>
         }
-<span class="fc bfc" id="L2840" title="All 2 branches covered.">        if (resultLeft != null) {</span>
-<span class="fc" id="L2841">          result.put(&quot;left&quot;, resultLeft);</span>
+<span class="fc bfc" id="L2828" title="All 2 branches covered.">        if (resultLeft != null) {</span>
+<span class="fc" id="L2829">          result.put(&quot;left&quot;, resultLeft);</span>
         }
-<span class="fc" id="L2843">        result.put(&quot;hit&quot;, resultHit);</span>
-<span class="fc bfc" id="L2844" title="All 2 branches covered.">        if (resultRight != null) {</span>
-<span class="fc" id="L2845">          result.put(&quot;right&quot;, resultRight);</span>
+<span class="fc" id="L2831">        result.put(&quot;hit&quot;, resultHit);</span>
+<span class="fc bfc" id="L2832" title="All 2 branches covered.">        if (resultRight != null) {</span>
+<span class="fc" id="L2833">          result.put(&quot;right&quot;, resultRight);</span>
         }
-<span class="fc" id="L2847">        newKey.append(keyLeft);</span>
-<span class="fc" id="L2848">        newKey.append(&quot; |&quot;);</span>
-<span class="fc" id="L2849">        newKey.append(keyHit);</span>
-<span class="fc" id="L2850">        newKey.append(&quot; |&quot;);</span>
-<span class="fc" id="L2851">        newKey.append(keyRight);</span>
-<span class="fc" id="L2852">        return result;</span>
+<span class="fc" id="L2835">        newKey.append(keyLeft);</span>
+<span class="fc" id="L2836">        newKey.append(&quot; |&quot;);</span>
+<span class="fc" id="L2837">        newKey.append(keyHit);</span>
+<span class="fc" id="L2838">        newKey.append(&quot; |&quot;);</span>
+<span class="fc" id="L2839">        newKey.append(keyRight);</span>
+<span class="fc" id="L2840">        return result;</span>
       } else {
-<span class="nc" id="L2854">        return null;</span>
+<span class="nc" id="L2842">        return null;</span>
       }
     }
 
@@ -2886,13 +2874,13 @@ public class CodecComponent {
      * @param tokens the tokens
      */
     public ListToken(Integer docId, Integer docPosition, Match match,
-<span class="nc" id="L2889">        List&lt;MtasTokenString&gt; tokens) {</span>
-<span class="nc" id="L2890">      this.docId = docId;</span>
-<span class="nc" id="L2891">      this.docPosition = docPosition;</span>
-<span class="nc" id="L2892">      startPosition = match.startPosition;</span>
-<span class="nc" id="L2893">      endPosition = match.endPosition - 1;</span>
-<span class="nc" id="L2894">      this.tokens = tokens;</span>
-<span class="nc" id="L2895">    }</span>
+<span class="nc" id="L2877">        List&lt;MtasTokenString&gt; tokens) {</span>
+<span class="nc" id="L2878">      this.docId = docId;</span>
+<span class="nc" id="L2879">      this.docPosition = docPosition;</span>
+<span class="nc" id="L2880">      startPosition = match.startPosition;</span>
+<span class="nc" id="L2881">      endPosition = match.endPosition - 1;</span>
+<span class="nc" id="L2882">      this.tokens = tokens;</span>
+<span class="nc" id="L2883">    }</span>
   }
 
   /**
@@ -2924,13 +2912,13 @@ public class CodecComponent {
      * @param hits the hits
      */
     public ListHit(Integer docId, Integer docPosition, Match match,
-<span class="nc" id="L2927">        Map&lt;Integer, List&lt;String&gt;&gt; hits) {</span>
-<span class="nc" id="L2928">      this.docId = docId;</span>
-<span class="nc" id="L2929">      this.docPosition = docPosition;</span>
-<span class="nc" id="L2930">      startPosition = match.startPosition;</span>
-<span class="nc" id="L2931">      endPosition = match.endPosition - 1;</span>
-<span class="nc" id="L2932">      this.hits = hits;</span>
-<span class="nc" id="L2933">    }</span>
+<span class="nc" id="L2915">        Map&lt;Integer, List&lt;String&gt;&gt; hits) {</span>
+<span class="nc" id="L2916">      this.docId = docId;</span>
+<span class="nc" id="L2917">      this.docPosition = docPosition;</span>
+<span class="nc" id="L2918">      startPosition = match.startPosition;</span>
+<span class="nc" id="L2919">      endPosition = match.endPosition - 1;</span>
+<span class="nc" id="L2920">      this.hits = hits;</span>
+<span class="nc" id="L2921">    }</span>
   }
 
   /**
@@ -2950,10 +2938,10 @@ public class CodecComponent {
      * @param startPosition the start position
      * @param endPosition the end position
      */
-<span class="fc" id="L2953">    public Match(int startPosition, int endPosition) {</span>
-<span class="fc" id="L2954">      this.startPosition = startPosition;</span>
-<span class="fc" id="L2955">      this.endPosition = endPosition;</span>
-<span class="fc" id="L2956">    }</span>
+<span class="fc" id="L2941">    public Match(int startPosition, int endPosition) {</span>
+<span class="fc" id="L2942">      this.startPosition = startPosition;</span>
+<span class="fc" id="L2943">      this.endPosition = endPosition;</span>
+<span class="fc" id="L2944">    }</span>
 
     /*
      * (non-Javadoc)
@@ -2962,14 +2950,14 @@ public class CodecComponent {
      */
     @Override
     public boolean equals(Object obj) {
-<span class="nc bnc" id="L2965" title="All 2 branches missed.">      if (this == obj)</span>
-<span class="nc" id="L2966">        return true;</span>
-<span class="nc bnc" id="L2967" title="All 2 branches missed.">      if (obj == null)</span>
-<span class="nc" id="L2968">        return false;</span>
-<span class="nc bnc" id="L2969" title="All 2 branches missed.">      if (getClass() != obj.getClass())</span>
-<span class="nc" id="L2970">        return false;</span>
-<span class="nc" id="L2971">      final Match that = (Match) obj;</span>
-<span class="nc bnc" id="L2972" title="All 4 branches missed.">      return startPosition == that.startPosition</span>
+<span class="nc bnc" id="L2953" title="All 2 branches missed.">      if (this == obj)</span>
+<span class="nc" id="L2954">        return true;</span>
+<span class="nc bnc" id="L2955" title="All 2 branches missed.">      if (obj == null)</span>
+<span class="nc" id="L2956">        return false;</span>
+<span class="nc bnc" id="L2957" title="All 2 branches missed.">      if (getClass() != obj.getClass())</span>
+<span class="nc" id="L2958">        return false;</span>
+<span class="nc" id="L2959">      final Match that = (Match) obj;</span>
+<span class="nc bnc" id="L2960" title="All 4 branches missed.">      return startPosition == that.startPosition</span>
           &amp;&amp; endPosition == that.endPosition;
     }
 
@@ -2980,10 +2968,10 @@ public class CodecComponent {
      */
     @Override
     public int hashCode() {
-<span class="nc" id="L2983">      int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L2984">      h = (h * 5) ^ startPosition;</span>
-<span class="nc" id="L2985">      h = (h * 7) ^ endPosition;</span>
-<span class="nc" id="L2986">      return h;</span>
+<span class="nc" id="L2971">      int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L2972">      h = (h * 5) ^ startPosition;</span>
+<span class="nc" id="L2973">      h = (h * 7) ^ endPosition;</span>
+<span class="nc" id="L2974">      return h;</span>
     }
 
   }

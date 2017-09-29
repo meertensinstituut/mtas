@@ -74,21 +74,21 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
 <span class="pc bpc" id="L78" title="2 of 4 branches missed.">    if (q1 == null || q2 == null) {</span>
 <span class="nc" id="L79">      return null;</span>
     } else {
 <span class="fc" id="L81">      MtasSpanFollowedByQueryWeight w1 = new MtasSpanFollowedByQueryWeight(</span>
-<span class="fc" id="L82">          q1.createWeight(searcher, needsScores));</span>
+<span class="fc" id="L82">          q1.createWeight(searcher, needsScores, boost));</span>
 <span class="fc" id="L83">      MtasSpanFollowedByQueryWeight w2 = new MtasSpanFollowedByQueryWeight(</span>
-<span class="fc" id="L84">          q2.createWeight(searcher, needsScores));</span>
+<span class="fc" id="L84">          q2.createWeight(searcher, needsScores, boost));</span>
       // subWeights
 <span class="fc" id="L86">      List&lt;MtasSpanFollowedByQueryWeight&gt; subWeights = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L87">      subWeights.add(w1);</span>
 <span class="fc" id="L88">      subWeights.add(w2);</span>
       // return
 <span class="pc bpc" id="L90" title="1 of 2 branches missed.">      return new SpanFollowedByWeight(w1, w2, searcher,</span>
-<span class="pc" id="L91">          needsScores ? getTermContexts(subWeights) : null);</span>
+<span class="pc" id="L91">          needsScores ? getTermContexts(subWeights) : null, boost);</span>
     }
   }
 
@@ -216,8 +216,8 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
      */
     public SpanFollowedByWeight(MtasSpanFollowedByQueryWeight w1,
         MtasSpanFollowedByQueryWeight w2, IndexSearcher searcher,
-<span class="fc" id="L219">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L220">      super(MtasSpanFollowedByQuery.this, searcher, terms);</span>
+<span class="fc" id="L219">        Map&lt;Term, TermContext&gt; terms, float boost) throws IOException {</span>
+<span class="fc" id="L220">      super(MtasSpanFollowedByQuery.this, searcher, terms, boost);</span>
 <span class="fc" id="L221">      this.w1 = w1;</span>
 <span class="fc" id="L222">      this.w2 = w2;</span>
 <span class="fc" id="L223">    }</span>

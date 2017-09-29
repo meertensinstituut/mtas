@@ -89,7 +89,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    * .search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
     final TermContext context;
 <span class="fc" id="L95">    final IndexReaderContext topContext = searcher.getTopReaderContext();</span>
@@ -99,7 +99,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
 <span class="nc" id="L99">      context = termContext;</span>
     }
 <span class="pc bpc" id="L101" title="1 of 2 branches missed.">    return new SpanTermWeight(context, searcher,</span>
-<span class="pc" id="L102">        needsScores ? Collections.singletonMap(localTerm, context) : null);</span>
+<span class="pc" id="L102">        needsScores ? Collections.singletonMap(localTerm, context) : null, boost);</span>
   }
 
   /**
@@ -122,8 +122,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(TermContext termContext, IndexSearcher searcher,
-<span class="fc" id="L125">        Map&lt;Term, TermContext&gt; terms) throws IOException {</span>
-<span class="fc" id="L126">      super(MtasExtendedSpanTermQuery.this, searcher, terms);</span>
+<span class="fc" id="L125">        Map&lt;Term, TermContext&gt; terms, float boost) throws IOException {</span>
+<span class="fc" id="L126">      super(MtasExtendedSpanTermQuery.this, searcher, terms, boost);</span>
 <span class="fc" id="L127">      this.termContext = termContext;</span>
 <span class="pc bpc" id="L128" title="2 of 4 branches missed.">      assert termContext != null : &quot;TermContext must not be null&quot;;</span>
 <span class="fc" id="L129">    }</span>

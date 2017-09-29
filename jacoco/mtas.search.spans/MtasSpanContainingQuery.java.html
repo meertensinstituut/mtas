@@ -78,9 +78,9 @@ public class MtasSpanContainingQuery extends MtasSpanQuery {
    * search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
-<span class="fc" id="L83">    return baseQuery.createWeight(searcher, needsScores);</span>
+<span class="fc" id="L83">    return baseQuery.createWeight(searcher, needsScores, boost);</span>
   }
 
   /*

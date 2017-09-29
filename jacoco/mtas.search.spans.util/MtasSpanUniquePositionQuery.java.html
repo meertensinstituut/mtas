@@ -121,10 +121,10 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-<span class="fc" id="L125">    SpanWeight subWeight = clause.createWeight(searcher, false);</span>
+      boolean needsScores, float boost) throws IOException {
+<span class="fc" id="L125">    SpanWeight subWeight = clause.createWeight(searcher, false, boost);</span>
 <span class="fc bfc" id="L126" title="All 2 branches covered.">    return new SpanUniquePositionWeight(subWeight, searcher,</span>
-<span class="fc" id="L127">        needsScores ? getTermContexts(subWeight) : null);</span>
+<span class="fc" id="L127">        needsScores ? getTermContexts(subWeight) : null, boost);</span>
   }
 
   /*
@@ -155,9 +155,9 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanUniquePositionWeight(SpanWeight subWeight,
-        IndexSearcher searcher, Map&lt;Term, TermContext&gt; terms)
+        IndexSearcher searcher, Map&lt;Term, TermContext&gt; terms, float boost)
 <span class="fc" id="L159">        throws IOException {</span>
-<span class="fc" id="L160">      super(MtasSpanUniquePositionQuery.this, searcher, terms);</span>
+<span class="fc" id="L160">      super(MtasSpanUniquePositionQuery.this, searcher, terms, boost);</span>
 <span class="fc" id="L161">      this.subWeight = subWeight;</span>
 <span class="fc" id="L162">    }</span>
 

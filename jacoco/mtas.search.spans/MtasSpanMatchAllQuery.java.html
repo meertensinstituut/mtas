@@ -63,9 +63,9 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
     // keep things simple
-<span class="fc" id="L68">    return new SpanAllWeight(searcher, null);</span>
+<span class="fc" id="L68">    return new SpanAllWeight(searcher, null, boost);</span>
   }
 
   /**
@@ -90,8 +90,8 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanAllWeight(IndexSearcher searcher,
-<span class="fc" id="L93">        Map&lt;Term, TermContext&gt; termContexts) throws IOException {</span>
-<span class="fc" id="L94">      super(MtasSpanMatchAllQuery.this, searcher, termContexts);</span>
+<span class="fc" id="L93">        Map&lt;Term, TermContext&gt; termContexts, float boost) throws IOException {</span>
+<span class="fc" id="L94">      super(MtasSpanMatchAllQuery.this, searcher, termContexts, boost);</span>
 <span class="fc" id="L95">      this.searcher = searcher;</span>
 <span class="fc" id="L96">    }</span>
 
