@@ -434,6 +434,9 @@ public class CodecCollector {
       // collect values for facetFields
       for (Entry<String, SortedMap<String, int[]>> entry : facetData
           .entrySet()) {
+        if(!facetDataType.containsKey(entry.getKey()) || !facetDataType.get(entry.getKey()).equals(ComponentFacet.TYPE_STRING)) {
+          throw new IOException("unexpected type");
+        }
         Terms fft = r.terms(entry.getKey());
         if (fft != null) {
           TermsEnum termsEnum = fft.iterator();
@@ -455,7 +458,7 @@ public class CodecCollector {
                 facetDataSublistCounter++;
               }
             }
-            if (facetDataSublistCounter > 0) {
+            if (facetDataSublistCounter > 0) {              
               String termValue = term.utf8ToString();              
               if (!facetDataList.containsKey(termValue)) {
                 facetDataList.put(termValue,
