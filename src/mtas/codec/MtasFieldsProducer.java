@@ -57,8 +57,7 @@ public class MtasFieldsProducer extends FieldsProducer {
     String postingsFormatName = null;
     indexInputList = new HashMap<>();
     indexInputOffsetList = new HashMap<>();
-    version = MtasCodecPostingsFormat.VERSION_CURRENT;
-
+    version = MtasCodecPostingsFormat.VERSION_CURRENT;    
     postingsFormatName = addIndexInputToList("object", openMtasFile(state, name,
         MtasCodecPostingsFormat.MTAS_OBJECT_EXTENSION), postingsFormatName);
     addIndexInputToList("term",
@@ -99,7 +98,7 @@ public class MtasFieldsProducer extends FieldsProducer {
     }
     // Load the delegate postingsFormatName from this file
     this.delegateFieldsProducer = PostingsFormat.forName(postingsFormatName)
-        .fieldsProducer(state);
+        .fieldsProducer(state);      
   }
 
   /**

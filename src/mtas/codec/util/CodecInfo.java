@@ -83,7 +83,7 @@ public class CodecInfo {
         } else if (m.getName().equals("getIndexInputOffsetList")) {
           indexInputOffsetList = (HashMap<String, Long>) m.invoke(t, emptyArgs);
         } else if (m.getName().equals("getVersion")) {
-          version = m.invoke(t, emptyArgs);
+          version = m.invoke(t, emptyArgs);          
         }
       }
       if (indexInputList == null || indexInputOffsetList == null

@@ -72,7 +72,6 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.LegacyNumericUtils;
 import org.apache.lucene.util.automaton.Automaton;
 import org.apache.lucene.util.automaton.ByteRunAutomaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
@@ -231,7 +230,7 @@ public class CodecCollector {
         lrc = iterator.next();
         r = lrc.reader();
         for (String field : collectionInfo.fields()) {
-          if ((terms = r.fields().terms(field)) != null) {
+          if ((terms = r.terms(field)) != null) {
             TermsEnum termsEnum = terms.iterator();
             while ((term = termsEnum.next()) != null) {
               Iterator<Integer> docIterator = docSet.iterator();
@@ -457,27 +456,7 @@ public class CodecCollector {
               }
             }
             if (facetDataSublistCounter > 0) {
-              String termValue = null;
-              if (facetDataType.get(entry.getKey())
-                  .equals(ComponentFacet.TYPE_INTEGER)) {
-                // only values without shifting bits
-                if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_INT) {
-                  termValue = Integer
-                      .toString(LegacyNumericUtils.prefixCodedToInt(term));
-                } else {
-                  continue;
-                }
-              } else if (facetDataType.get(entry.getKey())
-                  .equals(ComponentFacet.TYPE_LONG)) {
-                if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_LONG) {
-                  termValue = Long
-                      .toString(LegacyNumericUtils.prefixCodedToLong(term));
-                } else {
-                  continue;
-                }
-              } else {
-                termValue = term.utf8ToString();
-              }
+              String termValue = term.utf8ToString();              
               if (!facetDataList.containsKey(termValue)) {
                 facetDataList.put(termValue,
                     Arrays.copyOf(facetDataSublist, facetDataSublistCounter));
@@ -824,11 +803,12 @@ public class CodecCollector {
       IndexSearcher searcher, LeafReaderContext lrc) throws IOException {
     Map<GroupHit, Spans> list = new HashMap<>();
     IndexReader reader = searcher.getIndexReader();
+    final float boost = 0;
     for (GroupHit hit : occurences) {
       MtasSpanQuery queryHit = createQueryFromGroupHit(prefixes, field, hit);
       if (queryHit != null) {
         MtasSpanQuery queryHitRewritten = queryHit.rewrite(reader);
-        SpanWeight weight = queryHitRewritten.createWeight(searcher, false);
+        SpanWeight weight = queryHitRewritten.createWeight(searcher, false, boost);
         Spans spans = weight.getSpans(lrc, SpanWeight.Postings.POSITIONS);
         if (spans != null) {
           list.put(hit, spans);

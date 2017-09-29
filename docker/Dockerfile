@@ -1,6 +1,6 @@
 # Automatically generated Dockerfile 
-# - Build 2017-09-25 04:04
-# - Lucene/Solr version 6.6.1
+# - Build 2017-09-28 17:32
+# - Lucene/Solr version 7.0.0
 # - Mtas release 20170925 
 #
 
@@ -15,7 +15,7 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/20170925/mtas-6.6.1.jar /root/lib/
+ADD https://github.com/meertensinstituut/mtas/releases/download/20170925/mtas-7.0.0.jar /root/lib/
 
 RUN apt-get update && apt-get install -y locales lsof software-properties-common python-software-properties apache2 curl subversion && \
     locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en
@@ -40,17 +40,17 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get install -y oracle-java8-installer && \
     rm -rf /var/lib/apt/lists/*
 
-RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/6.6.1/solr-6.6.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
+RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/7.0.0/solr-7.0.0.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if echo "$solrurl" | grep -q '^.*[^ ].*$'; then \
-      curl -f -o /root/solr-6.6.1.tgz -O $solrurl || true; \
+      curl -f -o /root/solr-7.0.0.tgz -O $solrurl || true; \
     fi && \
-    if [ ! -f /root/solr-6.6.1.tgz ]; then \
-      echo "Solr 6.6.1 not found in mirror, falling back to apache archive"; \ 
-      solrurl="http://archive.apache.org/dist/lucene/solr/6.6.1/solr-6.6.1.tgz"; \
-      curl -f -o /root/solr-6.6.1.tgz -O $solrurl; \ 
+    if [ ! -f /root/solr-7.0.0.tgz ]; then \
+      echo "Solr 7.0.0 not found in mirror, falling back to apache archive"; \ 
+      solrurl="http://archive.apache.org/dist/lucene/solr/7.0.0/solr-7.0.0.tgz"; \
+      curl -f -o /root/solr-7.0.0.tgz -O $solrurl; \ 
     fi && \    
-    tar xzf solr-6.6.1.tgz solr-6.6.1/bin/install_solr_service.sh --strip-components=2 && \
-    bash ./install_solr_service.sh solr-6.6.1.tgz && rm install_solr_service.sh && rm -rf solr-6.6.1.tgz
+    tar xzf solr-7.0.0.tgz solr-7.0.0/bin/install_solr_service.sh --strip-components=2 && \
+    bash ./install_solr_service.sh solr-7.0.0.tgz && rm install_solr_service.sh && rm -rf solr-7.0.0.tgz
     
 RUN service apache2 stop && \
     echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf && \
@@ -74,8 +74,8 @@ RUN service apache2 stop && \
     chmod -R 755 /var/www/html && \
     printf "echo\n" >> /start.sh && \
     printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh && \
-    printf "echo \"  Timestamp 2017-09-25 04:04\"\n" >> /start.sh && \
-    printf "echo \"  Lucene/Solr version 6.6.1\"\n" >> /start.sh && \
+    printf "echo \"  Timestamp 2017-09-28 17:32\"\n" >> /start.sh && \
+    printf "echo \"  Lucene/Solr version 7.0.0\"\n" >> /start.sh && \
     printf "echo \"  Mtas release 20170925\"\n" >> /start.sh && \
     printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \
     printf "echo \"=======================================================================\"\n" >> /start.sh && \
@@ -85,7 +85,7 @@ RUN service apache2 stop && \
     mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && \
     echo "name=demo1" > demo1/core.properties && \
     cp lib/commons-math3-3.6.1.jar demo1/lib/ && \
-    cp lib/mtas-6.6.1.jar demo1/lib/ && \
+    cp lib/mtas-7.0.0.jar demo1/lib/ && \
     cp data/solrconfig.xml demo1/conf/ && \
     cp data/schemaBasic.xml demo1/conf/schema.xml && \
     cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ && \

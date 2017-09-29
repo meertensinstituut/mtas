@@ -73,21 +73,21 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
     if (q1 == null || q2 == null) {
       return null;
     } else {
       MtasSpanFullyAlignedWithQueryWeight w1 = new MtasSpanFullyAlignedWithQueryWeight(
-          q1.createWeight(searcher, needsScores));
+          q1.createWeight(searcher, needsScores, boost));
       MtasSpanFullyAlignedWithQueryWeight w2 = new MtasSpanFullyAlignedWithQueryWeight(
-          q2.createWeight(searcher, needsScores));
+          q2.createWeight(searcher, needsScores, boost));
       // subWeights
       List<MtasSpanFullyAlignedWithQueryWeight> subWeights = new ArrayList<>();
       subWeights.add(w1);
       subWeights.add(w2);
       // return
       return new SpanFullyAlignedWithWeight(w1, w2, searcher,
-          needsScores ? getTermContexts(subWeights) : null);
+          needsScores ? getTermContexts(subWeights) : null, boost);
     }
   }
 
@@ -235,8 +235,8 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      */
     public SpanFullyAlignedWithWeight(MtasSpanFullyAlignedWithQueryWeight w1,
         MtasSpanFullyAlignedWithQueryWeight w2, IndexSearcher searcher,
-        Map<Term, TermContext> terms) throws IOException {
-      super(MtasSpanFullyAlignedWithQuery.this, searcher, terms);
+        Map<Term, TermContext> terms, float boost) throws IOException {
+      super(MtasSpanFullyAlignedWithQuery.this, searcher, terms, boost);
       this.w1 = w1;
       this.w2 = w2;
     }

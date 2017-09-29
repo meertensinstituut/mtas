@@ -86,10 +86,10 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
     SpanWeight spanWeight = ((SpanQuery) searcher.rewrite(clause))
-        .createWeight(searcher, needsScores);
-    return new SpanTermWeight(spanWeight, searcher);
+        .createWeight(searcher, needsScores, boost);
+    return new SpanTermWeight(spanWeight, searcher, boost);
   }
 
   /**
@@ -107,9 +107,9 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
      * @param searcher the searcher
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public SpanTermWeight(SpanWeight spanWeight, IndexSearcher searcher)
+    public SpanTermWeight(SpanWeight spanWeight, IndexSearcher searcher, float boost)
         throws IOException {
-      super(MtasSpanEndQuery.this, searcher, null);
+      super(MtasSpanEndQuery.this, searcher, null, boost);
       this.spanWeight = spanWeight;
     }
 

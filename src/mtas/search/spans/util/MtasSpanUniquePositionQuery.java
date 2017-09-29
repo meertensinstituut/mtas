@@ -121,10 +121,10 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-    SpanWeight subWeight = clause.createWeight(searcher, false);
+      boolean needsScores, float boost) throws IOException {
+    SpanWeight subWeight = clause.createWeight(searcher, false, boost);
     return new SpanUniquePositionWeight(subWeight, searcher,
-        needsScores ? getTermContexts(subWeight) : null);
+        needsScores ? getTermContexts(subWeight) : null, boost);
   }
 
   /*
@@ -155,9 +155,9 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanUniquePositionWeight(SpanWeight subWeight,
-        IndexSearcher searcher, Map<Term, TermContext> terms)
+        IndexSearcher searcher, Map<Term, TermContext> terms, float boost)
         throws IOException {
-      super(MtasSpanUniquePositionQuery.this, searcher, terms);
+      super(MtasSpanUniquePositionQuery.this, searcher, terms, boost);
       this.subWeight = subWeight;
     }
 

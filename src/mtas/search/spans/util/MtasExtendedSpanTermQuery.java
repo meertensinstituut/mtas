@@ -89,7 +89,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    * .search.IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
     final TermContext context;
     final IndexReaderContext topContext = searcher.getTopReaderContext();
@@ -99,7 +99,7 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       context = termContext;
     }
     return new SpanTermWeight(context, searcher,
-        needsScores ? Collections.singletonMap(localTerm, context) : null);
+        needsScores ? Collections.singletonMap(localTerm, context) : null, boost);
   }
 
   /**
@@ -122,8 +122,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanTermWeight(TermContext termContext, IndexSearcher searcher,
-        Map<Term, TermContext> terms) throws IOException {
-      super(MtasExtendedSpanTermQuery.this, searcher, terms);
+        Map<Term, TermContext> terms, float boost) throws IOException {
+      super(MtasExtendedSpanTermQuery.this, searcher, terms, boost);
       this.termContext = termContext;
       assert termContext != null : "TermContext must not be null";
     }

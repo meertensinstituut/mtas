@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentGroup;
+import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentCollection;
 import mtas.codec.util.CodecComponent.ComponentKwic;
 import mtas.codec.util.CodecComponent.ComponentList;
@@ -152,7 +152,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void init(NamedList args) {
-    super.init(args);
+    super.init(args);   
     // init components
     searchDocument = new MtasSolrComponentDocument(this);
     searchKwic = new MtasSolrComponentKwic(this);
@@ -189,16 +189,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
     collectionCache = new MtasSolrCollectionCache(collectionCacheDirectory,
         collectionLifetime, collectionMaximumNumber, collectionMaximumOverflow);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.solr.handler.component.SearchComponent#getVersion()
-   */
-  @Override
-  public String getVersion() {
-    return String.valueOf(MtasCodecPostingsFormat.VERSION_CURRENT);
   }
 
   /*

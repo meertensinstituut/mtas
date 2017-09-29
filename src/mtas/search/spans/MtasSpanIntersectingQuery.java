@@ -73,21 +73,21 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
     if (q1 == null || q2 == null) {
       return null;
     } else {
       MtasSpanIntersectingQueryWeight w1 = new MtasSpanIntersectingQueryWeight(
-          q1.createWeight(searcher, needsScores));
+          q1.createWeight(searcher, needsScores, boost));
       MtasSpanIntersectingQueryWeight w2 = new MtasSpanIntersectingQueryWeight(
-          q2.createWeight(searcher, needsScores));
+          q2.createWeight(searcher, needsScores, boost));
       // subWeights
       List<MtasSpanIntersectingQueryWeight> subWeights = new ArrayList<>();
       subWeights.add(w1);
       subWeights.add(w2);
       // return
       return new SpanIntersectingWeight(w1, w2, searcher,
-          needsScores ? getTermContexts(subWeights) : null);
+          needsScores ? getTermContexts(subWeights) : null, boost);
     }
   }
 
@@ -224,8 +224,8 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
      */
     public SpanIntersectingWeight(MtasSpanIntersectingQueryWeight w1,
         MtasSpanIntersectingQueryWeight w2, IndexSearcher searcher,
-        Map<Term, TermContext> terms) throws IOException {
-      super(MtasSpanIntersectingQuery.this, searcher, terms);
+        Map<Term, TermContext> terms, float boost) throws IOException {
+      super(MtasSpanIntersectingQuery.this, searcher, terms, boost);
       this.w1 = w1;
       this.w2 = w2;
     }

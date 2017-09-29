@@ -148,10 +148,13 @@ public class CodecUtil {
   /**
    * Checks if is single position prefix.
    *
-   * @param fieldInfo the field info
-   * @param prefix the prefix
+   * @param fieldInfo
+   *          the field info
+   * @param prefix
+   *          the prefix
    * @return true, if is single position prefix
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static boolean isSinglePositionPrefix(FieldInfo fieldInfo,
       String prefix) throws IOException {
@@ -173,7 +176,8 @@ public class CodecUtil {
   /**
    * Term value.
    *
-   * @param term the term
+   * @param term
+   *          the term
    * @return the string
    */
   public static String termValue(String term) {
@@ -189,7 +193,8 @@ public class CodecUtil {
   /**
    * Term prefix.
    *
-   * @param term the term
+   * @param term
+   *          the term
    * @return the string
    */
   public static String termPrefix(String term) {
@@ -204,7 +209,8 @@ public class CodecUtil {
   /**
    * Term prefix value.
    *
-   * @param term the term
+   * @param term
+   *          the term
    * @return the string
    */
   public static String termPrefixValue(String term) {
@@ -214,16 +220,26 @@ public class CodecUtil {
   /**
    * Collect field.
    *
-   * @param field the field
-   * @param searcher the searcher
-   * @param rawReader the raw reader
-   * @param fullDocList the full doc list
-   * @param fullDocSet the full doc set
-   * @param fieldStats the field stats
-   * @throws IllegalAccessException the illegal access exception
-   * @throws IllegalArgumentException the illegal argument exception
-   * @throws InvocationTargetException the invocation target exception
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param searcher
+   *          the searcher
+   * @param rawReader
+   *          the raw reader
+   * @param fullDocList
+   *          the full doc list
+   * @param fullDocSet
+   *          the full doc set
+   * @param fieldStats
+   *          the field stats
+   * @throws IllegalAccessException
+   *           the illegal access exception
+   * @throws IllegalArgumentException
+   *           the illegal argument exception
+   * @throws InvocationTargetException
+   *           the invocation target exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static void collectField(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList<Integer> fullDocList,
@@ -235,9 +251,10 @@ public class CodecUtil {
       HashMap<MtasSpanQuery, SpanWeight> spansQueryWeight = new HashMap<>();
       // only if spanQueryList is not empty
       if (fieldStats.spanQueryList.size() > 0) {
+        final float boost = 0;
         for (MtasSpanQuery sq : fieldStats.spanQueryList) {
           spansQueryWeight.put(sq, ((MtasSpanQuery) sq.rewrite(reader))
-              .createWeight(searcher, false));
+              .createWeight(searcher, false, boost));
         }
       }
       // collect
@@ -249,10 +266,14 @@ public class CodecUtil {
   /**
    * Collect collection.
    *
-   * @param reader the reader
-   * @param fullDocSet the full doc set
-   * @param collectionInfo the collection info
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param reader
+   *          the reader
+   * @param fullDocSet
+   *          the full doc set
+   * @param collectionInfo
+   *          the collection info
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static void collectCollection(IndexReader reader,
       List<Integer> fullDocSet, ComponentCollection collectionInfo)
@@ -265,9 +286,11 @@ public class CodecUtil {
   /**
    * Creates the stats items.
    *
-   * @param statsType the stats type
+   * @param statsType
+   *          the stats type
    * @return the sorted set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   static SortedSet<String> createStatsItems(String statsType)
       throws IOException {
@@ -309,9 +332,12 @@ public class CodecUtil {
   /**
    * Creates the stats type.
    *
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param functionParser the function parser
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param functionParser
+   *          the function parser
    * @return the string
    */
   static String createStatsType(Set<String> statsItems, String sortType,
@@ -350,7 +376,8 @@ public class CodecUtil {
   /**
    * Checks if is stats type.
    *
-   * @param type the type
+   * @param type
+   *          the type
    * @return true, if is stats type
    */
   public static boolean isStatsType(String type) {

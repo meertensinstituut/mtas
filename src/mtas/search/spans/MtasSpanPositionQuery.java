@@ -77,8 +77,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-    return new SpanAllWeight(searcher, null);
+      boolean needsScores, float boost) throws IOException {
+    return new SpanAllWeight(searcher, null, boost);
   }
 
   /**
@@ -100,8 +100,8 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanAllWeight(IndexSearcher searcher,
-        Map<Term, TermContext> termContexts) throws IOException {
-      super(MtasSpanPositionQuery.this, searcher, termContexts);
+        Map<Term, TermContext> termContexts, float boost) throws IOException {
+      super(MtasSpanPositionQuery.this, searcher, termContexts, boost);
     }
 
     /*

@@ -50,7 +50,7 @@ public class CodecComponent {
   /**
    * Instantiates a new codec component.
    */
-  private CodecComponent() {
+  private CodecComponent() {       
   }
 
   /**
@@ -947,18 +947,6 @@ public class CodecComponent {
 
     /** The base function parser functions. */
     public MtasFunctionParserFunction[][] baseFunctionParserFunctions;
-
-    /** The Constant TYPE_INTEGER. */
-    public static final String TYPE_INTEGER = "integer";
-
-    /** The Constant TYPE_DOUBLE. */
-    public static final String TYPE_DOUBLE = "double";
-
-    /** The Constant TYPE_LONG. */
-    public static final String TYPE_LONG = "long";
-
-    /** The Constant TYPE_FLOAT. */
-    public static final String TYPE_FLOAT = "float";
 
     /** The Constant TYPE_STRING. */
     public static final String TYPE_STRING = "string";

@@ -264,15 +264,15 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-    SpanWeight subWeight = query.createWeight(searcher, false);
+      boolean needsScores, float boost) throws IOException {
+    SpanWeight subWeight = query.createWeight(searcher, false, boost);
     SpanWeight ignoreWeight = null;
     if (ignoreQuery != null) {
-      ignoreWeight = ignoreQuery.createWeight(searcher, false);
+      ignoreWeight = ignoreQuery.createWeight(searcher, false, boost);
     }
     return new SpanRecurrenceWeight(subWeight, ignoreWeight,
         maximumIgnoreLength, searcher,
-        needsScores ? getTermContexts(subWeight) : null);
+        needsScores ? getTermContexts(subWeight) : null, boost);
   }
 
   /*
@@ -315,8 +315,8 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
      */
     public SpanRecurrenceWeight(SpanWeight subWeight, SpanWeight ignoreWeight,
         Integer maximumIgnoreLength, IndexSearcher searcher,
-        Map<Term, TermContext> terms) throws IOException {
-      super(MtasSpanRecurrenceQuery.this, searcher, terms);
+        Map<Term, TermContext> terms, float boost) throws IOException {
+      super(MtasSpanRecurrenceQuery.this, searcher, terms, boost);
       this.subWeight = subWeight;
       this.ignoreWeight = ignoreWeight;
       this.maximumIgnoreLength = maximumIgnoreLength;

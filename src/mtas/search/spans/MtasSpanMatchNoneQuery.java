@@ -54,8 +54,8 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-    return new SpanNoneWeight(searcher, null);
+      boolean needsScores, float boost) throws IOException {
+    return new SpanNoneWeight(searcher, null, boost);
   }
 
   /**
@@ -74,8 +74,8 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public SpanNoneWeight(IndexSearcher searcher,
-        Map<Term, TermContext> termContexts) throws IOException {
-      super(MtasSpanMatchNoneQuery.this, searcher, termContexts);
+        Map<Term, TermContext> termContexts, float boost) throws IOException {
+      super(MtasSpanMatchNoneQuery.this, searcher, termContexts, boost);
     }
 
     /*

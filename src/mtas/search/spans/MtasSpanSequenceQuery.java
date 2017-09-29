@@ -406,18 +406,18 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
+      boolean needsScores, float boost) throws IOException {
     List<MtasSpanSequenceQueryWeight> subWeights = new ArrayList<>();
     SpanWeight ignoreWeight = null;
     for (MtasSpanSequenceItem item : items) {
       subWeights.add(new MtasSpanSequenceQueryWeight(
-          item.getQuery().createWeight(searcher, false), item.isOptional()));
+          item.getQuery().createWeight(searcher, false, boost), item.isOptional()));
     }
     if (ignoreQuery != null) {
-      ignoreWeight = ignoreQuery.createWeight(searcher, false);
+      ignoreWeight = ignoreQuery.createWeight(searcher, false, boost);
     }
     return new SpanSequenceWeight(subWeights, ignoreWeight, maximumIgnoreLength,
-        searcher, needsScores ? getTermContexts(subWeights) : null);
+        searcher, needsScores ? getTermContexts(subWeights) : null, boost);
   }
 
   /**
@@ -477,9 +477,9 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      */
     public SpanSequenceWeight(List<MtasSpanSequenceQueryWeight> subWeights,
         SpanWeight ignoreWeight, Integer maximumIgnoreLength,
-        IndexSearcher searcher, Map<Term, TermContext> terms)
+        IndexSearcher searcher, Map<Term, TermContext> terms, float boost)
         throws IOException {
-      super(MtasSpanSequenceQuery.this, searcher, terms);
+      super(MtasSpanSequenceQuery.this, searcher, terms, boost);
       this.subWeights = subWeights;
       this.ignoreWeight = ignoreWeight;
       this.maximumIgnoreLength = maximumIgnoreLength;

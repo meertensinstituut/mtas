@@ -22,8 +22,8 @@ public abstract class MtasSpanWeight extends SpanWeight {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasSpanWeight(SpanQuery query, IndexSearcher searcher,
-      Map<Term, TermContext> termContexts) throws IOException {
-    super(query, searcher, termContexts);
+      Map<Term, TermContext> termContexts, float boost) throws IOException {
+    super(query, searcher, termContexts, boost);
   }
 
   // abstract public MtasSpans getSpans(LeafReaderContext context,

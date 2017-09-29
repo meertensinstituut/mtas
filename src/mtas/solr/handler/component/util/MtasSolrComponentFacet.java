@@ -8,17 +8,13 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.FieldType.LegacyNumericType;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
-import org.apache.solr.schema.FieldType;
 import org.apache.solr.schema.IndexSchema;
-import org.apache.solr.schema.SchemaField;
-
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentFields;
@@ -653,20 +649,6 @@ public class MtasSolrComponentFacet
    * @return the field type
    */
   private String getFieldType(IndexSchema schema, String field) {
-    SchemaField sf = schema.getField(field);
-    FieldType ft = sf.getType();
-    if (ft != null && ft.getNumericType() != null) {
-      LegacyNumericType nt = ft.getNumericType();
-      if (nt.equals(LegacyNumericType.INT)) {
-        return ComponentFacet.TYPE_INTEGER;
-      } else if (nt.equals(LegacyNumericType.DOUBLE)) {
-        return ComponentFacet.TYPE_DOUBLE;
-      } else if (nt.equals(LegacyNumericType.LONG)) {
-        return ComponentFacet.TYPE_LONG;
-      } else if (nt.equals(LegacyNumericType.FLOAT)) {
-        return ComponentFacet.TYPE_FLOAT;
-      }
-    }
     return ComponentFacet.TYPE_STRING;
   }
 

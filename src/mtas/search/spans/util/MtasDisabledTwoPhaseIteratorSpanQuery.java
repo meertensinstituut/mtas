@@ -39,10 +39,10 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
    */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
-      boolean needsScores) throws IOException {
-    SpanWeight subWeight = subQuery.createWeight(searcher, needsScores);
+      boolean needsScores, float boost) throws IOException {
+    SpanWeight subWeight = subQuery.createWeight(searcher, needsScores, boost);
     return new MtasDisabledTwoPhaseIteratorWeight(subWeight, searcher,
-        needsScores);
+        needsScores, boost);
   }
 
   /*
@@ -143,9 +143,9 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public MtasDisabledTwoPhaseIteratorWeight(SpanWeight subWeight,
-        IndexSearcher searcher, boolean needsScores) throws IOException {
+        IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
       super(subQuery, searcher,
-          needsScores ? getTermContexts(subWeight) : null);
+          needsScores ? getTermContexts(subWeight) : null, boost);
       this.subWeight = subWeight;
     }
 

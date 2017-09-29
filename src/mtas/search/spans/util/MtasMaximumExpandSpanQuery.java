@@ -79,13 +79,13 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
    * IndexSearcher, boolean)
    */
   @Override
-  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores)
+  public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
-    SpanWeight subWeight = query.createWeight(searcher, needsScores);
+    SpanWeight subWeight = query.createWeight(searcher, needsScores, boost);
     if (maximumLeft == 0 && maximumRight == 0) {
       return subWeight;
     } else {
-      return new MtasMaximumExpandWeight(subWeight, searcher, needsScores);
+      return new MtasMaximumExpandWeight(subWeight, searcher, needsScores, boost);
     }
   }
 
@@ -208,9 +208,9 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public MtasMaximumExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
-        boolean needsScores) throws IOException {
+        boolean needsScores, float boost) throws IOException {
       super(MtasMaximumExpandSpanQuery.this, searcher,
-          needsScores ? getTermContexts(subWeight) : null);
+          needsScores ? getTermContexts(subWeight) : null, boost);
       this.subWeight = subWeight;
     }
 
