@@ -5,7 +5,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>7.0.0</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20170929</currentDevelopmentRelease>		
+		<currentDevelopmentRelease>20170929</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
@@ -41,13 +41,36 @@
 			<resource>
 				<directory>src/docker</directory>
 				<filtering>true</filtering>
-				<targetPath>${basedir}/docker</targetPath>
+				<targetPath>${project.basedir}/docker</targetPath>
 			</resource>
 			<resource>
 				<directory>resources</directory>
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.basedir}/src/</source>
+                <source>${project.basedir}/examples/</source>
+								<source>${project.basedir}/generated-sources/</source>
+								<source>${project.basedir}/resources/</source>
+								<source>${project.basedir}/junit/</source>
+                <source>${project.basedir}/test/</source>                                 
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -82,8 +105,8 @@
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.cql</packageName>
-							<sourceDirectory>${basedir}/src/mtas/parser/cql</sourceDirectory>
-							<outputDirectory>${basedir}/generated-sources</outputDirectory>
+							<sourceDirectory>${project.basedir}/src/mtas/parser/cql</sourceDirectory>
+							<outputDirectory>${project.basedir}/generated-sources</outputDirectory>
 						</configuration>
 					</execution>
 					<execution>
@@ -96,8 +119,8 @@
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.function</packageName>
-							<sourceDirectory>${basedir}/src/mtas/parser/function/</sourceDirectory>
-							<outputDirectory>${basedir}/generated-sources</outputDirectory>
+							<sourceDirectory>${project.basedir}/src/mtas/parser/function/</sourceDirectory>
+							<outputDirectory>${project.basedir}/generated-sources</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -145,7 +168,7 @@
 				<version>3.6</version>
 				<configuration>
 					<siteDirectory>${project.basedir}/src/site/</siteDirectory>
-          <outputDirectory>${project.basedir}/gh-pages/</outputDirectory>
+					<outputDirectory>${project.basedir}/gh-pages/</outputDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
