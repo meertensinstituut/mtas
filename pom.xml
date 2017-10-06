@@ -60,12 +60,10 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.basedir}/src/</source>
-                <source>${project.basedir}/examples/</source>
+								<source>${project.basedir}/examples/</source>
 								<source>${project.basedir}/generated-sources/</source>
 								<source>${project.basedir}/resources/</source>
-								<source>${project.basedir}/junit/</source>
-                <source>${project.basedir}/test/</source>                                 
+								<source>${project.basedir}/test/</source>                                 
 							</sources>
 						</configuration>
 					</execution>
