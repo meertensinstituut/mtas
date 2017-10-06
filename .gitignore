@@ -1,0 +1,15 @@
+.classpath
+.project
+.settings/
+.svn
+.settings
+.DS_store
+gh-pages/
+publications/
+target/
+solr-*/
+jetty-*/
+/data/
+examples/
+demo/
+generated-sources/*
