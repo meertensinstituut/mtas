@@ -162,15 +162,17 @@
                                   
             <h1>Docker</h1>
 <p>A <a class="externalLink" href="https://www.docker.com/">Dockerfile</a> is available to get started quickly with Mtas on a Solr based installation.</p>
-<p>To build the image</p>
+<p>To pull and run the image</p>
+
+<div class="source">
+<div class="source"><pre class="prettyprint">docker pull meertensinstituut/mtas
+docker run -t -i -p 8080:80 --name mtas meertensinstituut/mtas
+</pre></div></div>
+<p>Or to build and run</p>
 
 <div class="source">
 <div class="source"><pre class="prettyprint">docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/Dockerfile
-</pre></div></div>
-<p>And to run the created image</p>
-
-<div class="source">
-<div class="source"><pre class="prettyprint">docker run -t -i -p 8080:80 --name mtas mtas
+docker run -t -i -p 8080:80 --name mtas mtas
 </pre></div></div>
 <p>This wil make a site available on port 8080 from your docker host ip, containing access to the running solr instance and providing a demonstration scenario with indexing and querying of some sample documents.</p>
                   </div>
