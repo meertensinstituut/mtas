@@ -3,15 +3,17 @@
 A [Dockerfile](https://www.docker.com/) is available to get started quickly with 
 Mtas on a Solr based installation.
 
-To build the image
+To pull and run the image
+
+```console
+docker pull meertensinstituut/mtas
+docker run -t -i -p 8080:80 --name mtas meertensinstituut/mtas
+```
+
+Or to build and run
 
 ```console
 docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/Dockerfile
-```
-
-And to run the created image
-
-```console
 docker run -t -i -p 8080:80 --name mtas mtas
 ```
 

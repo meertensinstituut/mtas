@@ -4,7 +4,14 @@ See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas
 
 ---
 
-A Docker image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To build and run
+A Docker image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To pull and run
+
+```console
+docker pull meertensinstituut/mtas
+docker run -t -i -p 8080:80 --name mtas meertensinstituut/mtas
+```
+
+Or to build and run
 
 ```console
 docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/Dockerfile
