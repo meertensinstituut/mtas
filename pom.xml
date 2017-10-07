@@ -60,10 +60,8 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.basedir}/examples/</source>
 								<source>${project.basedir}/generated-sources/</source>
 								<source>${project.basedir}/resources/</source>
-								<source>${project.basedir}/test/</source>                                 
 							</sources>
 						</configuration>
 					</execution>
@@ -211,7 +209,6 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
-
 					</execution>
 					<execution>
 						<id>default-check</id>

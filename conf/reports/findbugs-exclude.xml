@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
   <Match>
-    <Package name="~mtas\.parser\.[a-zA-Z0-9]*\.*"/>
+    <Package name="~mtas\.parser\.[a-zA-Z0-9]*\.*"/>    
   </Match>
 </FindBugsFilter>
