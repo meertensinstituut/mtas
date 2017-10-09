@@ -133,10 +133,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
 				<version>3.6</version>
-				<configuration>
-					<siteDirectory>${project.basedir}/src/site/</siteDirectory>
-					<outputDirectory>${project.basedir}/gh-pages/</outputDirectory>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
