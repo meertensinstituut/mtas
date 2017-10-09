@@ -60,7 +60,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.basedir}/generated-sources/</source>
+								<source>${project.basedir}/target/generated-sources/javacc</source>
 								<source>${project.basedir}/resources/</source>
 							</sources>
 						</configuration>
@@ -102,7 +102,6 @@
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.cql</packageName>
 							<sourceDirectory>${project.basedir}/src/mtas/parser/cql</sourceDirectory>
-							<outputDirectory>${project.basedir}/generated-sources</outputDirectory>
 						</configuration>
 					</execution>
 					<execution>
@@ -116,7 +115,7 @@
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.function</packageName>
 							<sourceDirectory>${project.basedir}/src/mtas/parser/function/</sourceDirectory>
-							<outputDirectory>${project.basedir}/generated-sources</outputDirectory>
+							<outputDirectory>${project.basedir}/generated-sources/javacc</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -128,16 +127,6 @@
 					<filesets>
 						<fileset>
 							<directory>gh-pages</directory>
-							<includes>
-								<include>**/*</include>
-							</includes>
-							<excludes>
-								<exclude>**/.git/</exclude>
-							</excludes>
-							<followSymlinks>false</followSymlinks>
-						</fileset>
-						<fileset>
-							<directory>generated-sources</directory>
 							<includes>
 								<include>**/*</include>
 							</includes>
