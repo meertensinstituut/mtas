@@ -677,7 +677,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
   @Override
   public void write(Fields fields) throws IOException {
     delegateFieldsConsumer.write(fields);
-    write(state.fieldInfos, fields);
+    write(state.fieldInfos, fields);    
   }
 
   /**
@@ -824,7 +824,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
               // get postings
               postingsEnum = termsEnum.postings(postingsEnum, flags);
               // for each doc in field+term
-              while (true) {
+              while (true) {                
                 Integer docId = postingsEnum.nextDoc();
                 if (docId.equals(DocIdSetIterator.NO_MORE_DOCS)) {
                   break;
@@ -1307,7 +1307,7 @@ public class MtasFieldsConsumer extends FieldsConsumer {
       closeables.remove(outIndexDocId);
       CodecUtil.writeFooter(outField);
       outField.close();
-      closeables.remove(outField);
+      closeables.remove(outField);                 
     } catch (IOException e) {
       // ignore, can happen when merging segment already written by
       // delegateFieldsConsumer

@@ -79,7 +79,7 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
    * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
    */
   @Override
-  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
+  public MtasSpanQuery rewrite(IndexReader reader) throws IOException {    
     Query q = query.rewrite(reader);
     if (q instanceof SpanOrQuery) {
       SpanQuery[] clauses = ((SpanOrQuery) q).getClauses();

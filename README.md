@@ -4,7 +4,7 @@ See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas
 
 ---
 
-A Docker image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To pull and run
+A [docker](https://hub.docker.com/r/meertensinstituut/mtas/) image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To pull and run
 
 ```console
 docker pull meertensinstituut/mtas
@@ -23,8 +23,7 @@ more information.
 
 ---
 
-One of the primary use cases for Mtas, the [Nederlab project](http://www.nederlab.nl/), currently<sup>1</sup> provides access, both in terms of metadata and 
-annotated text, to over 15 million items for search and analysis as specified below. 
+One of the primary use cases for Mtas, the [Nederlab project](http://www.nederlab.nl/), currently<sup>1</sup> provides access, both in terms of metadata and annotated text, to over 15 million items for search and analysis as specified below. 
 
 |                 | Total          | Mean    | Min   | Max        |
 |-----------------|---------------:|--------:|------:|-----------:|
