@@ -115,7 +115,6 @@
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.function</packageName>
 							<sourceDirectory>${project.basedir}/src/mtas/parser/function/</sourceDirectory>
-							<outputDirectory>${project.basedir}/generated-sources/javacc</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
