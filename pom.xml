@@ -35,8 +35,6 @@
 		</developer>
 	</developers>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>junit</testSourceDirectory>
 		<resources>
 			<resource>
 				<directory>src/docker</directory>
@@ -44,30 +42,10 @@
 				<targetPath>${project.basedir}/docker</targetPath>
 			</resource>
 			<resource>
-				<directory>resources</directory>
+				<directory>src/main/resources/</directory>
 			</resource>
 		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.basedir}/target/generated-sources/javacc</source>
-								<source>${project.basedir}/resources/</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+		<plugins>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -96,12 +74,11 @@
 						<id>javacc1</id>
 						<phase>generate-sources</phase>
 						<goals>
-							<goal>javacc</goal>
+							<goal>javacc</goal> 
 						</goals>
 						<configuration>
 							<jdkVersion>1.5</jdkVersion>
-							<javadocFriendlyComments>true</javadocFriendlyComments>
-							<packageName>mtas.parser.cql</packageName>
+							<javadocFriendlyComments>true</javadocFriendlyComments> 
 							<sourceDirectory>${project.basedir}/src/mtas/parser/cql</sourceDirectory>
 						</configuration>
 					</execution>
@@ -114,7 +91,6 @@
 						<configuration>
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
-							<packageName>mtas.parser.function</packageName>
 							<sourceDirectory>${project.basedir}/src/mtas/parser/function/</sourceDirectory>
 						</configuration>
 					</execution>
