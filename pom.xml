@@ -153,9 +153,9 @@
 								<goals>
 										<goal>prepare-agent</goal>
 								</goals>
-								<configuration>
+								<!-- <configuration>
 										<propertyName>jacoco.argLine</propertyName>
-								</configuration>
+								</configuration> -->
 						</execution>
 						<execution>
 								<id>default-report</id>
