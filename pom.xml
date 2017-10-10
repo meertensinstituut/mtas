@@ -35,8 +35,6 @@
 		</developer>
 	</developers>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>junit</testSourceDirectory>
 		<resources>
 			<resource>
 				<directory>src/docker</directory>
@@ -102,7 +100,7 @@
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.cql</packageName>
-							<sourceDirectory>${project.basedir}/src/mtas/parser/cql</sourceDirectory>
+							<sourceDirectory>${project.basedir}/src/main/java/mtas/parser/cql</sourceDirectory>
 						</configuration>
 					</execution>
 					<execution>
@@ -115,7 +113,7 @@
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
 							<packageName>mtas.parser.function</packageName>
-							<sourceDirectory>${project.basedir}/src/mtas/parser/function/</sourceDirectory>
+							<sourceDirectory>${project.basedir}/src/main/java/mtas/parser/function/</sourceDirectory>
 						</configuration>
 					</execution>
 				</executions>

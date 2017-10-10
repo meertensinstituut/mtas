@@ -843,7 +843,7 @@ public class MtasSolrTestDistributedSearchConsistency {
    * Creates the cloud.
    */
   private static void createCloud() {
-    Path dataPath = Paths.get("junit").resolve("data");
+    Path dataPath = Paths.get("src/test/resources");
     String solrxml = MiniSolrCloudCluster.DEFAULT_CLOUD_SOLR_XML;
     JettyConfig jettyConfig = JettyConfig.builder().setContext("/solr").build();
     File cloudBase = Files.createTempDir();
