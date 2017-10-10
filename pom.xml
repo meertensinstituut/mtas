@@ -45,7 +45,25 @@
 				<directory>src/main/resources/</directory>
 			</resource>
 		</resources>
-		<plugins>			
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/javacc</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -74,12 +92,12 @@
 						<id>javacc1</id>
 						<phase>generate-sources</phase>
 						<goals>
-							<goal>javacc</goal> 
+							<goal>javacc</goal>
 						</goals>
 						<configuration>
 							<jdkVersion>1.5</jdkVersion>
-							<javadocFriendlyComments>true</javadocFriendlyComments> 
-							<sourceDirectory>${project.basedir}/src/mtas/parser/cql</sourceDirectory>
+							<javadocFriendlyComments>true</javadocFriendlyComments>
+							<sourceDirectory>${project.basedir}/src/main/java/mtas/parser/cql</sourceDirectory>
 						</configuration>
 					</execution>
 					<execution>
@@ -91,7 +109,7 @@
 						<configuration>
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
-							<sourceDirectory>${project.basedir}/src/mtas/parser/function/</sourceDirectory>
+							<sourceDirectory>${project.basedir}/src/main/java/mtas/parser/function/</sourceDirectory>
 						</configuration>
 					</execution>
 				</executions>
