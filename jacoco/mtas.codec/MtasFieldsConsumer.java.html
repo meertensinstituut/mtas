@@ -677,7 +677,7 @@ import org.apache.lucene.util.IOUtils;
   @Override
   public void write(Fields fields) throws IOException {
 <span class="fc" id="L679">    delegateFieldsConsumer.write(fields);</span>
-<span class="fc" id="L680">    write(state.fieldInfos, fields);</span>
+<span class="fc" id="L680">    write(state.fieldInfos, fields);    </span>
 <span class="fc" id="L681">  }</span>
 
   /**
@@ -824,7 +824,7 @@ import org.apache.lucene.util.IOUtils;
               // get postings
 <span class="fc" id="L825">              postingsEnum = termsEnum.postings(postingsEnum, flags);</span>
               // for each doc in field+term
-              while (true) {
+              while (true) {                
 <span class="fc" id="L828">                Integer docId = postingsEnum.nextDoc();</span>
 <span class="fc bfc" id="L829" title="All 2 branches covered.">                if (docId.equals(DocIdSetIterator.NO_MORE_DOCS)) {</span>
 <span class="fc" id="L830">                  break;</span>
@@ -1307,7 +1307,7 @@ import org.apache.lucene.util.IOUtils;
 <span class="fc" id="L1307">      closeables.remove(outIndexDocId);</span>
 <span class="fc" id="L1308">      CodecUtil.writeFooter(outField);</span>
 <span class="fc" id="L1309">      outField.close();</span>
-<span class="fc" id="L1310">      closeables.remove(outField);</span>
+<span class="fc" id="L1310">      closeables.remove(outField);                 </span>
 <span class="nc" id="L1311">    } catch (IOException e) {</span>
       // ignore, can happen when merging segment already written by
       // delegateFieldsConsumer

@@ -4,7 +4,7 @@
 'UTF-8'
 -private
 -sourcepath
-'/Users/matthijs/Software/Mtas/src:/Users/matthijs/Software/Mtas/generated-sources:/Users/matthijs/Software/Mtas/resources:/Users/matthijs/Software/Mtas/target/generated-sources/annotations'
+'/Users/matthijs/Software/Mtas/src/main/java:/Users/matthijs/Software/Mtas/target/generated-sources/javacc:/Users/matthijs/Software/Mtas/target/generated-sources/annotations'
 -author
 -bottom
 'Copyright &#169; 2017 <a href="http://www.meertens.knaw.nl/">Meertens Institute</a>. All rights reserved.'
