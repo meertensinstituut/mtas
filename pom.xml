@@ -39,11 +39,6 @@
 		<testSourceDirectory>junit</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>src/docker</directory>
-				<filtering>true</filtering>
-				<targetPath>${project.basedir}/docker</targetPath>
-			</resource>
-			<resource>
 				<directory>resources</directory>
 			</resource>
 		</resources>
@@ -280,6 +275,45 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.22.1</version>
+				<configuration>
+					<images>
+						<image>
+							<name>meertensinstituut/mtas</name>
+							<build>
+								<tags>
+									<tag>latest</tag>
+								</tags>
+								<dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+								<filter>@</filter>
+								<assembly>
+									<inline>
+										<files>
+											<file>
+												<source>${project.build.directory}/mtas-${project.version}.jar</source>
+												<outputDirectory>/root/lib/</outputDirectory>
+											</file>
+										</files>
+										<fileSets>
+											<fileSet>
+												<directory>src/main/docker</directory>
+												<outputDirectory>/data</outputDirectory>
+												<excludes>
+													<exclude>Dockerfile</exclude>
+												</excludes>
+											</fileSet>
+										</fileSets>
+									</inline>
+								</assembly>
+							</build>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+			
 			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jxr-plugin</artifactId> 
 				<version>2.5</version> </plugin> -->
 			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-pmd-plugin</artifactId> 
