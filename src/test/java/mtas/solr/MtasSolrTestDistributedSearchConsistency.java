@@ -120,7 +120,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler stats tokens.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerStatsTokens() throws IOException {
@@ -145,7 +146,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler stats positions.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerStatsPositions() throws IOException {
@@ -168,7 +170,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler stats spans.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerStatsSpans() throws IOException {
@@ -195,7 +198,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler termvector 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerTermvector1() throws IOException {
@@ -263,7 +267,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler termvector 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerTermvector2() throws IOException {
@@ -313,7 +318,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler collection 1.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerCollection1() throws IOException {
@@ -534,7 +540,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler collection 2.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerCollection2() throws IOException {
@@ -617,7 +624,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Mtas request handler prefix.
    *
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void mtasRequestHandlerPrefix() throws IOException {
@@ -640,8 +648,10 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the results.
    *
-   * @param initialParams the initial params
-   * @param collections the collections
+   * @param initialParams
+   *          the initial params
+   * @param collections
+   *          the collections
    * @return the hash map
    */
   private static HashMap<String, QueryResponse> createResults(
@@ -688,11 +698,16 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the stats assertions.
    *
-   * @param response1 the response 1
-   * @param response2 the response 2
-   * @param type the type
-   * @param key the key
-   * @param names the names
+   * @param response1
+   *          the response 1
+   * @param response2
+   *          the response 2
+   * @param type
+   *          the type
+   * @param key
+   *          the key
+   * @param names
+   *          the names
    */
   private static void createStatsAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String type, String key, String[] names) {
@@ -703,11 +718,16 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the stats assertions.
    *
-   * @param response1 the response 1
-   * @param responses2 the responses 2
-   * @param type the type
-   * @param key the key
-   * @param names the names
+   * @param response1
+   *          the response 1
+   * @param responses2
+   *          the responses 2
+   * @param type
+   *          the type
+   * @param key
+   *          the key
+   * @param names
+   *          the names
    */
   private static void createStatsAssertions(NamedList<Object> response1,
       NamedList<Object>[] responses2, String type, String key, String[] names) {
@@ -724,9 +744,12 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the prefix assertions.
    *
-   * @param response1 the response 1
-   * @param response2 the response 2
-   * @param key the key
+   * @param response1
+   *          the response 1
+   * @param response2
+   *          the response 2
+   * @param key
+   *          the key
    */
   private static void createPrefixAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key) {
@@ -751,10 +774,14 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the termvector assertions.
    *
-   * @param response1 the response 1
-   * @param response2 the response 2
-   * @param key the key
-   * @param names the names
+   * @param response1
+   *          the response 1
+   * @param response2
+   *          the response 2
+   * @param key
+   *          the key
+   * @param names
+   *          the names
    */
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
@@ -791,12 +818,18 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the collection assertions.
    *
-   * @param create the create
-   * @param collection the collection
-   * @param id the id
-   * @param version the version
-   * @param size the size
-   * @param shards the shards
+   * @param create
+   *          the create
+   * @param collection
+   *          the collection
+   * @param id
+   *          the id
+   * @param version
+   *          the version
+   * @param size
+   *          the size
+   * @param shards
+   *          the shards
    */
   private static void createCollectionAssertions(NamedList<Object> create,
       String collection, String id, String version, Number size, int shards) {
@@ -843,7 +876,8 @@ public class MtasSolrTestDistributedSearchConsistency {
    * Creates the cloud.
    */
   private static void createCloud() {
-    Path dataPath = Paths.get("src").resolve("test").resolve("resources").resolve("data");
+    Path dataPath = Paths.get("src" + File.pathSeparator + "test"
+        + File.pathSeparator + "resources" + File.pathSeparator + "data");
     String solrxml = MiniSolrCloudCluster.DEFAULT_CLOUD_SOLR_XML;
     JettyConfig jettyConfig = JettyConfig.builder().setContext("/solr").build();
     File cloudBase = Files.createTempDir();
@@ -900,11 +934,16 @@ public class MtasSolrTestDistributedSearchConsistency {
   /**
    * Creates the cloud collection.
    *
-   * @param collectionName the collection name
-   * @param numShards the num shards
-   * @param replicationFactor the replication factor
-   * @param confDir the conf dir
-   * @throws Exception the exception
+   * @param collectionName
+   *          the collection name
+   * @param numShards
+   *          the num shards
+   * @param replicationFactor
+   *          the replication factor
+   * @param confDir
+   *          the conf dir
+   * @throws Exception
+   *           the exception
    */
   private static void createCloudCollection(String collectionName,
       int numShards, int replicationFactor, Path confDir) throws Exception {

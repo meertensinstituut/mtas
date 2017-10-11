@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -95,19 +96,19 @@ public class MtasSearchTestConsistency {
   @org.junit.BeforeClass
   public static void initialize() {
     try {
-      Path path = Paths.get("src").resolve("test").resolve("resources").resolve("data");      
+      Path dataPath = Paths.get("src"+File.pathSeparator+"test"+File.pathSeparator+"resources"+File.pathSeparator+"data");
       // directory = FSDirectory.open(Paths.get("testindexMtas"));
       directory = new RAMDirectory();
       files = new HashMap<>();
       files.put("Een onaangenaam mens in de Haarlemmerhout",
-          path.resolve("resources").resolve("beets1.xml.gz").toAbsolutePath()
+          dataPath.resolve("resources").resolve("beets1.xml.gz").toAbsolutePath()
               .toString());
-      files.put("Een oude kennis", path.resolve("resources")
+      files.put("Een oude kennis", dataPath.resolve("resources")
           .resolve("beets2.xml.gz").toAbsolutePath().toString());
-      files.put("Varen en Rijden", path.resolve("resources")
+      files.put("Varen en Rijden", dataPath.resolve("resources")
           .resolve("beets3.xml.gz").toAbsolutePath().toString());
       createIndex(
-          path.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(),
+          dataPath.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(),
           files);
       docs = getLiveDocs(DirectoryReader.open(directory));
     } catch (IOException e) {
