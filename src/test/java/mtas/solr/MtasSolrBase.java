@@ -427,7 +427,7 @@ public class MtasSolrBase {
   public static Map<Integer, SolrInputDocument> createDocuments(
       boolean includeAdvanced) {
     Map<Integer, SolrInputDocument> solrDocuments = new HashMap<>();
-    Path dataPath = Paths.get("src/test/resources");
+    Path dataPath = Paths.get("src").resolve("test").resolve("resources").resolve("data");
     // data
     SolrInputDocument newDoc1 = new SolrInputDocument();
     newDoc1.addField(FIELD_ID, "1");

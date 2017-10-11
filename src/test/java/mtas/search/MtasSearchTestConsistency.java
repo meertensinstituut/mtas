@@ -95,7 +95,7 @@ public class MtasSearchTestConsistency {
   @org.junit.BeforeClass
   public static void initialize() {
     try {
-      Path path = Paths.get("src/test/resources");
+      Path path = Paths.get("src").resolve("test").resolve("resources").resolve("data");      
       // directory = FSDirectory.open(Paths.get("testindexMtas"));
       directory = new RAMDirectory();
       files = new HashMap<>();
@@ -1507,15 +1507,16 @@ public class MtasSearchTestConsistency {
      */
     @Override
     public boolean equals(Object obj) {
+
       if (this == obj) {
         return true;
-    }
+      }
       if (obj == null) {
         return false;
-    }
+      }
       if (getClass() != obj.getClass()) {
         return false;
-    }
+      }
       QueryResult other = (QueryResult) obj;
       return other.hits == hits && other.docs == docs;
     }
