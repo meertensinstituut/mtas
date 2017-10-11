@@ -42,7 +42,7 @@
 				<targetPath>${project.basedir}/docker</targetPath>
 			</resource>
 			<resource>
-				<directory>src/main/resources/</directory>
+        <directory>src/main/resources/</directory>
 			</resource>
 		</resources>
 		<plugins>
@@ -97,6 +97,7 @@
 						<configuration>
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
+              <packageName>mtas.parser.cql</packageName>
 							<sourceDirectory>${project.basedir}/src/main/java/mtas/parser/cql</sourceDirectory>
 						</configuration>
 					</execution>
@@ -109,6 +110,7 @@
 						<configuration>
 							<jdkVersion>1.5</jdkVersion>
 							<javadocFriendlyComments>true</javadocFriendlyComments>
+              <packageName>mtas.parser.function</packageName>
 							<sourceDirectory>${project.basedir}/src/main/java/mtas/parser/function/</sourceDirectory>
 						</configuration>
 					</execution>

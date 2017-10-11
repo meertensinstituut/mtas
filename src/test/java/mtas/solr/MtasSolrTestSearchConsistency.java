@@ -56,7 +56,6 @@ public class MtasSolrTestSearchConsistency {
   @org.junit.BeforeClass
   public static void setup() {
     try {
-
       Path dataPath = Paths.get("src").resolve("test").resolve("resources").resolve("data");
       // data
       Map<Integer, SolrInputDocument> solrDocuments = MtasSolrBase
