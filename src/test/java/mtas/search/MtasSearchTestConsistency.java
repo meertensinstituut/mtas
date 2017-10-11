@@ -96,7 +96,7 @@ public class MtasSearchTestConsistency {
   @org.junit.BeforeClass
   public static void initialize() {
     try {
-      Path dataPath = Paths.get("src"+File.pathSeparator+"test"+File.pathSeparator+"resources"+File.pathSeparator+"data");
+      Path dataPath = Paths.get("src"+File.separator+"test"+File.separator+"resources"+File.separator+"data");
       // directory = FSDirectory.open(Paths.get("testindexMtas"));
       directory = new RAMDirectory();
       files = new HashMap<>();
