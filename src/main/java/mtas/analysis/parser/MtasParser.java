@@ -30,8 +30,8 @@ abstract public class MtasParser {
   protected static final String TOKEN_REALOFFSET = "realoffset";
 
   /** The Constant TOKEN_PARENT. */
+  
   protected static final String TOKEN_PARENT = "parent";
-
   /**
    * Inits the parser.
    *
