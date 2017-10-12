@@ -245,6 +245,7 @@ public abstract class MtasBasicParser extends MtasParser {
    * Instantiates a new mtas basic parser.
    */
   public MtasBasicParser() {
+    super();
   }
 
   /**
@@ -253,7 +254,7 @@ public abstract class MtasBasicParser extends MtasParser {
    * @param config the config
    */
   public MtasBasicParser(MtasConfiguration config) {
-    this.config = config;
+    super(config);
   }
 
   /**
@@ -3325,5 +3326,5 @@ public abstract class MtasBasicParser extends MtasParser {
     }
 
   }
-  
+
 }

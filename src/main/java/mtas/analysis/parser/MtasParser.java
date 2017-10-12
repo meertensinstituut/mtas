@@ -30,8 +30,23 @@ abstract public class MtasParser {
   protected static final String TOKEN_REALOFFSET = "realoffset";
 
   /** The Constant TOKEN_PARENT. */
-  
   protected static final String TOKEN_PARENT = "parent";
+
+  /**
+   * Instantiates a new mtas parser.
+   */
+  public MtasParser() {
+  }
+
+  /**
+   * Instantiates a new mtas parser.
+   *
+   * @param config the config
+   */
+  public MtasParser(MtasConfiguration config) {
+    this.config = config;
+  }
+
   /**
    * Inits the parser.
    *
@@ -69,7 +84,5 @@ abstract public class MtasParser {
    * @return the string
    */
   public abstract String printConfig();
-
-  
 
 }
