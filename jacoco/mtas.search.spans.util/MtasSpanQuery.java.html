@@ -3,10 +3,7 @@
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.search.spans.SpanWeight;
-
 import mtas.search.spans.MtasSpanMatchNoneQuery;
 
 /**
@@ -36,10 +33,10 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @param maximum the maximum
    */
   public MtasSpanQuery(Integer minimum, Integer maximum) {
-<span class="fc" id="L39">    super();</span>
-<span class="fc" id="L40">    initialize(minimum, maximum);</span>
-<span class="fc" id="L41">    allowTwoPhaseIterator = true;</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L36">    super();</span>
+<span class="fc" id="L37">    initialize(minimum, maximum);</span>
+<span class="fc" id="L38">    allowTwoPhaseIterator = true;</span>
+<span class="fc" id="L39">  }</span>
 
   /**
    * Sets the width.
@@ -48,8 +45,8 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @param maximum the maximum
    */
   public void setWidth(Integer minimum, Integer maximum) {
-<span class="fc" id="L51">    initialize(minimum, maximum);</span>
-<span class="fc" id="L52">  }</span>
+<span class="fc" id="L48">    initialize(minimum, maximum);</span>
+<span class="fc" id="L49">  }</span>
 
   /**
    * Initialize.
@@ -58,12 +55,12 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @param maximum the maximum
    */
   private void initialize(Integer minimum, Integer maximum) {
-<span class="fc" id="L61">    minimumSpanWidth = minimum;</span>
-<span class="fc" id="L62">    maximumSpanWidth = maximum;</span>
-<span class="fc bfc" id="L63" title="All 6 branches covered.">    spanWidth = (minimum != null &amp;&amp; maximum != null &amp;&amp; minimum.equals(maximum))</span>
+<span class="fc" id="L58">    minimumSpanWidth = minimum;</span>
+<span class="fc" id="L59">    maximumSpanWidth = maximum;</span>
+<span class="fc bfc" id="L60" title="All 6 branches covered.">    spanWidth = (minimum != null &amp;&amp; maximum != null &amp;&amp; minimum.equals(maximum))</span>
         ? minimum : null;
-<span class="fc bfc" id="L65" title="All 4 branches covered.">    singlePositionQuery = spanWidth != null &amp;&amp; spanWidth.equals(1);</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc bfc" id="L62" title="All 4 branches covered.">    singlePositionQuery = spanWidth != null &amp;&amp; spanWidth.equals(1);</span>
+<span class="fc" id="L63">  }</span>
 
   // public abstract MtasSpanWeight createWeight(IndexSearcher searcher,
   // boolean needsScores) throws IOException;
@@ -76,11 +73,11 @@ public abstract class MtasSpanQuery extends SpanQuery {
    */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-<span class="fc bfc" id="L79" title="All 4 branches covered.">    if (minimumSpanWidth != null &amp;&amp; maximumSpanWidth != null</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        &amp;&amp; minimumSpanWidth &gt; maximumSpanWidth) {</span>
-<span class="nc" id="L81">      return new MtasSpanMatchNoneQuery(this.getField());</span>
+<span class="fc bfc" id="L76" title="All 4 branches covered.">    if (minimumSpanWidth != null &amp;&amp; maximumSpanWidth != null</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        &amp;&amp; minimumSpanWidth &gt; maximumSpanWidth) {</span>
+<span class="nc" id="L78">      return new MtasSpanMatchNoneQuery(this.getField());</span>
     } else {
-<span class="fc" id="L83">      return this;</span>
+<span class="fc" id="L80">      return this;</span>
     }
   }
 
@@ -90,7 +87,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @return the width
    */
   public final Integer getWidth() {
-<span class="nc" id="L93">    return spanWidth;</span>
+<span class="nc" id="L90">    return spanWidth;</span>
   }
 
   /**
@@ -99,7 +96,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @return the minimum width
    */
   public final Integer getMinimumWidth() {
-<span class="fc" id="L102">    return minimumSpanWidth;</span>
+<span class="fc" id="L99">    return minimumSpanWidth;</span>
   }
 
   /**
@@ -108,15 +105,15 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @return the maximum width
    */
   public final Integer getMaximumWidth() {
-<span class="fc" id="L111">    return maximumSpanWidth;</span>
+<span class="fc" id="L108">    return maximumSpanWidth;</span>
   }
 
   /**
    * Disable two phase iterator.
    */
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L118">    allowTwoPhaseIterator = false;</span>
-<span class="fc" id="L119">  }</span>
+<span class="fc" id="L115">    allowTwoPhaseIterator = false;</span>
+<span class="fc" id="L116">  }</span>
 
   /**
    * Two phase iterator allowed.
@@ -124,7 +121,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @return true, if successful
    */
   public final boolean twoPhaseIteratorAllowed() {
-<span class="fc" id="L127">    return allowTwoPhaseIterator;</span>
+<span class="fc" id="L124">    return allowTwoPhaseIterator;</span>
   }
 
   /**
@@ -133,7 +130,7 @@ public abstract class MtasSpanQuery extends SpanQuery {
    * @return true, if is single position query
    */
   public final boolean isSinglePositionQuery() {
-<span class="fc" id="L136">    return singlePositionQuery;</span>
+<span class="fc" id="L133">    return singlePositionQuery;</span>
   }
 
   /*

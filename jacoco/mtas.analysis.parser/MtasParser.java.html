@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.parser</a> &gt; <span class="el_source">MtasParser.java</span></div><h1>MtasParser.java</h1><pre class="source lang-java linenums">package mtas.analysis.parser;
 
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import mtas.analysis.parser.MtasBasicParser.MtasParserType;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
@@ -17,7 +9,7 @@ import mtas.analysis.util.MtasParserException;
 /**
  * The Class MtasParser.
  */
-<span class="fc" id="L20">abstract public class MtasParser {</span>
+abstract public class MtasParser {
 
   /** The token collection. */
   protected MtasTokenCollection tokenCollection;
@@ -26,10 +18,10 @@ import mtas.analysis.util.MtasParserException;
   protected MtasConfiguration config;
 
   /** The autorepair. */
-<span class="fc" id="L29">  protected Boolean autorepair = false;</span>
+<span class="pc" id="L21">  protected Boolean autorepair = false;</span>
 
   /** The makeunique. */
-<span class="fc" id="L32">  protected Boolean makeunique = false;</span>
+<span class="pc" id="L24">  protected Boolean makeunique = false;</span>
 
   /** The Constant TOKEN_OFFSET. */
   protected static final String TOKEN_OFFSET = &quot;offset&quot;;
@@ -41,24 +33,39 @@ import mtas.analysis.util.MtasParserException;
   protected static final String TOKEN_PARENT = &quot;parent&quot;;
 
   /**
+   * Instantiates a new mtas parser.
+   */
+<span class="nc" id="L38">  public MtasParser() {</span>
+<span class="nc" id="L39">  }</span>
+
+  /**
+   * Instantiates a new mtas parser.
+   *
+   * @param config the config
+   */
+<span class="fc" id="L46">  public MtasParser(MtasConfiguration config) {</span>
+<span class="fc" id="L47">    this.config = config;</span>
+<span class="fc" id="L48">  }</span>
+
+  /**
    * Inits the parser.
    *
    * @throws MtasConfigException the mtas config exception
    */
   protected void initParser() throws MtasConfigException {
-<span class="pc bpc" id="L49" title="1 of 2 branches missed.">    if (config != null) {</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    if (config != null) {</span>
       // find namespaceURI
-<span class="fc bfc" id="L51" title="All 2 branches covered.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
-<span class="fc" id="L52">        MtasConfiguration current = config.children.get(i);</span>
-<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (current.name.equals(&quot;autorepair&quot;)) {</span>
-<span class="fc" id="L54">          autorepair = current.attributes.get(&quot;value&quot;).equals(&quot;true&quot;);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
+<span class="fc" id="L59">        MtasConfiguration current = config.children.get(i);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (current.name.equals(&quot;autorepair&quot;)) {</span>
+<span class="fc" id="L61">          autorepair = current.attributes.get(&quot;value&quot;).equals(&quot;true&quot;);</span>
         }
-<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (current.name.equals(&quot;makeunique&quot;)) {</span>
-<span class="fc" id="L57">          makeunique = current.attributes.get(&quot;value&quot;).equals(&quot;true&quot;);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (current.name.equals(&quot;makeunique&quot;)) {</span>
+<span class="fc" id="L64">          makeunique = current.attributes.get(&quot;value&quot;).equals(&quot;true&quot;);</span>
         }
       }
     }
-<span class="fc" id="L61">  }</span>
+<span class="fc" id="L68">  }</span>
 
   /**
    * Creates the token collection.
@@ -77,466 +84,6 @@ import mtas.analysis.util.MtasParserException;
    * @return the string
    */
   public abstract String printConfig();
-
-  /**
-   * The Class MtasParserObject.
-   */
-<span class="fc" id="L84">  protected class MtasParserObject {</span>
-
-    /** The object type. */
-    MtasParserType objectType;
-
-    /** The object real offset start. */
-<span class="fc" id="L90">    private Integer objectRealOffsetStart = null;</span>
-
-    /** The object real offset end. */
-<span class="fc" id="L93">    private Integer objectRealOffsetEnd = null;</span>
-
-    /** The object offset start. */
-<span class="fc" id="L96">    private Integer objectOffsetStart = null;</span>
-
-    /** The object offset end. */
-<span class="fc" id="L99">    private Integer objectOffsetEnd = null;</span>
-
-    /** The object text. */
-<span class="fc" id="L102">    private String objectText = null;</span>
-
-    /** The object id. */
-<span class="fc" id="L105">    protected String objectId = null;</span>
-
-    /** The object unknown ancestor number. */
-<span class="fc" id="L108">    private Integer objectUnknownAncestorNumber = null;</span>
-
-    /** The object attributes. */
-<span class="fc" id="L111">    protected HashMap&lt;String, String&gt; objectAttributes = null;</span>
-
-    /** The object positions. */
-<span class="fc" id="L114">    private SortedSet&lt;Integer&gt; objectPositions = new TreeSet&lt;&gt;();</span>
-
-    /** The ref ids. */
-<span class="fc" id="L117">    private Set&lt;String&gt; refIds = new HashSet&lt;&gt;();</span>
-
-    /** The updateable mappings as parent. */
-<span class="fc" id="L120">    private Set&lt;Integer&gt; updateableMappingsAsParent = new HashSet&lt;&gt;();</span>
-
-    /** The updateable ids with position. */
-<span class="fc" id="L123">    private Set&lt;String&gt; updateableIdsWithPosition = new HashSet&lt;&gt;();</span>
-
-    /** The updateable mappings with position. */
-<span class="fc" id="L126">    protected Set&lt;Integer&gt; updateableMappingsWithPosition = new HashSet&lt;&gt;();</span>
-
-    /** The updateable ids with offset. */
-<span class="fc" id="L129">    private Set&lt;String&gt; updateableIdsWithOffset = new HashSet&lt;&gt;();</span>
-
-    /** The updateable mappings with offset. */
-<span class="fc" id="L132">    protected Set&lt;Integer&gt; updateableMappingsWithOffset = new HashSet&lt;&gt;();</span>
-
-    /** The referred start position. */
-<span class="fc" id="L135">    protected Map&lt;String, Integer&gt; referredStartPosition = new HashMap&lt;&gt;();</span>
-
-    /** The referred end position. */
-<span class="fc" id="L138">    protected Map&lt;String, Integer&gt; referredEndPosition = new HashMap&lt;&gt;();</span>
-
-    /** The referred start offset. */
-<span class="fc" id="L141">    protected Map&lt;String, Integer&gt; referredStartOffset = new HashMap&lt;&gt;();</span>
-
-    /** The referred end offset. */
-<span class="fc" id="L144">    protected Map&lt;String, Integer&gt; referredEndOffset = new HashMap&lt;&gt;();</span>
-
-    /**
-     * Instantiates a new mtas parser object.
-     *
-     * @param type the type
-     */
-<span class="fc" id="L151">    MtasParserObject(MtasParserType type) {</span>
-<span class="fc" id="L152">      objectType = type;</span>
-<span class="fc" id="L153">      objectAttributes = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L154">    }</span>
-
-    /**
-     * Register updateable mapping at parent.
-     *
-     * @param mappingId the mapping id
-     */
-    public void registerUpdateableMappingAtParent(Integer mappingId) {
-<span class="fc" id="L162">      updateableMappingsAsParent.add(mappingId);</span>
-<span class="fc" id="L163">    }</span>
-
-    /**
-     * Register updateable mappings at parent.
-     *
-     * @param mappingIds the mapping ids
-     */
-    public void registerUpdateableMappingsAtParent(Set&lt;Integer&gt; mappingIds) {
-<span class="fc" id="L171">      updateableMappingsAsParent.addAll(mappingIds);</span>
-<span class="fc" id="L172">    }</span>
-
-    /**
-     * Gets the updateable mappings as parent.
-     *
-     * @return the updateable mappings as parent
-     */
-    public Set&lt;Integer&gt; getUpdateableMappingsAsParent() {
-<span class="fc" id="L180">      return updateableMappingsAsParent;</span>
-    }
-
-    /**
-     * Reset updateable mappings as parent.
-     */
-    public void resetUpdateableMappingsAsParent() {
-<span class="fc" id="L187">      updateableMappingsAsParent.clear();</span>
-<span class="fc" id="L188">    }</span>
-
-    /**
-     * Adds the updateable mapping with position.
-     *
-     * @param mappingId the mapping id
-     */
-    public void addUpdateableMappingWithPosition(Integer mappingId) {
-<span class="nc" id="L196">      updateableMappingsWithPosition.add(mappingId);</span>
-<span class="nc" id="L197">    }</span>
-
-    /**
-     * Adds the updateable id with offset.
-     *
-     * @param id the id
-     */
-    public void addUpdateableIdWithOffset(String id) {
-<span class="nc" id="L205">      updateableIdsWithOffset.add(id);</span>
-<span class="nc" id="L206">    }</span>
-
-    /**
-     * Adds the updateable mapping with offset.
-     *
-     * @param mappingId the mapping id
-     */
-    public void addUpdateableMappingWithOffset(Integer mappingId) {
-<span class="fc" id="L214">      updateableMappingsWithOffset.add(mappingId);</span>
-<span class="fc" id="L215">    }</span>
-
-    /**
-     * Update mappings.
-     *
-     * @param idPositions the id positions
-     * @param idOffsets the id offsets
-     */
-    public void updateMappings(Map&lt;String, Set&lt;Integer&gt;&gt; idPositions,
-        Map&lt;String, Integer[]&gt; idOffsets) {
-<span class="pc bpc" id="L225" title="1 of 2 branches missed.">      for (Integer mappingId : updateableMappingsWithPosition) {</span>
-<span class="nc" id="L226">        tokenCollection.get(mappingId).addPositions(objectPositions);</span>
-<span class="nc" id="L227">      }</span>
-<span class="fc bfc" id="L228" title="All 2 branches covered.">      for (Integer mappingId : updateableMappingsWithOffset) {</span>
-<span class="fc" id="L229">        tokenCollection.get(mappingId).addOffset(objectOffsetStart,</span>
-            objectOffsetEnd);
-<span class="fc" id="L231">      }</span>
-<span class="pc bpc" id="L232" title="1 of 2 branches missed.">      for (String id : updateableIdsWithPosition) {</span>
-<span class="nc bnc" id="L233" title="All 2 branches missed.">        if (idPositions.containsKey(id)) {</span>
-<span class="nc bnc" id="L234" title="All 2 branches missed.">          if (idPositions.get(id) == null) {</span>
-<span class="nc" id="L235">            idPositions.put(id, objectPositions);</span>
-          } else {
-<span class="nc" id="L237">            idPositions.get(id).addAll(objectPositions);</span>
-          }
-        }
-<span class="nc" id="L240">      }</span>
-<span class="pc bpc" id="L241" title="1 of 2 branches missed.">      for (String id : updateableIdsWithOffset) {</span>
-<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (idOffsets.containsKey(id)) {</span>
-<span class="nc" id="L243">          Integer[] currentOffset = idOffsets.get(id);</span>
-<span class="nc bnc" id="L244" title="All 4 branches missed.">          if (currentOffset == null || currentOffset.length == 0) {</span>
-<span class="nc" id="L245">            idOffsets.put(id,</span>
-                new Integer[] { objectOffsetStart, objectOffsetEnd });
-          }
-        }
-<span class="nc" id="L249">      }</span>
-<span class="fc" id="L250">    }</span>
-
-    /**
-     * Gets the attribute.
-     *
-     * @param name the name
-     * @return the attribute
-     */
-    public String getAttribute(String name) {
-<span class="pc bpc" id="L259" title="1 of 2 branches missed.">      if (name != null) {</span>
-<span class="fc" id="L260">        return objectAttributes.get(name);</span>
-      } else {
-<span class="nc" id="L262">        return null;</span>
-      }
-    }
-
-    /**
-     * Gets the id.
-     *
-     * @return the id
-     */
-    public String getId() {
-<span class="fc" id="L272">      return objectId;</span>
-    }
-
-    /**
-     * Gets the type.
-     *
-     * @return the type
-     */
-    MtasParserType getType() {
-<span class="fc" id="L281">      return objectType;</span>
-    }
-
-    /**
-     * Sets the text.
-     *
-     * @param text the new text
-     */
-    public void setText(String text) {
-<span class="nc" id="L290">      objectText = text;</span>
-<span class="nc" id="L291">    }</span>
-
-    /**
-     * Adds the text.
-     *
-     * @param text the text
-     */
-    public void addText(String text) {
-<span class="fc bfc" id="L299" title="All 2 branches covered.">      if (objectText == null) {</span>
-<span class="fc" id="L300">        objectText = text;</span>
-      } else {
-<span class="fc" id="L302">        objectText += text;</span>
-      }
-<span class="fc" id="L304">    }</span>
-
-    /**
-     * Gets the text.
-     *
-     * @return the text
-     */
-    public String getText() {
-<span class="fc" id="L312">      return objectText;</span>
-    }
-
-    /**
-     * Sets the unknown ancestor number.
-     *
-     * @param i the new unknown ancestor number
-     */
-    public void setUnknownAncestorNumber(Integer i) {
-<span class="fc" id="L321">      objectUnknownAncestorNumber = i;</span>
-<span class="fc" id="L322">    }</span>
-
-    /**
-     * Gets the unknown ancestor number.
-     *
-     * @return the unknown ancestor number
-     */
-    public Integer getUnknownAncestorNumber() {
-<span class="fc" id="L330">      return objectUnknownAncestorNumber;</span>
-    }
-
-    /**
-     * Sets the real offset start.
-     *
-     * @param start the new real offset start
-     */
-    public void setRealOffsetStart(Integer start) {
-<span class="fc" id="L339">      objectRealOffsetStart = start;</span>
-<span class="fc" id="L340">    }</span>
-
-    /**
-     * Gets the real offset start.
-     *
-     * @return the real offset start
-     */
-    public Integer getRealOffsetStart() {
-<span class="fc" id="L348">      return objectRealOffsetStart;</span>
-    }
-
-    /**
-     * Sets the real offset end.
-     *
-     * @param end the new real offset end
-     */
-    public void setRealOffsetEnd(Integer end) {
-<span class="fc" id="L357">      objectRealOffsetEnd = end;</span>
-<span class="fc" id="L358">    }</span>
-
-    /**
-     * Gets the real offset end.
-     *
-     * @return the real offset end
-     */
-    public Integer getRealOffsetEnd() {
-<span class="fc" id="L366">      return objectRealOffsetEnd;</span>
-    }
-
-    /**
-     * Sets the offset start.
-     *
-     * @param start the new offset start
-     */
-    public void setOffsetStart(Integer start) {
-<span class="fc" id="L375">      objectOffsetStart = start;</span>
-<span class="fc" id="L376">    }</span>
-
-    /**
-     * Adds the offset start.
-     *
-     * @param start the start
-     */
-    public void addOffsetStart(Integer start) {
-<span class="pc bpc" id="L384" title="1 of 4 branches missed.">      if ((start != null)</span>
-<span class="pc bpc" id="L385" title="1 of 2 branches missed.">          &amp;&amp; ((objectOffsetStart == null) || (start &lt; objectOffsetStart))) {</span>
-<span class="fc" id="L386">        objectOffsetStart = start;</span>
-      }
-<span class="fc" id="L388">    }</span>
-
-    /**
-     * Adds the offset end.
-     *
-     * @param end the end
-     */
-    public void addOffsetEnd(Integer end) {
-<span class="pc bpc" id="L396" title="1 of 4 branches missed.">      if ((end != null)</span>
-<span class="pc bpc" id="L397" title="1 of 2 branches missed.">          &amp;&amp; ((objectOffsetEnd == null) || (end &gt; objectOffsetEnd))) {</span>
-<span class="fc" id="L398">        objectOffsetEnd = end;</span>
-      }
-<span class="fc" id="L400">    }</span>
-
-    /**
-     * Gets the offset start.
-     *
-     * @return the offset start
-     */
-    public Integer getOffsetStart() {
-<span class="fc" id="L408">      return objectOffsetStart;</span>
-    }
-
-    /**
-     * Sets the offset end.
-     *
-     * @param end the new offset end
-     */
-    public void setOffsetEnd(Integer end) {
-<span class="fc" id="L417">      objectOffsetEnd = end;</span>
-<span class="fc" id="L418">    }</span>
-
-    /**
-     * Gets the offset end.
-     *
-     * @return the offset end
-     */
-    public Integer getOffsetEnd() {
-<span class="fc" id="L426">      return objectOffsetEnd;</span>
-    }
-
-    /**
-     * Gets the offset.
-     *
-     * @return the offset
-     */
-    public Integer[] getOffset() {
-<span class="fc bfc" id="L435" title="All 2 branches covered.">      if (objectOffsetStart != null) {</span>
-<span class="fc" id="L436">        return new Integer[] { objectOffsetStart, objectOffsetEnd };</span>
-      } else {
-<span class="fc" id="L438">        return new Integer[0];</span>
-      }
-    }
-
-    /**
-     * Adds the position.
-     *
-     * @param position the position
-     */
-    public void addPosition(Integer position) {
-<span class="fc" id="L448">      objectPositions.add(position);</span>
-<span class="fc" id="L449">    }</span>
-
-    /**
-     * Adds the positions.
-     *
-     * @param positions the positions
-     */
-    public void addPositions(Set&lt;Integer&gt; positions) {
-<span class="fc" id="L457">      objectPositions.addAll(positions);</span>
-<span class="fc" id="L458">    }</span>
-
-    /**
-     * Gets the positions.
-     *
-     * @return the positions
-     */
-    public SortedSet&lt;Integer&gt; getPositions() {
-<span class="fc" id="L466">      return objectPositions;</span>
-    }
-
-    /**
-     * Adds the ref id.
-     *
-     * @param id the id
-     */
-    public void addRefId(String id) {
-<span class="pc bpc" id="L475" title="1 of 2 branches missed.">      if (id != null) {</span>
-<span class="fc" id="L476">        refIds.add(id);</span>
-      }
-<span class="fc" id="L478">    }</span>
-
-    /**
-     * Gets the ref ids.
-     *
-     * @return the ref ids
-     */
-    public Set&lt;String&gt; getRefIds() {
-<span class="fc" id="L486">      return refIds;</span>
-    }
-
-    /**
-     * Sets the referred start position.
-     *
-     * @param id the id
-     * @param position the position
-     */
-    public void setReferredStartPosition(String id, Integer position) {
-<span class="nc" id="L496">      referredStartPosition.put(id, position);</span>
-<span class="nc" id="L497">    }</span>
-
-    /**
-     * Sets the referred end position.
-     *
-     * @param id the id
-     * @param position the position
-     */
-    public void setReferredEndPosition(String id, Integer position) {
-<span class="nc" id="L506">      referredEndPosition.put(id, position);</span>
-<span class="nc" id="L507">    }</span>
-
-    /**
-     * Sets the referred start offset.
-     *
-     * @param id the id
-     * @param offset the offset
-     */
-    public void setReferredStartOffset(String id, Integer offset) {
-<span class="nc" id="L516">      referredStartOffset.put(id, offset);</span>
-<span class="nc" id="L517">    }</span>
-
-    /**
-     * Sets the referred end offset.
-     *
-     * @param id the id
-     * @param offset the offset
-     */
-    public void setReferredEndOffset(String id, Integer offset) {
-<span class="nc" id="L526">      referredEndOffset.put(id, offset);</span>
-<span class="nc" id="L527">    }</span>
-
-    /**
-     * Clear referred.
-     */
-    public void clearReferred() {
-<span class="nc" id="L533">      referredStartPosition.clear();</span>
-<span class="nc" id="L534">      referredEndPosition.clear();</span>
-<span class="nc" id="L535">      referredStartOffset.clear();</span>
-<span class="nc" id="L536">      referredEndOffset.clear();</span>
-<span class="nc" id="L537">    }</span>
-
-  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
