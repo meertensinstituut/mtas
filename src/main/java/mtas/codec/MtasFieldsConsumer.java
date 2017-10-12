@@ -1066,9 +1066,14 @@ public class MtasFieldsConsumer extends FieldsConsumer {
                 tmpSumXX += mtasId * mtasId;
                 mtasId++;
               }
-              int objectRefApproxQuotient = (int) (((tmpN * tmpSumXY)
+              int objectRefApproxQuotient;
+              if(tmpN>1) {
+                objectRefApproxQuotient= (int) (((tmpN * tmpSumXY)              
                   - (tmpSumX * tmpSumY))
                   / ((tmpN * tmpSumXX) - (tmpSumX * tmpSumX)));
+              } else {
+                objectRefApproxQuotient = 0;
+              }
               long objectRefApproxOffset = (tmpSumY
                   - objectRefApproxQuotient * tmpSumX) / tmpN;
               Long objectRefApproxCorrection;

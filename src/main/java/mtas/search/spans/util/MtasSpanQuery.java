@@ -3,10 +3,7 @@ package mtas.search.spans.util;
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanQuery;
-import org.apache.lucene.search.spans.SpanWeight;
-
 import mtas.search.spans.MtasSpanMatchNoneQuery;
 
 /**

@@ -159,7 +159,7 @@ public final class MtasTokenizer extends Tokenizer {
     try {
       constructTokenCollection(input);
       tokenCollectionIterator = tokenCollection.iterator();
-    } catch (MtasConfigException | MtasParserException e) {
+    } catch (MtasConfigException | MtasParserException e) {      
       tokenCollectionIterator = null;
       throw new IOException(e);
     }
