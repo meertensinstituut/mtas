@@ -5,7 +5,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>7.0.1</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20171007</currentDevelopmentRelease>
+		<currentDevelopmentRelease>20171012</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.meertens.mtas</groupId>
@@ -37,7 +37,7 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>src/docker</directory>
+				<directory>src/main/docker/</directory>
 				<filtering>true</filtering>
 				<targetPath>${project.basedir}/docker</targetPath>
 			</resource>
@@ -277,15 +277,6 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jxr-plugin</artifactId> 
-				<version>2.5</version> </plugin> -->
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-pmd-plugin</artifactId> 
-				<version>3.8</version> <configuration> <linkXref>true</linkXref> <sourceEncoding>utf-8</sourceEncoding> 
-				<minimumTokens>100</minimumTokens> </configuration> </plugin> -->
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>versions-maven-plugin</artifactId> 
-				<version>2.2</version> <reportSets> <reportSet> <reports> <report>dependency-updates-report</report> 
-				<report>plugin-updates-report</report> <report>property-updates-report</report> 
-				</reports> </reportSet> </reportSets> </plugin> -->
 		</plugins>
 	</reporting>
 	<repositories>
