@@ -28,6 +28,9 @@ public class MtasTokenizerFactory extends TokenizerFactory
   /** The Constant ARGUMENT_CONFIG. */
   public static final String ARGUMENT_CONFIG = "config";
 
+  /** The Constant ARGUMENT_ANALYZER. */
+  public static final String ARGUMENT_PARSER = "parser";
+
   /** The Constant ARGUMENT_DEFAULT. */
   public static final String ARGUMENT_DEFAULT = "default";
 
@@ -39,6 +42,9 @@ public class MtasTokenizerFactory extends TokenizerFactory
 
   /** The config file argument. */
   private String configFileArgument;
+
+  /** The analyzer argument. */
+  private String analyzerArgument;
 
   /** The configs. */
   private HashMap<String, MtasConfiguration> configs = null;
@@ -68,16 +74,22 @@ public class MtasTokenizerFactory extends TokenizerFactory
     super(args);
     configFileArgument = get(args, ARGUMENT_CONFIGFILE);
     configArgument = get(args, ARGUMENT_CONFIG);
+    analyzerArgument = get(args, ARGUMENT_PARSER);
     defaultArgument = get(args, ARGUMENT_DEFAULT);
-    if (configFileArgument != null && configArgument != null) {
-      throw new IOException(this.getClass().getName() + " can't have both "
-          + ARGUMENT_CONFIGFILE + " and " + ARGUMENT_CONFIG);
+    int numberOfArgs = 0;
+    numberOfArgs = (configFileArgument==null)?numberOfArgs:numberOfArgs+1;
+    numberOfArgs = (configArgument==null)?numberOfArgs:numberOfArgs+1;
+    numberOfArgs = (analyzerArgument==null)?numberOfArgs:numberOfArgs+1;
+    
+    if (numberOfArgs>1) {
+      throw new IOException(this.getClass().getName() + " can't have multiple of "
+          + ARGUMENT_CONFIGFILE + ", " + ARGUMENT_CONFIG+" AND "+ARGUMENT_PARSER);
     } else if (configArgument == null && defaultArgument != null) {
       throw new IOException(this.getClass().getName() + " can't have "
           + ARGUMENT_DEFAULT + " without " + ARGUMENT_CONFIG);
-    } else if (configFileArgument == null && configArgument == null) {
+    } else if (numberOfArgs==0) {
       throw new IOException(this.getClass().getName() + " should have "
-          + ARGUMENT_CONFIGFILE + " or " + ARGUMENT_CONFIG);
+          + ARGUMENT_CONFIGFILE + " or " + ARGUMENT_CONFIG+" or "+ARGUMENT_PARSER);
     }
     init(resourceLoader);
   }
@@ -167,7 +179,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
     if (config == null && configs == null) {
       if (resourceLoader == null) {
         return;
-      } else if (configFileArgument == null && configArgument == null) {
+      } else if (configFileArgument == null && configArgument == null && analyzerArgument==null) {
         throw new IOException("no configuration");
       } else {
         if (configFileArgument != null) {
@@ -187,6 +199,14 @@ public class MtasTokenizerFactory extends TokenizerFactory
             throw new IOException(
                 "Problem loading configurations from " + configArgument, e);
           }
+        }
+        if (analyzerArgument != null) {
+          configs = null;
+          config = new MtasConfiguration();
+          MtasConfiguration subConfig = new MtasConfiguration();
+          subConfig.name = "parser";
+          subConfig.attributes.put("name", analyzerArgument);
+          config.children.add(subConfig);
         }
       }
     }

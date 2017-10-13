@@ -37,6 +37,17 @@ public final class MtasTokenizer extends Tokenizer {
   /** The Constant CONFIGURATION_MTAS. */
   public static final String CONFIGURATION_MTAS = "mtas";
 
+  public static final String CONFIGURATION_MTAS_INDEX = "index";
+  public static final String CONFIGURATION_MTAS_INDEX_ATTRIBUTE = "index";
+
+  public static final String CONFIGURATION_MTAS_PARSER = "parser";
+  public static final String CONFIGURATION_MTAS_PARSER_ATTRIBUTE = "name";
+
+  private static final String VALUE_TRUE = "true";
+  private static final String VALUE_FALSE = "false";
+  private static final String VALUE_0 = "0";
+  private static final String VALUE_1 = "1";
+  
   /** The current position. */
   private int currentPosition = 0;
 
@@ -269,13 +280,6 @@ public final class MtasTokenizer extends Tokenizer {
    */
   private void processConfiguration(final MtasConfiguration config)
       throws IOException {
-    final String nameIndex = "index";
-    final String nameParser = "parser";
-    final String nameName = "name";
-    final String valueTrue = "true";
-    final String valueFalse = "false";
-    final String value0 = "0";
-    final String value1 = "1";
     HashMap<String, Integer> indexEncodingMapper = new HashMap<>();
     indexEncodingMapper.put("payload", MtasPayloadEncoder.ENCODE_PAYLOAD);
     indexEncodingMapper.put("offset", MtasPayloadEncoder.ENCODE_OFFSET);
@@ -284,23 +288,23 @@ public final class MtasTokenizer extends Tokenizer {
     // process
     if (config != null) {
       for (int i = 0; i < config.children.size(); i++) {
-        if (config.children.get(i).name.equals(nameIndex)) {
+        if (config.children.get(i).name.equals(CONFIGURATION_MTAS_INDEX)) {
           MtasConfiguration index = config.children.get(i);
           for (int j = 0; j < index.children.size(); j++) {
             if (indexEncodingMapper.containsKey(index.children.get(j).name)) {
-              String value = index.children.get(j).attributes.get(nameIndex);
-              if ((value.equals(valueTrue)) || (value.equals(value1))) {
+              String value = index.children.get(j).attributes.get(CONFIGURATION_MTAS_INDEX_ATTRIBUTE);
+              if ((value.equals(VALUE_TRUE)) || (value.equals(VALUE_1))) {
                 encodingFlags |= indexEncodingMapper
                     .get(index.children.get(j).name);
-              } else if ((value.equals(valueFalse)) || (value.equals(value0))) {
+              } else if ((value.equals(VALUE_FALSE)) || (value.equals(VALUE_0))) {
                 encodingFlags &= ~indexEncodingMapper
                     .get(index.children.get(j).name);
               }
             }
           }
-        } else if (config.children.get(i).name.equals(nameParser)) {
-          if (config.children.get(i).attributes.containsKey(nameName)) {
-            parserName = config.children.get(i).attributes.get(nameName);
+        } else if (config.children.get(i).name.equals(CONFIGURATION_MTAS_PARSER)) {
+          if (config.children.get(i).attributes.containsKey(CONFIGURATION_MTAS_PARSER_ATTRIBUTE)) {
+            parserName = config.children.get(i).attributes.get(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);
             parserConfiguration = config.children.get(i);
           } else {
             throw new IOException("no parser configuration");
