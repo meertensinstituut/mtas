@@ -552,7 +552,7 @@ public class CodecCollector {
                 if (facetDataSublistCounter > 0) {
                   String termValue = null;
                    if (facetDataType.get(entry.getKey())
-                      .equals(NumberType.INTEGER)) {
+                      .equals(NumberType.INTEGER.name())) {
                     // only values without shifting bits
                     if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_INT) {
                       termValue = Integer
@@ -561,7 +561,7 @@ public class CodecCollector {
                       continue;
                     }
                   } else if (facetDataType.get(entry.getKey())
-                      .equals(NumberType.LONG)) {
+                      .equals(NumberType.LONG.name())) {
                     if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_LONG) {
                       termValue = Long
                           .toString(LegacyNumericUtils.prefixCodedToLong(term));

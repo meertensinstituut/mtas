@@ -352,9 +352,9 @@ public class MtasConfiguration {
           + "name: " + name + "\n";
     }
     if (attributes != null) {
-      for (String key : attributes.keySet()) {
-        text += (indent > 0 ? String.format("%" + indent + "s", "") : "") + key
-            + ":" + attributes.get(key) + "\n";
+      for (Entry<String,String> entry : attributes.entrySet()) {
+        text += (indent > 0 ? String.format("%" + indent + "s", "") : "") + entry.getKey()
+            + ":" + entry.getValue() + "\n";
       }
     }
     if (children != null) {
