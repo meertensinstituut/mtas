@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<schema name="nederlab" version="1.6">
+<schema name="nederlab" version="1.5">
 
 	<field name="_version_" type="nederlab_long" indexed="true"
 		stored="true" />
@@ -203,13 +203,7 @@
 		required="false" multiValued="true" indexed="true" stored="true" />
 	<field name="NLPerson_NLPersonName_fullName" type="nederlab_text"
 		required="false" multiValued="true" indexed="true" stored="true" />
-	<field name="NLPerson_NLPersonName_prefixTitle" type="nederlab_text"
-    required="false" multiValued="true" indexed="true" stored="true" />
-  <field name="NLPerson_NLPersonName_additionalTitle" type="nederlab_text"
-    required="false" multiValued="true" indexed="true" stored="true" />
-  <field name="NLPerson_NLPersonName_organisationName" type="nederlab_text"
-    required="false" multiValued="true" indexed="true" stored="true" />
-  <field name="NLPerson_NLPersonName_fullName_serialized" type="nederlab_string"
+	<field name="NLPerson_NLPersonName_fullName_serialized" type="nederlab_string"
 		required="false" multiValued="true" indexed="false" stored="true" />
 	<field name="NLPerson_NLPersonName_preferredNameID" type="nederlab_uuid"
 		required="false" multiValued="false" indexed="true" stored="true" />
@@ -223,13 +217,7 @@
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLPerson_NLPersonName_preferredFullName" type="nederlab_text"
 		required="false" multiValued="false" indexed="true" stored="true" />
-	<field name="NLPerson_NLPersonName_preferredPrefixTitle" type="nederlab_text"
-    required="false" multiValued="false" indexed="true" stored="true" />
-  <field name="NLPerson_NLPersonName_preferredAdditionalTitle" type="nederlab_text"
-    required="false" multiValued="false" indexed="true" stored="true" />
-  <field name="NLPerson_NLPersonName_preferredOrganisationName" type="nederlab_text"
-    required="false" multiValued="false" indexed="true" stored="true" />
-  <field name="NLPerson_NLPersonName_preferredFullName_serialized"
+	<field name="NLPerson_NLPersonName_preferredFullName_serialized"
 		type="nederlab_string" required="false" multiValued="false" indexed="false"
 		stored="true" />
 	<field name="NLPerson_dateOfBirthDayMonth" type="nederlab_text"
@@ -420,10 +408,7 @@
 	<copyField source="NLPerson_NLPersonName_infixes" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_firstNameFull" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_fullName" dest="NLMetadata" />
-	<copyField source="NLPerson_NLPersonName_prefixTitle" dest="NLMetadata" />
-  <copyField source="NLPerson_NLPersonName_additionalTitle" dest="NLMetadata" />
-  <copyField source="NLPerson_NLPersonName_organisationName" dest="NLMetadata" />
-  <copyField source="NLPerson_dateOfBirthDayMonth" dest="NLMetadata" />
+	<copyField source="NLPerson_dateOfBirthDayMonth" dest="NLMetadata" />
 	<copyField source="NLPerson_yearOfBirthMin" dest="NLMetadata" />
 	<copyField source="NLPerson_yearOfBirthMax" dest="NLMetadata" />
 	<copyField source="NLPerson_yearOfBirthLabel" dest="NLMetadata" />
@@ -455,10 +440,13 @@
 	<fieldType name="nederlab_uuid" class="solr.StrField"
 		sortMissingLast="true" />
 	<fieldType name="nederlab_boolean" class="solr.BoolField"
-		sortMissingLast="true" docValues="true" />
-	<fieldType name="nederlab_int" class="solr.IntPointField" docValues="true" />
-	<fieldType name="nederlab_long" class="solr.LongPointField" docValues="true" />
-	<fieldType name="nederlab_date" class="solr.DatePointField" docValues="true" />
+		sortMissingLast="true" />
+	<fieldType name="nederlab_int" class="solr.TrieIntField"
+		precisionStep="8" positionIncrementGap="0" />
+	<fieldType name="nederlab_long" class="solr.TrieLongField"
+		precisionStep="0" positionIncrementGap="0" />
+	<fieldType name="nederlab_date" class="solr.TrieDateField"
+		precisionStep="6" positionIncrementGap="0" />
 	<fieldtype name="nederlab_binary" class="solr.BinaryField" />
 
 	<fieldType name="nederlab_text" class="solr.TextField"

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -127,7 +128,8 @@ public class MtasSolrComponentFacet
   /**
    * Instantiates a new mtas solr component facet.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentFacet(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -648,28 +650,37 @@ public class MtasSolrComponentFacet
   /**
    * Gets the field type.
    *
-   * @param schema the schema
-   * @param field the field
+   * @param schema
+   *          the schema
+   * @param field
+   *          the field
    * @return the field type
+   * @throws IOException 
    */
-  private String getFieldType(IndexSchema schema, String field) {
+  private String getFieldType(IndexSchema schema, String field) throws IOException {
     SchemaField sf = schema.getField(field);
     FieldType ft = sf.getType();
-    if (ft != null && ft.getNumberType() != null) {
-      NumberType nt = ft.getNumberType();
-      if(nt.equals(NumberType.INTEGER)) {
-        return ComponentFacet.TYPE_INTEGER;
-      } else if(nt.equals(NumberType.LONG)) {
-        return ComponentFacet.TYPE_LONG;
+    if (ft != null) {
+      if(ft.isPointField() && !sf.hasDocValues()) {
+        return ComponentFacet.TYPE_POINTFIELD_WITHOUT_DOCVALUES;
       }
-    }  
-    return ComponentFacet.TYPE_STRING;
+      NumberType nt = ft.getNumberType();               
+      if(nt!=null) {
+        return nt.name();
+      } else {
+        return ComponentFacet.TYPE_STRING;
+      }
+    } else {
+      //best guess
+      return ComponentFacet.TYPE_STRING;
+    }
   }
 
   /**
    * Gets the positive integer.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -683,7 +694,8 @@ public class MtasSolrComponentFacet
   /**
    * Gets the double.
    *
-   * @param number the number
+   * @param number
+   *          the number
    * @return the double
    */
   private Double getDouble(String number) {

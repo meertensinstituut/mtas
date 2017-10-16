@@ -12,6 +12,9 @@
     <configuration name="PM" file="mtas/folia_pm.xml" />
     <configuration name="HuygensING-declercq" file="mtas/folia_huygensing_declerq.xml" />
     <configuration name="HuygensING-actazh" file="mtas/folia_huygensing_actazh.xml" />
+    <configuration name="HuygensING-beaufort" file="mtas/folia_huygensing_beaufort.xml" />
+    <configuration name="HuygensING-stellingwerff" file="mtas/folia_huygensing_stellingwerff.xml" />
+    <configuration name="HuygensING-heinsius" file="mtas/folia_huygensing_heinsius.xml" />
     <configuration name="isotei" file="mtas/iso_tei.xml" />    
   </configurations>
   <configurations type="mtas.analysis.util.MtasCharFilterFactory">
@@ -26,6 +29,9 @@
     <configuration name="PM" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="HuygensING-declercq" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="HuygensING-actazh" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="HuygensING-beaufort" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="HuygensING-stellingwerff" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
+    <configuration name="HuygensING-heinsius" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
     <configuration name="isotei" type="file" prefix="/Users/matthijs/Software/Mtas/data/ISO_TEI/" postfix="" />    
   </configurations>
 </mtas>

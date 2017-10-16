@@ -2,9 +2,11 @@ package mtas.codec.util;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -56,12 +59,14 @@ import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
@@ -77,6 +82,7 @@ import org.apache.lucene.util.automaton.ByteRunAutomaton;
 import org.apache.lucene.util.automaton.CompiledAutomaton;
 import org.apache.lucene.util.automaton.RegExp;
 import org.apache.solr.legacy.LegacyNumericUtils;
+import org.apache.solr.schema.NumberType;
 
 /**
  * The Class CodecCollector.
@@ -459,71 +465,125 @@ public class CodecCollector {
     if (needSpans) {
       Map<Integer, Integer> numberData;
       Map<Integer, List<Match>> matchData;
-
       // collect values for facetFields
       for (Entry<String, SortedMap<String, int[]>> entry : facetData
           .entrySet()) {
-        if (!facetDataType.containsKey(entry.getKey()) && (!facetDataType
-            .get(entry.getKey()).equals(ComponentFacet.TYPE_STRING)
-            && !facetDataType.get(entry.getKey())
-                .equals(ComponentFacet.TYPE_INTEGER) && !facetDataType.get(entry.getKey())
-                .equals(ComponentFacet.TYPE_LONG))) {
-          throw new IOException("unexpected type");
-        }
-        Terms fft = r.terms(entry.getKey());
-        if (fft != null) {
-          TermsEnum termsEnum = fft.iterator();
-          BytesRef term = null;
-          PostingsEnum postingsEnum = null;
-          SortedMap<String, int[]> facetDataList = entry.getValue();
-          while ((term = termsEnum.next()) != null) {
-            int docId;
-            int termDocId = -1;
-            int[] facetDataSublist = new int[docSet.size()];
-            int facetDataSublistCounter = 0;
+        FieldInfo fi = fieldInfos.fieldInfo(entry.getKey());
+        if (fi != null) {
+          //prefer to use pointvalue
+          if (!fi.getDocValuesType().equals(DocValuesType.NONE)) {                        
             Iterator<Integer> docIterator = docSet.iterator();
-            postingsEnum = termsEnum.postings(postingsEnum);
-            while (docIterator.hasNext()) {
-              docId = docIterator.next() - lrc.docBase;
-              if (docId >= termDocId && ((docId == termDocId)
-                  || ((termDocId = postingsEnum.advance(docId)) == docId))) {
-                facetDataSublist[facetDataSublistCounter] = docId + lrc.docBase;
-                facetDataSublistCounter++;
+            //numeric
+            if(fi.getDocValuesType().equals(DocValuesType.NUMERIC)) {
+              Map<Long, List<Integer>> facetDataSubList = new HashMap<>();
+              NumericDocValues docValues = r.getContext().reader()
+                  .getNumericDocValues(entry.getKey());              
+              int docId;
+              while (docIterator.hasNext()) {
+                docId = docIterator.next() - lrc.docBase;
+                if(docValues.advanceExact(docId)) {
+                  long value = docValues.longValue();
+                  if(!facetDataSubList.containsKey(value)) {
+                    List<Integer> facetDataSubListItem = new ArrayList<Integer>();
+                    facetDataSubListItem.add(docId+lrc.docBase);
+                    facetDataSubList.put(value, facetDataSubListItem);                  
+                  } else {
+                    facetDataSubList.get(value).add(docId+lrc.docBase);
+                  }
+                }  
               }
+              if(!facetDataSubList.isEmpty()) {
+                SortedMap<String, int[]> facetDataList = entry.getValue();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                for(Entry<Long,List<Integer>> facetEntry : facetDataSubList.entrySet()) {
+                  int[] docIdList = facetEntry.getValue().stream().mapToInt(i -> i).toArray();
+                  String termValue;
+                  if(facetDataType.get(entry.getKey()).equals(NumberType.DATE.name())) {
+                    Date date = new Date(facetEntry.getKey());
+                    termValue = sdf.format(date);
+                  } else {
+                    termValue = facetEntry.getKey().toString();
+                  }  
+                  if (!facetDataList.containsKey(termValue)) {
+                    facetDataList.put(termValue, docIdList);
+                  } else {
+                    int[] oldList = facetDataList.get(termValue);
+                    int[] newList = new int[oldList.length
+                        + docIdList.length];
+                    System.arraycopy(oldList, 0, newList, 0, oldList.length);
+                    System.arraycopy(docIdList, 0, newList,
+                        oldList.length, docIdList.length);
+                    facetDataList.put(termValue, newList);
+                  }
+                }                     
+              }
+            } else {
+              throw new IOException("faces for docValues of type "+fi.getDocValuesType()+" not implemented");
+            }              
+          } else if(!docSet.isEmpty()) {
+            if(facetDataType.get(entry.getKey())
+                .equals(ComponentFacet.TYPE_POINTFIELD_WITHOUT_DOCVALUES)) {
+              throw new IOException("can't create facets for pointField without docValues");
             }
-            if (facetDataSublistCounter > 0) {
-              String termValue = null;
-              if (facetDataType.get(entry.getKey())
-                  .equals(ComponentFacet.TYPE_INTEGER)) {
-                // only values without shifting bits
-                if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_INT) {
-                  termValue = Integer
-                      .toString(LegacyNumericUtils.prefixCodedToInt(term));
-                } else {
-                  continue;
+            Terms fft = r.terms(entry.getKey());
+            if (fft != null) {                          
+              TermsEnum termsEnum = fft.iterator();
+              BytesRef term = null;
+              PostingsEnum postingsEnum = null;
+              SortedMap<String, int[]> facetDataList = entry.getValue();
+              while ((term = termsEnum.next()) != null) {
+                int docId;
+                int termDocId = -1;
+                int[] facetDataSublist = new int[docSet.size()];
+                int facetDataSublistCounter = 0;
+                Iterator<Integer> docIterator = docSet.iterator();
+                postingsEnum = termsEnum.postings(postingsEnum);
+                while (docIterator.hasNext()) {
+                  docId = docIterator.next() - lrc.docBase;
+                  if (docId >= termDocId
+                      && ((docId == termDocId) || ((termDocId = postingsEnum
+                          .advance(docId)) == docId))) {
+                    facetDataSublist[facetDataSublistCounter] = docId
+                        + lrc.docBase;
+                    facetDataSublistCounter++;
+                  }
                 }
-              } else if (facetDataType.get(entry.getKey())
-                  .equals(ComponentFacet.TYPE_LONG)) {
-                if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_LONG) {
-                  termValue = Long
-                      .toString(LegacyNumericUtils.prefixCodedToLong(term));
-                } else {
-                  continue;
+                if (facetDataSublistCounter > 0) {
+                  String termValue = null;
+                   if (facetDataType.get(entry.getKey())
+                      .equals(NumberType.INTEGER)) {
+                    // only values without shifting bits
+                    if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_INT) {
+                      termValue = Integer
+                          .toString(LegacyNumericUtils.prefixCodedToInt(term));
+                    } else {   
+                      continue;
+                    }
+                  } else if (facetDataType.get(entry.getKey())
+                      .equals(NumberType.LONG)) {
+                    if (term.bytes[term.offset] == LegacyNumericUtils.SHIFT_START_LONG) {
+                      termValue = Long
+                          .toString(LegacyNumericUtils.prefixCodedToLong(term));
+                    } else {
+                      continue;
+                    }
+                  } else {
+                    termValue = term.utf8ToString();
+                  }
+                  if (!facetDataList.containsKey(termValue)) {
+                    facetDataList.put(termValue, Arrays.copyOf(facetDataSublist,
+                        facetDataSublistCounter));
+                  } else {
+                    int[] oldList = facetDataList.get(termValue);
+                    int[] newList = new int[oldList.length
+                        + facetDataSublistCounter];
+                    System.arraycopy(oldList, 0, newList, 0, oldList.length);
+                    System.arraycopy(facetDataSublist, 0, newList,
+                        oldList.length, facetDataSublistCounter);
+                    facetDataList.put(termValue, newList);
+                  }
                 }
-              } else {
-                termValue = term.utf8ToString();
-              }
-              if (!facetDataList.containsKey(termValue)) {
-                facetDataList.put(termValue,
-                    Arrays.copyOf(facetDataSublist, facetDataSublistCounter));
-              } else {
-                int[] oldList = facetDataList.get(termValue);
-                int[] newList = new int[oldList.length
-                    + facetDataSublistCounter];
-                System.arraycopy(oldList, 0, newList, 0, oldList.length);
-                System.arraycopy(facetDataSublist, 0, newList, oldList.length,
-                    facetDataSublistCounter);
-                facetDataList.put(termValue, newList);
               }
             }
           }
