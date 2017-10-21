@@ -56,7 +56,7 @@
 				<version>2.5.3</version>
 				<configuration>
 					<pushChanges>false</pushChanges>
-					<tagNameFormat>${currentDevelopmentVersion}.${currentDevelopmentRelease}</tagNameFormat>
+					<tagNameFormat>${currentDevelopmentVersion}-${currentDevelopmentRelease}</tagNameFormat>
 					<updateWorkingCopyVersions>false</updateWorkingCopyVersions>
 				</configuration>
 			</plugin>
