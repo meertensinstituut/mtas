@@ -10,7 +10,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.0.1</version>
+	<version>${currentDevelopmentVersion}</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -35,7 +35,7 @@
 		</developer>
 	</developers>
 	<build>
-		<resources>
+	  <resources>
 			<resource>
 				<directory>src/main/docker/</directory>
 				<filtering>true</filtering>
@@ -335,27 +335,27 @@
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
-				<version>7.0.1</version>
+				<version>${currentDevelopmentVersion}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-analyzers-common</artifactId>
-				<version>7.0.1</version>
+				<version>${currentDevelopmentVersion}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-queryparser</artifactId>
-				<version>7.0.1</version>
+				<version>${currentDevelopmentVersion}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-codecs</artifactId>
-				<version>7.0.1</version>
+				<version>${currentDevelopmentVersion}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-core</artifactId>
-				<version>7.0.1</version>
+				<version>${currentDevelopmentVersion}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -371,7 +371,7 @@
 			<dependency>
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-test-framework</artifactId>
-				<version>7.0.1</version>
+				<version>${currentDevelopmentVersion}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
