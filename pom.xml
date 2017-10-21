@@ -19,7 +19,6 @@
 	</licenses>
 	<scm>
     <connection>scm:git:git://github.com/meertensinstituut/mtas.git</connection>
-    <developerConnection>scm:git:git@github.com:meertensinstituut/mtas.git</developerConnection>
     <url>http://github.com/meertensinstituut/mtas</url>
     <tag>7.0.1</tag>
   </scm>
