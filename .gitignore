@@ -3,9 +3,10 @@
 .settings/
 .svn
 .settings
-.DS_store
-gh-pages/
-publications/
+.DS_Store
+**/.DS_Store
+gh-pages
+publications
 target/
 solr-*/
 jetty-*/

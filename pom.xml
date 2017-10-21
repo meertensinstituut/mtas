@@ -8,7 +8,7 @@
 		<currentDevelopmentRelease>20171016</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dev.meertens.mtas</groupId>
+	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
 	<version>7.0.1</version>
 	<packaging>jar</packaging>
