@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.0.1-SNAPSHOT</version>
+	<version>7.0.1</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -21,7 +21,7 @@
     <connection>scm:git:git://github.com/meertensinstituut/mtas.git</connection>
     <developerConnection>scm:git:git@github.com:meertensinstituut/mtas.git</developerConnection>
     <url>http://github.com/meertensinstituut/mtas</url>
-    <tag>HEAD</tag>
+    <tag>7.0.1</tag>
   </scm>
 	<name>MTAS</name>
 	<description>Multi Tier Annotation Search</description>
