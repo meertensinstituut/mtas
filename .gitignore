@@ -14,3 +14,4 @@ jetty-*/
 examples/
 demo/
 generated-sources/*
+release.properties
