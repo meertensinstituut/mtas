@@ -20,6 +20,7 @@
 	<scm>
     <connection>scm:git:git://github.com/meertensinstituut/mtas.git</connection>
     <url>http://github.com/meertensinstituut/mtas</url>
+    <developerConnection>scm:git:git@github.com:meertensinstituut/mtas.git</developerConnection>
     <tag>7.0.1</tag>
   </scm>
 	<name>MTAS</name>
