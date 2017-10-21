@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.0.1</version>
+	<version>${currentDevelopmentVersion}</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -17,11 +17,6 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
-	<scm>
-    <connection>scm:git:git://github.com/meertensinstituut/mtas.git</connection>
-    <url>http://github.com/meertensinstituut/mtas</url>
-    <tag>7.0.1</tag>
-  </scm>
 	<name>MTAS</name>
 	<description>Multi Tier Annotation Search</description>
 	<organization>
@@ -50,15 +45,6 @@
 			</resource>
 		</resources>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<tagNameFormat>${currentDevelopmentVersion}</tagNameFormat>
-					<updateWorkingCopyVersions>false</updateWorkingCopyVersions>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
