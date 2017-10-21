@@ -56,7 +56,7 @@
 				<version>2.5.3</version>
 				<configuration>
 					<pushChanges>false</pushChanges>
-					<tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
+					<tagNameFormat>${currentDevelopmentVersion}.${currentDevelopmentRelease}</tagNameFormat>
 					<updateWorkingCopyVersions>false</updateWorkingCopyVersions>
 				</configuration>
 			</plugin>
