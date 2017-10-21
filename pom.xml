@@ -4,7 +4,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentDevelopmentVersion>7.0.1</currentDevelopmentVersion>
-		<currentDevelopmentRelease>20171016</currentDevelopmentRelease>
+		<currentDevelopmentRelease>20171021</currentDevelopmentRelease>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
