@@ -1,5 +1,6 @@
 # Automatically generated Dockerfile 
 # - Build ${timestamp}
+# - Buildnumber ${buildNumber}
 # - Lucene/Solr version ${currentDevelopmentVersion}
 # - Mtas release ${currentDevelopmentRelease} 
 #
