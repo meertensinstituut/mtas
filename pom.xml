@@ -7,7 +7,6 @@
 		<connection>scm:git:https://github.com/meertensinstituut/mtas.git</connection>
 		<url>http://github.com/meertensinstituut/mtas</url>
 		<developerConnection>scm:git:https://github.com/meertensinstituut/mtas.git</developerConnection>
-	  <tag>HEAD</tag>
   </scm>
 	<distributionManagement>
 		<snapshotRepository>
@@ -18,7 +17,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.0.1-r2-SNAPSHOT</version>
+	<version>7.0.1-r1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -61,10 +60,7 @@
 				<configuration>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<releaseProfiles>releases</releaseProfiles>
-					<checkModificationExcludes>
-						<checkModificationExclude>**/*</checkModificationExclude>
-					</checkModificationExcludes>
+					<releaseProfiles>releases</releaseProfiles>					
 				</configuration>
 			</plugin>
 			<plugin>
