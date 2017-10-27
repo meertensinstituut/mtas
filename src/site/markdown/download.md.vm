@@ -16,7 +16,9 @@
       <td><a href='https://search.maven.org/remotecontent?filepath=nl/knaw/meertens/mtas/mtas/${context.get("latestReleaseFullVersion")}/mtas-${context.get("latestReleaseFullVersion")}.jar'>Binary (jar)</a></td>
       <td><a href='https://github.com/meertensinstituut/mtas/archive/v${context.get("latestReleaseFullVersion")}.tar.gz'>Source (tgz)</a></td>
       <td><a href='https://github.com/meertensinstituut/mtas/archive/v${context.get("latestReleaseFullVersion")}.zip'>Source (zip)</a></td>
-      <td>Development version</td>
+      <td>Latest release</td>
     </tr>
   </tbody>
 </table>
+
+See also [previous releases](http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/).
