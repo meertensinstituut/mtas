@@ -1,6 +1,6 @@
 #Getting started
 
-Prebuilt jar libraries are available from the [download](download.html) page, current version is [${currentDevelopmentVersion}, release ${currentDevelopmentRelease}](https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar) (development)
+Prebuilt jar libraries are available from the [download](download.html) page, current version is [${context.get("latestReleaseFullVersion")}](https://search.maven.org/remotecontent?filepath=nl/knaw/meertens/mtas/mtas/${context.get("latestReleaseFullVersion")}/mtas-${context.get("latestReleaseFullVersion")}.jar) (development)
 
 **Build from Source with Maven**
 
@@ -27,4 +27,4 @@ Mtas can be used as plugin for [Apache Solr](https://lucene.apache.org/solr/) or
 
 or see [Mtas and Docker](installation_docker.html) to get a quick demonstration. 
 
-Versioning follows the required version of both Solr and Lucene, the latest available version is ${currentDevelopmentVersion}.
+Versioning follows the required version of both Solr and Lucene, the latest available version is ${context.get("latestReleaseLuceneVersion")}.

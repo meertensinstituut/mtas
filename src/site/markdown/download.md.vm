@@ -5,17 +5,17 @@
 <table>
   <tbody>
     <tr>
-      <th>Version</th>
-      <th>Release</th>
+      <th>Lucene/Solr</th>
+      <th>Mtas Release</th>
       <th colspan='3'>Downloads</th>
       <th>Description</th>
     </tr>
     <tr>
-      <td>$context.get("currentDevelopmentVersion")</td>
-      <td>$context.get("currentDevelopmentRelease")</td>
-      <td><a href='https://github.com/meertensinstituut/mtas/releases/download/${currentDevelopmentRelease}/mtas-${currentDevelopmentVersion}.jar'>Binary (jar)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/${currentDevelopmentRelease}.tar.gz'>Source (tgz)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/${currentDevelopmentRelease}.zip'>Source (zip)</a></td>
+      <td>$context.get("latestReleaseLuceneVersion")</td>
+      <td>$context.get("latestReleaseFullVersion")</td>
+      <td><a href='https://search.maven.org/remotecontent?filepath=nl/knaw/meertens/mtas/mtas/${context.get("latestReleaseFullVersion")}/mtas-${context.get("latestReleaseFullVersion")}.jar'>Binary (jar)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${context.get("latestReleaseFullVersion")}.tar.gz'>Source (tgz)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${context.get("latestReleaseFullVersion")}.zip'>Source (zip)</a></td>
       <td>Development version</td>
     </tr>
   </tbody>

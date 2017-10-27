@@ -5,14 +5,14 @@ Mtas can be used as plugin for Apache Solr
 **Prerequisites**
 
 - Installed [Apache Solr](https://lucene.apache.org/solr/)
-- Currently supported and advised version is ${currentDevelopmentVersion}
+- Currently supported and advised version is $context.get("latestReleaseLuceneVersion")
 
 Start with a new Solr core.
 
 **Libraries**
 
-Add the `mtas-${currentDevelopmentVersion}.jar` to the `lib` directory of the new Solr core. 
-A prebuilt `mtas-${currentDevelopmentVersion}.jar` is available from the [download](download.html) page.
+Add the `mtas-${context.get("latestReleaseFullVersion")}.jar` to the `lib` directory of the new Solr core. 
+A prebuilt `mtas-${context.get("latestReleaseFullVersion")}.jar` is available from the [download](download.html) page.
 
 Furthermore, add the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math/) to the `lib` directory of the new Solr core.
 
