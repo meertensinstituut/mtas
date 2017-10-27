@@ -7,6 +7,7 @@
 		<connection>scm:git:https://github.com/meertensinstituut/mtas.git</connection>
 		<url>http://github.com/meertensinstituut/mtas</url>
 		<developerConnection>scm:git:https://github.com/meertensinstituut/mtas.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
 	<distributionManagement>
 		<snapshotRepository>
@@ -206,7 +207,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
+	<!-- <profiles>
 		<profile>
 			<id>releases</id>
 			<build>
@@ -233,7 +234,7 @@
 				</plugins>
 			</build>
 		</profile>
-	</profiles>
+	</profiles> -->
 	<reporting>
 		<plugins>
 			<plugin>
