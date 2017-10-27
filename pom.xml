@@ -19,7 +19,7 @@
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
 	<version>7.0.1-r1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>jar</packaging>	
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
@@ -27,7 +27,7 @@
 		</license>
 	</licenses>
 	<name>MTAS</name>
-	<description>Multi Tier Annotation Search</description>
+	<description>Multi Tier Annotation Search, a Solr/Lucene based library and plugin providing search and analysis on annotated and structured text.</description>
 	<organization>
 		<name>Meertens Institute</name>
 		<url>http://www.meertens.knaw.nl/</url>
