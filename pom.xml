@@ -32,6 +32,7 @@
 	</licenses>
 	<name>MTAS</name>
 	<description>Multi Tier Annotation Search, a Solr/Lucene based library and plugin providing search and analysis on annotated and structured text.</description>
+	<url>https://meertensinstituut.github.io/mtas/</url>
 	<organization>
 		<name>Meertens Institute</name>
 		<url>http://www.meertens.knaw.nl/</url>
