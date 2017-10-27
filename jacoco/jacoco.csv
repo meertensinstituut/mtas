@@ -45,7 +45,7 @@ MTAS,mtas.parser.function,TokenMgrError,175,0,17,0,37,0,18,0,6,0
 MTAS,mtas.parser.function,MtasFunctionParserTokenManager,366,701,82,71,84,149,62,45,7,14
 MTAS,mtas.parser.function,SimpleCharStream,797,269,45,15,136,61,53,16,26,12
 MTAS,mtas.codec.util,CodecComponent.ComponentFields,0,49,0,0,0,16,0,1,0,1
-MTAS,mtas.codec.util,CodecInfo,517,653,55,49,115,136,46,29,10,13
+MTAS,mtas.codec.util,CodecInfo,550,653,57,49,122,136,49,29,12,13
 MTAS,mtas.codec.util,CodecComponent.ComponentFacet,764,0,70,0,107,0,40,0,5,0
 MTAS,mtas.codec.util,CodecInfo.FieldReferences,0,18,0,0,0,7,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.Match,54,9,10,0,12,4,7,1,2,1
