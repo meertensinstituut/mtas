@@ -50,7 +50,7 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>src/main/docker/</directory>
+				<directory>src/docker/</directory>
 				<filtering>true</filtering>
 				<targetPath>${project.basedir}/docker</targetPath>
 			</resource>
@@ -231,6 +231,12 @@
 								<goals>
 									<goal>jar</goal>
 								</goals>
+								<configuration>
+								  <excludeResources>true</excludeResources>
+								  <excludes>
+								    <exclude>src/test/resources/**</exclude>
+								  </excludes>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
