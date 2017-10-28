@@ -60,8 +60,7 @@
 				<configuration>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<releaseProfiles>release</releaseProfiles>
-					<!-- <preparationGoals>org.apache.maven.plugins:maven-resources-plugin:3.0.2:copy-resources</preparationGoals> -->
+					<releaseProfiles>release,release-prepare</releaseProfiles>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -200,26 +199,38 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>release</id>
+			<id>release-prepare</id>
+			<activation>
+				<file>
+					<exists>pom.xml.*</exists>
+				</file>
+			</activation>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.0.2</version>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/src/main/docker</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>Dockerfile</include>
-									</includes>
-								</resource>
-							</resources>
-							<outputDirectory>${project.basedir}/docker2</outputDirectory>
-						</configuration>
-					</plugin>
+				  <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.0.2</version>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/main/docker</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>Dockerfile</include>
+                  </includes>
+                </resource>
+              </resources>
+              <outputDirectory>${project.basedir}/docker2</outputDirectory>
+            </configuration>
+          </plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>					
 					<!-- <plugin> <groupId>de.jutzig</groupId> <artifactId>github-release-plugin</artifactId> 
 						<version>1.1.1</version> <executions> <execution> <id>github-upload</id> 
 						<phase>deploy</phase> <goals> <goal>release</goal> </goals> <inherited>false</inherited> 
