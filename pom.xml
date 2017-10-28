@@ -61,7 +61,7 @@
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<releaseProfiles>release</releaseProfiles>
-					<preparationGoals>org.apache.maven.plugins:maven-resources-plugin:3.0.2:copy-resources</preparationGoals>
+					<!-- <preparationGoals>org.apache.maven.plugins:maven-resources-plugin:3.0.2:copy-resources</preparationGoals> -->
 				</configuration>
 			</plugin>
 			<plugin>
