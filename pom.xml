@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentLuceneVersion>7.0.1</currentLuceneVersion>
@@ -60,8 +61,34 @@
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<releaseProfiles>release</releaseProfiles>
-					<preparationGoals>org.apache.maven.plugins:maven-resources-plugin:copy-resources</preparationGoals>
+					<preparationGoals>org.apache.maven.plugins:maven-resources-plugin:3.0.2:copy-resources</preparationGoals>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>filter-dockerfiles</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/src/main/docker</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>Dockerfile</include>
+									</includes>
+								</resource>
+							</resources>
+							<outputDirectory>${project.basedir}/docker2</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
@@ -202,58 +229,14 @@
 			<id>release</id>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-resources-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>filter-dockerfiles</id>
-								<phase>deploy</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<resources>
-										<resource>
-											<directory>${project.basedir}/src/main/docker</directory>
-											<filtering>true</filtering>
-											<includes>
-												<include>Dockerfile</include>
-											</includes>
-										</resource>
-									</resources>
-									<outputDirectory>${project.basedir}/docker2</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- <plugin>
-						<groupId>de.jutzig</groupId>
-						<artifactId>github-release-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>github-upload</id>
-								<phase>deploy</phase>
-								<goals>
-									<goal>release</goal>
-								</goals>
-								<inherited>false</inherited>
-								<configuration>
-									<releaseName>Mtas ${project.version}</releaseName>
-									<tag>v${project.version}</tag>
-									<fileSets>
-										<fileSet>
-											<directory>${project.build.directory}</directory>
-											<includes>
-												<include>${project.artifactId}-${project.version}.jar</include>
-											</includes>
-										</fileSet>
-									</fileSets>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin> -->
+
+					<!-- <plugin> <groupId>de.jutzig</groupId> <artifactId>github-release-plugin</artifactId> 
+						<version>1.1.1</version> <executions> <execution> <id>github-upload</id> 
+						<phase>deploy</phase> <goals> <goal>release</goal> </goals> <inherited>false</inherited> 
+						<configuration> <releaseName>Mtas ${project.version}</releaseName> <tag>v${project.version}</tag> 
+						<fileSets> <fileSet> <directory>${project.build.directory}</directory> <includes> 
+						<include>${project.artifactId}-${project.version}.jar</include> </includes> 
+						</fileSet> </fileSets> </configuration> </execution> </executions> </plugin> -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
