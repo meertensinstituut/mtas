@@ -207,30 +207,40 @@
 			</activation>
 			<build>
 				<plugins>
-				  <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.0.2</version>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>${project.basedir}/src/main/docker</directory>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>Dockerfile</include>
-                  </includes>
-                </resource>
-              </resources>
-              <outputDirectory>${project.basedir}/docker2</outputDirectory>
-            </configuration>
-          </plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.0.2</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<!-- here the phase you need -->
+								<phase>validate</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/main/docker</directory>
+											<filtering>true</filtering>
+											<includes>
+												<include>Dockerfile</include>
+											</includes>
+										</resource>
+									</resources>
+									<outputDirectory>${project.basedir}/docker2</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
 		<profile>
 			<id>release</id>
 			<build>
-				<plugins>					
+				<plugins>
 					<!-- <plugin> <groupId>de.jutzig</groupId> <artifactId>github-release-plugin</artifactId> 
 						<version>1.1.1</version> <executions> <execution> <id>github-upload</id> 
 						<phase>deploy</phase> <goals> <goal>release</goal> </goals> <inherited>false</inherited> 
