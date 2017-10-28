@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentLuceneVersion>7.0.1</currentLuceneVersion>
@@ -10,7 +11,7 @@
 		<connection>scm:git:https://github.com/meertensinstituut/mtas.git</connection>
 		<url>http://github.com/meertensinstituut/mtas</url>
 		<developerConnection>scm:git:https://github.com/meertensinstituut/mtas.git</developerConnection>
-		<tag>v7.0.1.2</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
@@ -25,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.0.1.2</version>
+	<version>7.0.1.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
