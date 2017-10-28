@@ -60,6 +60,7 @@
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<releaseProfiles>release</releaseProfiles>
+					<preparationGoals>copy-resources</preparationGoals>
 				</configuration>
 			</plugin>
 			<plugin>
