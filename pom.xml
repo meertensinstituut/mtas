@@ -200,11 +200,11 @@
 	<profiles>
 		<profile>
 			<id>release-prepare</id>
-			<activation>
+			<!-- <activation>
 				<file>
 					<exists>pom.xml.*</exists>
 				</file>
-			</activation>
+			</activation> -->
 			<build>
 				<plugins>
 					<plugin>
