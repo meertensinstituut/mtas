@@ -60,7 +60,7 @@
 				<executions>
 					<execution>
 						<id>github-upload</id>
-						<phase>release:prepare</phase>
+						<phase>release</phase>
 						<goals>
 							<goal>release</goal>
 						</goals>
