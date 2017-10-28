@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<currentLuceneVersion>7.0.1</currentLuceneVersion>
@@ -68,13 +67,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.0.2</version>
-				<executions>
-					<execution>
-						<id>filter-dockerfiles</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
+				
 						<configuration>
 							<resources>
 								<resource>
@@ -87,8 +80,7 @@
 							</resources>
 							<outputDirectory>${project.basedir}/docker2</outputDirectory>
 						</configuration>
-					</execution>
-				</executions>
+					
 			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
