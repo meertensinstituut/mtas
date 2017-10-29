@@ -4,7 +4,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<currentLuceneVersion>7.1.0</currentLuceneVersion>
+    <currentLuceneVersion>7.1.0</currentLuceneVersion>
 		<latestReleaseLuceneVersion>7.0.1</latestReleaseLuceneVersion>
 		<latestReleaseMtasVersion>1</latestReleaseMtasVersion>
 		<latestReleaseFullVersion>${latestReleaseLuceneVersion}.${latestReleaseMtasVersion}</latestReleaseFullVersion>
@@ -28,7 +28,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.1.0.0-SNAPSHOT</version>
+  <version>7.1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
