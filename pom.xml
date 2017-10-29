@@ -200,35 +200,46 @@
 	</build>
 	<profiles>
 		<profile>
+			<id>release-prepare</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.0.2</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/main/docker</directory>
+											<filtering>true</filtering>
+											<includes>
+												<include>Dockerfile</include>
+											</includes>
+										</resource>
+									</resources>
+									<outputDirectory>${project.basedir}/docker2</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>release</id>
 			<build>
 				<plugins>
-				  <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.0.2</version>
-            <executions>
-              <execution>
-                <id>copy-resources</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${project.basedir}/src/main/docker</directory>
-                      <filtering>true</filtering>
-                      <includes>
-                        <include>Dockerfile</include>
-                      </includes>
-                    </resource>
-                  </resources>
-                  <outputDirectory>${project.basedir}/docker2</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+
 					<!-- <plugin> <groupId>de.jutzig</groupId> <artifactId>github-release-plugin</artifactId> 
 						<version>1.1.1</version> <executions> <execution> <id>github-upload</id> 
 						<phase>deploy</phase> <goals> <goal>release</goal> </goals> <inherited>false</inherited> 
