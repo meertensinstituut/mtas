@@ -202,8 +202,10 @@
 		<profile>
 			<id>release-prepare</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+        <file>
+          <exists>pom.xml.releaseBackup</exists>
+        </file>
+      </activation>
 			<build>
 				<plugins>
 					<plugin>
@@ -213,7 +215,7 @@
 						<executions>
 							<execution>
 								<id>copy-resources</id>
-								<phase>prepare-package</phase>
+								<phase>validate</phase>
 								<goals>
 									<goal>copy-resources</goal>
 								</goals>
