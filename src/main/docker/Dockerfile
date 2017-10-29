@@ -85,7 +85,7 @@ RUN service apache2 stop && \
     mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && \
     echo "name=demo1" > demo1/core.properties && \
     cp lib/commons-math3-3.6.1.jar demo1/lib/ && \
-    cp lib/mtas-${currentLuceneVersion}.jar demo1/lib/ && \
+    cp lib/mtas-${project.version}.jar demo1/lib/ && \
     cp data/solrconfig.xml demo1/conf/ && \
     cp data/schemaBasic.xml demo1/conf/schema.xml && \
     cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ && \
