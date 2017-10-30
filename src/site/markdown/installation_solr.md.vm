@@ -1,18 +1,34 @@
 #Apache Solr
+#set($metadata = $xml.read("http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
+#set($version = $metadata.versioning.latest)
+#set($fullversion = $version.getText())
+#set($versionnumbers = $StringUtils.split($fullversion,"."))
+#foreach( $item in $loop.watch($versionnumbers) )
+#set($itemindex = $loop.getIndex())
+#if ($itemindex == 0)
+#set($majorversion = $item)
+#elseif ($itemindex == 1)
+#set($minorversion = $item)
+#elseif ($itemindex == 2)
+#set($incrementalversion = $item)
+#elseif ($itemindex == 3)
+#set($mtasversion = $item)
+#end
+#end 
 
 Mtas can be used as plugin for Apache Solr
 
 **Prerequisites**
 
 - Installed [Apache Solr](https://lucene.apache.org/solr/)
-- Currently supported and advised version is $context.get("latestReleaseLuceneVersion")
+- Currently supported and advised version is ${majorversion}.${minorversion}.${incrementalversion}
 
 Start with a new Solr core.
 
 **Libraries**
 
-Add the `mtas-${context.get("latestReleaseFullVersion")}.jar` to the `lib` directory of the new Solr core. 
-A prebuilt `mtas-${context.get("latestReleaseFullVersion")}.jar` is available from the [download](download.html) page.
+Add the `mtas-${fullversion}.jar` to the `lib` directory of the new Solr core. 
+A prebuilt `mtas-${fullversion}.jar` is available from the [download](download.html) page.
 
 Furthermore, add the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math/) to the `lib` directory of the new Solr core.
 
