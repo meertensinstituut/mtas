@@ -50,7 +50,9 @@ import mtas.codec.util.collector.MtasDataCollector;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.MtasSpanAndQuery;
+import mtas.search.spans.MtasSpanFollowedByQuery;
 import mtas.search.spans.MtasSpanMatchAllQuery;
+import mtas.search.spans.MtasSpanPrecededByQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.MtasSpanTermQuery;
@@ -967,7 +969,6 @@ public class CodecCollector {
       return null;
     } else {
       MtasSpanQuery query = null;
-      MtasSpanQuery hitQuery = null;
       // check for missing
       if (hit.missingLeft != null && hit.missingLeft.length > 0) {
         for (int i = 0; i < hit.missingLeft.length; i++) {
@@ -990,33 +991,47 @@ public class CodecCollector {
           }
         }
       }
-
-      if (hit.dataHit != null && hit.dataHit.length > 0) {
-        List<MtasSpanSequenceItem> items = new ArrayList<>();
-        for (int i = 0; i < hit.dataHit.length; i++) {
-          MtasSpanQuery item = null;
-          if (hit.dataHit[i].isEmpty()) {
-            item = new MtasSpanMatchAllQuery(field);
-          } else if (hit.dataHit[i].size() == 1) {
-            Term term = new Term(field, hit.dataHit[i].get(0));
-            item = new MtasSpanTermQuery(term);
-          } else {
-            MtasSpanQuery[] subList = new MtasSpanQuery[hit.dataHit[i].size()];
-            for (int j = 0; j < hit.dataHit[i].size(); j++) {
-              Term term = new Term(field, hit.dataHit[i].get(j));
-              subList[j] = new MtasSpanTermQuery(term);
-            }
-            item = new MtasSpanAndQuery(subList);
-          }
-          items.add(new MtasSpanSequenceItem(item, false));
-        }
-        hitQuery = new MtasSpanSequenceQuery(items, null, null);
-      }
+      MtasSpanQuery hitQuery = createSubQueryFromGroupHit(hit.dataHit, field);
       if (hitQuery != null) {
         query = hitQuery;
+        MtasSpanQuery leftHitQuery = createSubQueryFromGroupHit(hit.dataLeft, field);
+        MtasSpanQuery rightHitQuery = createSubQueryFromGroupHit(hit.dataRight, field);
+        if(leftHitQuery!=null) {
+          query = new MtasSpanPrecededByQuery(query, leftHitQuery);
+        }
+        if(rightHitQuery!=null) {
+          query = new MtasSpanFollowedByQuery(query, rightHitQuery);
+        }
       }
       return query;
     }
+  }
+  
+  private static MtasSpanQuery createSubQueryFromGroupHit(List<String>[] subHit,
+      String field) {
+    MtasSpanQuery query = null;
+    if (subHit != null && subHit.length > 0) {
+      List<MtasSpanSequenceItem> items = new ArrayList<>();
+      for (int i = 0; i < subHit.length; i++) {
+        MtasSpanQuery item = null;
+        if (subHit[i].isEmpty()) {
+          item = new MtasSpanMatchAllQuery(field);
+        } else if (subHit[i].size() == 1) {
+          Term term = new Term(field, subHit[i].get(0));
+          item = new MtasSpanTermQuery(term);
+        } else {
+          MtasSpanQuery[] subList = new MtasSpanQuery[subHit[i].size()];
+          for (int j = 0; j < subHit[i].size(); j++) {
+            Term term = new Term(field, subHit[i].get(j));
+            subList[j] = new MtasSpanTermQuery(term);
+          }
+          item = new MtasSpanAndQuery(subList);
+        }
+        items.add(new MtasSpanSequenceItem(item, false));
+      }
+      query = new MtasSpanSequenceQuery(items, null, null);
+    }
+    return query;
   }
 
   /**
