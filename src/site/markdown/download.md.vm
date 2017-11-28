@@ -1,24 +1,90 @@
 #Download
 
-##Releases
+#set($metadata = $xml.read("http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
+
+**Latest release**
 
 <table>
   <tbody>
     <tr>
+      <th>Version</th>
       <th>Lucene/Solr</th>
-      <th>Mtas Release</th>
-      <th colspan='3'>Downloads</th>
-      <th>Description</th>
+      <th>Mtas</th>
+      <th colspan='3'>GitHub</th>
+      <th colspan='4'>Maven</th>
     </tr>
+#set($version = $metadata.versioning.latest)
+#set($fullversion = $version.getText())
+#set($versionnumbers = $StringUtils.split($fullversion,"."))
+#foreach( $item in $loop.watch($versionnumbers) )
+#set($itemindex = $loop.getIndex())
+#if ($itemindex == 0)
+#set($majorversion = $item)
+#elseif ($itemindex == 1)
+#set($minorversion = $item)
+#elseif ($itemindex == 2)
+#set($incrementalversion = $item)
+#elseif ($itemindex == 3)
+#set($mtasversion = $item)
+#end
+#end  
     <tr>
-      <td>$context.get("latestReleaseLuceneVersion")</td>
-      <td>$context.get("latestReleaseFullVersion")</td>
-      <td><a href='https://search.maven.org/remotecontent?filepath=nl/knaw/meertens/mtas/mtas/${context.get("latestReleaseFullVersion")}/mtas-${context.get("latestReleaseFullVersion")}.jar'>Binary (jar)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${context.get("latestReleaseFullVersion")}.tar.gz'>Source (tgz)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${context.get("latestReleaseFullVersion")}.zip'>Source (zip)</a></td>
-      <td>Latest release</td>
-    </tr>
-  </tbody>
+      <td>${fullversion}</td>
+      <td>${majorversion}.${minorversion}.${incrementalversion}</td>
+      <td>${mtasversion}</td>
+      <td><a href='https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
+    </tr>   
+    </tbody>
 </table>
 
-See also [previous releases](http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/).
+**Previous releases**
+
+<table>
+  <tbody>
+    <tr>
+      <th>Version</th>
+      <th>Lucene/Solr</th>
+      <th>Mtas</th>
+      <th colspan='3'>GitHub</th>
+      <th colspan='4'>Central Repository</th>
+    </tr>
+#foreach($version in $metadata.versioning.versions.children().iterator())
+#set($fullversion = $version.getText())
+#if($fullversion !=  $metadata.versioning.latest.getText())
+#set($versionnumbers = $StringUtils.split($fullversion,"."))
+#foreach( $item in $loop.watch($versionnumbers) )
+#set($itemindex = $loop.getIndex())
+#if ($itemindex == 0)
+#set($majorversion = $item)
+#elseif ($itemindex == 1)
+#set($minorversion = $item)
+#elseif ($itemindex == 2)
+#set($incrementalversion = $item)
+#elseif ($itemindex == 3)
+#set($mtasversion = $item)
+#end
+#end  
+    <tr>
+      <td>${fullversion}</td>
+      <td>${majorversion}.${minorversion}.${incrementalversion}</td>
+      <td>${mtasversion}</td>
+      <td><a href='https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
+      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
+      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
+    </tr>
+#end    
+#end    
+    </tbody>
+</table>
+
+See also the [Central Repository](http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/) and [GitHub Releases](https://github.com/meertensinstituut/mtas/releases).

@@ -3,10 +3,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <currentLuceneVersion>7.1.0</currentLuceneVersion>
-		<latestReleaseLuceneVersion>7.0.1</latestReleaseLuceneVersion>
-		<latestReleaseMtasVersion>1</latestReleaseMtasVersion>
-		<latestReleaseFullVersion>${latestReleaseLuceneVersion}.${latestReleaseMtasVersion}</latestReleaseFullVersion>
+		<currentLuceneVersion>7.1.0</currentLuceneVersion>
 	</properties>
 	<scm>
 		<connection>scm:git:https://github.com/meertensinstituut/mtas.git</connection>
@@ -27,7 +24,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.knaw.meertens.mtas</groupId>
 	<artifactId>mtas</artifactId>
-  <version>7.1.0.1-SNAPSHOT</version>
+	<version>7.1.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -53,7 +50,7 @@
 		</developer>
 	</developers>
 	<build>
-		<plugins>
+		<plugins>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
@@ -69,7 +66,7 @@
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>3.0.0</version>
 				<executions>
-					<execution>
+				  <execution>
 						<id>add-source</id>
 						<phase>generate-sources</phase>
 						<goals>

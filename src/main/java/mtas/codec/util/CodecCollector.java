@@ -50,7 +50,9 @@ import mtas.codec.util.collector.MtasDataCollector;
 import mtas.parser.function.ParseException;
 import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.MtasSpanAndQuery;
+import mtas.search.spans.MtasSpanFollowedByQuery;
 import mtas.search.spans.MtasSpanMatchAllQuery;
+import mtas.search.spans.MtasSpanPrecededByQuery;
 import mtas.search.spans.MtasSpanSequenceItem;
 import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.MtasSpanTermQuery;
@@ -68,6 +70,7 @@ import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.PostingsEnum;
+import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -473,34 +476,55 @@ public class CodecCollector {
           //prefer to use pointvalue
           if (!fi.getDocValuesType().equals(DocValuesType.NONE)) {                        
             Iterator<Integer> docIterator = docSet.iterator();
-            //numeric
-            if(fi.getDocValuesType().equals(DocValuesType.NUMERIC)) {
-              Map<Long, List<Integer>> facetDataSubList = new HashMap<>();
-              NumericDocValues docValues = r.getContext().reader()
-                  .getNumericDocValues(entry.getKey());              
-              int docId;
-              while (docIterator.hasNext()) {
-                docId = docIterator.next() - lrc.docBase;
-                if(docValues.advanceExact(docId)) {
-                  long value = docValues.longValue();
-                  if(!facetDataSubList.containsKey(value)) {
-                    List<Integer> facetDataSubListItem = new ArrayList<Integer>();
-                    facetDataSubListItem.add(docId+lrc.docBase);
-                    facetDataSubList.put(value, facetDataSubListItem);                  
-                  } else {
-                    facetDataSubList.get(value).add(docId+lrc.docBase);
-                  }
-                }  
+            //numeric or sorted
+            if(fi.getDocValuesType().equals(DocValuesType.NUMERIC) || fi.getDocValuesType().equals(DocValuesType.SORTED)) {
+              //create map of values to corresponding docIds
+              Map<Object, List<Integer>> facetDataSubList = new HashMap<>();
+              //numeric
+              if(fi.getDocValuesType().equals(DocValuesType.NUMERIC)) {
+                NumericDocValues docValues = r.getContext().reader()
+                    .getNumericDocValues(entry.getKey());              
+                int docId;
+                while (docIterator.hasNext()) {
+                  docId = docIterator.next() - lrc.docBase;
+                  if(docValues.advanceExact(docId)) {
+                    long value = docValues.longValue();
+                    if(!facetDataSubList.containsKey(value)) {
+                      List<Integer> facetDataSubListItem = new ArrayList<Integer>();
+                      facetDataSubListItem.add(docId+lrc.docBase);
+                      facetDataSubList.put(value, facetDataSubListItem);                  
+                    } else {
+                      facetDataSubList.get(value).add(docId+lrc.docBase);
+                    }
+                  }  
+                }
+              //sorted
+              } else if(fi.getDocValuesType().equals(DocValuesType.SORTED)) { 
+                SortedDocValues docValues = r.getContext().reader().getSortedDocValues(entry.getKey());
+                int docId;
+                while (docIterator.hasNext()) {
+                  docId = docIterator.next() - lrc.docBase;
+                  if(docValues.advanceExact(docId)) {
+                    String value = docValues.binaryValue().utf8ToString();
+                    if(!facetDataSubList.containsKey(value)) {
+                      List<Integer> facetDataSubListItem = new ArrayList<Integer>();
+                      facetDataSubListItem.add(docId+lrc.docBase);
+                      facetDataSubList.put(value, facetDataSubListItem);                  
+                    } else {
+                      facetDataSubList.get(value).add(docId+lrc.docBase);
+                    }
+                  }  
+                }
               }
               if(!facetDataSubList.isEmpty()) {
                 SortedMap<String, int[]> facetDataList = entry.getValue();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                for(Entry<Long,List<Integer>> facetEntry : facetDataSubList.entrySet()) {
+                for(Entry<Object,List<Integer>> facetEntry : facetDataSubList.entrySet()) {
                   int[] docIdList = facetEntry.getValue().stream().mapToInt(i -> i).toArray();
                   String termValue;
                   if(facetDataType.get(entry.getKey()).equals(NumberType.DATE.name())) {
-                    Date date = new Date(facetEntry.getKey());
+                    Date date = new Date((Long) facetEntry.getKey());
                     termValue = sdf.format(date);
                   } else {
                     termValue = facetEntry.getKey().toString();
@@ -519,7 +543,7 @@ public class CodecCollector {
                 }                     
               }
             } else {
-              throw new IOException("faces for docValues of type "+fi.getDocValuesType()+" not implemented");
+              throw new IOException("facets for docValues of type "+fi.getDocValuesType()+" not implemented");
             }              
           } else if(!docSet.isEmpty()) {
             if(facetDataType.get(entry.getKey())
@@ -967,7 +991,6 @@ public class CodecCollector {
       return null;
     } else {
       MtasSpanQuery query = null;
-      MtasSpanQuery hitQuery = null;
       // check for missing
       if (hit.missingLeft != null && hit.missingLeft.length > 0) {
         for (int i = 0; i < hit.missingLeft.length; i++) {
@@ -990,33 +1013,47 @@ public class CodecCollector {
           }
         }
       }
-
-      if (hit.dataHit != null && hit.dataHit.length > 0) {
-        List<MtasSpanSequenceItem> items = new ArrayList<>();
-        for (int i = 0; i < hit.dataHit.length; i++) {
-          MtasSpanQuery item = null;
-          if (hit.dataHit[i].isEmpty()) {
-            item = new MtasSpanMatchAllQuery(field);
-          } else if (hit.dataHit[i].size() == 1) {
-            Term term = new Term(field, hit.dataHit[i].get(0));
-            item = new MtasSpanTermQuery(term);
-          } else {
-            MtasSpanQuery[] subList = new MtasSpanQuery[hit.dataHit[i].size()];
-            for (int j = 0; j < hit.dataHit[i].size(); j++) {
-              Term term = new Term(field, hit.dataHit[i].get(j));
-              subList[j] = new MtasSpanTermQuery(term);
-            }
-            item = new MtasSpanAndQuery(subList);
-          }
-          items.add(new MtasSpanSequenceItem(item, false));
-        }
-        hitQuery = new MtasSpanSequenceQuery(items, null, null);
-      }
+      MtasSpanQuery hitQuery = createSubQueryFromGroupHit(hit.dataHit, field);
       if (hitQuery != null) {
         query = hitQuery;
+        MtasSpanQuery leftHitQuery = createSubQueryFromGroupHit(hit.dataLeft, field);
+        MtasSpanQuery rightHitQuery = createSubQueryFromGroupHit(hit.dataRight, field);
+        if(leftHitQuery!=null) {
+          query = new MtasSpanPrecededByQuery(query, leftHitQuery);
+        }
+        if(rightHitQuery!=null) {
+          query = new MtasSpanFollowedByQuery(query, rightHitQuery);
+        }
       }
       return query;
     }
+  }
+  
+  private static MtasSpanQuery createSubQueryFromGroupHit(List<String>[] subHit,
+      String field) {
+    MtasSpanQuery query = null;
+    if (subHit != null && subHit.length > 0) {
+      List<MtasSpanSequenceItem> items = new ArrayList<>();
+      for (int i = 0; i < subHit.length; i++) {
+        MtasSpanQuery item = null;
+        if (subHit[i].isEmpty()) {
+          item = new MtasSpanMatchAllQuery(field);
+        } else if (subHit[i].size() == 1) {
+          Term term = new Term(field, subHit[i].get(0));
+          item = new MtasSpanTermQuery(term);
+        } else {
+          MtasSpanQuery[] subList = new MtasSpanQuery[subHit[i].size()];
+          for (int j = 0; j < subHit[i].size(); j++) {
+            Term term = new Term(field, subHit[i].get(j));
+            subList[j] = new MtasSpanTermQuery(term);
+          }
+          item = new MtasSpanAndQuery(subList);
+        }
+        items.add(new MtasSpanSequenceItem(item, false));
+      }
+      query = new MtasSpanSequenceQuery(items, null, null);
+    }
+    return query;
   }
 
   /**
