@@ -87,6 +87,8 @@ import org.apache.lucene.util.automaton.RegExp;
 import org.apache.solr.legacy.LegacyNumericUtils;
 import org.apache.solr.schema.NumberType;
 
+import com.sun.tools.javac.code.Attribute.Array;
+
 /**
  * The Class CodecCollector.
  */
@@ -1013,11 +1015,11 @@ public class CodecCollector {
           }
         }
       }
-      MtasSpanQuery hitQuery = createSubQueryFromGroupHit(hit.dataHit, field);
+      MtasSpanQuery hitQuery = createSubQueryFromGroupHit(hit.dataHit, false, field);
       if (hitQuery != null) {
         query = hitQuery;
-        MtasSpanQuery leftHitQuery = createSubQueryFromGroupHit(hit.dataLeft, field);
-        MtasSpanQuery rightHitQuery = createSubQueryFromGroupHit(hit.dataRight, field);
+        MtasSpanQuery leftHitQuery = createSubQueryFromGroupHit(hit.dataLeft, true, field);
+        MtasSpanQuery rightHitQuery = createSubQueryFromGroupHit(hit.dataRight, false, field);
         if(leftHitQuery!=null) {
           query = new MtasSpanPrecededByQuery(query, leftHitQuery);
         }
@@ -1029,22 +1031,28 @@ public class CodecCollector {
     }
   }
   
-  private static MtasSpanQuery createSubQueryFromGroupHit(List<String>[] subHit,
+  private static MtasSpanQuery createSubQueryFromGroupHit(List<String>[] subHit, boolean reverse, 
       String field) {
     MtasSpanQuery query = null;
     if (subHit != null && subHit.length > 0) {
-      List<MtasSpanSequenceItem> items = new ArrayList<>();
+      List<MtasSpanSequenceItem> items = new ArrayList<>();    
+      List<String> subHitItem;
       for (int i = 0; i < subHit.length; i++) {
         MtasSpanQuery item = null;
-        if (subHit[i].isEmpty()) {
+        if(reverse) {
+          subHitItem = subHit[(subHit.length - i - 1)];
+        } else {
+          subHitItem = subHit[i];
+        }
+        if (subHitItem.isEmpty()) {
           item = new MtasSpanMatchAllQuery(field);
-        } else if (subHit[i].size() == 1) {
-          Term term = new Term(field, subHit[i].get(0));
+        } else if (subHitItem.size() == 1) {
+          Term term = new Term(field, subHitItem.get(0));
           item = new MtasSpanTermQuery(term);
         } else {
-          MtasSpanQuery[] subList = new MtasSpanQuery[subHit[i].size()];
-          for (int j = 0; j < subHit[i].size(); j++) {
-            Term term = new Term(field, subHit[i].get(j));
+          MtasSpanQuery[] subList = new MtasSpanQuery[subHitItem.size()];
+          for (int j = 0; j < subHitItem.size(); j++) {
+            Term term = new Term(field, subHitItem.get(j));
             subList[j] = new MtasSpanTermQuery(term);
           }
           item = new MtasSpanAndQuery(subList);

@@ -1,6 +1,6 @@
 #Download
 
-#set($metadata = $xml.read("http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
+#set($metadata = $xml.read("http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
 
 **Latest release**
 
@@ -35,10 +35,10 @@
       <td><a href='https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
       <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
       <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
     </tr>   
     </tbody>
 </table>
@@ -77,14 +77,14 @@
       <td><a href='https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
       <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
       <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
-      <td><a href='http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
     </tr>
 #end    
 #end    
     </tbody>
 </table>
 
-See also the [Central Repository](http://repo1.maven.org/maven2/nl/knaw/meertens/mtas/mtas/) and [GitHub Releases](https://github.com/meertensinstituut/mtas/releases).
+See also the [Central Repository](http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/) and [GitHub Releases](https://github.com/meertensinstituut/mtas/releases).

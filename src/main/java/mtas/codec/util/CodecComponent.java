@@ -2555,9 +2555,9 @@ public class CodecComponent {
         }
       }
       // construct keys
-      keyLeft = dataToString(dataLeft, missingLeft);
-      keyHit = dataToString(dataHit, missingHit);
-      keyRight = dataToString(dataRight, missingRight);
+      keyLeft = dataToString(dataLeft, missingLeft, true);
+      keyHit = dataToString(dataHit, missingHit, false);
+      keyRight = dataToString(dataRight, missingRight, false);
       key = KEY_START;
       if (keyLeft != null) {
         key += keyLeft;
@@ -2662,25 +2662,34 @@ public class CodecComponent {
      * @return the string
      * @throws UnsupportedEncodingException the unsupported encoding exception
      */
-    private String dataToString(List<String>[] data, Set<String>[] missing)
+    private String dataToString(List<String>[] data, Set<String>[] missing, boolean reverse)
         throws UnsupportedEncodingException {
       StringBuilder text = null;
       Encoder encoder = Base64.getEncoder();
       String prefix;
       String postfix;
+      List<String> dataItem;
+      Set<String> missingItem;
       if (data != null && missing != null && data.length == missing.length) {
         for (int i = 0; i < data.length; i++) {
+          if(reverse) {
+            dataItem = data[(data.length-i-1)];
+            missingItem = missing[(data.length-i-1)];
+          } else {
+            dataItem = data[i];
+            missingItem = missing[i];
+          }
           if (i > 0) {
             text.append(",");
           } else {
             text = new StringBuilder();
           }
-          for (int j = 0; j < data[i].size(); j++) {
+          for (int j = 0; j < dataItem.size(); j++) {
             if (j > 0) {
               text.append("&");
             }
-            prefix = MtasToken.getPrefixFromValue(data[i].get(j));
-            postfix = MtasToken.getPostfixFromValue(data[i].get(j));
+            prefix = MtasToken.getPrefixFromValue(dataItem.get(j));
+            postfix = MtasToken.getPostfixFromValue(dataItem.get(j));
             text.append(encoder
                 .encodeToString(prefix.getBytes(StandardCharsets.UTF_8)));
             if (!postfix.isEmpty()) {
@@ -2689,11 +2698,11 @@ public class CodecComponent {
                   .encodeToString(postfix.getBytes(StandardCharsets.UTF_8)));
             }
           }
-          if (missing[i] != null) {
-            String[] tmpMissing = missing[i]
-                .toArray(new String[missing[i].size()]);
+          if (missingItem != null) {
+            String[] tmpMissing = missingItem
+                .toArray(new String[missingItem.size()]);
             for (int j = 0; j < tmpMissing.length; j++) {
-              if (j > 0 || !data[i].isEmpty()) {
+              if (j > 0 || !dataItem.isEmpty()) {
                 text.append("&");
               }
               text.append(encoder.encodeToString(
