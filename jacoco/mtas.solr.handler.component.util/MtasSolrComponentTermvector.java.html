@@ -122,7 +122,7 @@ public class MtasSolrComponentTermvector
   private static final int SHARD_NUMBER_MULTIPLIER = 2;
 
   /** The Constant DEFAULT_NUMBER. */
-  private static final int DEFAULT_NUMBER = 10;
+<span class="fc" id="L125">  private static final int DEFAULT_NUMBER = 10;</span>
 
   /**
    * Instantiates a new mtas solr component termvector.
@@ -169,36 +169,36 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L169">      Boolean[] ignoreListRegexps = new Boolean[ids.size()];</span>
 <span class="fc bfc" id="L170" title="All 2 branches covered.">      for (String id : ids) {</span>
 <span class="fc" id="L171">        fields[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FIELD,
-            null);
+<span class="fc" id="L172">            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FIELD,</span>
+<span class="fc" id="L173">            null);</span>
 <span class="fc" id="L174">        keys[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_KEY,
+<span class="fc" id="L175">            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_KEY,</span>
 <span class="fc" id="L176">            String.valueOf(tmpCounter)).trim();</span>
 <span class="fc" id="L177">        prefixes[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_PREFIX, null);
+<span class="fc" id="L178">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_PREFIX, null);</span>
 <span class="fc" id="L179">        regexps[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_REGEXP, null);
+<span class="fc" id="L180">            + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_REGEXP, null);</span>
 <span class="fc" id="L181">        fulls[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FULL,
-            null);
+<span class="fc" id="L182">            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FULL,</span>
+<span class="fc" id="L183">            null);</span>
 <span class="fc" id="L184">        sortTypes[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_SORT_TYPE, null);
+<span class="fc" id="L185">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_SORT_TYPE, null);</span>
 <span class="fc" id="L186">        sortDirections[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L187">            .get(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_SORT_DIRECTION, null);
+<span class="fc" id="L188">                + NAME_MTAS_TERMVECTOR_SORT_DIRECTION, null);</span>
 <span class="fc" id="L189">        startValues[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_START,
-            null);
+<span class="fc" id="L190">            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_START,</span>
+<span class="fc" id="L191">            null);</span>
 <span class="fc" id="L192">        numbers[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER, null);
+<span class="fc" id="L193">            + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER, null);</span>
 <span class="fc" id="L194">        numberShards[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS, null);
+<span class="fc" id="L195">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS, null);</span>
 <span class="fc" id="L196">        types[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_TYPE,
-            null);
+<span class="fc" id="L197">            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_TYPE,</span>
+<span class="fc" id="L198">            null);</span>
 <span class="fc" id="L199">        Set&lt;String&gt; functionIds = MtasSolrResultUtil</span>
 <span class="fc" id="L200">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR</span>
-                + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION);
+<span class="fc" id="L201">                + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION);</span>
 <span class="fc" id="L202">        functionExpressions[tmpCounter] = new String[functionIds.size()];</span>
 <span class="fc" id="L203">        functionKeys[tmpCounter] = new String[functionIds.size()];</span>
 <span class="fc" id="L204">        functionTypes[tmpCounter] = new String[functionIds.size()];</span>
@@ -206,37 +206,37 @@ public class MtasSolrComponentTermvector
 <span class="pc bpc" id="L206" title="1 of 2 branches missed.">        for (String functionId : functionIds) {</span>
 <span class="nc" id="L207">          functionKeys[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
 <span class="nc" id="L208">              .get(</span>
-                  PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;
-                      + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
-                      + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,
+<span class="nc" id="L209">                  PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="nc" id="L210">                      + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;</span>
+<span class="nc" id="L211">                      + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,</span>
 <span class="nc" id="L212">                  String.valueOf(tmpSubCounter))</span>
 <span class="nc" id="L213">              .trim();</span>
 <span class="nc" id="L214">          functionExpressions[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
 <span class="nc" id="L215">              .get(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
-                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
-                  + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION, null);
+<span class="nc" id="L216">                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;</span>
+<span class="nc" id="L217">                  + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION, null);</span>
 <span class="nc" id="L218">          functionTypes[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
 <span class="nc" id="L219">              .get(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
-                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
-                  + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE, null);
+<span class="nc" id="L220">                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;</span>
+<span class="nc" id="L221">                  + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE, null);</span>
 <span class="nc" id="L222">          tmpSubCounter++;</span>
-<span class="nc" id="L223">        }</span>
+        }
 <span class="fc" id="L224">        boundaries[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_BOUNDARY, null);
+<span class="fc" id="L225">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_BOUNDARY, null);</span>
 <span class="fc" id="L226">        lists[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_LIST);
+<span class="fc" id="L227">            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_LIST);</span>
 <span class="fc" id="L228">        listRegexps[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L229">            .getBool(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_LIST_REGEXP, false);
+<span class="fc" id="L230">                + NAME_MTAS_TERMVECTOR_LIST_REGEXP, false);</span>
 <span class="fc" id="L231">        ignoreRegexps[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, null);
+<span class="fc" id="L232">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, null);</span>
 <span class="fc" id="L233">        ignoreLists[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_IGNORE_LIST, null);
+<span class="fc" id="L234">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_TERMVECTOR_IGNORE_LIST, null);</span>
 <span class="fc" id="L235">        ignoreListRegexps[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L236">            .getBool(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP, false);
+<span class="fc" id="L237">                + NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP, false);</span>
 <span class="fc" id="L238">        tmpCounter++;</span>
-<span class="fc" id="L239">      }</span>
+      }
 <span class="fc" id="L240">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
 <span class="fc" id="L241">      mtasFields.doTermVector = true;</span>
 <span class="fc" id="L242">      rb.setNeedDocSet(true);</span>
@@ -259,7 +259,7 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L259">      MtasSolrResultUtil.compareAndCheck(sortTypes, fields,</span>
 <span class="fc" id="L260">          NAME_MTAS_TERMVECTOR_SORT_TYPE, NAME_MTAS_TERMVECTOR_FIELD, false);</span>
 <span class="fc" id="L261">      MtasSolrResultUtil.compareAndCheck(sortDirections, fields,</span>
-          NAME_MTAS_TERMVECTOR_SORT_DIRECTION, NAME_MTAS_TERMVECTOR_FIELD,
+<span class="fc" id="L262">          NAME_MTAS_TERMVECTOR_SORT_DIRECTION, NAME_MTAS_TERMVECTOR_FIELD,</span>
 <span class="fc" id="L263">          false);</span>
 <span class="fc" id="L264">      MtasSolrResultUtil.compareAndCheck(numbers, fields,</span>
 <span class="fc" id="L265">          NAME_MTAS_TERMVECTOR_NUMBER, NAME_MTAS_TERMVECTOR_FIELD, false);</span>
@@ -268,7 +268,7 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L268">      MtasSolrResultUtil.compareAndCheck(lists, fields,</span>
 <span class="fc" id="L269">          NAME_MTAS_TERMVECTOR_LIST, NAME_MTAS_TERMVECTOR_FIELD, false);</span>
 <span class="fc" id="L270">      MtasSolrResultUtil.compareAndCheck(ignoreRegexps, fields,</span>
-          NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, NAME_MTAS_TERMVECTOR_FIELD,
+<span class="fc" id="L271">          NAME_MTAS_TERMVECTOR_IGNORE_REGEXP, NAME_MTAS_TERMVECTOR_FIELD,</span>
 <span class="fc" id="L272">          false);</span>
 <span class="fc" id="L273">      MtasSolrResultUtil.compareAndCheck(ignoreLists, fields,</span>
 <span class="fc" id="L274">          NAME_MTAS_TERMVECTOR_IGNORE_LIST, NAME_MTAS_TERMVECTOR_FIELD, false);</span>
@@ -285,7 +285,7 @@ public class MtasSolrComponentTermvector
 <span class="pc bpc" id="L285" title="1 of 4 branches missed.">        String regexp = (regexps[i] == null) || (regexps[i].isEmpty()) ? null</span>
 <span class="fc" id="L286">            : regexps[i].trim();</span>
 <span class="fc bfc" id="L287" title="All 4 branches covered.">        Boolean full = (fulls[i] == null) || (!fulls[i].equals(&quot;true&quot;)) ? false</span>
-            : true;
+<span class="fc" id="L288">            : true;</span>
 <span class="pc bpc" id="L289" title="1 of 2 branches missed.">        String startValue = (startValues[i] == null)</span>
 <span class="pc bnc" id="L290" title="All 2 branches missed.">            || (startValues[i].isEmpty()) ? null : startValues[i].trim();</span>
 <span class="pc bpc" id="L291" title="1 of 4 branches missed.">        int listNumber = (numbers[i] == null) || (numbers[i].isEmpty())</span>
@@ -331,13 +331,13 @@ public class MtasSolrComponentTermvector
           try {
 <span class="fc" id="L332">            mtasFields.list.get(field).termVectorList</span>
 <span class="fc" id="L333">                .add(new ComponentTermVector(key, prefix, regexp, full, type,</span>
-                    sortType, sortDirection, startValue, numberFinal,
-                    functionKey, functionExpression, functionType, boundary,
-                    list, listRegexp, ignoreRegexp, ignoreList,
-                    ignoreListRegexp));
-<span class="nc" id="L338">          } catch (ParseException e) {</span>
+<span class="fc" id="L334">                    sortType, sortDirection, startValue, numberFinal,</span>
+<span class="fc" id="L335">                    functionKey, functionExpression, functionType, boundary,</span>
+<span class="fc" id="L336">                    list, listRegexp, ignoreRegexp, ignoreList,</span>
+<span class="fc" id="L337">                    ignoreListRegexp));</span>
+<span class="pc" id="L338">          } catch (ParseException e) {</span>
 <span class="nc" id="L339">            throw new IOException(e);</span>
-<span class="fc" id="L340">          }</span>
+          }
         }
       }
 
@@ -363,68 +363,68 @@ public class MtasSolrComponentTermvector
 <span class="fc bfc" id="L363" title="All 2 branches covered.">        if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
 <span class="fc bfc" id="L364" title="All 2 branches covered.">          for (String key : keys) {</span>
 <span class="fc" id="L365">            String oldNumber = sreq.params.get(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key</span>
-                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER);
+<span class="fc" id="L366">                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_NUMBER);</span>
             int number;
 <span class="pc bpc" id="L368" title="1 of 2 branches missed.">            if (oldNumber != null) {</span>
 <span class="fc" id="L369">              int oldNumberValue = Integer.parseInt(oldNumber);</span>
 <span class="fc bfc" id="L370" title="All 2 branches covered.">              number = (oldNumberValue &gt;= 0)</span>
-                  ? oldNumberValue * SHARD_NUMBER_MULTIPLIER : oldNumberValue;
+<span class="fc" id="L371">                  ? oldNumberValue * SHARD_NUMBER_MULTIPLIER : oldNumberValue;</span>
 <span class="fc" id="L372">            } else {</span>
 <span class="nc" id="L373">              number = DEFAULT_NUMBER * SHARD_NUMBER_MULTIPLIER;</span>
             }
 <span class="fc" id="L375">            sreq.params.add(</span>
-                PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;
-                    + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS,
+<span class="fc" id="L376">                PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L377">                    + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS,</span>
 <span class="fc" id="L378">                String.valueOf(number));</span>
-<span class="fc" id="L379">          }</span>
-        } else {
+          }
+<span class="fc" id="L380">        } else {</span>
 <span class="fc" id="L381">          sreq.params.remove(PARAM_MTAS_TERMVECTOR);</span>
 <span class="fc bfc" id="L382" title="All 2 branches covered.">          for (String key : keys) {</span>
 <span class="fc" id="L383">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_FIELD);
+<span class="fc" id="L384">                + NAME_MTAS_TERMVECTOR_FIELD);</span>
 <span class="fc" id="L385">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_KEY);
+<span class="fc" id="L386">                + NAME_MTAS_TERMVECTOR_KEY);</span>
 <span class="fc" id="L387">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_PREFIX);
+<span class="fc" id="L388">                + NAME_MTAS_TERMVECTOR_PREFIX);</span>
 <span class="fc" id="L389">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_REGEXP);
+<span class="fc" id="L390">                + NAME_MTAS_TERMVECTOR_REGEXP);</span>
 <span class="fc" id="L391">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_FULL);
+<span class="fc" id="L392">                + NAME_MTAS_TERMVECTOR_FULL);</span>
 <span class="fc" id="L393">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_SORT_TYPE);
+<span class="fc" id="L394">                + NAME_MTAS_TERMVECTOR_SORT_TYPE);</span>
 <span class="fc" id="L395">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_SORT_DIRECTION);
+<span class="fc" id="L396">                + NAME_MTAS_TERMVECTOR_SORT_DIRECTION);</span>
 <span class="fc" id="L397">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_NUMBER);
+<span class="fc" id="L398">                + NAME_MTAS_TERMVECTOR_NUMBER);</span>
 <span class="fc" id="L399">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS);
+<span class="fc" id="L400">                + NAME_MTAS_TERMVECTOR_NUMBER_SHARDS);</span>
 <span class="fc" id="L401">            Set&lt;String&gt; functionKeys = MtasSolrResultUtil</span>
 <span class="fc" id="L402">                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR</span>
-                    + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION);
+<span class="fc" id="L403">                    + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION);</span>
 <span class="pc bpc" id="L404" title="1 of 2 branches missed.">            for (String functionKey : functionKeys) {</span>
 <span class="nc" id="L405">              sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;
-                  + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION);
+<span class="nc" id="L406">                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;</span>
+<span class="nc" id="L407">                  + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION);</span>
 <span class="nc" id="L408">              sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;
-                  + NAME_MTAS_TERMVECTOR_FUNCTION_KEY);
+<span class="nc" id="L409">                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;</span>
+<span class="nc" id="L410">                  + NAME_MTAS_TERMVECTOR_FUNCTION_KEY);</span>
 <span class="nc" id="L411">              sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;
-                  + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE);
-<span class="nc" id="L414">            }</span>
+<span class="nc" id="L412">                  + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot; + functionKey + &quot;.&quot;</span>
+<span class="nc" id="L413">                  + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE);</span>
+            }
 <span class="fc" id="L415">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_BOUNDARY);
+<span class="fc" id="L416">                + NAME_MTAS_TERMVECTOR_BOUNDARY);</span>
 <span class="fc" id="L417">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_LIST);
+<span class="fc" id="L418">                + NAME_MTAS_TERMVECTOR_LIST);</span>
 <span class="fc" id="L419">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_LIST_REGEXP);
+<span class="fc" id="L420">                + NAME_MTAS_TERMVECTOR_LIST_REGEXP);</span>
 <span class="fc" id="L421">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP);
+<span class="fc" id="L422">                + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP);</span>
 <span class="fc" id="L423">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_IGNORE_LIST);
+<span class="fc" id="L424">                + NAME_MTAS_TERMVECTOR_IGNORE_LIST);</span>
 <span class="fc" id="L425">            sreq.params.remove(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP);
-<span class="fc" id="L427">          }</span>
+<span class="fc" id="L426">                + NAME_MTAS_TERMVECTOR_IGNORE_REGEXP);</span>
+          }
         }
       }
     }
@@ -448,33 +448,33 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L448">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L449">    HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L450">    functionData.put(termVector.subComponentFunction.dataCollector,</span>
-        functionDataItem);
+<span class="fc" id="L451">        functionDataItem);</span>
 <span class="pc bpc" id="L452" title="1 of 2 branches missed.">    if (termVector.functions != null) {</span>
 <span class="pc bpc" id="L453" title="1 of 2 branches missed.">      for (SubComponentFunction function : termVector.functions) {</span>
 <span class="nc" id="L454">        function.dataCollector.reduceToKeys(</span>
 <span class="nc" id="L455">            termVector.subComponentFunction.dataCollector.getKeyList());</span>
 <span class="nc" id="L456">        function.dataCollector.close();</span>
 <span class="nc" id="L457">        functionDataItem.put(function.key,</span>
-            new MtasSolrMtasResult(function.dataCollector,
-                new String[] { function.dataType },
-                new String[] { function.statsType },
-                new SortedSet[] { function.statsItems }, new String[] { null },
+<span class="nc" id="L458">            new MtasSolrMtasResult(function.dataCollector,</span>
+<span class="nc" id="L459">                new String[] { function.dataType },</span>
+<span class="nc" id="L460">                new String[] { function.statsType },</span>
+<span class="nc" id="L461">                new SortedSet[] { function.statsItems }, new String[] { null },</span>
 <span class="nc" id="L462">                new String[] { null }, new Integer[] { 0 },</span>
 <span class="nc" id="L463">                new Integer[] { Integer.MAX_VALUE }, null));</span>
-<span class="nc" id="L464">      }</span>
+      }
     }
 <span class="fc" id="L466">    MtasSolrMtasResult data = new MtasSolrMtasResult(</span>
-        termVector.subComponentFunction.dataCollector,
-        new String[] { termVector.subComponentFunction.dataType },
-        new String[] { termVector.subComponentFunction.statsType },
-        new SortedSet[] { termVector.subComponentFunction.statsItems },
-        new String[] { termVector.subComponentFunction.sortType },
-        new String[] { termVector.subComponentFunction.sortDirection },
+<span class="fc" id="L467">        termVector.subComponentFunction.dataCollector,</span>
+<span class="fc" id="L468">        new String[] { termVector.subComponentFunction.dataType },</span>
+<span class="fc" id="L469">        new String[] { termVector.subComponentFunction.statsType },</span>
+<span class="fc" id="L470">        new SortedSet[] { termVector.subComponentFunction.statsItems },</span>
+<span class="fc" id="L471">        new String[] { termVector.subComponentFunction.sortType },</span>
+<span class="fc" id="L472">        new String[] { termVector.subComponentFunction.sortDirection },</span>
 <span class="fc" id="L473">        new Integer[] { 0 }, new Integer[] { termVector.number }, functionData);</span>
 <span class="fc bfc" id="L474" title="All 2 branches covered.">    if (encode) {</span>
 <span class="fc" id="L475">      mtasTermVectorResponse.add(&quot;_encoded_list&quot;,</span>
 <span class="fc" id="L476">          MtasSolrResultUtil.encode(data));</span>
-    } else {
+<span class="fc" id="L477">    } else {</span>
 <span class="fc" id="L478">      mtasTermVectorResponse.add(&quot;list&quot;, data);</span>
 <span class="fc" id="L479">      MtasSolrResultUtil.rewrite(mtasTermVectorResponse, searchComponent);</span>
     }
@@ -491,8 +491,8 @@ public class MtasSolrComponentTermvector
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
 <span class="pc bpc" id="L493" title="1 of 2 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {</span>
-<span class="fc bfc" id="L494" title="All 4 branches covered.">      if (rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
-          &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
+<span class="fc bfc" id="L494" title="All 2 branches covered.">      if (rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">          &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {</span>
 <span class="fc bfc" id="L496" title="All 2 branches covered.">        for (ShardRequest sreq : rb.finished) {</span>
 <span class="pc bpc" id="L497" title="1 of 2 branches missed.">          if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
 <span class="pc bpc" id="L498" title="1 of 2 branches missed.">              &amp;&amp; sreq.params.getBool(PARAM_MTAS_TERMVECTOR, false)) {</span>
@@ -505,16 +505,16 @@ public class MtasSolrComponentTermvector
 <span class="pc bpc" id="L505" title="1 of 2 branches missed.">                if (data != null) {</span>
 <span class="fc" id="L506">                  MtasSolrResultUtil.decode(data);</span>
                 }
-<span class="nc" id="L508">              } catch (ClassCastException e) {</span>
+<span class="pc" id="L508">              } catch (ClassCastException e) {</span>
 <span class="nc" id="L509">                log.debug(e);</span>
                 // shouldnt happen
-<span class="fc" id="L511">              }</span>
-<span class="fc" id="L512">            }</span>
+              }
+            }
           }
-<span class="fc" id="L514">        }</span>
+        }
 <span class="fc bfc" id="L515" title="All 2 branches covered.">        if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_FINISH) {</span>
-<span class="pc bpc" id="L516" title="1 of 2 branches missed.">          if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS,</span>
-              false)
+<span class="fc" id="L516">          if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS,</span>
+<span class="pc bpc" id="L517" title="1 of 2 branches missed.">              false)</span>
 <span class="pc bpc" id="L518" title="1 of 2 branches missed.">              &amp;&amp; rb.req.getParams().getBool(PARAM_MTAS_TERMVECTOR, false)) {</span>
 <span class="fc" id="L519">            Set&lt;String&gt; ids = MtasSolrResultUtil.getIdsFromParameters(</span>
 <span class="fc" id="L520">                rb.req.getParams(), PARAM_MTAS_TERMVECTOR);</span>
@@ -525,24 +525,24 @@ public class MtasSolrComponentTermvector
 <span class="fc bfc" id="L525" title="All 2 branches covered.">              for (String id : ids) {</span>
 <span class="fc" id="L526">                keys[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L527">                    .get(</span>
-                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;
-                            + NAME_MTAS_TERMVECTOR_KEY,
+<span class="fc" id="L528">                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L529">                            + NAME_MTAS_TERMVECTOR_KEY,</span>
 <span class="fc" id="L530">                        String.valueOf(tmpCounter))</span>
 <span class="fc" id="L531">                    .trim();</span>
 <span class="fc" id="L532">                numbers[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L533">                    .get(PARAM_MTAS_TERMVECTOR + &quot;.&quot; + id + &quot;.&quot;</span>
-                        + NAME_MTAS_TERMVECTOR_NUMBER, null);
+<span class="fc" id="L534">                        + NAME_MTAS_TERMVECTOR_NUMBER, null);</span>
 <span class="fc" id="L535">                tmpCounter++;</span>
-<span class="fc" id="L536">              }</span>
+              }
               // mtas response
 <span class="fc" id="L538">              NamedList&lt;Object&gt; mtasResponse = null;</span>
               try {
 <span class="fc" id="L540">                mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues()</span>
 <span class="fc" id="L541">                    .get(&quot;mtas&quot;);</span>
-<span class="nc" id="L542">              } catch (ClassCastException e) {</span>
+<span class="pc" id="L542">              } catch (ClassCastException e) {</span>
 <span class="nc" id="L543">                log.debug(e);</span>
 <span class="nc" id="L544">                mtasResponse = null;</span>
-<span class="fc" id="L545">              }</span>
+              }
 <span class="pc bpc" id="L546" title="1 of 2 branches missed.">              if (mtasResponse == null) {</span>
 <span class="nc" id="L547">                mtasResponse = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="nc" id="L548">                rb.rsp.add(&quot;mtas&quot;, mtasResponse);</span>
@@ -568,7 +568,7 @@ public class MtasSolrComponentTermvector
 <span class="pc bpc" id="L568" title="1 of 2 branches missed.">                        if (numbers[i] != null) {</span>
 <span class="fc" id="L569">                          int numberValue = Integer.parseInt(numbers[i]);</span>
 <span class="fc bfc" id="L570" title="All 2 branches covered.">                          number = numberValue &gt;= 0 ? numberValue</span>
-                              : Integer.MAX_VALUE;
+<span class="fc" id="L571">                              : Integer.MAX_VALUE;</span>
 <span class="fc" id="L572">                        } else {</span>
 <span class="nc" id="L573">                          number = DEFAULT_NUMBER;</span>
                         }
@@ -620,14 +620,14 @@ public class MtasSolrComponentTermvector
     // rewrite
 
     Object mtasResponseRaw;
-<span class="pc bpc" id="L623" title="2 of 4 branches missed.">    if ((mtasResponseRaw = rb.rsp.getValues().get(&quot;mtas&quot;)) != null</span>
-        &amp;&amp; mtasResponseRaw instanceof NamedList) {
+<span class="pc bpc" id="L623" title="1 of 2 branches missed.">    if ((mtasResponseRaw = rb.rsp.getValues().get(&quot;mtas&quot;)) != null</span>
+<span class="pc bpc" id="L624" title="1 of 2 branches missed.">        &amp;&amp; mtasResponseRaw instanceof NamedList) {</span>
 <span class="fc" id="L625">      NamedList&lt;Object&gt; mtasResponse = (NamedList&lt;Object&gt;) mtasResponseRaw;</span>
       Object mtasResponseTermvectorRaw;
-<span class="pc bpc" id="L627" title="2 of 4 branches missed.">      if ((mtasResponseTermvectorRaw = mtasResponse.get(&quot;termvector&quot;)) != null</span>
-          &amp;&amp; mtasResponseTermvectorRaw instanceof ArrayList) {
+<span class="pc bpc" id="L627" title="1 of 2 branches missed.">      if ((mtasResponseTermvectorRaw = mtasResponse.get(&quot;termvector&quot;)) != null</span>
+<span class="pc bpc" id="L628" title="1 of 2 branches missed.">          &amp;&amp; mtasResponseTermvectorRaw instanceof ArrayList) {</span>
 <span class="fc" id="L629">        MtasSolrResultUtil.rewrite(</span>
-            (ArrayList&lt;Object&gt;) mtasResponseTermvectorRaw, searchComponent);
+<span class="fc" id="L630">            (ArrayList&lt;Object&gt;) mtasResponseTermvectorRaw, searchComponent);</span>
       }
     }
 <span class="fc" id="L633">  }</span>
@@ -654,11 +654,11 @@ public class MtasSolrComponentTermvector
 <span class="fc bfc" id="L654" title="All 2 branches covered.">        for (ComponentTermVector tv : tvList) {</span>
 <span class="fc bfc" id="L655" title="All 2 branches covered.">          if (!tv.subComponentFunction.sortType.equals(CodecUtil.SORT_TERM)) {</span>
 <span class="fc" id="L656">            mergedComparatorLists.put(tv.key,</span>
-                new TreeMap&lt;String, MtasDataItemNumberComparator&gt;());
+<span class="fc" id="L657">                new TreeMap&lt;String, MtasDataItemNumberComparator&gt;());</span>
           }
-<span class="fc" id="L659">        }</span>
+        }
       }
-<span class="fc" id="L661">    }</span>
+    }
     // compute for each termvector the mergedComparatorList and the
     // summedBoundary
 <span class="fc bfc" id="L664" title="All 2 branches covered.">    for (ShardRequest sreq : rb.finished) {</span>
@@ -696,42 +696,42 @@ public class MtasSolrComponentTermvector
 <span class="fc bfc" id="L696" title="All 2 branches covered.">                        if (mergedComparatorList.containsKey(entry.getKey())) {</span>
 <span class="fc" id="L697">                          mergedComparatorList.get(entry.getKey())</span>
 <span class="fc" id="L698">                              .add(entry.getValue().getValue());</span>
-                        } else {
+<span class="fc" id="L699">                        } else {</span>
 <span class="fc" id="L700">                          mergedComparatorList.put(entry.getKey(),</span>
 <span class="fc" id="L701">                              entry.getValue().clone());</span>
                         }
-<span class="fc" id="L703">                      }</span>
+                      }
 <span class="fc bfc" id="L704" title="All 2 branches covered.">                      if (!comparatorBoundariesList.containsKey(key)) {</span>
 <span class="fc" id="L705">                        comparatorBoundariesList.put(key,</span>
-                            new HashMap&lt;String, MtasDataItemNumberComparator&gt;());
+<span class="fc" id="L706">                            new HashMap&lt;String, MtasDataItemNumberComparator&gt;());</span>
                       }
 <span class="fc" id="L708">                      comparatorBoundariesList.get(key)</span>
 <span class="fc" id="L709">                          .put(shardResponse.getShardAddress(), comparatorLast);</span>
 <span class="fc bfc" id="L710" title="All 2 branches covered.">                      if (summedComparatorBoundaryList.containsKey(key)) {</span>
 <span class="fc" id="L711">                        summedComparatorBoundaryList.get(key)</span>
 <span class="fc" id="L712">                            .add(comparatorLast.getValue());</span>
-                      } else {
+<span class="fc" id="L713">                      } else {</span>
 <span class="fc" id="L714">                        summedComparatorBoundaryList.put(key,</span>
 <span class="fc" id="L715">                            comparatorLast.clone());</span>
                       }
                     }
-                  } else {
+<span class="fc" id="L718">                  } else {</span>
 <span class="nc" id="L719">                    throw new IOException(&quot;no data returned&quot;);</span>
                   }
 <span class="nc" id="L721">                } catch (ClassCastException e) {</span>
 <span class="nc" id="L722">                  log.debug(e);</span>
 <span class="nc" id="L723">                  dataItem.clear();</span>
-<span class="fc" id="L724">                }</span>
+                }
               }
             }
-<span class="nc" id="L727">          } catch (ClassCastException e) {</span>
+<span class="pc" id="L727">          } catch (ClassCastException e) {</span>
 <span class="nc" id="L728">            log.debug(e);</span>
             // shouldnt happen
-<span class="fc" id="L730">          }</span>
+          }
 <span class="fc" id="L731">          shardResponse.getSolrResponse().setResponse(response);</span>
-<span class="fc" id="L732">        }</span>
+        }
       }
-<span class="fc" id="L734">    }</span>
+    }
     // compute for each relevant termvector the mergedComparatorBoundary
 <span class="fc" id="L736">    HashMap&lt;String, HashMap&lt;String, HashMap&lt;String, MtasDataItemNumberComparator&gt;&gt;&gt; recomputeFieldList = new HashMap&lt;&gt;();</span>
 <span class="fc bfc" id="L737" title="All 2 branches covered.">    for (String field : mtasFields.list.keySet()) {</span>
@@ -748,9 +748,9 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L748">              final int sortDirection = tv.subComponentFunction.sortDirection</span>
 <span class="fc bfc" id="L749" title="All 2 branches covered.">                  .equals(CodecUtil.SORT_DESC) ? -1 : 1;</span>
 <span class="fc" id="L750">              SortedSet&lt;Map.Entry&lt;String, MtasDataItemNumberComparator&gt;&gt; sortedSet = new TreeSet&lt;&gt;(</span>
-                  (Map.Entry&lt;String, MtasDataItemNumberComparator&gt; e1,
-<span class="fc" id="L752">                      Map.Entry&lt;String, MtasDataItemNumberComparator&gt; e2) -&gt; (e1</span>
-<span class="fc bfc" id="L753" title="All 2 branches covered.">                          .getValue().compareTo(e2.getValue().getValue()) == 0)</span>
+<span class="fc" id="L751">                  (Map.Entry&lt;String, MtasDataItemNumberComparator&gt; e1,</span>
+<span class="fc bfc" id="L752" title="All 2 branches covered.">                      Map.Entry&lt;String, MtasDataItemNumberComparator&gt; e2) -&gt; (e1</span>
+<span class="fc" id="L753">                          .getValue().compareTo(e2.getValue().getValue()) == 0)</span>
 <span class="fc" id="L754">                              ? e1.getKey().compareTo(e2.getKey())</span>
 <span class="fc" id="L755">                              : e1.getValue().compareTo(</span>
 <span class="fc" id="L756">                                  e2.getValue().getValue()) * sortDirection);</span>
@@ -763,7 +763,7 @@ public class MtasSolrComponentTermvector
               }
             }
           }
-<span class="fc" id="L766">        }</span>
+        }
       }
 <span class="fc" id="L768">      HashMap&lt;String, HashMap&lt;String, MtasDataItemNumberComparator&gt;&gt; recomputeList = new HashMap&lt;&gt;();</span>
 <span class="pc bpc" id="L769" title="1 of 2 branches missed.">      if (tvList != null) {</span>
@@ -773,20 +773,20 @@ public class MtasSolrComponentTermvector
 <span class="pc bpc" id="L773" title="1 of 2 branches missed.">              &amp;&amp; summedComparatorBoundaryList.containsKey(key)) {</span>
             // set termvector to recompute
 <span class="fc" id="L775">            recomputeList.put(key,</span>
-                new HashMap&lt;String, MtasDataItemNumberComparator&gt;());
+<span class="fc" id="L776">                new HashMap&lt;String, MtasDataItemNumberComparator&gt;());</span>
             // sort
 <span class="fc" id="L778">            List&lt;Entry&lt;String, MtasDataItemNumberComparator&gt;&gt; list = new LinkedList&lt;&gt;(</span>
 <span class="fc" id="L779">                comparatorBoundariesList.get(key).entrySet());</span>
 <span class="fc" id="L780">            Collections.sort(list,</span>
-                (Entry&lt;String, MtasDataItemNumberComparator&gt; e1,
-                    Entry&lt;String, MtasDataItemNumberComparator&gt; e2) -&gt; e1
+<span class="fc" id="L781">                (Entry&lt;String, MtasDataItemNumberComparator&gt; e1,</span>
+<span class="fc" id="L782">                    Entry&lt;String, MtasDataItemNumberComparator&gt; e2) -&gt; e1</span>
 <span class="fc" id="L783">                        .getValue().compareTo(e2.getValue().getValue()));</span>
 <span class="fc" id="L784">            HashMap&lt;String, MtasDataItemNumberComparator&gt; sortedHashMap = new LinkedHashMap&lt;&gt;();</span>
 <span class="fc" id="L785">            for (Iterator&lt;Map.Entry&lt;String, MtasDataItemNumberComparator&gt;&gt; it = list</span>
 <span class="fc bfc" id="L786" title="All 2 branches covered.">                .iterator(); it.hasNext();) {</span>
 <span class="fc" id="L787">              Map.Entry&lt;String, MtasDataItemNumberComparator&gt; entry = it.next();</span>
 <span class="fc" id="L788">              sortedHashMap.put(entry.getKey(), entry.getValue());</span>
-<span class="fc" id="L789">            }</span>
+            }
 
 <span class="fc" id="L791">            MtasDataItemNumberComparator mainNewBoundary = mergedComparatorBoundaryList</span>
 <span class="fc" id="L792">                .get(key).recomputeBoundary(sortedHashMap.size());</span>
@@ -809,7 +809,7 @@ public class MtasSolrComponentTermvector
 <span class="nc" id="L809">                HashMap&lt;String, MtasDataItemNumberComparator&gt; recomputeSubList = new HashMap&lt;&gt;();</span>
                 // sum not null if number&gt;0, but do check
 <span class="nc bnc" id="L811" title="All 4 branches missed.">                if (number &gt; 0 &amp;&amp; sum != null</span>
-                    &amp;&amp; tv.subComponentFunction.sortDirection
+<span class="nc" id="L812">                    &amp;&amp; tv.subComponentFunction.sortDirection</span>
 <span class="nc bnc" id="L813" title="All 2 branches missed.">                        .equals(CodecUtil.SORT_DESC)) {</span>
 <span class="nc" id="L814">                  MtasDataItemNumberComparator tmpSumBoundary = mergedComparatorBoundaryList</span>
 <span class="nc" id="L815">                      .get(key);</span>
@@ -828,7 +828,7 @@ public class MtasSolrComponentTermvector
 <span class="nc bnc" id="L828" title="All 2 branches missed.">                    if (compare &lt; 0) {</span>
 <span class="nc" id="L829">                      recomputeSubList.put(entry.getKey(), newBoundary);</span>
                     }
-                  } else {
+<span class="nc" id="L831">                  } else {</span>
 <span class="nc" id="L832">                    recomputeSubList.put(entry.getKey(), newBoundary);</span>
                   }
 <span class="nc" id="L834">                } else {</span>
@@ -837,7 +837,7 @@ public class MtasSolrComponentTermvector
 <span class="nc bnc" id="L837" title="All 2 branches missed.">                if (!recomputeSubList.isEmpty()) {</span>
 <span class="nc bnc" id="L838" title="All 2 branches missed.">                  if (!recomputeList.containsKey(key)) {</span>
 <span class="nc" id="L839">                    recomputeList.put(key, recomputeSubList);</span>
-                  } else {
+<span class="nc" id="L840">                  } else {</span>
 <span class="nc" id="L841">                    recomputeList.get(key).putAll(recomputeSubList);</span>
                   }
                 }
@@ -846,18 +846,18 @@ public class MtasSolrComponentTermvector
               }
 <span class="fc bfc" id="L847" title="All 2 branches covered.">              if (sum == null) {</span>
 <span class="fc" id="L848">                sum = newBoundary.clone();</span>
-              } else {
+<span class="fc" id="L849">              } else {</span>
 <span class="fc" id="L850">                sum.add(newBoundary.getValue());</span>
               }
 <span class="fc" id="L852">              number++;</span>
-<span class="fc" id="L853">            }</span>
+            }
           }
-<span class="fc" id="L855">        }</span>
+        }
       }
 <span class="fc bfc" id="L857" title="All 2 branches covered.">      if (!recomputeList.isEmpty()) {</span>
 <span class="fc" id="L858">        recomputeFieldList.put(field, recomputeList);</span>
       }
-<span class="fc" id="L860">    }</span>
+    }
 
     // finally, recompute
 <span class="fc bfc" id="L863" title="All 2 branches covered.">    if (recomputeFieldList.size() &gt; 0) {</span>
@@ -886,10 +886,10 @@ public class MtasSolrComponentTermvector
                     boolean doClear;
 <span class="pc bpc" id="L887" title="3 of 4 branches missed.">                    doClear = field != null &amp;&amp; key != null;</span>
 <span class="pc bpc" id="L888" title="3 of 4 branches missed.">                    doClear = doClear ? recomputeFieldList.get(field) != null</span>
-                        : false;
+<span class="fc" id="L889">                        : false;</span>
 <span class="pc bpc" id="L890" title="1 of 2 branches missed.">                    doClear = doClear</span>
-<span class="pc" id="L891">                        ? recomputeFieldList.get(field).containsKey(key)</span>
-                        : false;
+<span class="nc" id="L891">                        ? recomputeFieldList.get(field).containsKey(key)</span>
+<span class="fc" id="L892">                        : false;</span>
 <span class="pc bpc" id="L893" title="1 of 2 branches missed.">                    doClear = doClear ? recomputeFieldList.get(field).get(key)</span>
 <span class="pc" id="L894">                        .containsKey(shardAddress) : false;</span>
 <span class="pc bpc" id="L895" title="1 of 2 branches missed.">                    if (doClear) {</span>
@@ -899,17 +899,17 @@ public class MtasSolrComponentTermvector
 <span class="nc" id="L899">                  } catch (ClassCastException e) {</span>
 <span class="nc" id="L900">                    log.debug(e);</span>
 <span class="nc" id="L901">                    dataItem.clear();</span>
-<span class="fc" id="L902">                  }</span>
+                  }
                 }
               }
-<span class="nc" id="L905">            } catch (ClassCastException e) {</span>
+<span class="pc" id="L905">            } catch (ClassCastException e) {</span>
 <span class="nc" id="L906">              log.debug(e);</span>
               // shouldnt happen
-<span class="fc" id="L908">            }</span>
+            }
 <span class="fc" id="L909">            shardResponse.getSolrResponse().setResponse(response);</span>
-<span class="fc" id="L910">          }</span>
+          }
         }
-<span class="fc" id="L912">      }</span>
+      }
 
       // parameter
 <span class="fc" id="L915">      HashMap&lt;String, ModifiableSolrParams&gt; requestParamList = new HashMap&lt;&gt;();</span>
@@ -927,86 +927,86 @@ public class MtasSolrComponentTermvector
 <span class="pc bpc" id="L927" title="1 of 2 branches missed.">                if (recomputeList.containsKey(tv.key)</span>
 <span class="pc bpc" id="L928" title="1 of 2 branches missed.">                    &amp;&amp; recomputeList.get(tv.key).containsKey(shardAddress)) {</span>
 <span class="nc" id="L929">                  paramsNewRequest.add(</span>
-                      PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                          + NAME_MTAS_TERMVECTOR_BOUNDARY,
+<span class="nc" id="L930">                      PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L931">                          + NAME_MTAS_TERMVECTOR_BOUNDARY,</span>
 <span class="nc" id="L932">                      String.valueOf(recomputeList.get(tv.key).get(shardAddress)</span>
 <span class="nc" id="L933">                          .getValue()));</span>
 <span class="nc" id="L934">                  paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FIELD,
-                      field);
+<span class="nc" id="L935">                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FIELD,</span>
+<span class="nc" id="L936">                      field);</span>
 <span class="nc" id="L937">                  paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_PREFIX,
-                      tv.prefix);
+<span class="nc" id="L938">                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_PREFIX,</span>
+<span class="nc" id="L939">                      tv.prefix);</span>
 <span class="nc" id="L940">                  paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_KEY,
-                      tv.key);
+<span class="nc" id="L941">                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_KEY,</span>
+<span class="nc" id="L942">                      tv.key);</span>
 <span class="nc" id="L943">                  paramsNewRequest.add(</span>
-                      PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                          + NAME_MTAS_TERMVECTOR_NUMBER,
+<span class="nc" id="L944">                      PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L945">                          + NAME_MTAS_TERMVECTOR_NUMBER,</span>
 <span class="nc" id="L946">                      String.valueOf(tv.number));</span>
 <span class="nc bnc" id="L947" title="All 2 branches missed.">                  if (tv.subComponentFunction.sortType != null) {</span>
 <span class="nc" id="L948">                    paramsNewRequest.add(</span>
-                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                            + NAME_MTAS_TERMVECTOR_SORT_TYPE,
-                        tv.subComponentFunction.sortType);
+<span class="nc" id="L949">                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L950">                            + NAME_MTAS_TERMVECTOR_SORT_TYPE,</span>
+<span class="nc" id="L951">                        tv.subComponentFunction.sortType);</span>
                   }
 <span class="nc bnc" id="L953" title="All 2 branches missed.">                  if (tv.subComponentFunction.sortDirection != null) {</span>
 <span class="nc" id="L954">                    paramsNewRequest.add(</span>
-                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                            + NAME_MTAS_TERMVECTOR_SORT_DIRECTION,
-                        tv.subComponentFunction.sortDirection);
+<span class="nc" id="L955">                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L956">                            + NAME_MTAS_TERMVECTOR_SORT_DIRECTION,</span>
+<span class="nc" id="L957">                        tv.subComponentFunction.sortDirection);</span>
                   }
 <span class="nc bnc" id="L959" title="All 2 branches missed.">                  if (tv.subComponentFunction.type != null) {</span>
 <span class="nc" id="L960">                    paramsNewRequest.add(</span>
-                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                            + NAME_MTAS_TERMVECTOR_TYPE,
-                        tv.subComponentFunction.type);
+<span class="nc" id="L961">                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L962">                            + NAME_MTAS_TERMVECTOR_TYPE,</span>
+<span class="nc" id="L963">                        tv.subComponentFunction.type);</span>
                   }
 <span class="nc bnc" id="L965" title="All 2 branches missed.">                  if (tv.functions != null) {</span>
 <span class="nc" id="L966">                    int functionCounter = 0;</span>
 <span class="nc bnc" id="L967" title="All 2 branches missed.">                    for (SubComponentFunction function : tv.functions) {</span>
 <span class="nc" id="L968">                      paramsNewRequest.add(</span>
-                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;
-                              + functionCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION,
-                          function.expression);
+<span class="nc" id="L969">                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L970">                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;</span>
+<span class="nc" id="L971">                              + functionCounter + &quot;.&quot;</span>
+<span class="nc" id="L972">                              + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION,</span>
+<span class="nc" id="L973">                          function.expression);</span>
 <span class="nc" id="L974">                      paramsNewRequest.add(</span>
-                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;
-                              + functionCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,
-                          function.key);
+<span class="nc" id="L975">                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L976">                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;</span>
+<span class="nc" id="L977">                              + functionCounter + &quot;.&quot;</span>
+<span class="nc" id="L978">                              + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,</span>
+<span class="nc" id="L979">                          function.key);</span>
 <span class="nc bnc" id="L980" title="All 2 branches missed.">                      if (function.type != null) {</span>
 <span class="nc" id="L981">                        paramsNewRequest.add(</span>
-                            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter
-                                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;
-                                + functionCounter + &quot;.&quot;
-                                + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE,
-                            function.type);
+<span class="nc" id="L982">                            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter</span>
+<span class="nc" id="L983">                                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;</span>
+<span class="nc" id="L984">                                + functionCounter + &quot;.&quot;</span>
+<span class="nc" id="L985">                                + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE,</span>
+<span class="nc" id="L986">                            function.type);</span>
                       }
 <span class="nc" id="L988">                      functionCounter++;</span>
-<span class="nc" id="L989">                    }</span>
+                    }
                   }
 <span class="nc bnc" id="L991" title="All 2 branches missed.">                  if (tv.regexp != null) {</span>
 <span class="nc" id="L992">                    paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                        + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_REGEXP,
-                        tv.regexp);
+<span class="nc" id="L993">                        + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_REGEXP,</span>
+<span class="nc" id="L994">                        tv.regexp);</span>
                   }
 <span class="nc" id="L996">                  termvectorCounter++;</span>
                 }
-<span class="fc" id="L998">              }</span>
+              }
             }
           }
-<span class="fc" id="L1001">        }</span>
+        }
 <span class="pc bpc" id="L1002" title="1 of 2 branches missed.">        if (!paramsNewRequest.getParameterNames().isEmpty()) {</span>
 <span class="nc" id="L1003">          requestParamList.put(shardAddress, paramsNewRequest);</span>
         }
-<span class="fc" id="L1005">      }</span>
+      }
 
       // new requests
 <span class="pc bpc" id="L1008" title="1 of 2 branches missed.">      for (Entry&lt;String, ModifiableSolrParams&gt; entry : requestParamList</span>
-<span class="fc" id="L1009">          .entrySet()) {</span>
+<span class="pc" id="L1009">          .entrySet()) {</span>
 <span class="nc" id="L1010">        ShardRequest sreq = new ShardRequest();</span>
 <span class="nc" id="L1011">        sreq.shards = new String[] { entry.getKey() };</span>
 <span class="nc" id="L1012">        sreq.purpose = ShardRequest.PURPOSE_PRIVATE;</span>
@@ -1020,7 +1020,7 @@ public class MtasSolrComponentTermvector
 <span class="nc" id="L1020">        sreq.params.add(PARAM_MTAS_TERMVECTOR,</span>
 <span class="nc" id="L1021">            rb.req.getOriginalParams().getParams(PARAM_MTAS_TERMVECTOR));</span>
 <span class="nc" id="L1022">        rb.addRequest(searchComponent, sreq);</span>
-<span class="nc" id="L1023">      }</span>
+      }
     }
 
 <span class="fc" id="L1026">  }</span>
@@ -1035,7 +1035,7 @@ public class MtasSolrComponentTermvector
   private void distributedProcessMissingKey(ResponseBuilder rb,
       ComponentFields mtasFields) throws IOException {
 <span class="fc" id="L1037">    HashMap&lt;String, HashMap&lt;String, HashSet&lt;String&gt;&gt;&gt; missingTermvectorKeys = computeMissingTermvectorItemsPerShard(</span>
-        rb.finished, &quot;mtas&quot;, &quot;termvector&quot;);
+<span class="fc" id="L1038">        rb.finished, &quot;mtas&quot;, &quot;termvector&quot;);</span>
 <span class="fc bfc" id="L1039" title="All 2 branches covered.">    for (Entry&lt;String, HashMap&lt;String, HashSet&lt;String&gt;&gt;&gt; entry : missingTermvectorKeys</span>
 <span class="fc" id="L1040">        .entrySet()) {</span>
 <span class="fc" id="L1041">      HashMap&lt;String, HashSet&lt;String&gt;&gt; missingTermvectorKeysShard = entry</span>
@@ -1052,50 +1052,50 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L1052">                HashSet&lt;String&gt; list = missingTermvectorKeysShard.get(tv.key);</span>
 <span class="fc bfc" id="L1053" title="All 2 branches covered.">                if (!list.isEmpty()) {</span>
 <span class="fc" id="L1054">                  paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FIELD,
-                      field);
+<span class="fc" id="L1055">                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FIELD,</span>
+<span class="fc" id="L1056">                      field);</span>
 <span class="fc" id="L1057">                  paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_PREFIX,
-                      tv.prefix);
+<span class="fc" id="L1058">                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_PREFIX,</span>
+<span class="fc" id="L1059">                      tv.prefix);</span>
 <span class="fc" id="L1060">                  paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_KEY,
-                      tv.key);
+<span class="fc" id="L1061">                      + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_KEY,</span>
+<span class="fc" id="L1062">                      tv.key);</span>
 <span class="pc bpc" id="L1063" title="1 of 2 branches missed.">                  if (tv.subComponentFunction.type != null) {</span>
 <span class="fc" id="L1064">                    paramsNewRequest.add(</span>
-                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                            + NAME_MTAS_TERMVECTOR_TYPE,
-                        tv.subComponentFunction.type);
+<span class="fc" id="L1065">                        PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="fc" id="L1066">                            + NAME_MTAS_TERMVECTOR_TYPE,</span>
+<span class="fc" id="L1067">                        tv.subComponentFunction.type);</span>
                   }
 <span class="pc bpc" id="L1069" title="1 of 2 branches missed.">                  if (tv.functions != null) {</span>
 <span class="fc" id="L1070">                    int functionCounter = 0;</span>
 <span class="pc bpc" id="L1071" title="1 of 2 branches missed.">                    for (SubComponentFunction function : tv.functions) {</span>
 <span class="nc" id="L1072">                      paramsNewRequest.add(</span>
-                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;
-                              + functionCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION,
-                          function.expression);
+<span class="nc" id="L1073">                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L1074">                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;</span>
+<span class="nc" id="L1075">                              + functionCounter + &quot;.&quot;</span>
+<span class="nc" id="L1076">                              + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION,</span>
+<span class="nc" id="L1077">                          function.expression);</span>
 <span class="nc" id="L1078">                      paramsNewRequest.add(</span>
-                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;
-                              + functionCounter + &quot;.&quot;
-                              + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,
-                          function.key);
+<span class="nc" id="L1079">                          PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter + &quot;.&quot;</span>
+<span class="nc" id="L1080">                              + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;</span>
+<span class="nc" id="L1081">                              + functionCounter + &quot;.&quot;</span>
+<span class="nc" id="L1082">                              + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,</span>
+<span class="nc" id="L1083">                          function.key);</span>
 <span class="nc bnc" id="L1084" title="All 2 branches missed.">                      if (function.type != null) {</span>
 <span class="nc" id="L1085">                        paramsNewRequest.add(</span>
-                            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter
-                                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;
-                                + functionCounter + &quot;.&quot;
-                                + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE,
-                            function.type);
+<span class="nc" id="L1086">                            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter</span>
+<span class="nc" id="L1087">                                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FUNCTION + &quot;.&quot;</span>
+<span class="nc" id="L1088">                                + functionCounter + &quot;.&quot;</span>
+<span class="nc" id="L1089">                                + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE,</span>
+<span class="nc" id="L1090">                            function.type);</span>
                       }
 <span class="nc" id="L1092">                      functionCounter++;</span>
-<span class="nc" id="L1093">                    }</span>
+                    }
                   }
 <span class="pc bpc" id="L1095" title="1 of 2 branches missed.">                  if (tv.regexp != null) {</span>
 <span class="nc" id="L1096">                    paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                        + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_REGEXP,
-                        tv.regexp);
+<span class="nc" id="L1097">                        + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_REGEXP,</span>
+<span class="nc" id="L1098">                        tv.regexp);</span>
                   }
 <span class="pc bpc" id="L1100" title="1 of 2 branches missed.">                  if (!list.isEmpty()) {</span>
 <span class="fc" id="L1101">                    StringBuilder listValue = new StringBuilder();</span>
@@ -1108,19 +1108,19 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L1108">                          .replace(&quot;,&quot;, &quot;\\\\&quot;));</span>
                     }
 <span class="fc" id="L1110">                    paramsNewRequest.add(PARAM_MTAS_TERMVECTOR + &quot;.&quot;</span>
-                        + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FULL,
-                        &quot;false&quot;);
+<span class="fc" id="L1111">                        + termvectorCounter + &quot;.&quot; + NAME_MTAS_TERMVECTOR_FULL,</span>
+<span class="fc" id="L1112">                        &quot;false&quot;);</span>
 <span class="fc" id="L1113">                    paramsNewRequest</span>
 <span class="fc" id="L1114">                        .add(</span>
-                            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter
-                                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_LIST,
+<span class="fc" id="L1115">                            PARAM_MTAS_TERMVECTOR + &quot;.&quot; + termvectorCounter</span>
+<span class="fc" id="L1116">                                + &quot;.&quot; + NAME_MTAS_TERMVECTOR_LIST,</span>
 <span class="fc" id="L1117">                            listValue.toString());</span>
                   }
 <span class="fc" id="L1119">                  termvectorCounter++;</span>
                 }
               }
             }
-<span class="fc" id="L1123">          }</span>
+          }
 <span class="fc bfc" id="L1124" title="All 2 branches covered.">          if (termvectorCounter &gt; 0) {</span>
 <span class="fc" id="L1125">            ShardRequest nsreq = new ShardRequest();</span>
 <span class="fc" id="L1126">            nsreq.shards = new String[] { entry.getKey() };</span>
@@ -1139,8 +1139,8 @@ public class MtasSolrComponentTermvector
 <span class="fc" id="L1139">            rb.addRequest(searchComponent, nsreq);</span>
           }
         }
-<span class="fc" id="L1142">      }</span>
-<span class="fc" id="L1143">    }</span>
+      }
+    }
 <span class="fc" id="L1144">  }</span>
 
   /**
@@ -1186,28 +1186,28 @@ public class MtasSolrComponentTermvector
 <span class="fc bfc" id="L1186" title="All 2 branches covered.">                    if (itemsPerShardSets.containsKey(termvectorKey)) {</span>
 <span class="fc" id="L1187">                      itemsPerShardSet = itemsPerShardSets.get(termvectorKey);</span>
 <span class="fc" id="L1188">                      itemSet = itemSets.get(termvectorKey);</span>
-                    } else {
+<span class="fc" id="L1189">                    } else {</span>
 <span class="fc" id="L1190">                      itemsPerShardSet = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L1191">                      itemSet = new HashSet&lt;&gt;();</span>
 <span class="fc" id="L1192">                      itemsPerShardSets.put(termvectorKey, itemsPerShardSet);</span>
 <span class="fc" id="L1193">                      itemSets.put(termvectorKey, itemSet);</span>
                     }
 <span class="fc" id="L1195">                    itemsPerShardSet.put(shardResponse.getShardAddress(),</span>
-                        tmpItemSet);
+<span class="fc" id="L1196">                        tmpItemSet);</span>
 <span class="fc" id="L1197">                    tmpItemSet.addAll(keyList);</span>
 <span class="fc" id="L1198">                    itemSet.addAll(keyList);</span>
                   }
-<span class="nc" id="L1200">                } catch (ClassCastException e) {</span>
+<span class="pc" id="L1200">                } catch (ClassCastException e) {</span>
 <span class="nc" id="L1201">                  log.debug(e);</span>
-<span class="fc" id="L1202">                }</span>
+                }
               }
             }
-<span class="nc" id="L1205">          } catch (ClassCastException e) {</span>
+<span class="pc" id="L1205">          } catch (ClassCastException e) {</span>
 <span class="nc" id="L1206">            log.debug(e);</span>
-<span class="fc" id="L1207">          }</span>
-<span class="fc" id="L1208">        }</span>
+          }
+        }
       }
-<span class="fc" id="L1210">    }</span>
+    }
 
     // construct result
 <span class="fc bfc" id="L1213" title="All 2 branches covered.">    for (Entry&lt;String, HashSet&lt;String&gt;&gt; entry : itemSets.entrySet()) {</span>
@@ -1222,7 +1222,7 @@ public class MtasSolrComponentTermvector
           HashMap&lt;String, HashSet&lt;String&gt;&gt; tmpShardKeySet;
 <span class="pc bpc" id="L1223" title="1 of 2 branches missed.">          if (result.containsKey(shardName)) {</span>
 <span class="nc" id="L1224">            tmpShardKeySet = result.get(shardName);</span>
-          } else {
+<span class="nc" id="L1225">          } else {</span>
 <span class="fc" id="L1226">            tmpShardKeySet = new HashMap&lt;&gt;();</span>
 <span class="fc" id="L1227">            result.put(shardName, tmpShardKeySet);</span>
           }
@@ -1232,11 +1232,11 @@ public class MtasSolrComponentTermvector
 <span class="fc bfc" id="L1232" title="All 2 branches covered.">            if (!shardItemsSet.contains(termvectorKeyListItem)) {</span>
 <span class="fc" id="L1233">              tmpResult.add(termvectorKeyListItem);</span>
             }
-<span class="fc" id="L1235">          }</span>
+          }
 <span class="fc" id="L1236">          tmpShardKeySet.put(termvectorKey, tmpResult);</span>
-<span class="fc" id="L1237">        }</span>
+        }
       }
-<span class="fc" id="L1239">    }</span>
+    }
 <span class="fc" id="L1240">    return result;</span>
   }
 

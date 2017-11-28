@@ -144,7 +144,7 @@ public class MtasSolrComponentStats
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME = &quot;name&quot;;
 
   /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE. */
-  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE = &quot;value&quot;;
+<span class="fc" id="L147">  public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE = &quot;value&quot;;</span>
 
   /**
    * Instantiates a new mtas solr component stats.
@@ -196,19 +196,19 @@ public class MtasSolrComponentStats
 <span class="fc" id="L196">      String[] types = new String[ids.size()];</span>
 <span class="fc bfc" id="L197" title="All 2 branches covered.">      for (String id : ids) {</span>
 <span class="fc" id="L198">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_FIELD, null);
+<span class="fc" id="L199">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_FIELD, null);</span>
 <span class="fc" id="L200">        keys[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L201">            .get(PARAM_MTAS_STATS_POSITIONS + &quot;.&quot; + id + &quot;.&quot;</span>
 <span class="fc" id="L202">                + NAME_MTAS_STATS_POSITIONS_KEY, String.valueOf(tmpCounter))</span>
 <span class="fc" id="L203">            .trim();</span>
 <span class="fc" id="L204">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_MINIMUM, null);
+<span class="fc" id="L205">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_MINIMUM, null);</span>
 <span class="fc" id="L206">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_MAXIMUM, null);
+<span class="fc" id="L207">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_MAXIMUM, null);</span>
 <span class="fc" id="L208">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_TYPE, null);
+<span class="fc" id="L209">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_TYPE, null);</span>
 <span class="fc" id="L210">        tmpCounter++;</span>
-<span class="fc" id="L211">      }</span>
+      }
 <span class="fc" id="L212">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
 <span class="fc" id="L213">      mtasFields.doStats = true;</span>
 <span class="fc" id="L214">      mtasFields.doStatsPositions = true;</span>
@@ -223,13 +223,13 @@ public class MtasSolrComponentStats
 <span class="fc" id="L223">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
 <span class="fc" id="L224">          NAME_MTAS_STATS_POSITIONS_KEY, NAME_MTAS_STATS_POSITIONS_FIELD, true);</span>
 <span class="fc" id="L225">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
-          NAME_MTAS_STATS_POSITIONS_MINIMUM, NAME_MTAS_STATS_POSITIONS_FIELD,
+<span class="fc" id="L226">          NAME_MTAS_STATS_POSITIONS_MINIMUM, NAME_MTAS_STATS_POSITIONS_FIELD,</span>
 <span class="fc" id="L227">          false);</span>
 <span class="fc" id="L228">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
-          NAME_MTAS_STATS_POSITIONS_MAXIMUM, NAME_MTAS_STATS_POSITIONS_FIELD,
+<span class="fc" id="L229">          NAME_MTAS_STATS_POSITIONS_MAXIMUM, NAME_MTAS_STATS_POSITIONS_FIELD,</span>
 <span class="fc" id="L230">          false);</span>
 <span class="fc" id="L231">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
-          NAME_MTAS_STATS_POSITIONS_TYPE, NAME_MTAS_STATS_POSITIONS_FIELD,
+<span class="fc" id="L232">          NAME_MTAS_STATS_POSITIONS_TYPE, NAME_MTAS_STATS_POSITIONS_FIELD,</span>
 <span class="fc" id="L233">          false);</span>
 <span class="fc bfc" id="L234" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
 <span class="fc" id="L235">        String field = fields[i];</span>
@@ -237,15 +237,15 @@ public class MtasSolrComponentStats
 <span class="pc bpc" id="L237" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
 <span class="fc" id="L238">            : types[i].trim();</span>
 <span class="pc bpc" id="L239" title="3 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
-<span class="pc" id="L240">            : Double.parseDouble(minima[i]);</span>
+<span class="nc" id="L240">            : Double.parseDouble(minima[i]);</span>
 <span class="pc bpc" id="L241" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
-<span class="pc" id="L242">            : Double.parseDouble(maxima[i]);</span>
+<span class="nc" id="L242">            : Double.parseDouble(maxima[i]);</span>
         try {
 <span class="fc" id="L244">          mtasFields.list.get(field).statsPositionList</span>
 <span class="fc" id="L245">              .add(new ComponentPosition(key, minimum, maximum, type));</span>
-<span class="nc" id="L246">        } catch (ParseException e) {</span>
+<span class="pc" id="L246">        } catch (ParseException e) {</span>
 <span class="nc" id="L247">          throw new IOException(e.getMessage());</span>
-<span class="fc" id="L248">        }</span>
+        }
       }
     }
 <span class="fc" id="L251">  }</span>
@@ -270,19 +270,19 @@ public class MtasSolrComponentStats
 <span class="fc" id="L270">      String[] types = new String[ids.size()];</span>
 <span class="fc bfc" id="L271" title="All 2 branches covered.">      for (String id : ids) {</span>
 <span class="fc" id="L272">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD, null);
+<span class="fc" id="L273">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD, null);</span>
 <span class="fc" id="L274">        keys[tmpCounter] = rb.req.getParams()</span>
 <span class="fc" id="L275">            .get(PARAM_MTAS_STATS_TOKENS + &quot;.&quot; + id + &quot;.&quot;</span>
 <span class="fc" id="L276">                + NAME_MTAS_STATS_TOKENS_KEY, String.valueOf(tmpCounter))</span>
 <span class="fc" id="L277">            .trim();</span>
 <span class="fc" id="L278">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_MINIMUM, null);
+<span class="fc" id="L279">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_MINIMUM, null);</span>
 <span class="fc" id="L280">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
-            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_MAXIMUM, null);
+<span class="fc" id="L281">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_MAXIMUM, null);</span>
 <span class="fc" id="L282">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE, null);
+<span class="fc" id="L283">            + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE, null);</span>
 <span class="fc" id="L284">        tmpCounter++;</span>
-<span class="fc" id="L285">      }</span>
+      }
 <span class="fc" id="L286">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
 <span class="fc" id="L287">      mtasFields.doStats = true;</span>
 <span class="fc" id="L288">      mtasFields.doStatsTokens = true;</span>
@@ -314,9 +314,9 @@ public class MtasSolrComponentStats
         try {
 <span class="fc" id="L315">          mtasFields.list.get(field).statsTokenList</span>
 <span class="fc" id="L316">              .add(new ComponentToken(key, minimum, maximum, type));</span>
-<span class="nc" id="L317">        } catch (ParseException e) {</span>
+<span class="pc" id="L317">        } catch (ParseException e) {</span>
 <span class="nc" id="L318">          throw new IOException(e.getMessage());</span>
-<span class="fc" id="L319">        }</span>
+        }
       }
     }
 <span class="fc" id="L322">  }</span>
@@ -351,19 +351,19 @@ public class MtasSolrComponentStats
 <span class="fc" id="L351">      Boolean[] expand = new Boolean[ids.size()];</span>
 <span class="fc bfc" id="L352" title="All 2 branches covered.">      for (String id : ids) {</span>
 <span class="fc" id="L353">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FIELD, null);
+<span class="fc" id="L354">            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FIELD, null);</span>
 <span class="fc" id="L355">        keys[tmpCounter] = rb.req.getParams().get(</span>
-            PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_KEY,
+<span class="fc" id="L356">            PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_KEY,</span>
 <span class="fc" id="L357">            String.valueOf(tmpCounter)).trim();</span>
 <span class="fc" id="L358">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_MINIMUM, null);
+<span class="fc" id="L359">            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_MINIMUM, null);</span>
 <span class="fc" id="L360">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_MAXIMUM, null);
+<span class="fc" id="L361">            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_MAXIMUM, null);</span>
 <span class="fc" id="L362">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
-            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_TYPE, null);
+<span class="fc" id="L363">            + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_TYPE, null);</span>
 <span class="fc" id="L364">        Set&lt;String&gt; functionIds = MtasSolrResultUtil</span>
 <span class="fc" id="L365">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
-                + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);
+<span class="fc" id="L366">                + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);</span>
 <span class="fc" id="L367">        functionExpressions[tmpCounter] = new String[functionIds.size()];</span>
 <span class="fc" id="L368">        functionKeys[tmpCounter] = new String[functionIds.size()];</span>
 <span class="fc" id="L369">        functionTypes[tmpCounter] = new String[functionIds.size()];</span>
@@ -371,25 +371,25 @@ public class MtasSolrComponentStats
 <span class="pc bpc" id="L371" title="1 of 2 branches missed.">        for (String functionId : functionIds) {</span>
 <span class="nc" id="L372">          functionKeys[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
 <span class="nc" id="L373">              .get(</span>
-                  PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;
-                      + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
-                      + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY,
+<span class="nc" id="L374">                  PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="nc" id="L375">                      + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;</span>
+<span class="nc" id="L376">                      + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY,</span>
 <span class="nc" id="L377">                  String.valueOf(tmpSubCounter))</span>
 <span class="nc" id="L378">              .trim();</span>
 <span class="nc" id="L379">          functionExpressions[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
 <span class="nc" id="L380">              .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                  + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
-                  + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION, null);
+<span class="nc" id="L381">                  + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;</span>
+<span class="nc" id="L382">                  + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION, null);</span>
 <span class="nc" id="L383">          functionTypes[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
 <span class="nc" id="L384">              .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                  + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
-                  + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE, null);
+<span class="nc" id="L385">                  + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;</span>
+<span class="nc" id="L386">                  + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE, null);</span>
 <span class="nc" id="L387">          tmpSubCounter++;</span>
-<span class="nc" id="L388">        }</span>
+        }
 
 <span class="fc" id="L390">        Set&lt;String&gt; qIds = MtasSolrResultUtil</span>
 <span class="fc" id="L391">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
-                + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_QUERY);
+<span class="fc" id="L392">                + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_QUERY);</span>
 <span class="pc bpc" id="L393" title="1 of 2 branches missed.">        if (!qIds.isEmpty()) {</span>
 <span class="fc" id="L394">          int tmpQCounter = 0;</span>
 <span class="fc" id="L395">          queryTypes[tmpCounter] = new String[qIds.size()];</span>
@@ -401,51 +401,51 @@ public class MtasSolrComponentStats
 <span class="fc bfc" id="L401" title="All 2 branches covered.">          for (String qId : qIds) {</span>
 <span class="fc" id="L402">            queryTypes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
 <span class="fc" id="L403">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                    + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE, null);
+<span class="fc" id="L404">                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L405">                    + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE, null);</span>
 <span class="fc" id="L406">            queryValues[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
 <span class="fc" id="L407">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                    + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE, null);
+<span class="fc" id="L408">                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L409">                    + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE, null);</span>
 <span class="fc" id="L410">            queryIgnores[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
 <span class="fc" id="L411">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                    + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE, null);
+<span class="fc" id="L412">                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L413">                    + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE, null);</span>
 <span class="fc" id="L414">            queryMaximumIgnoreLengths[tmpCounter][tmpQCounter] = rb.req</span>
 <span class="fc" id="L415">                .getParams().get(</span>
-                    PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;
-                        + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                        + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH,
-                    null);
+<span class="fc" id="L416">                    PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L417">                        + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L418">                        + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH,</span>
+<span class="fc" id="L419">                    null);</span>
 <span class="fc" id="L420">            queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
 <span class="fc" id="L421">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                    + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX, null);
+<span class="fc" id="L422">                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L423">                    + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX, null);</span>
 <span class="fc" id="L424">            Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
 <span class="fc" id="L425">                rb.req.getParams(),</span>
-                PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;
-                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                    + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
+<span class="fc" id="L426">                PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L427">                    + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L428">                    + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);</span>
 <span class="fc" id="L429">            queryVariables[tmpCounter][tmpQCounter] = new HashMap&lt;&gt;();</span>
 <span class="fc bfc" id="L430" title="All 2 branches covered.">            if (!vIds.isEmpty()) {</span>
 <span class="fc" id="L431">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
 <span class="fc bfc" id="L432" title="All 2 branches covered.">              for (String vId : vIds) {</span>
 <span class="fc" id="L433">                String name = rb.req.getParams()</span>
 <span class="fc" id="L434">                    .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                        + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                        + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId
-                        + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME,
-                        null);
+<span class="fc" id="L435">                        + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L436">                        + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId</span>
+<span class="fc" id="L437">                        + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME,</span>
+<span class="fc" id="L438">                        null);</span>
 <span class="pc bpc" id="L439" title="1 of 2 branches missed.">                if (name != null) {</span>
 <span class="pc bpc" id="L440" title="1 of 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
 <span class="fc" id="L441">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
                   }
 <span class="fc" id="L443">                  String value = rb.req.getParams()</span>
 <span class="fc" id="L444">                      .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-                          + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
-                          + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId
-                          + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE,
-                          null);
+<span class="fc" id="L445">                          + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;</span>
+<span class="fc" id="L446">                          + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId</span>
+<span class="fc" id="L447">                          + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE,</span>
+<span class="fc" id="L448">                          null);</span>
 <span class="pc bpc" id="L449" title="1 of 2 branches missed.">                  if (value != null) {</span>
 <span class="fc" id="L450">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L451">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
@@ -456,28 +456,28 @@ public class MtasSolrComponentStats
 <span class="fc" id="L456">                    tmpVariables.get(name).addAll(list);</span>
                   }
                 }
-<span class="fc" id="L459">              }</span>
+              }
 <span class="fc bfc" id="L460" title="All 2 branches covered.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
 <span class="fc" id="L461">                  .entrySet()) {</span>
 <span class="fc" id="L462">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
 <span class="fc" id="L463">                    entry.getValue()</span>
 <span class="fc" id="L464">                        .toArray(new String[entry.getValue().size()]));</span>
-<span class="fc" id="L465">              }</span>
+              }
             }
 <span class="fc" id="L467">            tmpQCounter++;</span>
-<span class="fc" id="L468">          }</span>
+          }
 <span class="fc" id="L469">        } else {</span>
 <span class="nc" id="L470">          throw new IOException(&quot;no &quot; + NAME_MTAS_STATS_SPANS_QUERY</span>
-              + &quot; for mtas stats span &quot; + id);
+<span class="nc" id="L471">              + &quot; for mtas stats span &quot; + id);</span>
         }
-<span class="pc bpc" id="L473" title="1 of 2 branches missed.">        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_SPANS_EXPAND, false)) {
+<span class="fc" id="L473">        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="pc bpc" id="L474" title="1 of 2 branches missed.">            + NAME_MTAS_STATS_SPANS_EXPAND, false)) {</span>
 <span class="nc" id="L475">          expand[tmpCounter] = true;</span>
-        } else {
+<span class="nc" id="L476">        } else {</span>
 <span class="fc" id="L477">          expand[tmpCounter] = false;</span>
         }
 <span class="fc" id="L479">        tmpCounter++;</span>
-<span class="fc" id="L480">      }</span>
+      }
 <span class="fc" id="L481">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
 <span class="fc" id="L482">      mtasFields.doStats = true;</span>
 <span class="fc" id="L483">      mtasFields.doStatsSpans = true;</span>
@@ -508,12 +508,12 @@ public class MtasSolrComponentStats
 <span class="pc bpc" id="L508" title="1 of 2 branches missed.">          Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
 <span class="pc" id="L509">              ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
 <span class="fc" id="L510">          MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],</span>
-              queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],
-              fields[i], queryIgnores[i][j], maximumIgnoreLength);
+<span class="fc" id="L511">              queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],</span>
+<span class="fc" id="L512">              fields[i], queryIgnores[i][j], maximumIgnoreLength);</span>
           // minimize number of queries
 <span class="fc bfc" id="L514" title="All 2 branches covered.">          if (cf.spanQueryList.contains(q)) {</span>
 <span class="fc" id="L515">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
-          } else {
+<span class="fc" id="L516">          } else {</span>
 <span class="fc" id="L517">            cf.spanQueryList.add(q);</span>
           }
 <span class="fc" id="L519">          ql[j] = q;</span>
@@ -521,9 +521,9 @@ public class MtasSolrComponentStats
 <span class="pc bpc" id="L521" title="1 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
 <span class="fc" id="L522">            : Double.parseDouble(minima[i]);</span>
 <span class="pc bpc" id="L523" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
-<span class="pc" id="L524">            : Double.parseDouble(maxima[i]);</span>
+<span class="nc" id="L524">            : Double.parseDouble(maxima[i]);</span>
 <span class="pc bpc" id="L525" title="2 of 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
-<span class="pc" id="L526">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryNumber</span>
+<span class="nc" id="L526">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryNumber</span>
 <span class="fc" id="L527">            : keys[i].trim();</span>
 <span class="pc bpc" id="L528" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
 <span class="fc" id="L529">            : types[i].trim();</span>
@@ -533,39 +533,39 @@ public class MtasSolrComponentStats
         try {
 <span class="fc" id="L534">          mtasFields.list.get(fields[i]).statsSpanList</span>
 <span class="fc" id="L535">              .add(new ComponentSpan(ql, key, minimum, maximum, type,</span>
-                  functionKey, functionExpression, functionType));
-<span class="nc" id="L537">        } catch (ParseException e) {</span>
+<span class="fc" id="L536">                  functionKey, functionExpression, functionType));</span>
+<span class="pc" id="L537">        } catch (ParseException e) {</span>
 <span class="nc" id="L538">          throw new IOException(e.getMessage());</span>
-<span class="fc" id="L539">        }</span>
+        }
 <span class="pc bpc" id="L540" title="1 of 2 branches missed.">        if (expand[i]) {</span>
 <span class="nc" id="L541">          HashMap&lt;String, String[]&gt;[][] expandedQueryVariables = expandedQueryVariables(</span>
-              queryVariables[i]);
+<span class="nc" id="L542">              queryVariables[i]);</span>
 <span class="nc bnc" id="L543" title="All 2 branches missed.">          for (int e = 0; e &lt; expandedQueryVariables.length; e++) {</span>
 <span class="nc" id="L544">            MtasSpanQuery[] eql = new MtasSpanQuery[queryNumber];</span>
 <span class="nc bnc" id="L545" title="All 2 branches missed.">            for (int j = 0; j &lt; queryNumber; j++) {</span>
 <span class="nc bnc" id="L546" title="All 2 branches missed.">              Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
 <span class="nc" id="L547">                  ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
 <span class="nc" id="L548">              MtasSpanQuery q = MtasSolrResultUtil.constructQuery(</span>
-                  queryValues[i][j], queryTypes[i][j], queryPrefixes[i][j],
-                  expandedQueryVariables[e][j], fields[i], queryIgnores[i][j],
-                  maximumIgnoreLength);
+<span class="nc" id="L549">                  queryValues[i][j], queryTypes[i][j], queryPrefixes[i][j],</span>
+<span class="nc" id="L550">                  expandedQueryVariables[e][j], fields[i], queryIgnores[i][j],</span>
+<span class="nc" id="L551">                  maximumIgnoreLength);</span>
               // minimize number of queries
 <span class="nc bnc" id="L553" title="All 2 branches missed.">              if (cf.spanQueryList.contains(q)) {</span>
 <span class="nc" id="L554">                q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
-              } else {
+<span class="nc" id="L555">              } else {</span>
 <span class="nc" id="L556">                cf.spanQueryList.add(q);</span>
               }
 <span class="nc" id="L558">              eql[j] = q;</span>
             }
 <span class="nc" id="L560">            String newKey = generateKey(key + &quot; (&quot; + e + &quot;)&quot;,</span>
-                expandedQueryVariables[e]);
+<span class="nc" id="L561">                expandedQueryVariables[e]);</span>
             try {
 <span class="nc" id="L563">              mtasFields.list.get(fields[i]).statsSpanList</span>
 <span class="nc" id="L564">                  .add(new ComponentSpan(eql, newKey, minimum, maximum, type,</span>
-                      functionKey, functionExpression, functionType));
+<span class="nc" id="L565">                      functionKey, functionExpression, functionType));</span>
 <span class="nc" id="L566">            } catch (ParseException ee) {</span>
 <span class="nc" id="L567">              throw new IOException(ee.getMessage());</span>
-<span class="nc" id="L568">            }</span>
+            }
           }
         }
       }
@@ -593,10 +593,10 @@ public class MtasSolrComponentStats
 <span class="nc bnc" id="L593" title="All 2 branches missed.">              &amp;&amp; queryVariables[q].get(name).length == 1) {</span>
 <span class="nc" id="L594">            newKey.append(&quot;'&quot; + queryVariables[q].get(name)[0]</span>
 <span class="nc" id="L595">                .replace(&quot;\\&quot;, &quot;\\\\&quot;).replace(&quot;,&quot;, &quot;\\,&quot;) + &quot;'&quot;);</span>
-          } else {
+<span class="nc" id="L596">          } else {</span>
 <span class="nc" id="L597">            newKey.append(&quot;-&quot;);</span>
           }
-<span class="nc" id="L599">        }</span>
+        }
       }
     }
 <span class="nc" id="L602">    return newKey.toString();</span>
@@ -637,7 +637,7 @@ public class MtasSolrComponentStats
 <span class="nc" id="L637">        resultItem[localIndex] = value[i];</span>
 <span class="nc" id="L638">        result.add(resultItem);</span>
       }
-    } else {
+<span class="nc" id="L640">    } else {</span>
 <span class="nc" id="L641">      ArrayList&lt;HashMap&lt;String, String[]&gt;[]&gt; newResult = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L642" title="All 2 branches missed.">      for (int e = 0; e &lt; result.size(); e++) {</span>
 <span class="nc bnc" id="L643" title="All 2 branches missed.">        for (int i = 0; i &lt; value.length; i++) {</span>
@@ -690,14 +690,14 @@ public class MtasSolrComponentStats
 <span class="nc" id="L690">          newItem = new HashMap&lt;&gt;();</span>
 <span class="nc" id="L691">          newItem.put(key, value);</span>
 <span class="nc" id="L692">          result.add(newItem);</span>
-        } else {
+<span class="nc" id="L693">        } else {</span>
 <span class="nc bnc" id="L694" title="All 2 branches missed.">          for (int j = 0; j &lt; value.length; j++) {</span>
 <span class="nc" id="L695">            newItem = new HashMap&lt;&gt;();</span>
 <span class="nc" id="L696">            newItem.put(key, new String[] { value[j] });</span>
 <span class="nc" id="L697">            result.add(newItem);</span>
           }
         }
-      } else {
+<span class="nc" id="L700">      } else {</span>
 <span class="nc" id="L701">        ArrayList&lt;HashMap&lt;String, String[]&gt;&gt; newResult = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L702" title="All 2 branches missed.">        for (int i = 0; i &lt; result.size(); i++) {</span>
           HashMap&lt;String, String[]&gt; newItem;
@@ -705,7 +705,7 @@ public class MtasSolrComponentStats
 <span class="nc" id="L705">            newItem = (HashMap&lt;String, String[]&gt;) result.get(i).clone();</span>
 <span class="nc" id="L706">            newItem.put(key, value);</span>
 <span class="nc" id="L707">            newResult.add(newItem);</span>
-          } else {
+<span class="nc" id="L708">          } else {</span>
 <span class="nc bnc" id="L709" title="All 2 branches missed.">            for (int j = 0; j &lt; value.length; j++) {</span>
 <span class="nc" id="L710">              newItem = (HashMap&lt;String, String[]&gt;) result.get(i).clone();</span>
 <span class="nc" id="L711">              newItem.put(key, new String[] { value[j] });</span>
@@ -744,95 +744,95 @@ public class MtasSolrComponentStats
 <span class="fc" id="L744">          .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
 <span class="fc bfc" id="L745" title="All 2 branches covered.">      for (String key : keys) {</span>
 <span class="fc" id="L746">        sreq.params.remove(</span>
-            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_KEY);
+<span class="fc" id="L747">            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_KEY);</span>
 <span class="fc" id="L748">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_POSITIONS_FIELD);
+<span class="fc" id="L749">            + NAME_MTAS_STATS_POSITIONS_FIELD);</span>
 <span class="fc" id="L750">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_POSITIONS_TYPE);
+<span class="fc" id="L751">            + NAME_MTAS_STATS_POSITIONS_TYPE);</span>
 <span class="fc" id="L752">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_POSITIONS_MAXIMUM);
+<span class="fc" id="L753">            + NAME_MTAS_STATS_POSITIONS_MAXIMUM);</span>
 <span class="fc" id="L754">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_POSITIONS_MINIMUM);
-<span class="fc" id="L756">      }</span>
+<span class="fc" id="L755">            + NAME_MTAS_STATS_POSITIONS_MINIMUM);</span>
+      }
 <span class="fc" id="L757">      sreq.params.remove(PARAM_MTAS_STATS_TOKENS);</span>
 <span class="fc" id="L758">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
-          PARAM_MTAS_STATS_TOKENS);
+<span class="fc" id="L759">          PARAM_MTAS_STATS_TOKENS);</span>
 <span class="fc bfc" id="L760" title="All 2 branches covered.">      for (String key : keys) {</span>
 <span class="fc" id="L761">        sreq.params.remove(</span>
-            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_KEY);
+<span class="fc" id="L762">            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_KEY);</span>
 <span class="fc" id="L763">        sreq.params.remove(</span>
-            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD);
+<span class="fc" id="L764">            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD);</span>
 <span class="fc" id="L765">        sreq.params.remove(</span>
-            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE);
+<span class="fc" id="L766">            PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE);</span>
 <span class="fc" id="L767">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_TOKENS_MAXIMUM);
+<span class="fc" id="L768">            + NAME_MTAS_STATS_TOKENS_MAXIMUM);</span>
 <span class="fc" id="L769">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_TOKENS_MINIMUM);
-<span class="fc" id="L771">      }</span>
+<span class="fc" id="L770">            + NAME_MTAS_STATS_TOKENS_MINIMUM);</span>
+      }
 <span class="fc" id="L772">      sreq.params.remove(PARAM_MTAS_STATS_SPANS);</span>
 <span class="fc" id="L773">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
-          PARAM_MTAS_STATS_SPANS);
+<span class="fc" id="L774">          PARAM_MTAS_STATS_SPANS);</span>
 <span class="fc bfc" id="L775" title="All 2 branches covered.">      for (String key : keys) {</span>
 <span class="fc" id="L776">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_SPANS_KEY);
+<span class="fc" id="L777">            + NAME_MTAS_STATS_SPANS_KEY);</span>
 <span class="fc" id="L778">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_SPANS_FIELD);
+<span class="fc" id="L779">            + NAME_MTAS_STATS_SPANS_FIELD);</span>
 <span class="fc" id="L780">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_SPANS_TYPE);
+<span class="fc" id="L781">            + NAME_MTAS_STATS_SPANS_TYPE);</span>
 <span class="fc" id="L782">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_SPANS_MAXIMUM);
+<span class="fc" id="L783">            + NAME_MTAS_STATS_SPANS_MAXIMUM);</span>
 <span class="fc" id="L784">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-            + NAME_MTAS_STATS_SPANS_MINIMUM);
+<span class="fc" id="L785">            + NAME_MTAS_STATS_SPANS_MINIMUM);</span>
 <span class="fc" id="L786">        Set&lt;String&gt; subKeys = MtasSolrResultUtil</span>
 <span class="fc" id="L787">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
-                + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);
+<span class="fc" id="L788">                + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);</span>
 <span class="pc bpc" id="L789" title="1 of 2 branches missed.">        for (String subKey : subKeys) {</span>
 <span class="nc" id="L790">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);
+<span class="nc" id="L791">              + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="nc" id="L792">              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);</span>
 <span class="nc" id="L793">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY);
+<span class="nc" id="L794">              + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="nc" id="L795">              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY);</span>
 <span class="nc" id="L796">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);
-<span class="nc" id="L799">        }</span>
+<span class="nc" id="L797">              + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="nc" id="L798">              + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);</span>
+        }
 <span class="fc" id="L800">        subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
-            PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;
-                + NAME_MTAS_STATS_SPANS_QUERY);
+<span class="fc" id="L801">            PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L802">                + NAME_MTAS_STATS_SPANS_QUERY);</span>
 <span class="fc bfc" id="L803" title="All 2 branches covered.">        for (String subKey : subKeys) {</span>
 <span class="fc" id="L804">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE);
+<span class="fc" id="L805">              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L806">              + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE);</span>
 <span class="fc" id="L807">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH);
+<span class="fc" id="L808">              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L809">              + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH);</span>
 <span class="fc" id="L810">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);
+<span class="fc" id="L811">              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L812">              + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);</span>
 <span class="fc" id="L813">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);
+<span class="fc" id="L814">              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L815">              + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);</span>
 <span class="fc" id="L816">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-              + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);
+<span class="fc" id="L817">              + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L818">              + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);</span>
 <span class="fc" id="L819">          Set&lt;String&gt; subSubKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
 <span class="fc" id="L820">              rb.req.getParams(),</span>
-              PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;
-                  + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-                  + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
+<span class="fc" id="L821">              PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L822">                  + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L823">                  + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);</span>
 <span class="fc bfc" id="L824" title="All 2 branches covered.">          for (String subSubKey : subSubKeys) {</span>
 <span class="fc" id="L825">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-                + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey
-                + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);
+<span class="fc" id="L826">                + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L827">                + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey</span>
+<span class="fc" id="L828">                + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);</span>
 <span class="fc" id="L829">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
-                + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
-                + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey
-                + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);
-<span class="fc" id="L833">          }</span>
-<span class="fc" id="L834">        }</span>
-<span class="fc" id="L835">      }</span>
+<span class="fc" id="L830">                + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;</span>
+<span class="fc" id="L831">                + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey</span>
+<span class="fc" id="L832">                + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);</span>
+          }
+        }
+      }
     }
 <span class="fc" id="L837">  }</span>
 
@@ -872,11 +872,11 @@ public class MtasSolrComponentStats
 <span class="fc" id="L872">    SimpleOrderedMap&lt;Object&gt; mtasPositionResponse = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="fc" id="L873">    mtasPositionResponse.add(&quot;key&quot;, position.key);</span>
 <span class="fc" id="L874">    MtasSolrMtasResult data = new MtasSolrMtasResult(position.dataCollector,</span>
-        position.dataType, position.statsType, position.statsItems, null);
+<span class="fc" id="L875">        position.dataType, position.statsType, position.statsItems, null);</span>
 <span class="fc bfc" id="L876" title="All 2 branches covered.">    if (encode) {</span>
 <span class="fc" id="L877">      mtasPositionResponse.add(&quot;_encoded_data&quot;,</span>
 <span class="fc" id="L878">          MtasSolrResultUtil.encode(data));</span>
-    } else {
+<span class="fc" id="L879">    } else {</span>
 <span class="fc" id="L880">      mtasPositionResponse.add(position.dataCollector.getCollectorType(), data);</span>
 <span class="fc" id="L881">      MtasSolrResultUtil.rewrite(mtasPositionResponse, searchComponent);</span>
     }
@@ -898,10 +898,10 @@ public class MtasSolrComponentStats
 <span class="fc" id="L898">    SimpleOrderedMap&lt;Object&gt; mtasTokenResponse = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="fc" id="L899">    mtasTokenResponse.add(&quot;key&quot;, token.key);</span>
 <span class="fc" id="L900">    MtasSolrMtasResult data = new MtasSolrMtasResult(token.dataCollector,</span>
-        token.dataType, token.statsType, token.statsItems, null);
+<span class="fc" id="L901">        token.dataType, token.statsType, token.statsItems, null);</span>
 <span class="fc bfc" id="L902" title="All 2 branches covered.">    if (encode) {</span>
 <span class="fc" id="L903">      mtasTokenResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
-    } else {
+<span class="fc" id="L904">    } else {</span>
 <span class="fc" id="L905">      mtasTokenResponse.add(token.dataCollector.getCollectorType(), data);</span>
 <span class="fc" id="L906">      MtasSolrResultUtil.rewrite(mtasTokenResponse, searchComponent);</span>
     }
@@ -930,19 +930,19 @@ public class MtasSolrComponentStats
 <span class="pc bpc" id="L930" title="1 of 2 branches missed.">      for (SubComponentFunction function : span.functions) {</span>
 <span class="nc" id="L931">        function.dataCollector.close();</span>
 <span class="nc" id="L932">        functionDataItem.put(function.key,</span>
-            new MtasSolrMtasResult(function.dataCollector,
-                new String[] { function.dataType },
-                new String[] { function.statsType },
-                new SortedSet[] { function.statsItems }, new String[] { null },
+<span class="nc" id="L933">            new MtasSolrMtasResult(function.dataCollector,</span>
+<span class="nc" id="L934">                new String[] { function.dataType },</span>
+<span class="nc" id="L935">                new String[] { function.statsType },</span>
+<span class="nc" id="L936">                new SortedSet[] { function.statsItems }, new String[] { null },</span>
 <span class="nc" id="L937">                new String[] { null }, new Integer[] { 0 },</span>
 <span class="nc" id="L938">                new Integer[] { Integer.MAX_VALUE }, null));</span>
-<span class="nc" id="L939">      }</span>
+      }
     }
 <span class="fc" id="L941">    MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector,</span>
-        span.dataType, span.statsType, span.statsItems, functionData);
+<span class="fc" id="L942">        span.dataType, span.statsType, span.statsItems, functionData);</span>
 <span class="fc bfc" id="L943" title="All 2 branches covered.">    if (encode) {</span>
 <span class="fc" id="L944">      mtasSpanResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
-    } else {
+<span class="fc" id="L945">    } else {</span>
 <span class="fc" id="L946">      mtasSpanResponse.add(span.dataCollector.getCollectorType(), data);</span>
 <span class="fc" id="L947">      MtasSolrResultUtil.rewrite(mtasSpanResponse, searchComponent);</span>
     }
@@ -958,9 +958,9 @@ public class MtasSolrComponentStats
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
-<span class="pc bpc" id="L961" title="1 of 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
-        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
+<span class="pc bpc" id="L961" title="1 of 2 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="fc bfc" id="L962" title="All 2 branches covered.">        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc bfc" id="L963" title="All 2 branches covered.">        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {</span>
 <span class="fc bfc" id="L964" title="All 2 branches covered.">      for (ShardRequest sreq : rb.finished) {</span>
 <span class="pc bpc" id="L965" title="1 of 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
 <span class="pc bpc" id="L966" title="1 of 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_STATS, false)) {</span>
@@ -968,18 +968,18 @@ public class MtasSolrComponentStats
 <span class="fc" id="L968">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
 <span class="fc" id="L969">                .getResponse();</span>
             try {
-<span class="fc" id="L971">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
+<span class="pc" id="L971">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
 <span class="nc" id="L972">                  .findRecursive(&quot;mtas&quot;, &quot;stats&quot;);</span>
 <span class="nc bnc" id="L973" title="All 2 branches missed.">              if (data != null) {</span>
 <span class="nc" id="L974">                MtasSolrResultUtil.decode(data);</span>
               }
-<span class="fc" id="L976">            } catch (ClassCastException e) {</span>
+<span class="pc" id="L976">            } catch (ClassCastException e) {</span>
 <span class="fc" id="L977">              log.debug(e);</span>
               // shouldnt happen
-<span class="nc" id="L979">            }</span>
-<span class="fc" id="L980">          }</span>
+            }
+          }
         }
-<span class="fc" id="L982">      }</span>
+      }
     }
 <span class="fc" id="L984">  }</span>
 
@@ -998,10 +998,10 @@ public class MtasSolrComponentStats
 <span class="fc" id="L998">    NamedList&lt;Object&gt; mtasResponse = null;</span>
     try {
 <span class="fc" id="L1000">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
-<span class="nc" id="L1001">    } catch (ClassCastException e) {</span>
+<span class="pc" id="L1001">    } catch (ClassCastException e) {</span>
 <span class="nc" id="L1002">      log.debug(e);</span>
 <span class="nc" id="L1003">      mtasResponse = null;</span>
-<span class="fc" id="L1004">    }</span>
+    }
 <span class="pc bpc" id="L1005" title="1 of 2 branches missed.">    if (mtasResponse != null) {</span>
       NamedList&lt;Object&gt; mtasResponseStats;
       try {
@@ -1009,10 +1009,10 @@ public class MtasSolrComponentStats
 <span class="pc bpc" id="L1009" title="1 of 2 branches missed.">        if (mtasResponseStats != null) {</span>
 <span class="fc" id="L1010">          MtasSolrResultUtil.rewrite(mtasResponseStats, searchComponent);</span>
         }
-<span class="nc" id="L1012">      } catch (ClassCastException e) {</span>
+<span class="pc" id="L1012">      } catch (ClassCastException e) {</span>
 <span class="nc" id="L1013">        log.debug(e);</span>
 <span class="nc" id="L1014">        mtasResponse.remove(&quot;stats&quot;);</span>
-<span class="fc" id="L1015">      }</span>
+      }
     }
 <span class="fc" id="L1017">  }</span>
 
