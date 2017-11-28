@@ -67,7 +67,8 @@ public class MtasSolrComponentCollection
   /**
    * Instantiates a new mtas solr component collection.
    *
-   * @param searchComponent the search component
+   * @param searchComponent
+   *          the search component
    */
   public MtasSolrComponentCollection(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -83,11 +84,11 @@ public class MtasSolrComponentCollection
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-    //System.out.println(
-    //"collection: " + System.nanoTime() + " - " +
-    //Thread.currentThread().getId()
-    //+ " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
-    //+ rb.stage + " " + rb.req.getParamString());
+    // System.out.println(
+    // "collection: " + System.nanoTime() + " - " +
+    // Thread.currentThread().getId()
+    // + " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
+    // + rb.stage + " " + rb.req.getParamString());
     Set<String> ids = MtasSolrResultUtil
         .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_COLLECTION);
     if (!ids.isEmpty()) {
@@ -119,15 +120,22 @@ public class MtasSolrComponentCollection
             null);
         collections[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_COLLECTION
             + "." + id + "." + NAME_MTAS_COLLECTION_COLLECTION, null);
-        //always id for post
-        if(actions[tmpCounter]!=null && (actions[tmpCounter].equals(ComponentCollection.ACTION_POST) || actions[tmpCounter].equals(ComponentCollection.ACTION_IMPORT) || actions[tmpCounter].equals(ComponentCollection.ACTION_CREATE))) {
-          if(collectionIds[tmpCounter]==null || collectionIds[tmpCounter].isEmpty()) {
+        // always id for post
+        if (actions[tmpCounter] != null && (actions[tmpCounter]
+            .equals(ComponentCollection.ACTION_POST)
+            || actions[tmpCounter].equals(ComponentCollection.ACTION_IMPORT)
+            || actions[tmpCounter].equals(ComponentCollection.ACTION_CREATE))) {
+          if (collectionIds[tmpCounter] == null
+              || collectionIds[tmpCounter].isEmpty()) {
             collectionIds[tmpCounter] = UUID.randomUUID().toString();
-            ModifiableSolrParams changedParams = new ModifiableSolrParams(rb.req.getParams());
-            changedParams.remove(PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_ID);
-            changedParams.set(PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_ID, collectionIds[tmpCounter]);            
+            ModifiableSolrParams changedParams = new ModifiableSolrParams(
+                rb.req.getParams());
+            changedParams.remove(PARAM_MTAS_COLLECTION + "." + id + "."
+                + NAME_MTAS_COLLECTION_ID);
+            changedParams.set(PARAM_MTAS_COLLECTION + "." + id + "."
+                + NAME_MTAS_COLLECTION_ID, collectionIds[tmpCounter]);
             rb.req.setParams(changedParams);
-          }          
+          }
         }
         tmpCounter++;
       }
@@ -177,7 +185,7 @@ public class MtasSolrComponentCollection
             }
             break;
           case ComponentCollection.ACTION_CREATE:
-            if(collectionIds[i]==null) {
+            if (collectionIds[i] == null) {
               collectionIds[i] = UUID.randomUUID().toString();
             }
             if (fields[i] != null) {
@@ -216,7 +224,8 @@ public class MtasSolrComponentCollection
               mtasFields.collection.add(componentCollection);
             } else {
               throw new IOException(
-                  "no url or collection defined for collection (" + actions[i] + ")");
+                  "no url or collection defined for collection (" + actions[i]
+                      + ")");
             }
             break;
           case ComponentCollection.ACTION_DELETE:
@@ -265,7 +274,7 @@ public class MtasSolrComponentCollection
     if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
         && sreq.params.getBool(PARAM_MTAS_COLLECTION, false)) {
       if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-        //do nothing
+        // do nothing
       } else {
         // remove for other requests
         Set<String> keys = MtasSolrResultUtil
@@ -319,10 +328,13 @@ public class MtasSolrComponentCollection
   /**
    * Creates the mtas solr collection result.
    *
-   * @param componentCollection the component collection
-   * @param storeIfRelevant the store if relevant
+   * @param componentCollection
+   *          the component collection
+   * @param storeIfRelevant
+   *          the store if relevant
    * @return the mtas solr collection result
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   /*
    * (non-Javadoc)
@@ -682,7 +694,7 @@ public class MtasSolrComponentCollection
                       + NAME_MTAS_COLLECTION_POST,
                   stringValuesToString(componentCollection.values()));
             }
-          } 
+          }
           id++;
         }
         // add new requests
@@ -721,7 +733,8 @@ public class MtasSolrComponentCollection
   /**
    * Gets the mtas fields.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    * @return the mtas fields
    */
   private ComponentFields getMtasFields(ResponseBuilder rb) {
@@ -731,7 +744,8 @@ public class MtasSolrComponentCollection
   /**
    * String values to string.
    *
-   * @param stringValues the string values
+   * @param stringValues
+   *          the string values
    * @return the string
    */
   private static String stringValuesToString(HashSet<String> stringValues) {
@@ -741,9 +755,11 @@ public class MtasSolrComponentCollection
   /**
    * String to string values.
    *
-   * @param stringValue the string value
+   * @param stringValue
+   *          the string value
    * @return the hash set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static HashSet<String> stringToStringValues(String stringValue)
       throws IOException {
@@ -768,6 +784,7 @@ public class MtasSolrComponentCollection
             break;
           default:
             // do nothing
+            break;
           }
         }
       }
