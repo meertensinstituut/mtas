@@ -9,7 +9,7 @@
     <tr>
       <th>Version</th>
       <th>Lucene/Solr</th>
-      <th>Mtas</th>
+      <th>Release</th>
       <th colspan='3'>GitHub</th>
       <th colspan='4'>Maven</th>
     </tr>
@@ -50,9 +50,9 @@
     <tr>
       <th>Version</th>
       <th>Lucene/Solr</th>
-      <th>Mtas</th>
+      <th>Release</th>
       <th colspan='3'>GitHub</th>
-      <th colspan='4'>Central Repository</th>
+      <th colspan='4'>Maven</th>
     </tr>
 #foreach($version in $metadata.versioning.versions.children().iterator())
 #set($fullversion = $version.getText())
@@ -87,4 +87,4 @@
     </tbody>
 </table>
 
-See also the [Central Repository](http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/) and [GitHub Releases](https://github.com/meertensinstituut/mtas/releases).
+See also the [Maven Central Repository](http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/) and [GitHub Releases](https://github.com/meertensinstituut/mtas/releases).
