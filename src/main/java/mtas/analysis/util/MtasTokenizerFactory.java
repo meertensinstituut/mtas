@@ -31,6 +31,9 @@ public class MtasTokenizerFactory extends TokenizerFactory
   /** The Constant ARGUMENT_ANALYZER. */
   public static final String ARGUMENT_PARSER = "parser";
 
+  /** The Constant ARGUMENT_PARSER_ARGS. */
+  public static final String ARGUMENT_PARSER_ARGS = "parserArgs";
+
   /** The Constant ARGUMENT_DEFAULT. */
   public static final String ARGUMENT_DEFAULT = "default";
 
@@ -45,6 +48,9 @@ public class MtasTokenizerFactory extends TokenizerFactory
 
   /** The analyzer argument. */
   private String analyzerArgument;
+
+  /** The parser arguments. */
+  private String analyzerArgumentParserArgs;
 
   /** The configs. */
   private HashMap<String, MtasConfiguration> configs = null;
@@ -75,6 +81,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
     configFileArgument = get(args, ARGUMENT_CONFIGFILE);
     configArgument = get(args, ARGUMENT_CONFIG);
     analyzerArgument = get(args, ARGUMENT_PARSER);
+    analyzerArgumentParserArgs = get(args, ARGUMENT_PARSER_ARGS);
     defaultArgument = get(args, ARGUMENT_DEFAULT);
     int numberOfArgs = 0;
     numberOfArgs = (configFileArgument==null)?numberOfArgs:numberOfArgs+1;
@@ -206,6 +213,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
           MtasConfiguration subConfig = new MtasConfiguration();
           subConfig.name = "parser";
           subConfig.attributes.put("name", analyzerArgument);
+          subConfig.attributes.put(ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
           config.children.add(subConfig);
         }
       }
