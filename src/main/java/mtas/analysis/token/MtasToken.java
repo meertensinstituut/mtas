@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,11 +102,43 @@ public abstract class MtasToken {
    * Instantiates a new mtas token.
    *
    * @param tokenId the token id
+   * @param prefix the prefix
+   * @param postfix the postfix
+   */
+  protected MtasToken(Integer tokenId, String prefix, String postfix) {
+    Objects.requireNonNull(prefix, "prefix is obligatory");
+    this.tokenId = tokenId;
+    setType();
+    if (postfix != null) {
+      setValue(prefix + DELIMITER + postfix);
+    } else {
+      setValue(prefix + DELIMITER);
+    }
+  }
+
+  /**
+   * Instantiates a new mtas token.
+   *
+   * @param tokenId the token id
    * @param value the value
    * @param position the position
    */
   protected MtasToken(Integer tokenId, String value, Integer position) {
     this(tokenId, value);
+    addPosition(position);
+  }
+
+  /**
+   * Instantiates a new mtas token.
+   *
+   * @param tokenId the token id
+   * @param prefix the prefix
+   * @param postfix the postfix
+   * @param position the position
+   */
+  protected MtasToken(Integer tokenId, String prefix, String postfix,
+      Integer position) {
+    this(tokenId, prefix, postfix);
     addPosition(position);
   }
 

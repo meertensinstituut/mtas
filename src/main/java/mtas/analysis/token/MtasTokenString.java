@@ -22,11 +22,35 @@ public class MtasTokenString extends MtasToken {
    * Instantiates a new mtas token string.
    *
    * @param tokenId the token id
+   * @param prefix the prefix
+   * @param postfix the postfix
+   */
+  public MtasTokenString(Integer tokenId, String prefix, String postfix) {
+    super(tokenId, prefix, postfix);
+  }
+
+  /**
+   * Instantiates a new mtas token string.
+   *
+   * @param tokenId the token id
    * @param value the value
    * @param position the position
    */
   public MtasTokenString(Integer tokenId, String value, Integer position) {
     super(tokenId, value, position);
+  }
+
+  /**
+   * Instantiates a new mtas token string.
+   *
+   * @param tokenId the token id
+   * @param prefix the prefix
+   * @param postfix the postfix
+   * @param position the position
+   */
+  public MtasTokenString(Integer tokenId, String prefix, String postfix,
+      Integer position) {
+    super(tokenId, prefix, postfix, position);
   }
 
   /*
