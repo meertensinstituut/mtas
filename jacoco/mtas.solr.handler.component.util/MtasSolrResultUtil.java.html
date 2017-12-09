@@ -70,7 +70,7 @@ public class MtasSolrResultUtil {
 <span class="fc bfc" id="L70" title="All 2 branches covered.">    for (int i = 0; i &lt; al.size(); i++) {</span>
 <span class="pc bpc" id="L71" title="1 of 2 branches missed.">      if (al.get(i) instanceof NamedList) {</span>
 <span class="fc" id="L72">        rewrite((NamedList) al.get(i), searchComponent);</span>
-<span class="pc bnc" id="L73" title="All 2 branches missed.">      } else if (al.get(i) instanceof ArrayList) {</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">      } else if (al.get(i) instanceof ArrayList) {</span>
 <span class="nc" id="L74">        rewrite((ArrayList) al.get(i), searchComponent);</span>
       }
     }
@@ -150,7 +150,7 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L150">            tmpResponse.add(nl.getName(i), rewriteToArray(nnl));</span>
 <span class="fc" id="L151">            nl.setVal(i, null);</span>
 <span class="fc" id="L152">            collapseNamedList.put(nl.getName(i), tmpResponse);</span>
-          }
+<span class="fc" id="L153">          }</span>
 <span class="fc" id="L154">        } else if (o.dataCollector.getCollectorType()</span>
 <span class="pc bpc" id="L155" title="1 of 2 branches missed.">            .equals(DataCollector.COLLECTOR_TYPE_DATA)) {</span>
 <span class="fc" id="L156">          NamedList&lt;Object&gt; nnl = o.getData(showDebugInfo);</span>
@@ -158,7 +158,7 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L158">            rewrite(nnl, searchComponent);</span>
 <span class="fc" id="L159">            collapseNamedList.put(nl.getName(i), nnl);</span>
 <span class="fc" id="L160">            nl.setVal(i, nnl);</span>
-<span class="fc" id="L161">          } else {</span>
+          } else {
 <span class="fc" id="L162">            nl.setVal(i, null);</span>
           }
         }
@@ -168,10 +168,10 @@ public class MtasSolrResultUtil {
 <span class="pc bpc" id="L168" title="1 of 4 branches missed.">    if (doCollapse &amp;&amp; collapseNamedList.size() &gt; 0) {</span>
 <span class="fc bfc" id="L169" title="All 2 branches covered.">      for (String key : collapseNamedList.keySet()) {</span>
 <span class="fc" id="L170">        nl.remove(key);</span>
-      }
+<span class="fc" id="L171">      }</span>
 <span class="fc bfc" id="L172" title="All 2 branches covered.">      for (NamedList&lt;Object&gt; items : collapseNamedList.values()) {</span>
 <span class="fc" id="L173">        nl.addAll(items);</span>
-      }
+<span class="fc" id="L174">      }</span>
     }
 <span class="fc" id="L176">  }</span>
 
@@ -198,7 +198,7 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L198">        item.add(&quot;key&quot;, key);</span>
       }
 <span class="fc" id="L200">      al.add(item);</span>
-    }
+<span class="fc" id="L201">    }</span>
 <span class="fc" id="L202">    return al;</span>
   }
 
@@ -221,7 +221,7 @@ public class MtasSolrResultUtil {
         NamedList&lt;Object&gt; tnnnl;
 <span class="nc bnc" id="L222" title="All 4 branches missed.">        if (o != null &amp;&amp; o instanceof NamedList) {</span>
 <span class="nc" id="L223">          tnnnl = (NamedList&lt;Object&gt;) o;</span>
-<span class="nc" id="L224">        } else {</span>
+        } else {
 <span class="nc" id="L225">          tnnnl = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="nc" id="L226">          tnnl.add(key, tnnnl);</span>
         }
@@ -246,7 +246,7 @@ public class MtasSolrResultUtil {
       NamedList&lt;Object&gt; tnnnl;
 <span class="nc bnc" id="L247" title="All 4 branches missed.">      if (o != null &amp;&amp; o instanceof NamedList) {</span>
 <span class="nc" id="L248">        tnnnl = (NamedList&lt;Object&gt;) o;</span>
-<span class="nc" id="L249">      } else {</span>
+      } else {
 <span class="nc" id="L250">        tnnnl = new SimpleOrderedMap&lt;&gt;();</span>
 <span class="nc" id="L251">        tnl.add(key, tnnnl);</span>
       }
@@ -292,7 +292,7 @@ public class MtasSolrResultUtil {
     ObjectInputStream objectInputStream;
     try {
 <span class="fc" id="L294">      objectInputStream = new ObjectInputStream(</span>
-<span class="fc" id="L295">          new ByteArrayInputStream(bytes));</span>
+          new ByteArrayInputStream(bytes));
 <span class="fc" id="L296">      return objectInputStream.readObject();</span>
 <span class="nc" id="L297">    } catch (IOException | ClassNotFoundException e) {</span>
 <span class="nc" id="L298">      log.error(e);</span>
@@ -311,7 +311,7 @@ public class MtasSolrResultUtil {
 <span class="fc bfc" id="L311" title="All 2 branches covered.">    for (int i = 0; i &lt; l.size(); i++) {</span>
 <span class="pc bpc" id="L312" title="1 of 2 branches missed.">      if (l.get(i) instanceof NamedList) {</span>
 <span class="fc" id="L313">        l.set(i, decode((NamedList) l.get(i)));</span>
-<span class="pc bnc" id="L314" title="All 2 branches missed.">      } else if (l.get(i) instanceof ArrayList) {</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">      } else if (l.get(i) instanceof ArrayList) {</span>
 <span class="nc" id="L315">        l.set(i, decode((ArrayList) l.get(i)));</span>
       }
     }
@@ -345,14 +345,14 @@ public class MtasSolrResultUtil {
 <span class="nc" id="L345">              nl2.setVal(j, decode((String) nl2.getVal(j)));</span>
             }
           }
-        } else {
+<span class="nc" id="L348">        } else {</span>
           // System.out.println(&quot;unknown type &quot; +
           // o.getClass().getCanonicalName());
         }
-<span class="nc" id="L352">      } else {</span>
+      } else {
 <span class="pc bpc" id="L353" title="1 of 2 branches missed.">        if (o instanceof NamedList) {</span>
 <span class="nc" id="L354">          nl.setVal(i, decode((NamedList&lt;Object&gt;) o));</span>
-<span class="pc bfc" id="L355" title="All 2 branches covered.">        } else if (o instanceof ArrayList) {</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">        } else if (o instanceof ArrayList) {</span>
 <span class="fc" id="L356">          nl.setVal(i, decode((ArrayList&lt;Object&gt;) o));</span>
         }
       }
@@ -379,7 +379,7 @@ public class MtasSolrResultUtil {
 <span class="fc bfc" id="L379" title="All 2 branches covered.">      if (m.matches()) {</span>
 <span class="fc" id="L380">        ids.add(m.group(1));</span>
       }
-    }
+<span class="fc" id="L382">    }</span>
 <span class="fc" id="L383">    return ids;</span>
   }
 
@@ -398,7 +398,7 @@ public class MtasSolrResultUtil {
 <span class="pc bpc" id="L398" title="1 of 2 branches missed.">    if (list != null) {</span>
 <span class="pc bpc" id="L399" title="1 of 2 branches missed.">      if (list.length != original.length) {</span>
 <span class="nc" id="L400">        throw new IOException(</span>
-<span class="nc" id="L401">            &quot;unequal size &quot; + nameNew + &quot; and &quot; + nameOriginal);</span>
+            &quot;unequal size &quot; + nameNew + &quot; and &quot; + nameOriginal);
       }
 <span class="fc bfc" id="L403" title="All 2 branches covered.">      if (unique) {</span>
 <span class="fc" id="L404">        Set&lt;String&gt; set = new HashSet&lt;&gt;();</span>
@@ -437,7 +437,7 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L437">    MtasSpanQuery ignore = null;</span>
 <span class="pc bpc" id="L438" title="1 of 2 branches missed.">    if (queryIgnore != null) {</span>
 <span class="nc" id="L439">      Reader queryIgnoreReader = new BufferedReader(</span>
-<span class="nc" id="L440">          new StringReader(queryIgnore));</span>
+          new StringReader(queryIgnore));
 <span class="nc bnc" id="L441" title="All 2 branches missed.">      if (queryType.equals(QUERY_TYPE_CQL)) {</span>
 <span class="nc" id="L442">        MtasCQLParser ip = new MtasCQLParser(queryIgnoreReader);</span>
         try {
@@ -448,10 +448,10 @@ public class MtasSolrResultUtil {
 <span class="nc" id="L448">        } catch (TokenMgrError e) {</span>
 <span class="nc" id="L449">          throw new IOException(&quot;couldn't parse &quot; + queryType + &quot; query &quot;</span>
 <span class="nc" id="L450">              + queryIgnore + &quot; (&quot; + e.getMessage() + &quot;)&quot;, e);</span>
-        }
-      } else {
+<span class="nc" id="L451">        }</span>
+<span class="nc" id="L452">      } else {</span>
 <span class="nc" id="L453">        throw new IOException(</span>
-<span class="nc" id="L454">            &quot;unknown queryType &quot; + queryType + &quot; for query &quot; + queryValue);</span>
+            &quot;unknown queryType &quot; + queryType + &quot; for query &quot; + queryValue);
       }
     }
 <span class="fc" id="L457">    Reader queryValueReader = new BufferedReader(new StringReader(queryValue));</span>
@@ -459,7 +459,7 @@ public class MtasSolrResultUtil {
 <span class="fc" id="L459">      MtasCQLParser qp = new MtasCQLParser(queryValueReader);</span>
       try {
 <span class="fc" id="L461">        return qp.parse(field, queryPrefix, queryVariables, ignore,</span>
-<span class="fc" id="L462">            maximumIgnoreLength);</span>
+            maximumIgnoreLength);
 <span class="nc" id="L463">      } catch (mtas.parser.cql.ParseException e) {</span>
 <span class="nc" id="L464">        throw new IOException(&quot;couldn't parse &quot; + queryType + &quot; query &quot;</span>
 <span class="nc" id="L465">            + queryValue + &quot; (&quot; + e.getMessage() + &quot;)&quot;, e);</span>
@@ -469,7 +469,7 @@ public class MtasSolrResultUtil {
       }
     } else {
 <span class="nc" id="L471">      throw new IOException(</span>
-<span class="nc" id="L472">          &quot;unknown queryType &quot; + queryType + &quot; for query &quot; + queryValue);</span>
+          &quot;unknown queryType &quot; + queryType + &quot; for query &quot; + queryValue);
     }
   }
 

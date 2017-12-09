@@ -70,7 +70,7 @@ public class MtasSolrComponentDocument
   public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP = &quot;ignoreListRegexp&quot;;
 
   /** The Constant NAME_MTAS_DOCUMENT_NUMBER. */
-<span class="fc" id="L73">  public static final String NAME_MTAS_DOCUMENT_NUMBER = &quot;number&quot;;</span>
+  public static final String NAME_MTAS_DOCUMENT_NUMBER = &quot;number&quot;;
 
   /** The search component. */
   private MtasSolrSearchComponent searchComponent;
@@ -113,43 +113,43 @@ public class MtasSolrComponentDocument
 <span class="nc" id="L113">      String[] listNumbers = new String[ids.size()];</span>
 <span class="nc bnc" id="L114" title="All 2 branches missed.">      for (String id : ids) {</span>
 <span class="nc" id="L115">        fields[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L116">            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_FIELD,</span>
-<span class="nc" id="L117">            null);</span>
+            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_FIELD,
+            null);
 <span class="nc" id="L118">        keys[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L119">            .get(PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_KEY,</span>
 <span class="nc" id="L120">                String.valueOf(tmpCounter))</span>
 <span class="nc" id="L121">            .trim();</span>
 <span class="nc" id="L122">        prefixes[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L123">            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_PREFIX,</span>
-<span class="nc" id="L124">            null);</span>
+            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_PREFIX,
+            null);
 <span class="nc" id="L125">        types[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L126">            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_TYPE,</span>
-<span class="nc" id="L127">            null);</span>
+            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_TYPE,
+            null);
 <span class="nc" id="L128">        regexps[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L129">            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_REGEXP,</span>
-<span class="nc" id="L130">            null);</span>
+            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_REGEXP,
+            null);
 <span class="nc" id="L131">        lists[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L132">            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_LIST,</span>
-<span class="nc" id="L133">            null);</span>
+            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_LIST,
+            null);
 <span class="nc" id="L134">        listRegexps[tmpCounter] = rb.req.getParams().getBool(PARAM_MTAS_DOCUMENT</span>
-<span class="nc" id="L135">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_LIST_REGEXP, false);</span>
+            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_LIST_REGEXP, false);
 <span class="nc" id="L136">        listExpands[tmpCounter] = rb.req.getParams().getBool(PARAM_MTAS_DOCUMENT</span>
-<span class="nc" id="L137">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_LIST_EXPAND, false);</span>
+            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_LIST_EXPAND, false);
 <span class="nc" id="L138">        listExpandNumbers[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L139">            .getInt(PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot;</span>
-<span class="nc" id="L140">                + NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER, 10);</span>
+                + NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER, 10);
 <span class="nc" id="L141">        ignoreRegexps[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_DOCUMENT</span>
-<span class="nc" id="L142">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_IGNORE_REGEXP, null);</span>
+            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_IGNORE_REGEXP, null);
 <span class="nc" id="L143">        ignoreLists[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_DOCUMENT</span>
-<span class="nc" id="L144">            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_IGNORE_LIST, null);</span>
+            + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_IGNORE_LIST, null);
 <span class="nc" id="L145">        ignoreListRegexps[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L146">            .getBool(PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot;</span>
-<span class="nc" id="L147">                + NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP, false);</span>
+                + NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP, false);
 <span class="nc" id="L148">        listNumbers[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L149">            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_NUMBER,</span>
-<span class="nc" id="L150">            null);</span>
+            PARAM_MTAS_DOCUMENT + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_DOCUMENT_NUMBER,
+            null);
 <span class="nc" id="L151">        tmpCounter++;</span>
-      }
+<span class="nc" id="L152">      }</span>
 <span class="nc" id="L153">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
 <span class="nc" id="L154">      mtasFields.doDocument = true;</span>
 <span class="nc" id="L155">      rb.setNeedDocList(true);</span>
@@ -198,8 +198,8 @@ public class MtasSolrComponentDocument
           }
 <span class="nc" id="L199">          list = tmpList.toArray(new String[tmpList.size()]);</span>
         }
-<span class="nc" id="L201">        int listNumber = Math.max(0,</span>
-<span class="nc bnc" id="L202" title="All 4 branches missed.">            (listNumbers[i] == null) || (listNumbers[i].isEmpty()) ? 0</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        int listNumber = Math.max(0,</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">            (listNumbers[i] == null) || (listNumbers[i].isEmpty()) ? 0</span>
 <span class="nc" id="L203">                : Integer.parseInt(listNumbers[i]));</span>
 <span class="nc" id="L204">        String ignoreRegexp = ignoreRegexps[i];</span>
 <span class="nc" id="L205">        String[] ignoreList = null;</span>
@@ -213,8 +213,8 @@ public class MtasSolrComponentDocument
 <span class="nc" id="L213">          ignoreList = tmpList.toArray(new String[tmpList.size()]);</span>
         }
 <span class="nc" id="L215">        mtasFields.list.get(fields[i]).documentList.add(new ComponentDocument(</span>
-<span class="nc" id="L216">            key, prefix, type, regexp, list, listNumber, listRegexp, listExpand,</span>
-<span class="nc" id="L217">            listExpandNumber, ignoreRegexp, ignoreList, ignoreListRegexp));</span>
+            key, prefix, type, regexp, list, listNumber, listRegexp, listExpand,
+            listExpandNumber, ignoreRegexp, ignoreList, ignoreListRegexp));
       }
     }
 <span class="nc" id="L220">  }</span>
@@ -249,9 +249,9 @@ public class MtasSolrComponentDocument
 <span class="nc" id="L249">              new String[] { list.getDataType(), list.getDataType() },</span>
 <span class="nc" id="L250">              new String[] { list.getStatsType(), list.getStatsType() },</span>
 <span class="nc" id="L251">              new SortedSet[] { list.getStatsItems(), list.getStatsItems() },</span>
-<span class="nc" id="L252">              new String[] { null, null }, new String[] { null, null },</span>
+              new String[] { null, null }, new String[] { null, null },
 <span class="nc" id="L253">              new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));</span>
-<span class="nc" id="L254">        } else {</span>
+        } else {
 <span class="nc" id="L255">          mtasDocumentItemResponse.add(&quot;list&quot;,</span>
 <span class="nc" id="L256">              new MtasSolrMtasResult(list, list.getDataType(),</span>
 <span class="nc" id="L257">                  list.getStatsType(), list.getStatsItems(), null));</span>
@@ -260,7 +260,7 @@ public class MtasSolrComponentDocument
       }
       // add
 <span class="nc" id="L262">      mtasDocumentItemResponses.add(mtasDocumentItemResponse);</span>
-    }
+<span class="nc" id="L263">    }</span>
 <span class="nc" id="L264">    mtasDocumentResponse.add(&quot;list&quot;, mtasDocumentItemResponses);</span>
 <span class="nc" id="L265">    MtasSolrResultUtil.rewrite(mtasDocumentResponse, searchComponent);</span>
 <span class="nc" id="L266">    return mtasDocumentResponse;</span>
@@ -287,12 +287,12 @@ public class MtasSolrComponentDocument
 <span class="nc" id="L287">        sreq.params.remove(PARAM_MTAS_DOCUMENT);</span>
 <span class="nc bnc" id="L288" title="All 2 branches missed.">        for (String key : keys) {</span>
 <span class="nc" id="L289">          sreq.params.remove(</span>
-<span class="nc" id="L290">              PARAM_MTAS_DOCUMENT + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_DOCUMENT_FIELD);</span>
+              PARAM_MTAS_DOCUMENT + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_DOCUMENT_FIELD);
 <span class="nc" id="L291">          sreq.params.remove(</span>
-<span class="nc" id="L292">              PARAM_MTAS_DOCUMENT + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_DOCUMENT_KEY);</span>
+              PARAM_MTAS_DOCUMENT + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_DOCUMENT_KEY);
 <span class="nc" id="L293">          sreq.params.remove(PARAM_MTAS_DOCUMENT + &quot;.&quot; + key + &quot;.&quot;</span>
-<span class="nc" id="L294">              + NAME_MTAS_DOCUMENT_PREFIX);</span>
-        }
+              + NAME_MTAS_DOCUMENT_PREFIX);
+<span class="nc" id="L295">        }</span>
       }
     }
 
@@ -306,15 +306,15 @@ public class MtasSolrComponentDocument
    * solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
-<span class="nc bnc" id="L309" title="All 2 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L310" title="All 2 branches missed.">        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
-<span class="nc bnc" id="L311" title="All 2 branches missed.">        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {</span>
+<span class="nc bnc" id="L309" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
+        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
 <span class="nc bnc" id="L312" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
 <span class="nc bnc" id="L313" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc" id="L314">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_DOCUMENT, false)) {</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_DOCUMENT, false)) {</span>
           // nothing to do
         }
-      }
+<span class="nc" id="L317">      }</span>
     }
 <span class="nc" id="L319">  }</span>
 
@@ -335,7 +335,7 @@ public class MtasSolrComponentDocument
 <span class="nc" id="L335">    } catch (ClassCastException e) {</span>
 <span class="nc" id="L336">      log.debug(e);</span>
 <span class="nc" id="L337">      mtasResponse = null;</span>
-    }
+<span class="nc" id="L338">    }</span>
 
 <span class="nc bnc" id="L340" title="All 2 branches missed.">    if (mtasResponse != null) {</span>
       ArrayList&lt;Object&gt; mtasResponseDocument;
@@ -346,7 +346,7 @@ public class MtasSolrComponentDocument
         }
 <span class="nc" id="L347">      } catch (ClassCastException e) {</span>
 <span class="nc" id="L348">        log.debug(e);</span>
-      }
+<span class="nc" id="L349">      }</span>
     }
 
 <span class="nc" id="L352">  }</span>

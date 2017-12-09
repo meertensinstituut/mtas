@@ -48,8 +48,8 @@ public class MtasSolrCollectionResult implements Serializable {
    * @param componentCollection the component collection
    * @throws IOException Signals that an I/O exception has occurred.
    */
-<span class="fc" id="L51">  public MtasSolrCollectionResult(ComponentCollection componentCollection)</span>
-      throws IOException {
+  public MtasSolrCollectionResult(ComponentCollection componentCollection)
+<span class="fc" id="L52">      throws IOException {</span>
 <span class="fc" id="L53">    this.componentCollection = componentCollection;</span>
 <span class="pc bpc" id="L54" title="1 of 2 branches missed.">    if (componentCollection != null) {</span>
 <span class="fc" id="L55">      action = componentCollection.action();</span>
@@ -57,7 +57,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="fc" id="L57">      values = null;</span>
 <span class="fc" id="L58">      now = null;</span>
 <span class="fc" id="L59">      list = null;</span>
-<span class="pc bpc" id="L60" title="15 of 25 branches missed.">      switch (action) {</span>
+<span class="pc bpc" id="L60" title="16 of 30 branches missed.">      switch (action) {</span>
       case ComponentCollection.ACTION_CREATE:
 <span class="fc" id="L62">        values = componentCollection.values();</span>
 <span class="fc" id="L63">        id = componentCollection.id;</span>
@@ -75,11 +75,11 @@ public class MtasSolrCollectionResult implements Serializable {
       case ComponentCollection.ACTION_LIST:
       case ComponentCollection.ACTION_EMPTY:
         // do nothing
-        break;
+<span class="fc" id="L78">        break;</span>
       default:
-<span class="nc" id="L80">        throw new IOException(&quot;action &quot; + action + &quot; not allowed&quot;);</span>
+<span class="pc" id="L80">        throw new IOException(&quot;action &quot; + action + &quot; not allowed&quot;);</span>
       }
-<span class="nc" id="L82">    } else {</span>
+    } else {
 <span class="nc" id="L83">      throw new IOException(&quot;no componentCollection available&quot;);</span>
     }
 <span class="fc" id="L85">  }</span>
@@ -96,7 +96,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (action.equals(ComponentCollection.ACTION_LIST)) {</span>
 <span class="fc" id="L97">      this.now = now;</span>
 <span class="fc" id="L98">      this.list = list;</span>
-<span class="fc" id="L99">    } else {</span>
+    } else {
 <span class="nc" id="L100">      throw new IOException(&quot;not allowed with action '&quot; + action + &quot;'&quot;);</span>
     }
 <span class="fc" id="L102">  }</span>
@@ -113,7 +113,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (action.equals(ComponentCollection.ACTION_CHECK)) {</span>
 <span class="fc" id="L114">      this.now = now;</span>
 <span class="fc" id="L115">      this.status = status;</span>
-<span class="fc" id="L116">    } else {</span>
+    } else {
 <span class="nc" id="L117">      throw new IOException(&quot;not allowed with action '&quot; + action + &quot;'&quot;);</span>
     }
 <span class="fc" id="L119">  }</span>
@@ -132,7 +132,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="nc" id="L132">      this.now = now;</span>
 <span class="nc" id="L133">      this.status = status;</span>
 <span class="nc" id="L134">      this.values = stringValues;</span>
-<span class="nc" id="L135">    } else {</span>
+    } else {
 <span class="nc" id="L136">      throw new IOException(&quot;not allowed with action '&quot; + action + &quot;'&quot;);</span>
     }
 <span class="nc" id="L138">  }</span>
@@ -149,7 +149,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (action.equals(ComponentCollection.ACTION_POST)) {</span>
 <span class="fc" id="L150">      this.now = now;</span>
 <span class="fc" id="L151">      this.status = status;</span>
-<span class="fc" id="L152">    } else {</span>
+    } else {
 <span class="nc" id="L153">      throw new IOException(&quot;not allowed with action '&quot; + action + &quot;'&quot;);</span>
     }
 <span class="fc" id="L155">  }</span>
@@ -166,7 +166,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="nc bnc" id="L166" title="All 2 branches missed.">    if (action.equals(ComponentCollection.ACTION_IMPORT)) {</span>
 <span class="nc" id="L167">      this.now = now;</span>
 <span class="nc" id="L168">      this.status = status;</span>
-<span class="nc" id="L169">    } else {</span>
+    } else {
 <span class="nc" id="L170">      throw new IOException(&quot;not allowed with action '&quot; + action + &quot;'&quot;);</span>
     }
 <span class="nc" id="L172">  }</span>
@@ -183,7 +183,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="pc bpc" id="L183" title="1 of 2 branches missed.">    if (action.equals(ComponentCollection.ACTION_CREATE)) {</span>
 <span class="fc" id="L184">      this.now = now;</span>
 <span class="fc" id="L185">      this.status = status;</span>
-<span class="fc" id="L186">    } else {</span>
+    } else {
 <span class="nc" id="L187">      throw new IOException(&quot;not allowed with action '&quot; + action + &quot;'&quot;);</span>
     }
 <span class="fc" id="L189">  }</span>
@@ -217,7 +217,7 @@ public class MtasSolrCollectionResult implements Serializable {
       MtasSolrSearchComponent searchComponent) throws IOException {
 <span class="fc" id="L218">    SimpleOrderedMap&lt;Object&gt; response = new SimpleOrderedMap&lt;&gt;();</span>
     Iterator&lt;Entry&lt;String, Object&gt;&gt; it;
-<span class="pc bpc" id="L220" title="10 of 19 branches missed.">    switch (action) {</span>
+<span class="pc bpc" id="L220" title="11 of 24 branches missed.">    switch (action) {</span>
     case ComponentCollection.ACTION_LIST:
 <span class="fc" id="L222">      response.add(&quot;now&quot;, now);</span>
 <span class="fc" id="L223">      response.add(&quot;list&quot;, list);</span>
@@ -230,30 +230,30 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="fc bfc" id="L230" title="All 2 branches covered.">        while (it.hasNext()) {</span>
 <span class="fc" id="L231">          Entry&lt;String, Object&gt; entry = it.next();</span>
 <span class="fc" id="L232">          response.add(entry.getKey(), entry.getValue());</span>
-        }
+<span class="fc" id="L233">        }</span>
       }
-<span class="fc" id="L235">      break;</span>
+      break;
     case ComponentCollection.ACTION_CHECK:
 <span class="fc bfc" id="L237" title="All 2 branches covered.">      if (status != null) {</span>
 <span class="fc" id="L238">        it = status.iterator();</span>
 <span class="fc bfc" id="L239" title="All 2 branches covered.">        while (it.hasNext()) {</span>
 <span class="fc" id="L240">          Entry&lt;String, Object&gt; entry = it.next();</span>
 <span class="fc" id="L241">          response.add(entry.getKey(), entry.getValue());</span>
-        }
+<span class="fc" id="L242">        }</span>
       }
-<span class="fc" id="L244">      break;</span>
+      break;
     case ComponentCollection.ACTION_GET:
 <span class="nc bnc" id="L246" title="All 2 branches missed.">      if (status != null) {</span>
 <span class="nc" id="L247">        it = status.iterator();</span>
 <span class="nc bnc" id="L248" title="All 2 branches missed.">        while (it.hasNext()) {</span>
 <span class="nc" id="L249">          Entry&lt;String, Object&gt; entry = it.next();</span>
 <span class="nc" id="L250">          response.add(entry.getKey(), entry.getValue());</span>
-        }
+<span class="nc" id="L251">        }</span>
       }
 <span class="nc bnc" id="L253" title="All 2 branches missed.">      if (values != null) {</span>
 <span class="nc" id="L254">        response.add(&quot;values&quot;, values);</span>
       }
-<span class="nc" id="L256">      break;</span>
+      break;
     default:
       break;
     }
@@ -274,7 +274,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="pc bpc" id="L274" title="3 of 6 branches missed.">        if (id != null &amp;&amp; (newItem.id == null || !newItem.id.equals(id))) {</span>
 <span class="nc" id="L275">          id = null;</span>
         }
-<span class="pc bfc" id="L277" title="All 2 branches covered.">      } else if (action.equals(ComponentCollection.ACTION_LIST)) {</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">      } else if (action.equals(ComponentCollection.ACTION_LIST)) {</span>
 <span class="pc bpc" id="L278" title="1 of 2 branches missed.">        if (list != null) {</span>
 <span class="fc" id="L279">          HashMap&lt;String, SimpleOrderedMap&lt;Object&gt;&gt; index = new HashMap&lt;&gt;();</span>
 <span class="fc bfc" id="L280" title="All 2 branches covered.">          for (SimpleOrderedMap&lt;Object&gt; item : list) {</span>
@@ -285,7 +285,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="fc" id="L285">                item.add(&quot;shards&quot;, new ArrayList&lt;&gt;());</span>
               }
             }
-          }
+<span class="fc" id="L288">          }</span>
 <span class="fc bfc" id="L289" title="All 2 branches covered.">          for (SimpleOrderedMap&lt;Object&gt; item : newItem.list) {</span>
 <span class="pc bpc" id="L290" title="2 of 4 branches missed.">            if (item.get(&quot;id&quot;) != null &amp;&amp; item.get(&quot;id&quot;) instanceof String) {</span>
 <span class="fc" id="L291">              String id = (String) item.get(&quot;id&quot;);</span>
@@ -296,15 +296,15 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="pc bpc" id="L296" title="1 of 2 branches missed.">                    &amp;&amp; indexItem.get(&quot;shards&quot;) instanceof List) {</span>
 <span class="fc" id="L297">                  shards = (List&lt;SimpleOrderedMap&lt;Object&gt;&gt;) indexItem</span>
 <span class="fc" id="L298">                      .get(&quot;shards&quot;);</span>
-<span class="fc" id="L299">                } else {</span>
+                } else {
 <span class="nc" id="L300">                  shards = new ArrayList&lt;&gt;();</span>
 <span class="nc" id="L301">                  indexItem.add(&quot;shards&quot;, shards);</span>
                 }
 <span class="fc" id="L303">                shards.add(item);</span>
               }
             }
-          }
-        }
+<span class="fc" id="L306">          }</span>
+<span class="fc" id="L307">        }</span>
 <span class="fc bfc" id="L308" title="All 2 branches covered.">      } else if (action.equals(ComponentCollection.ACTION_CHECK)</span>
 <span class="fc bfc" id="L309" title="All 2 branches covered.">          || action.equals(ComponentCollection.ACTION_POST)</span>
 <span class="pc bpc" id="L310" title="1 of 2 branches missed.">          || action.equals(ComponentCollection.ACTION_IMPORT)</span>
@@ -318,7 +318,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="fc bfc" id="L318" title="All 2 branches covered.">            if (status.get(&quot;shards&quot;) != null</span>
 <span class="pc bpc" id="L319" title="1 of 2 branches missed.">                &amp;&amp; status.get(&quot;shards&quot;) instanceof List) {</span>
 <span class="fc" id="L320">              shards = (List&lt;SimpleOrderedMap&lt;Object&gt;&gt;) status.get(&quot;shards&quot;);</span>
-<span class="fc" id="L321">            } else {</span>
+            } else {
 <span class="fc" id="L322">              shards = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L323">              status.add(&quot;shards&quot;, shards);</span>
             }
@@ -329,8 +329,8 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="fc" id="L329">              shards.add(newItem.status);</span>
             }
           }
-        }
-<span class="fc" id="L333">      } else {</span>
+<span class="fc" id="L332">        }</span>
+      } else {
 <span class="fc" id="L334">        throw new IOException(&quot;not allowed for action '&quot; + action + &quot;'&quot;);</span>
       }
     }
@@ -351,7 +351,7 @@ public class MtasSolrCollectionResult implements Serializable {
 <span class="nc" id="L351">      text.append(componentCollection.version + &quot;, &quot;);</span>
 <span class="nc bnc" id="L352" title="All 2 branches missed.">    } else if (status != null) {</span>
 <span class="nc" id="L353">      text.append(status.get(&quot;version&quot;) + &quot;, &quot;);</span>
-<span class="nc" id="L354">    } else {</span>
+    } else {
 <span class="nc" id="L355">      text.append(&quot;null, &quot;);</span>
     }
 <span class="nc bnc" id="L357" title="All 2 branches missed.">    text.append((values != null) ? values.size() : &quot;null&quot;);</span>

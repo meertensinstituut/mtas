@@ -22,12 +22,36 @@ public class MtasTokenString extends MtasToken {
    * Instantiates a new mtas token string.
    *
    * @param tokenId the token id
+   * @param prefix the prefix
+   * @param postfix the postfix
+   */
+  public MtasTokenString(Integer tokenId, String prefix, String postfix) {
+<span class="nc" id="L29">    super(tokenId, prefix, postfix);</span>
+<span class="nc" id="L30">  }</span>
+
+  /**
+   * Instantiates a new mtas token string.
+   *
+   * @param tokenId the token id
    * @param value the value
    * @param position the position
    */
   public MtasTokenString(Integer tokenId, String value, Integer position) {
-<span class="nc" id="L29">    super(tokenId, value, position);</span>
-<span class="nc" id="L30">  }</span>
+<span class="nc" id="L40">    super(tokenId, value, position);</span>
+<span class="nc" id="L41">  }</span>
+
+  /**
+   * Instantiates a new mtas token string.
+   *
+   * @param tokenId the token id
+   * @param prefix the prefix
+   * @param postfix the postfix
+   * @param position the position
+   */
+  public MtasTokenString(Integer tokenId, String prefix, String postfix,
+      Integer position) {
+<span class="nc" id="L53">    super(tokenId, prefix, postfix, position);</span>
+<span class="nc" id="L54">  }</span>
 
   /*
    * (non-Javadoc)
@@ -36,8 +60,8 @@ public class MtasTokenString extends MtasToken {
    */
   @Override
   public void setType() {
-<span class="fc" id="L39">    tokenType = TOKEN_TYPE;</span>
-<span class="fc" id="L40">  }</span>
+<span class="fc" id="L63">    tokenType = TOKEN_TYPE;</span>
+<span class="fc" id="L64">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

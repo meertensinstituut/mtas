@@ -91,7 +91,7 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
   public static final String NAME_MTAS_LIST_RIGHT = &quot;right&quot;;
 
   /** The Constant NAME_MTAS_LIST_OUTPUT. */
-<span class="fc" id="L94">  public static final String NAME_MTAS_LIST_OUTPUT = &quot;output&quot;;</span>
+  public static final String NAME_MTAS_LIST_OUTPUT = &quot;output&quot;;
 
   /**
    * Instantiates a new mtas solr component list.
@@ -138,38 +138,38 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L138">                String.valueOf(tmpCounter))</span>
 <span class="nc" id="L139">            .trim();</span>
 <span class="nc" id="L140">        queryTypes[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L141">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_TYPE, null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_TYPE, null);
 <span class="nc" id="L142">        queryValues[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L143">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VALUE,</span>
-<span class="nc" id="L144">            null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VALUE,
+            null);
 <span class="nc" id="L145">        queryPrefixes[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L146">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_PREFIX,</span>
-<span class="nc" id="L147">            null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_PREFIX,
+            null);
 <span class="nc" id="L148">        queryIgnores[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L149">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_IGNORE,</span>
-<span class="nc" id="L150">            null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_IGNORE,
+            null);
 <span class="nc" id="L151">        queryMaximumIgnoreLengths[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L152">            .get(PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot;</span>
-<span class="nc" id="L153">                + NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH, null);</span>
+                + NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH, null);
 <span class="nc" id="L154">        Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
 <span class="nc" id="L155">            rb.req.getParams(),</span>
-<span class="nc" id="L156">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VARIABLE);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VARIABLE);
 <span class="nc" id="L157">        queryVariables[tmpCounter] = new HashMap&lt;&gt;();</span>
 <span class="nc bnc" id="L158" title="All 2 branches missed.">        if (!vIds.isEmpty()) {</span>
 <span class="nc" id="L159">          HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
 <span class="nc bnc" id="L160" title="All 2 branches missed.">          for (String vId : vIds) {</span>
 <span class="nc" id="L161">            String name = rb.req.getParams().get(</span>
-<span class="nc" id="L162">                PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VARIABLE</span>
-<span class="nc" id="L163">                    + &quot;.&quot; + vId + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME,</span>
-<span class="nc" id="L164">                null);</span>
+                PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VARIABLE
+                    + &quot;.&quot; + vId + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME,
+                null);
 <span class="nc bnc" id="L165" title="All 2 branches missed.">            if (name != null) {</span>
 <span class="nc bnc" id="L166" title="All 2 branches missed.">              if (!tmpVariables.containsKey(name)) {</span>
 <span class="nc" id="L167">                tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
               }
 <span class="nc" id="L169">              String value = rb.req.getParams()</span>
 <span class="nc" id="L170">                  .get(PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot;</span>
-<span class="nc" id="L171">                      + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;</span>
-<span class="nc" id="L172">                      + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE, null);</span>
+                      + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + vId + &quot;.&quot;
+                      + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE, null);
 <span class="nc bnc" id="L173" title="All 2 branches missed.">              if (value != null) {</span>
 <span class="nc" id="L174">                ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
 <span class="nc" id="L175">                String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
@@ -180,27 +180,27 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L180">                tmpVariables.get(name).addAll(list);</span>
               }
             }
-          }
+<span class="nc" id="L183">          }</span>
 <span class="nc bnc" id="L184" title="All 2 branches missed.">          for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
 <span class="nc" id="L185">              .entrySet()) {</span>
 <span class="nc" id="L186">            queryVariables[tmpCounter].put(entry.getKey(),</span>
 <span class="nc" id="L187">                entry.getValue().toArray(new String[entry.getValue().size()]));</span>
-          }
+<span class="nc" id="L188">          }</span>
         }
 <span class="nc" id="L190">        prefixes[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L191">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_PREFIX, null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_PREFIX, null);
 <span class="nc" id="L192">        starts[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L193">            .get(PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_START, null);</span>
 <span class="nc" id="L194">        numbers[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L195">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_NUMBER, null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_NUMBER, null);
 <span class="nc" id="L196">        lefts[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L197">            .get(PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_LEFT, null);</span>
 <span class="nc" id="L198">        rights[tmpCounter] = rb.req.getParams()</span>
 <span class="nc" id="L199">            .get(PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_RIGHT, null);</span>
 <span class="nc" id="L200">        outputs[tmpCounter] = rb.req.getParams().get(</span>
-<span class="nc" id="L201">            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_OUTPUT, null);</span>
+            PARAM_MTAS_LIST + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_LIST_OUTPUT, null);
 <span class="nc" id="L202">        tmpCounter++;</span>
-      }
+<span class="nc" id="L203">      }</span>
 <span class="nc" id="L204">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
 <span class="nc" id="L205">      mtasFields.doList = true;</span>
 <span class="nc" id="L206">      rb.setNeedDocSet(true);</span>
@@ -222,7 +222,7 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L222">      MtasSolrResultUtil.compareAndCheck(prefixes, queryIgnores,</span>
 <span class="nc" id="L223">          NAME_MTAS_LIST_QUERY_IGNORE, NAME_MTAS_LIST_FIELD, false);</span>
 <span class="nc" id="L224">      MtasSolrResultUtil.compareAndCheck(prefixes, queryMaximumIgnoreLengths,</span>
-<span class="nc" id="L225">          NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH, NAME_MTAS_LIST_FIELD,</span>
+          NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH, NAME_MTAS_LIST_FIELD,
 <span class="nc" id="L226">          false);</span>
 <span class="nc" id="L227">      MtasSolrResultUtil.compareAndCheck(prefixes, fields,</span>
 <span class="nc" id="L228">          NAME_MTAS_LIST_PREFIX, NAME_MTAS_LIST_FIELD, false);</span>
@@ -241,17 +241,17 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc bnc" id="L241" title="All 2 branches missed.">        Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i] == null)</span>
 <span class="nc" id="L242">            ? null : Integer.parseInt(queryMaximumIgnoreLengths[i]);</span>
 <span class="nc" id="L243">        MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i],</span>
-<span class="nc" id="L244">            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i],</span>
-<span class="nc" id="L245">            queryIgnores[i], maximumIgnoreLength);</span>
+            queryTypes[i], queryPrefixes[i], queryVariables[i], fields[i],
+            queryIgnores[i], maximumIgnoreLength);
         // minimize number of queries
 <span class="nc bnc" id="L247" title="All 2 branches missed.">        if (cf.spanQueryList.contains(q)) {</span>
 <span class="nc" id="L248">          q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
-<span class="nc" id="L249">        } else {</span>
+        } else {
 <span class="nc" id="L250">          cf.spanQueryList.add(q);</span>
         }
 <span class="nc bnc" id="L252" title="All 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
 <span class="nc" id="L253">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryValues[i] + &quot;:&quot;</span>
-<span class="nc" id="L254">                + queryPrefixes[i]</span>
+                + queryPrefixes[i]
 <span class="nc" id="L255">            : keys[i].trim();</span>
 <span class="nc" id="L256">        String prefix = prefixes[i];</span>
 <span class="nc bnc" id="L257" title="All 4 branches missed.">        int start = (starts[i] == null) || (starts[i].isEmpty()) ? 0</span>
@@ -264,9 +264,9 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L264">            : Integer.parseInt(rights[i]);</span>
 <span class="nc" id="L265">        String output = outputs[i];</span>
 <span class="nc" id="L266">        mtasFields.list.get(fields[i]).listList.add(new ComponentList(q,</span>
-<span class="nc" id="L267">            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i],</span>
-<span class="nc" id="L268">            queryVariables[i], queryIgnores[i], queryMaximumIgnoreLengths[i],</span>
-<span class="nc" id="L269">            key, prefix, start, number, left, right, output));</span>
+            fields[i], queryValues[i], queryTypes[i], queryPrefixes[i],
+            queryVariables[i], queryIgnores[i], queryMaximumIgnoreLengths[i],
+            key, prefix, start, number, left, right, output));
       }
     }
 <span class="nc" id="L272">  }</span>
@@ -290,62 +290,62 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc bnc" id="L290" title="All 2 branches missed.">      if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
 <span class="nc bnc" id="L291" title="All 2 branches missed.">        for (String key : keys) {</span>
 <span class="nc" id="L292">          sreq.params.remove(</span>
-<span class="nc" id="L293">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_PREFIX);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_PREFIX);
 <span class="nc" id="L294">          sreq.params</span>
 <span class="nc" id="L295">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_START);</span>
 <span class="nc" id="L296">          sreq.params.remove(</span>
-<span class="nc" id="L297">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_NUMBER);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_NUMBER);
 <span class="nc" id="L298">          sreq.params</span>
 <span class="nc" id="L299">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_LEFT);</span>
 <span class="nc" id="L300">          sreq.params</span>
 <span class="nc" id="L301">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_RIGHT);</span>
 <span class="nc" id="L302">          sreq.params.remove(</span>
-<span class="nc" id="L303">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_OUTPUT);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_OUTPUT);
           // don't get data
 <span class="nc" id="L305">          sreq.params.add(</span>
-<span class="nc" id="L306">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_NUMBER, &quot;0&quot;);</span>
-        }
-<span class="nc" id="L308">      } else {</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_NUMBER, &quot;0&quot;);
+<span class="nc" id="L307">        }</span>
+      } else {
 <span class="nc" id="L309">        sreq.params.remove(PARAM_MTAS_LIST);</span>
 <span class="nc bnc" id="L310" title="All 2 branches missed.">        for (String key : keys) {</span>
 <span class="nc" id="L311">          sreq.params</span>
 <span class="nc" id="L312">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_FIELD);</span>
 <span class="nc" id="L313">          sreq.params.remove(</span>
-<span class="nc" id="L314">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VALUE);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VALUE);
 <span class="nc" id="L315">          sreq.params.remove(</span>
-<span class="nc" id="L316">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_TYPE);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_TYPE);
 <span class="nc" id="L317">          sreq.params.remove(</span>
-<span class="nc" id="L318">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_PREFIX);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_PREFIX);
 <span class="nc" id="L319">          sreq.params.remove(</span>
-<span class="nc" id="L320">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_IGNORE);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_IGNORE);
 <span class="nc" id="L321">          sreq.params.remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot;</span>
-<span class="nc" id="L322">              + NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH);</span>
+              + NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH);
 <span class="nc" id="L323">          Set&lt;String&gt; subKeys = MtasSolrResultUtil</span>
 <span class="nc" id="L324">              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_LIST + &quot;.&quot;</span>
-<span class="nc" id="L325">                  + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VARIABLE);</span>
+                  + key + &quot;.&quot; + NAME_MTAS_LIST_QUERY_VARIABLE);
 <span class="nc bnc" id="L326" title="All 2 branches missed.">          for (String subKey : subKeys) {</span>
 <span class="nc" id="L327">            sreq.params.remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot;</span>
-<span class="nc" id="L328">                + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subKey + &quot;.&quot;</span>
-<span class="nc" id="L329">                + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME);</span>
+                + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subKey + &quot;.&quot;
+                + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME);
 <span class="nc" id="L330">            sreq.params.remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot;</span>
-<span class="nc" id="L331">                + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subKey + &quot;.&quot;</span>
-<span class="nc" id="L332">                + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE);</span>
-          }
+                + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subKey + &quot;.&quot;
+                + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE);
+<span class="nc" id="L333">          }</span>
 <span class="nc" id="L334">          sreq.params</span>
 <span class="nc" id="L335">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_KEY);</span>
 <span class="nc" id="L336">          sreq.params.remove(</span>
-<span class="nc" id="L337">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_PREFIX);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_PREFIX);
 <span class="nc" id="L338">          sreq.params</span>
 <span class="nc" id="L339">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_START);</span>
 <span class="nc" id="L340">          sreq.params.remove(</span>
-<span class="nc" id="L341">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_NUMBER);</span>
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_NUMBER);
 <span class="nc" id="L342">          sreq.params</span>
 <span class="nc" id="L343">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_LEFT);</span>
 <span class="nc" id="L344">          sreq.params</span>
 <span class="nc" id="L345">              .remove(PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_RIGHT);</span>
 <span class="nc" id="L346">          sreq.params.remove(</span>
-<span class="nc" id="L347">              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_OUTPUT);</span>
-        }
+              PARAM_MTAS_LIST + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_LIST_OUTPUT);
+<span class="nc" id="L348">        }</span>
       }
     }
 <span class="nc" id="L351">  }</span>
@@ -377,24 +377,24 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc bnc" id="L377" title="All 2 branches missed.">                for (NamedList&lt;Object&gt; dataItem : data) {</span>
 <span class="nc" id="L378">                  Object key = dataItem.get(&quot;key&quot;);</span>
 <span class="nc" id="L379">                  Object total = dataItem.get(&quot;total&quot;);</span>
-<span class="nc bnc" id="L380" title="All 4 branches missed.">                  if ((key != null) &amp;&amp; (key instanceof String)</span>
-<span class="nc bnc" id="L381" title="All 4 branches missed.">                      &amp;&amp; (total != null) &amp;&amp; (total instanceof Integer)) {</span>
+<span class="nc bnc" id="L380" title="All 8 branches missed.">                  if ((key != null) &amp;&amp; (key instanceof String)</span>
+                      &amp;&amp; (total != null) &amp;&amp; (total instanceof Integer)) {
 <span class="nc bnc" id="L382" title="All 2 branches missed.">                    if (!listShardTotals.containsKey(key)) {</span>
 <span class="nc" id="L383">                      listShardTotals.put((String) key,</span>
-<span class="nc" id="L384">                          new HashMap&lt;String, Integer&gt;());</span>
+                          new HashMap&lt;String, Integer&gt;());
                     }
 <span class="nc" id="L386">                    HashMap&lt;String, Integer&gt; listShardTotal = listShardTotals</span>
 <span class="nc" id="L387">                        .get(key);</span>
 <span class="nc" id="L388">                    listShardTotal.put(response.getShard(), (Integer) total);</span>
                   }
-                }
+<span class="nc" id="L390">                }</span>
               }
 <span class="nc" id="L392">            } catch (ClassCastException e) {</span>
 <span class="nc" id="L393">              log.debug(e);</span>
-            }
-          }
+<span class="nc" id="L394">            }</span>
+<span class="nc" id="L395">          }</span>
         }
-      }
+<span class="nc" id="L397">      }</span>
       // compute shard requests
 <span class="nc" id="L399">      HashMap&lt;String, ModifiableSolrParams&gt; shardRequests = new HashMap&lt;&gt;();</span>
 <span class="nc" id="L400">      int requestId = 0;</span>
@@ -419,58 +419,58 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
                 }
 <span class="nc" id="L420">                params = shardRequests.get(rb.shards[i]);</span>
 <span class="nc" id="L421">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L422">                    + NAME_MTAS_LIST_FIELD, list.field);</span>
+                    + NAME_MTAS_LIST_FIELD, list.field);
 <span class="nc" id="L423">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L424">                    + NAME_MTAS_LIST_QUERY_VALUE, list.queryValue);</span>
+                    + NAME_MTAS_LIST_QUERY_VALUE, list.queryValue);
 <span class="nc" id="L425">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L426">                    + NAME_MTAS_LIST_QUERY_TYPE, list.queryType);</span>
+                    + NAME_MTAS_LIST_QUERY_TYPE, list.queryType);
 <span class="nc" id="L427">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L428">                    + NAME_MTAS_LIST_QUERY_PREFIX, list.queryPrefix);</span>
+                    + NAME_MTAS_LIST_QUERY_PREFIX, list.queryPrefix);
 <span class="nc" id="L429">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L430">                    + NAME_MTAS_LIST_QUERY_IGNORE, list.queryIgnore);</span>
+                    + NAME_MTAS_LIST_QUERY_IGNORE, list.queryIgnore);
 <span class="nc" id="L431">                params.add(</span>
-<span class="nc" id="L432">                    PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L433">                        + NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH,</span>
-<span class="nc" id="L434">                    list.queryMaximumIgnoreLength);</span>
+                    PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;
+                        + NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH,
+                    list.queryMaximumIgnoreLength);
 <span class="nc" id="L435">                int subRequestId = 0;</span>
 <span class="nc bnc" id="L436" title="All 2 branches missed.">                for (String name : list.queryVariables.keySet()) {</span>
 <span class="nc bnc" id="L437" title="All 2 branches missed.">                  if (list.queryVariables.get(name) == null</span>
 <span class="nc bnc" id="L438" title="All 2 branches missed.">                      || list.queryVariables.get(name).length == 0) {</span>
 <span class="nc" id="L439">                    params.add(</span>
-<span class="nc" id="L440">                        PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L441">                            + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subRequestId</span>
-<span class="nc" id="L442">                            + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME,</span>
-<span class="nc" id="L443">                        name);</span>
+                        PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;
+                            + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subRequestId
+                            + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME,
+                        name);
 <span class="nc" id="L444">                    subRequestId++;</span>
-<span class="nc" id="L445">                  } else {</span>
+                  } else {
 <span class="nc bnc" id="L446" title="All 2 branches missed.">                    for (String value : list.queryVariables.get(name)) {</span>
 <span class="nc" id="L447">                      params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L448">                          + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subRequestId</span>
-<span class="nc" id="L449">                          + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME, name);</span>
+                          + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subRequestId
+                          + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME, name);
 <span class="nc" id="L450">                      params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L451">                          + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subRequestId</span>
-<span class="nc" id="L452">                          + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE,</span>
-<span class="nc" id="L453">                          value);</span>
+                          + NAME_MTAS_LIST_QUERY_VARIABLE + &quot;.&quot; + subRequestId
+                          + &quot;.&quot; + SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE,
+                          value);
 <span class="nc" id="L454">                      subRequestId++;</span>
                     }
                   }
-                }
+<span class="nc" id="L457">                }</span>
 <span class="nc" id="L458">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L459">                    + NAME_MTAS_LIST_KEY, list.key);</span>
+                    + NAME_MTAS_LIST_KEY, list.key);
 <span class="nc" id="L460">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L461">                    + NAME_MTAS_LIST_PREFIX, list.prefix);</span>
+                    + NAME_MTAS_LIST_PREFIX, list.prefix);
 <span class="nc" id="L462">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
 <span class="nc" id="L463">                    + NAME_MTAS_LIST_START, Integer.toString(start));</span>
 <span class="nc" id="L464">                params.add(</span>
-<span class="nc" id="L465">                    PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L466">                        + NAME_MTAS_LIST_NUMBER,</span>
+                    PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;
+                        + NAME_MTAS_LIST_NUMBER,
 <span class="nc" id="L467">                    Integer.toString(Math.min(number, (subTotal - start))));</span>
 <span class="nc" id="L468">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
 <span class="nc" id="L469">                    + NAME_MTAS_LIST_LEFT, Integer.toString(list.left));</span>
 <span class="nc" id="L470">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
 <span class="nc" id="L471">                    + NAME_MTAS_LIST_RIGHT, Integer.toString(list.right));</span>
 <span class="nc" id="L472">                params.add(PARAM_MTAS_LIST + &quot;.&quot; + requestId + &quot;.&quot;</span>
-<span class="nc" id="L473">                    + NAME_MTAS_LIST_OUTPUT, list.output);</span>
+                    + NAME_MTAS_LIST_OUTPUT, list.output);
 <span class="nc" id="L474">                number -= (subTotal - start);</span>
 <span class="nc" id="L475">                start = 0;</span>
 <span class="nc" id="L476">              } else {</span>
@@ -478,8 +478,8 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
               }
             }
           }
-        }
-      }
+<span class="nc" id="L481">        }</span>
+<span class="nc" id="L482">      }</span>
 
 <span class="nc bnc" id="L484" title="All 2 branches missed.">      for (Entry&lt;String, ModifiableSolrParams&gt; entry : shardRequests</span>
 <span class="nc" id="L485">          .entrySet()) {</span>
@@ -497,7 +497,7 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L497">            rb.req.getOriginalParams().getParams(PARAM_MTAS_LIST));</span>
 <span class="nc" id="L498">        sreq.params.add(entry.getValue());</span>
 <span class="nc" id="L499">        rb.addRequest(searchComponent, sreq);</span>
-      }
+<span class="nc" id="L500">      }</span>
     }
 <span class="nc" id="L502">  }</span>
 
@@ -541,8 +541,8 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc bnc" id="L541" title="All 2 branches missed.">          if (list.right &gt; 0) {</span>
 <span class="nc" id="L542">            rightData = new TreeMap&lt;&gt;();</span>
           }
-<span class="nc bnc" id="L544" title="All 2 branches missed.">          for (int position = Math.max(0,</span>
-<span class="nc" id="L545">              hit.startPosition - list.left); position &lt;= (hit.endPosition</span>
+<span class="nc" id="L544">          for (int position = Math.max(0,</span>
+<span class="nc bnc" id="L545" title="All 2 branches missed.">              hit.startPosition - list.left); position &lt;= (hit.endPosition</span>
 <span class="nc" id="L546">                  + list.right); position++) {</span>
 <span class="nc" id="L547">            List&lt;List&lt;String&gt;&gt; hitDataItem = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L548" title="All 2 branches missed.">            if (hit.hits.containsKey(position)) {</span>
@@ -551,7 +551,7 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L551">                hitDataSubItem.add(CodecUtil.termPrefix(term));</span>
 <span class="nc" id="L552">                hitDataSubItem.add(CodecUtil.termValue(term));</span>
 <span class="nc" id="L553">                hitDataItem.add(hitDataSubItem);</span>
-              }
+<span class="nc" id="L554">              }</span>
             }
 <span class="nc bnc" id="L556" title="All 2 branches missed.">            if (position &lt; hit.startPosition) {</span>
 <span class="nc bnc" id="L557" title="All 2 branches missed.">              if (leftData != null) {</span>
@@ -561,7 +561,7 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc bnc" id="L561" title="All 2 branches missed.">              if (rightData != null) {</span>
 <span class="nc" id="L562">                rightData.put(position, hitDataItem);</span>
               }
-<span class="nc" id="L564">            } else {</span>
+            } else {
 <span class="nc" id="L565">              hitData.put(position, hitDataItem);</span>
             }
           }
@@ -573,7 +573,7 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L573">            mtasListItemResponse.add(&quot;right&quot;, rightData);</span>
           }
 <span class="nc" id="L575">          mtasListItemResponses.add(mtasListItemResponse);</span>
-        }
+<span class="nc" id="L576">        }</span>
 <span class="nc bnc" id="L577" title="All 2 branches missed.">      } else if (list.output.equals(ComponentList.LIST_OUTPUT_TOKEN)) {</span>
 <span class="nc" id="L578">        mtasListResponse.add(&quot;number&quot;, list.tokens.size());</span>
 <span class="nc bnc" id="L579" title="All 2 branches missed.">        for (ListToken tokenHit : list.tokens) {</span>
@@ -628,10 +628,10 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
 <span class="nc" id="L628">                  token.getRealOffsetEnd());</span>
             }
 <span class="nc" id="L630">            mtasListItemResponseItemTokens.add(mtasListItemResponseItemToken);</span>
-          }
+<span class="nc" id="L631">          }</span>
 <span class="nc" id="L632">          mtasListItemResponse.add(&quot;tokens&quot;, mtasListItemResponseItemTokens);</span>
 <span class="nc" id="L633">          mtasListItemResponses.add(mtasListItemResponse);</span>
-        }
+<span class="nc" id="L634">        }</span>
       }
 <span class="nc" id="L636">      mtasListResponse.add(&quot;list&quot;, mtasListItemResponses);</span>
     }
@@ -646,15 +646,15 @@ public class MtasSolrComponentList implements MtasSolrComponent&lt;ComponentList
    * solr.handler.component.ResponseBuilder)
    */
   public void finishStage(ResponseBuilder rb) {
-<span class="nc bnc" id="L649" title="All 2 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc bnc" id="L650" title="All 2 branches missed.">        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
-<span class="nc bnc" id="L651" title="All 2 branches missed.">        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {</span>
+<span class="nc bnc" id="L649" title="All 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+        &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
+        &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
 <span class="nc bnc" id="L652" title="All 2 branches missed.">      for (ShardRequest sreq : rb.finished) {</span>
 <span class="nc bnc" id="L653" title="All 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="nc" id="L654">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_LIST, false)) {</span>
+<span class="nc bnc" id="L654" title="All 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_LIST, false)) {</span>
           // nothing to do
         }
-      }
+<span class="nc" id="L657">      }</span>
     }
 <span class="nc" id="L659">  }</span>
 
