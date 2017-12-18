@@ -64,6 +64,24 @@ public class MtasSolrComponentTermvector
   /** The Constant NAME_MTAS_TERMVECTOR_PREFIX. */
   public static final String NAME_MTAS_TERMVECTOR_PREFIX = "prefix";
 
+  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE. */
+  public static final String NAME_MTAS_TERMVECTOR_DISTANCE = "distance";
+
+  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_KEY. */
+  public static final String NAME_MTAS_TERMVECTOR_DISTANCE_KEY = "key";
+
+  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_TYPE. */
+  public static final String NAME_MTAS_TERMVECTOR_DISTANCE_TYPE = "type";
+
+  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_BASE. */
+  public static final String NAME_MTAS_TERMVECTOR_DISTANCE_BASE = "base";
+
+  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETERS. */
+  public static final String NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER = "parameter";
+
+  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM. */
+  public static final String NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM = "maximum";
+
   /** The Constant NAME_MTAS_TERMVECTOR_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_REGEXP = "regexp";
 
@@ -150,6 +168,12 @@ public class MtasSolrComponentTermvector
       String[] fields = new String[ids.size()];
       String[] keys = new String[ids.size()];
       String[] prefixes = new String[ids.size()];
+      String[][] distanceKeys = new String[ids.size()][];
+      String[][] distanceTypes = new String[ids.size()][];
+      String[][] distanceBases = new String[ids.size()][];
+      Map<String,String>[][] distanceParameters = new Map[ids.size()][];
+      String[][] distanceMinimums = new String[ids.size()][];
+      String[][] distanceMaximums = new String[ids.size()][];
       String[] regexps = new String[ids.size()];
       String[] fulls = new String[ids.size()];
       String[] sortTypes = new String[ids.size()];
@@ -176,6 +200,47 @@ public class MtasSolrComponentTermvector
             String.valueOf(tmpCounter)).trim();
         prefixes[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR
             + "." + id + "." + NAME_MTAS_TERMVECTOR_PREFIX, null);
+        Set<String> distanceIds = MtasSolrResultUtil
+            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR
+                + "." + id + "." + NAME_MTAS_TERMVECTOR_DISTANCE);
+        distanceKeys[tmpCounter] = new String[distanceIds.size()];
+        distanceTypes[tmpCounter] = new String[distanceIds.size()];
+        distanceBases[tmpCounter] = new String[distanceIds.size()];
+        distanceParameters[tmpCounter] = new Map[distanceIds.size()];
+        distanceMinimums[tmpCounter] = new String[distanceIds.size()];
+        distanceMaximums[tmpCounter] = new String[distanceIds.size()];
+        int tmpSubDistanceCounter = 0;
+        for (String distanceId : distanceIds) {
+          distanceKeys[tmpCounter][tmpSubDistanceCounter] = rb.req.getParams()
+              .get(
+                  PARAM_MTAS_TERMVECTOR + "." + id + "."
+                      + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceId + "."
+                      + NAME_MTAS_TERMVECTOR_DISTANCE_KEY,
+                  String.valueOf(tmpSubDistanceCounter))
+              .trim();
+          distanceTypes[tmpCounter][tmpSubDistanceCounter] = rb.req.getParams()
+              .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceId + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_TYPE, null);
+          distanceBases[tmpCounter][tmpSubDistanceCounter] = rb.req.getParams()
+              .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceId + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_BASE, null);
+          distanceParameters[tmpCounter][tmpSubDistanceCounter] = new HashMap<String, String>();
+          Set<String> parameters = MtasSolrResultUtil
+              .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR
+                  + "." + id + "." + NAME_MTAS_TERMVECTOR_DISTANCE+ "." + distanceId + "." +NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER);
+          for(String parameter : parameters) {
+            distanceParameters[tmpCounter][tmpSubDistanceCounter].put(parameter, rb.req.getParams().get(PARAM_MTAS_TERMVECTOR
+                  + "." + id + "." + NAME_MTAS_TERMVECTOR_DISTANCE+ "." + distanceId + "." +NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER+"."+parameter));
+          }
+          distanceMaximums[tmpCounter][tmpSubDistanceCounter] = rb.req
+              .getParams()
+              .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceId + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM, null);
+          tmpSubDistanceCounter++;
+        }
         regexps[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR + "."
             + id + "." + NAME_MTAS_TERMVECTOR_REGEXP, null);
         fulls[tmpCounter] = rb.req.getParams().get(
@@ -202,24 +267,25 @@ public class MtasSolrComponentTermvector
         functionExpressions[tmpCounter] = new String[functionIds.size()];
         functionKeys[tmpCounter] = new String[functionIds.size()];
         functionTypes[tmpCounter] = new String[functionIds.size()];
-        int tmpSubCounter = 0;
+        int tmpSubFunctionCounter = 0;
         for (String functionId : functionIds) {
-          functionKeys[tmpCounter][tmpSubCounter] = rb.req.getParams()
+          functionKeys[tmpCounter][tmpSubFunctionCounter] = rb.req.getParams()
               .get(
                   PARAM_MTAS_TERMVECTOR + "." + id + "."
                       + NAME_MTAS_TERMVECTOR_FUNCTION + "." + functionId + "."
                       + NAME_MTAS_TERMVECTOR_FUNCTION_KEY,
-                  String.valueOf(tmpSubCounter))
+                  String.valueOf(tmpSubFunctionCounter))
               .trim();
-          functionExpressions[tmpCounter][tmpSubCounter] = rb.req.getParams()
+          functionExpressions[tmpCounter][tmpSubFunctionCounter] = rb.req
+              .getParams()
               .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION + "." + functionId + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION, null);
-          functionTypes[tmpCounter][tmpSubCounter] = rb.req.getParams()
+          functionTypes[tmpCounter][tmpSubFunctionCounter] = rb.req.getParams()
               .get(PARAM_MTAS_TERMVECTOR + "." + id + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION + "." + functionId + "."
                   + NAME_MTAS_TERMVECTOR_FUNCTION_TYPE, null);
-          tmpSubCounter++;
+          tmpSubFunctionCounter++;
         }
         boundaries[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_TERMVECTOR
             + "." + id + "." + NAME_MTAS_TERMVECTOR_BOUNDARY, null);
@@ -282,6 +348,12 @@ public class MtasSolrComponentTermvector
             : prefixes[i].trim();
         String key = (keys[i] == null) || (keys[i].isEmpty())
             ? String.valueOf(i) + ":" + field + ":" + prefix : keys[i].trim();
+        String[] distanceKey = distanceKeys[i];
+        String[] distanceType = distanceTypes[i];
+        String[] distanceBase = distanceBases[i];
+        Map<String, String>[] distanceParameter = distanceParameters[i];
+        String[] distanceMinimum = distanceMinimums[i];
+        String[] distanceMaximum = distanceMaximums[i];
         String regexp = (regexps[i] == null) || (regexps[i].isEmpty()) ? null
             : regexps[i].trim();
         Boolean full = (fulls[i] == null) || (!fulls[i].equals("true")) ? false
@@ -330,11 +402,12 @@ public class MtasSolrComponentTermvector
         } else {
           try {
             mtasFields.list.get(field).termVectorList
-                .add(new ComponentTermVector(key, prefix, regexp, full, type,
-                    sortType, sortDirection, startValue, numberFinal,
-                    functionKey, functionExpression, functionType, boundary,
-                    list, listRegexp, ignoreRegexp, ignoreList,
-                    ignoreListRegexp));
+                .add(new ComponentTermVector(key, prefix, distanceKey,
+                    distanceType, distanceBase, distanceParameter,
+                    distanceMaximum, regexp, full, type, sortType,
+                    sortDirection, startValue, numberFinal, functionKey,
+                    functionExpression, functionType, boundary, list,
+                    listRegexp, ignoreRegexp, ignoreList, ignoreListRegexp));
           } catch (ParseException e) {
             throw new IOException(e);
           }
@@ -386,6 +459,26 @@ public class MtasSolrComponentTermvector
                 + NAME_MTAS_TERMVECTOR_KEY);
             sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
                 + NAME_MTAS_TERMVECTOR_PREFIX);
+            Set<String> distanceKeys = MtasSolrResultUtil
+                .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR
+                    + "." + key + "." + NAME_MTAS_TERMVECTOR_DISTANCE);
+            for (String distanceKey : distanceKeys) {
+              sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_KEY);
+              sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_TYPE);
+              sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_BASE);
+              sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER);
+              sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                  + NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM);
+            }
             sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
                 + NAME_MTAS_TERMVECTOR_REGEXP);
             sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
@@ -454,13 +547,12 @@ public class MtasSolrComponentTermvector
         function.dataCollector.reduceToKeys(
             termVector.subComponentFunction.dataCollector.getKeyList());
         function.dataCollector.close();
-        functionDataItem.put(function.key,
-            new MtasSolrMtasResult(function.dataCollector,
-                new String[] { function.dataType },
-                new String[] { function.statsType },
-                new SortedSet[] { function.statsItems }, new String[] { null },
-                new String[] { null }, new Integer[] { 0 },
-                new Integer[] { Integer.MAX_VALUE }, null));
+        functionDataItem.put(function.key, new MtasSolrMtasResult(
+            function.dataCollector, new String[] { function.dataType },
+            new String[] { function.statsType },
+            new SortedSet[] { function.statsItems }, new List[] { null },
+            new String[] { null }, new String[] { null }, new Integer[] { 0 },
+            new Integer[] { Integer.MAX_VALUE }, null));
       }
     }
     MtasSolrMtasResult data = new MtasSolrMtasResult(
@@ -468,6 +560,7 @@ public class MtasSolrComponentTermvector
         new String[] { termVector.subComponentFunction.dataType },
         new String[] { termVector.subComponentFunction.statsType },
         new SortedSet[] { termVector.subComponentFunction.statsItems },
+        new List[] { termVector.distances },
         new String[] { termVector.subComponentFunction.sortType },
         new String[] { termVector.subComponentFunction.sortDirection },
         new Integer[] { 0 }, new Integer[] { termVector.number }, functionData);

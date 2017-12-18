@@ -559,7 +559,7 @@ public class MtasSolrComponentFacet
                   new MtasSolrMtasResult(tmpSubComponentFunction.dataCollector,
                       tmpSubComponentFunction.dataType,
                       tmpSubComponentFunction.statsType,
-                      tmpSubComponentFunction.statsItems, null));
+                      tmpSubComponentFunction.statsItems, null, null));
             }
             functionData.put(functionDataCollector, tmpList);
           }
@@ -567,7 +567,7 @@ public class MtasSolrComponentFacet
       }
     }
     MtasSolrMtasResult data = new MtasSolrMtasResult(facet.dataCollector,
-        facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,
+        facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,null, 
         facet.baseSortTypes, facet.baseSortDirections, null, facet.baseNumbers,
         functionData);
 

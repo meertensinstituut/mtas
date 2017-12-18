@@ -3,17 +3,22 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+
+import mtas.codec.util.CodecComponent.SubComponentDistance;
 import mtas.codec.util.DataCollector;
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.codec.util.collector.MtasDataCollectorResult;
 import mtas.codec.util.collector.MtasDataItem;
+import mtas.codec.util.distance.Distance;
 
 /**
  * The Class MtasSolrMtasResult.
@@ -28,9 +33,8 @@ public class MtasSolrMtasResult implements Serializable {
 
   /** The stats type. */
   public String statsType;
-
-  /** The stats items. */
-  public SortedSet<String> statsItems;
+  
+  public List<SubComponentDistance> distances;
 
   /** The sort type. */
   public String sortType;
@@ -59,6 +63,8 @@ public class MtasSolrMtasResult implements Serializable {
   /** The sub stats items. */
   private SortedSet<String>[] subStatsItems;
 
+  private List<SubComponentDistance>[] subDistances;
+  
   /** The sub sort type. */
   private String[] subSortType;
 
@@ -74,27 +80,36 @@ public class MtasSolrMtasResult implements Serializable {
   /**
    * Instantiates a new mtas solr mtas result.
    *
-   * @param dataCollector the data collector
-   * @param dataType the data type
-   * @param statsType the stats type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param functionData the function data
+   * @param dataCollector
+   *          the data collector
+   * @param dataType
+   *          the data type
+   * @param statsType
+   *          the stats type
+   * @param statsItems
+   *          the stats items
+   * @param sortType
+   *          the sort type
+   * @param sortDirection
+   *          the sort direction
+   * @param start
+   *          the start
+   * @param number
+   *          the number
+   * @param functionData
+   *          the function data
    */
   @SuppressWarnings("unchecked")
   public MtasSolrMtasResult(MtasDataCollector<?, ?> dataCollector,
       String[] dataType, String[] statsType, SortedSet<String>[] statsItems,
-      String[] sortType, String[] sortDirection, Integer[] start,
-      Integer[] number,
+      List<SubComponentDistance>[] distances, String[] sortType, String[] sortDirection,
+      Integer[] start, Integer[] number,
       Map<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData) {
     this.dataCollector = dataCollector;
     this.functionData = functionData;
     this.dataType = (dataType == null) ? null : dataType[0];
     this.statsType = (statsType == null) ? null : statsType[0];
-    this.statsItems = (statsItems == null) ? null : statsItems[0];
+    this.distances = (distances==null) ? null : distances[0];
     this.sortType = (sortType == null) ? null : sortType[0];
     this.sortDirection = (sortDirection == null) ? null : sortDirection[0];
     this.start = (start == null) ? null : start[0];
@@ -105,11 +120,13 @@ public class MtasSolrMtasResult implements Serializable {
       subDataType = new String[dataType.length - 1];
       subStatsType = new String[dataType.length - 1];
       subStatsItems = new TreeSet[dataType.length - 1];
+      subDistances = new List[dataType.length - 1];
       subSortType = new String[dataType.length - 1];
       subSortDirection = new String[dataType.length - 1];
       System.arraycopy(dataType, 1, subDataType, 0, dataType.length - 1);
       System.arraycopy(statsType, 1, subStatsType, 0, dataType.length - 1);
       System.arraycopy(statsItems, 1, subStatsItems, 0, dataType.length - 1);
+      System.arraycopy(distances, 1, subDistances, 0, dataType.length - 1);
       System.arraycopy(sortType, 1, subSortType, 0, dataType.length - 1);
       System.arraycopy(sortDirection, 1, subSortDirection, 0,
           dataType.length - 1);
@@ -117,6 +134,7 @@ public class MtasSolrMtasResult implements Serializable {
       subDataType = null;
       subStatsType = null;
       subStatsItems = null;
+      subDistances = null;
       subSortType = null;
       subSortDirection = null;
     }
@@ -125,27 +143,35 @@ public class MtasSolrMtasResult implements Serializable {
   /**
    * Instantiates a new mtas solr mtas result.
    *
-   * @param dataCollector the data collector
-   * @param dataType the data type
-   * @param statsType the stats type
-   * @param statsItems the stats items
-   * @param functionData the function data
+   * @param dataCollector
+   *          the data collector
+   * @param dataType
+   *          the data type
+   * @param statsType
+   *          the stats type
+   * @param statsItems
+   *          the stats items
+   * @param functionData
+   *          the function data
    */
   @SuppressWarnings("unchecked")
   public MtasSolrMtasResult(MtasDataCollector<?, ?> dataCollector,
       String dataType, String statsType, SortedSet<String> statsItems,
+      List<SubComponentDistance> distance,
       Map<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData) {
     this(dataCollector, new String[] { dataType }, new String[] { statsType },
-        new SortedSet[] { statsItems }, new String[] { null },
-        new String[] { null }, new Integer[] { 0 }, new Integer[] { 1 },
-        functionData);
+        new SortedSet[] { statsItems }, new List[] { distance },
+        new String[] { null }, new String[] { null }, new Integer[] { 0 },
+        new Integer[] { 1 }, functionData);
   }
 
   /**
    * Merge.
    *
-   * @param newItem the new item
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param newItem
+   *          the new item
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   void merge(MtasSolrMtasResult newItem) throws IOException {
     HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<>();
@@ -190,9 +216,11 @@ public class MtasSolrMtasResult implements Serializable {
   /**
    * Gets the data.
    *
-   * @param showDebugInfo the show debug info
+   * @param showDebugInfo
+   *          the show debug info
    * @return the data
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   NamedList<Object> getData(boolean showDebugInfo) throws IOException {
     if (dataCollector.getCollectorType()
@@ -226,7 +254,7 @@ public class MtasSolrMtasResult implements Serializable {
         }
         if ((subDataType != null) && (dataItem.getSub() != null)) {
           MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(),
-              subDataType, subStatsType, subStatsItems, subSortType,
+              subDataType, subStatsType, subStatsItems, subDistances, subSortType,
               subSortDirection, subStart, subNumber, functionData);
           if (dataItem.getSub().getCollectorType()
               .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
@@ -250,7 +278,8 @@ public class MtasSolrMtasResult implements Serializable {
    * Gets the key list.
    *
    * @return the key list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public Set<String> getKeyList() throws IOException {
     if (dataCollector.getCollectorType()
@@ -266,7 +295,8 @@ public class MtasSolrMtasResult implements Serializable {
    * Gets the full key list.
    *
    * @return the full key list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public Set<String> getFullKeyList() throws IOException {
     if (dataCollector.getCollectorType()
@@ -281,9 +311,11 @@ public class MtasSolrMtasResult implements Serializable {
   /**
    * Gets the named list.
    *
-   * @param showDebugInfo the show debug info
+   * @param showDebugInfo
+   *          the show debug info
    * @return the named list
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   NamedList<Object> getNamedList(boolean showDebugInfo) throws IOException {
     if (dataCollector.getCollectorType()
@@ -323,6 +355,13 @@ public class MtasSolrMtasResult implements Serializable {
       for (Entry<String, ?> entry : dataList.entrySet()) {
         SimpleOrderedMap<Object> mtasResponseListItem = new SimpleOrderedMap<>();
         MtasDataItem<?, ?> dataItem = (MtasDataItem<?, ?>) entry.getValue();
+        if(this.distances!=null && !this.distances.isEmpty()) {
+          SimpleOrderedMap<Object> mtasResponseListItemDistance = new SimpleOrderedMap<>();
+          for(SubComponentDistance item : this.distances) {
+            mtasResponseListItemDistance.add(item.key, item.getDistance().compute(entry.getKey()));
+          }
+          mtasResponseListItem.add(Distance.NAME, mtasResponseListItemDistance);
+        } 
         mtasResponseListItem.addAll(dataItem.rewrite(showDebugInfo));
         if (functionList.containsKey(entry.getKey())) {
           mtasResponseListItem.add("functions",
@@ -330,7 +369,7 @@ public class MtasSolrMtasResult implements Serializable {
         }
         if ((subDataType != null) && (dataItem.getSub() != null)) {
           MtasSolrMtasResult css = new MtasSolrMtasResult(dataItem.getSub(),
-              subDataType, subStatsType, subStatsItems, subSortType,
+              subDataType, subStatsType, subStatsItems, subDistances, subSortType,
               subSortDirection, subStart, subNumber, functionData);
           if (dataItem.getSub().getCollectorType()
               .equals(DataCollector.COLLECTOR_TYPE_LIST)) {
@@ -380,7 +419,8 @@ public class MtasSolrMtasResult implements Serializable {
    * Gets the result.
    *
    * @return the result
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public MtasDataCollectorResult getResult() throws IOException {
     return dataCollector.getResult();

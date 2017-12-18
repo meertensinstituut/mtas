@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
@@ -872,7 +873,7 @@ public class MtasSolrComponentStats
     SimpleOrderedMap<Object> mtasPositionResponse = new SimpleOrderedMap<>();
     mtasPositionResponse.add("key", position.key);
     MtasSolrMtasResult data = new MtasSolrMtasResult(position.dataCollector,
-        position.dataType, position.statsType, position.statsItems, null);
+        position.dataType, position.statsType, position.statsItems, null, null);
     if (encode) {
       mtasPositionResponse.add("_encoded_data",
           MtasSolrResultUtil.encode(data));
@@ -898,7 +899,7 @@ public class MtasSolrComponentStats
     SimpleOrderedMap<Object> mtasTokenResponse = new SimpleOrderedMap<>();
     mtasTokenResponse.add("key", token.key);
     MtasSolrMtasResult data = new MtasSolrMtasResult(token.dataCollector,
-        token.dataType, token.statsType, token.statsItems, null);
+        token.dataType, token.statsType, token.statsItems, null, null);
     if (encode) {
       mtasTokenResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));
     } else {
@@ -933,13 +934,13 @@ public class MtasSolrComponentStats
             new MtasSolrMtasResult(function.dataCollector,
                 new String[] { function.dataType },
                 new String[] { function.statsType },
-                new SortedSet[] { function.statsItems }, new String[] { null },
+                new SortedSet[] { function.statsItems }, new List[] {null}, new String[] { null },
                 new String[] { null }, new Integer[] { 0 },
                 new Integer[] { Integer.MAX_VALUE }, null));
       }
     }
     MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector,
-        span.dataType, span.statsType, span.statsItems, functionData);
+        span.dataType, span.statsType, span.statsItems, null, functionData);
     if (encode) {
       mtasSpanResponse.add("_encoded_data", MtasSolrResultUtil.encode(data));
     } else {

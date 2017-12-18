@@ -43,6 +43,7 @@ import mtas.codec.util.CodecComponent.KwicToken;
 import mtas.codec.util.CodecComponent.ListHit;
 import mtas.codec.util.CodecComponent.ListToken;
 import mtas.codec.util.CodecComponent.Match;
+import mtas.codec.util.CodecComponent.SubComponentDistance;
 import mtas.codec.util.CodecComponent.SubComponentFunction;
 import mtas.codec.util.CodecInfo.IndexDoc;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
@@ -87,21 +88,18 @@ import org.apache.lucene.util.automaton.RegExp;
 import org.apache.solr.legacy.LegacyNumericUtils;
 import org.apache.solr.schema.NumberType;
 
-import com.sun.tools.javac.code.Attribute.Array;
-
 /**
  * The Class CodecCollector.
  */
 public class CodecCollector {
 
   /** The Constant log. */
-  private static final Log log = LogFactory.getLog(CodecCollector.class);
+  private static final Log log = LogFactory.getLog(CodecCollector.class);  
 
   /**
    * Instantiates a new codec collector.
    */
-  private CodecCollector() {
-    // don't do anything
+  public CodecCollector() {    
   }
 
   /**
@@ -3007,7 +3005,6 @@ public class CodecCollector {
               ignoreByteRunAutomatonList.add(new ByteRunAutomaton(automaton));
             }
           }
-
           for (CompiledAutomaton compiledAutomaton : listAutomata) {
             if (!compiledAutomaton.type
                 .equals(CompiledAutomaton.AUTOMATON_TYPE.NORMAL)) {
@@ -3042,7 +3039,7 @@ public class CodecCollector {
                 String key;
                 // loop over terms
                 while ((term = termsEnum.next()) != null) {
-                  if (validateTermWithStartValue(term, termVector)) {
+                  if (validateTermWithStartValue(term, termVector) && validateTermWithDistance(term, termVector)) {
                     termDocId = -1;
                     acceptedTerm = true;
                     if (ignoreByteRunAutomatonList != null) {
@@ -3266,7 +3263,7 @@ public class CodecCollector {
               // loop over terms
               boolean acceptedTerm;
               while ((term = termsEnum.next()) != null) {
-                if (validateTermWithStartValue(term, termVector)) {
+                if (validateTermWithStartValue(term, termVector) && validateTermWithDistance(term, termVector)) {
                   termDocId = -1;
                   acceptedTerm = true;
                   if (ignoreByteRunAutomatonList != null) {
@@ -3328,7 +3325,7 @@ public class CodecCollector {
               if (computeFullList.size() > 0) {
                 termsEnum = t.intersect(compiledAutomaton, null);
                 while ((term = termsEnum.next()) != null) {
-                  if (validateTermWithStartValue(term, termVector)) {
+                  if (validateTermWithStartValue(term, termVector) && validateTermWithDistance(term, termVector)) {
                     termDocId = -1;
                     mutableKey[0] = null;
                     // only if (probably) needed
@@ -3522,6 +3519,24 @@ public class CodecCollector {
     return false;
   }
 
+  private static boolean validateTermWithDistance(BytesRef term,
+      ComponentTermVector termVector) throws IOException {
+    if(termVector.distances==null || termVector.distances.isEmpty()) {
+      return true;
+    } else {      
+      for(SubComponentDistance item : termVector.distances) {
+        if(item.maximum==null) {
+          continue;
+        } else {
+          if(!item.getDistance().validate(term)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  }
+  
   /**
    * Need second round termvector.
    *

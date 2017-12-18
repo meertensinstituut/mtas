@@ -3,6 +3,7 @@ package mtas.solr.handler.component.util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
@@ -491,7 +492,7 @@ public class MtasSolrComponentGroup
     mtasGroupResponse.add("key", group.key);
     MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,
         new String[] { group.dataType }, new String[] { group.statsType },
-        new SortedSet[] { group.statsItems }, new String[] { group.sortType },
+        new SortedSet[] { group.statsItems }, new List[] {null}, new String[] { group.sortType },
         new String[] { group.sortDirection }, new Integer[] { group.start },
         new Integer[] { group.number }, null);
     if (encode) {

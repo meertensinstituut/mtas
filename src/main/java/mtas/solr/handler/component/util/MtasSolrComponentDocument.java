@@ -2,6 +2,7 @@ package mtas.solr.handler.component.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -240,7 +241,7 @@ public class MtasSolrComponentDocument
       }
       mtasDocumentItemResponse.add("stats",
           new MtasSolrMtasResult(stats, stats.getDataType(),
-              stats.getStatsType(), stats.getStatsItems(), null));
+              stats.getStatsType(), stats.getStatsItems(), null, null));
       mtasDocumentItemResponse.add("documentKey",
           document.uniqueKey.get(docId));
       if (list != null) {
@@ -249,12 +250,13 @@ public class MtasSolrComponentDocument
               new String[] { list.getDataType(), list.getDataType() },
               new String[] { list.getStatsType(), list.getStatsType() },
               new SortedSet[] { list.getStatsItems(), list.getStatsItems() },
+              new List[] {null, null}, 
               new String[] { null, null }, new String[] { null, null },
               new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
         } else {
           mtasDocumentItemResponse.add("list",
               new MtasSolrMtasResult(list, list.getDataType(),
-                  list.getStatsType(), list.getStatsItems(), null));
+                  list.getStatsType(), list.getStatsItems(), null, null));
         }
 
       }
