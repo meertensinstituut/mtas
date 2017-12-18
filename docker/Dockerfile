@@ -1,5 +1,5 @@
 # Automatically generated Dockerfile 
-# - Build 2017-12-18 15:25
+# - Build 2017-12-18 15:53
 # - Lucene/Solr version 7.1.0
 # - Mtas release 7.1.0.3 
 #
@@ -74,7 +74,7 @@ RUN service apache2 stop && \
     chmod -R 755 /var/www/html && \
     printf "echo\n" >> /start.sh && \
     printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh && \
-    printf "echo \"  Timestamp 2017-12-18 15:25\"\n" >> /start.sh && \
+    printf "echo \"  Timestamp 2017-12-18 15:53\"\n" >> /start.sh && \
     printf "echo \"  Lucene/Solr version 7.1.0\"\n" >> /start.sh && \
     printf "echo \"  Mtas release ${currentDevelopmentRelease}\"\n" >> /start.sh && \
     printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \
