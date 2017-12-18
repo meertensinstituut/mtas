@@ -930,13 +930,12 @@ public class MtasSolrComponentStats
     if (span.functions != null) {
       for (SubComponentFunction function : span.functions) {
         function.dataCollector.close();
-        functionDataItem.put(function.key,
-            new MtasSolrMtasResult(function.dataCollector,
-                new String[] { function.dataType },
-                new String[] { function.statsType },
-                new SortedSet[] { function.statsItems }, new List[] {null}, new String[] { null },
-                new String[] { null }, new Integer[] { 0 },
-                new Integer[] { Integer.MAX_VALUE }, null));
+        functionDataItem.put(function.key, new MtasSolrMtasResult(
+            function.dataCollector, new String[] { function.dataType },
+            new String[] { function.statsType },
+            new SortedSet[] { function.statsItems }, new List[] { null },
+            new String[] { null }, new String[] { null }, new Integer[] { 0 },
+            new Integer[] { Integer.MAX_VALUE }, null));
       }
     }
     MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector,

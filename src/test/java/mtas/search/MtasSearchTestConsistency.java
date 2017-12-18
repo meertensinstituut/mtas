@@ -119,8 +119,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search number of words.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchNumberOfWords() throws IOException {
@@ -133,8 +132,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search start sentence 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchStartSentence1() throws IOException {
@@ -147,8 +145,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search start sentence 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchStartSentence2() throws IOException {
@@ -161,8 +158,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search intersecting 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchIntersecting1() throws IOException {
@@ -176,8 +172,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search intersecting 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchIntersecting2() throws IOException {
@@ -198,8 +193,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search ignore.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchIgnore() throws IOException {
@@ -237,8 +231,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search sequence.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchSequence() throws IOException {
@@ -287,8 +280,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search within 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin1() throws IOException {
@@ -301,8 +293,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search within 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin2() throws IOException {
@@ -341,8 +332,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search within 3.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin3() throws IOException {
@@ -386,8 +376,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search within 4.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin4() throws IOException {
@@ -407,8 +396,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search within 5.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchWithin5() throws IOException {
@@ -428,8 +416,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search containing 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchContaining1() throws IOException {
@@ -443,8 +430,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search containing 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchContaining2() throws IOException {
@@ -492,8 +478,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search containing 3.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchContaining3() throws IOException {
@@ -513,8 +498,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search containing 4.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchContaining4() throws IOException {
@@ -535,8 +519,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search followed by 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFollowedBy1() throws IOException {
@@ -572,8 +555,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search followed by 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFollowedBy2() throws IOException {
@@ -609,8 +591,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search preceded by 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchPrecededBy1() throws IOException {
@@ -648,8 +629,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search preceded by 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchPrecededBy2() throws IOException {
@@ -679,8 +659,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search fully aligned with 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFullyAlignedWith1() throws IOException {
@@ -750,8 +729,7 @@ public class MtasSearchTestConsistency {
   /**
    * Basic search fully aligned with 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void basicSearchFullyAlignedWith2() throws IOException {
@@ -772,8 +750,7 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats positions 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsPositions1() throws IOException {
@@ -818,8 +795,7 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats positions 2.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsPositions2() throws IOException {
@@ -882,8 +858,7 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats tokens.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsTokens() throws IOException {
@@ -946,8 +921,7 @@ public class MtasSearchTestConsistency {
   /**
    * Collect stats spans 1.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectStatsSpans1() throws IOException {
@@ -1064,8 +1038,7 @@ public class MtasSearchTestConsistency {
   /**
    * Collect group.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectGroup() throws IOException {
@@ -1115,8 +1088,7 @@ public class MtasSearchTestConsistency {
   /**
    * Collect termvector.
    *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
   public void collectTermvector() throws IOException {
@@ -1128,10 +1100,10 @@ public class MtasSearchTestConsistency {
       ComponentField fieldStats = new ComponentField(FIELD_ID);
       fieldStats.statsPositionList
           .add(new ComponentPosition("total", null, null, "sum"));
-      fieldStats.termVectorList
-          .add(new ComponentTermVector("toplist", prefix, null, null, null, null, null, null, false,
-              "sum", CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC, null,
-              number, null, null, null, null, null, null, prefix, null, null));
+      fieldStats.termVectorList.add(new ComponentTermVector("toplist", prefix,
+          null, null, null, null, null, null, false, "sum",
+          CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC, null, number, null,
+          null, null, null, null, null, prefix, null, null));
       fieldStats.termVectorList
           .add(new ComponentTermVector("fulllist", prefix, null, null, null,
               null, null, null, true, "sum", CodecUtil.STATS_TYPE_SUM,
@@ -1188,10 +1160,8 @@ public class MtasSearchTestConsistency {
   /**
    * Do advanced search.
    *
-   * @param fullDocSet
-   *          the full doc set
-   * @param fieldStats
-   *          the field stats
+   * @param fullDocSet the full doc set
+   * @param fieldStats the field stats
    * @return the hash map
    */
   private HashMap<String, HashMap<String, Object>> doAdvancedSearch(
@@ -1264,12 +1234,9 @@ public class MtasSearchTestConsistency {
   /**
    * Creates the index.
    *
-   * @param configFile
-   *          the config file
-   * @param files
-   *          the files
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param configFile the config file
+   * @param files the files
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void createIndex(String configFile,
       HashMap<String, String> files) throws IOException {
@@ -1317,16 +1284,11 @@ public class MtasSearchTestConsistency {
   /**
    * Adds the doc.
    *
-   * @param w
-   *          the w
-   * @param id
-   *          the id
-   * @param title
-   *          the title
-   * @param file
-   *          the file
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param w the w
+   * @param id the id
+   * @param title the title
+   * @param file the file
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void addDoc(IndexWriter w, Integer id, String title,
       String file) throws IOException {
@@ -1344,8 +1306,7 @@ public class MtasSearchTestConsistency {
   /**
    * Gets the live docs.
    *
-   * @param indexReader
-   *          the index reader
+   * @param indexReader the index reader
    * @return the live docs
    */
   private static ArrayList<Integer> getLiveDocs(IndexReader indexReader) {
@@ -1367,19 +1328,13 @@ public class MtasSearchTestConsistency {
   /**
    * Creates the query.
    *
-   * @param field
-   *          the field
-   * @param cql
-   *          the cql
-   * @param ignore
-   *          the ignore
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
-   * @param disableTwoPhaseIterator
-   *          the disable two phase iterator
+   * @param field the field
+   * @param cql the cql
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
+   * @param disableTwoPhaseIterator the disable two phase iterator
    * @return the mtas span query
-   * @throws ParseException
-   *           the parse exception
+   * @throws ParseException the parse exception
    */
   private MtasSpanQuery createQuery(String field, String cql,
       MtasSpanQuery ignore, Integer maximumIgnoreLength,
@@ -1397,23 +1352,15 @@ public class MtasSearchTestConsistency {
   /**
    * Do query.
    *
-   * @param indexReader
-   *          the index reader
-   * @param field
-   *          the field
-   * @param cql
-   *          the cql
-   * @param ignore
-   *          the ignore
-   * @param maximumIgnoreLength
-   *          the maximum ignore length
-   * @param prefixes
-   *          the prefixes
-   * @param disableTwoPhaseIterator
-   *          the disable two phase iterator
+   * @param indexReader the index reader
+   * @param field the field
+   * @param cql the cql
+   * @param ignore the ignore
+   * @param maximumIgnoreLength the maximum ignore length
+   * @param prefixes the prefixes
+   * @param disableTwoPhaseIterator the disable two phase iterator
    * @return the query result
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private QueryResult doQuery(IndexReader indexReader, String field, String cql,
       MtasSpanQuery ignore, Integer maximumIgnoreLength,
@@ -1433,17 +1380,12 @@ public class MtasSearchTestConsistency {
   /**
    * Do query.
    *
-   * @param indexReader
-   *          the index reader
-   * @param field
-   *          the field
-   * @param q
-   *          the q
-   * @param prefixes
-   *          the prefixes
+   * @param indexReader the index reader
+   * @param field the field
+   * @param q the q
+   * @param prefixes the prefixes
    * @return the query result
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private QueryResult doQuery(IndexReader indexReader, String field,
       MtasSpanQuery q, ArrayList<String> prefixes) throws IOException {
@@ -1490,16 +1432,11 @@ public class MtasSearchTestConsistency {
   /**
    * Test number of hits.
    *
-   * @param indexReader
-   *          the index reader
-   * @param field
-   *          the field
-   * @param cqls1
-   *          the cqls 1
-   * @param cqls2
-   *          the cqls 2
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param indexReader the index reader
+   * @param field the field
+   * @param cqls1 the cqls 1
+   * @param cqls2 the cqls 2
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void testNumberOfHits(IndexReader indexReader, String field,
       List<String> cqls1, List<String> cqls2) throws IOException {
@@ -1609,16 +1546,11 @@ public class MtasSearchTestConsistency {
     /**
      * Instantiates a new query hit.
      *
-     * @param docId
-     *          the doc id
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
-     * @param prefix
-     *          the prefix
-     * @param value
-     *          the value
+     * @param docId the doc id
+     * @param startPosition the start position
+     * @param endPosition the end position
+     * @param prefix the prefix
+     * @param value the value
      */
     protected QueryHit(int docId, int startPosition, int endPosition,
         String prefix, String value) {

@@ -15,31 +15,31 @@ public class LevenshteinDistance extends Distance {
 
   /** The initial state. */
   protected final double[] initialState;
-  
+
   /** The Constant defaultDeletionDistance. */
   protected final static double defaultDeletionDistance = 1.0;
-  
+
   /** The Constant defaultInsertionDistance. */
   protected final static double defaultInsertionDistance = 1.0;
-  
+
   /** The Constant defaultReplaceDistance. */
   protected final static double defaultReplaceDistance = 1.0;
-  
+
   /** The deletion distance. */
   protected double deletionDistance;
-  
+
   /** The insertion distance. */
   protected double insertionDistance;
-  
+
   /** The replace distance. */
   protected double replaceDistance;
 
   /** The Constant PARAMETER_DELETIONDISTANCE. */
   protected final static String PARAMETER_DELETIONDISTANCE = "deletionDistance";
-  
+
   /** The Constant PARAMETER_INSERTIONDISTANCE. */
   protected final static String PARAMETER_INSERTIONDISTANCE = "insertionDistance";
-  
+
   /** The Constant PARAMETER_REPLACEDISTANCE. */
   protected final static String PARAMETER_REPLACEDISTANCE = "replaceDistance";
 
@@ -78,8 +78,11 @@ public class LevenshteinDistance extends Distance {
     }
   }
 
-  /* (non-Javadoc)
-   * @see mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
    */
   public boolean validate(BytesRef term) {
     if (maximum == null) {
@@ -102,7 +105,9 @@ public class LevenshteinDistance extends Distance {
     }
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.codec.util.distance.Distance#compute(java.lang.String)
    */
   @Override
