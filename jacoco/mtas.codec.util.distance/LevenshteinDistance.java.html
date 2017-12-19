@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LevenshteinDistance.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.distance</a> &gt; <span class="el_source">LevenshteinDistance.java</span></div><h1>LevenshteinDistance.java</h1><pre class="source lang-java linenums">package mtas.codec.util.distance;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.apache.lucene.util.BytesRef;
+
+import mtas.analysis.token.MtasToken;
+
+/**
+ * The Class LevenshteinDistance.
+ */
+public class LevenshteinDistance extends Distance {
+
+  /** The initial state. */
+  protected final double[] initialState;
+
+  /** The Constant defaultDeletionDistance. */
+  protected final static double defaultDeletionDistance = 1.0;
+
+  /** The Constant defaultInsertionDistance. */
+  protected final static double defaultInsertionDistance = 1.0;
+
+  /** The Constant defaultReplaceDistance. */
+  protected final static double defaultReplaceDistance = 1.0;
+
+  /** The deletion distance. */
+  protected double deletionDistance;
+
+  /** The insertion distance. */
+  protected double insertionDistance;
+
+  /** The replace distance. */
+  protected double replaceDistance;
+
+  /** The Constant PARAMETER_DELETIONDISTANCE. */
+  protected final static String PARAMETER_DELETIONDISTANCE = &quot;deletionDistance&quot;;
+
+  /** The Constant PARAMETER_INSERTIONDISTANCE. */
+  protected final static String PARAMETER_INSERTIONDISTANCE = &quot;insertionDistance&quot;;
+
+  /** The Constant PARAMETER_REPLACEDISTANCE. */
+  protected final static String PARAMETER_REPLACEDISTANCE = &quot;replaceDistance&quot;;
+
+  /**
+   * Instantiates a new levenshtein distance.
+   *
+   * @param prefix the prefix
+   * @param base the base
+   * @param maximum the maximum
+   * @param parameters the parameters
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public LevenshteinDistance(String prefix, String base, Double maximum,
+      Map&lt;String, String&gt; parameters) throws IOException {
+<span class="nc" id="L57">    super(prefix, base, maximum, parameters);</span>
+<span class="nc" id="L58">    deletionDistance = defaultDeletionDistance;</span>
+<span class="nc" id="L59">    insertionDistance = defaultInsertionDistance;</span>
+<span class="nc" id="L60">    replaceDistance = defaultReplaceDistance;</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">    if (parameters != null) {</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">      for (Entry&lt;String, String&gt; entry : parameters.entrySet()) {</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (entry.getKey().equals(PARAMETER_DELETIONDISTANCE)) {</span>
+<span class="nc" id="L64">          deletionDistance = Double.parseDouble(entry.getValue());</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        } else if (entry.getKey().equals(PARAMETER_INSERTIONDISTANCE)) {</span>
+<span class="nc" id="L66">          insertionDistance = Double.parseDouble(entry.getValue());</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        } else if (entry.getKey().equals(PARAMETER_REPLACEDISTANCE)) {</span>
+<span class="nc" id="L68">          replaceDistance = Double.parseDouble(entry.getValue());</span>
+        }
+<span class="nc" id="L70">      }</span>
+    }
+<span class="nc bnc" id="L72" title="All 6 branches missed.">    if (deletionDistance &lt; 0 || insertionDistance &lt; 0 || replaceDistance &lt; 0) {</span>
+<span class="nc" id="L73">      throw new IOException(&quot;distances should be zero or positive&quot;);</span>
+    }
+<span class="nc" id="L75">    initialState = new double[base.length() + 1];</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">    for (int i = 0; i &lt;= base.length(); i++) {</span>
+<span class="nc" id="L77">      initialState[i] = i * insertionDistance;</span>
+    }
+<span class="nc" id="L79">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
+   */
+  public boolean validate(BytesRef term) {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">    if (maximum == null) {</span>
+<span class="nc" id="L89">      return true;</span>
+    } else {
+<span class="nc" id="L91">      double[][] state = _start();</span>
+      char ch1;
+<span class="nc" id="L93">      int i = term.offset + MtasToken.DELIMITER.length() + prefix.length();</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">      for (; i &lt; term.length; i++) {</span>
+<span class="nc" id="L95">        ch1 = (char) term.bytes[i];</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (ch1 == 0x00) {</span>
+<span class="nc" id="L97">          break;</span>
+        }
+<span class="nc" id="L99">        state = _step(state, ch1);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (!_can_match(state)) {</span>
+<span class="nc" id="L101">          return false;</span>
+        }
+      }
+<span class="nc" id="L104">      return _is_match(state);</span>
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see mtas.codec.util.distance.Distance#compute(java.lang.String)
+   */
+  @Override
+  public double compute(String key) {
+<span class="nc" id="L115">    double[][] state = _start();</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">    for (char ch1 : key.toCharArray()) {</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">      if (ch1 == 0x00) {</span>
+<span class="nc" id="L118">        break;</span>
+      }
+<span class="nc" id="L120">      state = _step(state, ch1);</span>
+    }
+<span class="nc" id="L122">    return _distance(state);</span>
+  }
+
+  /**
+   * Start.
+   *
+   * @return the double[][]
+   */
+  private double[][] _start() {
+<span class="nc" id="L131">    double[][] startState = new double[2][];</span>
+<span class="nc" id="L132">    startState[0] = new double[initialState.length];</span>
+<span class="nc" id="L133">    startState[1] = Arrays.copyOf(initialState, initialState.length);</span>
+<span class="nc" id="L134">    return startState;</span>
+  }
+
+  /**
+   * Step.
+   *
+   * @param state the state
+   * @param ch1 the ch 1
+   * @return the double[][]
+   */
+  private double[][] _step(double[][] state, char ch1) {
+    double cost;
+<span class="nc" id="L146">    _shift(state);</span>
+<span class="nc" id="L147">    state[1][0] = state[0][0] + deletionDistance;</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    for (int i = 0; i &lt; base.length(); i++) {</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">      cost = (base.charAt(i) == ch1) ? 0 : replaceDistance;</span>
+<span class="nc" id="L150">      state[1][i + 1] = Math.min(state[1][i] + insertionDistance,</span>
+          state[0][i] + cost);
+<span class="nc" id="L152">      state[1][i + 1] = Math.min(state[1][i + 1],</span>
+          state[0][i + 1] + deletionDistance);
+    }
+<span class="nc" id="L155">    return state;</span>
+  }
+
+  /**
+   * Shift.
+   *
+   * @param state the state
+   */
+  private void _shift(double[][] state) {
+<span class="nc" id="L164">    double[] tmpState = state[0];</span>
+<span class="nc" id="L165">    state[0] = state[1];</span>
+<span class="nc" id="L166">    state[1] = tmpState;</span>
+<span class="nc" id="L167">  }</span>
+
+  /**
+   * Checks if is match.
+   *
+   * @param state the state
+   * @return true, if successful
+   */
+  private boolean _is_match(double[][] state) {
+<span class="nc bnc" id="L176" title="All 2 branches missed.">    return state[1][state[1].length - 1] &lt;= maximum;</span>
+  }
+
+  /**
+   * Can match.
+   *
+   * @param state the state
+   * @return true, if successful
+   */
+  private boolean _can_match(double[][] state) {
+<span class="nc bnc" id="L186" title="All 2 branches missed.">    for (double d : state[1]) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">      if (d &lt;= maximum) {</span>
+<span class="nc" id="L188">        return true;</span>
+      }
+    }
+<span class="nc" id="L191">    return false;</span>
+  }
+
+  /**
+   * Distance.
+   *
+   * @param state the state
+   * @return the double
+   */
+  private double _distance(double[][] state) {
+<span class="nc" id="L201">    return state[1][state[1].length - 1];</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

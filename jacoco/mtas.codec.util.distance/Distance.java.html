@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Distance.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.distance</a> &gt; <span class="el_source">Distance.java</span></div><h1>Distance.java</h1><pre class="source lang-java linenums">package mtas.codec.util.distance;
+
+import java.io.IOException;
+import java.util.Map;
+
+import org.apache.lucene.util.BytesRef;
+
+public abstract class Distance {
+
+  protected final String prefix;
+  protected final String base;
+  protected final Double maximum;
+  protected final Map&lt;String,String&gt; parameters;
+  
+  public static final String NAME = &quot;distance&quot;;
+  
+<span class="nc" id="L17">  public Distance(String prefix, String base, Double maximum, Map&lt;String,String&gt; parameters) throws IOException {</span>
+<span class="nc" id="L18">    this.prefix = prefix;</span>
+<span class="nc" id="L19">    this.base = base;</span>
+<span class="nc" id="L20">    this.maximum = maximum;   </span>
+<span class="nc" id="L21">    this.parameters = parameters;</span>
+<span class="nc" id="L22">  }</span>
+    
+  public abstract double compute(String key);
+  
+  public abstract boolean validate(BytesRef term);
+  
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

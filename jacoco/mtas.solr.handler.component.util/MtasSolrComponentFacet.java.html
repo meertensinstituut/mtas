@@ -559,7 +559,7 @@ public class MtasSolrComponentFacet
                   new MtasSolrMtasResult(tmpSubComponentFunction.dataCollector,
                       tmpSubComponentFunction.dataType,
                       tmpSubComponentFunction.statsType,
-                      tmpSubComponentFunction.statsItems, null));
+                      tmpSubComponentFunction.statsItems, null, null));
             }
 <span class="nc" id="L564">            functionData.put(functionDataCollector, tmpList);</span>
           }
@@ -567,7 +567,7 @@ public class MtasSolrComponentFacet
       }
     }
 <span class="nc" id="L569">    MtasSolrMtasResult data = new MtasSolrMtasResult(facet.dataCollector,</span>
-        facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,
+        facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,null, 
         facet.baseSortTypes, facet.baseSortDirections, null, facet.baseNumbers,
         functionData);
 
