@@ -46,6 +46,26 @@ Furthermore,  a list of terms can be provided that should be ignored within the 
 | mtas.termvector.\<identifier\>.ignoreList       | [\<string\>,...]   | list of terms | yes |
 | mtas.termvector.\<identifier\>.ignoreListRegexp | \<boolean\>  | interpret items in provided ignoreList as regular expressions | no         |
 
+## Distances
+
+For each term in the termvector, the distance to a predefined `base` term can be computed. Two `type` of distance are available: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) and [Damerau–Levenshtein](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance), each with configurable parameters to define the weight of the relevant operations.
+
+| Parameter                                       | Value        | Info                           | Obligatory  |
+|-------------------------------------------------|--------------|--------------------------------|-------------|
+| mtas.termvector.\<identifier\>.distance.\<identifier distance\>.key | \<string\>   | key used in response           | no          |
+| mtas.termvector.\<identifier\>.distance.\<identifier distance\>.type    | \<string\>   | type of distance         | yes         |
+| mtas.termvector.\<identifier\>.distance.\<identifier distance\>.base | \<string\>  | base term for distance | yes         |
+| mtas.termvector.\<identifier\>.distance.\<identifier distance\>.maximum | \<double\>  | restrict termvector to terms with provided maximum | no         |
+| mtas.termvector.\<identifier\>.distance.\<identifier distance\>.parameter.* | \<string\>  | type dependent parameters | no         |
+
+The available type dependent additional parameters for type `levenshtein` and `damerau-levenshtein` are
+
+| Type | Type dependent parameter         | Value        | Info                           | Default  |
+|-----|-------------------------------------------------|--------------|--------------------------------|-------------|
+| levenshtein, damerau-levenshtein | deletionDistance | \<double\>   | distance for a deletion | 1.0          |
+| levenshtein, damerau-levenshtein | insertionDistance | \<double\>   | distance for an insertion | 1.0          |
+| levenshtein, damerau-levenshtein | replaceDistance | \<double\>   | distance for a replacement | 1.0          |
+| damerau-levenshtein | transpositionDistance | \<double\>   | distance for a transposition | 1.0          |
 
 ## Functions
 
@@ -68,7 +88,8 @@ Again, the key is added to the response and may be used to distinguish between m
 3. [Ignore](#ignore) : previous result, ignoring words ending with $-e$.
 4. [List](#list) : termvector for provided list of words.
 5. [Start](#start) : termvector for words containing only characters a-z sorted by term and &gt; *koe*.
-6. [Functions](#functions) : statistics on hits, relative frequency and total number of words in document for words containing only characters a-z.
+6. [Distances](#distances) : termvector for words with Levenshtein distance from 1 or less sorted descending by frequency.
+7. [Functions](#functions) : statistics on hits, relative frequency and total number of words in document for words containing only characters a-z.
 
 ---
 
@@ -262,6 +283,18 @@ Termvector for words containing only characters a-z sorted by term and &gt; *koe
             "key":"koeala"}]}]}
 ```
 
+<a name="distances"></a>  
+
+### Distances
+
+**Example**  
+List of words sorted descending by number of hits with at most Levenshtein distance 1 from `regering`.
+
+**Request and response**  
+``
+
+``` json
+```
 
 <a name="functions"></a>  
 

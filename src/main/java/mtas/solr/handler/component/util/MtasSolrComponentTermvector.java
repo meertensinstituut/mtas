@@ -32,6 +32,7 @@ import mtas.codec.util.CodecUtil;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentTermVector;
+import mtas.codec.util.CodecComponent.SubComponentDistance;
 import mtas.codec.util.CodecComponent.SubComponentFunction;
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.codec.util.collector.MtasDataItemNumberComparator;
@@ -477,10 +478,16 @@ public class MtasSolrComponentTermvector
                   + NAME_MTAS_TERMVECTOR_DISTANCE_BASE);
               sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
                   + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
-                  + NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER);
-              sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
-                  + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
                   + NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM);
+              Set<String> distanceParameters = MtasSolrResultUtil
+                  .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_TERMVECTOR
+                      + "." + key + "." + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                      + NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER);
+              for(String distanceParameter : distanceParameters) {
+                sreq.params.remove(PARAM_MTAS_TERMVECTOR
+                      + "." + key + "." + NAME_MTAS_TERMVECTOR_DISTANCE + "." + distanceKey + "."
+                      + NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER+"."+distanceParameter);
+              }
             }
             sreq.params.remove(PARAM_MTAS_TERMVECTOR + "." + key + "."
                 + NAME_MTAS_TERMVECTOR_REGEXP);
@@ -1058,6 +1065,49 @@ public class MtasSolrComponentTermvector
                             + NAME_MTAS_TERMVECTOR_TYPE,
                         tv.subComponentFunction.type);
                   }
+                  if (tv.distances != null) {
+                    int distanceCounter = 0;
+                    for (SubComponentDistance distance : tv.distances) {
+                      paramsNewRequest.add(
+                          PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                              + distanceCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE_TYPE,
+                          distance.type);
+                      paramsNewRequest.add(
+                          PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                              + distanceCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE_BASE,
+                          distance.base);
+                      if(distance.key!=null) {
+                        paramsNewRequest.add(
+                            PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                                + distanceCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE_KEY,
+                            distance.key);
+                      }
+                      if(distance.maximum!=null) {
+                        paramsNewRequest.add(
+                            PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                                + distanceCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM,
+                            String.valueOf(distance.maximum));
+                      }
+                      if(distance.parameters!=null) {
+                        for(Entry<String,String> parameter : distance.parameters.entrySet()) {
+                          paramsNewRequest.add(
+                              PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                                  + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                                  + distanceCounter + "."
+                                  + NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER + "." +parameter.getKey(),
+                              parameter.getValue());
+                        }
+                      }
+                    }
+                  }                  
                   if (tv.functions != null) {
                     int functionCounter = 0;
                     for (SubComponentFunction function : tv.functions) {
@@ -1161,6 +1211,49 @@ public class MtasSolrComponentTermvector
                         PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
                             + NAME_MTAS_TERMVECTOR_TYPE,
                         tv.subComponentFunction.type);
+                  }
+                  if (tv.distances != null) {
+                    int distanceCounter = 0;
+                    for (SubComponentDistance distance : tv.distances) {
+                      paramsNewRequest.add(
+                          PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                              + distanceCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE_TYPE,
+                          distance.type);
+                      paramsNewRequest.add(
+                          PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                              + distanceCounter + "."
+                              + NAME_MTAS_TERMVECTOR_DISTANCE_BASE,
+                          distance.base);
+                      if(distance.key!=null) {
+                        paramsNewRequest.add(
+                            PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                                + distanceCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE_KEY,
+                            distance.key);
+                      }
+                      if(distance.maximum!=null) {
+                        paramsNewRequest.add(
+                            PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                                + distanceCounter + "."
+                                + NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM,
+                            String.valueOf(distance.maximum));
+                      }
+                      if(distance.parameters!=null) {
+                        for(Entry<String,String> parameter : distance.parameters.entrySet()) {
+                          paramsNewRequest.add(
+                              PARAM_MTAS_TERMVECTOR + "." + termvectorCounter + "."
+                                  + NAME_MTAS_TERMVECTOR_DISTANCE + "."
+                                  + distanceCounter + "."
+                                  + NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER + "." +parameter.getKey(),
+                              parameter.getValue());
+                        }
+                      }
+                    }
                   }
                   if (tv.functions != null) {
                     int functionCounter = 0;

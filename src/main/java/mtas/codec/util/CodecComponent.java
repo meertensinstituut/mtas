@@ -2082,7 +2082,7 @@ public class CodecComponent {
     public Double maximum;
 
     /** The parameters. */
-    Map<String, String> parameters;
+    public Map<String, String> parameters;
 
     /** The distance. */
     public transient Distance distance = null;
