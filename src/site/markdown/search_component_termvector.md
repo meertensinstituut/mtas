@@ -48,7 +48,9 @@ Furthermore,  a list of terms can be provided that should be ignored within the 
 
 ## Distances
 
-For each term in the termvector, the distance to a predefined `base` term can be computed. Two `type` of distance are available: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) and [Damerau–Levenshtein](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance), each with configurable parameters to define the weight of the relevant operations.
+For each term in the termvector, the distance to a predefined `base` term can be computed. 
+
+Two `type` of distance are available: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) and [Damerau–Levenshtein](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance), each with configurable parameters to define the weight of the relevant operations.
 
 | Parameter                                       | Value        | Info                           | Obligatory  |
 |-------------------------------------------------|--------------|--------------------------------|-------------|
@@ -288,12 +290,56 @@ Termvector for words containing only characters a-z sorted by term and &gt; *koe
 ### Distances
 
 **Example**  
-List of words sorted descending by number of hits with at most Levenshtein distance 1 from `regering`.
+List of words, sorted descending by number of hits, with at most Levenshtein distance 1 from `regering`. For each word, the Levenshtein distance from `regering` is computed, and also the Damerau-Levensthein distance from `regering` with specific weights for *deletion*, *insertion*, *replacement* and *transposition*.
 
 **Request and response**  
-``
+`q=*%3A*&mtas=true&mtas.termvector=true&mtas.termvector.0.field=text&mtas.termvector.0.prefix=t_lc&mtas.termvector.0.key=distance&mtas.termvector.0.distance.0.type=levenshtein&mtas.termvector.0.distance.0.base=regering&mtas.termvector.0.distance.0.key=Levenshtein&mtas.termvector.0.distance.0.maximum=1&mtas.termvector.0.distance.1.type=damerau-levenshtein&mtas.termvector.0.distance.1.base=regering&mtas.termvector.0.distance.1.key=Damerau-Levenshtein&mtas.termvector.0.distance.1.parameter.deletionDistance=0.81&mtas.termvector.0.distance.1.parameter.insertionDistance=0.82&mtas.termvector.0.distance.1.parameter.replaceDistance=0.83&mtas.termvector.0.distance.1.parameter.transpositionDistance=0.84&mtas.termvector.0.number=5&mtas.termvector.0.sort.type=sum&mtas.termvector.0.sort.direction=desc&mtas.termvector.0.full=true&rows=0&wt=json`
 
 ``` json
+"mtas":{
+    "termvector":[{
+        "key":"distance",
+        "listTotal":49,
+        "list":[{
+            "distance":{
+              "Levenshtein":0.0,
+              "Damerau-Levenshtein":0.0},
+            "mean":1.7536344857153994,
+            "sum":134979,
+            "n":76971,
+            "key":"regering"},
+          {
+            "distance":{
+              "Levenshtein":1.0,
+              "Damerau-Levenshtein":0.83},
+            "mean":1.6863562423749492,
+            "sum":16587,
+            "n":9836,
+            "key":"regeling"},
+          {
+            "distance":{
+              "Levenshtein":1.0,
+              "Damerau-Levenshtein":0.81},
+            "mean":1.0262390670553936,
+            "sum":352,
+            "n":343,
+            "key":"regerings"},
+          {
+            "distance":{
+              "Levenshtein":1.0,
+              "Damerau-Levenshtein":0.83},
+            "mean":1.4080459770114941,
+            "sum":245,
+            "n":174,
+            "key":"legering"},
+          {
+            "distance":{
+              "Levenshtein":1.0,
+              "Damerau-Levenshtein":0.81},
+            "mean":1.0,
+            "sum":97,
+            "n":97,
+            "key":"regering."}]}]}
 ```
 
 <a name="functions"></a>  
