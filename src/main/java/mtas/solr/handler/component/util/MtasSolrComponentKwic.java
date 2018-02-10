@@ -31,9 +31,12 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
 
+  /** The Constant NAME. */
+  public static final String NAME = "kwic";
+
   /** The Constant PARAM_MTAS_KWIC. */
   public static final String PARAM_MTAS_KWIC = MtasSolrSearchComponent.PARAM_MTAS
-      + ".kwic";
+      + "." + NAME;
 
   /** The Constant NAME_MTAS_KWIC_FIELD. */
   public static final String NAME_MTAS_KWIC_FIELD = "field";

@@ -4,7 +4,7 @@
     <configuration name="test" file="mtas/folia_test.xml" />
     <configuration name="TEST" file="mtas/folia_dbnl.xml" />
     <configuration name="CRM" file="mtas/crm.xml" />
-    <configuration name="CGR" file="mtas/crm.xml" />
+    <configuration name="CGR" file="mtas/cgr.xml" />
     <configuration name="DBNL" file="mtas/folia_dbnl.xml" />
     <configuration name="DDD" file="mtas/folia_ddd.xml" />
     <configuration name="EDBO" file="mtas/folia_edbo.xml" />

@@ -105,33 +105,60 @@ public class CodecCollector {
   /**
    * Collect field.
    *
-   * @param field the field
-   * @param searcher the searcher
-   * @param reader the reader
-   * @param rawReader the raw reader
-   * @param fullDocList the full doc list
-   * @param fullDocSet the full doc set
-   * @param fieldInfo the field info
-   * @param spansQueryWeight the spans query weight
-   * @throws IllegalAccessException the illegal access exception
-   * @throws IllegalArgumentException the illegal argument exception
-   * @throws InvocationTargetException the invocation target exception
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param field
+   *          the field
+   * @param searcher
+   *          the searcher
+   * @param reader
+   *          the reader
+   * @param rawReader
+   *          the raw reader
+   * @param fullDocList
+   *          the full doc list
+   * @param fullDocSet
+   *          the full doc set
+   * @param fieldInfo
+   *          the field info
+   * @param spansQueryWeight
+   *          the spans query weight
+   * @throws IllegalAccessException
+   *           the illegal access exception
+   * @throws IllegalArgumentException
+   *           the illegal argument exception
+   * @throws InvocationTargetException
+   *           the invocation target exception
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static void collectField(String field, IndexSearcher searcher,
       IndexReader reader, IndexReader rawReader, List<Integer> fullDocList,
       List<Integer> fullDocSet, ComponentField fieldInfo,
-      Map<MtasSpanQuery, SpanWeight> spansQueryWeight)
+      Map<MtasSpanQuery, SpanWeight> spansQueryWeight, Status status)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
 
     Map<Integer, List<Integer>> docSets = new HashMap<>();
 
     ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
+    long numberOfDocumentsFound = 0;
+    if (status != null) {
+      status.init(reader.numDocs(), reader.leaves().size());
+      if (fullDocSet != null && status.numberDocumentsFound == null) {
+        status.numberDocumentsFound = numberOfDocumentsFound;
+      }
+    }
+
     while (iterator.hasNext()) {
+      // try
+      // {
+      // Thread.sleep(10000);
+      // }
+      // catch(InterruptedException ex)
+      // {
+      // Thread.currentThread().interrupt();
+      // }
       LeafReaderContext lrc = iterator.next();
       LeafReader r = lrc.reader();
-
       // compute relevant docSet/docList
       List<Integer> docSet = null;
       List<Integer> docList = null;
@@ -151,6 +178,9 @@ public class CodecCollector {
           }
         }
         Collections.sort(docSet);
+        numberOfDocumentsFound += docSet.size();
+        status.numberDocumentsFound = Math.max(status.numberDocumentsFound,
+            numberOfDocumentsFound);
       }
       if (fullDocList != null) {
         docList = new ArrayList<>();
@@ -172,9 +202,29 @@ public class CodecCollector {
 
       collectSpansPositionsAndTokens(spansQueryWeight, searcher, mtasCodecInfo,
           r, lrc, field, t, docSet, docList, fieldInfo,
-          rawReader.leaves().get(lrc.ord).reader().getFieldInfos());
+          rawReader.leaves().get(lrc.ord).reader().getFieldInfos(), status);
       collectPrefixes(rawReader.leaves().get(lrc.ord).reader().getFieldInfos(),
-          field, fieldInfo);
+          field, fieldInfo, status);
+
+      if (status != null) {
+        Integer segmentNumber;
+        Long documentNumber;
+        if ((segmentNumber = status.subNumberSegmentsFinished
+            .get(field)) != null) {
+          status.subNumberSegmentsFinished.put(field, segmentNumber + 1);
+          status.subNumberSegmentsFinishedTotal++;
+          status.numberSegmentsFinished = Collections
+              .max(status.subNumberSegmentsFinished.values());
+        }
+        if ((documentNumber = status.subNumberDocumentsFinished
+            .get(field)) != null) {
+          status.subNumberDocumentsFinished.put(field,
+              documentNumber + r.numDocs());
+          status.subNumberDocumentsFinishedTotal += +r.numDocs();
+          status.numberDocumentsFinished = Collections
+              .max(status.subNumberDocumentsFinished.values());
+        }
+      }
     }
 
     // check termvectors
@@ -206,18 +256,23 @@ public class CodecCollector {
               docSet);
         }
         createTermvectorSecondRound(fieldInfo.termVectorList, positionsData,
-            docSets.get(lrc.ord), t, r, lrc);
+            docSets.get(lrc.ord), t, r, lrc, status);
       }
+
     }
   }
 
   /**
    * Collect collection.
    *
-   * @param reader the reader
-   * @param docSet the doc set
-   * @param collectionInfo the collection info
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param reader
+   *          the reader
+   * @param docSet
+   *          the doc set
+   * @param collectionInfo
+   *          the collection info
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public static void collectCollection(IndexReader reader, List<Integer> docSet,
       ComponentCollection collectionInfo) throws IOException {
@@ -269,24 +324,37 @@ public class CodecCollector {
   /**
    * Collect spans positions and tokens.
    *
-   * @param spansQueryWeight the spans query weight
-   * @param searcher the searcher
-   * @param mtasCodecInfo the mtas codec info
-   * @param r the r
-   * @param lrc the lrc
-   * @param field the field
-   * @param t the t
-   * @param docSet the doc set
-   * @param docList the doc list
-   * @param fieldInfo the field info
-   * @param fieldInfos the field infos
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param spansQueryWeight
+   *          the spans query weight
+   * @param searcher
+   *          the searcher
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @param field
+   *          the field
+   * @param t
+   *          the t
+   * @param docSet
+   *          the doc set
+   * @param docList
+   *          the doc list
+   * @param fieldInfo
+   *          the field info
+   * @param fieldInfos
+   *          the field infos
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void collectSpansPositionsAndTokens(
       Map<MtasSpanQuery, SpanWeight> spansQueryWeight, IndexSearcher searcher,
       CodecInfo mtasCodecInfo, LeafReader r, LeafReaderContext lrc,
       String field, Terms t, List<Integer> docSet, List<Integer> docList,
-      ComponentField fieldInfo, FieldInfos fieldInfos) throws IOException {
+      ComponentField fieldInfo, FieldInfos fieldInfos, Status status)
+      throws IOException {
 
     boolean needSpans = false;
     boolean needPositions = false;
@@ -463,7 +531,7 @@ public class CodecCollector {
                   if (docValues.advanceExact(docId)) {
                     long value = docValues.longValue();
                     if (!facetDataSubList.containsKey(value)) {
-                      List<Integer> facetDataSubListItem = new ArrayList<Integer>();
+                      List<Integer> facetDataSubListItem = new ArrayList<>();
                       facetDataSubListItem.add(docId + lrc.docBase);
                       facetDataSubList.put(value, facetDataSubListItem);
                     } else {
@@ -750,7 +818,7 @@ public class CodecCollector {
         // create group
         createGroup(fieldInfo.groupList, spansMatchData, docSet,
             fieldInfos.fieldInfo(field), field, lrc.docBase, mtasCodecInfo,
-            searcher, lrc);
+            searcher, lrc, status);
       }
       if (!fieldInfo.kwicList.isEmpty()) {
         // create kwic
@@ -774,9 +842,11 @@ public class CodecCollector {
   /**
    * Collect known prefixes.
    *
-   * @param fi the fi
+   * @param fi
+   *          the fi
    * @return the sets the
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static Set<String> collectKnownPrefixes(FieldInfo fi)
       throws IOException {
@@ -827,9 +897,11 @@ public class CodecCollector {
   /**
    * Collect intersection prefixes.
    *
-   * @param fi the fi
+   * @param fi
+   *          the fi
    * @return the sets the
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static Set<String> collectIntersectionPrefixes(FieldInfo fi)
       throws IOException {
@@ -856,13 +928,17 @@ public class CodecCollector {
   /**
    * Collect prefixes.
    *
-   * @param fieldInfos the field infos
-   * @param field the field
-   * @param fieldInfo the field info
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param fieldInfos
+   *          the field infos
+   * @param field
+   *          the field
+   * @param fieldInfo
+   *          the field info
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void collectPrefixes(FieldInfos fieldInfos, String field,
-      ComponentField fieldInfo) throws IOException {
+      ComponentField fieldInfo, Status status) throws IOException {
     if (fieldInfo.prefix != null) {
       FieldInfo fi = fieldInfos.fieldInfo(field);
       if (fi != null) {
@@ -909,13 +985,19 @@ public class CodecCollector {
   /**
    * Collect spans for occurences.
    *
-   * @param occurences the occurences
-   * @param prefixes the prefixes
-   * @param field the field
-   * @param searcher the searcher
-   * @param lrc the lrc
+   * @param occurences
+   *          the occurences
+   * @param prefixes
+   *          the prefixes
+   * @param field
+   *          the field
+   * @param searcher
+   *          the searcher
+   * @param lrc
+   *          the lrc
    * @return the map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static Map<GroupHit, Spans> collectSpansForOccurences(
       Set<GroupHit> occurences, Set<String> prefixes, String field,
@@ -941,9 +1023,12 @@ public class CodecCollector {
   /**
    * Creates the query from group hit.
    *
-   * @param prefixes the prefixes
-   * @param field the field
-   * @param hit the hit
+   * @param prefixes
+   *          the prefixes
+   * @param field
+   *          the field
+   * @param hit
+   *          the hit
    * @return the mtas span query
    */
   private static MtasSpanQuery createQueryFromGroupHit(Set<String> prefixes,
@@ -997,9 +1082,12 @@ public class CodecCollector {
   /**
    * Creates the sub query from group hit.
    *
-   * @param subHit the sub hit
-   * @param reverse the reverse
-   * @param field the field
+   * @param subHit
+   *          the sub hit
+   * @param reverse
+   *          the reverse
+   * @param field
+   *          the field
    * @return the mtas span query
    */
   private static MtasSpanQuery createSubQueryFromGroupHit(List<String>[] subHit,
@@ -1038,13 +1126,19 @@ public class CodecCollector {
   /**
    * Compute positions.
    *
-   * @param mtasCodecInfo the mtas codec info
-   * @param r the r
-   * @param lrc the lrc
-   * @param field the field
-   * @param docSet the doc set
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @param field
+   *          the field
+   * @param docSet
+   *          the doc set
    * @return the map
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static Map<Integer, Integer> computePositions(CodecInfo mtasCodecInfo,
       LeafReader r, LeafReaderContext lrc, String field, List<Integer> docSet)
@@ -1080,9 +1174,12 @@ public class CodecCollector {
   /**
    * Compute arguments.
    *
-   * @param spansNumberData the spans number data
-   * @param queries the queries
-   * @param docSet the doc set
+   * @param spansNumberData
+   *          the spans number data
+   * @param queries
+   *          the queries
+   * @param docSet
+   *          the doc set
    * @return the map
    */
   private static Map<Integer, long[]> computeArguments(
@@ -1113,8 +1210,10 @@ public class CodecCollector {
   /**
    * Intersected doc list.
    *
-   * @param facetDocList the facet doc list
-   * @param docSet the doc set
+   * @param facetDocList
+   *          the facet doc list
+   * @param docSet
+   *          the doc set
    * @return the integer[]
    */
   private static Integer[] intersectedDocList(int[] facetDocList,
@@ -1145,10 +1244,14 @@ public class CodecCollector {
   /**
    * Creates the positions.
    *
-   * @param statsPositionList the stats position list
-   * @param positionsData the positions data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param statsPositionList
+   *          the stats position list
+   * @param positionsData
+   *          the positions data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createPositions(List<ComponentPosition> statsPositionList,
       Map<Integer, Integer> positionsData, List<Integer> docSet)
@@ -1182,10 +1285,14 @@ public class CodecCollector {
   /**
    * Creates the tokens.
    *
-   * @param statsTokenList the stats token list
-   * @param tokensData the tokens data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param statsTokenList
+   *          the stats token list
+   * @param tokensData
+   *          the tokens data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createTokens(List<ComponentToken> statsTokenList,
       Map<Integer, Integer> tokensData, List<Integer> docSet)
@@ -1220,11 +1327,16 @@ public class CodecCollector {
   /**
    * Creates the stats.
    *
-   * @param statsSpanList the stats span list
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param statsSpanList
+   *          the stats span list
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createStats(List<ComponentSpan> statsSpanList,
       Map<Integer, Integer> positionsData,
@@ -1402,16 +1514,26 @@ public class CodecCollector {
   /**
    * Creates the list.
    *
-   * @param listList the list list
-   * @param spansNumberData the spans number data
-   * @param spansMatchData the spans match data
-   * @param docSet the doc set
-   * @param field the field
-   * @param docBase the doc base
-   * @param uniqueKeyField the unique key field
-   * @param mtasCodecInfo the mtas codec info
-   * @param searcher the searcher
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param listList
+   *          the list list
+   * @param spansNumberData
+   *          the spans number data
+   * @param spansMatchData
+   *          the spans match data
+   * @param docSet
+   *          the doc set
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param uniqueKeyField
+   *          the unique key field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param searcher
+   *          the searcher
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createList(List<ComponentList> listList,
       Map<MtasSpanQuery, Map<Integer, Integer>> spansNumberData,
@@ -1566,22 +1688,32 @@ public class CodecCollector {
   /**
    * Creates the group.
    *
-   * @param groupList the group list
-   * @param spansMatchData the spans match data
-   * @param docSet the doc set
-   * @param fieldInfo the field info
-   * @param field the field
-   * @param docBase the doc base
-   * @param mtasCodecInfo the mtas codec info
-   * @param searcher the searcher
-   * @param lrc the lrc
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param groupList
+   *          the group list
+   * @param spansMatchData
+   *          the spans match data
+   * @param docSet
+   *          the doc set
+   * @param fieldInfo
+   *          the field info
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param searcher
+   *          the searcher
+   * @param lrc
+   *          the lrc
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createGroup(List<ComponentGroup> groupList,
       Map<MtasSpanQuery, Map<Integer, List<Match>>> spansMatchData,
       List<Integer> docSet, FieldInfo fieldInfo, String field, int docBase,
-      CodecInfo mtasCodecInfo, IndexSearcher searcher, LeafReaderContext lrc)
-      throws IOException {
+      CodecInfo mtasCodecInfo, IndexSearcher searcher, LeafReaderContext lrc,
+      Status status) throws IOException {
 
     if (mtasCodecInfo != null && groupList != null) {
       List<Match> matchList;
@@ -1752,8 +1884,10 @@ public class CodecCollector {
   /**
    * Available prefixes.
    *
-   * @param group the group
-   * @param knownPrefixes the known prefixes
+   * @param group
+   *          the group
+   * @param knownPrefixes
+   *          the known prefixes
    * @return true, if successful
    */
   private static boolean availablePrefixes(ComponentGroup group,
@@ -1771,8 +1905,10 @@ public class CodecCollector {
   /**
    * Intersection prefixes.
    *
-   * @param group the group
-   * @param intersectionPrefixes the intersection prefixes
+   * @param group
+   *          the group
+   * @param intersectionPrefixes
+   *          the intersection prefixes
    * @return true, if successful
    */
   private static boolean intersectionPrefixes(ComponentGroup group,
@@ -1790,8 +1926,10 @@ public class CodecCollector {
   /**
    * Creates the position hit.
    *
-   * @param m the m
-   * @param group the group
+   * @param m
+   *          the m
+   * @param group
+   *          the group
    * @return the interval tree node data
    */
   private static IntervalTreeNodeData<String> createPositionHit(Match m,
@@ -1834,15 +1972,23 @@ public class CodecCollector {
   /**
    * Collect group using spans.
    *
-   * @param list the list
-   * @param docSet the doc set
-   * @param docBase the doc base
-   * @param docCounter the doc counter
-   * @param matchData the match data
-   * @param occurencesSum the occurences sum
-   * @param occurencesN the occurences N
+   * @param list
+   *          the list
+   * @param docSet
+   *          the doc set
+   * @param docBase
+   *          the doc base
+   * @param docCounter
+   *          the doc counter
+   * @param matchData
+   *          the match data
+   * @param occurencesSum
+   *          the occurences sum
+   * @param occurencesN
+   *          the occurences N
    * @return the int
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static int collectGroupUsingSpans(Map<GroupHit, Spans> list,
       List<Integer> docSet, int docBase, int docCounter,
@@ -2040,7 +2186,8 @@ public class CodecCollector {
   /**
    * Sort match list.
    *
-   * @param list the list
+   * @param list
+   *          the list
    */
   private static void sortMatchList(List<Match> list) {
     if (list != null) {
@@ -2053,13 +2200,20 @@ public class CodecCollector {
   /**
    * Creates the document.
    *
-   * @param documentList the document list
-   * @param docList the doc list
-   * @param uniqueKeyField the unique key field
-   * @param searcher the searcher
-   * @param t the t
-   * @param lrc the lrc
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param documentList
+   *          the document list
+   * @param docList
+   *          the doc list
+   * @param uniqueKeyField
+   *          the unique key field
+   * @param searcher
+   *          the searcher
+   * @param t
+   *          the t
+   * @param lrc
+   *          the lrc
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createDocument(List<ComponentDocument> documentList,
       List<Integer> docList, String uniqueKeyField, IndexSearcher searcher,
@@ -2266,15 +2420,24 @@ public class CodecCollector {
   /**
    * Creates the kwic.
    *
-   * @param kwicList the kwic list
-   * @param spansMatchData the spans match data
-   * @param docList the doc list
-   * @param field the field
-   * @param docBase the doc base
-   * @param uniqueKeyField the unique key field
-   * @param mtasCodecInfo the mtas codec info
-   * @param searcher the searcher
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param kwicList
+   *          the kwic list
+   * @param spansMatchData
+   *          the spans match data
+   * @param docList
+   *          the doc list
+   * @param field
+   *          the field
+   * @param docBase
+   *          the doc base
+   * @param uniqueKeyField
+   *          the unique key field
+   * @param mtasCodecInfo
+   *          the mtas codec info
+   * @param searcher
+   *          the searcher
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createKwic(List<ComponentKwic> kwicList,
       Map<MtasSpanQuery, Map<Integer, List<Match>>> spansMatchData,
@@ -2391,14 +2554,22 @@ public class CodecCollector {
   /**
    * Creates the facet base.
    *
-   * @param cf the cf
-   * @param level the level
-   * @param dataCollector the data collector
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param facetData the facet data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param cf
+   *          the cf
+   * @param level
+   *          the level
+   * @param dataCollector
+   *          the data collector
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param facetData
+   *          the facet data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createFacetBase(ComponentFacet cf, int level,
       MtasDataCollector<?, ?> dataCollector,
@@ -2699,9 +2870,12 @@ public class CodecCollector {
   /**
    * Grouped key name.
    *
-   * @param key the key
-   * @param baseRangeSize the base range size
-   * @param baseRangeBase the base range base
+   * @param key
+   *          the key
+   * @param baseRangeSize
+   *          the base range size
+   * @param baseRangeBase
+   *          the base range base
    * @return the string
    */
   private static String groupedKeyName(String key, Double baseRangeSize,
@@ -2746,8 +2920,10 @@ public class CodecCollector {
   /**
    * Merge doc lists.
    *
-   * @param a the a
-   * @param b the b
+   * @param a
+   *          the a
+   * @param b
+   *          the b
    * @return the integer[]
    */
   private static Integer[] mergeDocLists(Integer[] a, Integer[] b) {
@@ -2782,12 +2958,18 @@ public class CodecCollector {
   /**
    * Creates the facet.
    *
-   * @param facetList the facet list
-   * @param positionsData the positions data
-   * @param spansNumberData the spans number data
-   * @param facetData the facet data
-   * @param docSet the doc set
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param facetList
+   *          the facet list
+   * @param positionsData
+   *          the positions data
+   * @param spansNumberData
+   *          the spans number data
+   * @param facetData
+   *          the facet data
+   * @param docSet
+   *          the doc set
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createFacet(List<ComponentFacet> facetList,
       Map<Integer, Integer> positionsData,
@@ -2809,13 +2991,20 @@ public class CodecCollector {
   /**
    * Creates the termvector full.
    *
-   * @param termVectorList the term vector list
-   * @param positionsData the positions data
-   * @param docSet the doc set
-   * @param t the t
-   * @param r the r
-   * @param lrc the lrc
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param termVectorList
+   *          the term vector list
+   * @param positionsData
+   *          the positions data
+   * @param docSet
+   *          the doc set
+   * @param t
+   *          the t
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createTermvectorFull(
       List<ComponentTermVector> termVectorList,
@@ -3045,13 +3234,20 @@ public class CodecCollector {
   /**
    * Creates the termvector first round.
    *
-   * @param termVectorList the term vector list
-   * @param positionsData the positions data
-   * @param docSet the doc set
-   * @param t the t
-   * @param r the r
-   * @param lrc the lrc
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param termVectorList
+   *          the term vector list
+   * @param positionsData
+   *          the positions data
+   * @param docSet
+   *          the doc set
+   * @param t
+   *          the t
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createTermvectorFirstRound(
       List<ComponentTermVector> termVectorList,
@@ -3253,18 +3449,25 @@ public class CodecCollector {
   /**
    * Creates the termvector second round.
    *
-   * @param termVectorList the term vector list
-   * @param positionsData the positions data
-   * @param docSet the doc set
-   * @param t the t
-   * @param r the r
-   * @param lrc the lrc
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param termVectorList
+   *          the term vector list
+   * @param positionsData
+   *          the positions data
+   * @param docSet
+   *          the doc set
+   * @param t
+   *          the t
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static void createTermvectorSecondRound(
       List<ComponentTermVector> termVectorList,
       Map<Integer, Integer> positionsData, List<Integer> docSet, Terms t,
-      LeafReader r, LeafReaderContext lrc) throws IOException {
+      LeafReader r, LeafReaderContext lrc, Status status) throws IOException {
     if (t != null) {
       BytesRef term;
       TermsEnum termsEnum;
@@ -3341,8 +3544,10 @@ public class CodecCollector {
   /**
    * Validate term with start value.
    *
-   * @param term the term
-   * @param termVector the term vector
+   * @param term
+   *          the term
+   * @param termVector
+   *          the term vector
    * @return true, if successful
    */
   private static boolean validateTermWithStartValue(BytesRef term,
@@ -3381,25 +3586,49 @@ public class CodecCollector {
   /**
    * Validate term with distance.
    *
-   * @param term the term
-   * @param termVector the term vector
+   * @param term
+   *          the term
+   * @param termVector
+   *          the term vector
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static boolean validateTermWithDistance(BytesRef term,
       ComponentTermVector termVector) throws IOException {
     if (termVector.distances == null || termVector.distances.isEmpty()) {
       return true;
     } else {
+      // first check maximum for all distances
       for (SubComponentDistance item : termVector.distances) {
         if (item.maximum == null) {
           continue;
         } else {
-          if (!item.getDistance().validate(term)) {
+          if (!item.getDistance().validateMaximum(term)) {
             return false;
           }
         }
       }
+      // then check minimum for all distances
+      for (SubComponentDistance item : termVector.distances) {
+        if (item.minimum == null) {
+          continue;
+        } else {
+          if (!item.getDistance().validateMinimum(term)) {
+            return false;
+          }
+        }
+      }
+//      try {
+//        System.out.println("ACCEPT: " + term.utf8ToString()+" ("+termVector.distances.size()+")");
+//        for (SubComponentDistance item : termVector.distances) {
+//          System.out.println(
+//              item.hashCode() + "\t" + term.utf8ToString()+"\t"+item.getDistance().getClass().getName()+"\t"+item.getDistance().minimum+"\t"+item.getDistance().maximum
+//                  + "\t" + item.getDistance().validate(term)+"\t"+item.getDistance().compute(term));
+//        }
+//      } catch (Exception e) {
+//        System.out.println("PROBLEEM: "+e.getMessage());
+//      }
       return true;
     }
   }
@@ -3407,9 +3636,11 @@ public class CodecCollector {
   /**
    * Need second round termvector.
    *
-   * @param termVectorList the term vector list
+   * @param termVectorList
+   *          the term vector list
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static boolean needSecondRoundTermvector(
       List<ComponentTermVector> termVectorList) throws IOException {
@@ -3479,7 +3710,8 @@ public class CodecCollector {
     /**
      * Instantiates a new termvector number full.
      *
-     * @param maxSize the max size
+     * @param maxSize
+     *          the max size
      */
     TermvectorNumberFull(int maxSize) {
       args = new long[maxSize];
@@ -3502,8 +3734,10 @@ public class CodecCollector {
     /**
      * Instantiates a new register status.
      *
-     * @param sortValue the sort value
-     * @param force the force
+     * @param sortValue
+     *          the sort value
+     * @param force
+     *          the force
      */
     RegisterStatus(long sortValue, boolean force) {
       this.sortValue = sortValue;
@@ -3514,15 +3748,23 @@ public class CodecCollector {
   /**
    * Register value.
    *
-   * @param term the term
-   * @param termVector the term vector
-   * @param number the number
-   * @param termNumberMaximum the term number maximum
-   * @param segmentNumber the segment number
-   * @param forceAccept the force accept
-   * @param mutableKey the mutable key
+   * @param term
+   *          the term
+   * @param termVector
+   *          the term vector
+   * @param number
+   *          the number
+   * @param termNumberMaximum
+   *          the term number maximum
+   * @param segmentNumber
+   *          the segment number
+   * @param forceAccept
+   *          the force accept
+   * @param mutableKey
+   *          the mutable key
    * @return the register status
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private static RegisterStatus registerValue(BytesRef term,
@@ -3661,14 +3903,21 @@ public class CodecCollector {
   /**
    * Preliminary register value.
    *
-   * @param term the term
-   * @param termVector the term vector
-   * @param number the number
-   * @param termNumberMaximum the term number maximum
-   * @param segmentNumber the segment number
-   * @param mutableKey the mutable key
+   * @param term
+   *          the term
+   * @param termVector
+   *          the term vector
+   * @param number
+   *          the number
+   * @param termNumberMaximum
+   *          the term number maximum
+   * @param segmentNumber
+   *          the segment number
+   * @param mutableKey
+   *          the mutable key
    * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static boolean preliminaryRegisterValue(BytesRef term,
       ComponentTermVector termVector, TermvectorNumberBasic number,
@@ -3717,11 +3966,16 @@ public class CodecCollector {
   /**
    * Register value.
    *
-   * @param term the term
-   * @param termVector the term vector
-   * @param number the number
-   * @param mutableKey the mutable key
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param term
+   *          the term
+   * @param termVector
+   *          the term vector
+   * @param number
+   *          the number
+   * @param mutableKey
+   *          the mutable key
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   @SuppressWarnings("unchecked")
   private static void registerValue(BytesRef term,
@@ -3785,10 +4039,13 @@ public class CodecCollector {
   /**
    * Compute termvector number basic.
    *
-   * @param termsEnum the terms enum
-   * @param r the r
+   * @param termsEnum
+   *          the terms enum
+   * @param r
+   *          the r
    * @return the termvector number basic
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static TermvectorNumberBasic computeTermvectorNumberBasic(
       TermsEnum termsEnum, LeafReader r) throws IOException {
@@ -3807,14 +4064,21 @@ public class CodecCollector {
   /**
    * Compute termvector number basic.
    *
-   * @param docSet the doc set
-   * @param termDocId the term doc id
-   * @param termsEnum the terms enum
-   * @param r the r
-   * @param lrc the lrc
-   * @param postingsEnum the postings enum
+   * @param docSet
+   *          the doc set
+   * @param termDocId
+   *          the term doc id
+   * @param termsEnum
+   *          the terms enum
+   * @param r
+   *          the r
+   * @param lrc
+   *          the lrc
+   * @param postingsEnum
+   *          the postings enum
    * @return the termvector number basic
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static TermvectorNumberBasic computeTermvectorNumberBasic(
       List<Integer> docSet, int termDocId, TermsEnum termsEnum, LeafReader r,
@@ -3852,14 +4116,21 @@ public class CodecCollector {
   /**
    * Compute termvector number full.
    *
-   * @param docSet the doc set
-   * @param termDocId the term doc id
-   * @param termsEnum the terms enum
-   * @param lrc the lrc
-   * @param postingsEnum the postings enum
-   * @param positionsData the positions data
+   * @param docSet
+   *          the doc set
+   * @param termDocId
+   *          the term doc id
+   * @param termsEnum
+   *          the terms enum
+   * @param lrc
+   *          the lrc
+   * @param postingsEnum
+   *          the postings enum
+   * @param positionsData
+   *          the positions data
    * @return the termvector number full
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   private static TermvectorNumberFull computeTermvectorNumberFull(
       List<Integer> docSet, int termDocId, TermsEnum termsEnum,

@@ -1191,7 +1191,7 @@
   </requestHandler>
   
   <requestHandler name="/mtas"
-                  class="mtas.solr.handler.MtasRequestHandler" />
+                  class="mtas.solr.handler.MtasRequestHandler"/>
 
   <!-- Clustering Component. (Omitted here. See the default Solr example for a typical configuration.) -->
 

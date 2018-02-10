@@ -52,6 +52,8 @@ public class MtasCRMParser extends MtasBasicParser {
   /** The functions. */
   private HashMap<String, HashMap<String, MtasCRMParserFunction>> functions = new HashMap<>();
 
+  private HashMap<Integer, HashMap<String, String>> filterReplace = new HashMap<>();
+
   /** The Constant MAPPING_TYPE_CRM_SENTENCE. */
   protected static final String MAPPING_TYPE_CRM_SENTENCE = "crmSentence";
 
@@ -61,6 +63,9 @@ public class MtasCRMParser extends MtasBasicParser {
   /** The Constant MAPPING_TYPE_CRM_PAIR. */
   protected static final String MAPPING_TYPE_CRM_PAIR = "crmPair";
 
+  protected static final String FILTER_TYPE_REPLACE = "replace";
+
+  
   /** The history pair. */
   private HashMap<String, HashMap<String, MtasParserObject>> historyPair = new HashMap<>();
 
@@ -96,7 +101,42 @@ public class MtasCRMParser extends MtasBasicParser {
       wordType = new MtasParserType<>(MAPPING_TYPE_WORD, null, false);
       for (int i = 0; i < config.children.size(); i++) {
         MtasConfiguration current = config.children.get(i);
-        if (current.name.equals("mappings")) {
+        if (current.name.equals("filters")) {
+          for (int j = 0; j < current.children.size(); j++) {
+            if (current.children.get(j).name.equals("filter")) {
+              MtasConfiguration filter = current.children.get(j);
+              String typeFilter = filter.attributes.get("type");
+              String nameFilter = filter.attributes.get("name");
+              if(typeFilter!=null) {
+                if(typeFilter.equals(FILTER_TYPE_REPLACE)) {
+                  String value = filter.attributes.get("value");
+                  String replace = filter.attributes.get("replace");
+                  if(nameFilter!=null && value!=null && replace!=null) {
+                    String[] names = nameFilter.split(Pattern.quote(","));
+                    for(String name : names) {
+                      HashMap<String, String> nameMap;
+                      if(!filterReplace.containsKey(name)) {
+                        nameMap = new HashMap<>();
+                        filterReplace.put(Integer.parseInt(name), nameMap);
+                      } else {
+                        nameMap = filterReplace.get(name);
+                      }
+                      nameMap.put(value, replace);
+                    }                    
+                  } else {
+                    throw new MtasConfigException("no name, value or replace for filter "
+                        + typeFilter );
+                  }
+                } else {
+                  throw new MtasConfigException("unknown filter type "
+                      + typeFilter );
+                }
+              } else {
+                throw new MtasConfigException("no type provided for filter" );
+              }
+            }
+          }  
+        } else if (current.name.equals("mappings")) {
           for (int j = 0; j < current.children.size(); j++) {
             if (current.children.get(j).name.equals("mapping")) {
               MtasConfiguration mapping = current.children.get(j);
@@ -256,18 +296,20 @@ public class MtasCRMParser extends MtasBasicParser {
       Set<MtasParserObject> newPreviousSentence = new HashSet<>();
       Set<MtasParserObject> previousSentence = new HashSet<>();
       Set<MtasParserObject> newPreviousClause = new HashSet<>();
-      Set<MtasParserObject> previousClause = new HashSet<>();
+      Set<MtasParserObject> previousClause = new HashSet<>(); 
+      String[] matcherList = new String[8];
       while ((line = br.readLine()) != null) {
         currentOffset = br.getPosition();
         matcherHeader = headerPattern.matcher(line.trim());
         matcherRegular = regularPattern.matcher(line.trim());
         if (matcherRegular.matches()) {
           newPreviousSentence.clear();
+          matcherList = createMatcherList(matcherRegular); 
           for (int i = 4; i < 8; i++) {
             List<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<>();
             Set<MtasParserObject> tmpList = processCRMSentence(
                 mtasTokenIdFactory, String.valueOf(i),
-                matcherRegular.group((i + 1)), currentOffset,
+                matcherList[i], currentOffset,
                 functionOutputList, unknownAncestors, currentList, updateList,
                 idPositions, idOffsets, previousSentence, previousClause);
             if (tmpList != null) {
@@ -291,7 +333,7 @@ public class MtasCRMParser extends MtasBasicParser {
           for (int i = 4; i < 8; i++) {
             ArrayList<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<>();
             Set<MtasParserObject> tmpList = processCRMClause(mtasTokenIdFactory,
-                String.valueOf(i), matcherRegular.group((i + 1)), currentOffset,
+                String.valueOf(i), matcherList[i], currentOffset,
                 functionOutputList, unknownAncestors, currentList, updateList,
                 idPositions, idOffsets, previousClause);
             if (tmpList != null) {
@@ -333,7 +375,7 @@ public class MtasCRMParser extends MtasBasicParser {
               for (int i = 0; i < 8; i++) {
                 List<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<>();
                 processCRMPair(mtasTokenIdFactory, p, String.valueOf(i),
-                    matcherRegular.group((i + 1)), currentOffset,
+                    matcherList[i], currentOffset,
                     functionOutputList, unknownAncestors, currentList,
                     updateList, idPositions, idOffsets);
                 for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {
@@ -348,7 +390,7 @@ public class MtasCRMParser extends MtasBasicParser {
                 ArrayList<MtasCRMParserFunctionOutput> functionOutputList = new ArrayList<>();
                 functionOutputList
                     .addAll(processWordAnnotation(mtasTokenIdFactory,
-                        String.valueOf(i), matcherRegular.group((i + 1)),
+                        String.valueOf(i), matcherList[i],
                         previousOffset, currentOffset, unknownAncestors,
                         currentList, updateList, idPositions, idOffsets));
                 for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {
@@ -407,6 +449,21 @@ public class MtasCRMParser extends MtasBasicParser {
 
   }
 
+  private String[] createMatcherList(Matcher matcher) {
+    String[] list = new String[8];
+    String value;
+    for(int i=0; i<8; i++) {
+      value = matcher.group((i+1));
+      if(filterReplace.containsKey(i)) {
+        for(Entry<String,String> entry : filterReplace.get(i).entrySet()) {
+          value = value.replaceAll(Pattern.quote(entry.getKey()), entry.getValue());
+        }
+      }
+      list[i] = value;
+    }
+    return list;
+  }
+  
   /**
    * Process word annotation.
    *

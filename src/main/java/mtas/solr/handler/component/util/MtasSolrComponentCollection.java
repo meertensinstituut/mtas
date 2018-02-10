@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -36,9 +37,12 @@ public class MtasSolrComponentCollection
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentCollection.class);
 
+  /** The Constant NAME. */
+  public static final String NAME = "collection";
+
   /** The Constant PARAM_MTAS_COLLECTION. */
   public static final String PARAM_MTAS_COLLECTION = MtasSolrSearchComponent.PARAM_MTAS
-      + ".collection";
+      + "." + NAME;
 
   /** The Constant NAME_MTAS_COLLECTION_ACTION. */
   public static final String NAME_MTAS_COLLECTION_ACTION = "action";
@@ -67,8 +71,7 @@ public class MtasSolrComponentCollection
   /**
    * Instantiates a new mtas solr component collection.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentCollection(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -328,13 +331,10 @@ public class MtasSolrComponentCollection
   /**
    * Creates the mtas solr collection result.
    *
-   * @param componentCollection
-   *          the component collection
-   * @param storeIfRelevant
-   *          the store if relevant
+   * @param componentCollection the component collection
+   * @param storeIfRelevant the store if relevant
    * @return the mtas solr collection result
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   /*
    * (non-Javadoc)
@@ -443,23 +443,23 @@ public class MtasSolrComponentCollection
             // mtas response
             NamedList<Object> mtasResponse = null;
             try {
-              mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
+              mtasResponse = (NamedList<Object>) rb.rsp.getValues().get(MtasSolrSearchComponent.NAME);
             } catch (ClassCastException e) {
               log.debug(e);
               mtasResponse = null;
             }
             if (mtasResponse == null) {
               mtasResponse = new SimpleOrderedMap<>();
-              rb.rsp.add("mtas", mtasResponse);
+              rb.rsp.add(MtasSolrSearchComponent.NAME, mtasResponse);
             }
             ArrayList<Object> mtasCollectionResponses;
-            if (mtasResponse.get("collection") != null
-                && mtasResponse.get("collection") instanceof ArrayList) {
+            if (mtasResponse.get(NAME) != null
+                && mtasResponse.get(NAME) instanceof ArrayList) {
               mtasCollectionResponses = (ArrayList<Object>) mtasResponse
-                  .get("collection");
+                  .get(NAME);
             } else {
               mtasCollectionResponses = new ArrayList<>();
-              mtasResponse.add("collection", mtasCollectionResponses);
+              mtasResponse.add(NAME, mtasCollectionResponses);
             }
             MtasSolrCollectionResult collectionResult;
             for (ComponentCollection componentCollection : mtasFields.collection) {
@@ -485,7 +485,7 @@ public class MtasSolrComponentCollection
                     .getSolrResponse().getResponse();
                 try {
                   ArrayList<SimpleOrderedMap<Object>> data = (ArrayList<SimpleOrderedMap<Object>>) solrShardResponse
-                      .findRecursive("mtas", "collection");
+                      .findRecursive(MtasSolrSearchComponent.NAME, NAME);
                   if (data != null) {
                     MtasSolrResultUtil.decode(data);
                     if (rb.stage > ResponseBuilder.STAGE_EXECUTE_QUERY) {
@@ -551,7 +551,7 @@ public class MtasSolrComponentCollection
     // + rb.stage + " " + rb.req.getParamString());
     NamedList<Object> mtasResponse = null;
     try {
-      mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
+      mtasResponse = (NamedList<Object>) rb.rsp.getValues().get(MtasSolrSearchComponent.NAME);
     } catch (ClassCastException e) {
       log.debug(e);
       mtasResponse = null;
@@ -563,7 +563,7 @@ public class MtasSolrComponentCollection
         ArrayList<Object> mtasResponseCollection;
         try {
           mtasResponseCollection = (ArrayList<Object>) mtasResponse
-              .get("collection");
+              .get(NAME);
           for (Object item : mtasResponseCollection) {
             if (item instanceof SimpleOrderedMap) {
               SimpleOrderedMap<Object> itemMap = (SimpleOrderedMap<Object>) item;
@@ -577,7 +577,7 @@ public class MtasSolrComponentCollection
           }
         } catch (ClassCastException e) {
           log.debug(e);
-          mtasResponse.remove("collection");
+          mtasResponse.remove(NAME);
         }
         // check and remove previous responses
         Map<String, Set<String>> createPostAfterMissingCheckResult = new HashMap<>();
@@ -589,7 +589,7 @@ public class MtasSolrComponentCollection
                   .getSolrResponse().getResponse();
               try {
                 ArrayList<SimpleOrderedMap<Object>> data = (ArrayList<SimpleOrderedMap<Object>>) solrShardResponse
-                    .findRecursive("mtas", "collection");
+                    .findRecursive(MtasSolrSearchComponent.NAME, NAME);
                 if (data != null) {
                   for (SimpleOrderedMap<Object> dataItem : data) {
                     if (dataItem.get("data") != null && dataItem
@@ -704,8 +704,8 @@ public class MtasSolrComponentCollection
           newSreq.shards = new String[] { entry.getKey() };
           newSreq.purpose = ShardRequest.PURPOSE_PRIVATE;
           newSreq.params = entry.getValue();
-          newSreq.params.add("q", "*");
-          newSreq.params.add("rows", "0");
+          newSreq.params.add(CommonParams.Q, "*");
+          newSreq.params.add(CommonParams.ROWS, "0");
           newSreq.params.add(MtasSolrSearchComponent.PARAM_MTAS,
               rb.req.getOriginalParams()
                   .getParams(MtasSolrSearchComponent.PARAM_MTAS));
@@ -718,13 +718,13 @@ public class MtasSolrComponentCollection
         ArrayList<Object> mtasResponseCollection;
         try {
           mtasResponseCollection = (ArrayList<Object>) mtasResponse
-              .get("collection");
+              .get(NAME);
           if (mtasResponseCollection != null) {
             MtasSolrResultUtil.rewrite(mtasResponseCollection, searchComponent);
           }
         } catch (ClassCastException e) {
           log.debug(e);
-          mtasResponse.remove("collection");
+          mtasResponse.remove(NAME);
         }
       }
     }
@@ -733,8 +733,7 @@ public class MtasSolrComponentCollection
   /**
    * Gets the mtas fields.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    * @return the mtas fields
    */
   private ComponentFields getMtasFields(ResponseBuilder rb) {
@@ -744,8 +743,7 @@ public class MtasSolrComponentCollection
   /**
    * String values to string.
    *
-   * @param stringValues
-   *          the string values
+   * @param stringValues the string values
    * @return the string
    */
   private static String stringValuesToString(HashSet<String> stringValues) {
@@ -755,11 +753,9 @@ public class MtasSolrComponentCollection
   /**
    * String to string values.
    *
-   * @param stringValue
-   *          the string value
+   * @param stringValue the string value
    * @return the hash set
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private static HashSet<String> stringToStringValues(String stringValue)
       throws IOException {

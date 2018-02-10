@@ -23,6 +23,7 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentDocument.
  */
+
 public class MtasSolrComponentDocument
     implements MtasSolrComponent<ComponentDocument> {
 
@@ -30,9 +31,12 @@ public class MtasSolrComponentDocument
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentDocument.class);
 
+  /** The Constant NAME. */
+  public static final String NAME = "document";
+
   /** The Constant PARAM_MTAS_DOCUMENT. */
   public static final String PARAM_MTAS_DOCUMENT = MtasSolrSearchComponent.PARAM_MTAS
-      + ".document";
+      + "." + NAME;
 
   /** The Constant NAME_MTAS_DOCUMENT_FIELD. */
   public static final String NAME_MTAS_DOCUMENT_FIELD = "field";
@@ -246,13 +250,15 @@ public class MtasSolrComponentDocument
           document.uniqueKey.get(docId));
       if (list != null) {
         if (document.listExpand) {
-          mtasDocumentItemResponse.add("list", new MtasSolrMtasResult(list,
-              new String[] { list.getDataType(), list.getDataType() },
-              new String[] { list.getStatsType(), list.getStatsType() },
-              new SortedSet[] { list.getStatsItems(), list.getStatsItems() },
-              new List[] {null, null}, 
-              new String[] { null, null }, new String[] { null, null },
-              new Integer[] { 0, 0 }, new Integer[] { 1, 1 }, null));
+          mtasDocumentItemResponse.add("list",
+              new MtasSolrMtasResult(list,
+                  new String[] { list.getDataType(), list.getDataType() },
+                  new String[] { list.getStatsType(), list.getStatsType() },
+                  new SortedSet[] { list.getStatsItems(),
+                      list.getStatsItems() },
+                  new List[] { null, null }, new String[] { null, null },
+                  new String[] { null, null }, new Integer[] { 0, 0 },
+                  new Integer[] { 1, 1 }, null));
         } else {
           mtasDocumentItemResponse.add("list",
               new MtasSolrMtasResult(list, list.getDataType(),
@@ -342,7 +348,7 @@ public class MtasSolrComponentDocument
     if (mtasResponse != null) {
       ArrayList<Object> mtasResponseDocument;
       try {
-        mtasResponseDocument = (ArrayList<Object>) mtasResponse.get("document");
+        mtasResponseDocument = (ArrayList<Object>) mtasResponse.get(NAME);
         if (mtasResponseDocument != null) {
           MtasSolrResultUtil.rewrite(mtasResponseDocument, searchComponent);
         }

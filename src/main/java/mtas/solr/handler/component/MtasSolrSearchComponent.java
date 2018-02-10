@@ -3,8 +3,12 @@ package mtas.solr.handler.component;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Map.Entry;
 
 import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
@@ -18,24 +22,34 @@ import mtas.codec.util.CodecComponent.ComponentSpan;
 import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecUtil;
+import mtas.codec.util.Status;
 import mtas.solr.handler.component.util.MtasSolrResultMerge;
+import mtas.solr.handler.util.MtasSolrStatus;
+import mtas.solr.handler.util.MtasSolrStatus.ShardStatus;
 import mtas.solr.search.MtasSolrCollectionCache;
 import mtas.solr.handler.component.util.MtasSolrComponentDocument;
 import mtas.solr.handler.component.util.MtasSolrComponentFacet;
 import mtas.solr.handler.component.util.MtasSolrComponentGroup;
+import mtas.solr.handler.MtasRequestHandler;
+import mtas.solr.handler.MtasRequestHandler.ShardInformation;
 import mtas.solr.handler.component.util.MtasSolrComponentCollection;
 import mtas.solr.handler.component.util.MtasSolrComponentKwic;
 import mtas.solr.handler.component.util.MtasSolrComponentList;
 import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
 import mtas.solr.handler.component.util.MtasSolrComponentStats;
+import mtas.solr.handler.component.util.MtasSolrComponentStatus;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.core.SolrInfoBean;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
+import org.apache.solr.response.BasicResultContext;
 import org.apache.solr.search.DocList;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
@@ -62,6 +76,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
 
   /** The Constant CONFIG_COLLECTION_MAXIMUM_OVERFLOW. */
   public static final String CONFIG_COLLECTION_MAXIMUM_OVERFLOW = "collectionMaximumOverflow";
+
+  public static final String NAME = "mtas";
 
   /** The Constant PARAM_MTAS. */
   public static final String PARAM_MTAS = "mtas";
@@ -139,8 +155,16 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The search collection. */
   private MtasSolrComponentCollection searchCollection;
 
+  /** The search status. */
+  private MtasSolrComponentStatus searchStatus;
+
   /** The collection cache. */
   private MtasSolrCollectionCache collectionCache = null;
+
+  /** The request handler. */
+  private MtasRequestHandler requestHandler = null;
+
+  private String requestHandlerName = null;
 
   /*
    * (non-Javadoc)
@@ -151,8 +175,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void init(NamedList args) {
-    super.init(args);   
+    super.init(args);
     // init components
+    searchStatus = new MtasSolrComponentStatus(this);
     searchDocument = new MtasSolrComponentDocument(this);
     searchKwic = new MtasSolrComponentKwic(this);
     searchList = new MtasSolrComponentList(this);
@@ -218,59 +243,90 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
-    //System.out
-    //.println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    //+ " - " + rb.req.getParams().getBool("isShard", false) + " PREPARE "
-    //+ rb.stage + " " + rb.req.getParamString());
+    // System.out
+    // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
+    // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + " PREPARE " + rb.stage + " " + rb.req.getParamString());
+    // always create status
+    initializeRequestHandler(rb);
+    MtasSolrStatus solrStatus = new MtasSolrStatus(
+        rb.req.getOriginalParams().toQueryString(),
+        rb.req.getParams().getBool(ShardParams.IS_SHARD, false), rb.shards,
+        rb.rsp);
+    rb.req.getContext().put(MtasSolrStatus.class, solrStatus);
+    solrStatus.setStage(rb.stage);
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-      mtasSolrResultMerge = new MtasSolrResultMerge();
-      ComponentFields mtasFields = new ComponentFields();
-      // get settings document
-      if (rb.req.getParams()
-          .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
-        searchDocument.prepare(rb, mtasFields);
+      try {
+        // initialize
+        mtasSolrResultMerge = new MtasSolrResultMerge();
+        // prepare components
+        ComponentFields mtasFields = new ComponentFields();
+        // get settings status
+        if (rb.req.getParams()
+            .getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS, false)) {
+          searchStatus.prepare(rb, mtasFields);
+          mtasFields.status.handler = requestHandlerName;
+          if (mtasFields.status.key != null) {
+            solrStatus.setKey(mtasFields.status.key);            
+          }
+        }
+        // now, register status
+        registerStatus(solrStatus);
+        // get settings document
+        if (rb.req.getParams()
+            .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+          searchDocument.prepare(rb, mtasFields);
+        }
+        // get settings kwic
+        if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
+            false)) {
+          searchKwic.prepare(rb, mtasFields);
+        }
+        // get settings list
+        if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,
+            false)) {
+          searchList.prepare(rb, mtasFields);
+        }
+        // get settings group
+        if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,
+            false)) {
+          searchGroup.prepare(rb, mtasFields);
+        }
+        // get settings termvector
+        if (rb.req.getParams().getBool(
+            MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+          searchTermvector.prepare(rb, mtasFields);
+        }
+        // get settings prefix
+        if (rb.req.getParams()
+            .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
+          searchPrefix.prepare(rb, mtasFields);
+        }
+        // get settings stats
+        if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,
+            false)) {
+          searchStats.prepare(rb, mtasFields);
+        }
+        // get settings facet
+        if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,
+            false)) {
+          searchFacet.prepare(rb, mtasFields);
+        }
+        // get settings collection
+        if (rb.req.getParams().getBool(
+            MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+          searchCollection.prepare(rb, mtasFields);
+        }
+        rb.req.getContext().put(ComponentFields.class, mtasFields);
+      } catch (IOException e) {
+        solrStatus.setError(e);
+      } finally {
+        checkStatus(solrStatus);
       }
-      // get settings kwic
-      if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
-          false)) {
-        searchKwic.prepare(rb, mtasFields);
-      }
-      // get settings list
-      if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,
-          false)) {
-        searchList.prepare(rb, mtasFields);
-      }
-      // get settings group
-      if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,
-          false)) {
-        searchGroup.prepare(rb, mtasFields);
-      }
-      // get settings termvector
-      if (rb.req.getParams()
-          .getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-        searchTermvector.prepare(rb, mtasFields);
-      }
-      // get settings prefix
-      if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,
-          false)) {
-        searchPrefix.prepare(rb, mtasFields);
-      }
-      // get settings stats
-      if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,
-          false)) {
-        searchStats.prepare(rb, mtasFields);
-      }
-      // get settings facet
-      if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,
-          false)) {
-        searchFacet.prepare(rb, mtasFields);
-      }
-      // get settings collection
-      if (rb.req.getParams()
-          .getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-        searchCollection.prepare(rb, mtasFields);
-      }
-      rb.req.getContext().put(ComponentFields.class, mtasFields);
+    } else {
+      // register and check status
+      registerStatus(solrStatus);
+      checkStatus(solrStatus);
     }
   }
 
@@ -285,213 +341,283 @@ public class MtasSolrSearchComponent extends SearchComponent {
   public void process(ResponseBuilder rb) throws IOException {
     // System.out
     // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false) + " PROCESS "
-    // + rb.stage + " " + rb.req.getParamString());
-    ComponentFields mtasFields = getMtasFields(rb);
-    if (mtasFields != null) {
-      DocSet docSet = rb.getResults().docSet;
-      DocList docList = rb.getResults().docList;
-      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic
-          || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
-          || mtasFields.doCollection || mtasFields.doTermVector
-          || mtasFields.doPrefix) {
-        SolrIndexSearcher searcher = rb.req.getSearcher();
-        ArrayList<Integer> docSetList = null;
-        ArrayList<Integer> docListList = null;
-        if (docSet != null) {
-          docSetList = new ArrayList<>();
-          Iterator<Integer> docSetIterator = docSet.iterator();
-          while (docSetIterator.hasNext()) {
-            docSetList.add(docSetIterator.next());
-          }
-          Collections.sort(docSetList);
-        }
-        if (docList != null) {
-          docListList = new ArrayList<>();
-          Iterator<Integer> docListIterator = docList.iterator();
-          while (docListIterator.hasNext()) {
-            docListList.add(docListIterator.next());
-          }
-          Collections.sort(docListList);
-        }
-        for (String field : mtasFields.list.keySet()) {
-          try {
-            CodecUtil.collectField(field, searcher, searcher.getRawReader(),
-                docListList, docSetList, mtasFields.list.get(field));
-          } catch (IllegalAccessException | IllegalArgumentException
-              | InvocationTargetException e) {
-            log.error(e);
-            throw new IOException(e);
-          }
-        }
-        for (ComponentCollection collection : mtasFields.collection) {
-          CodecUtil.collectCollection(searcher.getRawReader(), docSetList,
-              collection);
-        }
-        NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
-        if (mtasFields.doDocument) {
-          ArrayList<NamedList<?>> mtasDocumentResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            for (ComponentDocument document : mtasFields.list
-                .get(field).documentList) {
-              mtasDocumentResponses.add(searchDocument.create(document, false));
-            }
-          }
-          // add to response
-          mtasResponse.add("document", mtasDocumentResponses);
-        }
-        if (mtasFields.doKwic) {
-          ArrayList<NamedList<?>> mtasKwicResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            for (ComponentKwic kwic : mtasFields.list.get(field).kwicList) {
-              mtasKwicResponses.add(searchKwic.create(kwic, false));
-            }
-          }
-          // add to response
-          mtasResponse.add("kwic", mtasKwicResponses);
-        }
-        if (mtasFields.doFacet) {
-          ArrayList<NamedList<?>> mtasFacetResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            for (ComponentFacet facet : mtasFields.list.get(field).facetList) {
-              if (rb.req.getParams().getBool("isShard", false)) {
-                mtasFacetResponses.add(searchFacet.create(facet, true));
-              } else {
-                mtasFacetResponses.add(searchFacet.create(facet, false));
+    // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + " PROCESS " + rb.stage + " " + rb.req.getParamString());
+    MtasSolrStatus solrStatus = Objects.requireNonNull(
+        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),
+        "couldn't find status");
+    solrStatus.setStage(rb.stage);
+    try {
+      if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
+        try {
+          ComponentFields mtasFields = getMtasFields(rb);
+          if (mtasFields != null) {
+            DocSet docSet = rb.getResults().docSet;
+            DocList docList = rb.getResults().docList;
+            if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic
+                || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
+                || mtasFields.doCollection || mtasFields.doTermVector
+                || mtasFields.doPrefix || mtasFields.doStatus) {
+              SolrIndexSearcher searcher = rb.req.getSearcher();
+              ArrayList<Integer> docSetList = null;
+              ArrayList<Integer> docListList = null;
+              // initialise docSetList
+              if (docSet != null) {
+                docSetList = new ArrayList<>();
+                Iterator<Integer> docSetIterator = docSet.iterator();
+                while (docSetIterator.hasNext()) {
+                  docSetList.add(docSetIterator.next());
+                }
+                Collections.sort(docSetList);
               }
-            }
-          }
-          // add to response
-          mtasResponse.add("facet", mtasFacetResponses);
-        }
-        if (mtasFields.doCollection) {
-          ArrayList<NamedList<?>> mtasCollectionResponses = new ArrayList<>();
-          for (ComponentCollection collection : mtasFields.collection) {
-            if (rb.req.getParams().getBool("isShard", false)) {
-              mtasCollectionResponses
-                  .add(searchCollection.create(collection, true));
-            } else {
-              mtasCollectionResponses
-                  .add(searchCollection.create(collection, false));
-            }
-          }
-          // add to response
-          mtasResponse.add("collection", mtasCollectionResponses);
-        }
-        if (mtasFields.doList) {
-          ArrayList<NamedList<?>> mtasListResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            for (ComponentList list : mtasFields.list.get(field).listList) {
-              mtasListResponses.add(searchList.create(list, false));
-            }
-          }
-          // add to response
-          mtasResponse.add("list", mtasListResponses);
-        }
-        if (mtasFields.doGroup) {
-          ArrayList<NamedList<?>> mtasGroupResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            for (ComponentGroup group : mtasFields.list.get(field).groupList) {
-              if (rb.req.getParams().getBool("isShard", false)) {
-                mtasGroupResponses.add(searchGroup.create(group, true));
-              } else {
-                mtasGroupResponses.add(searchGroup.create(group, false));
+              // initialise docListList
+              if (docList != null) {
+                docListList = new ArrayList<>();
+                Iterator<Integer> docListIterator = docList.iterator();
+                while (docListIterator.hasNext()) {
+                  docListList.add(docListIterator.next());
+                }
+                Collections.sort(docListList);
               }
-            }
-          }
-          // add to response
-          mtasResponse.add("group", mtasGroupResponses);
-        }
-        if (mtasFields.doTermVector) {
-          ArrayList<NamedList<?>> mtasTermVectorResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            for (ComponentTermVector termVector : mtasFields.list
-                .get(field).termVectorList) {
-              if (rb.req.getParams().getBool("isShard", false)) {
-                mtasTermVectorResponses
-                    .add(searchTermvector.create(termVector, true));
-              } else {
-                mtasTermVectorResponses
-                    .add(searchTermvector.create(termVector, false));
-              }
-            }
-          }
-          // add to response
-          mtasResponse.add("termvector", mtasTermVectorResponses);
-        }
-        if (mtasFields.doPrefix) {
-          ArrayList<NamedList<?>> mtasPrefixResponses = new ArrayList<>();
-          for (String field : mtasFields.list.keySet()) {
-            if (mtasFields.list.get(field).prefix != null) {
-              if (rb.req.getParams().getBool("isShard", false)) {
-                mtasPrefixResponses.add(searchPrefix
-                    .create(mtasFields.list.get(field).prefix, true));
-              } else {
-                mtasPrefixResponses.add(searchPrefix
-                    .create(mtasFields.list.get(field).prefix, false));
-              }
-            }
-          }
-          mtasResponse.add("prefix", mtasPrefixResponses);
-        }
-        if (mtasFields.doStats) {
-          NamedList<Object> mtasStatsResponse = new SimpleOrderedMap<>();
-          if (mtasFields.doStatsPositions || mtasFields.doStatsTokens
-              || mtasFields.doStatsSpans) {
-            if (mtasFields.doStatsTokens) {
-              ArrayList<Object> mtasStatsTokensResponses = new ArrayList<>();
+              solrStatus.status().addSubs(mtasFields.list.keySet());
               for (String field : mtasFields.list.keySet()) {
-                for (ComponentToken token : mtasFields.list
-                    .get(field).statsTokenList) {
-                  if (rb.req.getParams().getBool("isShard", false)) {
-                    mtasStatsTokensResponses
-                        .add(searchStats.create(token, true));
-                  } else {
-                    mtasStatsTokensResponses
-                        .add(searchStats.create(token, false));
-                  }
+                try {
+                  CodecUtil.collectField(field, searcher,
+                      searcher.getRawReader(), docListList, docSetList,
+                      mtasFields.list.get(field), solrStatus.status());
+                } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                  log.error(e);
+                  throw new IOException(e);
                 }
               }
-              mtasStatsResponse.add("tokens", mtasStatsTokensResponses);
-            }
-            if (mtasFields.doStatsPositions) {
-              ArrayList<Object> mtasStatsPositionsResponses = new ArrayList<>();
-              for (String field : mtasFields.list.keySet()) {
-                for (ComponentPosition position : mtasFields.list
-                    .get(field).statsPositionList) {
-                  if (rb.req.getParams().getBool("isShard", false)) {
-                    mtasStatsPositionsResponses
-                        .add(searchStats.create(position, true));
-                  } else {
-                    mtasStatsPositionsResponses
-                        .add(searchStats.create(position, false));
+              for (ComponentCollection collection : mtasFields.collection) {
+                CodecUtil.collectCollection(searcher.getRawReader(), docSetList,
+                    collection);
+              }
+              NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
+              if (mtasFields.doStatus) {
+                // add to response
+                SimpleOrderedMap<Object> statusResponse = searchStatus.create(mtasFields.status, false);
+                if(statusResponse!=null) {
+                  mtasResponse.add(MtasSolrComponentStatus.NAME,                
+                    searchStatus.create(mtasFields.status, false));
+                }  
+              }
+              if (mtasFields.doDocument) {
+                ArrayList<NamedList<?>> mtasDocumentResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  for (ComponentDocument document : mtasFields.list
+                      .get(field).documentList) {
+                    mtasDocumentResponses
+                        .add(searchDocument.create(document, false));
                   }
                 }
+                // add to response
+                mtasResponse.add(MtasSolrComponentDocument.NAME,
+                    mtasDocumentResponses);
               }
-              mtasStatsResponse.add("positions", mtasStatsPositionsResponses);
-            }
-            if (mtasFields.doStatsSpans) {
-              ArrayList<Object> mtasStatsSpansResponses = new ArrayList<>();
-              for (String field : mtasFields.list.keySet()) {
-                for (ComponentSpan span : mtasFields.list
-                    .get(field).statsSpanList) {
-                  if (rb.req.getParams().getBool("isShard", false)) {
-                    mtasStatsSpansResponses.add(searchStats.create(span, true));
-                  } else {
-                    mtasStatsSpansResponses
-                        .add(searchStats.create(span, false));
+              if (mtasFields.doKwic) {
+                ArrayList<NamedList<?>> mtasKwicResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  for (ComponentKwic kwic : mtasFields.list
+                      .get(field).kwicList) {
+                    mtasKwicResponses.add(searchKwic.create(kwic, false));
                   }
                 }
+                // add to response
+                mtasResponse.add(MtasSolrComponentKwic.NAME, mtasKwicResponses);
               }
-              mtasStatsResponse.add("spans", mtasStatsSpansResponses);
+              if (mtasFields.doFacet) {
+                ArrayList<NamedList<?>> mtasFacetResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  for (ComponentFacet facet : mtasFields.list
+                      .get(field).facetList) {
+                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                        false)) {
+                      mtasFacetResponses.add(searchFacet.create(facet, true));
+                    } else {
+                      mtasFacetResponses.add(searchFacet.create(facet, false));
+                    }
+                  }
+                }
+                // add to response
+                mtasResponse.add(MtasSolrComponentFacet.NAME,
+                    mtasFacetResponses);
+              }
+              if (mtasFields.doCollection) {
+                ArrayList<NamedList<?>> mtasCollectionResponses = new ArrayList<>();
+                for (ComponentCollection collection : mtasFields.collection) {
+                  if (rb.req.getParams().getBool(ShardParams.IS_SHARD, false)) {
+                    mtasCollectionResponses
+                        .add(searchCollection.create(collection, true));
+                  } else {
+                    mtasCollectionResponses
+                        .add(searchCollection.create(collection, false));
+                  }
+                }
+                // add to response
+                mtasResponse.add(MtasSolrComponentCollection.NAME,
+                    mtasCollectionResponses);
+              }
+              if (mtasFields.doList) {
+                ArrayList<NamedList<?>> mtasListResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  for (ComponentList list : mtasFields.list
+                      .get(field).listList) {
+                    mtasListResponses.add(searchList.create(list, false));
+                  }
+                }
+                // add to response
+                mtasResponse.add(MtasSolrComponentList.NAME, mtasListResponses);
+              }
+              if (mtasFields.doGroup) {
+                ArrayList<NamedList<?>> mtasGroupResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  for (ComponentGroup group : mtasFields.list
+                      .get(field).groupList) {
+                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                        false)) {
+                      mtasGroupResponses.add(searchGroup.create(group, true));
+                    } else {
+                      mtasGroupResponses.add(searchGroup.create(group, false));
+                    }
+                  }
+                }
+                // add to response
+                mtasResponse.add(MtasSolrComponentGroup.NAME,
+                    mtasGroupResponses);
+              }
+              if (mtasFields.doTermVector) {
+                ArrayList<NamedList<?>> mtasTermVectorResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  for (ComponentTermVector termVector : mtasFields.list
+                      .get(field).termVectorList) {
+                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                        false)) {
+                      mtasTermVectorResponses
+                          .add(searchTermvector.create(termVector, true));
+                    } else {
+                      mtasTermVectorResponses
+                          .add(searchTermvector.create(termVector, false));
+                    }
+                  }
+                }
+                // add to response
+                mtasResponse.add(MtasSolrComponentTermvector.NAME,
+                    mtasTermVectorResponses);
+              }
+              if (mtasFields.doPrefix) {
+                ArrayList<NamedList<?>> mtasPrefixResponses = new ArrayList<>();
+                for (String field : mtasFields.list.keySet()) {
+                  if (mtasFields.list.get(field).prefix != null) {
+                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                        false)) {
+                      mtasPrefixResponses.add(searchPrefix
+                          .create(mtasFields.list.get(field).prefix, true));
+                    } else {
+                      mtasPrefixResponses.add(searchPrefix
+                          .create(mtasFields.list.get(field).prefix, false));
+                    }
+                  }
+                }
+                mtasResponse.add(MtasSolrComponentPrefix.NAME,
+                    mtasPrefixResponses);
+              }
+              if (mtasFields.doStats) {
+                NamedList<Object> mtasStatsResponse = new SimpleOrderedMap<>();
+                if (mtasFields.doStatsPositions || mtasFields.doStatsTokens
+                    || mtasFields.doStatsSpans) {
+                  if (mtasFields.doStatsTokens) {
+                    ArrayList<Object> mtasStatsTokensResponses = new ArrayList<>();
+                    for (String field : mtasFields.list.keySet()) {
+                      for (ComponentToken token : mtasFields.list
+                          .get(field).statsTokenList) {
+                        if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                            false)) {
+                          mtasStatsTokensResponses
+                              .add(searchStats.create(token, true));
+                        } else {
+                          mtasStatsTokensResponses
+                              .add(searchStats.create(token, false));
+                        }
+                      }
+                    }
+                    mtasStatsResponse.add(MtasSolrComponentStats.NAME_TOKENS,
+                        mtasStatsTokensResponses);
+                  }
+                  if (mtasFields.doStatsPositions) {
+                    ArrayList<Object> mtasStatsPositionsResponses = new ArrayList<>();
+                    for (String field : mtasFields.list.keySet()) {
+                      for (ComponentPosition position : mtasFields.list
+                          .get(field).statsPositionList) {
+                        if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                            false)) {
+                          mtasStatsPositionsResponses
+                              .add(searchStats.create(position, true));
+                        } else {
+                          mtasStatsPositionsResponses
+                              .add(searchStats.create(position, false));
+                        }
+                      }
+                    }
+                    mtasStatsResponse.add(MtasSolrComponentStats.NAME_POSITIONS,
+                        mtasStatsPositionsResponses);
+                  }
+                  if (mtasFields.doStatsSpans) {
+                    ArrayList<Object> mtasStatsSpansResponses = new ArrayList<>();
+                    for (String field : mtasFields.list.keySet()) {
+                      for (ComponentSpan span : mtasFields.list
+                          .get(field).statsSpanList) {
+                        if (rb.req.getParams().getBool(ShardParams.IS_SHARD,
+                            false)) {
+                          mtasStatsSpansResponses
+                              .add(searchStats.create(span, true));
+                        } else {
+                          mtasStatsSpansResponses
+                              .add(searchStats.create(span, false));
+                        }
+                      }
+                    }
+                    mtasStatsResponse.add(MtasSolrComponentStats.NAME_SPANS,
+                        mtasStatsSpansResponses);
+                  }
+                  // add to response
+                  mtasResponse.add(MtasSolrComponentStats.NAME,
+                      mtasStatsResponse);
+                }
+              }
+              // add to response
+              if(mtasResponse.size()>0) {
+                rb.rsp.add(NAME, mtasResponse);
+              }  
             }
-            // add to response
-            mtasResponse.add("stats", mtasStatsResponse);
           }
+        } catch (IOException e) {
+          errorStatus(solrStatus, e);
         }
-        // add to response
-        rb.rsp.add("mtas", mtasResponse);
       }
+      if(!solrStatus.error()) {
+        //always set status segments
+        if(solrStatus.status().numberSegmentsTotal==null) {          
+          solrStatus.status().numberSegmentsTotal = rb.req.getSearcher().getRawReader().leaves().size();
+          solrStatus.status().numberSegmentsFinished = solrStatus.status().numberSegmentsTotal;          
+        }  
+        //always try to set number of documents
+        if(solrStatus.status().numberDocumentsTotal==null) {
+          solrStatus.status().numberDocumentsTotal = (long) rb.req.getSearcher().numDocs();
+          if(rb.getResults().docList!=null) {
+            solrStatus.status().numberDocumentsFinished = rb.getResults().docList.matches();
+            solrStatus.status().numberDocumentsFound = rb.getResults().docList.matches();
+          } else if(rb.getResults().docSet!=null) {
+            solrStatus.status().numberDocumentsFinished = (long) rb.getResults().docSet.size();
+            solrStatus.status().numberDocumentsFound = (long) rb.getResults().docSet.size();
+          }
+        }
+      }  
+    } finally {
+      checkStatus(solrStatus);
+      finishStatus(solrStatus);
     }
   }
 
@@ -507,11 +633,28 @@ public class MtasSolrSearchComponent extends SearchComponent {
   @Override
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-    // System.out.println(System.nanoTime() + " - " +
-    // Thread.currentThread().getId() + " - "
-    // + rb.req.getParams().getBool("isShard", false) + " MODIFY REQUEST "
-    // + rb.stage + " " + rb.req.getParamString());
+    // System.out
+    // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
+    // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + " MODIFY REQUEST " + rb.stage + " " + rb.req.getParamString());
+    MtasSolrStatus solrStatus = Objects.requireNonNull(
+        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),
+        "couldn't find status");
+    solrStatus.setStage(rb.stage);
     if (sreq.params.getBool(PARAM_MTAS, false)) {
+      if (sreq.params.getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS,
+          false)) {
+        searchStatus.modifyRequest(rb, who, sreq);
+      } else if (requestHandler != null) {
+        sreq.params.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS,
+            CommonParams.TRUE);
+      }
+      if (requestHandler != null) {
+        sreq.params.add(
+            MtasSolrComponentStatus.PARAM_MTAS_STATUS + "."
+                + MtasSolrComponentStatus.NAME_MTAS_STATUS_KEY,
+            solrStatus.shardKey(rb.stage));
+      }
       if (sreq.params.getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
         searchStats.modifyRequest(rb, who, sreq);
       }
@@ -557,8 +700,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
   public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
     // System.out
     // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false)
+    // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
     // + " HANDLERESPONSES " + rb.stage + " " + rb.req.getParamString());
+    MtasSolrStatus solrStatus = Objects.requireNonNull(
+        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),
+        "couldn't find status");
+    solrStatus.setStage(rb.stage);
+    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
+      // do nothing
+    }
   }
 
   /*
@@ -572,8 +722,20 @@ public class MtasSolrSearchComponent extends SearchComponent {
   public void finishStage(ResponseBuilder rb) {
     // System.out
     // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-    // + " - " + rb.req.getParams().getBool("isShard", false)
+    // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
     // + " FINISHRESPONSES " + rb.stage + " " + rb.req.getParamString());
+    MtasSolrStatus solrStatus = Objects.requireNonNull(
+        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),
+        "couldn't find status");
+    solrStatus.setStage(rb.stage);
+    if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {
+      Status status = solrStatus.status();
+      status.numberDocumentsFound = (status.numberDocumentsFound == null)
+          ? rb.getNumberDocumentsFound() : status.numberDocumentsFound;
+      // try to finish status from get fields stage
+    } else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS) {
+      finishStatus(solrStatus);
+    }
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
       if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,
           false)) {
@@ -624,11 +786,14 @@ public class MtasSolrSearchComponent extends SearchComponent {
    */
   @Override
   public int distributedProcess(ResponseBuilder rb) throws IOException {
-    // System.out.println(System.nanoTime() + " - " +
-    // Thread.currentThread().getId() + " - "
-    // + rb.req.getParams().getBool("isShard", false) + " DISTIRBUTEDPROCESS "
-    // + rb.stage + " " + rb.req.getParamString());
-    // distributed processes
+    // System.out.println(System.nanoTime() + " - "
+    // + Thread.currentThread().getId() + " - "
+    // + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + " DISTIRBUTEDPROCESS " + rb.stage + " " + rb.req.getParamString());
+    MtasSolrStatus solrStatus = Objects.requireNonNull(
+        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),
+        "couldn't find status");
+    solrStatus.setStage(rb.stage);
     if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
       if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP
           || rb.stage == STAGE_TERMVECTOR_MISSING_KEY
@@ -711,12 +876,105 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the mtas fields.
    *
-   * @param rb the rb
+   * @param rb
+   *          the rb
    * @return the mtas fields
    */
 
   private ComponentFields getMtasFields(ResponseBuilder rb) {
     return (ComponentFields) rb.req.getContext().get(ComponentFields.class);
+  }
+
+  /**
+   * Initialize request handler.
+   *
+   * @param rb
+   *          the rb
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
+   */
+  private void initializeRequestHandler(ResponseBuilder rb) {
+    if (requestHandler == null) {
+      // try to initialize
+      for (Entry<String, SolrInfoBean> entry : rb.req.getCore()
+          .getInfoRegistry().entrySet()) {
+        if (entry.getValue() instanceof MtasRequestHandler) {
+          requestHandlerName = entry.getKey();
+          requestHandler = (MtasRequestHandler) entry.getValue();
+          break;
+        }
+      }
+    }
+  }
+
+  private void checkStatus(MtasSolrStatus status) throws IOException {
+    if (!status.finished()) {
+      if (status.error()) {
+        status.setFinished();
+        if (requestHandler != null) {
+          requestHandler.finishStatus(status);
+        }
+        throw new IOException(status.errorMessage());
+      } else if (status.abort()) {
+        status.setFinished();
+        if (requestHandler != null) {
+          requestHandler.finishStatus(status);
+        }
+        throw new IOException(status.abortMessage());
+      }
+    }
+  }
+
+  private void registerStatus(MtasSolrStatus solrStatus) throws IOException {
+    if (requestHandler != null) {
+      Map<String, ShardStatus> shards = solrStatus.getShards();
+      if (shards != null) {
+        Status status = solrStatus.status();
+        status.numberDocumentsTotal = Long.valueOf(0);
+        status.numberSegmentsTotal = 0;
+        for (Entry<String, ShardStatus> entry : shards.entrySet()) {
+          // get shard info
+          ShardInformation shardInformation = requestHandler
+              .getShardInformation(entry.getKey());
+          if(shardInformation==null) {
+            throw new IOException("no shard information "+entry.getKey());
+          }
+          ShardStatus shardStatus = entry.getValue();          
+          shardStatus.name = shardInformation.name;
+          shardStatus.location = entry.getKey();
+          shardStatus.mtasHandler = shardInformation.mtasHandler;
+          shardStatus.numberDocumentsTotal = shardInformation.numberOfDocuments;
+          shardStatus.numberSegmentsTotal = shardInformation.numberOfSegments;
+          status.numberDocumentsTotal += shardInformation.numberOfDocuments;
+          status.numberSegmentsTotal += shardInformation.numberOfSegments;
+        }
+      }
+      requestHandler.registerStatus(solrStatus);
+    }
+  }
+
+  private void errorStatus(MtasSolrStatus status, IOException exception) {
+    try {
+      status.setError(exception);
+      if (requestHandler != null) {
+        requestHandler.finishStatus(status);
+      }
+    } catch (IOException e) {
+      log.error(e);
+    }
+  }
+
+  private void finishStatus(MtasSolrStatus status) {
+    if (!status.finished()) {
+      status.setFinished();
+      if (requestHandler != null) {
+        try {
+          requestHandler.finishStatus(status);
+        } catch (IOException e) {
+          log.error(e);
+        }
+      }
+    }
   }
 
 }

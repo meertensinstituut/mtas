@@ -52,9 +52,9 @@ public class LevenshteinDistance extends Distance {
    * @param parameters the parameters
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public LevenshteinDistance(String prefix, String base, Double maximum,
+  public LevenshteinDistance(String prefix, String base, Double minimum, Double maximum,
       Map<String, String> parameters) throws IOException {
-    super(prefix, base, maximum, parameters);
+    super(prefix, base, minimum, maximum, parameters);
     deletionDistance = defaultDeletionDistance;
     insertionDistance = defaultInsertionDistance;
     replaceDistance = defaultReplaceDistance;
@@ -84,13 +84,13 @@ public class LevenshteinDistance extends Distance {
    * @see
    * mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
    */
-  public boolean validate(BytesRef term) {
+  public boolean validateMaximum(BytesRef term) {
     if (maximum == null) {
       return true;
     } else {
       double[][] state = _start();
       char ch1;
-      int i = term.offset + MtasToken.DELIMITER.length() + prefix.length();
+      int i = term.offset + prefixOffset;
       for (; i < term.length; i++) {
         ch1 = (char) term.bytes[i];
         if (ch1 == 0x00) {
@@ -104,7 +104,31 @@ public class LevenshteinDistance extends Distance {
       return _is_match(state);
     }
   }
-
+  
+  @Override
+  public boolean validateMinimum(BytesRef term) {
+    if (minimum == null) {
+      return true;
+    } else {
+      return compute(term)>minimum;
+    }
+  }
+  
+  @Override
+  public double compute(BytesRef term) {
+    double[][] state = _start();
+    char ch1;
+    int i = term.offset + prefixOffset;
+    for (; i < term.length; i++) {
+      ch1 = (char) term.bytes[i];
+      if (ch1 == 0x00) {
+        break;
+      }
+      state = _step(state, ch1);
+    }
+    return _distance(state);
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -173,7 +197,7 @@ public class LevenshteinDistance extends Distance {
    * @return true, if successful
    */
   private boolean _is_match(double[][] state) {
-    return state[1][state[1].length - 1] <= maximum;
+    return state[1][state[1].length - 1] < maximum;
   }
 
   /**
@@ -184,7 +208,7 @@ public class LevenshteinDistance extends Distance {
    */
   private boolean _can_match(double[][] state) {
     for (double d : state[1]) {
-      if (d <= maximum) {
+      if (d < maximum) {
         return true;
       }
     }

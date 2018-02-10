@@ -32,9 +32,9 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @param parameters the parameters
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public DamerauLevenshteinDistance(String prefix, String base, Double maximum,
+  public DamerauLevenshteinDistance(String prefix, String base, Double minimum, Double maximum,
       Map<String, String> parameters) throws IOException {
-    super(prefix, base, maximum, parameters);
+    super(prefix, base, minimum, maximum, parameters);
     transpositionDistance = defaultTranspositionDistance;
     if (parameters != null) {
       for (Entry<String, String> entry : parameters.entrySet()) {
@@ -56,14 +56,14 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * util.BytesRef)
    */
   @Override
-  public boolean validate(BytesRef term) {
+  public boolean validateMaximum(BytesRef term) {
     if (maximum == null) {
       return true;
     } else {
       double[][] state = _start();
       char ch1;
       char ch2 = 0x00;
-      int i = term.offset + MtasToken.DELIMITER.length() + prefix.length();
+      int i = term.offset + prefixOffset;
       for (; i < term.length; i++) {
         ch1 = (char) term.bytes[i];
         if (ch1 == 0x00) {
@@ -77,6 +77,23 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
       }
       return _is_match(state);
     }
+  }
+  
+  @Override
+  public double compute(BytesRef term) {
+    double[][] state = _start();
+    char ch1;
+    char ch2 = 0x00;
+    int i = term.offset + prefixOffset;
+    for (; i < term.length; i++) {
+      ch1 = (char) term.bytes[i];
+      if (ch1 == 0x00) {
+        break;
+      }
+      state = _step(state, ch1, ch2);
+      ch2 = ch1;
+    }
+    return _distance(state);
   }
 
   /*
@@ -157,7 +174,7 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @return true, if successful
    */
   private boolean _is_match(double[][] state) {
-    return state[2][state[2].length - 1] <= maximum;
+    return state[2][state[2].length - 1] < maximum;
   }
 
   /**
@@ -168,7 +185,7 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    */
   private boolean _can_match(double[][] state) {
     for (double d : state[2]) {
-      if (d <= maximum) {
+      if (d < maximum) {
         return true;
       }
     }

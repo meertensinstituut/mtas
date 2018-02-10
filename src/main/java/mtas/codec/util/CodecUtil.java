@@ -243,7 +243,7 @@ public class CodecUtil {
    */
   public static void collectField(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList<Integer> fullDocList,
-      ArrayList<Integer> fullDocSet, ComponentField fieldStats)
+      ArrayList<Integer> fullDocSet, ComponentField fieldStats, Status status)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
     if (fieldStats != null) {
@@ -259,7 +259,7 @@ public class CodecUtil {
       }
       // collect
       CodecCollector.collectField(field, searcher, reader, rawReader,
-          fullDocList, fullDocSet, fieldStats, spansQueryWeight);
+          fullDocList, fullDocSet, fieldStats, spansQueryWeight, status);
     }
   }
 

@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
@@ -38,12 +39,15 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
   /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasSolrComponentList.class);
 
+  /** The Constant NAME. */
+  public static final String NAME = "list";
+
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
   /** The Constant PARAM_MTAS_LIST. */
   public static final String PARAM_MTAS_LIST = MtasSolrSearchComponent.PARAM_MTAS
-      + ".list";
+      + "." + NAME;
 
   /** The Constant NAME_MTAS_LIST_FIELD. */
   public static final String NAME_MTAS_LIST_FIELD = "field";
@@ -372,7 +376,7 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
             NamedList<Object> result = response.getSolrResponse().getResponse();
             try {
               ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) result
-                  .findRecursive("mtas", "list");
+                  .findRecursive("mtas", NAME);
               if (data != null) {
                 for (NamedList<Object> dataItem : data) {
                   Object key = dataItem.get("key");
@@ -487,10 +491,10 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
         sreq.shards = new String[] { entry.getKey() };
         sreq.purpose = ShardRequest.PURPOSE_PRIVATE;
         sreq.params = new ModifiableSolrParams();
-        sreq.params.add("fq", rb.req.getParams().getParams("fq"));
-        sreq.params.add("q", rb.req.getParams().getParams("q"));
-        sreq.params.add("cache", rb.req.getParams().getParams("cache"));
-        sreq.params.add("rows", "0");
+        sreq.params.add(CommonParams.FQ, rb.req.getParams().getParams(CommonParams.FQ));
+        sreq.params.add(CommonParams.Q, rb.req.getParams().getParams(CommonParams.Q));
+        sreq.params.add(CommonParams.CACHE, rb.req.getParams().getParams(CommonParams.CACHE));
+        sreq.params.add(CommonParams.ROWS, "0");
         sreq.params.add(MtasSolrSearchComponent.PARAM_MTAS, rb.req
             .getOriginalParams().getParams(MtasSolrSearchComponent.PARAM_MTAS));
         sreq.params.add(PARAM_MTAS_LIST,
@@ -633,7 +637,7 @@ public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
           mtasListItemResponses.add(mtasListItemResponse);
         }
       }
-      mtasListResponse.add("list", mtasListItemResponses);
+      mtasListResponse.add(NAME, mtasListItemResponses);
     }
     return mtasListResponse;
   }

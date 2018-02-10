@@ -32,7 +32,6 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 /**
  * The Class MtasSolrComponentFacet.
  */
-@SuppressWarnings("deprecation")
 public class MtasSolrComponentFacet
     implements MtasSolrComponent<ComponentFacet> {
 
@@ -43,9 +42,12 @@ public class MtasSolrComponentFacet
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
+  /** The Constant NAME. */
+  public static final String NAME = "facet";
+
   /** The Constant PARAM_MTAS_FACET. */
   public static final String PARAM_MTAS_FACET = MtasSolrSearchComponent.PARAM_MTAS
-      + ".facet";
+      + "." + NAME;
 
   /** The Constant NAME_MTAS_FACET_KEY. */
   public static final String NAME_MTAS_FACET_KEY = "key";
@@ -128,8 +130,7 @@ public class MtasSolrComponentFacet
   /**
    * Instantiates a new mtas solr component facet.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentFacet(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -567,7 +568,7 @@ public class MtasSolrComponentFacet
       }
     }
     MtasSolrMtasResult data = new MtasSolrMtasResult(facet.dataCollector,
-        facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems,null, 
+        facet.baseDataTypes, facet.baseStatsTypes, facet.baseStatsItems, null,
         facet.baseSortTypes, facet.baseSortDirections, null, facet.baseNumbers,
         functionData);
 
@@ -600,7 +601,7 @@ public class MtasSolrComponentFacet
                 .getResponse();
             try {
               ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                  .findRecursive("mtas", "facet");
+                  .findRecursive("mtas", NAME);
               if (data != null) {
                 MtasSolrResultUtil.decode(data);
               }
@@ -636,13 +637,13 @@ public class MtasSolrComponentFacet
     if (mtasResponse != null) {
       ArrayList<Object> mtasResponseFacet;
       try {
-        mtasResponseFacet = (ArrayList<Object>) mtasResponse.get("facet");
+        mtasResponseFacet = (ArrayList<Object>) mtasResponse.get(NAME);
         if (mtasResponseFacet != null) {
           MtasSolrResultUtil.rewrite(mtasResponseFacet, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);
-        mtasResponse.remove("facet");
+        mtasResponse.remove(NAME);
       }
     }
   }
@@ -650,28 +651,27 @@ public class MtasSolrComponentFacet
   /**
    * Gets the field type.
    *
-   * @param schema
-   *          the schema
-   * @param field
-   *          the field
+   * @param schema the schema
+   * @param field the field
    * @return the field type
-   * @throws IOException 
+   * @throws IOException Signals that an I/O exception has occurred.
    */
-  private String getFieldType(IndexSchema schema, String field) throws IOException {
+  private String getFieldType(IndexSchema schema, String field)
+      throws IOException {
     SchemaField sf = schema.getField(field);
     FieldType ft = sf.getType();
     if (ft != null) {
-      if(ft.isPointField() && !sf.hasDocValues()) {
+      if (ft.isPointField() && !sf.hasDocValues()) {
         return ComponentFacet.TYPE_POINTFIELD_WITHOUT_DOCVALUES;
       }
-      NumberType nt = ft.getNumberType();               
-      if(nt!=null) {
+      NumberType nt = ft.getNumberType();
+      if (nt != null) {
         return nt.name();
       } else {
         return ComponentFacet.TYPE_STRING;
       }
     } else {
-      //best guess
+      // best guess
       return ComponentFacet.TYPE_STRING;
     }
   }
@@ -679,8 +679,7 @@ public class MtasSolrComponentFacet
   /**
    * Gets the positive integer.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the positive integer
    */
   private int getPositiveInteger(String number) {
@@ -694,8 +693,7 @@ public class MtasSolrComponentFacet
   /**
    * Gets the double.
    *
-   * @param number
-   *          the number
+   * @param number the number
    * @return the double
    */
   private Double getDouble(String number) {

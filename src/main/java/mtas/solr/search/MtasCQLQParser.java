@@ -64,7 +64,6 @@ public class MtasCQLQParser extends QParser {
   public MtasCQLQParser(String qstr, SolrParams localParams, SolrParams params,
       SolrQueryRequest req) {
     super(qstr, localParams, params, req);
-
     if ((localParams.getParams(MTAS_CQL_QPARSER_FIELD) != null)
         && (localParams.getParams(MTAS_CQL_QPARSER_FIELD).length == 1)) {
       field = localParams.getParams(MTAS_CQL_QPARSER_FIELD)[0];

@@ -35,15 +35,16 @@ public class MtasSolrResultMerge {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)) {
       // mtas response
       NamedList<Object> mtasResponse = null;
+      boolean newResponse = false;
       try {
-        mtasResponse = (NamedList<Object>) rb.rsp.getValues().get("mtas");
+        mtasResponse = (NamedList<Object>) rb.rsp.getValues().get(MtasSolrSearchComponent.NAME);        
       } catch (ClassCastException e) {
         log.debug(e);
-        mtasResponse = null;
+        mtasResponse = null;        
       }
       if (mtasResponse == null) {
-        mtasResponse = new SimpleOrderedMap<>();
-        rb.rsp.add("mtas", mtasResponse);
+        newResponse = true;
+        mtasResponse = new SimpleOrderedMap<>();               
       }
 
       for (ShardRequest sreq : rb.finished) {
@@ -51,61 +52,64 @@ public class MtasSolrResultMerge {
           // merge stats
           if (rb.req.getParams()
               .getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
-            mergeNamedList(sreq, mtasResponse, "stats", null);
+            mergeNamedList(sreq, mtasResponse, MtasSolrComponentStats.NAME, null);
           }
           // merge group
           if (rb.req.getParams()
               .getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
-            mergeArrayList(sreq, mtasResponse, "group", null, false);
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentGroup.NAME, null, false);
           }
           // merge facet
           if (rb.req.getParams()
               .getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
-            mergeArrayList(sreq, mtasResponse, "facet", null, false);
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentFacet.NAME, null, false);
           }
           // merge collection
           if (rb.req.getParams().getBool(
               MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-            mergeArrayList(sreq, mtasResponse, "collection", null, false);
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentCollection.NAME, null, false);
           }
           // merge prefix
           if (rb.req.getParams()
               .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
-            mergeArrayList(sreq, mtasResponse, "prefix", null, false);
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentPrefix.NAME, null, false);
           }
         } else if (rb.stage == MtasSolrSearchComponent.STAGE_COLLECTION_INIT) {
           // merge collection
           if (rb.req.getParams().getBool(
               MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-            mergeArrayList(sreq, mtasResponse, "collection", null, false);
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentCollection.NAME, null, false);
           }
         } else if (rb.stage == MtasSolrSearchComponent.STAGE_TERMVECTOR_MISSING_KEY) {
           // merge termvector
           if (rb.req.getParams().getBool(
               MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-            mergeArrayList(sreq, mtasResponse, "termvector", null, false);
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentTermvector.NAME, null, false);
           }
         } else if (rb.stage == MtasSolrSearchComponent.STAGE_LIST) {
           // merge list
           if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,
               false)) {
-            mergeArrayList(sreq, mtasResponse, "list",
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentList.NAME,
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
         } else if (rb.stage == ResponseBuilder.STAGE_GET_FIELDS) {
           // merge document
           if (rb.req.getParams()
               .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
-            mergeArrayList(sreq, mtasResponse, "document",
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentDocument.NAME,
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
           // merge kwic
           if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,
               false)) {
-            mergeArrayList(sreq, mtasResponse, "kwic",
+            mergeArrayList(sreq, mtasResponse, MtasSolrComponentKwic.NAME,
                 ShardRequest.PURPOSE_PRIVATE, true);
           }
         }
+      }
+      if(newResponse && mtasResponse.size()>0) {
+        rb.rsp.add(MtasSolrSearchComponent.NAME, mtasResponse);
       }
     }
   }

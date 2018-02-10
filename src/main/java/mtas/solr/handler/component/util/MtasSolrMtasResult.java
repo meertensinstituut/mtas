@@ -113,17 +113,21 @@ public class MtasSolrMtasResult implements Serializable {
     if ((dataType != null) && (dataType.length > 1)) {
       subDataType = new String[dataType.length - 1];
       subStatsType = new String[dataType.length - 1];
-      subStatsItems = new TreeSet[dataType.length - 1];
-      subDistances = new List[dataType.length - 1];
+      subStatsItems = new TreeSet[dataType.length - 1];      
       subSortType = new String[dataType.length - 1];
       subSortDirection = new String[dataType.length - 1];
       System.arraycopy(dataType, 1, subDataType, 0, dataType.length - 1);
       System.arraycopy(statsType, 1, subStatsType, 0, dataType.length - 1);
-      System.arraycopy(statsItems, 1, subStatsItems, 0, dataType.length - 1);
-      System.arraycopy(distances, 1, subDistances, 0, dataType.length - 1);
+      System.arraycopy(statsItems, 1, subStatsItems, 0, dataType.length - 1);      
       System.arraycopy(sortType, 1, subSortType, 0, dataType.length - 1);
       System.arraycopy(sortDirection, 1, subSortDirection, 0,
           dataType.length - 1);
+      if(distances!=null) {
+        subDistances = new List[dataType.length - 1];
+        System.arraycopy(distances, 1, subDistances, 0, dataType.length - 1);
+      } else {
+        subDistances = null;
+      }      
     } else {
       subDataType = null;
       subStatsType = null;

@@ -44,13 +44,20 @@ public class MtasSolrComponentStats
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
+  /** The Constant NAME. */
+  public static final String NAME = "stats";
+  
+  public static final String NAME_POSITIONS = "positions";
+  public static final String NAME_TOKENS = "tokens";
+  public static final String NAME_SPANS = "spans";
+
   /** The Constant PARAM_MTAS_STATS. */
   public static final String PARAM_MTAS_STATS = MtasSolrSearchComponent.PARAM_MTAS
-      + ".stats";
+      + "." + NAME;
 
   /** The Constant PARAM_MTAS_STATS_POSITIONS. */
   public static final String PARAM_MTAS_STATS_POSITIONS = PARAM_MTAS_STATS
-      + ".positions";
+      + "." + NAME_POSITIONS;
 
   /** The Constant NAME_MTAS_STATS_POSITIONS_FIELD. */
   public static final String NAME_MTAS_STATS_POSITIONS_FIELD = "field";
@@ -69,7 +76,7 @@ public class MtasSolrComponentStats
 
   /** The Constant PARAM_MTAS_STATS_TOKENS. */
   public static final String PARAM_MTAS_STATS_TOKENS = PARAM_MTAS_STATS
-      + ".tokens";
+      + "." + NAME_TOKENS;
 
   /** The Constant NAME_MTAS_STATS_TOKENS_FIELD. */
   public static final String NAME_MTAS_STATS_TOKENS_FIELD = "field";
@@ -88,7 +95,7 @@ public class MtasSolrComponentStats
 
   /** The Constant PARAM_MTAS_STATS_SPANS. */
   public static final String PARAM_MTAS_STATS_SPANS = PARAM_MTAS_STATS
-      + ".spans";
+      + "." + NAME_SPANS;
 
   /** The Constant NAME_MTAS_STATS_SPANS_FIELD. */
   public static final String NAME_MTAS_STATS_SPANS_FIELD = "field";
@@ -969,7 +976,7 @@ public class MtasSolrComponentStats
                 .getResponse();
             try {
               ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                  .findRecursive("mtas", "stats");
+                  .findRecursive("mtas", NAME);
               if (data != null) {
                 MtasSolrResultUtil.decode(data);
               }
@@ -1005,13 +1012,13 @@ public class MtasSolrComponentStats
     if (mtasResponse != null) {
       NamedList<Object> mtasResponseStats;
       try {
-        mtasResponseStats = (NamedList<Object>) mtasResponse.get("stats");
+        mtasResponseStats = (NamedList<Object>) mtasResponse.get(NAME);
         if (mtasResponseStats != null) {
           MtasSolrResultUtil.rewrite(mtasResponseStats, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);
-        mtasResponse.remove("stats");
+        mtasResponse.remove(NAME);
       }
     }
   }

@@ -32,6 +32,9 @@ public class MtasSolrComponentPrefix
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
+  /** The Constant NAME. */
+  public static final String NAME = "prefix";
+
   /** The Constant PARAM_MTAS_PREFIX. */
   public static final String PARAM_MTAS_PREFIX = MtasSolrSearchComponent.PARAM_MTAS
       + ".prefix";
@@ -177,7 +180,7 @@ public class MtasSolrComponentPrefix
                 .getResponse();
             try {
               ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                  .findRecursive("mtas", "prefix");
+                  .findRecursive("mtas", NAME);
               if (data != null) {
                 MtasSolrResultUtil.decode(data);
               }
@@ -213,7 +216,7 @@ public class MtasSolrComponentPrefix
     if (mtasResponse != null) {
       ArrayList<Object> mtasResponsePrefix;
       try {
-        mtasResponsePrefix = (ArrayList<Object>) mtasResponse.get("prefix");
+        mtasResponsePrefix = (ArrayList<Object>) mtasResponse.get(NAME);
         if (mtasResponsePrefix != null) {
           NamedList<Object> mtasResponsePrefixItem;
           for (Object mtasResponsePrefixItemRaw : mtasResponsePrefix) {
@@ -224,7 +227,7 @@ public class MtasSolrComponentPrefix
         }
       } catch (ClassCastException e) {
         log.debug(e);
-        mtasResponse.remove("prefix");
+        mtasResponse.remove(NAME);
       }
     }
   }
@@ -239,7 +242,7 @@ public class MtasSolrComponentPrefix
     // repair prefix lists
     try {
       ArrayList<NamedList<?>> list = (ArrayList<NamedList<?>>) mtasResponse
-          .findRecursive("prefix");
+          .findRecursive(NAME);
       // MtasSolrResultUtil.rewrite(list);
       if (list != null) {
         for (NamedList<?> item : list) {

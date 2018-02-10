@@ -48,6 +48,7 @@ import org.apache.lucene.store.RAMDirectory;
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecInfo;
 import mtas.codec.util.CodecUtil;
+import mtas.codec.util.Status;
 import mtas.codec.util.collector.MtasDataItem;
 import mtas.codec.util.CodecComponent.ComponentField;
 import mtas.codec.util.CodecComponent.ComponentGroup;
@@ -1101,12 +1102,12 @@ public class MtasSearchTestConsistency {
       fieldStats.statsPositionList
           .add(new ComponentPosition("total", null, null, "sum"));
       fieldStats.termVectorList.add(new ComponentTermVector("toplist", prefix,
-          null, null, null, null, null, null, false, "sum",
+          null, null, null, null, null, null, null, false, "sum",
           CodecUtil.STATS_TYPE_SUM, CodecUtil.SORT_DESC, null, number, null,
           null, null, null, null, null, prefix, null, null));
       fieldStats.termVectorList
           .add(new ComponentTermVector("fulllist", prefix, null, null, null,
-              null, null, null, true, "sum", CodecUtil.STATS_TYPE_SUM,
+              null, null, null, null, true, "sum", CodecUtil.STATS_TYPE_SUM,
               CodecUtil.SORT_DESC, null, Integer.MAX_VALUE, null, null, null,
               null, null, null, prefix, null, null));
       HashMap<String, HashMap<String, Object>> response = doAdvancedSearch(
@@ -1168,12 +1169,13 @@ public class MtasSearchTestConsistency {
       ArrayList<Integer> fullDocSet, ComponentField fieldStats) {
     HashMap<String, HashMap<String, Object>> response = new HashMap<>();
     IndexReader indexReader;
+    Status status = new Status();
     try {
       indexReader = DirectoryReader.open(directory);
       IndexSearcher searcher = new IndexSearcher(indexReader);
       ArrayList<Integer> fullDocList = new ArrayList<>();
       CodecUtil.collectField(FIELD_CONTENT, searcher, indexReader, fullDocList,
-          fullDocSet, fieldStats);
+          fullDocSet, fieldStats, status);
       // add stats - position
       response.put("statsPositions", new HashMap<String, Object>());
       for (ComponentPosition cp : fieldStats.statsPositionList) {

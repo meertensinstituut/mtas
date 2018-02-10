@@ -6,10 +6,16 @@ For indexing CRM resources with format Corpus Van Reenen-Mulder/Adelheid, the *m
 <!-- START CONFIGURATION MTAS PARSER -->
 <parser name="mtas.analysis.parser.MtasCRMParser">
 ...
+  <!-- START FILTERS -->
+  <filters>
+  ...
+  </filters>
+  <!-- END FILTERS --->
+  
   <!-- START MAPPINGS -->
   <mappings>
   ...
-  </mapping>
+  </mappings>
   <!-- END MAPPINGS --->
   ...
 </parser>

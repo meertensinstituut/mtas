@@ -36,9 +36,12 @@ public class MtasSolrComponentGroup
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
+  /** The Constant NAME. */
+  public static final String NAME = "group";
+
   /** The Constant PARAM_MTAS_GROUP. */
   public static final String PARAM_MTAS_GROUP = MtasSolrSearchComponent.PARAM_MTAS
-      + ".group";
+      + "." + NAME;
 
   /** The Constant NAME_MTAS_GROUP_FIELD. */
   public static final String NAME_MTAS_GROUP_FIELD = "field";
@@ -109,8 +112,7 @@ public class MtasSolrComponentGroup
   /**
    * Instantiates a new mtas solr component group.
    *
-   * @param searchComponent
-   *          the search component
+   * @param searchComponent the search component
    */
   public MtasSolrComponentGroup(MtasSolrSearchComponent searchComponent) {
     this.searchComponent = searchComponent;
@@ -335,21 +337,41 @@ public class MtasSolrComponentGroup
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
+   * CodecComponent.BasicComponent, java.lang.Boolean)
+   */
+  @SuppressWarnings("unchecked")
+  public SimpleOrderedMap<Object> create(ComponentGroup group, Boolean encode)
+      throws IOException {
+    SimpleOrderedMap<Object> mtasGroupResponse = new SimpleOrderedMap<>();
+    mtasGroupResponse.add("key", group.key);
+    MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,
+        new String[] { group.dataType }, new String[] { group.statsType },
+        new SortedSet[] { group.statsItems }, new List[] { null },
+        new String[] { group.sortType }, new String[] { group.sortDirection },
+        new Integer[] { group.start }, new Integer[] { group.number }, null);
+    if (encode) {
+      mtasGroupResponse.add("_encoded_list", MtasSolrResultUtil.encode(data));
+    } else {
+      mtasGroupResponse.add("list", data);
+      MtasSolrResultUtil.rewrite(mtasGroupResponse, searchComponent);
+    }
+    return mtasGroupResponse;
+  }
+
   /**
    * Prepare.
    *
-   * @param solrParams
-   *          the solr params
-   * @param gids
-   *          the gids
-   * @param name
-   *          the name
-   * @param positions
-   *          the positions
-   * @param prefixes
-   *          the prefixes
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param solrParams the solr params
+   * @param gids the gids
+   * @param name the name
+   * @param positions the positions
+   * @param prefixes the prefixes
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void prepare(SolrParams solrParams, SortedSet<String> gids,
       String name, String[] positions, String[] prefixes) throws IOException {
@@ -384,15 +406,15 @@ public class MtasSolrComponentGroup
     if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
         && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
       if ((sreq.purpose & ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {
-        //do nothing
-//        Set<String> keys = MtasSolrResultUtil
-//            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);
-//        for (String key : keys) {
-//          sreq.params.remove(
-//              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_NUMBER);
-//          sreq.params.remove(
-//              PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_START);
-//        }
+        // do nothing
+        // Set<String> keys = MtasSolrResultUtil
+        // .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_GROUP);
+        // for (String key : keys) {
+        // sreq.params.remove(
+        // PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_NUMBER);
+        // sreq.params.remove(
+        // PARAM_MTAS_GROUP + "." + key + "." + NAME_MTAS_GROUP_START);
+        // }
       } else {
         // remove prefix for other requests
         Set<String> keys = MtasSolrResultUtil
@@ -482,41 +504,15 @@ public class MtasSolrComponentGroup
    * (non-Javadoc)
    * 
    * @see
-   * mtas.solr.handler.component.util.MtasSolrComponent#create(mtas.codec.util.
-   * CodecComponent.BasicComponent, java.lang.Boolean)
-   */
-  @SuppressWarnings("unchecked")
-  public SimpleOrderedMap<Object> create(ComponentGroup group, Boolean encode)
-      throws IOException {
-    SimpleOrderedMap<Object> mtasGroupResponse = new SimpleOrderedMap<>();
-    mtasGroupResponse.add("key", group.key);
-    MtasSolrMtasResult data = new MtasSolrMtasResult(group.dataCollector,
-        new String[] { group.dataType }, new String[] { group.statsType },
-        new SortedSet[] { group.statsItems }, new List[] {null}, new String[] { group.sortType },
-        new String[] { group.sortDirection }, new Integer[] { group.start },
-        new Integer[] { group.number }, null);
-    if (encode) {
-      mtasGroupResponse.add("_encoded_list", MtasSolrResultUtil.encode(data));
-    } else {
-      mtasGroupResponse.add("list", data);
-      MtasSolrResultUtil.rewrite(mtasGroupResponse, searchComponent);
-    }
-    return mtasGroupResponse;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
    * mtas.solr.handler.component.util.MtasSolrComponent#finishStage(org.apache.
    * solr.handler.component.ResponseBuilder)
    */
   @SuppressWarnings("unchecked")
-  public void finishStage(ResponseBuilder rb) {   
+  public void finishStage(ResponseBuilder rb) {
     if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
         && rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY
         && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-      //decode finished results
+      // decode finished results
       for (ShardRequest sreq : rb.finished) {
         if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)
             && sreq.params.getBool(PARAM_MTAS_GROUP, false)) {
@@ -525,7 +521,7 @@ public class MtasSolrComponentGroup
                 .getResponse();
             try {
               ArrayList<NamedList<Object>> data = (ArrayList<NamedList<Object>>) response
-                  .findRecursive("mtas", "group");
+                  .findRecursive("mtas", NAME);
               if (data != null) {
                 MtasSolrResultUtil.decode(data);
               }
@@ -561,13 +557,13 @@ public class MtasSolrComponentGroup
     if (mtasResponse != null) {
       ArrayList<Object> mtasResponseGroup;
       try {
-        mtasResponseGroup = (ArrayList<Object>) mtasResponse.get("group");
+        mtasResponseGroup = (ArrayList<Object>) mtasResponse.get(NAME);
         if (mtasResponseGroup != null) {
           MtasSolrResultUtil.rewrite(mtasResponseGroup, searchComponent);
         }
       } catch (ClassCastException e) {
         log.debug(e);
-        mtasResponse.remove("group");
+        mtasResponse.remove(NAME);
       }
     }
   }

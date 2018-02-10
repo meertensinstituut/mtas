@@ -22,7 +22,13 @@
 		<makeunique value="true" />
 		<!-- END GENERAL SETTINGS MTAS PARSER -->
 
-		<mappings>
+		<filters>
+      <filter type="replace" name="4" value="*" replace="" />
+      <filter type="replace" name="4" value="#" replace="" />       
+    </filters>
+
+    
+    <mappings>
 
 			<mapping type="word">
 			</mapping>

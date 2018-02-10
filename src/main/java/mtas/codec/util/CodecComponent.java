@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -32,6 +35,7 @@ import mtas.analysis.token.MtasTokenString;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.codec.util.collector.MtasDataCollector;
 import mtas.codec.util.distance.LevenshteinDistance;
+import mtas.codec.util.distance.MorseDistance;
 import mtas.codec.util.distance.DamerauLevenshteinDistance;
 import mtas.codec.util.distance.Distance;
 import mtas.parser.function.MtasFunctionParser;
@@ -49,10 +53,7 @@ import org.noggit.ObjectBuilder;
 /**
  * The Class CodecComponent.
  */
-/**
- * @author matthijs
- *
- */
+
 public class CodecComponent {
 
   /**
@@ -65,6 +66,8 @@ public class CodecComponent {
    * The Class ComponentFields.
    */
   public static class ComponentFields {
+
+    public ComponentStatus status;
 
     /** The list. */
     public Map<String, ComponentField> list;
@@ -108,10 +111,14 @@ public class CodecComponent {
     /** The do collection. */
     public boolean doCollection;
 
+    /** The do status. */
+    public boolean doStatus;
+
     /**
      * Instantiates a new component fields.
      */
     public ComponentFields() {
+      status = null;
       list = new HashMap<>();
       collection = new ArrayList<>();
       doDocument = false;
@@ -126,6 +133,7 @@ public class CodecComponent {
       doPrefix = false;
       doFacet = false;
       doCollection = false;
+      doStatus = false;
     }
   }
 
@@ -179,7 +187,8 @@ public class CodecComponent {
     /**
      * Instantiates a new component field.
      *
-     * @param uniqueKeyField the unique key field
+     * @param uniqueKeyField
+     *          the unique key field
      */
     public ComponentField(String uniqueKeyField) {
       this.uniqueKeyField = uniqueKeyField;
@@ -221,7 +230,8 @@ public class CodecComponent {
     /**
      * Instantiates a new component prefix.
      *
-     * @param key the key
+     * @param key
+     *          the key
      */
     public ComponentPrefix(String key) {
       this.key = key;
@@ -234,7 +244,8 @@ public class CodecComponent {
     /**
      * Adds the single position.
      *
-     * @param prefix the prefix
+     * @param prefix
+     *          the prefix
      */
     public void addSinglePosition(String prefix) {
       if (!prefix.trim().isEmpty() && !singlePositionList.contains(prefix)
@@ -246,7 +257,8 @@ public class CodecComponent {
     /**
      * Adds the multiple position.
      *
-     * @param prefix the prefix
+     * @param prefix
+     *          the prefix
      */
     public void addMultiplePosition(String prefix) {
       if (!prefix.trim().isEmpty()) {
@@ -264,7 +276,8 @@ public class CodecComponent {
     /**
      * Adds the set position.
      *
-     * @param prefix the prefix
+     * @param prefix
+     *          the prefix
      */
     public void addSetPosition(String prefix) {
       if (!prefix.trim().isEmpty()) {
@@ -282,7 +295,8 @@ public class CodecComponent {
     /**
      * Adds the intersecting.
      *
-     * @param prefix the prefix
+     * @param prefix
+     *          the prefix
      */
     public void addIntersecting(String prefix) {
       if (!prefix.trim().isEmpty()) {
@@ -351,19 +365,32 @@ public class CodecComponent {
     /**
      * Instantiates a new component document.
      *
-     * @param key the key
-     * @param prefix the prefix
-     * @param statsType the stats type
-     * @param regexp the regexp
-     * @param list the list
-     * @param listNumber the list number
-     * @param listRegexp the list regexp
-     * @param listExpand the list expand
-     * @param listExpandNumber the list expand number
-     * @param ignoreRegexp the ignore regexp
-     * @param ignoreList the ignore list
-     * @param ignoreListRegexp the ignore list regexp
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param key
+     *          the key
+     * @param prefix
+     *          the prefix
+     * @param statsType
+     *          the stats type
+     * @param regexp
+     *          the regexp
+     * @param list
+     *          the list
+     * @param listNumber
+     *          the list number
+     * @param listRegexp
+     *          the list regexp
+     * @param listExpand
+     *          the list expand
+     * @param listExpandNumber
+     *          the list expand number
+     * @param ignoreRegexp
+     *          the ignore regexp
+     * @param ignoreList
+     *          the ignore list
+     * @param ignoreListRegexp
+     *          the ignore list regexp
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public ComponentDocument(String key, String prefix, String statsType,
         String regexp, String[] list, int listNumber, Boolean listRegexp,
@@ -467,15 +494,24 @@ public class CodecComponent {
     /**
      * Instantiates a new component kwic.
      *
-     * @param query the query
-     * @param key the key
-     * @param prefixes the prefixes
-     * @param number the number
-     * @param start the start
-     * @param left the left
-     * @param right the right
-     * @param output the output
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param query
+     *          the query
+     * @param key
+     *          the key
+     * @param prefixes
+     *          the prefixes
+     * @param number
+     *          the number
+     * @param start
+     *          the start
+     * @param left
+     *          the left
+     * @param right
+     *          the right
+     * @param output
+     *          the output
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public ComponentKwic(MtasSpanQuery query, String key, String prefixes,
         Integer number, int start, int left, int right, String output)
@@ -601,22 +637,38 @@ public class CodecComponent {
     /**
      * Instantiates a new component list.
      *
-     * @param spanQuery the span query
-     * @param field the field
-     * @param queryValue the query value
-     * @param queryType the query type
-     * @param queryPrefix the query prefix
-     * @param queryVariables the query variables
-     * @param queryIgnore the query ignore
-     * @param queryMaximumIgnoreLength the query maximum ignore length
-     * @param key the key
-     * @param prefix the prefix
-     * @param start the start
-     * @param number the number
-     * @param left the left
-     * @param right the right
-     * @param output the output
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param spanQuery
+     *          the span query
+     * @param field
+     *          the field
+     * @param queryValue
+     *          the query value
+     * @param queryType
+     *          the query type
+     * @param queryPrefix
+     *          the query prefix
+     * @param queryVariables
+     *          the query variables
+     * @param queryIgnore
+     *          the query ignore
+     * @param queryMaximumIgnoreLength
+     *          the query maximum ignore length
+     * @param key
+     *          the key
+     * @param prefix
+     *          the prefix
+     * @param start
+     *          the start
+     * @param number
+     *          the number
+     * @param left
+     *          the left
+     * @param right
+     *          the right
+     * @param output
+     *          the output
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public ComponentList(MtasSpanQuery spanQuery, String field,
         String queryValue, String queryType, String queryPrefix,
@@ -731,24 +783,42 @@ public class CodecComponent {
     /**
      * Instantiates a new component group.
      *
-     * @param spanQuery the span query
-     * @param key the key
-     * @param number the number
-     * @param start the start
-     * @param groupingHitInsidePrefixes the grouping hit inside prefixes
-     * @param groupingHitInsideLeftPosition the grouping hit inside left position
-     * @param groupingHitInsideLeftPrefixes the grouping hit inside left prefixes
-     * @param groupingHitInsideRightPosition the grouping hit inside right position
-     * @param groupingHitInsideRightPrefixes the grouping hit inside right prefixes
-     * @param groupingHitLeftPosition the grouping hit left position
-     * @param groupingHitLeftPrefixes the grouping hit left prefixes
-     * @param groupingHitRightPosition the grouping hit right position
-     * @param groupingHitRightPrefixes the grouping hit right prefixes
-     * @param groupingLeftPosition the grouping left position
-     * @param groupingLeftPrefixes the grouping left prefixes
-     * @param groupingRightPosition the grouping right position
-     * @param groupingRightPrefixes the grouping right prefixes
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param spanQuery
+     *          the span query
+     * @param key
+     *          the key
+     * @param number
+     *          the number
+     * @param start
+     *          the start
+     * @param groupingHitInsidePrefixes
+     *          the grouping hit inside prefixes
+     * @param groupingHitInsideLeftPosition
+     *          the grouping hit inside left position
+     * @param groupingHitInsideLeftPrefixes
+     *          the grouping hit inside left prefixes
+     * @param groupingHitInsideRightPosition
+     *          the grouping hit inside right position
+     * @param groupingHitInsideRightPrefixes
+     *          the grouping hit inside right prefixes
+     * @param groupingHitLeftPosition
+     *          the grouping hit left position
+     * @param groupingHitLeftPrefixes
+     *          the grouping hit left prefixes
+     * @param groupingHitRightPosition
+     *          the grouping hit right position
+     * @param groupingHitRightPrefixes
+     *          the grouping hit right prefixes
+     * @param groupingLeftPosition
+     *          the grouping left position
+     * @param groupingLeftPrefixes
+     *          the grouping left prefixes
+     * @param groupingRightPosition
+     *          the grouping right position
+     * @param groupingRightPrefixes
+     *          the grouping right prefixes
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public ComponentGroup(MtasSpanQuery spanQuery, String key, int number,
         int start, String groupingHitInsidePrefixes,
@@ -808,11 +878,15 @@ public class CodecComponent {
     /**
      * Creates the positioned prefixes.
      *
-     * @param prefixList the prefix list
-     * @param position the position
-     * @param prefixes the prefixes
+     * @param prefixList
+     *          the prefix list
+     * @param position
+     *          the position
+     * @param prefixes
+     *          the prefixes
      * @return the hash set[]
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     private static HashSet<String>[] createPositionedPrefixes(
         HashSet<String> prefixList, String[] position, String[] prefixes)
@@ -966,24 +1040,42 @@ public class CodecComponent {
     /**
      * Instantiates a new component facet.
      *
-     * @param spanQueries the span queries
-     * @param field the field
-     * @param key the key
-     * @param baseFields the base fields
-     * @param baseFieldTypes the base field types
-     * @param baseTypes the base types
-     * @param baseRangeSizes the base range sizes
-     * @param baseRangeBases the base range bases
-     * @param baseSortTypes the base sort types
-     * @param baseSortDirections the base sort directions
-     * @param baseNumbers the base numbers
-     * @param baseMinimumDoubles the base minimum doubles
-     * @param baseMaximumDoubles the base maximum doubles
-     * @param baseFunctionKeys the base function keys
-     * @param baseFunctionExpressions the base function expressions
-     * @param baseFunctionTypes the base function types
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ParseException the parse exception
+     * @param spanQueries
+     *          the span queries
+     * @param field
+     *          the field
+     * @param key
+     *          the key
+     * @param baseFields
+     *          the base fields
+     * @param baseFieldTypes
+     *          the base field types
+     * @param baseTypes
+     *          the base types
+     * @param baseRangeSizes
+     *          the base range sizes
+     * @param baseRangeBases
+     *          the base range bases
+     * @param baseSortTypes
+     *          the base sort types
+     * @param baseSortDirections
+     *          the base sort directions
+     * @param baseNumbers
+     *          the base numbers
+     * @param baseMinimumDoubles
+     *          the base minimum doubles
+     * @param baseMaximumDoubles
+     *          the base maximum doubles
+     * @param baseFunctionKeys
+     *          the base function keys
+     * @param baseFunctionExpressions
+     *          the base function expressions
+     * @param baseFunctionTypes
+     *          the base function types
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     * @throws ParseException
+     *           the parse exception
      */
     @SuppressWarnings("unchecked")
     public ComponentFacet(MtasSpanQuery[] spanQueries, String field, String key,
@@ -1246,36 +1338,61 @@ public class CodecComponent {
     /**
      * Instantiates a new component term vector.
      *
-     * @param key the key
-     * @param prefix the prefix
-     * @param distanceKey the distance key
-     * @param distanceType the distance type
-     * @param distanceBase the distance base
-     * @param distanceParameter the distance parameter
-     * @param distanceMaximum the distance maximum
-     * @param regexp the regexp
-     * @param full the full
-     * @param type the type
-     * @param sortType the sort type
-     * @param sortDirection the sort direction
-     * @param startValue the start value
-     * @param number the number
-     * @param functionKey the function key
-     * @param functionExpression the function expression
-     * @param functionType the function type
-     * @param boundary the boundary
-     * @param list the list
-     * @param listRegexp the list regexp
-     * @param ignoreRegexp the ignore regexp
-     * @param ignoreList the ignore list
-     * @param ignoreListRegexp the ignore list regexp
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ParseException the parse exception
+     * @param key
+     *          the key
+     * @param prefix
+     *          the prefix
+     * @param distanceKey
+     *          the distance key
+     * @param distanceType
+     *          the distance type
+     * @param distanceBase
+     *          the distance base
+     * @param distanceParameter
+     *          the distance parameter
+     * @param distanceMaximum
+     *          the distance maximum
+     * @param regexp
+     *          the regexp
+     * @param full
+     *          the full
+     * @param type
+     *          the type
+     * @param sortType
+     *          the sort type
+     * @param sortDirection
+     *          the sort direction
+     * @param startValue
+     *          the start value
+     * @param number
+     *          the number
+     * @param functionKey
+     *          the function key
+     * @param functionExpression
+     *          the function expression
+     * @param functionType
+     *          the function type
+     * @param boundary
+     *          the boundary
+     * @param list
+     *          the list
+     * @param listRegexp
+     *          the list regexp
+     * @param ignoreRegexp
+     *          the ignore regexp
+     * @param ignoreList
+     *          the ignore list
+     * @param ignoreListRegexp
+     *          the ignore list regexp
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     * @throws ParseException
+     *           the parse exception
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ComponentTermVector(String key, String prefix, String[] distanceKey,
         String[] distanceType, String[] distanceBase, Map[] distanceParameter,
-        String[] distanceMaximum, String regexp, Boolean full, String type,
+        String[] distanceMinimum, String[] distanceMaximum, String regexp, Boolean full, String type,
         String sortType, String sortDirection, String startValue, int number,
         String[] functionKey, String[] functionExpression,
         String[] functionType, String boundary, String[] list,
@@ -1293,7 +1410,7 @@ public class CodecComponent {
           for (int i = 0; i < distanceKey.length; i++) {
             SubComponentDistance item = new SubComponentDistance(distanceKey[i],
                 distanceType[i], this.prefix, distanceBase[i],
-                distanceParameter[i], distanceMaximum[i]);
+                distanceParameter[i], distanceMinimum[i], distanceMaximum[i]);
             distances.add(item);
           }
         }
@@ -1450,6 +1567,34 @@ public class CodecComponent {
   }
 
   /**
+   * The Class ComponentStatus.
+   */
+  public static class ComponentStatus implements BasicComponent {
+
+    public String handler;
+    public String name;
+    public String key;
+    public Integer numberOfDocuments;
+    public Integer numberOfSegments;
+    public boolean getMtasHandler;
+    public boolean getNumberOfDocuments;
+    public boolean getNumberOfSegments;
+
+    public ComponentStatus(String name, String key, boolean getMtasHandler,
+        boolean getNumberOfDocuments, boolean getNumberOfSegments) {
+      this.name = Objects.requireNonNull(name, "no name");
+      this.key = key;
+      this.getMtasHandler = getMtasHandler;
+      this.getNumberOfDocuments = getNumberOfDocuments;
+      this.getNumberOfSegments = getNumberOfSegments;
+      handler = null;
+      numberOfDocuments = null;
+      numberOfSegments = null;
+    }
+
+  }
+
+  /**
    * The Interface ComponentStats.
    */
   public abstract static interface ComponentStats extends BasicComponent {
@@ -1493,16 +1638,26 @@ public class CodecComponent {
     /**
      * Instantiates a new component span.
      *
-     * @param queries the queries
-     * @param key the key
-     * @param minimumDouble the minimum double
-     * @param maximumDouble the maximum double
-     * @param type the type
-     * @param functionKey the function key
-     * @param functionExpression the function expression
-     * @param functionType the function type
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ParseException the parse exception
+     * @param queries
+     *          the queries
+     * @param key
+     *          the key
+     * @param minimumDouble
+     *          the minimum double
+     * @param maximumDouble
+     *          the maximum double
+     * @param type
+     *          the type
+     * @param functionKey
+     *          the function key
+     * @param functionExpression
+     *          the function expression
+     * @param functionType
+     *          the function type
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     * @throws ParseException
+     *           the parse exception
      */
     public ComponentSpan(MtasSpanQuery[] queries, String key,
         Double minimumDouble, Double maximumDouble, String type,
@@ -1635,12 +1790,18 @@ public class CodecComponent {
     /**
      * Instantiates a new component position.
      *
-     * @param key the key
-     * @param minimumDouble the minimum double
-     * @param maximumDouble the maximum double
-     * @param statsType the stats type
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ParseException the parse exception
+     * @param key
+     *          the key
+     * @param minimumDouble
+     *          the minimum double
+     * @param maximumDouble
+     *          the maximum double
+     * @param statsType
+     *          the stats type
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     * @throws ParseException
+     *           the parse exception
      */
     public ComponentPosition(String key, Double minimumDouble,
         Double maximumDouble, String statsType)
@@ -1694,12 +1855,18 @@ public class CodecComponent {
     /**
      * Instantiates a new component token.
      *
-     * @param key the key
-     * @param minimumDouble the minimum double
-     * @param maximumDouble the maximum double
-     * @param statsType the stats type
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ParseException the parse exception
+     * @param key
+     *          the key
+     * @param minimumDouble
+     *          the minimum double
+     * @param maximumDouble
+     *          the maximum double
+     * @param statsType
+     *          the stats type
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
+     * @throws ParseException
+     *           the parse exception
      */
     public ComponentToken(String key, Double minimumDouble,
         Double maximumDouble, String statsType)
@@ -1774,8 +1941,10 @@ public class CodecComponent {
     /**
      * Instantiates a new component collection.
      *
-     * @param key the key
-     * @param action the action
+     * @param key
+     *          the key
+     * @param action
+     *          the action
      */
     public ComponentCollection(String key, String action) {
       this.key = key;
@@ -1787,7 +1956,8 @@ public class CodecComponent {
     /**
      * Sets the list variables.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setListVariables() throws IOException {
       if (action.equals(ACTION_LIST)) {
@@ -1800,9 +1970,12 @@ public class CodecComponent {
     /**
      * Sets the create variables.
      *
-     * @param id the id
-     * @param fields the fields
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *          the id
+     * @param fields
+     *          the fields
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setCreateVariables(String id, Set<String> fields)
         throws IOException {
@@ -1817,8 +1990,10 @@ public class CodecComponent {
     /**
      * Sets the check variables.
      *
-     * @param id the new check variables
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *          the new check variables
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setCheckVariables(String id) throws IOException {
       if (action.equals(ACTION_CHECK)) {
@@ -1831,8 +2006,10 @@ public class CodecComponent {
     /**
      * Sets the gets the variables.
      *
-     * @param id the new gets the variables
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *          the new gets the variables
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setGetVariables(String id) throws IOException {
       if (action.equals(ACTION_GET)) {
@@ -1845,9 +2022,12 @@ public class CodecComponent {
     /**
      * Sets the post variables.
      *
-     * @param id the id
-     * @param values the values
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *          the id
+     * @param values
+     *          the values
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setPostVariables(String id, HashSet<String> values)
         throws IOException {
@@ -1862,10 +2042,14 @@ public class CodecComponent {
     /**
      * Sets the import variables.
      *
-     * @param id the id
-     * @param url the url
-     * @param collection the collection
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *          the id
+     * @param url
+     *          the url
+     * @param collection
+     *          the collection
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setImportVariables(String id, String url, String collection)
         throws IOException {
@@ -1923,9 +2107,11 @@ public class CodecComponent {
     /**
      * Gets the import.
      *
-     * @param collectionGetUrl the collection get url
+     * @param collectionGetUrl
+     *          the collection get url
      * @return the import
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     private Map<String, Object> getImport(String collectionGetUrl)
         throws IOException {
@@ -1957,8 +2143,10 @@ public class CodecComponent {
     /**
      * Sets the delete variables.
      *
-     * @param id the new delete variables
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param id
+     *          the new delete variables
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void setDeleteVariables(String id) throws IOException {
       if (action.equals(ACTION_DELETE)) {
@@ -1998,8 +2186,10 @@ public class CodecComponent {
     /**
      * Adds the value.
      *
-     * @param value the value
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param value
+     *          the value
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public void addValue(String value) throws IOException {
       if (action.equals(ACTION_CREATE)) {
@@ -2016,8 +2206,10 @@ public class CodecComponent {
     /**
      * Gets the params from JSON.
      *
-     * @param params the params
-     * @param json the json
+     * @param params
+     *          the params
+     * @param json
+     *          the json
      * @return the params from JSON
      */
     private static void getParamsFromJSON(Map<String, Object> params,
@@ -2078,6 +2270,8 @@ public class CodecComponent {
     /** The prefix. */
     public String prefix;
 
+    public Double minimum;
+    
     /** The maximum. */
     public Double maximum;
 
@@ -2093,23 +2287,33 @@ public class CodecComponent {
     /** The Constant NAME_DAMERAULEVENSHTEIN. */
     private static final String NAME_DAMERAULEVENSHTEIN = "damerau-levenshtein";
 
+    /** The Constant NAME_MORSE. */
+    private static final String NAME_MORSE = "morse";
+
     /**
      * Instantiates a new sub component distance.
      *
-     * @param key the key
-     * @param type the type
-     * @param prefix the prefix
-     * @param base the base
-     * @param parameters the parameters
-     * @param maximum the maximum
+     * @param key
+     *          the key
+     * @param type
+     *          the type
+     * @param prefix
+     *          the prefix
+     * @param base
+     *          the base
+     * @param parameters
+     *          the parameters
+     * @param maximum
+     *          the maximum
      */
     public SubComponentDistance(String key, String type, String prefix,
-        String base, Map<String, String> parameters, String maximum) {
+        String base, Map<String, String> parameters, String minimum, String maximum) {
       this.key = key;
       this.prefix = prefix;
       this.type = type;
       this.base = base;
       this.parameters = parameters;
+      this.minimum = minimum != null ? Double.parseDouble(minimum) : null;
       this.maximum = maximum != null ? Double.parseDouble(maximum) : null;
     }
 
@@ -2117,21 +2321,54 @@ public class CodecComponent {
      * Gets the distance.
      *
      * @return the distance
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public Distance getDistance() throws IOException {
       if (distance == null) {
-        if (type != null && type.equals(NAME_LEVENSHTEIN)) {
-          distance = new LevenshteinDistance(prefix, base, maximum, parameters);
-        } else if (type != null && type.equals(NAME_DAMERAULEVENSHTEIN)) {
-          distance = new DamerauLevenshteinDistance(prefix, base, maximum,
-              parameters);
+        if (type != null) {
+          try {
+            Constructor<Distance> constructor = (Constructor<Distance>) Class
+                .forName("mtas.codec.util.distance." + createClassName(type)
+                    + "Distance")
+                .getConstructor(String.class, String.class, Double.class, Double.class,
+                    Map.class);
+            distance = constructor.newInstance(prefix, base, minimum, maximum,
+                parameters);
+          } catch (ClassNotFoundException | NoSuchMethodException
+              | SecurityException | InstantiationException
+              | IllegalAccessException | IllegalArgumentException
+              | InvocationTargetException e) {
+            throw new IllegalStateException(e);
+          }
+          // distance = new MorseDistance(prefix, base, maximum, parameters);
         } else {
           throw new IOException("unrecognized distance " + type);
         }
       }
       return distance;
     }
+
+    private String createClassName(String type) {
+      final char DASH = '-';
+      Objects.requireNonNull(type, "Type is obligatory");
+      final StringBuilder output = new StringBuilder(type.length());
+      boolean lastCharacterWasDash = true;
+      boolean thisCharacterWasDash;
+      for (final char currentCharacter : type.toCharArray()) {
+        thisCharacterWasDash = (currentCharacter == DASH);
+        if (!thisCharacterWasDash) {
+          if (lastCharacterWasDash) {
+            output.append(Character.toTitleCase(currentCharacter));
+          } else {
+            output.append(currentCharacter);
+          }
+        }
+        lastCharacterWasDash = thisCharacterWasDash;
+      }
+      return output.toString();
+    }
+
   }
 
   /**
@@ -2172,18 +2409,30 @@ public class CodecComponent {
     /**
      * Instantiates a new sub component function.
      *
-     * @param collectorType the collector type
-     * @param key the key
-     * @param type the type
-     * @param parserFunction the parser function
-     * @param sortType the sort type
-     * @param sortDirection the sort direction
-     * @param start the start
-     * @param number the number
-     * @param segmentRegistration the segment registration
-     * @param boundary the boundary
-     * @throws ParseException the parse exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param collectorType
+     *          the collector type
+     * @param key
+     *          the key
+     * @param type
+     *          the type
+     * @param parserFunction
+     *          the parser function
+     * @param sortType
+     *          the sort type
+     * @param sortDirection
+     *          the sort direction
+     * @param start
+     *          the start
+     * @param number
+     *          the number
+     * @param segmentRegistration
+     *          the segment registration
+     * @param boundary
+     *          the boundary
+     * @throws ParseException
+     *           the parse exception
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public SubComponentFunction(String collectorType, String key, String type,
         MtasFunctionParserFunction parserFunction, String sortType,
@@ -2216,12 +2465,18 @@ public class CodecComponent {
     /**
      * Instantiates a new sub component function.
      *
-     * @param collectorType the collector type
-     * @param key the key
-     * @param expression the expression
-     * @param type the type
-     * @throws ParseException the parse exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param collectorType
+     *          the collector type
+     * @param key
+     *          the key
+     * @param expression
+     *          the expression
+     * @param type
+     *          the type
+     * @throws ParseException
+     *           the parse exception
+     * @throws IOException
+     *           Signals that an I/O exception has occurred.
      */
     public SubComponentFunction(String collectorType, String key,
         String expression, String type) throws ParseException, IOException {
@@ -2264,8 +2519,10 @@ public class CodecComponent {
     /**
      * Instantiates a new kwic token.
      *
-     * @param match the match
-     * @param tokens the tokens
+     * @param match
+     *          the match
+     * @param tokens
+     *          the tokens
      */
     public KwicToken(Match match, List<MtasTokenString> tokens) {
       startPosition = match.startPosition;
@@ -2292,8 +2549,10 @@ public class CodecComponent {
     /**
      * Instantiates a new kwic hit.
      *
-     * @param match the match
-     * @param hits the hits
+     * @param match
+     *          the match
+     * @param hits
+     *          the hits
      */
     public KwicHit(Match match, Map<Integer, List<String>> hits) {
       startPosition = match.startPosition;
@@ -2365,7 +2624,8 @@ public class CodecComponent {
     /**
      * Sort.
      *
-     * @param data the data
+     * @param data
+     *          the data
      * @return the list
      */
     private List<MtasTreeHit<String>> sort(List<MtasTreeHit<String>> data) {
@@ -2384,14 +2644,22 @@ public class CodecComponent {
     /**
      * Instantiates a new group hit.
      *
-     * @param list the list
-     * @param start the start
-     * @param end the end
-     * @param hitStart the hit start
-     * @param hitEnd the hit end
-     * @param group the group
-     * @param knownPrefixes the known prefixes
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @param list
+     *          the list
+     * @param start
+     *          the start
+     * @param end
+     *          the end
+     * @param hitStart
+     *          the hit start
+     * @param hitEnd
+     *          the hit end
+     * @param group
+     *          the group
+     * @param knownPrefixes
+     *          the known prefixes
+     * @throws UnsupportedEncodingException
+     *           the unsupported encoding exception
      */
     @SuppressWarnings("unchecked")
     public GroupHit(List<MtasTreeHit<String>> list, int start, int end,
@@ -2700,8 +2968,10 @@ public class CodecComponent {
     /**
      * Data equals.
      *
-     * @param d1 the d 1
-     * @param d2 the d 2
+     * @param d1
+     *          the d 1
+     * @param d2
+     *          the d 2
      * @return true, if successful
      */
     private boolean dataEquals(List<String>[] d1, List<String>[] d2) {
@@ -2761,11 +3031,15 @@ public class CodecComponent {
     /**
      * Data to string.
      *
-     * @param data the data
-     * @param missing the missing
-     * @param reverse the reverse
+     * @param data
+     *          the data
+     * @param missing
+     *          the missing
+     * @param reverse
+     *          the reverse
      * @return the string
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws UnsupportedEncodingException
+     *           the unsupported encoding exception
      */
     private String dataToString(List<String>[] data, Set<String>[] missing,
         boolean reverse) throws UnsupportedEncodingException {
@@ -2831,8 +3105,10 @@ public class CodecComponent {
     /**
      * Key to sub sub object.
      *
-     * @param key the key
-     * @param newKey the new key
+     * @param key
+     *          the key
+     * @param newKey
+     *          the new key
      * @return the map[]
      */
     private static Map<String, String>[] keyToSubSubObject(String key,
@@ -2899,8 +3175,10 @@ public class CodecComponent {
     /**
      * Key to sub object.
      *
-     * @param key the key
-     * @param newKey the new key
+     * @param key
+     *          the key
+     * @param newKey
+     *          the new key
      * @return the map
      */
     private static Map<Integer, Map<String, String>[]> keyToSubObject(
@@ -2924,8 +3202,10 @@ public class CodecComponent {
     /**
      * Key to object.
      *
-     * @param key the key
-     * @param newKey the new key
+     * @param key
+     *          the key
+     * @param newKey
+     *          the new key
      * @return the map
      */
     public static Map<String, Map<Integer, Map<String, String>[]>> keyToObject(
@@ -2990,10 +3270,14 @@ public class CodecComponent {
     /**
      * Instantiates a new list token.
      *
-     * @param docId the doc id
-     * @param docPosition the doc position
-     * @param match the match
-     * @param tokens the tokens
+     * @param docId
+     *          the doc id
+     * @param docPosition
+     *          the doc position
+     * @param match
+     *          the match
+     * @param tokens
+     *          the tokens
      */
     public ListToken(Integer docId, Integer docPosition, Match match,
         List<MtasTokenString> tokens) {
@@ -3028,10 +3312,14 @@ public class CodecComponent {
     /**
      * Instantiates a new list hit.
      *
-     * @param docId the doc id
-     * @param docPosition the doc position
-     * @param match the match
-     * @param hits the hits
+     * @param docId
+     *          the doc id
+     * @param docPosition
+     *          the doc position
+     * @param match
+     *          the match
+     * @param hits
+     *          the hits
      */
     public ListHit(Integer docId, Integer docPosition, Match match,
         Map<Integer, List<String>> hits) {
@@ -3057,8 +3345,10 @@ public class CodecComponent {
     /**
      * Instantiates a new match.
      *
-     * @param startPosition the start position
-     * @param endPosition the end position
+     * @param startPosition
+     *          the start position
+     * @param endPosition
+     *          the end position
      */
     public Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
