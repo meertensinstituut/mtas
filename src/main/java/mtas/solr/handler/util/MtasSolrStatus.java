@@ -2,7 +2,6 @@ package mtas.solr.handler.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +21,6 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.response.SolrQueryResponse;
-import org.eclipse.jetty.util.ConcurrentHashSet;
-
 import mtas.codec.util.Status;
 import mtas.solr.handler.MtasRequestHandler;
 import mtas.solr.handler.component.util.MtasSolrComponentStatus;
@@ -549,11 +546,11 @@ public class MtasSolrStatus {
   private final Map<String, Integer> getIntegerMap(NamedList<Object> response,
       String... args) {
     Object objectItem = response.findRecursive(args);
+    Map<String, Integer> result = null;
     if (objectItem != null && objectItem instanceof Map) {
-      return (Map) objectItem;
-    } else {
-      return null;
-    }
+      result = (Map) objectItem;
+    } 
+    return result;
   }
 
   /**
@@ -622,11 +619,11 @@ public class MtasSolrStatus {
    */
   private final Boolean getBoolean(NamedList<Object> response, String... args) {
     Object objectItem = response.findRecursive(args);
+    Boolean result = null;
     if (objectItem != null && objectItem instanceof Boolean) {
-      return (Boolean) objectItem;
-    } else {
-      return null;
-    }
+      result = (Boolean) objectItem;
+    } 
+    return result;
   }
 
   /**

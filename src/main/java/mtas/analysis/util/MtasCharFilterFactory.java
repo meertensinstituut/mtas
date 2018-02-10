@@ -5,8 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.solr.core.SolrResourceLoader;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
