@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+
+	<!-- START MTAS INDEX CONFIGURATION -->
+	<index>
+		<!-- START GENERAL SETTINGS MTAS INDEX PROCESS -->
+		<payload index="true" />
+		<offset index="true" />
+		<realoffset index="true" />
+		<parent index="true" />
+		<!-- END GENERAL SETTINGS MTAS INDEX PROCESS -->
+	</index>
+	<!-- END MTAS INDEX CONFIGURATION -->
+
+
+
+	<!-- START CONFIGURATION MTAS PENN TREEBANK PARSER -->
+	<parser name="mtas.analysis.parser.MtasPennTreebankParser">
+
+		<!-- START GENERAL SETTINGS MTAS PENN TREEBANK PARSER -->
+		<autorepair value="true" />
+		<makeunique value="true" />
+		<!-- END GENERAL SETTINGS MTAS PENN TREEBANK PARSER -->
+
+		<!-- START IGNORED NODES -->
+		<ignore>
+			<node name="ID" />
+		</ignore>
+		<!-- END IGNORED NODES -->
+
+		<!-- START MAPPINGS -->
+		<mappings>
+
+
+		</mappings>
+		<!-- END MAPPINGS -->
+
+	</parser>
+	<!-- END CONFIGURATION MTAS PENN TREEBANK PARSER -->
+
+</mtas>
