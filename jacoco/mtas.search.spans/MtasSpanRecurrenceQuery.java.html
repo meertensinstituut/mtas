@@ -376,6 +376,11 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     public void extractTerms(Set&lt;Term&gt; terms) {
 <span class="nc" id="L377">      subWeight.extractTerms(terms);</span>
 <span class="nc" id="L378">    }</span>
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return subWeight.isCacheable(arg0) &amp;&amp; (ignoreWeight==null || ignoreWeight.isCacheable(arg0));
+//    }
 
   }
 

@@ -9,10 +9,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.handler.RequestHandlerBase;
 import org.apache.solr.request.SolrQueryRequest;
@@ -23,41 +31,94 @@ import org.noggit.ObjectBuilder;
 import mtas.analysis.MtasTokenizer;
 import mtas.analysis.util.MtasFetchData;
 import mtas.analysis.util.MtasParserException;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
+import mtas.solr.handler.component.util.MtasSolrComponentStatus;
+import mtas.solr.handler.util.MtasSolrHistoryList;
+import mtas.solr.handler.util.MtasSolrRunningList;
+import mtas.solr.handler.util.MtasSolrStatus;
 
 /**
  * The Class MtasRequestHandler.
  */
-<span class="fc" id="L30">public class MtasRequestHandler extends RequestHandlerBase {</span>
+public class MtasRequestHandler extends RequestHandlerBase {
 
   /** The log. */
-<span class="fc" id="L33">  private static Log log = LogFactory.getLog(MtasRequestHandler.class);</span>
+<span class="fc" id="L46">  private static Log log = LogFactory.getLog(MtasRequestHandler.class);</span>
 
-  /** The Constant ERROR. */
-  private static final String ERROR = &quot;error&quot;;
+  /** The Constant MESSAGE_ERROR. */
+  public static final String MESSAGE_ERROR = &quot;error&quot;;
 
   /** The Constant ACTION_CONFIG_FILES. */
-  private static final String ACTION_CONFIG_FILES = &quot;files&quot;;
+  public static final String ACTION_CONFIG_FILES = &quot;files&quot;;
 
   /** The Constant ACTION_CONFIG_FILE. */
-  private static final String ACTION_CONFIG_FILE = &quot;file&quot;;
+  public static final String ACTION_CONFIG_FILE = &quot;file&quot;;
 
   /** The Constant ACTION_MAPPING. */
-  private static final String ACTION_MAPPING = &quot;mapping&quot;;
+  public static final String ACTION_MAPPING = &quot;mapping&quot;;
+
+  /** The Constant ACTION_RUNNING. */
+  public static final String ACTION_RUNNING = &quot;running&quot;;
+
+  /** The Constant ACTION_HISTORY. */
+  public static final String ACTION_HISTORY = &quot;history&quot;;
+
+  /** The Constant ACTION_ERROR. */
+  public static final String ACTION_ERROR = &quot;error&quot;;
+
+  /** The Constant ACTION_STATUS. */
+  public static final String ACTION_STATUS = &quot;status&quot;;
 
   /** The Constant PARAM_ACTION. */
-  private static final String PARAM_ACTION = &quot;action&quot;;
+  public static final String PARAM_ACTION = &quot;action&quot;;
+
+  /** The Constant PARAM_KEY. */
+  public static final String PARAM_KEY = &quot;key&quot;;
+
+  /** The Constant PARAM_ABORT. */
+  public static final String PARAM_ABORT = &quot;abort&quot;;
+
+  /** The Constant PARAM_SHARDREQUESTS. */
+  public static final String PARAM_SHARDREQUESTS = &quot;shardRequests&quot;;
 
   /** The Constant PARAM_CONFIG_FILE. */
-  private static final String PARAM_CONFIG_FILE = &quot;file&quot;;
+  public static final String PARAM_CONFIG_FILE = &quot;file&quot;;
 
   /** The Constant PARAM_MAPPING_CONFIGURATION. */
-  private static final String PARAM_MAPPING_CONFIGURATION = &quot;configuration&quot;;
+  public static final String PARAM_MAPPING_CONFIGURATION = &quot;configuration&quot;;
 
   /** The Constant PARAM_MAPPING_DOCUMENT. */
-  private static final String PARAM_MAPPING_DOCUMENT = &quot;document&quot;;
+  public static final String PARAM_MAPPING_DOCUMENT = &quot;document&quot;;
 
   /** The Constant PARAM_MAPPING_DOCUMENT_URL. */
-  private static final String PARAM_MAPPING_DOCUMENT_URL = &quot;url&quot;;
+  public static final String PARAM_MAPPING_DOCUMENT_URL = &quot;url&quot;;
+
+  /** The running. */
+  private MtasSolrRunningList running;
+
+  /** The history. */
+  private MtasSolrHistoryList history;
+
+  /** The error. */
+  private MtasSolrHistoryList error;
+
+  /** The shard index. */
+  private Map&lt;String, ShardInformation&gt; shardIndex;
+
+  private static final int defaultTimeout = 3600;
+  private static final int defaultSoftLimit = 100;
+  private static final int defaultHardLimit = 200;
+  
+  /**
+   * Instantiates a new mtas request handler.
+   */
+  public MtasRequestHandler() {
+<span class="fc" id="L116">    super();</span>
+<span class="fc" id="L117">    running = new MtasSolrRunningList(defaultTimeout);</span>
+<span class="fc" id="L118">    history = new MtasSolrHistoryList(defaultSoftLimit, defaultHardLimit);</span>
+<span class="fc" id="L119">    error = new MtasSolrHistoryList(defaultSoftLimit, defaultHardLimit);</span>
+<span class="fc" id="L120">    shardIndex = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L121">  }</span>
 
   /*
    * (non-Javadoc)
@@ -68,80 +129,105 @@ import mtas.analysis.util.MtasParserException;
    */
   @Override
   public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp)
-      throws IOException {
-
-<span class="nc" id="L73">    String configDir = req.getCore().getResourceLoader().getConfigDir();</span>
-    // generate list of files
-<span class="nc" id="L75">    if (req.getParams().get(PARAM_ACTION, &quot;false&quot;)</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        .equals(ACTION_CONFIG_FILES)) {</span>
-<span class="nc" id="L77">      rsp.add(ACTION_CONFIG_FILES, getFiles(configDir, null));</span>
-      // get file
-<span class="nc" id="L79">    } else if (req.getParams().get(PARAM_ACTION, &quot;false&quot;)</span>
-<span class="nc bnc" id="L80" title="All 2 branches missed.">        .equals(ACTION_CONFIG_FILE)) {</span>
-<span class="nc" id="L81">      String file = req.getParams().get(PARAM_CONFIG_FILE, null);</span>
-<span class="nc bnc" id="L82" title="All 4 branches missed.">      if (file != null &amp;&amp; !file.contains(&quot;..&quot;)) {</span>
-        InputStream is;
-        try {
-<span class="nc" id="L85">          is = req.getCore().getResourceLoader().openResource(file);</span>
-<span class="nc" id="L86">          rsp.add(ACTION_CONFIG_FILE,</span>
-<span class="nc" id="L87">              IOUtils.toString(is, StandardCharsets.UTF_8));</span>
-<span class="nc" id="L88">        } catch (IOException e) {</span>
-<span class="nc" id="L89">          log.debug(e);</span>
-<span class="nc" id="L90">          rsp.add(ERROR, e.getMessage());</span>
-<span class="nc" id="L91">        }</span>
-      }
-      // test mapping
-<span class="nc" id="L94">    } else if (req.getParams().get(PARAM_ACTION, &quot;false&quot;)</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">        .equals(ACTION_MAPPING)) {</span>
-<span class="nc" id="L96">      String configuration = null;</span>
-<span class="nc" id="L97">      String document = null;</span>
-<span class="nc" id="L98">      String documentUrl = null;</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">      if (req.getContentStreams() != null) {</span>
-<span class="nc" id="L100">        Iterator&lt;ContentStream&gt; it = req.getContentStreams().iterator();</span>
-<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (it.hasNext()) {</span>
-<span class="nc" id="L102">          ContentStream cs = it.next();</span>
-<span class="nc" id="L103">          Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L104">          getParamsFromJSON(params, IOUtils.toString(cs.getReader()));</span>
-<span class="nc" id="L105">          configuration = params.get(PARAM_MAPPING_CONFIGURATION);</span>
-<span class="nc" id="L106">          document = params.get(PARAM_MAPPING_DOCUMENT);</span>
-<span class="nc" id="L107">          documentUrl = params.get(PARAM_MAPPING_DOCUMENT_URL);</span>
+      throws IOException {    
+    String action;
+<span class="nc bnc" id="L134" title="All 2 branches missed.">    if ((action = req.getParams().get(PARAM_ACTION)) != null) {</span>
+      // generate list of files
+<span class="nc bnc" id="L136" title="All 2 branches missed.">      if (action.equals(ACTION_CONFIG_FILES)) {</span>
+<span class="nc" id="L137">        String configDir = req.getCore().getResourceLoader().getConfigDir();</span>
+<span class="nc" id="L138">        rsp.add(ACTION_CONFIG_FILES, getFiles(configDir, null));</span>
+        // get file
+<span class="nc bnc" id="L140" title="All 2 branches missed.">      } else if (action.equals(ACTION_CONFIG_FILE)) {</span>
+<span class="nc" id="L141">        String file = req.getParams().get(PARAM_CONFIG_FILE, null);</span>
+<span class="nc bnc" id="L142" title="All 6 branches missed.">        if (file != null &amp;&amp; !file.contains(&quot;..&quot;) &amp;&amp; !file.startsWith(&quot;/&quot;)) {</span>
+          InputStream is;
+          try {
+<span class="nc" id="L145">            is = req.getCore().getResourceLoader().openResource(file);</span>
+<span class="nc" id="L146">            rsp.add(ACTION_CONFIG_FILE,</span>
+<span class="nc" id="L147">                IOUtils.toString(is, StandardCharsets.UTF_8));</span>
+<span class="nc" id="L148">          } catch (IOException e) {</span>
+<span class="nc" id="L149">            log.debug(e);</span>
+<span class="nc" id="L150">            rsp.add(MESSAGE_ERROR, e.getMessage());</span>
+<span class="nc" id="L151">          }</span>
         }
-<span class="nc" id="L109">      } else {</span>
-<span class="nc" id="L110">        configuration = req.getParams().get(PARAM_MAPPING_CONFIGURATION);</span>
-<span class="nc" id="L111">        document = req.getParams().get(PARAM_MAPPING_DOCUMENT);</span>
-<span class="nc" id="L112">        documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);</span>
-      }
-<span class="nc bnc" id="L114" title="All 4 branches missed.">      if (configuration != null &amp;&amp; documentUrl != null) {</span>
-<span class="nc" id="L115">        InputStream stream = IOUtils.toInputStream(configuration,</span>
-            StandardCharsets.UTF_8);
-<span class="nc" id="L117">        try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {</span>
-<span class="nc" id="L118">          MtasFetchData fetchData = new MtasFetchData(</span>
-              new StringReader(documentUrl));
-<span class="nc" id="L120">          rsp.add(ACTION_MAPPING,</span>
-<span class="nc" id="L121">              tokenizer.getList(fetchData.getUrl(null, null)));</span>
-<span class="nc" id="L122">          tokenizer.close();</span>
-<span class="nc bnc" id="L123" title="All 8 branches missed.">        } catch (IOException | MtasParserException e) {</span>
-<span class="nc" id="L124">          log.debug(e);</span>
-<span class="nc" id="L125">          rsp.add(ERROR, e.getMessage());</span>
-        } finally {
-<span class="nc" id="L127">          stream.close();</span>
-<span class="nc" id="L128">        }</span>
-<span class="nc bnc" id="L129" title="All 4 branches missed.">      } else if (configuration != null &amp;&amp; document != null) {</span>
-<span class="nc" id="L130">        InputStream stream = IOUtils.toInputStream(configuration,</span>
-            StandardCharsets.UTF_8);
-<span class="nc" id="L132">        try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {</span>
-<span class="nc" id="L133">          rsp.add(ACTION_MAPPING,</span>
-<span class="nc" id="L134">              tokenizer.getList(new StringReader(document)));</span>
-<span class="nc" id="L135">          tokenizer.close();</span>
-<span class="nc bnc" id="L136" title="All 8 branches missed.">        } catch (IOException e) {</span>
-<span class="nc" id="L137">          log.debug(e);</span>
-<span class="nc" id="L138">          rsp.add(ERROR, e.getMessage());</span>
-        } finally {
-<span class="nc" id="L140">          stream.close();</span>
-<span class="nc" id="L141">        }</span>
+        // test mapping
+<span class="nc bnc" id="L154" title="All 2 branches missed.">      } else if (action.equals(ACTION_MAPPING)) {</span>
+<span class="nc" id="L155">        String configuration = null;</span>
+<span class="nc" id="L156">        String document = null;</span>
+<span class="nc" id="L157">        String documentUrl = null;</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (req.getContentStreams() != null) {</span>
+<span class="nc" id="L159">          Iterator&lt;ContentStream&gt; it = req.getContentStreams().iterator();</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">          if (it.hasNext()) {</span>
+<span class="nc" id="L161">            ContentStream cs = it.next();</span>
+<span class="nc" id="L162">            Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L163">            getParamsFromJSON(params, IOUtils.toString(cs.getReader()));</span>
+<span class="nc" id="L164">            configuration = params.get(PARAM_MAPPING_CONFIGURATION);</span>
+<span class="nc" id="L165">            document = params.get(PARAM_MAPPING_DOCUMENT);</span>
+<span class="nc" id="L166">            documentUrl = params.get(PARAM_MAPPING_DOCUMENT_URL);</span>
+          }
+<span class="nc" id="L168">        } else {</span>
+<span class="nc" id="L169">          configuration = req.getParams().get(PARAM_MAPPING_CONFIGURATION);</span>
+<span class="nc" id="L170">          document = req.getParams().get(PARAM_MAPPING_DOCUMENT);</span>
+<span class="nc" id="L171">          documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);</span>
+        }
+<span class="nc bnc" id="L173" title="All 4 branches missed.">        if (configuration != null &amp;&amp; documentUrl != null) {</span>
+<span class="nc" id="L174">          InputStream stream = IOUtils.toInputStream(configuration,</span>
+              StandardCharsets.UTF_8);
+<span class="nc" id="L176">          try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {</span>
+<span class="nc" id="L177">            MtasFetchData fetchData = new MtasFetchData(</span>
+                new StringReader(documentUrl));
+<span class="nc" id="L179">            rsp.add(ACTION_MAPPING,</span>
+<span class="nc" id="L180">                tokenizer.getList(fetchData.getUrl(null, null)));</span>
+<span class="nc" id="L181">            tokenizer.close();</span>
+<span class="nc bnc" id="L182" title="All 8 branches missed.">          } catch (IOException | MtasParserException e) {</span>
+<span class="nc" id="L183">            log.debug(e);</span>
+<span class="nc" id="L184">            rsp.add(MESSAGE_ERROR, e.getMessage());</span>
+          } finally {
+<span class="nc" id="L186">            stream.close();</span>
+<span class="nc" id="L187">          }</span>
+<span class="nc bnc" id="L188" title="All 4 branches missed.">        } else if (configuration != null &amp;&amp; document != null) {</span>
+<span class="nc" id="L189">          InputStream stream = IOUtils.toInputStream(configuration,</span>
+              StandardCharsets.UTF_8);
+<span class="nc" id="L191">          try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {</span>
+<span class="nc" id="L192">            rsp.add(ACTION_MAPPING,</span>
+<span class="nc" id="L193">                tokenizer.getList(new StringReader(document)));</span>
+<span class="nc" id="L194">            tokenizer.close();</span>
+<span class="nc bnc" id="L195" title="All 8 branches missed.">          } catch (IOException e) {</span>
+<span class="nc" id="L196">            log.debug(e);</span>
+<span class="nc" id="L197">            rsp.add(MESSAGE_ERROR, e.getMessage());</span>
+          } finally {
+<span class="nc" id="L199">            stream.close();</span>
+<span class="nc" id="L200">          }</span>
+        }
+<span class="nc bnc" id="L202" title="All 2 branches missed.">      } else if (action.equals(ACTION_RUNNING)) {</span>
+<span class="nc" id="L203">        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,</span>
+            false);
+<span class="nc" id="L205">        rsp.add(ACTION_RUNNING, running.createOutput(shardRequests));</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">      } else if (action.equals(ACTION_HISTORY)) {</span>
+<span class="nc" id="L207">        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,</span>
+            false);
+<span class="nc" id="L209">        rsp.add(ACTION_HISTORY, history.createOutput(shardRequests));</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">      } else if (action.equals(ACTION_ERROR)) {</span>
+<span class="nc" id="L211">        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,</span>
+            false);
+<span class="nc" id="L213">        rsp.add(ACTION_ERROR, error.createOutput(shardRequests));</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">      } else if (action.equals(ACTION_STATUS)) {</span>
+<span class="nc" id="L215">        String key = req.getParams().get(PARAM_KEY, null);</span>
+<span class="nc" id="L216">        String abort = req.getParams().get(PARAM_ABORT, null);</span>
+<span class="nc" id="L217">        MtasSolrStatus solrStatus = null;</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        if ((solrStatus = history.get(key)) != null</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">            || (solrStatus = running.get(key)) != null</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">            || (solrStatus = error.get(key)) != null) {</span>
+<span class="nc bnc" id="L221" title="All 4 branches missed.">          if (abort != null &amp;&amp; !solrStatus.finished()) {</span>
+<span class="nc" id="L222">            solrStatus.setError(abort);</span>
+          }
+<span class="nc" id="L224">          rsp.add(ACTION_STATUS, solrStatus.createOutput());</span>
+        } else {
+<span class="nc" id="L226">          rsp.add(ACTION_STATUS, null);</span>
+        }
       }
     }
-<span class="nc" id="L144">  }</span>
+<span class="nc" id="L230">  }</span>
 
   /**
    * Gets the files.
@@ -151,21 +237,21 @@ import mtas.analysis.util.MtasParserException;
    * @return the files
    */
   private ArrayList&lt;String&gt; getFiles(String dir, String subDir) {
-<span class="nc" id="L154">    ArrayList&lt;String&gt; files = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L155" title="All 2 branches missed.">    String fullDir = subDir == null ? dir : dir + File.separator + subDir;</span>
-<span class="nc" id="L156">    File[] listOfFiles = (new File(fullDir)).listFiles();</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">    if (listOfFiles != null) {</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">      for (File file : listOfFiles) {</span>
-<span class="nc bnc" id="L159" title="All 2 branches missed.">        String fullName = subDir == null ? file.getName()</span>
-<span class="nc" id="L160">            : subDir + File.separator + file.getName();</span>
-<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (file.isFile()) {</span>
-<span class="nc" id="L162">          files.add(fullName);</span>
-<span class="nc bnc" id="L163" title="All 2 branches missed.">        } else if (file.isDirectory()) {</span>
-<span class="nc" id="L164">          files.addAll(getFiles(dir, fullName));</span>
+<span class="nc" id="L240">    ArrayList&lt;String&gt; files = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">    String fullDir = subDir == null ? dir : dir + File.separator + subDir;</span>
+<span class="nc" id="L242">    File[] listOfFiles = (new File(fullDir)).listFiles();</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">    if (listOfFiles != null) {</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">      for (File file : listOfFiles) {</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        String fullName = subDir == null ? file.getName()</span>
+<span class="nc" id="L246">            : subDir + File.separator + file.getName();</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        if (file.isFile()) {</span>
+<span class="nc" id="L248">          files.add(fullName);</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">        } else if (file.isDirectory()) {</span>
+<span class="nc" id="L250">          files.addAll(getFiles(dir, fullName));</span>
         }
       }
     }
-<span class="nc" id="L168">    return files;</span>
+<span class="nc" id="L254">    return files;</span>
   }
 
   /*
@@ -175,7 +261,7 @@ import mtas.analysis.util.MtasParserException;
    */
   @Override
   public String getDescription() {
-<span class="nc" id="L178">    return &quot;Mtas Request Handler&quot;;</span>
+<span class="nc" id="L264">    return &quot;Mtas Request Handler&quot;;</span>
   }
 
   /**
@@ -188,37 +274,186 @@ import mtas.analysis.util.MtasParserException;
   @SuppressWarnings(&quot;unchecked&quot;)
   private static void getParamsFromJSON(Map&lt;String, String&gt; params,
       String json) {
-<span class="nc" id="L191">    JSONParser parser = new JSONParser(json);</span>
+<span class="nc" id="L277">    JSONParser parser = new JSONParser(json);</span>
     try {
-<span class="nc" id="L193">      Object o = ObjectBuilder.getVal(parser);</span>
-<span class="nc bnc" id="L194" title="All 2 branches missed.">      if (!(o instanceof Map))</span>
-<span class="nc" id="L195">        return;</span>
-<span class="nc" id="L196">      Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) o;</span>
+<span class="nc" id="L279">      Object o = ObjectBuilder.getVal(parser);</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">      if (!(o instanceof Map))</span>
+<span class="nc" id="L281">        return;</span>
+<span class="nc" id="L282">      Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) o;</span>
       // To make consistent with json.param handling, we should make query
       // params come after json params (i.e. query params should
       // appear to overwrite json params.
 
       // Solr params are based on String though, so we need to convert
-<span class="nc bnc" id="L202" title="All 2 branches missed.">      for (Map.Entry&lt;String, Object&gt; entry : map.entrySet()) {</span>
-<span class="nc" id="L203">        String key = entry.getKey();</span>
-<span class="nc" id="L204">        Object val = entry.getValue();</span>
-<span class="nc bnc" id="L205" title="All 2 branches missed.">        if (params.get(key) != null) {</span>
-<span class="nc" id="L206">          continue;</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">      for (Map.Entry&lt;String, Object&gt; entry : map.entrySet()) {</span>
+<span class="nc" id="L289">        String key = entry.getKey();</span>
+<span class="nc" id="L290">        Object val = entry.getValue();</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">        if (params.get(key) != null) {</span>
+<span class="nc" id="L292">          continue;</span>
         }
-
-<span class="nc bnc" id="L209" title="All 2 branches missed.">        if (val == null) {</span>
-<span class="nc" id="L210">          params.remove(key);</span>
-<span class="nc bnc" id="L211" title="All 2 branches missed.">        } else if (val instanceof String) {</span>
-<span class="nc" id="L212">          params.put(key, (String) val);</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        if (val == null) {</span>
+<span class="nc" id="L295">          params.remove(key);</span>
+<span class="nc bnc" id="L296" title="All 2 branches missed.">        } else if (val instanceof String) {</span>
+<span class="nc" id="L297">          params.put(key, (String) val);</span>
         }
-<span class="nc" id="L214">      }</span>
-<span class="nc" id="L215">    } catch (Exception e) {</span>
-<span class="nc" id="L216">      log.debug(</span>
+<span class="nc" id="L299">      }</span>
+<span class="nc" id="L300">    } catch (Exception e) {</span>
+<span class="nc" id="L301">      log.debug(</span>
           &quot;ignore parse exceptions at this stage, they may be caused by incomplete macro expansions&quot;,
           e);
-<span class="nc" id="L219">      return;</span>
-<span class="nc" id="L220">    }</span>
-<span class="nc" id="L221">  }</span>
+<span class="nc" id="L304">      return;</span>
+<span class="nc" id="L305">    }</span>
+<span class="nc" id="L306">  }</span>
+
+  /**
+   * Register status.
+   *
+   * @param item the item
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void registerStatus(MtasSolrStatus item) throws IOException {
+<span class="fc" id="L315">    history.add(item);</span>
+<span class="fc" id="L316">    running.add(item);</span>
+<span class="fc" id="L317">  }</span>
+
+  /**
+   * Finish status.
+   *
+   * @param item the item
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void finishStatus(MtasSolrStatus item) throws IOException {
+<span class="fc" id="L326">    running.remove(item);</span>
+<span class="pc bpc" id="L327" title="1 of 2 branches missed.">    if (item.error()) {</span>
+<span class="nc" id="L328">      error.add(item);</span>
+    }
+<span class="fc" id="L330">  }</span>
+
+  /**
+   * Check key.
+   *
+   * @param key the key
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void checkKey(String key) throws IOException {
+<span class="nc" id="L339">    history.updateKey(key);</span>
+<span class="nc" id="L340">  }</span>
+
+  /**
+   * Gets the shard information.
+   *
+   * @param shard the shard
+   * @return the shard information
+   */
+  public ShardInformation getShardInformation(String shard) {
+<span class="fc" id="L349">    ShardInformation shardInformation = shardIndex</span>
+<span class="fc" id="L350">        .get(Objects.requireNonNull(shard, &quot;shard required&quot;));</span>
+<span class="fc bfc" id="L351" title="All 2 branches covered.">    if (shardInformation == null) {</span>
+<span class="fc" id="L352">      shardInformation = createShardInformation(shard);</span>
+    }
+<span class="fc" id="L354">    return shardInformation;</span>
+  }
+
+  /**
+   * Creates the shard information.
+   *
+   * @param shard the shard
+   * @return the shard information
+   */
+  private ShardInformation createShardInformation(String shard) {
+<span class="fc" id="L364">    ShardInformation shardInformation = new ShardInformation(shard);</span>
+<span class="fc" id="L365">    SolrClient solrClient = new HttpSolrClient.Builder(shard).build();</span>
+<span class="fc" id="L366">    ModifiableSolrParams solrParams = new ModifiableSolrParams();</span>
+<span class="fc" id="L367">    solrParams.add(CommonParams.Q, &quot;*:*&quot;);</span>
+<span class="fc" id="L368">    solrParams.add(CommonParams.ROWS, &quot;0&quot;);</span>
+<span class="fc" id="L369">    solrParams.add(CommonParams.HEADER_ECHO_PARAMS, &quot;none&quot;);</span>
+<span class="fc" id="L370">    solrParams.add(ShardParams.IS_SHARD, CommonParams.TRUE);</span>
+<span class="fc" id="L371">    solrParams.add(MtasSolrSearchComponent.PARAM_MTAS, CommonParams.TRUE);</span>
+<span class="fc" id="L372">    solrParams.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS,</span>
+        CommonParams.TRUE);
+<span class="fc" id="L374">    solrParams.add(</span>
+        MtasSolrComponentStatus.PARAM_MTAS_STATUS + &quot;.&quot;
+            + MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER,
+        CommonParams.TRUE);
+<span class="fc" id="L378">    solrParams.add(</span>
+        MtasSolrComponentStatus.PARAM_MTAS_STATUS + &quot;.&quot;
+            + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS,
+        CommonParams.TRUE);
+<span class="fc" id="L382">    solrParams.add(</span>
+        MtasSolrComponentStatus.PARAM_MTAS_STATUS + &quot;.&quot;
+            + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS,
+        CommonParams.TRUE);
+    try {
+<span class="fc" id="L387">      QueryResponse response = solrClient.query(solrParams);</span>
+<span class="fc" id="L388">      Object mtasHandlerObject = Objects.requireNonNull(response.getResponse().findRecursive(</span>
+          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER), &quot;no number of segments for &quot;+shard);
+<span class="fc" id="L391">      Object numberOfSegmentsObject = Objects.requireNonNull(response.getResponse().findRecursive(</span>
+          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS), &quot;no number of documents for &quot;+shard);
+<span class="fc" id="L394">      Object numberOfDocumentsObject = Objects.requireNonNull(response.getResponse().findRecursive(</span>
+          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS), &quot;no name for &quot;+shard);
+<span class="fc" id="L397">      Object nameObject = Objects.requireNonNull(response.getResponse().findRecursive(</span>
+          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          ShardInformation.NAME_NAME), &quot;no handler for &quot;+shard);      
+<span class="pc bpc" id="L400" title="1 of 2 branches missed.">      if (mtasHandlerObject instanceof String) {</span>
+<span class="fc" id="L401">        shardInformation.mtasHandler = (String) mtasHandlerObject;</span>
+      }
+<span class="pc bpc" id="L403" title="1 of 2 branches missed.">      if (numberOfSegmentsObject instanceof Integer) {</span>
+<span class="fc" id="L404">        shardInformation.numberOfSegments = (Integer) numberOfSegmentsObject;</span>
+      }
+<span class="pc bpc" id="L406" title="1 of 2 branches missed.">      if (numberOfDocumentsObject instanceof Integer) {</span>
+<span class="fc" id="L407">        shardInformation.numberOfDocuments = ((Integer) numberOfDocumentsObject)</span>
+<span class="fc" id="L408">            .longValue();</span>
+      }
+<span class="pc bpc" id="L410" title="1 of 2 branches missed.">      if (nameObject instanceof String) {</span>
+<span class="fc" id="L411">        shardInformation.name = (String) nameObject;</span>
+      }
+<span class="fc" id="L413">      shardIndex.put(shard, shardInformation);</span>
+<span class="nc" id="L414">    } catch (NullPointerException | SolrServerException | IOException e) {</span>
+<span class="nc" id="L415">      log.error(e);</span>
+<span class="nc" id="L416">      return null;</span>
+<span class="fc" id="L417">    }</span>
+<span class="fc" id="L418">    return shardInformation;</span>
+  }
+
+  /**
+   * The Class ShardInformation.
+   */
+  public static class ShardInformation {
+
+    /** The Constant NAME_NAME. */
+    public final static String NAME_NAME = &quot;name&quot;;
+
+    /** The number of documents. */
+<span class="fc" id="L430">    public Long numberOfDocuments = null;</span>
+
+    /** The number of segments. */
+<span class="fc" id="L433">    public Integer numberOfSegments = null;</span>
+
+    /** The mtas handler. */
+<span class="fc" id="L436">    public String mtasHandler = null;</span>
+
+    /** The name. */
+<span class="fc" id="L439">    public String name = null;</span>
+
+    /** The location. */
+    private String location;
+
+    /**
+     * Instantiates a new shard information.
+     *
+     * @param location the location
+     */
+<span class="fc" id="L449">    public ShardInformation(String location) {</span>
+<span class="fc" id="L450">      this.location = location;</span>
+<span class="fc" id="L451">    }</span>
+    
+    public String location() {
+<span class="nc" id="L454">      return location;</span>
+    }
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

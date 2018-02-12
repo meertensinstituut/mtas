@@ -5,8 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.solr.core.SolrResourceLoader;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
@@ -19,7 +17,7 @@ public class MtasCharFilterFactory extends CharFilterFactory
     implements ResourceLoaderAware {
 
   /** The Constant log. */
-<span class="fc" id="L22">  private static final Log log = LogFactory.getLog(MtasCharFilterFactory.class);</span>
+<span class="fc" id="L20">  private static final Log log = LogFactory.getLog(MtasCharFilterFactory.class);</span>
 
   /** The Constant ARGUMENT_TYPE. */
   public static final String ARGUMENT_TYPE = &quot;type&quot;;
@@ -58,10 +56,10 @@ public class MtasCharFilterFactory extends CharFilterFactory
   String postfixArgument;
 
   /** The configs. */
-<span class="fc" id="L61">  private HashMap&lt;String, MtasConfiguration&gt; configs = null;</span>
+<span class="fc" id="L59">  private HashMap&lt;String, MtasConfiguration&gt; configs = null;</span>
 
   /** The config. */
-<span class="fc" id="L64">  private MtasConfiguration config = null;</span>
+<span class="fc" id="L62">  private MtasConfiguration config = null;</span>
 
   /**
    * Instantiates a new mtas char filter factory.
@@ -70,8 +68,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public MtasCharFilterFactory(Map&lt;String, String&gt; args) throws IOException {
-<span class="fc" id="L73">    this(args, null);</span>
-<span class="fc" id="L74">  }</span>
+<span class="fc" id="L71">    this(args, null);</span>
+<span class="fc" id="L72">  }</span>
 
   /**
    * Instantiates a new mtas char filter factory.
@@ -82,30 +80,30 @@ public class MtasCharFilterFactory extends CharFilterFactory
    */
   public MtasCharFilterFactory(Map&lt;String, String&gt; args,
       ResourceLoader resourceLoader) throws IOException {
-<span class="fc" id="L85">    super(args);</span>
-<span class="fc" id="L86">    typeArgument = get(args, ARGUMENT_TYPE);</span>
-<span class="fc" id="L87">    prefixArgument = get(args, ARGUMENT_PREFIX);</span>
-<span class="fc" id="L88">    postfixArgument = get(args, ARGUMENT_POSTFIX);</span>
-<span class="fc" id="L89">    configArgument = get(args, ARGUMENT_CONFIG);</span>
-<span class="fc" id="L90">    defaultArgument = get(args, ARGUMENT_DEFAULT);</span>
-<span class="pc bpc" id="L91" title="1 of 4 branches missed.">    if (typeArgument != null &amp;&amp; configArgument != null) {</span>
-<span class="nc" id="L92">      throw new IOException(this.getClass().getName() + &quot; can't have both &quot;</span>
+<span class="fc" id="L83">    super(args);</span>
+<span class="fc" id="L84">    typeArgument = get(args, ARGUMENT_TYPE);</span>
+<span class="fc" id="L85">    prefixArgument = get(args, ARGUMENT_PREFIX);</span>
+<span class="fc" id="L86">    postfixArgument = get(args, ARGUMENT_POSTFIX);</span>
+<span class="fc" id="L87">    configArgument = get(args, ARGUMENT_CONFIG);</span>
+<span class="fc" id="L88">    defaultArgument = get(args, ARGUMENT_DEFAULT);</span>
+<span class="pc bpc" id="L89" title="1 of 4 branches missed.">    if (typeArgument != null &amp;&amp; configArgument != null) {</span>
+<span class="nc" id="L90">      throw new IOException(this.getClass().getName() + &quot; can't have both &quot;</span>
           + ARGUMENT_TYPE + &quot; and &quot; + ARGUMENT_CONFIG);
-<span class="pc bpc" id="L94" title="1 of 4 branches missed.">    } else if (typeArgument == null &amp;&amp; prefixArgument != null) {</span>
-<span class="nc" id="L95">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
+<span class="pc bpc" id="L92" title="1 of 4 branches missed.">    } else if (typeArgument == null &amp;&amp; prefixArgument != null) {</span>
+<span class="nc" id="L93">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
           + ARGUMENT_PREFIX + &quot; without &quot; + ARGUMENT_TYPE);
-<span class="pc bpc" id="L97" title="1 of 4 branches missed.">    } else if (typeArgument == null &amp;&amp; postfixArgument != null) {</span>
-<span class="nc" id="L98">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
+<span class="pc bpc" id="L95" title="1 of 4 branches missed.">    } else if (typeArgument == null &amp;&amp; postfixArgument != null) {</span>
+<span class="nc" id="L96">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
           + ARGUMENT_POSTFIX + &quot; without &quot; + ARGUMENT_TYPE);
-<span class="pc bpc" id="L100" title="1 of 4 branches missed.">    } else if (configArgument == null &amp;&amp; defaultArgument != null) {</span>
-<span class="nc" id="L101">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">    } else if (configArgument == null &amp;&amp; defaultArgument != null) {</span>
+<span class="nc" id="L99">      throw new IOException(this.getClass().getName() + &quot; can't have &quot;</span>
           + ARGUMENT_DEFAULT + &quot; without &quot; + ARGUMENT_CONFIG);
-<span class="pc bpc" id="L103" title="1 of 4 branches missed.">    } else if (typeArgument == null &amp;&amp; configArgument == null) {</span>
-<span class="nc" id="L104">      throw new IOException(this.getClass().getName() + &quot; should have &quot;</span>
+<span class="pc bpc" id="L101" title="1 of 4 branches missed.">    } else if (typeArgument == null &amp;&amp; configArgument == null) {</span>
+<span class="nc" id="L102">      throw new IOException(this.getClass().getName() + &quot; should have &quot;</span>
           + ARGUMENT_TYPE + &quot; or &quot; + ARGUMENT_CONFIG);
     }
-<span class="fc" id="L107">    init(resourceLoader);</span>
-<span class="fc" id="L108">  }</span>
+<span class="fc" id="L105">    init(resourceLoader);</span>
+<span class="fc" id="L106">  }</span>
 
   /**
    * Inits the.
@@ -114,35 +112,35 @@ public class MtasCharFilterFactory extends CharFilterFactory
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private void init(ResourceLoader resourceLoader) throws IOException {
-<span class="pc bpc" id="L117" title="1 of 4 branches missed.">    if (config == null &amp;&amp; configs == null) {</span>
-<span class="pc bpc" id="L118" title="1 of 4 branches missed.">      if (typeArgument == null &amp;&amp; configArgument == null) {</span>
-<span class="nc" id="L119">        throw new IOException(&quot;no configuration&quot;);</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">    if (config == null &amp;&amp; configs == null) {</span>
+<span class="pc bpc" id="L116" title="1 of 4 branches missed.">      if (typeArgument == null &amp;&amp; configArgument == null) {</span>
+<span class="nc" id="L117">        throw new IOException(&quot;no configuration&quot;);</span>
       } else {
-<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (typeArgument != null) {</span>
-<span class="fc" id="L122">          config = new MtasConfiguration();</span>
-<span class="fc" id="L123">          config.attributes.put(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE,</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        if (typeArgument != null) {</span>
+<span class="fc" id="L120">          config = new MtasConfiguration();</span>
+<span class="fc" id="L121">          config.attributes.put(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE,</span>
               typeArgument);
-<span class="fc" id="L125">          config.attributes.put(</span>
+<span class="fc" id="L123">          config.attributes.put(</span>
               MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX,
               prefixArgument);
-<span class="fc" id="L128">          config.attributes.put(</span>
+<span class="fc" id="L126">          config.attributes.put(</span>
               MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX,
               postfixArgument);
         }
-<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (configArgument != null) {</span>
-<span class="fc bfc" id="L133" title="All 2 branches covered.">          if (resourceLoader != null) {</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (configArgument != null) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">          if (resourceLoader != null) {</span>
             try {
-<span class="fc" id="L135">              configs = MtasConfiguration.readMtasCharFilterConfigurations(</span>
+<span class="fc" id="L133">              configs = MtasConfiguration.readMtasCharFilterConfigurations(</span>
                   resourceLoader, configArgument);
-<span class="nc" id="L137">            } catch (IOException e) {</span>
-<span class="nc" id="L138">              throw new IOException(</span>
+<span class="nc" id="L135">            } catch (IOException e) {</span>
+<span class="nc" id="L136">              throw new IOException(</span>
                   &quot;problem loading configurations from &quot; + configArgument, e);
-<span class="fc" id="L140">            }</span>
+<span class="fc" id="L138">            }</span>
           }
         }
       }
     }
-<span class="fc" id="L145">  }</span>
+<span class="fc" id="L143">  }</span>
 
   /*
    * (non-Javadoc)
@@ -152,12 +150,12 @@ public class MtasCharFilterFactory extends CharFilterFactory
    */
   @Override
   public Reader create(Reader input) {
-<span class="fc" id="L155">    String configuration = null;</span>
+<span class="fc" id="L153">    String configuration = null;</span>
     try {
-<span class="fc" id="L157">      return create(input, configuration);</span>
-<span class="nc" id="L158">    } catch (IOException e) {</span>
-<span class="nc" id="L159">      log.debug(e);</span>
-<span class="nc" id="L160">      return null;</span>
+<span class="fc" id="L155">      return create(input, configuration);</span>
+<span class="nc" id="L156">    } catch (IOException e) {</span>
+<span class="nc" id="L157">      log.debug(e);</span>
+<span class="nc" id="L158">      return null;</span>
     }
   }
 
@@ -170,39 +168,39 @@ public class MtasCharFilterFactory extends CharFilterFactory
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Reader create(Reader input, String configuration) throws IOException {
-<span class="pc bpc" id="L173" title="1 of 4 branches missed.">    if (configs != null &amp;&amp; configs.size() &gt; 0) {</span>
-<span class="pc bpc" id="L174" title="3 of 4 branches missed.">      if (configuration == null &amp;&amp; defaultArgument == null) {</span>
-<span class="nc" id="L175">        throw new IOException(&quot;no (default)configuration&quot;);</span>
-<span class="pc bpc" id="L176" title="1 of 2 branches missed.">      } else if (configuration == null) {</span>
-<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (configs.get(defaultArgument) != null) {</span>
-<span class="nc" id="L178">          return create(input, configs.get(defaultArgument));</span>
+<span class="pc bpc" id="L171" title="1 of 4 branches missed.">    if (configs != null &amp;&amp; configs.size() &gt; 0) {</span>
+<span class="pc bpc" id="L172" title="3 of 4 branches missed.">      if (configuration == null &amp;&amp; defaultArgument == null) {</span>
+<span class="nc" id="L173">        throw new IOException(&quot;no (default)configuration&quot;);</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">      } else if (configuration == null) {</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">        if (configs.get(defaultArgument) != null) {</span>
+<span class="nc" id="L176">          return create(input, configs.get(defaultArgument));</span>
         } else {
-<span class="nc" id="L180">          throw new IOException(</span>
+<span class="nc" id="L178">          throw new IOException(</span>
               &quot;default configuration &quot; + defaultArgument + &quot; not available&quot;);
         }
       } else {
-<span class="fc" id="L184">        MtasConfiguration config = configs.get(configuration);</span>
-<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        if (config == null) {</span>
-<span class="nc bnc" id="L186" title="All 2 branches missed.">          if (defaultArgument != null) {</span>
-<span class="nc bnc" id="L187" title="All 2 branches missed.">            if (configs.get(defaultArgument) != null) {</span>
-<span class="nc" id="L188">              return create(input, configs.get(defaultArgument));</span>
+<span class="fc" id="L182">        MtasConfiguration config = configs.get(configuration);</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">        if (config == null) {</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">          if (defaultArgument != null) {</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            if (configs.get(defaultArgument) != null) {</span>
+<span class="nc" id="L186">              return create(input, configs.get(defaultArgument));</span>
             } else {
-<span class="nc" id="L190">              throw new IOException(&quot;configuration &quot; + configuration</span>
+<span class="nc" id="L188">              throw new IOException(&quot;configuration &quot; + configuration</span>
                   + &quot; not found and default configuration &quot; + defaultArgument
                   + &quot; not available&quot;);
             }
           } else {
-<span class="nc" id="L195">            throw new IOException(&quot;configuration &quot; + configuration</span>
+<span class="nc" id="L193">            throw new IOException(&quot;configuration &quot; + configuration</span>
                 + &quot; not available and no default configuration&quot;);
           }
         } else {
-<span class="fc" id="L199">          return create(input, config);</span>
+<span class="fc" id="L197">          return create(input, config);</span>
         }
       }
-<span class="pc bpc" id="L202" title="1 of 2 branches missed.">    } else if (config != null) {</span>
-<span class="fc" id="L203">      return create(input, config);</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">    } else if (config != null) {</span>
+<span class="fc" id="L201">      return create(input, config);</span>
     } else {
-<span class="nc" id="L205">      throw new IOException(&quot;no configuration&quot;);</span>
+<span class="nc" id="L203">      throw new IOException(&quot;no configuration&quot;);</span>
     }
 
   }
@@ -217,38 +215,38 @@ public class MtasCharFilterFactory extends CharFilterFactory
    */
   public Reader create(Reader input, MtasConfiguration config)
       throws IOException {
-<span class="fc" id="L220">    MtasFetchData fetchData = new MtasFetchData(input);</span>
-<span class="fc" id="L221">    if (config.attributes</span>
-<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        .containsKey(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)) {</span>
-<span class="fc" id="L223">      if (config.attributes.get(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)</span>
-<span class="pc bpc" id="L224" title="1 of 2 branches missed.">          .equals(VALUE_TYPE_URL)) {</span>
+<span class="fc" id="L218">    MtasFetchData fetchData = new MtasFetchData(input);</span>
+<span class="fc" id="L219">    if (config.attributes</span>
+<span class="pc bpc" id="L220" title="1 of 2 branches missed.">        .containsKey(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)) {</span>
+<span class="fc" id="L221">      if (config.attributes.get(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)</span>
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">          .equals(VALUE_TYPE_URL)) {</span>
         try {
-<span class="nc" id="L226">          return fetchData.getUrl(</span>
+<span class="nc" id="L224">          return fetchData.getUrl(</span>
               config.attributes
-<span class="nc" id="L228">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX),</span>
+<span class="nc" id="L226">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX),</span>
               config.attributes
-<span class="nc" id="L230">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));</span>
-<span class="nc" id="L231">        } catch (MtasParserException e) {</span>
-<span class="nc" id="L232">          log.debug(e);</span>
-<span class="nc" id="L233">          throw new IOException(e.getMessage());</span>
+<span class="nc" id="L228">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));</span>
+<span class="nc" id="L229">        } catch (MtasParserException e) {</span>
+<span class="nc" id="L230">          log.debug(e);</span>
+<span class="nc" id="L231">          throw new IOException(e.getMessage());</span>
         }
-<span class="fc" id="L235">      } else if (config.attributes</span>
-<span class="fc" id="L236">          .get(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)</span>
-<span class="pc bpc" id="L237" title="1 of 2 branches missed.">          .equals(VALUE_TYPE_FILE)) {</span>
+<span class="fc" id="L233">      } else if (config.attributes</span>
+<span class="fc" id="L234">          .get(MtasConfiguration.CHARFILTER_CONFIGURATION_TYPE)</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">          .equals(VALUE_TYPE_FILE)) {</span>
         try {
-<span class="fc" id="L239">          return fetchData.getFile(</span>
+<span class="fc" id="L237">          return fetchData.getFile(</span>
               config.attributes
-<span class="fc" id="L241">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX),</span>
+<span class="fc" id="L239">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_PREFIX),</span>
               config.attributes
-<span class="fc" id="L243">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));</span>
-<span class="nc" id="L244">        } catch (MtasParserException e) {</span>
-<span class="nc" id="L245">          throw new IOException(e);</span>
+<span class="fc" id="L241">                  .get(MtasConfiguration.CHARFILTER_CONFIGURATION_POSTFIX));</span>
+<span class="nc" id="L242">        } catch (MtasParserException e) {</span>
+<span class="nc" id="L243">          throw new IOException(e);</span>
         }
       } else {
-<span class="nc" id="L248">        return fetchData.getDefault();</span>
+<span class="nc" id="L246">        return fetchData.getDefault();</span>
       }
     } else {
-<span class="nc" id="L251">      return fetchData.getDefault();</span>
+<span class="nc" id="L249">      return fetchData.getDefault();</span>
     }
   }
 
@@ -260,8 +258,8 @@ public class MtasCharFilterFactory extends CharFilterFactory
    */
   @Override
   public void inform(ResourceLoader loader) throws IOException {
-<span class="fc" id="L263">    init(loader);</span>
-<span class="fc" id="L264">  }</span>
+<span class="fc" id="L261">    init(loader);</span>
+<span class="fc" id="L262">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

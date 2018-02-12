@@ -243,7 +243,7 @@ public class CodecUtil {
    */
   public static void collectField(String field, IndexSearcher searcher,
       IndexReader rawReader, ArrayList&lt;Integer&gt; fullDocList,
-      ArrayList&lt;Integer&gt; fullDocSet, ComponentField fieldStats)
+      ArrayList&lt;Integer&gt; fullDocSet, ComponentField fieldStats, Status status)
       throws IllegalAccessException, IllegalArgumentException,
       InvocationTargetException, IOException {
 <span class="pc bpc" id="L249" title="1 of 2 branches missed.">    if (fieldStats != null) {</span>
@@ -259,7 +259,7 @@ public class CodecUtil {
       }
       // collect
 <span class="fc" id="L261">      CodecCollector.collectField(field, searcher, reader, rawReader,</span>
-          fullDocList, fullDocSet, fieldStats, spansQueryWeight);
+          fullDocList, fullDocSet, fieldStats, spansQueryWeight, status);
     }
 <span class="fc" id="L264">  }</span>
 

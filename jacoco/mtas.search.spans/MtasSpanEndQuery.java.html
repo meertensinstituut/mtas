@@ -150,6 +150,11 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
 <span class="nc" id="L150">      spanWeight.extractTerms(terms);</span>
 <span class="nc" id="L151">    }</span>
 
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return spanWeight.isCacheable(arg0);
+//    }
+
   }
 
   /*
@@ -159,14 +164,14 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L163">      return true;</span>
-<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L165">      return false;</span>
-<span class="fc bfc" id="L166" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L167">      return false;</span>
-<span class="fc" id="L168">    final MtasSpanEndQuery that = (MtasSpanEndQuery) obj;</span>
-<span class="fc" id="L169">    return clause.equals(that.clause);</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L168">      return true;</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L170">      return false;</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L172">      return false;</span>
+<span class="fc" id="L173">    final MtasSpanEndQuery that = (MtasSpanEndQuery) obj;</span>
+<span class="fc" id="L174">    return clause.equals(that.clause);</span>
   }
 
   /*
@@ -176,9 +181,9 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L179">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="nc" id="L180">    h = (h * 7) ^ clause.hashCode();</span>
-<span class="nc" id="L181">    return h;</span>
+<span class="nc" id="L184">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="nc" id="L185">    h = (h * 7) ^ clause.hashCode();</span>
+<span class="nc" id="L186">    return h;</span>
   }
 
   /*
@@ -188,9 +193,9 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
    */
   @Override
   public void disableTwoPhaseIterator() {
-<span class="fc" id="L191">    super.disableTwoPhaseIterator();</span>
-<span class="fc" id="L192">    clause.disableTwoPhaseIterator();</span>
-<span class="fc" id="L193">  }</span>
+<span class="fc" id="L196">    super.disableTwoPhaseIterator();</span>
+<span class="fc" id="L197">    clause.disableTwoPhaseIterator();</span>
+<span class="fc" id="L198">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

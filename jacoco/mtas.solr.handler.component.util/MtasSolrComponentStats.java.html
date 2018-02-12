@@ -44,13 +44,20 @@ public class MtasSolrComponentStats
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
+  /** The Constant NAME. */
+  public static final String NAME = &quot;stats&quot;;
+  
+  public static final String NAME_POSITIONS = &quot;positions&quot;;
+  public static final String NAME_TOKENS = &quot;tokens&quot;;
+  public static final String NAME_SPANS = &quot;spans&quot;;
+
   /** The Constant PARAM_MTAS_STATS. */
   public static final String PARAM_MTAS_STATS = MtasSolrSearchComponent.PARAM_MTAS
-      + &quot;.stats&quot;;
+      + &quot;.&quot; + NAME;
 
   /** The Constant PARAM_MTAS_STATS_POSITIONS. */
   public static final String PARAM_MTAS_STATS_POSITIONS = PARAM_MTAS_STATS
-      + &quot;.positions&quot;;
+      + &quot;.&quot; + NAME_POSITIONS;
 
   /** The Constant NAME_MTAS_STATS_POSITIONS_FIELD. */
   public static final String NAME_MTAS_STATS_POSITIONS_FIELD = &quot;field&quot;;
@@ -69,7 +76,7 @@ public class MtasSolrComponentStats
 
   /** The Constant PARAM_MTAS_STATS_TOKENS. */
   public static final String PARAM_MTAS_STATS_TOKENS = PARAM_MTAS_STATS
-      + &quot;.tokens&quot;;
+      + &quot;.&quot; + NAME_TOKENS;
 
   /** The Constant NAME_MTAS_STATS_TOKENS_FIELD. */
   public static final String NAME_MTAS_STATS_TOKENS_FIELD = &quot;field&quot;;
@@ -88,7 +95,7 @@ public class MtasSolrComponentStats
 
   /** The Constant PARAM_MTAS_STATS_SPANS. */
   public static final String PARAM_MTAS_STATS_SPANS = PARAM_MTAS_STATS
-      + &quot;.spans&quot;;
+      + &quot;.&quot; + NAME_SPANS;
 
   /** The Constant NAME_MTAS_STATS_SPANS_FIELD. */
   public static final String NAME_MTAS_STATS_SPANS_FIELD = &quot;field&quot;;
@@ -152,9 +159,9 @@ public class MtasSolrComponentStats
    *
    * @param searchComponent the search component
    */
-<span class="fc" id="L155">  public MtasSolrComponentStats(MtasSolrSearchComponent searchComponent) {</span>
-<span class="fc" id="L156">    this.searchComponent = searchComponent;</span>
-<span class="fc" id="L157">  }</span>
+<span class="fc" id="L162">  public MtasSolrComponentStats(MtasSolrSearchComponent searchComponent) {</span>
+<span class="fc" id="L163">    this.searchComponent = searchComponent;</span>
+<span class="fc" id="L164">  }</span>
 
   /*
    * (non-Javadoc)
@@ -166,16 +173,16 @@ public class MtasSolrComponentStats
    */
   public void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="fc bfc" id="L169" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS_STATS_POSITIONS, false)) {</span>
-<span class="fc" id="L170">      preparePositions(rb, mtasFields);</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS_STATS_POSITIONS, false)) {</span>
+<span class="fc" id="L177">      preparePositions(rb, mtasFields);</span>
     }
-<span class="fc bfc" id="L172" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS_STATS_TOKENS, false)) {</span>
-<span class="fc" id="L173">      prepareTokens(rb, mtasFields);</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS_STATS_TOKENS, false)) {</span>
+<span class="fc" id="L180">      prepareTokens(rb, mtasFields);</span>
     }
-<span class="fc bfc" id="L175" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS, false)) {</span>
-<span class="fc" id="L176">      prepareSpans(rb, mtasFields);</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS, false)) {</span>
+<span class="fc" id="L183">      prepareSpans(rb, mtasFields);</span>
     }
-<span class="fc" id="L178">  }</span>
+<span class="fc" id="L185">  }</span>
 
   /**
    * Prepare positions.
@@ -186,70 +193,70 @@ public class MtasSolrComponentStats
    */
   private void preparePositions(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="fc" id="L189">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
-<span class="fc" id="L190">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
-<span class="pc bpc" id="L191" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
-<span class="fc" id="L192">      int tmpCounter = 0;</span>
-<span class="fc" id="L193">      String[] fields = new String[ids.size()];</span>
-<span class="fc" id="L194">      String[] keys = new String[ids.size()];</span>
-<span class="fc" id="L195">      String[] minima = new String[ids.size()];</span>
-<span class="fc" id="L196">      String[] maxima = new String[ids.size()];</span>
-<span class="fc" id="L197">      String[] types = new String[ids.size()];</span>
-<span class="fc bfc" id="L198" title="All 2 branches covered.">      for (String id : ids) {</span>
-<span class="fc" id="L199">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
+<span class="fc" id="L196">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="fc" id="L197">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="fc" id="L199">      int tmpCounter = 0;</span>
+<span class="fc" id="L200">      String[] fields = new String[ids.size()];</span>
+<span class="fc" id="L201">      String[] keys = new String[ids.size()];</span>
+<span class="fc" id="L202">      String[] minima = new String[ids.size()];</span>
+<span class="fc" id="L203">      String[] maxima = new String[ids.size()];</span>
+<span class="fc" id="L204">      String[] types = new String[ids.size()];</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">      for (String id : ids) {</span>
+<span class="fc" id="L206">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_FIELD, null);
-<span class="fc" id="L201">        keys[tmpCounter] = rb.req.getParams()</span>
-<span class="fc" id="L202">            .get(PARAM_MTAS_STATS_POSITIONS + &quot;.&quot; + id + &quot;.&quot;</span>
-<span class="fc" id="L203">                + NAME_MTAS_STATS_POSITIONS_KEY, String.valueOf(tmpCounter))</span>
-<span class="fc" id="L204">            .trim();</span>
-<span class="fc" id="L205">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
+<span class="fc" id="L208">        keys[tmpCounter] = rb.req.getParams()</span>
+<span class="fc" id="L209">            .get(PARAM_MTAS_STATS_POSITIONS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L210">                + NAME_MTAS_STATS_POSITIONS_KEY, String.valueOf(tmpCounter))</span>
+<span class="fc" id="L211">            .trim();</span>
+<span class="fc" id="L212">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_MINIMUM, null);
-<span class="fc" id="L207">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
+<span class="fc" id="L214">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_MAXIMUM, null);
-<span class="fc" id="L209">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
+<span class="fc" id="L216">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_POSITIONS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_TYPE, null);
-<span class="fc" id="L211">        tmpCounter++;</span>
-<span class="fc" id="L212">      }</span>
-<span class="fc" id="L213">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
-<span class="fc" id="L214">      mtasFields.doStats = true;</span>
-<span class="fc" id="L215">      mtasFields.doStatsPositions = true;</span>
-<span class="fc" id="L216">      rb.setNeedDocSet(true);</span>
-<span class="fc bfc" id="L217" title="All 2 branches covered.">      for (String field : fields) {</span>
-<span class="pc bpc" id="L218" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
-<span class="nc" id="L219">          throw new IOException(&quot;no (valid) field in mtas stats positions&quot;);</span>
-<span class="pc bpc" id="L220" title="1 of 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
-<span class="fc" id="L221">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+<span class="fc" id="L218">        tmpCounter++;</span>
+<span class="fc" id="L219">      }</span>
+<span class="fc" id="L220">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="fc" id="L221">      mtasFields.doStats = true;</span>
+<span class="fc" id="L222">      mtasFields.doStatsPositions = true;</span>
+<span class="fc" id="L223">      rb.setNeedDocSet(true);</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">      for (String field : fields) {</span>
+<span class="pc bpc" id="L225" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L226">          throw new IOException(&quot;no (valid) field in mtas stats positions&quot;);</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="fc" id="L228">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
-<span class="fc" id="L224">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
-<span class="fc" id="L225">          NAME_MTAS_STATS_POSITIONS_KEY, NAME_MTAS_STATS_POSITIONS_FIELD, true);</span>
-<span class="fc" id="L226">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
+<span class="fc" id="L231">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
+<span class="fc" id="L232">          NAME_MTAS_STATS_POSITIONS_KEY, NAME_MTAS_STATS_POSITIONS_FIELD, true);</span>
+<span class="fc" id="L233">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
           NAME_MTAS_STATS_POSITIONS_MINIMUM, NAME_MTAS_STATS_POSITIONS_FIELD,
-<span class="fc" id="L228">          false);</span>
-<span class="fc" id="L229">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
+<span class="fc" id="L235">          false);</span>
+<span class="fc" id="L236">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
           NAME_MTAS_STATS_POSITIONS_MAXIMUM, NAME_MTAS_STATS_POSITIONS_FIELD,
-<span class="fc" id="L231">          false);</span>
-<span class="fc" id="L232">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
+<span class="fc" id="L238">          false);</span>
+<span class="fc" id="L239">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
           NAME_MTAS_STATS_POSITIONS_TYPE, NAME_MTAS_STATS_POSITIONS_FIELD,
-<span class="fc" id="L234">          false);</span>
-<span class="fc bfc" id="L235" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
-<span class="fc" id="L236">        String field = fields[i];</span>
-<span class="fc" id="L237">        String key = keys[i];</span>
-<span class="pc bpc" id="L238" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
-<span class="fc" id="L239">            : types[i].trim();</span>
-<span class="pc bpc" id="L240" title="3 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
-<span class="pc" id="L241">            : Double.parseDouble(minima[i]);</span>
-<span class="pc bpc" id="L242" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
-<span class="pc" id="L243">            : Double.parseDouble(maxima[i]);</span>
+<span class="fc" id="L241">          false);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="fc" id="L243">        String field = fields[i];</span>
+<span class="fc" id="L244">        String key = keys[i];</span>
+<span class="pc bpc" id="L245" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
+<span class="fc" id="L246">            : types[i].trim();</span>
+<span class="pc bpc" id="L247" title="3 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
+<span class="pc" id="L248">            : Double.parseDouble(minima[i]);</span>
+<span class="pc bpc" id="L249" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
+<span class="pc" id="L250">            : Double.parseDouble(maxima[i]);</span>
         try {
-<span class="fc" id="L245">          mtasFields.list.get(field).statsPositionList</span>
-<span class="fc" id="L246">              .add(new ComponentPosition(key, minimum, maximum, type));</span>
-<span class="nc" id="L247">        } catch (ParseException e) {</span>
-<span class="nc" id="L248">          throw new IOException(e.getMessage());</span>
-<span class="fc" id="L249">        }</span>
+<span class="fc" id="L252">          mtasFields.list.get(field).statsPositionList</span>
+<span class="fc" id="L253">              .add(new ComponentPosition(key, minimum, maximum, type));</span>
+<span class="nc" id="L254">        } catch (ParseException e) {</span>
+<span class="nc" id="L255">          throw new IOException(e.getMessage());</span>
+<span class="fc" id="L256">        }</span>
       }
     }
-<span class="fc" id="L252">  }</span>
+<span class="fc" id="L259">  }</span>
 
   /**
    * Prepare tokens.
@@ -260,67 +267,67 @@ public class MtasSolrComponentStats
    */
   private void prepareTokens(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="fc" id="L263">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
-<span class="fc" id="L264">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_TOKENS);</span>
-<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
-<span class="fc" id="L266">      int tmpCounter = 0;</span>
-<span class="fc" id="L267">      String[] fields = new String[ids.size()];</span>
-<span class="fc" id="L268">      String[] keys = new String[ids.size()];</span>
-<span class="fc" id="L269">      String[] minima = new String[ids.size()];</span>
-<span class="fc" id="L270">      String[] maxima = new String[ids.size()];</span>
-<span class="fc" id="L271">      String[] types = new String[ids.size()];</span>
-<span class="fc bfc" id="L272" title="All 2 branches covered.">      for (String id : ids) {</span>
-<span class="fc" id="L273">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
+<span class="fc" id="L270">    Set&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="fc" id="L271">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_TOKENS);</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="fc" id="L273">      int tmpCounter = 0;</span>
+<span class="fc" id="L274">      String[] fields = new String[ids.size()];</span>
+<span class="fc" id="L275">      String[] keys = new String[ids.size()];</span>
+<span class="fc" id="L276">      String[] minima = new String[ids.size()];</span>
+<span class="fc" id="L277">      String[] maxima = new String[ids.size()];</span>
+<span class="fc" id="L278">      String[] types = new String[ids.size()];</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">      for (String id : ids) {</span>
+<span class="fc" id="L280">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD, null);
-<span class="fc" id="L275">        keys[tmpCounter] = rb.req.getParams()</span>
-<span class="fc" id="L276">            .get(PARAM_MTAS_STATS_TOKENS + &quot;.&quot; + id + &quot;.&quot;</span>
-<span class="fc" id="L277">                + NAME_MTAS_STATS_TOKENS_KEY, String.valueOf(tmpCounter))</span>
-<span class="fc" id="L278">            .trim();</span>
-<span class="fc" id="L279">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
+<span class="fc" id="L282">        keys[tmpCounter] = rb.req.getParams()</span>
+<span class="fc" id="L283">            .get(PARAM_MTAS_STATS_TOKENS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L284">                + NAME_MTAS_STATS_TOKENS_KEY, String.valueOf(tmpCounter))</span>
+<span class="fc" id="L285">            .trim();</span>
+<span class="fc" id="L286">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_MINIMUM, null);
-<span class="fc" id="L281">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
+<span class="fc" id="L288">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS</span>
             + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_MAXIMUM, null);
-<span class="fc" id="L283">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS + &quot;.&quot;</span>
+<span class="fc" id="L290">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_TOKENS + &quot;.&quot;</span>
             + id + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE, null);
-<span class="fc" id="L285">        tmpCounter++;</span>
-<span class="fc" id="L286">      }</span>
-<span class="fc" id="L287">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
-<span class="fc" id="L288">      mtasFields.doStats = true;</span>
-<span class="fc" id="L289">      mtasFields.doStatsTokens = true;</span>
-<span class="fc" id="L290">      rb.setNeedDocSet(true);</span>
-<span class="fc bfc" id="L291" title="All 2 branches covered.">      for (String field : fields) {</span>
-<span class="pc bpc" id="L292" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
-<span class="nc" id="L293">          throw new IOException(&quot;no (valid) field in mtas stats tokens&quot;);</span>
-<span class="fc bfc" id="L294" title="All 2 branches covered.">        } else if (!mtasFields.list.containsKey(field)) {</span>
-<span class="fc" id="L295">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+<span class="fc" id="L292">        tmpCounter++;</span>
+<span class="fc" id="L293">      }</span>
+<span class="fc" id="L294">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="fc" id="L295">      mtasFields.doStats = true;</span>
+<span class="fc" id="L296">      mtasFields.doStatsTokens = true;</span>
+<span class="fc" id="L297">      rb.setNeedDocSet(true);</span>
+<span class="fc bfc" id="L298" title="All 2 branches covered.">      for (String field : fields) {</span>
+<span class="pc bpc" id="L299" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L300">          throw new IOException(&quot;no (valid) field in mtas stats tokens&quot;);</span>
+<span class="fc bfc" id="L301" title="All 2 branches covered.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="fc" id="L302">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
-<span class="fc" id="L298">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
-<span class="fc" id="L299">          NAME_MTAS_STATS_TOKENS_KEY, NAME_MTAS_STATS_TOKENS_FIELD, true);</span>
-<span class="fc" id="L300">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
-<span class="fc" id="L301">          NAME_MTAS_STATS_TOKENS_MINIMUM, NAME_MTAS_STATS_TOKENS_FIELD, false);</span>
-<span class="fc" id="L302">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
-<span class="fc" id="L303">          NAME_MTAS_STATS_TOKENS_MAXIMUM, NAME_MTAS_STATS_TOKENS_FIELD, false);</span>
-<span class="fc" id="L304">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
-<span class="fc" id="L305">          NAME_MTAS_STATS_TOKENS_TYPE, NAME_MTAS_STATS_TOKENS_FIELD, false);</span>
-<span class="fc bfc" id="L306" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
-<span class="fc" id="L307">        String field = fields[i];</span>
-<span class="fc" id="L308">        String key = keys[i];</span>
-<span class="pc bpc" id="L309" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
-<span class="fc" id="L310">            : types[i].trim();</span>
-<span class="pc bpc" id="L311" title="1 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
-<span class="fc" id="L312">            : Double.parseDouble(minima[i]);</span>
-<span class="pc bpc" id="L313" title="1 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
-<span class="fc" id="L314">            : Double.parseDouble(maxima[i]);</span>
+<span class="fc" id="L305">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
+<span class="fc" id="L306">          NAME_MTAS_STATS_TOKENS_KEY, NAME_MTAS_STATS_TOKENS_FIELD, true);</span>
+<span class="fc" id="L307">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
+<span class="fc" id="L308">          NAME_MTAS_STATS_TOKENS_MINIMUM, NAME_MTAS_STATS_TOKENS_FIELD, false);</span>
+<span class="fc" id="L309">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
+<span class="fc" id="L310">          NAME_MTAS_STATS_TOKENS_MAXIMUM, NAME_MTAS_STATS_TOKENS_FIELD, false);</span>
+<span class="fc" id="L311">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
+<span class="fc" id="L312">          NAME_MTAS_STATS_TOKENS_TYPE, NAME_MTAS_STATS_TOKENS_FIELD, false);</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="fc" id="L314">        String field = fields[i];</span>
+<span class="fc" id="L315">        String key = keys[i];</span>
+<span class="pc bpc" id="L316" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
+<span class="fc" id="L317">            : types[i].trim();</span>
+<span class="pc bpc" id="L318" title="1 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
+<span class="fc" id="L319">            : Double.parseDouble(minima[i]);</span>
+<span class="pc bpc" id="L320" title="1 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
+<span class="fc" id="L321">            : Double.parseDouble(maxima[i]);</span>
         try {
-<span class="fc" id="L316">          mtasFields.list.get(field).statsTokenList</span>
-<span class="fc" id="L317">              .add(new ComponentToken(key, minimum, maximum, type));</span>
-<span class="nc" id="L318">        } catch (ParseException e) {</span>
-<span class="nc" id="L319">          throw new IOException(e.getMessage());</span>
-<span class="fc" id="L320">        }</span>
+<span class="fc" id="L323">          mtasFields.list.get(field).statsTokenList</span>
+<span class="fc" id="L324">              .add(new ComponentToken(key, minimum, maximum, type));</span>
+<span class="nc" id="L325">        } catch (ParseException e) {</span>
+<span class="nc" id="L326">          throw new IOException(e.getMessage());</span>
+<span class="fc" id="L327">        }</span>
       }
     }
-<span class="fc" id="L323">  }</span>
+<span class="fc" id="L330">  }</span>
 
   /**
    * Prepare spans.
@@ -331,249 +338,249 @@ public class MtasSolrComponentStats
    */
   private void prepareSpans(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
-<span class="fc" id="L334">    SortedSet&lt;String&gt; ids = MtasSolrResultUtil</span>
-<span class="fc" id="L335">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS);</span>
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
-<span class="fc" id="L337">      int tmpCounter = 0;</span>
-<span class="fc" id="L338">      String[] fields = new String[ids.size()];</span>
-<span class="fc" id="L339">      String[] keys = new String[ids.size()];</span>
-<span class="fc" id="L340">      String[] minima = new String[ids.size()];</span>
-<span class="fc" id="L341">      String[] maxima = new String[ids.size()];</span>
-<span class="fc" id="L342">      String[] types = new String[ids.size()];</span>
-<span class="fc" id="L343">      String[][] functionExpressions = new String[ids.size()][];</span>
-<span class="fc" id="L344">      String[][] functionKeys = new String[ids.size()][];</span>
-<span class="fc" id="L345">      String[][] functionTypes = new String[ids.size()][];</span>
-<span class="fc" id="L346">      String[][] queryTypes = new String[ids.size()][];</span>
-<span class="fc" id="L347">      String[][] queryValues = new String[ids.size()][];</span>
-<span class="fc" id="L348">      String[][] queryIgnores = new String[ids.size()][];</span>
-<span class="fc" id="L349">      String[][] queryMaximumIgnoreLengths = new String[ids.size()][];</span>
-<span class="fc" id="L350">      String[][] queryPrefixes = new String[ids.size()][];</span>
-<span class="fc" id="L351">      HashMap&lt;String, String[]&gt;[][] queryVariables = new HashMap[ids.size()][];</span>
-<span class="fc" id="L352">      Boolean[] expand = new Boolean[ids.size()];</span>
-<span class="fc bfc" id="L353" title="All 2 branches covered.">      for (String id : ids) {</span>
-<span class="fc" id="L354">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
+<span class="fc" id="L341">    SortedSet&lt;String&gt; ids = MtasSolrResultUtil</span>
+<span class="fc" id="L342">        .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS);</span>
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">    if (!ids.isEmpty()) {</span>
+<span class="fc" id="L344">      int tmpCounter = 0;</span>
+<span class="fc" id="L345">      String[] fields = new String[ids.size()];</span>
+<span class="fc" id="L346">      String[] keys = new String[ids.size()];</span>
+<span class="fc" id="L347">      String[] minima = new String[ids.size()];</span>
+<span class="fc" id="L348">      String[] maxima = new String[ids.size()];</span>
+<span class="fc" id="L349">      String[] types = new String[ids.size()];</span>
+<span class="fc" id="L350">      String[][] functionExpressions = new String[ids.size()][];</span>
+<span class="fc" id="L351">      String[][] functionKeys = new String[ids.size()][];</span>
+<span class="fc" id="L352">      String[][] functionTypes = new String[ids.size()][];</span>
+<span class="fc" id="L353">      String[][] queryTypes = new String[ids.size()][];</span>
+<span class="fc" id="L354">      String[][] queryValues = new String[ids.size()][];</span>
+<span class="fc" id="L355">      String[][] queryIgnores = new String[ids.size()][];</span>
+<span class="fc" id="L356">      String[][] queryMaximumIgnoreLengths = new String[ids.size()][];</span>
+<span class="fc" id="L357">      String[][] queryPrefixes = new String[ids.size()][];</span>
+<span class="fc" id="L358">      HashMap&lt;String, String[]&gt;[][] queryVariables = new HashMap[ids.size()][];</span>
+<span class="fc" id="L359">      Boolean[] expand = new Boolean[ids.size()];</span>
+<span class="fc bfc" id="L360" title="All 2 branches covered.">      for (String id : ids) {</span>
+<span class="fc" id="L361">        fields[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
             + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FIELD, null);
-<span class="fc" id="L356">        keys[tmpCounter] = rb.req.getParams().get(</span>
+<span class="fc" id="L363">        keys[tmpCounter] = rb.req.getParams().get(</span>
             PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_KEY,
-<span class="fc" id="L358">            String.valueOf(tmpCounter)).trim();</span>
-<span class="fc" id="L359">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
+<span class="fc" id="L365">            String.valueOf(tmpCounter)).trim();</span>
+<span class="fc" id="L366">        minima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
             + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_MINIMUM, null);
-<span class="fc" id="L361">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
+<span class="fc" id="L368">        maxima[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
             + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_MAXIMUM, null);
-<span class="fc" id="L363">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
+<span class="fc" id="L370">        types[tmpCounter] = rb.req.getParams().get(PARAM_MTAS_STATS_SPANS + &quot;.&quot;</span>
             + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_TYPE, null);
-<span class="fc" id="L365">        Set&lt;String&gt; functionIds = MtasSolrResultUtil</span>
-<span class="fc" id="L366">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
+<span class="fc" id="L372">        Set&lt;String&gt; functionIds = MtasSolrResultUtil</span>
+<span class="fc" id="L373">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
                 + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);
-<span class="fc" id="L368">        functionExpressions[tmpCounter] = new String[functionIds.size()];</span>
-<span class="fc" id="L369">        functionKeys[tmpCounter] = new String[functionIds.size()];</span>
-<span class="fc" id="L370">        functionTypes[tmpCounter] = new String[functionIds.size()];</span>
-<span class="fc" id="L371">        int tmpSubCounter = 0;</span>
-<span class="pc bpc" id="L372" title="1 of 2 branches missed.">        for (String functionId : functionIds) {</span>
-<span class="nc" id="L373">          functionKeys[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
-<span class="nc" id="L374">              .get(</span>
+<span class="fc" id="L375">        functionExpressions[tmpCounter] = new String[functionIds.size()];</span>
+<span class="fc" id="L376">        functionKeys[tmpCounter] = new String[functionIds.size()];</span>
+<span class="fc" id="L377">        functionTypes[tmpCounter] = new String[functionIds.size()];</span>
+<span class="fc" id="L378">        int tmpSubCounter = 0;</span>
+<span class="pc bpc" id="L379" title="1 of 2 branches missed.">        for (String functionId : functionIds) {</span>
+<span class="nc" id="L380">          functionKeys[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
+<span class="nc" id="L381">              .get(</span>
                   PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;
                       + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
                       + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY,
-<span class="nc" id="L378">                  String.valueOf(tmpSubCounter))</span>
-<span class="nc" id="L379">              .trim();</span>
-<span class="nc" id="L380">          functionExpressions[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
-<span class="nc" id="L381">              .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="nc" id="L385">                  String.valueOf(tmpSubCounter))</span>
+<span class="nc" id="L386">              .trim();</span>
+<span class="nc" id="L387">          functionExpressions[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
+<span class="nc" id="L388">              .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                   + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
                   + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION, null);
-<span class="nc" id="L384">          functionTypes[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
-<span class="nc" id="L385">              .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="nc" id="L391">          functionTypes[tmpCounter][tmpSubCounter] = rb.req.getParams()</span>
+<span class="nc" id="L392">              .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                   + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + functionId + &quot;.&quot;
                   + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE, null);
-<span class="nc" id="L388">          tmpSubCounter++;</span>
-<span class="nc" id="L389">        }</span>
+<span class="nc" id="L395">          tmpSubCounter++;</span>
+<span class="nc" id="L396">        }</span>
 
-<span class="fc" id="L391">        Set&lt;String&gt; qIds = MtasSolrResultUtil</span>
-<span class="fc" id="L392">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
+<span class="fc" id="L398">        Set&lt;String&gt; qIds = MtasSolrResultUtil</span>
+<span class="fc" id="L399">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
                 + &quot;.&quot; + id + &quot;.&quot; + NAME_MTAS_STATS_SPANS_QUERY);
-<span class="pc bpc" id="L394" title="1 of 2 branches missed.">        if (!qIds.isEmpty()) {</span>
-<span class="fc" id="L395">          int tmpQCounter = 0;</span>
-<span class="fc" id="L396">          queryTypes[tmpCounter] = new String[qIds.size()];</span>
-<span class="fc" id="L397">          queryValues[tmpCounter] = new String[qIds.size()];</span>
-<span class="fc" id="L398">          queryIgnores[tmpCounter] = new String[qIds.size()];</span>
-<span class="fc" id="L399">          queryMaximumIgnoreLengths[tmpCounter] = new String[qIds.size()];</span>
-<span class="fc" id="L400">          queryPrefixes[tmpCounter] = new String[qIds.size()];</span>
-<span class="fc" id="L401">          queryVariables[tmpCounter] = new HashMap[qIds.size()];</span>
-<span class="fc bfc" id="L402" title="All 2 branches covered.">          for (String qId : qIds) {</span>
-<span class="fc" id="L403">            queryTypes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="fc" id="L404">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="pc bpc" id="L401" title="1 of 2 branches missed.">        if (!qIds.isEmpty()) {</span>
+<span class="fc" id="L402">          int tmpQCounter = 0;</span>
+<span class="fc" id="L403">          queryTypes[tmpCounter] = new String[qIds.size()];</span>
+<span class="fc" id="L404">          queryValues[tmpCounter] = new String[qIds.size()];</span>
+<span class="fc" id="L405">          queryIgnores[tmpCounter] = new String[qIds.size()];</span>
+<span class="fc" id="L406">          queryMaximumIgnoreLengths[tmpCounter] = new String[qIds.size()];</span>
+<span class="fc" id="L407">          queryPrefixes[tmpCounter] = new String[qIds.size()];</span>
+<span class="fc" id="L408">          queryVariables[tmpCounter] = new HashMap[qIds.size()];</span>
+<span class="fc bfc" id="L409" title="All 2 branches covered.">          for (String qId : qIds) {</span>
+<span class="fc" id="L410">            queryTypes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="fc" id="L411">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                     + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE, null);
-<span class="fc" id="L407">            queryValues[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="fc" id="L408">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L414">            queryValues[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="fc" id="L415">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                     + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE, null);
-<span class="fc" id="L411">            queryIgnores[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="fc" id="L412">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L418">            queryIgnores[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="fc" id="L419">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                     + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE, null);
-<span class="fc" id="L415">            queryMaximumIgnoreLengths[tmpCounter][tmpQCounter] = rb.req</span>
-<span class="fc" id="L416">                .getParams().get(</span>
+<span class="fc" id="L422">            queryMaximumIgnoreLengths[tmpCounter][tmpQCounter] = rb.req</span>
+<span class="fc" id="L423">                .getParams().get(</span>
                     PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;
                         + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                         + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH,
                     null);
-<span class="fc" id="L421">            queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
-<span class="fc" id="L422">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L428">            queryPrefixes[tmpCounter][tmpQCounter] = rb.req.getParams()</span>
+<span class="fc" id="L429">                .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                     + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX, null);
-<span class="fc" id="L425">            Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="fc" id="L426">                rb.req.getParams(),</span>
+<span class="fc" id="L432">            Set&lt;String&gt; vIds = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="fc" id="L433">                rb.req.getParams(),</span>
                 PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;
                     + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                     + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
-<span class="fc" id="L430">            queryVariables[tmpCounter][tmpQCounter] = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L431" title="All 2 branches covered.">            if (!vIds.isEmpty()) {</span>
-<span class="fc" id="L432">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L433" title="All 2 branches covered.">              for (String vId : vIds) {</span>
-<span class="fc" id="L434">                String name = rb.req.getParams()</span>
-<span class="fc" id="L435">                    .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L437">            queryVariables[tmpCounter][tmpQCounter] = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L438" title="All 2 branches covered.">            if (!vIds.isEmpty()) {</span>
+<span class="fc" id="L439">              HashMap&lt;String, ArrayList&lt;String&gt;&gt; tmpVariables = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L440" title="All 2 branches covered.">              for (String vId : vIds) {</span>
+<span class="fc" id="L441">                String name = rb.req.getParams()</span>
+<span class="fc" id="L442">                    .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                         + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                         + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId
                         + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME,
                         null);
-<span class="pc bpc" id="L440" title="1 of 2 branches missed.">                if (name != null) {</span>
-<span class="pc bpc" id="L441" title="1 of 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
-<span class="fc" id="L442">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
+<span class="pc bpc" id="L447" title="1 of 2 branches missed.">                if (name != null) {</span>
+<span class="pc bpc" id="L448" title="1 of 2 branches missed.">                  if (!tmpVariables.containsKey(name)) {</span>
+<span class="fc" id="L449">                    tmpVariables.put(name, new ArrayList&lt;String&gt;());</span>
                   }
-<span class="fc" id="L444">                  String value = rb.req.getParams()</span>
-<span class="fc" id="L445">                      .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="fc" id="L451">                  String value = rb.req.getParams()</span>
+<span class="fc" id="L452">                      .get(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
                           + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + qId + &quot;.&quot;
                           + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + vId
                           + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE,
                           null);
-<span class="pc bpc" id="L450" title="1 of 2 branches missed.">                  if (value != null) {</span>
-<span class="fc" id="L451">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L452">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
-<span class="fc bfc" id="L453" title="All 2 branches covered.">                    for (int i = 0; i &lt; subList.length; i++) {</span>
-<span class="fc" id="L454">                      list.add(</span>
-<span class="fc" id="L455">                          subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
+<span class="pc bpc" id="L457" title="1 of 2 branches missed.">                  if (value != null) {</span>
+<span class="fc" id="L458">                    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L459">                    String[] subList = value.split(&quot;(?&lt;!\\\\),&quot;);</span>
+<span class="fc bfc" id="L460" title="All 2 branches covered.">                    for (int i = 0; i &lt; subList.length; i++) {</span>
+<span class="fc" id="L461">                      list.add(</span>
+<span class="fc" id="L462">                          subList[i].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
                     }
-<span class="fc" id="L457">                    tmpVariables.get(name).addAll(list);</span>
+<span class="fc" id="L464">                    tmpVariables.get(name).addAll(list);</span>
                   }
                 }
-<span class="fc" id="L460">              }</span>
-<span class="fc bfc" id="L461" title="All 2 branches covered.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
-<span class="fc" id="L462">                  .entrySet()) {</span>
-<span class="fc" id="L463">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
-<span class="fc" id="L464">                    entry.getValue()</span>
-<span class="fc" id="L465">                        .toArray(new String[entry.getValue().size()]));</span>
-<span class="fc" id="L466">              }</span>
+<span class="fc" id="L467">              }</span>
+<span class="fc bfc" id="L468" title="All 2 branches covered.">              for (Entry&lt;String, ArrayList&lt;String&gt;&gt; entry : tmpVariables</span>
+<span class="fc" id="L469">                  .entrySet()) {</span>
+<span class="fc" id="L470">                queryVariables[tmpCounter][tmpQCounter].put(entry.getKey(),</span>
+<span class="fc" id="L471">                    entry.getValue()</span>
+<span class="fc" id="L472">                        .toArray(new String[entry.getValue().size()]));</span>
+<span class="fc" id="L473">              }</span>
             }
-<span class="fc" id="L468">            tmpQCounter++;</span>
-<span class="fc" id="L469">          }</span>
-<span class="fc" id="L470">        } else {</span>
-<span class="nc" id="L471">          throw new IOException(&quot;no &quot; + NAME_MTAS_STATS_SPANS_QUERY</span>
+<span class="fc" id="L475">            tmpQCounter++;</span>
+<span class="fc" id="L476">          }</span>
+<span class="fc" id="L477">        } else {</span>
+<span class="nc" id="L478">          throw new IOException(&quot;no &quot; + NAME_MTAS_STATS_SPANS_QUERY</span>
               + &quot; for mtas stats span &quot; + id);
         }
-<span class="pc bpc" id="L474" title="1 of 2 branches missed.">        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
+<span class="pc bpc" id="L481" title="1 of 2 branches missed.">        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + id + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_EXPAND, false)) {
-<span class="nc" id="L476">          expand[tmpCounter] = true;</span>
+<span class="nc" id="L483">          expand[tmpCounter] = true;</span>
         } else {
-<span class="fc" id="L478">          expand[tmpCounter] = false;</span>
+<span class="fc" id="L485">          expand[tmpCounter] = false;</span>
         }
-<span class="fc" id="L480">        tmpCounter++;</span>
-<span class="fc" id="L481">      }</span>
-<span class="fc" id="L482">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
-<span class="fc" id="L483">      mtasFields.doStats = true;</span>
-<span class="fc" id="L484">      mtasFields.doStatsSpans = true;</span>
-<span class="fc" id="L485">      rb.setNeedDocSet(true);</span>
-<span class="fc bfc" id="L486" title="All 2 branches covered.">      for (String field : fields) {</span>
-<span class="pc bpc" id="L487" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
-<span class="nc" id="L488">          throw new IOException(&quot;no (valid) field in mtas stats spans&quot;);</span>
-<span class="fc bfc" id="L489" title="All 2 branches covered.">        } else if (!mtasFields.list.containsKey(field)) {</span>
-<span class="fc" id="L490">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
+<span class="fc" id="L487">        tmpCounter++;</span>
+<span class="fc" id="L488">      }</span>
+<span class="fc" id="L489">      String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();</span>
+<span class="fc" id="L490">      mtasFields.doStats = true;</span>
+<span class="fc" id="L491">      mtasFields.doStatsSpans = true;</span>
+<span class="fc" id="L492">      rb.setNeedDocSet(true);</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">      for (String field : fields) {</span>
+<span class="pc bpc" id="L494" title="2 of 4 branches missed.">        if (field == null || field.isEmpty()) {</span>
+<span class="nc" id="L495">          throw new IOException(&quot;no (valid) field in mtas stats spans&quot;);</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">        } else if (!mtasFields.list.containsKey(field)) {</span>
+<span class="fc" id="L497">          mtasFields.list.put(field, new ComponentField(uniqueKeyField));</span>
         }
       }
-<span class="fc" id="L493">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
-<span class="fc" id="L494">          NAME_MTAS_STATS_SPANS_KEY, NAME_MTAS_STATS_SPANS_FIELD, true);</span>
-<span class="fc" id="L495">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
-<span class="fc" id="L496">          NAME_MTAS_STATS_SPANS_MINIMUM, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
-<span class="fc" id="L497">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
-<span class="fc" id="L498">          NAME_MTAS_STATS_SPANS_MAXIMUM, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
-<span class="fc" id="L499">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
-<span class="fc" id="L500">          NAME_MTAS_STATS_SPANS_TYPE, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
-<span class="fc" id="L501">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
-<span class="fc" id="L502">          NAME_MTAS_STATS_SPANS_FUNCTION, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
+<span class="fc" id="L500">      MtasSolrResultUtil.compareAndCheck(keys, fields,</span>
+<span class="fc" id="L501">          NAME_MTAS_STATS_SPANS_KEY, NAME_MTAS_STATS_SPANS_FIELD, true);</span>
+<span class="fc" id="L502">      MtasSolrResultUtil.compareAndCheck(minima, fields,</span>
+<span class="fc" id="L503">          NAME_MTAS_STATS_SPANS_MINIMUM, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
+<span class="fc" id="L504">      MtasSolrResultUtil.compareAndCheck(maxima, fields,</span>
+<span class="fc" id="L505">          NAME_MTAS_STATS_SPANS_MAXIMUM, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
+<span class="fc" id="L506">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
+<span class="fc" id="L507">          NAME_MTAS_STATS_SPANS_TYPE, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
+<span class="fc" id="L508">      MtasSolrResultUtil.compareAndCheck(types, fields,</span>
+<span class="fc" id="L509">          NAME_MTAS_STATS_SPANS_FUNCTION, NAME_MTAS_STATS_SPANS_FIELD, false);</span>
 
-<span class="fc bfc" id="L504" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
-<span class="fc" id="L505">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
-<span class="fc" id="L506">        int queryNumber = queryValues[i].length;</span>
-<span class="fc" id="L507">        MtasSpanQuery[] ql = new MtasSpanQuery[queryNumber];</span>
-<span class="fc bfc" id="L508" title="All 2 branches covered.">        for (int j = 0; j &lt; queryNumber; j++) {</span>
-<span class="pc bpc" id="L509" title="1 of 2 branches missed.">          Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
-<span class="pc" id="L510">              ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
-<span class="fc" id="L511">          MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">      for (int i = 0; i &lt; fields.length; i++) {</span>
+<span class="fc" id="L512">        ComponentField cf = mtasFields.list.get(fields[i]);</span>
+<span class="fc" id="L513">        int queryNumber = queryValues[i].length;</span>
+<span class="fc" id="L514">        MtasSpanQuery[] ql = new MtasSpanQuery[queryNumber];</span>
+<span class="fc bfc" id="L515" title="All 2 branches covered.">        for (int j = 0; j &lt; queryNumber; j++) {</span>
+<span class="pc bpc" id="L516" title="1 of 2 branches missed.">          Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
+<span class="pc" id="L517">              ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
+<span class="fc" id="L518">          MtasSpanQuery q = MtasSolrResultUtil.constructQuery(queryValues[i][j],</span>
               queryTypes[i][j], queryPrefixes[i][j], queryVariables[i][j],
               fields[i], queryIgnores[i][j], maximumIgnoreLength);
           // minimize number of queries
-<span class="fc bfc" id="L515" title="All 2 branches covered.">          if (cf.spanQueryList.contains(q)) {</span>
-<span class="fc" id="L516">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
+<span class="fc bfc" id="L522" title="All 2 branches covered.">          if (cf.spanQueryList.contains(q)) {</span>
+<span class="fc" id="L523">            q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
           } else {
-<span class="fc" id="L518">            cf.spanQueryList.add(q);</span>
+<span class="fc" id="L525">            cf.spanQueryList.add(q);</span>
           }
-<span class="fc" id="L520">          ql[j] = q;</span>
+<span class="fc" id="L527">          ql[j] = q;</span>
         }
-<span class="pc bpc" id="L522" title="1 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
-<span class="fc" id="L523">            : Double.parseDouble(minima[i]);</span>
-<span class="pc bpc" id="L524" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
-<span class="pc" id="L525">            : Double.parseDouble(maxima[i]);</span>
-<span class="pc bpc" id="L526" title="2 of 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
-<span class="pc" id="L527">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryNumber</span>
-<span class="fc" id="L528">            : keys[i].trim();</span>
-<span class="pc bpc" id="L529" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
-<span class="fc" id="L530">            : types[i].trim();</span>
-<span class="fc" id="L531">        String[] functionKey = functionKeys[i];</span>
-<span class="fc" id="L532">        String[] functionExpression = functionExpressions[i];</span>
-<span class="fc" id="L533">        String[] functionType = functionTypes[i];</span>
+<span class="pc bpc" id="L529" title="1 of 4 branches missed.">        Double minimum = (minima[i] == null) || (minima[i].isEmpty()) ? null</span>
+<span class="fc" id="L530">            : Double.parseDouble(minima[i]);</span>
+<span class="pc bpc" id="L531" title="3 of 4 branches missed.">        Double maximum = (maxima[i] == null) || (maxima[i].isEmpty()) ? null</span>
+<span class="pc" id="L532">            : Double.parseDouble(maxima[i]);</span>
+<span class="pc bpc" id="L533" title="2 of 4 branches missed.">        String key = (keys[i] == null) || (keys[i].isEmpty())</span>
+<span class="pc" id="L534">            ? String.valueOf(i) + &quot;:&quot; + fields[i] + &quot;:&quot; + queryNumber</span>
+<span class="fc" id="L535">            : keys[i].trim();</span>
+<span class="pc bpc" id="L536" title="2 of 4 branches missed.">        String type = (types[i] == null) || (types[i].isEmpty()) ? null</span>
+<span class="fc" id="L537">            : types[i].trim();</span>
+<span class="fc" id="L538">        String[] functionKey = functionKeys[i];</span>
+<span class="fc" id="L539">        String[] functionExpression = functionExpressions[i];</span>
+<span class="fc" id="L540">        String[] functionType = functionTypes[i];</span>
         try {
-<span class="fc" id="L535">          mtasFields.list.get(fields[i]).statsSpanList</span>
-<span class="fc" id="L536">              .add(new ComponentSpan(ql, key, minimum, maximum, type,</span>
+<span class="fc" id="L542">          mtasFields.list.get(fields[i]).statsSpanList</span>
+<span class="fc" id="L543">              .add(new ComponentSpan(ql, key, minimum, maximum, type,</span>
                   functionKey, functionExpression, functionType));
-<span class="nc" id="L538">        } catch (ParseException e) {</span>
-<span class="nc" id="L539">          throw new IOException(e.getMessage());</span>
-<span class="fc" id="L540">        }</span>
-<span class="pc bpc" id="L541" title="1 of 2 branches missed.">        if (expand[i]) {</span>
-<span class="nc" id="L542">          HashMap&lt;String, String[]&gt;[][] expandedQueryVariables = expandedQueryVariables(</span>
+<span class="nc" id="L545">        } catch (ParseException e) {</span>
+<span class="nc" id="L546">          throw new IOException(e.getMessage());</span>
+<span class="fc" id="L547">        }</span>
+<span class="pc bpc" id="L548" title="1 of 2 branches missed.">        if (expand[i]) {</span>
+<span class="nc" id="L549">          HashMap&lt;String, String[]&gt;[][] expandedQueryVariables = expandedQueryVariables(</span>
               queryVariables[i]);
-<span class="nc bnc" id="L544" title="All 2 branches missed.">          for (int e = 0; e &lt; expandedQueryVariables.length; e++) {</span>
-<span class="nc" id="L545">            MtasSpanQuery[] eql = new MtasSpanQuery[queryNumber];</span>
-<span class="nc bnc" id="L546" title="All 2 branches missed.">            for (int j = 0; j &lt; queryNumber; j++) {</span>
-<span class="nc bnc" id="L547" title="All 2 branches missed.">              Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
-<span class="nc" id="L548">                  ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
-<span class="nc" id="L549">              MtasSpanQuery q = MtasSolrResultUtil.constructQuery(</span>
+<span class="nc bnc" id="L551" title="All 2 branches missed.">          for (int e = 0; e &lt; expandedQueryVariables.length; e++) {</span>
+<span class="nc" id="L552">            MtasSpanQuery[] eql = new MtasSpanQuery[queryNumber];</span>
+<span class="nc bnc" id="L553" title="All 2 branches missed.">            for (int j = 0; j &lt; queryNumber; j++) {</span>
+<span class="nc bnc" id="L554" title="All 2 branches missed.">              Integer maximumIgnoreLength = (queryMaximumIgnoreLengths[i][j] == null)</span>
+<span class="nc" id="L555">                  ? null : Integer.parseInt(queryMaximumIgnoreLengths[i][j]);</span>
+<span class="nc" id="L556">              MtasSpanQuery q = MtasSolrResultUtil.constructQuery(</span>
                   queryValues[i][j], queryTypes[i][j], queryPrefixes[i][j],
                   expandedQueryVariables[e][j], fields[i], queryIgnores[i][j],
                   maximumIgnoreLength);
               // minimize number of queries
-<span class="nc bnc" id="L554" title="All 2 branches missed.">              if (cf.spanQueryList.contains(q)) {</span>
-<span class="nc" id="L555">                q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
+<span class="nc bnc" id="L561" title="All 2 branches missed.">              if (cf.spanQueryList.contains(q)) {</span>
+<span class="nc" id="L562">                q = cf.spanQueryList.get(cf.spanQueryList.indexOf(q));</span>
               } else {
-<span class="nc" id="L557">                cf.spanQueryList.add(q);</span>
+<span class="nc" id="L564">                cf.spanQueryList.add(q);</span>
               }
-<span class="nc" id="L559">              eql[j] = q;</span>
+<span class="nc" id="L566">              eql[j] = q;</span>
             }
-<span class="nc" id="L561">            String newKey = generateKey(key + &quot; (&quot; + e + &quot;)&quot;,</span>
+<span class="nc" id="L568">            String newKey = generateKey(key + &quot; (&quot; + e + &quot;)&quot;,</span>
                 expandedQueryVariables[e]);
             try {
-<span class="nc" id="L564">              mtasFields.list.get(fields[i]).statsSpanList</span>
-<span class="nc" id="L565">                  .add(new ComponentSpan(eql, newKey, minimum, maximum, type,</span>
+<span class="nc" id="L571">              mtasFields.list.get(fields[i]).statsSpanList</span>
+<span class="nc" id="L572">                  .add(new ComponentSpan(eql, newKey, minimum, maximum, type,</span>
                       functionKey, functionExpression, functionType));
-<span class="nc" id="L567">            } catch (ParseException ee) {</span>
-<span class="nc" id="L568">              throw new IOException(ee.getMessage());</span>
-<span class="nc" id="L569">            }</span>
+<span class="nc" id="L574">            } catch (ParseException ee) {</span>
+<span class="nc" id="L575">              throw new IOException(ee.getMessage());</span>
+<span class="nc" id="L576">            }</span>
           }
         }
       }
-<span class="fc" id="L573">    } else {</span>
-<span class="nc" id="L574">      throw new IOException(&quot;missing parameters stats spans&quot;);</span>
+<span class="fc" id="L580">    } else {</span>
+<span class="nc" id="L581">      throw new IOException(&quot;missing parameters stats spans&quot;);</span>
     }
-<span class="fc" id="L576">  }</span>
+<span class="fc" id="L583">  }</span>
 
   /**
    * Generate key.
@@ -584,23 +591,23 @@ public class MtasSolrComponentStats
    */
   private String generateKey(String key,
       HashMap&lt;String, String[]&gt;[] queryVariables) {
-<span class="nc" id="L587">    StringBuilder newKey = new StringBuilder(key);</span>
-<span class="nc" id="L588">    newKey.append(&quot; -&quot;);</span>
-<span class="nc bnc" id="L589" title="All 2 branches missed.">    for (int q = 0; q &lt; queryVariables.length; q++) {</span>
-<span class="nc bnc" id="L590" title="All 4 branches missed.">      if (queryVariables[q] != null &amp;&amp; queryVariables[q].size() &gt; 0) {</span>
-<span class="nc bnc" id="L591" title="All 2 branches missed.">        for (String name : queryVariables[q].keySet()) {</span>
-<span class="nc" id="L592">          newKey.append(&quot; q&quot; + q + &quot;:$&quot; + name + &quot;=&quot;);</span>
-<span class="nc bnc" id="L593" title="All 2 branches missed.">          if (queryVariables[q].get(name) != null</span>
-<span class="nc bnc" id="L594" title="All 2 branches missed.">              &amp;&amp; queryVariables[q].get(name).length == 1) {</span>
-<span class="nc" id="L595">            newKey.append(&quot;'&quot; + queryVariables[q].get(name)[0]</span>
-<span class="nc" id="L596">                .replace(&quot;\\&quot;, &quot;\\\\&quot;).replace(&quot;,&quot;, &quot;\\,&quot;) + &quot;'&quot;);</span>
+<span class="nc" id="L594">    StringBuilder newKey = new StringBuilder(key);</span>
+<span class="nc" id="L595">    newKey.append(&quot; -&quot;);</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">    for (int q = 0; q &lt; queryVariables.length; q++) {</span>
+<span class="nc bnc" id="L597" title="All 4 branches missed.">      if (queryVariables[q] != null &amp;&amp; queryVariables[q].size() &gt; 0) {</span>
+<span class="nc bnc" id="L598" title="All 2 branches missed.">        for (String name : queryVariables[q].keySet()) {</span>
+<span class="nc" id="L599">          newKey.append(&quot; q&quot; + q + &quot;:$&quot; + name + &quot;=&quot;);</span>
+<span class="nc bnc" id="L600" title="All 2 branches missed.">          if (queryVariables[q].get(name) != null</span>
+<span class="nc bnc" id="L601" title="All 2 branches missed.">              &amp;&amp; queryVariables[q].get(name).length == 1) {</span>
+<span class="nc" id="L602">            newKey.append(&quot;'&quot; + queryVariables[q].get(name)[0]</span>
+<span class="nc" id="L603">                .replace(&quot;\\&quot;, &quot;\\\\&quot;).replace(&quot;,&quot;, &quot;\\,&quot;) + &quot;'&quot;);</span>
           } else {
-<span class="nc" id="L598">            newKey.append(&quot;-&quot;);</span>
+<span class="nc" id="L605">            newKey.append(&quot;-&quot;);</span>
           }
-<span class="nc" id="L600">        }</span>
+<span class="nc" id="L607">        }</span>
       }
     }
-<span class="nc" id="L603">    return newKey.toString();</span>
+<span class="nc" id="L610">    return newKey.toString();</span>
   }
 
   /**
@@ -611,13 +618,13 @@ public class MtasSolrComponentStats
    */
   private HashMap&lt;String, String[]&gt;[][] expandedQueryVariables(
       HashMap&lt;String, String[]&gt;[] queryVariables) {
-<span class="nc" id="L614">    HashMap&lt;String, String[]&gt;[][] subResult = new HashMap[queryVariables.length][];</span>
-<span class="nc bnc" id="L615" title="All 2 branches missed.">    for (int q = 0; q &lt; queryVariables.length; q++) {</span>
-<span class="nc" id="L616">      subResult[q] = expandedQueryVariables(queryVariables[q]);</span>
+<span class="nc" id="L621">    HashMap&lt;String, String[]&gt;[][] subResult = new HashMap[queryVariables.length][];</span>
+<span class="nc bnc" id="L622" title="All 2 branches missed.">    for (int q = 0; q &lt; queryVariables.length; q++) {</span>
+<span class="nc" id="L623">      subResult[q] = expandedQueryVariables(queryVariables[q]);</span>
     }
-<span class="nc" id="L618">    ArrayList&lt;HashMap&lt;String, String[]&gt;[]&gt; result = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L619">    generatePermutations(result, 0, subResult);</span>
-<span class="nc" id="L620">    return result.toArray(new HashMap[result.size()][]);</span>
+<span class="nc" id="L625">    ArrayList&lt;HashMap&lt;String, String[]&gt;[]&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L626">    generatePermutations(result, 0, subResult);</span>
+<span class="nc" id="L627">    return result.toArray(new HashMap[result.size()][]);</span>
   }
 
   /**
@@ -630,31 +637,31 @@ public class MtasSolrComponentStats
   private void generatePermutations(
       ArrayList&lt;HashMap&lt;String, String[]&gt;[]&gt; result, int index,
       HashMap&lt;String, String[]&gt;[][] subResult) {
-<span class="nc" id="L633">    int localIndex = index;</span>
-<span class="nc" id="L634">    HashMap&lt;String, String[]&gt;[] value = subResult[localIndex];</span>
-<span class="nc bnc" id="L635" title="All 2 branches missed.">    if (localIndex == 0) {</span>
-<span class="nc bnc" id="L636" title="All 2 branches missed.">      for (int i = 0; i &lt; value.length; i++) {</span>
-<span class="nc" id="L637">        HashMap&lt;String, String[]&gt;[] resultItem = new HashMap[subResult.length];</span>
-<span class="nc" id="L638">        resultItem[localIndex] = value[i];</span>
-<span class="nc" id="L639">        result.add(resultItem);</span>
+<span class="nc" id="L640">    int localIndex = index;</span>
+<span class="nc" id="L641">    HashMap&lt;String, String[]&gt;[] value = subResult[localIndex];</span>
+<span class="nc bnc" id="L642" title="All 2 branches missed.">    if (localIndex == 0) {</span>
+<span class="nc bnc" id="L643" title="All 2 branches missed.">      for (int i = 0; i &lt; value.length; i++) {</span>
+<span class="nc" id="L644">        HashMap&lt;String, String[]&gt;[] resultItem = new HashMap[subResult.length];</span>
+<span class="nc" id="L645">        resultItem[localIndex] = value[i];</span>
+<span class="nc" id="L646">        result.add(resultItem);</span>
       }
     } else {
-<span class="nc" id="L642">      ArrayList&lt;HashMap&lt;String, String[]&gt;[]&gt; newResult = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L643" title="All 2 branches missed.">      for (int e = 0; e &lt; result.size(); e++) {</span>
-<span class="nc bnc" id="L644" title="All 2 branches missed.">        for (int i = 0; i &lt; value.length; i++) {</span>
-<span class="nc" id="L645">          HashMap&lt;String, String[]&gt;[] resultItem = result.get(e);</span>
-<span class="nc" id="L646">          resultItem[localIndex] = value[i];</span>
-<span class="nc" id="L647">          newResult.add(resultItem);</span>
+<span class="nc" id="L649">      ArrayList&lt;HashMap&lt;String, String[]&gt;[]&gt; newResult = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L650" title="All 2 branches missed.">      for (int e = 0; e &lt; result.size(); e++) {</span>
+<span class="nc bnc" id="L651" title="All 2 branches missed.">        for (int i = 0; i &lt; value.length; i++) {</span>
+<span class="nc" id="L652">          HashMap&lt;String, String[]&gt;[] resultItem = result.get(e);</span>
+<span class="nc" id="L653">          resultItem[localIndex] = value[i];</span>
+<span class="nc" id="L654">          newResult.add(resultItem);</span>
         }
       }
-<span class="nc" id="L650">      result.clear();</span>
-<span class="nc" id="L651">      result.addAll(newResult);</span>
+<span class="nc" id="L657">      result.clear();</span>
+<span class="nc" id="L658">      result.addAll(newResult);</span>
     }
-<span class="nc" id="L653">    localIndex++;</span>
-<span class="nc bnc" id="L654" title="All 2 branches missed.">    if (localIndex &lt; subResult.length) {</span>
-<span class="nc" id="L655">      generatePermutations(result, localIndex, subResult);</span>
+<span class="nc" id="L660">    localIndex++;</span>
+<span class="nc bnc" id="L661" title="All 2 branches missed.">    if (localIndex &lt; subResult.length) {</span>
+<span class="nc" id="L662">      generatePermutations(result, localIndex, subResult);</span>
     }
-<span class="nc" id="L657">  }</span>
+<span class="nc" id="L664">  }</span>
 
   /**
    * Expanded query variables.
@@ -664,10 +671,10 @@ public class MtasSolrComponentStats
    */
   private HashMap&lt;String, String[]&gt;[] expandedQueryVariables(
       HashMap&lt;String, String[]&gt; queryVariables) {
-<span class="nc" id="L667">    ArrayList&lt;HashMap&lt;String, String[]&gt;&gt; result = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L668">    Set&lt;String&gt; keys = queryVariables.keySet();</span>
-<span class="nc" id="L669">    generatePermutationsQueryVariables(result, keys, queryVariables);</span>
-<span class="nc" id="L670">    return result.toArray(new HashMap[result.size()]);</span>
+<span class="nc" id="L674">    ArrayList&lt;HashMap&lt;String, String[]&gt;&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L675">    Set&lt;String&gt; keys = queryVariables.keySet();</span>
+<span class="nc" id="L676">    generatePermutationsQueryVariables(result, keys, queryVariables);</span>
+<span class="nc" id="L677">    return result.toArray(new HashMap[result.size()]);</span>
   }
 
   /**
@@ -680,49 +687,49 @@ public class MtasSolrComponentStats
   private void generatePermutationsQueryVariables(
       ArrayList&lt;HashMap&lt;String, String[]&gt;&gt; result, Set&lt;String&gt; keys,
       HashMap&lt;String, String[]&gt; queryVariables) {
-<span class="nc bnc" id="L683" title="All 4 branches missed.">    if (keys != null &amp;&amp; !keys.isEmpty()) {</span>
-<span class="nc" id="L684">      Set&lt;String&gt; newKeys = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L685">      Iterator&lt;String&gt; it = keys.iterator();</span>
-<span class="nc" id="L686">      String key = it.next();</span>
-<span class="nc" id="L687">      String[] value = queryVariables.get(key);</span>
-<span class="nc bnc" id="L688" title="All 2 branches missed.">      if (result.isEmpty()) {</span>
+<span class="nc bnc" id="L690" title="All 4 branches missed.">    if (keys != null &amp;&amp; !keys.isEmpty()) {</span>
+<span class="nc" id="L691">      Set&lt;String&gt; newKeys = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L692">      Iterator&lt;String&gt; it = keys.iterator();</span>
+<span class="nc" id="L693">      String key = it.next();</span>
+<span class="nc" id="L694">      String[] value = queryVariables.get(key);</span>
+<span class="nc bnc" id="L695" title="All 2 branches missed.">      if (result.isEmpty()) {</span>
         HashMap&lt;String, String[]&gt; newItem;
-<span class="nc bnc" id="L690" title="All 4 branches missed.">        if (value == null || value.length == 0) {</span>
-<span class="nc" id="L691">          newItem = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L692">          newItem.put(key, value);</span>
-<span class="nc" id="L693">          result.add(newItem);</span>
+<span class="nc bnc" id="L697" title="All 4 branches missed.">        if (value == null || value.length == 0) {</span>
+<span class="nc" id="L698">          newItem = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L699">          newItem.put(key, value);</span>
+<span class="nc" id="L700">          result.add(newItem);</span>
         } else {
-<span class="nc bnc" id="L695" title="All 2 branches missed.">          for (int j = 0; j &lt; value.length; j++) {</span>
-<span class="nc" id="L696">            newItem = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L697">            newItem.put(key, new String[] { value[j] });</span>
-<span class="nc" id="L698">            result.add(newItem);</span>
+<span class="nc bnc" id="L702" title="All 2 branches missed.">          for (int j = 0; j &lt; value.length; j++) {</span>
+<span class="nc" id="L703">            newItem = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L704">            newItem.put(key, new String[] { value[j] });</span>
+<span class="nc" id="L705">            result.add(newItem);</span>
           }
         }
       } else {
-<span class="nc" id="L702">        ArrayList&lt;HashMap&lt;String, String[]&gt;&gt; newResult = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L703" title="All 2 branches missed.">        for (int i = 0; i &lt; result.size(); i++) {</span>
+<span class="nc" id="L709">        ArrayList&lt;HashMap&lt;String, String[]&gt;&gt; newResult = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L710" title="All 2 branches missed.">        for (int i = 0; i &lt; result.size(); i++) {</span>
           HashMap&lt;String, String[]&gt; newItem;
-<span class="nc bnc" id="L705" title="All 4 branches missed.">          if (value == null || value.length == 0) {</span>
-<span class="nc" id="L706">            newItem = (HashMap&lt;String, String[]&gt;) result.get(i).clone();</span>
-<span class="nc" id="L707">            newItem.put(key, value);</span>
-<span class="nc" id="L708">            newResult.add(newItem);</span>
+<span class="nc bnc" id="L712" title="All 4 branches missed.">          if (value == null || value.length == 0) {</span>
+<span class="nc" id="L713">            newItem = (HashMap&lt;String, String[]&gt;) result.get(i).clone();</span>
+<span class="nc" id="L714">            newItem.put(key, value);</span>
+<span class="nc" id="L715">            newResult.add(newItem);</span>
           } else {
-<span class="nc bnc" id="L710" title="All 2 branches missed.">            for (int j = 0; j &lt; value.length; j++) {</span>
-<span class="nc" id="L711">              newItem = (HashMap&lt;String, String[]&gt;) result.get(i).clone();</span>
-<span class="nc" id="L712">              newItem.put(key, new String[] { value[j] });</span>
-<span class="nc" id="L713">              newResult.add(newItem);</span>
+<span class="nc bnc" id="L717" title="All 2 branches missed.">            for (int j = 0; j &lt; value.length; j++) {</span>
+<span class="nc" id="L718">              newItem = (HashMap&lt;String, String[]&gt;) result.get(i).clone();</span>
+<span class="nc" id="L719">              newItem.put(key, new String[] { value[j] });</span>
+<span class="nc" id="L720">              newResult.add(newItem);</span>
             }
           }
         }
-<span class="nc" id="L717">        result.clear();</span>
-<span class="nc" id="L718">        result.addAll(newResult);</span>
+<span class="nc" id="L724">        result.clear();</span>
+<span class="nc" id="L725">        result.addAll(newResult);</span>
       }
-<span class="nc bnc" id="L720" title="All 2 branches missed.">      while (it.hasNext()) {</span>
-<span class="nc" id="L721">        newKeys.add(it.next());</span>
+<span class="nc bnc" id="L727" title="All 2 branches missed.">      while (it.hasNext()) {</span>
+<span class="nc" id="L728">        newKeys.add(it.next());</span>
       }
-<span class="nc" id="L723">      generatePermutationsQueryVariables(result, newKeys, queryVariables);</span>
+<span class="nc" id="L730">      generatePermutationsQueryVariables(result, newKeys, queryVariables);</span>
     }
-<span class="nc" id="L725">  }</span>
+<span class="nc" id="L732">  }</span>
 
   /*
    * (non-Javadoc)
@@ -735,107 +742,107 @@ public class MtasSolrComponentStats
    */
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-<span class="fc bfc" id="L738" title="All 2 branches covered.">    if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
+<span class="fc bfc" id="L745" title="All 2 branches covered.">    if ((sreq.purpose &amp; ShardRequest.PURPOSE_GET_TOP_IDS) != 0) {</span>
       // do nothing
     } else {
       // remove stats for other requests
-<span class="fc" id="L742">      sreq.params.remove(PARAM_MTAS_STATS);</span>
-<span class="fc" id="L743">      sreq.params.remove(PARAM_MTAS_STATS_POSITIONS);</span>
-<span class="fc" id="L744">      Set&lt;String&gt; keys = MtasSolrResultUtil</span>
-<span class="fc" id="L745">          .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
-<span class="fc bfc" id="L746" title="All 2 branches covered.">      for (String key : keys) {</span>
-<span class="fc" id="L747">        sreq.params.remove(</span>
+<span class="fc" id="L749">      sreq.params.remove(PARAM_MTAS_STATS);</span>
+<span class="fc" id="L750">      sreq.params.remove(PARAM_MTAS_STATS_POSITIONS);</span>
+<span class="fc" id="L751">      Set&lt;String&gt; keys = MtasSolrResultUtil</span>
+<span class="fc" id="L752">          .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_POSITIONS);</span>
+<span class="fc bfc" id="L753" title="All 2 branches covered.">      for (String key : keys) {</span>
+<span class="fc" id="L754">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_POSITIONS_KEY);
-<span class="fc" id="L749">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L756">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_FIELD);
-<span class="fc" id="L751">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L758">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_TYPE);
-<span class="fc" id="L753">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L760">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_MAXIMUM);
-<span class="fc" id="L755">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L762">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_POSITIONS_MINIMUM);
-<span class="fc" id="L757">      }</span>
-<span class="fc" id="L758">      sreq.params.remove(PARAM_MTAS_STATS_TOKENS);</span>
-<span class="fc" id="L759">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="fc" id="L764">      }</span>
+<span class="fc" id="L765">      sreq.params.remove(PARAM_MTAS_STATS_TOKENS);</span>
+<span class="fc" id="L766">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
           PARAM_MTAS_STATS_TOKENS);
-<span class="fc bfc" id="L761" title="All 2 branches covered.">      for (String key : keys) {</span>
-<span class="fc" id="L762">        sreq.params.remove(</span>
+<span class="fc bfc" id="L768" title="All 2 branches covered.">      for (String key : keys) {</span>
+<span class="fc" id="L769">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_KEY);
-<span class="fc" id="L764">        sreq.params.remove(</span>
+<span class="fc" id="L771">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_FIELD);
-<span class="fc" id="L766">        sreq.params.remove(</span>
+<span class="fc" id="L773">        sreq.params.remove(</span>
             PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_TOKENS_TYPE);
-<span class="fc" id="L768">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L775">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_TOKENS_MAXIMUM);
-<span class="fc" id="L770">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L777">        sreq.params.remove(PARAM_MTAS_STATS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_TOKENS_MINIMUM);
-<span class="fc" id="L772">      }</span>
-<span class="fc" id="L773">      sreq.params.remove(PARAM_MTAS_STATS_SPANS);</span>
-<span class="fc" id="L774">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="fc" id="L779">      }</span>
+<span class="fc" id="L780">      sreq.params.remove(PARAM_MTAS_STATS_SPANS);</span>
+<span class="fc" id="L781">      keys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
           PARAM_MTAS_STATS_SPANS);
-<span class="fc bfc" id="L776" title="All 2 branches covered.">      for (String key : keys) {</span>
-<span class="fc" id="L777">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc bfc" id="L783" title="All 2 branches covered.">      for (String key : keys) {</span>
+<span class="fc" id="L784">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_KEY);
-<span class="fc" id="L779">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L786">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_FIELD);
-<span class="fc" id="L781">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L788">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_TYPE);
-<span class="fc" id="L783">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L790">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_MAXIMUM);
-<span class="fc" id="L785">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L792">        sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
             + NAME_MTAS_STATS_SPANS_MINIMUM);
-<span class="fc" id="L787">        Set&lt;String&gt; subKeys = MtasSolrResultUtil</span>
-<span class="fc" id="L788">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
+<span class="fc" id="L794">        Set&lt;String&gt; subKeys = MtasSolrResultUtil</span>
+<span class="fc" id="L795">            .getIdsFromParameters(rb.req.getParams(), PARAM_MTAS_STATS_SPANS</span>
                 + &quot;.&quot; + key + &quot;.&quot; + NAME_MTAS_STATS_SPANS_FUNCTION);
-<span class="pc bpc" id="L790" title="1 of 2 branches missed.">        for (String subKey : subKeys) {</span>
-<span class="nc" id="L791">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="pc bpc" id="L797" title="1 of 2 branches missed.">        for (String subKey : subKeys) {</span>
+<span class="nc" id="L798">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION);
-<span class="nc" id="L794">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L801">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY);
-<span class="nc" id="L797">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="nc" id="L804">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_FUNCTION + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE);
-<span class="nc" id="L800">        }</span>
-<span class="fc" id="L801">        subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
+<span class="nc" id="L807">        }</span>
+<span class="fc" id="L808">        subKeys = MtasSolrResultUtil.getIdsFromParameters(rb.req.getParams(),</span>
             PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;
                 + NAME_MTAS_STATS_SPANS_QUERY);
-<span class="fc bfc" id="L804" title="All 2 branches covered.">        for (String subKey : subKeys) {</span>
-<span class="fc" id="L805">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc bfc" id="L811" title="All 2 branches covered.">        for (String subKey : subKeys) {</span>
+<span class="fc" id="L812">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE);
-<span class="fc" id="L808">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L815">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH);
-<span class="fc" id="L811">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L818">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX);
-<span class="fc" id="L814">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L821">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE);
-<span class="fc" id="L817">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L824">          sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
               + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
               + SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE);
-<span class="fc" id="L820">          Set&lt;String&gt; subSubKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
-<span class="fc" id="L821">              rb.req.getParams(),</span>
+<span class="fc" id="L827">          Set&lt;String&gt; subSubKeys = MtasSolrResultUtil.getIdsFromParameters(</span>
+<span class="fc" id="L828">              rb.req.getParams(),</span>
               PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;
                   + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                   + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE);
-<span class="fc bfc" id="L825" title="All 2 branches covered.">          for (String subSubKey : subSubKeys) {</span>
-<span class="fc" id="L826">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc bfc" id="L832" title="All 2 branches covered.">          for (String subSubKey : subSubKeys) {</span>
+<span class="fc" id="L833">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                 + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey
                 + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME);
-<span class="fc" id="L830">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
+<span class="fc" id="L837">            sreq.params.remove(PARAM_MTAS_STATS_SPANS + &quot;.&quot; + key + &quot;.&quot;</span>
                 + NAME_MTAS_STATS_SPANS_QUERY + &quot;.&quot; + subKey + &quot;.&quot;
                 + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE + &quot;.&quot; + subSubKey
                 + &quot;.&quot; + SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE);
-<span class="fc" id="L834">          }</span>
-<span class="fc" id="L835">        }</span>
-<span class="fc" id="L836">      }</span>
+<span class="fc" id="L841">          }</span>
+<span class="fc" id="L842">        }</span>
+<span class="fc" id="L843">      }</span>
     }
-<span class="fc" id="L838">  }</span>
+<span class="fc" id="L845">  }</span>
 
   /*
    * (non-Javadoc)
@@ -847,14 +854,14 @@ public class MtasSolrComponentStats
   @Override
   public SimpleOrderedMap&lt;Object&gt; create(ComponentStats response,
       Boolean encode) throws IOException {
-<span class="fc bfc" id="L850" title="All 2 branches covered.">    if (response instanceof ComponentPosition) {</span>
-<span class="fc" id="L851">      return createPosition((ComponentPosition) response, encode);</span>
-<span class="fc bfc" id="L852" title="All 2 branches covered.">    } else if (response instanceof ComponentToken) {</span>
-<span class="fc" id="L853">      return createToken((ComponentToken) response, encode);</span>
-<span class="pc bpc" id="L854" title="1 of 2 branches missed.">    } else if (response instanceof ComponentSpan) {</span>
-<span class="fc" id="L855">      return createSpan((ComponentSpan) response, encode);</span>
+<span class="fc bfc" id="L857" title="All 2 branches covered.">    if (response instanceof ComponentPosition) {</span>
+<span class="fc" id="L858">      return createPosition((ComponentPosition) response, encode);</span>
+<span class="fc bfc" id="L859" title="All 2 branches covered.">    } else if (response instanceof ComponentToken) {</span>
+<span class="fc" id="L860">      return createToken((ComponentToken) response, encode);</span>
+<span class="pc bpc" id="L861" title="1 of 2 branches missed.">    } else if (response instanceof ComponentSpan) {</span>
+<span class="fc" id="L862">      return createSpan((ComponentSpan) response, encode);</span>
     } else {
-<span class="nc" id="L857">      throw new IOException(&quot;incorrect type &quot; + response.getClass());</span>
+<span class="nc" id="L864">      throw new IOException(&quot;incorrect type &quot; + response.getClass());</span>
     }
   }
 
@@ -870,18 +877,18 @@ public class MtasSolrComponentStats
       Boolean encode) throws IOException {
     // System.out.println(&quot;Create stats position &quot; + position.dataType + &quot; &quot;
     // + position.statsType + &quot; &quot; + position.statsItems + &quot; --- &quot; + encode);
-<span class="fc" id="L873">    SimpleOrderedMap&lt;Object&gt; mtasPositionResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="fc" id="L874">    mtasPositionResponse.add(&quot;key&quot;, position.key);</span>
-<span class="fc" id="L875">    MtasSolrMtasResult data = new MtasSolrMtasResult(position.dataCollector,</span>
+<span class="fc" id="L880">    SimpleOrderedMap&lt;Object&gt; mtasPositionResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L881">    mtasPositionResponse.add(&quot;key&quot;, position.key);</span>
+<span class="fc" id="L882">    MtasSolrMtasResult data = new MtasSolrMtasResult(position.dataCollector,</span>
         position.dataType, position.statsType, position.statsItems, null, null);
-<span class="fc bfc" id="L877" title="All 2 branches covered.">    if (encode) {</span>
-<span class="fc" id="L878">      mtasPositionResponse.add(&quot;_encoded_data&quot;,</span>
-<span class="fc" id="L879">          MtasSolrResultUtil.encode(data));</span>
+<span class="fc bfc" id="L884" title="All 2 branches covered.">    if (encode) {</span>
+<span class="fc" id="L885">      mtasPositionResponse.add(&quot;_encoded_data&quot;,</span>
+<span class="fc" id="L886">          MtasSolrResultUtil.encode(data));</span>
     } else {
-<span class="fc" id="L881">      mtasPositionResponse.add(position.dataCollector.getCollectorType(), data);</span>
-<span class="fc" id="L882">      MtasSolrResultUtil.rewrite(mtasPositionResponse, searchComponent);</span>
+<span class="fc" id="L888">      mtasPositionResponse.add(position.dataCollector.getCollectorType(), data);</span>
+<span class="fc" id="L889">      MtasSolrResultUtil.rewrite(mtasPositionResponse, searchComponent);</span>
     }
-<span class="fc" id="L884">    return mtasPositionResponse;</span>
+<span class="fc" id="L891">    return mtasPositionResponse;</span>
   }
 
   /**
@@ -896,17 +903,17 @@ public class MtasSolrComponentStats
       Boolean encode) throws IOException {
     // System.out.println(&quot;Create stats position &quot; + position.dataType + &quot; &quot;
     // + position.statsType + &quot; &quot; + position.statsItems + &quot; --- &quot; + encode);
-<span class="fc" id="L899">    SimpleOrderedMap&lt;Object&gt; mtasTokenResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="fc" id="L900">    mtasTokenResponse.add(&quot;key&quot;, token.key);</span>
-<span class="fc" id="L901">    MtasSolrMtasResult data = new MtasSolrMtasResult(token.dataCollector,</span>
+<span class="fc" id="L906">    SimpleOrderedMap&lt;Object&gt; mtasTokenResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L907">    mtasTokenResponse.add(&quot;key&quot;, token.key);</span>
+<span class="fc" id="L908">    MtasSolrMtasResult data = new MtasSolrMtasResult(token.dataCollector,</span>
         token.dataType, token.statsType, token.statsItems, null, null);
-<span class="fc bfc" id="L903" title="All 2 branches covered.">    if (encode) {</span>
-<span class="fc" id="L904">      mtasTokenResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
+<span class="fc bfc" id="L910" title="All 2 branches covered.">    if (encode) {</span>
+<span class="fc" id="L911">      mtasTokenResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
-<span class="fc" id="L906">      mtasTokenResponse.add(token.dataCollector.getCollectorType(), data);</span>
-<span class="fc" id="L907">      MtasSolrResultUtil.rewrite(mtasTokenResponse, searchComponent);</span>
+<span class="fc" id="L913">      mtasTokenResponse.add(token.dataCollector.getCollectorType(), data);</span>
+<span class="fc" id="L914">      MtasSolrResultUtil.rewrite(mtasTokenResponse, searchComponent);</span>
     }
-<span class="fc" id="L909">    return mtasTokenResponse;</span>
+<span class="fc" id="L916">    return mtasTokenResponse;</span>
   }
 
   /**
@@ -922,31 +929,31 @@ public class MtasSolrComponentStats
       Boolean encode) throws IOException {
     // System.out.println(&quot;Create stats span &quot; + span.dataType + &quot; &quot;
     // + span.statsType + &quot; &quot; + span.statsItems + &quot; --- &quot; + encode);
-<span class="fc" id="L925">    SimpleOrderedMap&lt;Object&gt; mtasSpanResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="fc" id="L926">    mtasSpanResponse.add(&quot;key&quot;, span.key);</span>
-<span class="fc" id="L927">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L928">    HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L929">    functionData.put(span.dataCollector, functionDataItem);</span>
-<span class="pc bpc" id="L930" title="1 of 2 branches missed.">    if (span.functions != null) {</span>
-<span class="pc bpc" id="L931" title="1 of 2 branches missed.">      for (SubComponentFunction function : span.functions) {</span>
-<span class="nc" id="L932">        function.dataCollector.close();</span>
-<span class="nc" id="L933">        functionDataItem.put(function.key, new MtasSolrMtasResult(</span>
+<span class="fc" id="L932">    SimpleOrderedMap&lt;Object&gt; mtasSpanResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc" id="L933">    mtasSpanResponse.add(&quot;key&quot;, span.key);</span>
+<span class="fc" id="L934">    HashMap&lt;MtasDataCollector&lt;?, ?&gt;, HashMap&lt;String, MtasSolrMtasResult&gt;&gt; functionData = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L935">    HashMap&lt;String, MtasSolrMtasResult&gt; functionDataItem = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L936">    functionData.put(span.dataCollector, functionDataItem);</span>
+<span class="pc bpc" id="L937" title="1 of 2 branches missed.">    if (span.functions != null) {</span>
+<span class="pc bpc" id="L938" title="1 of 2 branches missed.">      for (SubComponentFunction function : span.functions) {</span>
+<span class="nc" id="L939">        function.dataCollector.close();</span>
+<span class="nc" id="L940">        functionDataItem.put(function.key, new MtasSolrMtasResult(</span>
             function.dataCollector, new String[] { function.dataType },
             new String[] { function.statsType },
             new SortedSet[] { function.statsItems }, new List[] { null },
-<span class="nc" id="L937">            new String[] { null }, new String[] { null }, new Integer[] { 0 },</span>
-<span class="nc" id="L938">            new Integer[] { Integer.MAX_VALUE }, null));</span>
-<span class="nc" id="L939">      }</span>
+<span class="nc" id="L944">            new String[] { null }, new String[] { null }, new Integer[] { 0 },</span>
+<span class="nc" id="L945">            new Integer[] { Integer.MAX_VALUE }, null));</span>
+<span class="nc" id="L946">      }</span>
     }
-<span class="fc" id="L941">    MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector,</span>
+<span class="fc" id="L948">    MtasSolrMtasResult data = new MtasSolrMtasResult(span.dataCollector,</span>
         span.dataType, span.statsType, span.statsItems, null, functionData);
-<span class="fc bfc" id="L943" title="All 2 branches covered.">    if (encode) {</span>
-<span class="fc" id="L944">      mtasSpanResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
+<span class="fc bfc" id="L950" title="All 2 branches covered.">    if (encode) {</span>
+<span class="fc" id="L951">      mtasSpanResponse.add(&quot;_encoded_data&quot;, MtasSolrResultUtil.encode(data));</span>
     } else {
-<span class="fc" id="L946">      mtasSpanResponse.add(span.dataCollector.getCollectorType(), data);</span>
-<span class="fc" id="L947">      MtasSolrResultUtil.rewrite(mtasSpanResponse, searchComponent);</span>
+<span class="fc" id="L953">      mtasSpanResponse.add(span.dataCollector.getCollectorType(), data);</span>
+<span class="fc" id="L954">      MtasSolrResultUtil.rewrite(mtasSpanResponse, searchComponent);</span>
     }
-<span class="fc" id="L949">    return mtasSpanResponse;</span>
+<span class="fc" id="L956">    return mtasSpanResponse;</span>
   }
 
   /*
@@ -958,30 +965,30 @@ public class MtasSolrComponentStats
    */
   @SuppressWarnings(&quot;unchecked&quot;)
   public void finishStage(ResponseBuilder rb) {
-<span class="pc bpc" id="L961" title="1 of 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="pc bpc" id="L968" title="1 of 6 branches missed.">    if (rb.req.getParams().getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
         &amp;&amp; rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY
         &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
-<span class="fc bfc" id="L964" title="All 2 branches covered.">      for (ShardRequest sreq : rb.finished) {</span>
-<span class="pc bpc" id="L965" title="1 of 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
-<span class="pc bpc" id="L966" title="1 of 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_STATS, false)) {</span>
-<span class="fc bfc" id="L967" title="All 2 branches covered.">          for (ShardResponse shardResponse : sreq.responses) {</span>
-<span class="fc" id="L968">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
-<span class="fc" id="L969">                .getResponse();</span>
+<span class="fc bfc" id="L971" title="All 2 branches covered.">      for (ShardRequest sreq : rb.finished) {</span>
+<span class="pc bpc" id="L972" title="1 of 2 branches missed.">        if (sreq.params.getBool(MtasSolrSearchComponent.PARAM_MTAS, false)</span>
+<span class="pc bpc" id="L973" title="1 of 2 branches missed.">            &amp;&amp; sreq.params.getBool(PARAM_MTAS_STATS, false)) {</span>
+<span class="fc bfc" id="L974" title="All 2 branches covered.">          for (ShardResponse shardResponse : sreq.responses) {</span>
+<span class="fc" id="L975">            NamedList&lt;Object&gt; response = shardResponse.getSolrResponse()</span>
+<span class="fc" id="L976">                .getResponse();</span>
             try {
-<span class="fc" id="L971">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
-<span class="nc" id="L972">                  .findRecursive(&quot;mtas&quot;, &quot;stats&quot;);</span>
-<span class="nc bnc" id="L973" title="All 2 branches missed.">              if (data != null) {</span>
-<span class="nc" id="L974">                MtasSolrResultUtil.decode(data);</span>
+<span class="fc" id="L978">              ArrayList&lt;NamedList&lt;Object&gt;&gt; data = (ArrayList&lt;NamedList&lt;Object&gt;&gt;) response</span>
+<span class="nc" id="L979">                  .findRecursive(&quot;mtas&quot;, NAME);</span>
+<span class="nc bnc" id="L980" title="All 2 branches missed.">              if (data != null) {</span>
+<span class="nc" id="L981">                MtasSolrResultUtil.decode(data);</span>
               }
-<span class="fc" id="L976">            } catch (ClassCastException e) {</span>
-<span class="fc" id="L977">              log.debug(e);</span>
+<span class="fc" id="L983">            } catch (ClassCastException e) {</span>
+<span class="fc" id="L984">              log.debug(e);</span>
               // shouldnt happen
-<span class="nc" id="L979">            }</span>
-<span class="fc" id="L980">          }</span>
+<span class="nc" id="L986">            }</span>
+<span class="fc" id="L987">          }</span>
         }
-<span class="fc" id="L982">      }</span>
+<span class="fc" id="L989">      }</span>
     }
-<span class="fc" id="L984">  }</span>
+<span class="fc" id="L991">  }</span>
 
   /*
    * (non-Javadoc)
@@ -995,26 +1002,26 @@ public class MtasSolrComponentStats
   public void distributedProcess(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException {
     // rewrite
-<span class="fc" id="L998">    NamedList&lt;Object&gt; mtasResponse = null;</span>
+<span class="fc" id="L1005">    NamedList&lt;Object&gt; mtasResponse = null;</span>
     try {
-<span class="fc" id="L1000">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
-<span class="nc" id="L1001">    } catch (ClassCastException e) {</span>
-<span class="nc" id="L1002">      log.debug(e);</span>
-<span class="nc" id="L1003">      mtasResponse = null;</span>
-<span class="fc" id="L1004">    }</span>
-<span class="pc bpc" id="L1005" title="1 of 2 branches missed.">    if (mtasResponse != null) {</span>
+<span class="fc" id="L1007">      mtasResponse = (NamedList&lt;Object&gt;) rb.rsp.getValues().get(&quot;mtas&quot;);</span>
+<span class="nc" id="L1008">    } catch (ClassCastException e) {</span>
+<span class="nc" id="L1009">      log.debug(e);</span>
+<span class="nc" id="L1010">      mtasResponse = null;</span>
+<span class="fc" id="L1011">    }</span>
+<span class="pc bpc" id="L1012" title="1 of 2 branches missed.">    if (mtasResponse != null) {</span>
       NamedList&lt;Object&gt; mtasResponseStats;
       try {
-<span class="fc" id="L1008">        mtasResponseStats = (NamedList&lt;Object&gt;) mtasResponse.get(&quot;stats&quot;);</span>
-<span class="pc bpc" id="L1009" title="1 of 2 branches missed.">        if (mtasResponseStats != null) {</span>
-<span class="fc" id="L1010">          MtasSolrResultUtil.rewrite(mtasResponseStats, searchComponent);</span>
+<span class="fc" id="L1015">        mtasResponseStats = (NamedList&lt;Object&gt;) mtasResponse.get(NAME);</span>
+<span class="pc bpc" id="L1016" title="1 of 2 branches missed.">        if (mtasResponseStats != null) {</span>
+<span class="fc" id="L1017">          MtasSolrResultUtil.rewrite(mtasResponseStats, searchComponent);</span>
         }
-<span class="nc" id="L1012">      } catch (ClassCastException e) {</span>
-<span class="nc" id="L1013">        log.debug(e);</span>
-<span class="nc" id="L1014">        mtasResponse.remove(&quot;stats&quot;);</span>
-<span class="fc" id="L1015">      }</span>
+<span class="nc" id="L1019">      } catch (ClassCastException e) {</span>
+<span class="nc" id="L1020">        log.debug(e);</span>
+<span class="nc" id="L1021">        mtasResponse.remove(NAME);</span>
+<span class="fc" id="L1022">      }</span>
     }
-<span class="fc" id="L1017">  }</span>
+<span class="fc" id="L1024">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

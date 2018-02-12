@@ -234,6 +234,11 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       }
 
     }
+
+    @Override
+    public boolean isCacheable(LeafReaderContext arg0) {
+<span class="nc" id="L240">      return false;</span>
+    }
   }
 
   /*
@@ -244,15 +249,15 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L247">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L248">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
-<span class="nc bnc" id="L249" title="All 2 branches missed.">    if (value == null) {</span>
-<span class="nc" id="L250">      buffer.append(field + &quot;:&quot; + prefix);</span>
+<span class="nc" id="L252">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L253">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot;);</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">    if (value == null) {</span>
+<span class="nc" id="L255">      buffer.append(field + &quot;:&quot; + prefix);</span>
     } else {
-<span class="nc" id="L252">      buffer.append(field + &quot;:&quot; + prefix + &quot;=&quot; + value);</span>
+<span class="nc" id="L257">      buffer.append(field + &quot;:&quot; + prefix + &quot;=&quot; + value);</span>
     }
-<span class="nc" id="L254">    buffer.append(&quot;])&quot;);</span>
-<span class="nc" id="L255">    return buffer.toString();</span>
+<span class="nc" id="L259">    buffer.append(&quot;])&quot;);</span>
+<span class="nc" id="L260">    return buffer.toString();</span>
   }
 
   /*
@@ -262,14 +267,14 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L266">      return true;</span>
-<span class="pc bpc" id="L267" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L268">      return false;</span>
-<span class="pc bpc" id="L269" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L270">      return false;</span>
-<span class="fc" id="L271">    MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;</span>
-<span class="pc bpc" id="L272" title="1 of 4 branches missed.">    return other.localTerm.equals(localTerm)</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L271">      return true;</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L273">      return false;</span>
+<span class="pc bpc" id="L274" title="1 of 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L275">      return false;</span>
+<span class="fc" id="L276">    MtasExtendedSpanTermQuery other = (MtasExtendedSpanTermQuery) obj;</span>
+<span class="pc bpc" id="L277" title="1 of 4 branches missed.">    return other.localTerm.equals(localTerm)</span>
         &amp;&amp; (other.singlePosition == singlePosition);
   }
 
@@ -280,12 +285,12 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L283">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L284">    h = (h * 5) ^ localTerm.hashCode();</span>
-<span class="fc bfc" id="L285" title="All 2 branches covered.">    if (singlePosition) {</span>
-<span class="fc" id="L286">      h += 1;</span>
+<span class="fc" id="L288">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L289">    h = (h * 5) ^ localTerm.hashCode();</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">    if (singlePosition) {</span>
+<span class="fc" id="L291">      h += 1;</span>
     }
-<span class="fc" id="L288">    return h;</span>
+<span class="fc" id="L293">    return h;</span>
   }
 
 }

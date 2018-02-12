@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MorseDistance.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util.distance</a> &gt; <span class="el_source">MorseDistance.java</span></div><h1>MorseDistance.java</h1><pre class="source lang-java linenums">package mtas.codec.util.distance;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.lucene.util.BytesRef;
+
+import mtas.analysis.token.MtasToken;
+
+/**
+ * The Class MorseDistance.
+ */
+public class MorseDistance extends Distance {
+
+  /** The initial state. */
+  protected final double[] initialState;
+
+  /** The Constant defaultDeletionDistance. */
+  protected final static double defaultDeletionDistance = 1.0;
+
+  /** The Constant defaultInsertionDistance. */
+  protected final static double defaultInsertionDistance = 10.0;
+
+  /** The Constant defaultReplaceDistance. */
+  protected final static double defaultReplaceDistance = 10.0;
+
+  /** The Constant defaultTranspositionDistance. */
+  protected final static double defaultTranspositionDistance = 10.0;
+
+  /** The deletion distance. */
+  protected double deletionDistance;
+
+  /** The insertion distance. */
+  protected double insertionDistance;
+
+  /** The replace distance. */
+  protected double replaceDistance;
+
+  /** The transposition distance. */
+  protected double transpositionDistance;
+
+  /** The Constant PARAMETER_DELETIONDISTANCE. */
+  protected final static String PARAMETER_DELETIONDISTANCE = &quot;deletionDistance&quot;;
+
+  /** The Constant PARAMETER_INSERTIONDISTANCE. */
+  protected final static String PARAMETER_INSERTIONDISTANCE = &quot;insertionDistance&quot;;
+
+  /** The Constant PARAMETER_REPLACEDISTANCE. */
+  protected final static String PARAMETER_REPLACEDISTANCE = &quot;replaceDistance&quot;;
+
+  /** The Constant PARAMETER_TRANSPOSITIONDISTANCE. */
+  protected final static String PARAMETER_TRANSPOSITIONDISTANCE = &quot;transpositionDistance&quot;;
+
+  /** The morse base. */
+  protected final String morseBase;
+
+  /** The Constant ALPHABET_MORSE. */
+  private static final Map&lt;Byte, String&gt; ALPHABET_MORSE;
+  static {
+<span class="nc" id="L64">    Map&lt;Byte, String&gt; m = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L65">    m.put((byte) 'a', &quot;.-&quot;);</span>
+<span class="nc" id="L66">    m.put((byte) 'b', &quot;-...&quot;);</span>
+<span class="nc" id="L67">    m.put((byte) 'c', &quot;-.-.&quot;);</span>
+<span class="nc" id="L68">    m.put((byte) 'd', &quot;-..&quot;);</span>
+<span class="nc" id="L69">    m.put((byte) 'e', &quot;.&quot;);</span>
+<span class="nc" id="L70">    m.put((byte) 'f', &quot;..-.&quot;);</span>
+<span class="nc" id="L71">    m.put((byte) 'g', &quot;--.&quot;);</span>
+<span class="nc" id="L72">    m.put((byte) 'h', &quot;....&quot;);</span>
+<span class="nc" id="L73">    m.put((byte) 'i', &quot;..&quot;);</span>
+<span class="nc" id="L74">    m.put((byte) 'j', &quot;.---&quot;);</span>
+<span class="nc" id="L75">    m.put((byte) 'k', &quot;-.-&quot;);</span>
+<span class="nc" id="L76">    m.put((byte) 'l', &quot;.-..&quot;);</span>
+<span class="nc" id="L77">    m.put((byte) 'm', &quot;--&quot;);</span>
+<span class="nc" id="L78">    m.put((byte) 'n', &quot;-.&quot;);</span>
+<span class="nc" id="L79">    m.put((byte) 'o', &quot;---&quot;);</span>
+<span class="nc" id="L80">    m.put((byte) 'p', &quot;.--.&quot;);</span>
+<span class="nc" id="L81">    m.put((byte) 'q', &quot;--.-&quot;);</span>
+<span class="nc" id="L82">    m.put((byte) 'r', &quot;.-.&quot;);</span>
+<span class="nc" id="L83">    m.put((byte) 's', &quot;...&quot;);</span>
+<span class="nc" id="L84">    m.put((byte) 't', &quot;-&quot;);</span>
+<span class="nc" id="L85">    m.put((byte) 'u', &quot;..-&quot;);</span>
+<span class="nc" id="L86">    m.put((byte) 'v', &quot;...-&quot;);</span>
+<span class="nc" id="L87">    m.put((byte) 'w', &quot;.--&quot;);</span>
+<span class="nc" id="L88">    m.put((byte) 'x', &quot;-..-&quot;);</span>
+<span class="nc" id="L89">    m.put((byte) 'y', &quot;-.--&quot;);</span>
+<span class="nc" id="L90">    m.put((byte) 'z', &quot;--..&quot;);</span>
+<span class="nc" id="L91">    m.put((byte) '1', &quot;.----&quot;);</span>
+<span class="nc" id="L92">    m.put((byte) '2', &quot;..---&quot;);</span>
+<span class="nc" id="L93">    m.put((byte) '3', &quot;...--&quot;);</span>
+<span class="nc" id="L94">    m.put((byte) '4', &quot;....-&quot;);</span>
+<span class="nc" id="L95">    m.put((byte) '5', &quot;.....&quot;);</span>
+<span class="nc" id="L96">    m.put((byte) '6', &quot;-....&quot;);</span>
+<span class="nc" id="L97">    m.put((byte) '7', &quot;--...&quot;);</span>
+<span class="nc" id="L98">    m.put((byte) '8', &quot;---..&quot;);</span>
+<span class="nc" id="L99">    m.put((byte) '9', &quot;----.&quot;);</span>
+<span class="nc" id="L100">    m.put((byte) '0', &quot;-----&quot;);</span>
+<span class="nc" id="L101">    ALPHABET_MORSE = Collections.unmodifiableMap(m);</span>
+<span class="nc" id="L102">  }</span>
+
+  /**
+   * Instantiates a new morse distance.
+   *
+   * @param prefix the prefix
+   * @param base the base
+   * @param maximum the maximum
+   * @param parameters the parameters
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public MorseDistance(String prefix, String base, Double minimum, Double maximum,
+      Map&lt;String, String&gt; parameters) throws IOException {
+<span class="nc" id="L115">    super(prefix, base, minimum, maximum, parameters);</span>
+<span class="nc" id="L116">    deletionDistance = defaultDeletionDistance;</span>
+<span class="nc" id="L117">    insertionDistance = defaultInsertionDistance;</span>
+<span class="nc" id="L118">    replaceDistance = defaultReplaceDistance;</span>
+<span class="nc" id="L119">    transpositionDistance = defaultTranspositionDistance;</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">    if (parameters != null) {</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">      for (Entry&lt;String, String&gt; entry : parameters.entrySet()) {</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (entry.getKey().equals(PARAMETER_DELETIONDISTANCE)) {</span>
+<span class="nc" id="L123">          deletionDistance = Double.parseDouble(entry.getValue());</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        } else if (entry.getKey().equals(PARAMETER_INSERTIONDISTANCE)) {</span>
+<span class="nc" id="L125">          insertionDistance = Double.parseDouble(entry.getValue());</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        } else if (entry.getKey().equals(PARAMETER_REPLACEDISTANCE)) {</span>
+<span class="nc" id="L127">          replaceDistance = Double.parseDouble(entry.getValue());</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        } else if (entry.getKey().equals(PARAMETER_TRANSPOSITIONDISTANCE)) {</span>
+<span class="nc" id="L129">          transpositionDistance = Double.parseDouble(entry.getValue());</span>
+        }
+<span class="nc" id="L131">      }</span>
+    }
+<span class="nc bnc" id="L133" title="All 8 branches missed.">    if (deletionDistance &lt; 0 || insertionDistance &lt; 0 || replaceDistance &lt; 0</span>
+        || transpositionDistance &lt; 0) {
+<span class="nc" id="L135">      throw new IOException(&quot;distances should be zero or positive&quot;);</span>
+    }
+<span class="nc" id="L137">    morseBase = computeMorse(new BytesRef(prefix + MtasToken.DELIMITER + base));</span>
+<span class="nc" id="L138">    initialState = new double[morseBase.length() + 1];</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">    for (int i = 0; i &lt;= morseBase.length(); i++) {</span>
+<span class="nc" id="L140">      initialState[i] = i * insertionDistance;</span>
+    }
+<span class="nc" id="L142">  }</span>
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
+   */
+  @Override
+  public boolean validateMaximum(BytesRef term) {
+<span class="nc bnc" id="L152" title="All 2 branches missed.">    if (morseBase == null) {</span>
+<span class="nc" id="L153">      return false;</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">    } else if (maximum == null) {</span>
+<span class="nc" id="L155">      return true;</span>
+    } else {
+<span class="nc" id="L157">      double[][] state = _start();</span>
+      byte b0;
+      String morse;
+<span class="nc" id="L160">      char ch2 = 0x00;</span>
+<span class="nc" id="L161">      int i = term.offset + prefixOffset;</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">      for (; i &lt; term.length; i++) {</span>
+<span class="nc" id="L163">        b0 = term.bytes[i];    </span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        if (b0 == 0x00) {</span>
+<span class="nc" id="L165">          break;</span>
+        }
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        if (ALPHABET_MORSE.containsKey(b0)) {</span>
+<span class="nc" id="L168">          morse = ALPHABET_MORSE.get(b0)+&quot; &quot;;</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">          for (char ch1 : morse.toCharArray()) {            </span>
+<span class="nc" id="L170">            state = _step(state, ch1, ch2);</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">            if (!_can_match(state)) {</span>
+<span class="nc" id="L172">              return false;</span>
+            }
+<span class="nc" id="L174">            ch2 = ch1;</span>
+          }
+        } else {
+<span class="nc" id="L177">          return false;</span>
+        }        
+      }
+<span class="nc" id="L180">      return _is_match(state);      </span>
+    }
+  }
+  
+  @Override
+  public boolean validateMinimum(BytesRef term) {
+<span class="nc bnc" id="L186" title="All 2 branches missed.">    if (minimum == null) {</span>
+<span class="nc" id="L187">      return true;</span>
+    } else {
+<span class="nc bnc" id="L189" title="All 2 branches missed.">      return compute(term)&gt;minimum;</span>
+    }
+  }
+  
+  @Override
+  public double compute(BytesRef term) {
+<span class="nc" id="L195">    String morseKey = computeMorse(term);</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">    if(morseKey==null) {</span>
+<span class="nc" id="L197">      return Double.MAX_VALUE;</span>
+    } else {
+<span class="nc" id="L199">      double[][] state = _start();</span>
+<span class="nc" id="L200">      char ch2 = 0x00;</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">      for (char ch1 : morseKey.toCharArray()) {</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        if (ch1 == 0x00) {</span>
+<span class="nc" id="L203">          break;</span>
+        }
+<span class="nc" id="L205">        state = _step(state, ch1, ch2);</span>
+<span class="nc" id="L206">        ch2 = ch1;</span>
+      }
+<span class="nc" id="L208">      return _distance(state);</span>
+    }  
+  }
+
+  
+  @Override
+  public double compute(String key) {
+<span class="nc" id="L215">    String morseKey = computeMorse(key);</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">    if(morseKey==null) {</span>
+<span class="nc" id="L217">      return Double.MAX_VALUE;</span>
+    } else {
+<span class="nc" id="L219">      double[][] state = _start();</span>
+<span class="nc" id="L220">      char ch2 = 0x00;</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">      for (char ch1 : morseKey.toCharArray()) {</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (ch1 == 0x00) {</span>
+<span class="nc" id="L223">          break;</span>
+        }
+<span class="nc" id="L225">        state = _step(state, ch1, ch2);</span>
+<span class="nc" id="L226">        ch2 = ch1;</span>
+      }
+<span class="nc" id="L228">      return _distance(state);</span>
+    }  
+  }
+
+  /**
+   * Start.
+   *
+   * @return the double[][]
+   */
+  private double[][] _start() {
+<span class="nc" id="L238">    double[][] startState = new double[3][];</span>
+<span class="nc" id="L239">    startState[0] = new double[initialState.length];</span>
+<span class="nc" id="L240">    startState[1] = new double[initialState.length];</span>
+<span class="nc" id="L241">    startState[2] = Arrays.copyOf(initialState, initialState.length);</span>
+<span class="nc" id="L242">    return startState;</span>
+  }
+
+  /**
+   * Step.
+   *
+   * @param state the state
+   * @param ch1 the ch 1
+   * @param ch2 the ch 2
+   * @return the double[][]
+   */
+  private double[][] _step(double[][] state, char ch1, char ch2) {
+    double cost;
+<span class="nc" id="L255">    _shift(state);</span>
+<span class="nc" id="L256">    state[2][0] = state[1][0] + deletionDistance;</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">    for (int i = 0; i &lt; morseBase.length(); i++) {</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">      cost = (morseBase.charAt(i) == ch1) ? 0 : replaceDistance;</span>
+<span class="nc" id="L259">      state[2][i + 1] = Math.min(state[2][i] + insertionDistance,</span>
+          state[1][i] + cost);
+<span class="nc" id="L261">      state[2][i + 1] = Math.min(state[2][i + 1],</span>
+          state[1][i + 1] + deletionDistance);
+<span class="nc bnc" id="L263" title="All 6 branches missed.">      if (i &gt; 0 &amp;&amp; ch2 != 0x00 &amp;&amp; (morseBase.charAt(i - 1) == ch1)</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">          &amp;&amp; (morseBase.charAt(i) == ch2)) {</span>
+<span class="nc" id="L265">        state[2][i + 1] = Math.min(state[2][i + 1],</span>
+            state[0][i - 1] + transpositionDistance);
+      }
+    }
+<span class="nc" id="L269">    return state;</span>
+  }
+
+  /**
+   * Shift.
+   *
+   * @param state the state
+   */
+  private void _shift(double[][] state) {
+<span class="nc" id="L278">    double[] tmpState = state[0];</span>
+<span class="nc" id="L279">    state[0] = state[1];</span>
+<span class="nc" id="L280">    state[1] = state[2];</span>
+<span class="nc" id="L281">    state[2] = tmpState;</span>
+<span class="nc" id="L282">  }</span>
+
+  /**
+   * Checks if is match.
+   *
+   * @param state the state
+   * @return true, if successful
+   */
+  private boolean _is_match(double[][] state) {
+<span class="nc bnc" id="L291" title="All 2 branches missed.">    return state[2][state[2].length - 1] &lt; maximum;</span>
+  }
+
+  /**
+   * Can match.
+   *
+   * @param state the state
+   * @return true, if successful
+   */
+  private boolean _can_match(double[][] state) {
+<span class="nc bnc" id="L301" title="All 2 branches missed.">    for (double d : state[2]) {</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">      if (d &lt; maximum) {</span>
+<span class="nc" id="L303">        return true;</span>
+      }
+    }
+<span class="nc" id="L306">    return false;</span>
+  }
+
+  /**
+   * Distance.
+   *
+   * @param state the state
+   * @return the double
+   */
+  private double _distance(double[][] state) {
+<span class="nc" id="L316">    return state[2][state[2].length - 1];</span>
+  }
+
+  /**
+   * Compute morse.
+   *
+   * @param term the term
+   * @return the string
+   */
+  private String computeMorse(BytesRef term) {
+<span class="nc" id="L326">    StringBuilder stringBuilder = new StringBuilder();</span>
+<span class="nc" id="L327">    int i = term.offset + prefixOffset;</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">    for (; i &lt; term.length; i++) {</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">      if (ALPHABET_MORSE.containsKey(term.bytes[i])) {</span>
+<span class="nc" id="L330">        stringBuilder.append(ALPHABET_MORSE.get(term.bytes[i]) + &quot; &quot;);</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">      } else if(term.bytes[i]!=0x00){</span>
+<span class="nc" id="L332">        return null;</span>
+      } else {
+        break;
+      }
+    }
+<span class="nc" id="L337">    return stringBuilder.toString();</span>
+  }
+  
+  private String computeMorse(String key) {
+<span class="nc" id="L341">    StringBuilder stringBuilder = new StringBuilder();</span>
+    Byte b;
+<span class="nc bnc" id="L343" title="All 2 branches missed.">    for (char ch : key.toCharArray()) {</span>
+<span class="nc" id="L344">      b = (byte) ch;</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">      if (ALPHABET_MORSE.containsKey(b)) {</span>
+<span class="nc" id="L346">        stringBuilder.append(ALPHABET_MORSE.get(b) + &quot; &quot;);</span>
+      } else {
+<span class="nc" id="L348">        return null;</span>
+      } 
+    }
+<span class="nc" id="L351">    return stringBuilder.toString();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

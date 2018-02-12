@@ -52,6 +52,8 @@ import mtas.analysis.util.MtasParserException;
   /** The functions. */
 <span class="nc" id="L53">  private HashMap&lt;String, HashMap&lt;String, MtasCRMParserFunction&gt;&gt; functions = new HashMap&lt;&gt;();</span>
 
+<span class="nc" id="L55">  private HashMap&lt;Integer, HashMap&lt;String, String&gt;&gt; filterReplace = new HashMap&lt;&gt;();</span>
+
   /** The Constant MAPPING_TYPE_CRM_SENTENCE. */
   protected static final String MAPPING_TYPE_CRM_SENTENCE = &quot;crmSentence&quot;;
 
@@ -61,11 +63,14 @@ import mtas.analysis.util.MtasParserException;
   /** The Constant MAPPING_TYPE_CRM_PAIR. */
   protected static final String MAPPING_TYPE_CRM_PAIR = &quot;crmPair&quot;;
 
+  protected static final String FILTER_TYPE_REPLACE = &quot;replace&quot;;
+
+  
   /** The history pair. */
-<span class="nc" id="L65">  private HashMap&lt;String, HashMap&lt;String, MtasParserObject&gt;&gt; historyPair = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L70">  private HashMap&lt;String, HashMap&lt;String, MtasParserObject&gt;&gt; historyPair = new HashMap&lt;&gt;();</span>
 
   /** The pair pattern. */
-<span class="nc" id="L68">  Pattern pairPattern = Pattern.compile(&quot;^([b|e])([a-z])([0-9]+)$&quot;);</span>
+<span class="nc" id="L73">  Pattern pairPattern = Pattern.compile(&quot;^([b|e])([a-z])([0-9]+)$&quot;);</span>
 
   /**
    * Instantiates a new mtas CRM parser.
@@ -73,14 +78,14 @@ import mtas.analysis.util.MtasParserException;
    * @param config the config
    */
   public MtasCRMParser(MtasConfiguration config) {
-<span class="nc" id="L76">    super(config);</span>
+<span class="nc" id="L81">    super(config);</span>
     try {
-<span class="nc" id="L78">      initParser();</span>
+<span class="nc" id="L83">      initParser();</span>
       // System.out.print(printConfig());
-<span class="nc" id="L80">    } catch (MtasConfigException e) {</span>
-<span class="nc" id="L81">      log.error(e);</span>
-<span class="nc" id="L82">    }</span>
-<span class="nc" id="L83">  }</span>
+<span class="nc" id="L85">    } catch (MtasConfigException e) {</span>
+<span class="nc" id="L86">      log.error(e);</span>
+<span class="nc" id="L87">    }</span>
+<span class="nc" id="L88">  }</span>
 
   /*
    * (non-Javadoc)
@@ -90,126 +95,166 @@ import mtas.analysis.util.MtasParserException;
   @SuppressWarnings(&quot;unchecked&quot;)
   @Override
   protected void initParser() throws MtasConfigException {
-<span class="nc" id="L93">    super.initParser();</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">    if (config != null) {</span>
+<span class="nc" id="L98">    super.initParser();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    if (config != null) {</span>
       // always word, no mappings
-<span class="nc" id="L96">      wordType = new MtasParserType&lt;&gt;(MAPPING_TYPE_WORD, null, false);</span>
-<span class="nc bnc" id="L97" title="All 2 branches missed.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
-<span class="nc" id="L98">        MtasConfiguration current = config.children.get(i);</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (current.name.equals(&quot;mappings&quot;)) {</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">          for (int j = 0; j &lt; current.children.size(); j++) {</span>
-<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (current.children.get(j).name.equals(&quot;mapping&quot;)) {</span>
-<span class="nc" id="L102">              MtasConfiguration mapping = current.children.get(j);</span>
-<span class="nc" id="L103">              String typeMapping = mapping.attributes.get(&quot;type&quot;);</span>
-<span class="nc" id="L104">              String nameMapping = mapping.attributes.get(&quot;name&quot;);</span>
-<span class="nc bnc" id="L105" title="All 2 branches missed.">              if ((typeMapping != null)) {</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">                if (typeMapping.equals(MAPPING_TYPE_WORD)) {</span>
-<span class="nc" id="L107">                  MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();</span>
-<span class="nc" id="L108">                  m.processConfig(mapping);</span>
-<span class="nc" id="L109">                  wordType.addItem(m);</span>
-<span class="nc bnc" id="L110" title="All 4 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="nc" id="L101">      wordType = new MtasParserType&lt;&gt;(MAPPING_TYPE_WORD, null, false);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
+<span class="nc" id="L103">        MtasConfiguration current = config.children.get(i);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (current.name.equals(&quot;filters&quot;)) {</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">          for (int j = 0; j &lt; current.children.size(); j++) {</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">            if (current.children.get(j).name.equals(&quot;filter&quot;)) {</span>
+<span class="nc" id="L107">              MtasConfiguration filter = current.children.get(j);</span>
+<span class="nc" id="L108">              String typeFilter = filter.attributes.get(&quot;type&quot;);</span>
+<span class="nc" id="L109">              String nameFilter = filter.attributes.get(&quot;name&quot;);</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">              if(typeFilter!=null) {</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                if(typeFilter.equals(FILTER_TYPE_REPLACE)) {</span>
+<span class="nc" id="L112">                  String value = filter.attributes.get(&quot;value&quot;);</span>
+<span class="nc" id="L113">                  String replace = filter.attributes.get(&quot;replace&quot;);</span>
+<span class="nc bnc" id="L114" title="All 6 branches missed.">                  if(nameFilter!=null &amp;&amp; value!=null &amp;&amp; replace!=null) {</span>
+<span class="nc" id="L115">                    String[] names = nameFilter.split(Pattern.quote(&quot;,&quot;));</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">                    for(String name : names) {</span>
+                      try {
+<span class="nc" id="L118">                        int nameInt = Integer.parseInt(name);</span>
+                        HashMap&lt;String, String&gt; nameMap;
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                        if(!filterReplace.containsKey(nameInt)) {</span>
+<span class="nc" id="L121">                          nameMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L122">                          filterReplace.put(nameInt, nameMap);</span>
+                        } else {
+<span class="nc" id="L124">                          nameMap = filterReplace.get(nameInt);</span>
+                        }
+<span class="nc" id="L126">                        nameMap.put(value, replace);</span>
+<span class="nc" id="L127">                      } catch (NumberFormatException e) {</span>
+<span class="nc" id="L128">                        log.info(e);                        </span>
+<span class="nc" id="L129">                      }                      </span>
+                    }                    
+<span class="nc" id="L131">                  } else {</span>
+<span class="nc" id="L132">                    throw new MtasConfigException(&quot;no name, value or replace for filter &quot;</span>
+                        + typeFilter );
+                  }
+<span class="nc" id="L135">                } else {</span>
+<span class="nc" id="L136">                  throw new MtasConfigException(&quot;unknown filter type &quot;</span>
+                      + typeFilter );
+                }
+              } else {
+<span class="nc" id="L140">                throw new MtasConfigException(&quot;no type provided for filter&quot; );</span>
+              }
+            }
+          }  
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        } else if (current.name.equals(&quot;mappings&quot;)) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">          for (int j = 0; j &lt; current.children.size(); j++) {</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            if (current.children.get(j).name.equals(&quot;mapping&quot;)) {</span>
+<span class="nc" id="L147">              MtasConfiguration mapping = current.children.get(j);</span>
+<span class="nc" id="L148">              String typeMapping = mapping.attributes.get(&quot;type&quot;);</span>
+<span class="nc" id="L149">              String nameMapping = mapping.attributes.get(&quot;name&quot;);</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">              if ((typeMapping != null)) {</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                if (typeMapping.equals(MAPPING_TYPE_WORD)) {</span>
+<span class="nc" id="L152">                  MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();</span>
+<span class="nc" id="L153">                  m.processConfig(mapping);</span>
+<span class="nc" id="L154">                  wordType.addItem(m);</span>
+<span class="nc bnc" id="L155" title="All 4 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)</span>
                     &amp;&amp; (nameMapping != null)) {
-<span class="nc" id="L112">                  MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();</span>
-<span class="nc" id="L113">                  m.processConfig(mapping);</span>
-<span class="nc bnc" id="L114" title="All 2 branches missed.">                  if (wordAnnotationTypes.containsKey(nameMapping)) {</span>
-<span class="nc" id="L115">                    wordAnnotationTypes.get(nameMapping).addItem(m);</span>
+<span class="nc" id="L157">                  MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();</span>
+<span class="nc" id="L158">                  m.processConfig(mapping);</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">                  if (wordAnnotationTypes.containsKey(nameMapping)) {</span>
+<span class="nc" id="L160">                    wordAnnotationTypes.get(nameMapping).addItem(m);</span>
                   } else {
-<span class="nc" id="L117">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
+<span class="nc" id="L162">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         typeMapping, nameMapping, false);
-<span class="nc" id="L119">                    t.addItem(m);</span>
-<span class="nc" id="L120">                    wordAnnotationTypes.put(nameMapping, t);</span>
+<span class="nc" id="L164">                    t.addItem(m);</span>
+<span class="nc" id="L165">                    wordAnnotationTypes.put(nameMapping, t);</span>
                   }
-<span class="nc bnc" id="L122" title="All 2 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_CRM_SENTENCE)) {</span>
-<span class="nc" id="L123">                  MtasCRMParserMappingCRMSentence m = new MtasCRMParserMappingCRMSentence();</span>
-<span class="nc" id="L124">                  m.processConfig(mapping);</span>
-<span class="nc bnc" id="L125" title="All 2 branches missed.">                  if (crmSentenceTypes.containsKey(nameMapping)) {</span>
-<span class="nc" id="L126">                    crmSentenceTypes.get(nameMapping).addItem(m);</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_CRM_SENTENCE)) {</span>
+<span class="nc" id="L168">                  MtasCRMParserMappingCRMSentence m = new MtasCRMParserMappingCRMSentence();</span>
+<span class="nc" id="L169">                  m.processConfig(mapping);</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                  if (crmSentenceTypes.containsKey(nameMapping)) {</span>
+<span class="nc" id="L171">                    crmSentenceTypes.get(nameMapping).addItem(m);</span>
                   } else {
-<span class="nc" id="L128">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
+<span class="nc" id="L173">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         MAPPING_TYPE_GROUP, nameMapping, true);
-<span class="nc" id="L130">                    t.addItem(m);</span>
-<span class="nc" id="L131">                    crmSentenceTypes.put(nameMapping, t);</span>
+<span class="nc" id="L175">                    t.addItem(m);</span>
+<span class="nc" id="L176">                    crmSentenceTypes.put(nameMapping, t);</span>
                   }
-<span class="nc bnc" id="L133" title="All 2 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_CRM_CLAUSE)) {</span>
-<span class="nc" id="L134">                  MtasCRMParserMappingCRMSentence m = new MtasCRMParserMappingCRMSentence();</span>
-<span class="nc" id="L135">                  m.processConfig(mapping);</span>
-<span class="nc bnc" id="L136" title="All 2 branches missed.">                  if (crmClauseTypes.containsKey(nameMapping)) {</span>
-<span class="nc" id="L137">                    crmClauseTypes.get(nameMapping).addItem(m);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_CRM_CLAUSE)) {</span>
+<span class="nc" id="L179">                  MtasCRMParserMappingCRMSentence m = new MtasCRMParserMappingCRMSentence();</span>
+<span class="nc" id="L180">                  m.processConfig(mapping);</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                  if (crmClauseTypes.containsKey(nameMapping)) {</span>
+<span class="nc" id="L182">                    crmClauseTypes.get(nameMapping).addItem(m);</span>
                   } else {
-<span class="nc" id="L139">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
+<span class="nc" id="L184">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         MAPPING_TYPE_GROUP, nameMapping, true);
-<span class="nc" id="L141">                    t.addItem(m);</span>
-<span class="nc" id="L142">                    crmClauseTypes.put(nameMapping, t);</span>
+<span class="nc" id="L186">                    t.addItem(m);</span>
+<span class="nc" id="L187">                    crmClauseTypes.put(nameMapping, t);</span>
                   }
-<span class="nc bnc" id="L144" title="All 2 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_CRM_PAIR)) {</span>
-<span class="nc" id="L145">                  MtasCRMParserMappingCRMPair m = new MtasCRMParserMappingCRMPair();</span>
-<span class="nc" id="L146">                  m.processConfig(mapping);</span>
-<span class="nc bnc" id="L147" title="All 2 branches missed.">                  if (crmPairTypes.containsKey(nameMapping)) {</span>
-<span class="nc" id="L148">                    crmPairTypes.get(nameMapping).addItem(m);</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">                } else if (typeMapping.equals(MAPPING_TYPE_CRM_PAIR)) {</span>
+<span class="nc" id="L190">                  MtasCRMParserMappingCRMPair m = new MtasCRMParserMappingCRMPair();</span>
+<span class="nc" id="L191">                  m.processConfig(mapping);</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">                  if (crmPairTypes.containsKey(nameMapping)) {</span>
+<span class="nc" id="L193">                    crmPairTypes.get(nameMapping).addItem(m);</span>
                   } else {
-<span class="nc" id="L150">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
+<span class="nc" id="L195">                    MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt; t = new MtasParserType&lt;&gt;(</span>
                         MAPPING_TYPE_RELATION, nameMapping, true);
-<span class="nc" id="L152">                    t.addItem(m);</span>
-<span class="nc" id="L153">                    crmPairTypes.put(nameMapping, t);</span>
+<span class="nc" id="L197">                    t.addItem(m);</span>
+<span class="nc" id="L198">                    crmPairTypes.put(nameMapping, t);</span>
                   }
-<span class="nc" id="L155">                } else {</span>
-<span class="nc" id="L156">                  throw new MtasConfigException(&quot;unknown mapping type &quot;</span>
+<span class="nc" id="L200">                } else {</span>
+<span class="nc" id="L201">                  throw new MtasConfigException(&quot;unknown mapping type &quot;</span>
                       + typeMapping + &quot; or missing name&quot;);
                 }
               }
             }
           }
-<span class="nc bnc" id="L162" title="All 2 branches missed.">        } else if (current.name.equals(&quot;functions&quot;)) {</span>
-<span class="nc bnc" id="L163" title="All 2 branches missed.">          for (int j = 0; j &lt; current.children.size(); j++) {</span>
-<span class="nc bnc" id="L164" title="All 2 branches missed.">            if (current.children.get(j).name.equals(&quot;function&quot;)) {</span>
-<span class="nc" id="L165">              MtasConfiguration function = current.children.get(j);</span>
-<span class="nc" id="L166">              String nameFunction = function.attributes.get(&quot;name&quot;);</span>
-<span class="nc" id="L167">              String typeFunction = function.attributes.get(&quot;type&quot;);</span>
-<span class="nc" id="L168">              String splitFunction = function.attributes.get(&quot;split&quot;);</span>
-<span class="nc bnc" id="L169" title="All 4 branches missed.">              if (nameFunction != null &amp;&amp; typeFunction != null) {</span>
-<span class="nc" id="L170">                MtasCRMParserFunction mtasCRMParserFunction = new MtasCRMParserFunction(</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        } else if (current.name.equals(&quot;functions&quot;)) {</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">          for (int j = 0; j &lt; current.children.size(); j++) {</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            if (current.children.get(j).name.equals(&quot;function&quot;)) {</span>
+<span class="nc" id="L210">              MtasConfiguration function = current.children.get(j);</span>
+<span class="nc" id="L211">              String nameFunction = function.attributes.get(&quot;name&quot;);</span>
+<span class="nc" id="L212">              String typeFunction = function.attributes.get(&quot;type&quot;);</span>
+<span class="nc" id="L213">              String splitFunction = function.attributes.get(&quot;split&quot;);</span>
+<span class="nc bnc" id="L214" title="All 4 branches missed.">              if (nameFunction != null &amp;&amp; typeFunction != null) {</span>
+<span class="nc" id="L215">                MtasCRMParserFunction mtasCRMParserFunction = new MtasCRMParserFunction(</span>
                     typeFunction, splitFunction);
-<span class="nc bnc" id="L172" title="All 2 branches missed.">                if (!functions.containsKey(typeFunction)) {</span>
-<span class="nc" id="L173">                  functions.put(typeFunction,</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">                if (!functions.containsKey(typeFunction)) {</span>
+<span class="nc" id="L218">                  functions.put(typeFunction,</span>
                       new HashMap&lt;String, MtasCRMParserFunction&gt;());
                 }
-<span class="nc" id="L176">                functions.get(typeFunction).put(nameFunction,</span>
+<span class="nc" id="L221">                functions.get(typeFunction).put(nameFunction,</span>
                     mtasCRMParserFunction);
-<span class="nc" id="L178">                MtasConfiguration subCurrent = current.children.get(j);</span>
-<span class="nc bnc" id="L179" title="All 2 branches missed.">                for (int k = 0; k &lt; subCurrent.children.size(); k++) {</span>
-<span class="nc bnc" id="L180" title="All 2 branches missed.">                  if (subCurrent.children.get(k).name.equals(&quot;condition&quot;)) {</span>
-<span class="nc" id="L181">                    MtasConfiguration subSubCurrent = subCurrent.children</span>
-<span class="nc" id="L182">                        .get(k);</span>
-<span class="nc bnc" id="L183" title="All 2 branches missed.">                    if (subSubCurrent.attributes.containsKey(&quot;value&quot;)) {</span>
-<span class="nc" id="L184">                      String[] valuesCondition = subSubCurrent.attributes</span>
-<span class="nc" id="L185">                          .get(&quot;value&quot;).split(Pattern.quote(&quot;,&quot;));</span>
-<span class="nc" id="L186">                      ArrayList&lt;MtasCRMParserFunctionOutput&gt; valueOutputList = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L187" title="All 2 branches missed.">                      for (int l = 0; l &lt; subSubCurrent.children.size(); l++) {</span>
-<span class="nc" id="L188">                        if (subSubCurrent.children.get(l).name</span>
-<span class="nc bnc" id="L189" title="All 2 branches missed.">                            .equals(&quot;output&quot;)) {</span>
-<span class="nc" id="L190">                          String valueOutput = subSubCurrent.children</span>
-<span class="nc" id="L191">                              .get(l).attributes.get(&quot;value&quot;);</span>
-<span class="nc" id="L192">                          String nameOutput = subSubCurrent.children</span>
-<span class="nc" id="L193">                              .get(l).attributes.get(&quot;name&quot;);</span>
-<span class="nc bnc" id="L194" title="All 2 branches missed.">                          if (nameOutput != null) {</span>
-<span class="nc" id="L195">                            MtasCRMParserFunctionOutput o = new MtasCRMParserFunctionOutput(</span>
+<span class="nc" id="L223">                MtasConfiguration subCurrent = current.children.get(j);</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">                for (int k = 0; k &lt; subCurrent.children.size(); k++) {</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">                  if (subCurrent.children.get(k).name.equals(&quot;condition&quot;)) {</span>
+<span class="nc" id="L226">                    MtasConfiguration subSubCurrent = subCurrent.children</span>
+<span class="nc" id="L227">                        .get(k);</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">                    if (subSubCurrent.attributes.containsKey(&quot;value&quot;)) {</span>
+<span class="nc" id="L229">                      String[] valuesCondition = subSubCurrent.attributes</span>
+<span class="nc" id="L230">                          .get(&quot;value&quot;).split(Pattern.quote(&quot;,&quot;));</span>
+<span class="nc" id="L231">                      ArrayList&lt;MtasCRMParserFunctionOutput&gt; valueOutputList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">                      for (int l = 0; l &lt; subSubCurrent.children.size(); l++) {</span>
+<span class="nc" id="L233">                        if (subSubCurrent.children.get(l).name</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">                            .equals(&quot;output&quot;)) {</span>
+<span class="nc" id="L235">                          String valueOutput = subSubCurrent.children</span>
+<span class="nc" id="L236">                              .get(l).attributes.get(&quot;value&quot;);</span>
+<span class="nc" id="L237">                          String nameOutput = subSubCurrent.children</span>
+<span class="nc" id="L238">                              .get(l).attributes.get(&quot;name&quot;);</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">                          if (nameOutput != null) {</span>
+<span class="nc" id="L240">                            MtasCRMParserFunctionOutput o = new MtasCRMParserFunctionOutput(</span>
                                 nameOutput, valueOutput);
-<span class="nc" id="L197">                            valueOutputList.add(o);</span>
+<span class="nc" id="L242">                            valueOutputList.add(o);</span>
                           }
                         }
                       }
-<span class="nc bnc" id="L201" title="All 2 branches missed.">                      if (!valueOutputList.isEmpty()) {</span>
-<span class="nc bnc" id="L202" title="All 2 branches missed.">                        for (String valueCondition : valuesCondition) {</span>
-<span class="nc" id="L203">                          if (mtasCRMParserFunction.output</span>
-<span class="nc bnc" id="L204" title="All 2 branches missed.">                              .containsKey(valueCondition)) {</span>
-<span class="nc" id="L205">                            mtasCRMParserFunction.output.get(valueCondition)</span>
-<span class="nc" id="L206">                                .addAll(</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">                      if (!valueOutputList.isEmpty()) {</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">                        for (String valueCondition : valuesCondition) {</span>
+<span class="nc" id="L248">                          if (mtasCRMParserFunction.output</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">                              .containsKey(valueCondition)) {</span>
+<span class="nc" id="L250">                            mtasCRMParserFunction.output.get(valueCondition)</span>
+<span class="nc" id="L251">                                .addAll(</span>
                                     (Collection&lt;? extends MtasCRMParserFunctionOutput&gt;) valueOutputList
-<span class="nc" id="L208">                                        .clone());</span>
+<span class="nc" id="L253">                                        .clone());</span>
                           } else {
-<span class="nc" id="L210">                            mtasCRMParserFunction.output.put(valueCondition,</span>
+<span class="nc" id="L255">                            mtasCRMParserFunction.output.put(valueCondition,</span>
                                 (ArrayList&lt;MtasCRMParserFunctionOutput&gt;) valueOutputList
-<span class="nc" id="L212">                                    .clone());</span>
+<span class="nc" id="L257">                                    .clone());</span>
                           }
                         }
                       }
@@ -222,7 +267,7 @@ import mtas.analysis.util.MtasParserException;
         }
       }
     }
-<span class="nc" id="L225">  }</span>
+<span class="nc" id="L270">  }</span>
 
   /*
    * (non-Javadoc)
@@ -232,158 +277,160 @@ import mtas.analysis.util.MtasParserException;
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException {
-<span class="nc" id="L235">    AtomicInteger position = new AtomicInteger(0);</span>
-<span class="nc" id="L236">    MtasCRMAncestors unknownAncestors = new MtasCRMAncestors();</span>
+<span class="nc" id="L280">    AtomicInteger position = new AtomicInteger(0);</span>
+<span class="nc" id="L281">    MtasCRMAncestors unknownAncestors = new MtasCRMAncestors();</span>
 
-<span class="nc" id="L238">    Map&lt;String, Set&lt;Integer&gt;&gt; idPositions = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L239">    Map&lt;String, Integer[]&gt; idOffsets = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L283">    Map&lt;String, Set&lt;Integer&gt;&gt; idPositions = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L284">    Map&lt;String, Integer[]&gt; idOffsets = new HashMap&lt;&gt;();</span>
 
-<span class="nc" id="L241">    Map&lt;String, Map&lt;Integer, Set&lt;String&gt;&gt;&gt; updateList = createUpdateList();</span>
-<span class="nc" id="L242">    Map&lt;String, List&lt;MtasParserObject&gt;&gt; currentList = createCurrentList();</span>
+<span class="nc" id="L286">    Map&lt;String, Map&lt;Integer, Set&lt;String&gt;&gt;&gt; updateList = createUpdateList();</span>
+<span class="nc" id="L287">    Map&lt;String, List&lt;MtasParserObject&gt;&gt; currentList = createCurrentList();</span>
 
-<span class="nc" id="L244">    tokenCollection = new MtasTokenCollection();</span>
-<span class="nc" id="L245">    MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();</span>
-<span class="nc" id="L246">    try (MtasBufferedReader br = new MtasBufferedReader(reader)) {</span>
+<span class="nc" id="L289">    tokenCollection = new MtasTokenCollection();</span>
+<span class="nc" id="L290">    MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();</span>
+<span class="nc" id="L291">    try (MtasBufferedReader br = new MtasBufferedReader(reader)) {</span>
       String line;
       int currentOffset;
-<span class="nc" id="L249">      int previousOffset = br.getPosition();</span>
+<span class="nc" id="L294">      int previousOffset = br.getPosition();</span>
       MtasParserObject currentObject;
-<span class="nc" id="L251">      Pattern headerPattern = Pattern.compile(&quot;^@ @ @(.*)$&quot;);</span>
-<span class="nc" id="L252">      Pattern regularPattern = Pattern.compile(</span>
+<span class="nc" id="L296">      Pattern headerPattern = Pattern.compile(&quot;^@ @ @(.*)$&quot;);</span>
+<span class="nc" id="L297">      Pattern regularPattern = Pattern.compile(</span>
           &quot;^([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+)$&quot;);
       Matcher matcherHeader;
-<span class="nc" id="L255">      Matcher matcherRegular = null;</span>
-<span class="nc" id="L256">      Set&lt;MtasParserObject&gt; newPreviousSentence = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L257">      Set&lt;MtasParserObject&gt; previousSentence = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L258">      Set&lt;MtasParserObject&gt; newPreviousClause = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L259">      Set&lt;MtasParserObject&gt; previousClause = new HashSet&lt;&gt;();</span>
-<span class="nc bnc" id="L260" title="All 2 branches missed.">      while ((line = br.readLine()) != null) {</span>
-<span class="nc" id="L261">        currentOffset = br.getPosition();</span>
-<span class="nc" id="L262">        matcherHeader = headerPattern.matcher(line.trim());</span>
-<span class="nc" id="L263">        matcherRegular = regularPattern.matcher(line.trim());</span>
-<span class="nc bnc" id="L264" title="All 2 branches missed.">        if (matcherRegular.matches()) {</span>
-<span class="nc" id="L265">          newPreviousSentence.clear();</span>
-<span class="nc bnc" id="L266" title="All 2 branches missed.">          for (int i = 4; i &lt; 8; i++) {</span>
-<span class="nc" id="L267">            List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L268">            Set&lt;MtasParserObject&gt; tmpList = processCRMSentence(</span>
-<span class="nc" id="L269">                mtasTokenIdFactory, String.valueOf(i),</span>
-<span class="nc" id="L270">                matcherRegular.group((i + 1)), currentOffset,</span>
+<span class="nc" id="L300">      Matcher matcherRegular = null;</span>
+<span class="nc" id="L301">      Set&lt;MtasParserObject&gt; newPreviousSentence = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L302">      Set&lt;MtasParserObject&gt; previousSentence = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L303">      Set&lt;MtasParserObject&gt; newPreviousClause = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L304">      Set&lt;MtasParserObject&gt; previousClause = new HashSet&lt;&gt;(); </span>
+<span class="nc" id="L305">      String[] matcherList = new String[8];</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">      while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L307">        currentOffset = br.getPosition();</span>
+<span class="nc" id="L308">        matcherHeader = headerPattern.matcher(line.trim());</span>
+<span class="nc" id="L309">        matcherRegular = regularPattern.matcher(line.trim());</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (matcherRegular.matches()) {</span>
+<span class="nc" id="L311">          newPreviousSentence.clear();</span>
+<span class="nc" id="L312">          matcherList = createMatcherList(matcherRegular); </span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">          for (int i = 4; i &lt; 8; i++) {</span>
+<span class="nc" id="L314">            List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L315">            Set&lt;MtasParserObject&gt; tmpList = processCRMSentence(</span>
+<span class="nc" id="L316">                mtasTokenIdFactory, String.valueOf(i),</span>
+<span class="nc" id="L317">                matcherList[i], currentOffset,</span>
                 functionOutputList, unknownAncestors, currentList, updateList,
                 idPositions, idOffsets, previousSentence, previousClause);
-<span class="nc bnc" id="L273" title="All 2 branches missed.">            if (tmpList != null) {</span>
-<span class="nc" id="L274">              newPreviousSentence.addAll(tmpList);</span>
+<span class="nc bnc" id="L320" title="All 2 branches missed.">            if (tmpList != null) {</span>
+<span class="nc" id="L321">              newPreviousSentence.addAll(tmpList);</span>
             }
-<span class="nc bnc" id="L276" title="All 2 branches missed.">            for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
-<span class="nc" id="L277">              tmpList = processCRMSentence(mtasTokenIdFactory,</span>
-<span class="nc" id="L278">                  functionOutput.name, functionOutput.value, currentOffset,</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">            for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
+<span class="nc" id="L324">              tmpList = processCRMSentence(mtasTokenIdFactory,</span>
+<span class="nc" id="L325">                  functionOutput.name, functionOutput.value, currentOffset,</span>
                   functionOutputList, unknownAncestors, currentList, updateList,
                   idPositions, idOffsets, previousSentence, previousClause);
-<span class="nc bnc" id="L281" title="All 2 branches missed.">              if (tmpList != null) {</span>
-<span class="nc" id="L282">                newPreviousSentence.addAll(tmpList);</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">              if (tmpList != null) {</span>
+<span class="nc" id="L329">                newPreviousSentence.addAll(tmpList);</span>
               }
-<span class="nc" id="L284">            }</span>
+<span class="nc" id="L331">            }</span>
           }
-<span class="nc bnc" id="L286" title="All 2 branches missed.">          if (!newPreviousSentence.isEmpty()) {</span>
-<span class="nc" id="L287">            previousSentence.clear();</span>
-<span class="nc" id="L288">            previousSentence.addAll(newPreviousSentence);</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">          if (!newPreviousSentence.isEmpty()) {</span>
+<span class="nc" id="L334">            previousSentence.clear();</span>
+<span class="nc" id="L335">            previousSentence.addAll(newPreviousSentence);</span>
           }
-<span class="nc" id="L290">          newPreviousClause.clear();</span>
-<span class="nc bnc" id="L291" title="All 2 branches missed.">          for (int i = 4; i &lt; 8; i++) {</span>
-<span class="nc" id="L292">            ArrayList&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L293">            Set&lt;MtasParserObject&gt; tmpList = processCRMClause(mtasTokenIdFactory,</span>
-<span class="nc" id="L294">                String.valueOf(i), matcherRegular.group((i + 1)), currentOffset,</span>
+<span class="nc" id="L337">          newPreviousClause.clear();</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">          for (int i = 4; i &lt; 8; i++) {</span>
+<span class="nc" id="L339">            ArrayList&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L340">            Set&lt;MtasParserObject&gt; tmpList = processCRMClause(mtasTokenIdFactory,</span>
+<span class="nc" id="L341">                String.valueOf(i), matcherList[i], currentOffset,</span>
                 functionOutputList, unknownAncestors, currentList, updateList,
                 idPositions, idOffsets, previousClause);
-<span class="nc bnc" id="L297" title="All 2 branches missed.">            if (tmpList != null) {</span>
-<span class="nc" id="L298">              newPreviousClause.addAll(tmpList);</span>
+<span class="nc bnc" id="L344" title="All 2 branches missed.">            if (tmpList != null) {</span>
+<span class="nc" id="L345">              newPreviousClause.addAll(tmpList);</span>
             }
-<span class="nc bnc" id="L300" title="All 2 branches missed.">            for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
-<span class="nc" id="L301">              tmpList = processCRMClause(mtasTokenIdFactory,</span>
-<span class="nc" id="L302">                  functionOutput.name, functionOutput.value, currentOffset,</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">            for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
+<span class="nc" id="L348">              tmpList = processCRMClause(mtasTokenIdFactory,</span>
+<span class="nc" id="L349">                  functionOutput.name, functionOutput.value, currentOffset,</span>
                   functionOutputList, unknownAncestors, currentList, updateList,
                   idPositions, idOffsets, previousClause);
-<span class="nc bnc" id="L305" title="All 2 branches missed.">              if (tmpList != null) {</span>
-<span class="nc" id="L306">                newPreviousClause.addAll(tmpList);</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">              if (tmpList != null) {</span>
+<span class="nc" id="L353">                newPreviousClause.addAll(tmpList);</span>
               }
-<span class="nc" id="L308">            }</span>
+<span class="nc" id="L355">            }</span>
           }
-<span class="nc bnc" id="L310" title="All 2 branches missed.">          if (!newPreviousClause.isEmpty()) {</span>
-<span class="nc" id="L311">            previousClause.clear();</span>
-<span class="nc" id="L312">            previousClause.addAll(newPreviousClause);</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">          if (!newPreviousClause.isEmpty()) {</span>
+<span class="nc" id="L358">            previousClause.clear();</span>
+<span class="nc" id="L359">            previousClause.addAll(newPreviousClause);</span>
           }
         }
 
-<span class="nc bnc" id="L316" title="All 4 branches missed.">        if (matcherRegular.matches() &amp;&amp; !matcherHeader.matches()) {</span>
-<span class="nc" id="L317">          matcherRegular = regularPattern.matcher(line.trim());</span>
-<span class="nc bnc" id="L318" title="All 2 branches missed.">          if (matcherRegular.matches()) {</span>
+<span class="nc bnc" id="L363" title="All 4 branches missed.">        if (matcherRegular.matches() &amp;&amp; !matcherHeader.matches()) {</span>
+<span class="nc" id="L364">          matcherRegular = regularPattern.matcher(line.trim());</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">          if (matcherRegular.matches()) {</span>
             // regular line - start word
-<span class="nc" id="L320">            currentObject = new MtasParserObject(wordType);</span>
-<span class="nc" id="L321">            currentObject.setOffsetStart(previousOffset);</span>
-<span class="nc" id="L322">            currentObject.setRealOffsetStart(previousOffset);</span>
-<span class="nc" id="L323">            currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
-<span class="nc bnc" id="L324" title="All 2 branches missed.">            if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="nc" id="L325">              unknownAncestors.unknown++;</span>
+<span class="nc" id="L367">            currentObject = new MtasParserObject(wordType);</span>
+<span class="nc" id="L368">            currentObject.setOffsetStart(previousOffset);</span>
+<span class="nc" id="L369">            currentObject.setRealOffsetStart(previousOffset);</span>
+<span class="nc" id="L370">            currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
+<span class="nc bnc" id="L371" title="All 2 branches missed.">            if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="nc" id="L372">              unknownAncestors.unknown++;</span>
             } else {
-<span class="nc" id="L327">              int p = position.getAndIncrement();</span>
-<span class="nc" id="L328">              currentObject.addPosition(p);</span>
-<span class="nc" id="L329">              currentObject.objectId = &quot;word_&quot; + p;</span>
-<span class="nc" id="L330">              currentList.get(MAPPING_TYPE_WORD).add(currentObject);</span>
-<span class="nc" id="L331">              unknownAncestors.unknown = 0;</span>
+<span class="nc" id="L374">              int p = position.getAndIncrement();</span>
+<span class="nc" id="L375">              currentObject.addPosition(p);</span>
+<span class="nc" id="L376">              currentObject.objectId = &quot;word_&quot; + p;</span>
+<span class="nc" id="L377">              currentList.get(MAPPING_TYPE_WORD).add(currentObject);</span>
+<span class="nc" id="L378">              unknownAncestors.unknown = 0;</span>
               // check for crmPair
-<span class="nc bnc" id="L333" title="All 2 branches missed.">              for (int i = 0; i &lt; 8; i++) {</span>
-<span class="nc" id="L334">                List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L335">                processCRMPair(mtasTokenIdFactory, p, String.valueOf(i),</span>
-<span class="nc" id="L336">                    matcherRegular.group((i + 1)), currentOffset,</span>
+<span class="nc bnc" id="L380" title="All 2 branches missed.">              for (int i = 0; i &lt; 8; i++) {</span>
+<span class="nc" id="L381">                List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L382">                processCRMPair(mtasTokenIdFactory, p, String.valueOf(i),</span>
+<span class="nc" id="L383">                    matcherList[i], currentOffset,</span>
                     functionOutputList, unknownAncestors, currentList,
                     updateList, idPositions, idOffsets);
-<span class="nc bnc" id="L339" title="All 2 branches missed.">                for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
-<span class="nc" id="L340">                  processCRMPair(mtasTokenIdFactory, p, functionOutput.name,</span>
-<span class="nc" id="L341">                      functionOutput.value, currentOffset, functionOutputList,</span>
+<span class="nc bnc" id="L386" title="All 2 branches missed.">                for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
+<span class="nc" id="L387">                  processCRMPair(mtasTokenIdFactory, p, functionOutput.name,</span>
+<span class="nc" id="L388">                      functionOutput.value, currentOffset, functionOutputList,</span>
                       unknownAncestors, currentList, updateList, idPositions,
                       idOffsets);
-<span class="nc" id="L344">                }</span>
+<span class="nc" id="L391">                }</span>
               }
               // compute word annotations
-<span class="nc bnc" id="L347" title="All 2 branches missed.">              for (int i = 0; i &lt; 8; i++) {</span>
-<span class="nc" id="L348">                ArrayList&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L349">                functionOutputList</span>
-<span class="nc" id="L350">                    .addAll(processWordAnnotation(mtasTokenIdFactory,</span>
-<span class="nc" id="L351">                        String.valueOf(i), matcherRegular.group((i + 1)),</span>
-<span class="nc" id="L352">                        previousOffset, currentOffset, unknownAncestors,</span>
+<span class="nc bnc" id="L394" title="All 2 branches missed.">              for (int i = 0; i &lt; 8; i++) {</span>
+<span class="nc" id="L395">                ArrayList&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L396">                functionOutputList</span>
+<span class="nc" id="L397">                    .addAll(processWordAnnotation(mtasTokenIdFactory,</span>
+<span class="nc" id="L398">                        String.valueOf(i), matcherList[i],</span>
+<span class="nc" id="L399">                        previousOffset, currentOffset, unknownAncestors,</span>
                         currentList, updateList, idPositions, idOffsets));
-<span class="nc bnc" id="L354" title="All 2 branches missed.">                for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
-<span class="nc" id="L355">                  processWordAnnotation(mtasTokenIdFactory, functionOutput.name,</span>
-<span class="nc" id="L356">                      functionOutput.value, previousOffset, currentOffset,</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">                for (MtasCRMParserFunctionOutput functionOutput : functionOutputList) {</span>
+<span class="nc" id="L402">                  processWordAnnotation(mtasTokenIdFactory, functionOutput.name,</span>
+<span class="nc" id="L403">                      functionOutput.value, previousOffset, currentOffset,</span>
                       unknownAncestors, currentList, updateList, idPositions,
                       idOffsets);
-<span class="nc" id="L359">                }</span>
+<span class="nc" id="L406">                }</span>
               }
             }
             // finish word
-<span class="nc bnc" id="L363" title="All 2 branches missed.">            if (unknownAncestors.unknown &gt; 0) {</span>
-<span class="nc" id="L364">              unknownAncestors.unknown--;</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">            if (unknownAncestors.unknown &gt; 0) {</span>
+<span class="nc" id="L411">              unknownAncestors.unknown--;</span>
             } else {
-<span class="nc" id="L366">              currentObject = currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="nc" id="L367">                  .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);</span>
-<span class="nc bnc" id="L368" title="All 4 branches missed.">              assert unknownAncestors.unknown == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L369">                  + currentObject.getType().getName();</span>
-<span class="nc" id="L370">              currentObject.setText(null);</span>
-<span class="nc" id="L371">              currentObject.setOffsetEnd(currentOffset - 1);</span>
-<span class="nc" id="L372">              currentObject.setRealOffsetEnd(currentOffset - 1);</span>
+<span class="nc" id="L413">              currentObject = currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="nc" id="L414">                  .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);</span>
+<span class="nc bnc" id="L415" title="All 4 branches missed.">              assert unknownAncestors.unknown == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L416">                  + currentObject.getType().getName();</span>
+<span class="nc" id="L417">              currentObject.setText(null);</span>
+<span class="nc" id="L418">              currentObject.setOffsetEnd(currentOffset - 1);</span>
+<span class="nc" id="L419">              currentObject.setRealOffsetEnd(currentOffset - 1);</span>
               // update ancestor groups with position and offset
               for (MtasParserObject currentGroup : currentList
-<span class="nc bnc" id="L375" title="All 2 branches missed.">                  .get(MAPPING_TYPE_GROUP)) {</span>
-<span class="nc" id="L376">                currentGroup.addPositions(currentObject.getPositions());</span>
-<span class="nc" id="L377">                currentGroup.addOffsetStart(currentObject.getOffsetStart());</span>
-<span class="nc" id="L378">                currentGroup.addOffsetEnd(currentObject.getOffsetEnd());</span>
-<span class="nc" id="L379">              }</span>
-<span class="nc" id="L380">              idPositions.put(currentObject.getId(),</span>
-<span class="nc" id="L381">                  currentObject.getPositions());</span>
-<span class="nc" id="L382">              idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
-<span class="nc" id="L383">              currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="nc" id="L384">              unknownAncestors.unknown = currentObject</span>
-<span class="nc" id="L385">                  .getUnknownAncestorNumber();</span>
-<span class="nc" id="L386">              computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="nc bnc" id="L422" title="All 2 branches missed.">                  .get(MAPPING_TYPE_GROUP)) {</span>
+<span class="nc" id="L423">                currentGroup.addPositions(currentObject.getPositions());</span>
+<span class="nc" id="L424">                currentGroup.addOffsetStart(currentObject.getOffsetStart());</span>
+<span class="nc" id="L425">                currentGroup.addOffsetEnd(currentObject.getOffsetEnd());</span>
+<span class="nc" id="L426">              }</span>
+<span class="nc" id="L427">              idPositions.put(currentObject.getId(),</span>
+<span class="nc" id="L428">                  currentObject.getPositions());</span>
+<span class="nc" id="L429">              idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
+<span class="nc" id="L430">              currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="nc" id="L431">              unknownAncestors.unknown = currentObject</span>
+<span class="nc" id="L432">                  .getUnknownAncestorNumber();</span>
+<span class="nc" id="L433">              computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
                   currentList, updateList);
             }
 
@@ -391,22 +438,37 @@ import mtas.analysis.util.MtasParserException;
             // System.out.println(&quot;PROBLEM: &quot; + line);
           }
         }
-<span class="nc" id="L394">        previousOffset = br.getPosition();</span>
+<span class="nc" id="L441">        previousOffset = br.getPosition();</span>
       }
-<span class="nc" id="L396">      closePrevious(mtasTokenIdFactory, previousSentence, previousOffset,</span>
+<span class="nc" id="L443">      closePrevious(mtasTokenIdFactory, previousSentence, previousOffset,</span>
           unknownAncestors, currentList, updateList, idPositions, idOffsets);
-<span class="nc" id="L398">      closePrevious(mtasTokenIdFactory, previousClause, previousOffset,</span>
+<span class="nc" id="L445">      closePrevious(mtasTokenIdFactory, previousClause, previousOffset,</span>
           unknownAncestors, currentList, updateList, idPositions, idOffsets);
-<span class="nc bnc" id="L400" title="All 8 branches missed.">    } catch (IOException e) {</span>
-<span class="nc" id="L401">      log.debug(e);</span>
-<span class="nc" id="L402">      throw new MtasParserException(e.getMessage());</span>
-<span class="nc" id="L403">    }</span>
+<span class="nc bnc" id="L447" title="All 8 branches missed.">    } catch (IOException e) {</span>
+<span class="nc" id="L448">      log.debug(e);</span>
+<span class="nc" id="L449">      throw new MtasParserException(e.getMessage());</span>
+<span class="nc" id="L450">    }</span>
     // final check
-<span class="nc" id="L405">    tokenCollection.check(autorepair, makeunique);</span>
-<span class="nc" id="L406">    return tokenCollection;</span>
+<span class="nc" id="L452">    tokenCollection.check(autorepair, makeunique);</span>
+<span class="nc" id="L453">    return tokenCollection;</span>
 
   }
 
+  private String[] createMatcherList(Matcher matcher) {
+<span class="nc" id="L458">    String[] list = new String[8];</span>
+    String value;
+<span class="nc bnc" id="L460" title="All 2 branches missed.">    for(int i=0; i&lt;8; i++) {</span>
+<span class="nc" id="L461">      value = matcher.group((i+1));</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">      if(filterReplace.containsKey(i)) {</span>
+<span class="nc bnc" id="L463" title="All 2 branches missed.">        for(Entry&lt;String,String&gt; entry : filterReplace.get(i).entrySet()) {</span>
+<span class="nc" id="L464">          value = value.replaceAll(Pattern.quote(entry.getKey()), entry.getValue());</span>
+<span class="nc" id="L465">        }</span>
+      }
+<span class="nc" id="L467">      list[i] = value;</span>
+    }
+<span class="nc" id="L469">    return list;</span>
+  }
+  
   /**
    * Process word annotation.
    *
@@ -434,63 +496,63 @@ import mtas.analysis.util.MtasParserException;
       throws MtasParserException, MtasConfigException {
     MtasParserType tmpCurrentType;
     MtasParserObject currentObject;
-<span class="nc" id="L437">    List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L438" title="All 2 branches missed.">    if ((tmpCurrentType = wordAnnotationTypes.get(name)) != null) {</span>
+<span class="nc" id="L499">    List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">    if ((tmpCurrentType = wordAnnotationTypes.get(name)) != null) {</span>
       // start word annotation
-<span class="nc" id="L440">      currentObject = new MtasParserObject(tmpCurrentType);</span>
-<span class="nc" id="L441">      currentObject.setRealOffsetStart(previousOffset);</span>
-<span class="nc" id="L442">      currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="nc" id="L443">          .get((currentList.get(MAPPING_TYPE_WORD).size() - 1)).getPositions());</span>
-<span class="nc" id="L444">      currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
-<span class="nc bnc" id="L445" title="All 2 branches missed.">      if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="nc" id="L446">        unknownAncestors.unknown++;</span>
+<span class="nc" id="L502">      currentObject = new MtasParserObject(tmpCurrentType);</span>
+<span class="nc" id="L503">      currentObject.setRealOffsetStart(previousOffset);</span>
+<span class="nc" id="L504">      currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="nc" id="L505">          .get((currentList.get(MAPPING_TYPE_WORD).size() - 1)).getPositions());</span>
+<span class="nc" id="L506">      currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
+<span class="nc bnc" id="L507" title="All 2 branches missed.">      if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="nc" id="L508">        unknownAncestors.unknown++;</span>
       } else {
-<span class="nc" id="L448">        currentList.get(MAPPING_TYPE_WORD_ANNOTATION).add(currentObject);</span>
-<span class="nc" id="L449">        unknownAncestors.unknown = 0;</span>
+<span class="nc" id="L510">        currentList.get(MAPPING_TYPE_WORD_ANNOTATION).add(currentObject);</span>
+<span class="nc" id="L511">        unknownAncestors.unknown = 0;</span>
       }
       // finish word annotation
-<span class="nc bnc" id="L452" title="All 2 branches missed.">      if (unknownAncestors.unknown &gt; 0) {</span>
-<span class="nc" id="L453">        unknownAncestors.unknown--;</span>
+<span class="nc bnc" id="L514" title="All 2 branches missed.">      if (unknownAncestors.unknown &gt; 0) {</span>
+<span class="nc" id="L515">        unknownAncestors.unknown--;</span>
       } else {
-<span class="nc" id="L455">        currentObject = currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
-<span class="nc" id="L456">            .remove(currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size() - 1);</span>
-<span class="nc bnc" id="L457" title="All 4 branches missed.">        assert unknownAncestors.unknown == 0 : &quot;error in administration &quot;</span>
-<span class="nc" id="L458">            + currentObject.getType().getName();</span>
-<span class="nc bnc" id="L459" title="All 2 branches missed.">        if (functions.containsKey(MAPPING_TYPE_WORD_ANNOTATION)</span>
-<span class="nc bnc" id="L460" title="All 4 branches missed.">            &amp;&amp; functions.get(MAPPING_TYPE_WORD_ANNOTATION).containsKey(name)</span>
+<span class="nc" id="L517">        currentObject = currentList.get(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="nc" id="L518">            .remove(currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size() - 1);</span>
+<span class="nc bnc" id="L519" title="All 4 branches missed.">        assert unknownAncestors.unknown == 0 : &quot;error in administration &quot;</span>
+<span class="nc" id="L520">            + currentObject.getType().getName();</span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">        if (functions.containsKey(MAPPING_TYPE_WORD_ANNOTATION)</span>
+<span class="nc bnc" id="L522" title="All 4 branches missed.">            &amp;&amp; functions.get(MAPPING_TYPE_WORD_ANNOTATION).containsKey(name)</span>
             &amp;&amp; text != null) {
-<span class="nc" id="L462">          MtasCRMParserFunction function = functions</span>
-<span class="nc" id="L463">              .get(MAPPING_TYPE_WORD_ANNOTATION).get(name);</span>
+<span class="nc" id="L524">          MtasCRMParserFunction function = functions</span>
+<span class="nc" id="L525">              .get(MAPPING_TYPE_WORD_ANNOTATION).get(name);</span>
           String[] value;
-<span class="nc bnc" id="L465" title="All 2 branches missed.">          if (function.split != null) {</span>
-<span class="nc" id="L466">            value = text.split(Pattern.quote(function.split));</span>
+<span class="nc bnc" id="L527" title="All 2 branches missed.">          if (function.split != null) {</span>
+<span class="nc" id="L528">            value = text.split(Pattern.quote(function.split));</span>
           } else {
-<span class="nc" id="L468">            value = new String[] { text };</span>
+<span class="nc" id="L530">            value = new String[] { text };</span>
           }
-<span class="nc bnc" id="L470" title="All 2 branches missed.">          for (int c = 0; c &lt; value.length; c++) {</span>
-<span class="nc bnc" id="L471" title="All 2 branches missed.">            if (function.output.containsKey(value[c])) {</span>
-<span class="nc" id="L472">              functionOutputList.addAll(function.output.get(value[c]));</span>
+<span class="nc bnc" id="L532" title="All 2 branches missed.">          for (int c = 0; c &lt; value.length; c++) {</span>
+<span class="nc bnc" id="L533" title="All 2 branches missed.">            if (function.output.containsKey(value[c])) {</span>
+<span class="nc" id="L534">              functionOutputList.addAll(function.output.get(value[c]));</span>
             }
           }
         }
-<span class="nc" id="L476">        currentObject.setText(text);</span>
-<span class="nc" id="L477">        currentObject.setRealOffsetEnd(currentOffset - 1);</span>
-<span class="nc" id="L478">        idPositions.put(currentObject.getId(), currentObject.getPositions());</span>
-<span class="nc" id="L479">        idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
+<span class="nc" id="L538">        currentObject.setText(text);</span>
+<span class="nc" id="L539">        currentObject.setRealOffsetEnd(currentOffset - 1);</span>
+<span class="nc" id="L540">        idPositions.put(currentObject.getId(), currentObject.getPositions());</span>
+<span class="nc" id="L541">        idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
         // offset always null, so update later with word (should be possible)
-<span class="nc bnc" id="L481" title="All 2 branches missed.">        if ((currentObject.getId() != null)</span>
-<span class="nc bnc" id="L482" title="All 2 branches missed.">            &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
-<span class="nc" id="L483">          currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="nc" id="L484">              .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
-<span class="nc" id="L485">              .addUpdateableIdWithOffset(currentObject.getId());</span>
+<span class="nc bnc" id="L543" title="All 2 branches missed.">        if ((currentObject.getId() != null)</span>
+<span class="nc bnc" id="L544" title="All 2 branches missed.">            &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
+<span class="nc" id="L545">          currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="nc" id="L546">              .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
+<span class="nc" id="L547">              .addUpdateableIdWithOffset(currentObject.getId());</span>
         }
-<span class="nc" id="L487">        currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="nc" id="L488">        unknownAncestors.unknown = currentObject.getUnknownAncestorNumber();</span>
-<span class="nc" id="L489">        computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="nc" id="L549">        currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="nc" id="L550">        unknownAncestors.unknown = currentObject.getUnknownAncestorNumber();</span>
+<span class="nc" id="L551">        computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
             currentList, updateList);
       }
     }
-<span class="nc" id="L493">    return functionOutputList;</span>
+<span class="nc" id="L555">    return functionOutputList;</span>
   }
 
   /**
@@ -524,26 +586,26 @@ import mtas.analysis.util.MtasParserException;
       throws MtasParserException, MtasConfigException {
     MtasParserType tmpCurrentType;
     MtasParserObject currentObject;
-<span class="nc bnc" id="L527" title="All 2 branches missed.">    if ((tmpCurrentType = crmSentenceTypes.get(name)) != null) {</span>
-<span class="nc" id="L528">      String filteredText = text.replaceAll(&quot;[^0-9\\-]&quot;, &quot;&quot;);</span>
-<span class="nc" id="L529">      currentObject = new MtasParserObject(tmpCurrentType);</span>
-<span class="nc" id="L530">      currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
-<span class="nc" id="L531">      currentObject.setRealOffsetStart(currentOffset);</span>
-<span class="nc" id="L532">      currentObject.setText(filteredText);</span>
-<span class="nc bnc" id="L533" title="All 2 branches missed.">      if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="nc" id="L534">        return new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L589" title="All 2 branches missed.">    if ((tmpCurrentType = crmSentenceTypes.get(name)) != null) {</span>
+<span class="nc" id="L590">      String filteredText = text.replaceAll(&quot;[^0-9\\-]&quot;, &quot;&quot;);</span>
+<span class="nc" id="L591">      currentObject = new MtasParserObject(tmpCurrentType);</span>
+<span class="nc" id="L592">      currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
+<span class="nc" id="L593">      currentObject.setRealOffsetStart(currentOffset);</span>
+<span class="nc" id="L594">      currentObject.setText(filteredText);</span>
+<span class="nc bnc" id="L595" title="All 2 branches missed.">      if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="nc" id="L596">        return new HashSet&lt;&gt;();</span>
       } else {
-<span class="nc" id="L536">        closePrevious(mtasTokenIdFactory, previousClause, currentOffset,</span>
+<span class="nc" id="L598">        closePrevious(mtasTokenIdFactory, previousClause, currentOffset,</span>
             unknownAncestors, currentList, updateList, idPositions, idOffsets);
-<span class="nc" id="L538">        closePrevious(mtasTokenIdFactory, previous, currentOffset,</span>
+<span class="nc" id="L600">        closePrevious(mtasTokenIdFactory, previous, currentOffset,</span>
             unknownAncestors, currentList, updateList, idPositions, idOffsets);
-<span class="nc" id="L540">        previous.clear();</span>
-<span class="nc" id="L541">        currentList.get(MAPPING_TYPE_GROUP).add(currentObject);</span>
-<span class="nc" id="L542">        unknownAncestors.unknown = 0;</span>
-<span class="nc" id="L543">        return new HashSet&lt;&gt;(Arrays.asList(currentObject));</span>
+<span class="nc" id="L602">        previous.clear();</span>
+<span class="nc" id="L603">        currentList.get(MAPPING_TYPE_GROUP).add(currentObject);</span>
+<span class="nc" id="L604">        unknownAncestors.unknown = 0;</span>
+<span class="nc" id="L605">        return new HashSet&lt;&gt;(Arrays.asList(currentObject));</span>
       }
     }
-<span class="nc" id="L546">    return new HashSet&lt;&gt;();</span>
+<span class="nc" id="L608">    return new HashSet&lt;&gt;();</span>
   }
 
   /**
@@ -576,24 +638,24 @@ import mtas.analysis.util.MtasParserException;
       throws MtasParserException, MtasConfigException {
     MtasParserType tmpCurrentType;
     MtasParserObject currentObject;
-<span class="nc bnc" id="L579" title="All 2 branches missed.">    if ((tmpCurrentType = crmClauseTypes.get(name)) != null) {</span>
-<span class="nc" id="L580">      String filteredText = text.replaceAll(&quot;[^0-9\\-]&quot;, &quot;&quot;);</span>
-<span class="nc" id="L581">      currentObject = new MtasParserObject(tmpCurrentType);</span>
-<span class="nc" id="L582">      currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
-<span class="nc" id="L583">      currentObject.setRealOffsetStart(currentOffset);</span>
-<span class="nc" id="L584">      currentObject.setText(filteredText);</span>
-<span class="nc bnc" id="L585" title="All 2 branches missed.">      if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="nc" id="L586">        return new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L641" title="All 2 branches missed.">    if ((tmpCurrentType = crmClauseTypes.get(name)) != null) {</span>
+<span class="nc" id="L642">      String filteredText = text.replaceAll(&quot;[^0-9\\-]&quot;, &quot;&quot;);</span>
+<span class="nc" id="L643">      currentObject = new MtasParserObject(tmpCurrentType);</span>
+<span class="nc" id="L644">      currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
+<span class="nc" id="L645">      currentObject.setRealOffsetStart(currentOffset);</span>
+<span class="nc" id="L646">      currentObject.setText(filteredText);</span>
+<span class="nc bnc" id="L647" title="All 2 branches missed.">      if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="nc" id="L648">        return new HashSet&lt;&gt;();</span>
       } else {
-<span class="nc" id="L588">        closePrevious(mtasTokenIdFactory, previous, currentOffset,</span>
+<span class="nc" id="L650">        closePrevious(mtasTokenIdFactory, previous, currentOffset,</span>
             unknownAncestors, currentList, updateList, idPositions, idOffsets);
-<span class="nc" id="L590">        previous.clear();</span>
-<span class="nc" id="L591">        currentList.get(MAPPING_TYPE_GROUP).add(currentObject);</span>
-<span class="nc" id="L592">        unknownAncestors.unknown = 0;</span>
-<span class="nc" id="L593">        return new HashSet&lt;&gt;(Arrays.asList(currentObject));</span>
+<span class="nc" id="L652">        previous.clear();</span>
+<span class="nc" id="L653">        currentList.get(MAPPING_TYPE_GROUP).add(currentObject);</span>
+<span class="nc" id="L654">        unknownAncestors.unknown = 0;</span>
+<span class="nc" id="L655">        return new HashSet&lt;&gt;(Arrays.asList(currentObject));</span>
       }
     }
-<span class="nc" id="L596">    return new HashSet&lt;&gt;();</span>
+<span class="nc" id="L658">    return new HashSet&lt;&gt;();</span>
   }
 
   /**
@@ -617,17 +679,17 @@ import mtas.analysis.util.MtasParserException;
       Map&lt;String, Map&lt;Integer, Set&lt;String&gt;&gt;&gt; updateList,
       Map&lt;String, Set&lt;Integer&gt;&gt; idPositions, Map&lt;String, Integer[]&gt; idOffsets)
       throws MtasParserException, MtasConfigException {
-<span class="nc bnc" id="L620" title="All 2 branches missed.">    for (MtasParserObject previousObject : previous) {</span>
-<span class="nc" id="L621">      previousObject.setRealOffsetEnd(currentOffset);</span>
-<span class="nc" id="L622">      idPositions.put(previousObject.getId(), previousObject.getPositions());</span>
-<span class="nc" id="L623">      idOffsets.put(previousObject.getId(), previousObject.getOffset());</span>
-<span class="nc" id="L624">      previousObject.updateMappings(idPositions, idOffsets);</span>
-<span class="nc" id="L625">      unknownAncestors.unknown = previousObject.getUnknownAncestorNumber();</span>
-<span class="nc" id="L626">      computeMappingsFromObject(mtasTokenIdFactory, previousObject, currentList,</span>
+<span class="nc bnc" id="L682" title="All 2 branches missed.">    for (MtasParserObject previousObject : previous) {</span>
+<span class="nc" id="L683">      previousObject.setRealOffsetEnd(currentOffset);</span>
+<span class="nc" id="L684">      idPositions.put(previousObject.getId(), previousObject.getPositions());</span>
+<span class="nc" id="L685">      idOffsets.put(previousObject.getId(), previousObject.getOffset());</span>
+<span class="nc" id="L686">      previousObject.updateMappings(idPositions, idOffsets);</span>
+<span class="nc" id="L687">      unknownAncestors.unknown = previousObject.getUnknownAncestorNumber();</span>
+<span class="nc" id="L688">      computeMappingsFromObject(mtasTokenIdFactory, previousObject, currentList,</span>
           updateList);
-<span class="nc" id="L628">      currentList.get(MAPPING_TYPE_GROUP).remove(previousObject);</span>
-<span class="nc" id="L629">    }</span>
-<span class="nc" id="L630">  }</span>
+<span class="nc" id="L690">      currentList.get(MAPPING_TYPE_GROUP).remove(previousObject);</span>
+<span class="nc" id="L691">    }</span>
+<span class="nc" id="L692">  }</span>
 
   /**
    * Process CRM pair.
@@ -658,58 +720,58 @@ import mtas.analysis.util.MtasParserException;
     MtasParserType tmpCurrentType;
     MtasParserObject currentObject;
 
-<span class="nc bnc" id="L661" title="All 2 branches missed.">    if ((tmpCurrentType = crmPairTypes.get(name)) != null) {</span>
+<span class="nc bnc" id="L723" title="All 2 branches missed.">    if ((tmpCurrentType = crmPairTypes.get(name)) != null) {</span>
       // get history
       HashMap&lt;String, MtasParserObject&gt; currentNamePairHistory;
-<span class="nc bnc" id="L664" title="All 2 branches missed.">      if (!historyPair.containsKey(name)) {</span>
-<span class="nc" id="L665">        currentNamePairHistory = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L666">        historyPair.put(name, currentNamePairHistory);</span>
+<span class="nc bnc" id="L726" title="All 2 branches missed.">      if (!historyPair.containsKey(name)) {</span>
+<span class="nc" id="L727">        currentNamePairHistory = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L728">        historyPair.put(name, currentNamePairHistory);</span>
       } else {
-<span class="nc" id="L668">        currentNamePairHistory = historyPair.get(name);</span>
+<span class="nc" id="L730">        currentNamePairHistory = historyPair.get(name);</span>
       }
-<span class="nc" id="L670">      Matcher m = pairPattern.matcher(text);</span>
-<span class="nc bnc" id="L671" title="All 2 branches missed.">      if (m.find()) {</span>
-<span class="nc" id="L672">        String thisKey = m.group(1) + m.group(2);</span>
-<span class="nc bnc" id="L673" title="All 2 branches missed.">        String otherKey = (m.group(1).equals(&quot;b&quot;) ? &quot;e&quot; : &quot;b&quot;) + m.group(2);</span>
-<span class="nc bnc" id="L674" title="All 2 branches missed.">        if (currentNamePairHistory.containsKey(otherKey)) {</span>
-<span class="nc" id="L675">          currentObject = currentNamePairHistory.remove(otherKey);</span>
-<span class="nc" id="L676">          currentObject.setText(currentObject.getText() + &quot;+&quot; + text);</span>
-<span class="nc" id="L677">          currentObject.addPosition(position);</span>
-<span class="nc" id="L678">          processFunctions(name, text, MAPPING_TYPE_CRM_PAIR,</span>
+<span class="nc" id="L732">      Matcher m = pairPattern.matcher(text);</span>
+<span class="nc bnc" id="L733" title="All 2 branches missed.">      if (m.find()) {</span>
+<span class="nc" id="L734">        String thisKey = m.group(1) + m.group(2);</span>
+<span class="nc bnc" id="L735" title="All 2 branches missed.">        String otherKey = (m.group(1).equals(&quot;b&quot;) ? &quot;e&quot; : &quot;b&quot;) + m.group(2);</span>
+<span class="nc bnc" id="L736" title="All 2 branches missed.">        if (currentNamePairHistory.containsKey(otherKey)) {</span>
+<span class="nc" id="L737">          currentObject = currentNamePairHistory.remove(otherKey);</span>
+<span class="nc" id="L738">          currentObject.setText(currentObject.getText() + &quot;+&quot; + text);</span>
+<span class="nc" id="L739">          currentObject.addPosition(position);</span>
+<span class="nc" id="L740">          processFunctions(name, text, MAPPING_TYPE_CRM_PAIR,</span>
               functionOutputList);
-<span class="nc" id="L680">          currentObject.setRealOffsetEnd(currentOffset + 1);</span>
-<span class="nc" id="L681">          currentObject.setOffsetEnd(currentOffset + 1);</span>
-<span class="nc" id="L682">          idPositions.put(currentObject.getId(), currentObject.getPositions());</span>
-<span class="nc" id="L683">          idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
-<span class="nc" id="L684">          currentObject.updateMappings(idPositions, idOffsets);</span>
-<span class="nc" id="L685">          unknownAncestors.unknown = currentObject.getUnknownAncestorNumber();</span>
-<span class="nc" id="L686">          computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
+<span class="nc" id="L742">          currentObject.setRealOffsetEnd(currentOffset + 1);</span>
+<span class="nc" id="L743">          currentObject.setOffsetEnd(currentOffset + 1);</span>
+<span class="nc" id="L744">          idPositions.put(currentObject.getId(), currentObject.getPositions());</span>
+<span class="nc" id="L745">          idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
+<span class="nc" id="L746">          currentObject.updateMappings(idPositions, idOffsets);</span>
+<span class="nc" id="L747">          unknownAncestors.unknown = currentObject.getUnknownAncestorNumber();</span>
+<span class="nc" id="L748">          computeMappingsFromObject(mtasTokenIdFactory, currentObject,</span>
               currentList, updateList);
         } else {
-<span class="nc" id="L689">          currentObject = new MtasParserObject(tmpCurrentType);</span>
-<span class="nc" id="L690">          currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
-<span class="nc" id="L691">          currentObject.setRealOffsetStart(currentOffset);</span>
-<span class="nc" id="L692">          currentObject.setOffsetStart(currentOffset);</span>
-<span class="nc" id="L693">          currentObject.setText(text);</span>
-<span class="nc" id="L694">          currentObject.addPosition(position);</span>
-<span class="nc bnc" id="L695" title="All 2 branches missed.">          if (!prevalidateObject(currentObject, currentList)) {</span>
-<span class="nc" id="L696">            unknownAncestors.unknown++;</span>
+<span class="nc" id="L751">          currentObject = new MtasParserObject(tmpCurrentType);</span>
+<span class="nc" id="L752">          currentObject.setUnknownAncestorNumber(unknownAncestors.unknown);</span>
+<span class="nc" id="L753">          currentObject.setRealOffsetStart(currentOffset);</span>
+<span class="nc" id="L754">          currentObject.setOffsetStart(currentOffset);</span>
+<span class="nc" id="L755">          currentObject.setText(text);</span>
+<span class="nc" id="L756">          currentObject.addPosition(position);</span>
+<span class="nc bnc" id="L757" title="All 2 branches missed.">          if (!prevalidateObject(currentObject, currentList)) {</span>
+<span class="nc" id="L758">            unknownAncestors.unknown++;</span>
           } else {
-<span class="nc" id="L698">            currentNamePairHistory.put(thisKey, currentObject);</span>
-<span class="nc" id="L699">            processFunctions(name, text, MAPPING_TYPE_CRM_PAIR,</span>
+<span class="nc" id="L760">            currentNamePairHistory.put(thisKey, currentObject);</span>
+<span class="nc" id="L761">            processFunctions(name, text, MAPPING_TYPE_CRM_PAIR,</span>
                 functionOutputList);
-<span class="nc" id="L701">            currentObject.setRealOffsetEnd(currentOffset + 1);</span>
-<span class="nc" id="L702">            currentObject.setOffsetEnd(currentOffset + 1);</span>
-<span class="nc" id="L703">            idPositions.put(currentObject.getId(),</span>
-<span class="nc" id="L704">                currentObject.getPositions());</span>
-<span class="nc" id="L705">            idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
+<span class="nc" id="L763">            currentObject.setRealOffsetEnd(currentOffset + 1);</span>
+<span class="nc" id="L764">            currentObject.setOffsetEnd(currentOffset + 1);</span>
+<span class="nc" id="L765">            idPositions.put(currentObject.getId(),</span>
+<span class="nc" id="L766">                currentObject.getPositions());</span>
+<span class="nc" id="L767">            idOffsets.put(currentObject.getId(), currentObject.getOffset());</span>
             // offset always null, so update later with word (should be
             // possible)
-<span class="nc bnc" id="L708" title="All 2 branches missed.">            if ((currentObject.getId() != null)</span>
-<span class="nc bnc" id="L709" title="All 2 branches missed.">                &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
-<span class="nc" id="L710">              currentList.get(MAPPING_TYPE_WORD)</span>
-<span class="nc" id="L711">                  .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
-<span class="nc" id="L712">                  .addUpdateableIdWithOffset(currentObject.getId());</span>
+<span class="nc bnc" id="L770" title="All 2 branches missed.">            if ((currentObject.getId() != null)</span>
+<span class="nc bnc" id="L771" title="All 2 branches missed.">                &amp;&amp; (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {</span>
+<span class="nc" id="L772">              currentList.get(MAPPING_TYPE_WORD)</span>
+<span class="nc" id="L773">                  .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))</span>
+<span class="nc" id="L774">                  .addUpdateableIdWithOffset(currentObject.getId());</span>
             }
 
           }
@@ -718,7 +780,7 @@ import mtas.analysis.util.MtasParserException;
 
     }
 
-<span class="nc" id="L721">  }</span>
+<span class="nc" id="L783">  }</span>
 
   /**
    * Process functions.
@@ -730,36 +792,36 @@ import mtas.analysis.util.MtasParserException;
    */
   private void processFunctions(String name, String text, String type,
       List&lt;MtasCRMParserFunctionOutput&gt; functionOutputList) {
-<span class="nc bnc" id="L733" title="All 6 branches missed.">    if (functions.containsKey(type) &amp;&amp; functions.get(type).containsKey(name)</span>
+<span class="nc bnc" id="L795" title="All 6 branches missed.">    if (functions.containsKey(type) &amp;&amp; functions.get(type).containsKey(name)</span>
         &amp;&amp; text != null) {
-<span class="nc" id="L735">      MtasCRMParserFunction function = functions.get(type).get(name);</span>
+<span class="nc" id="L797">      MtasCRMParserFunction function = functions.get(type).get(name);</span>
       String[] value;
-<span class="nc bnc" id="L737" title="All 2 branches missed.">      if (function.split != null) {</span>
-<span class="nc" id="L738">        value = text.split(Pattern.quote(function.split));</span>
+<span class="nc bnc" id="L799" title="All 2 branches missed.">      if (function.split != null) {</span>
+<span class="nc" id="L800">        value = text.split(Pattern.quote(function.split));</span>
       } else {
-<span class="nc" id="L740">        value = new String[] { text };</span>
+<span class="nc" id="L802">        value = new String[] { text };</span>
       }
-<span class="nc bnc" id="L742" title="All 2 branches missed.">      for (int c = 0; c &lt; value.length; c++) {</span>
-<span class="nc" id="L743">        boolean checkedEmpty = false;</span>
-<span class="nc bnc" id="L744" title="All 2 branches missed.">        if (value[c].equals(&quot;&quot;)) {</span>
-<span class="nc" id="L745">          checkedEmpty = true;</span>
+<span class="nc bnc" id="L804" title="All 2 branches missed.">      for (int c = 0; c &lt; value.length; c++) {</span>
+<span class="nc" id="L805">        boolean checkedEmpty = false;</span>
+<span class="nc bnc" id="L806" title="All 2 branches missed.">        if (value[c].equals(&quot;&quot;)) {</span>
+<span class="nc" id="L807">          checkedEmpty = true;</span>
         }
-<span class="nc bnc" id="L747" title="All 2 branches missed.">        if (function.output.containsKey(value[c])) {</span>
-<span class="nc" id="L748">          ArrayList&lt;MtasCRMParserFunctionOutput&gt; list = function.output</span>
-<span class="nc" id="L749">              .get(value[c]);</span>
-<span class="nc bnc" id="L750" title="All 2 branches missed.">          for (MtasCRMParserFunctionOutput listItem : list) {</span>
-<span class="nc" id="L751">            functionOutputList.add(listItem.create(value[c]));</span>
-<span class="nc" id="L752">          }</span>
+<span class="nc bnc" id="L809" title="All 2 branches missed.">        if (function.output.containsKey(value[c])) {</span>
+<span class="nc" id="L810">          ArrayList&lt;MtasCRMParserFunctionOutput&gt; list = function.output</span>
+<span class="nc" id="L811">              .get(value[c]);</span>
+<span class="nc bnc" id="L812" title="All 2 branches missed.">          for (MtasCRMParserFunctionOutput listItem : list) {</span>
+<span class="nc" id="L813">            functionOutputList.add(listItem.create(value[c]));</span>
+<span class="nc" id="L814">          }</span>
         }
-<span class="nc bnc" id="L754" title="All 4 branches missed.">        if (!checkedEmpty &amp;&amp; function.output.containsKey(&quot;&quot;)) {</span>
-<span class="nc" id="L755">          ArrayList&lt;MtasCRMParserFunctionOutput&gt; list = function.output.get(&quot;&quot;);</span>
-<span class="nc bnc" id="L756" title="All 2 branches missed.">          for (MtasCRMParserFunctionOutput listItem : list) {</span>
-<span class="nc" id="L757">            functionOutputList.add(listItem.create(value[c]));</span>
-<span class="nc" id="L758">          }</span>
+<span class="nc bnc" id="L816" title="All 4 branches missed.">        if (!checkedEmpty &amp;&amp; function.output.containsKey(&quot;&quot;)) {</span>
+<span class="nc" id="L817">          ArrayList&lt;MtasCRMParserFunctionOutput&gt; list = function.output.get(&quot;&quot;);</span>
+<span class="nc bnc" id="L818" title="All 2 branches missed.">          for (MtasCRMParserFunctionOutput listItem : list) {</span>
+<span class="nc" id="L819">            functionOutputList.add(listItem.create(value[c]));</span>
+<span class="nc" id="L820">          }</span>
         }
       }
     }
-<span class="nc" id="L762">  }</span>
+<span class="nc" id="L824">  }</span>
 
   /*
    * (non-Javadoc)
@@ -768,12 +830,12 @@ import mtas.analysis.util.MtasParserException;
    */
   @Override
   public String printConfig() {
-<span class="nc" id="L771">    StringBuilder text = new StringBuilder();</span>
-<span class="nc" id="L772">    text.append(&quot;=== CONFIGURATION ===\n&quot;);</span>
-<span class="nc" id="L773">    text.append(&quot;type: &quot; + wordAnnotationTypes.size() + &quot; x wordAnnotation&quot;);</span>
-<span class="nc" id="L774">    text.append(printConfigTypes(wordAnnotationTypes));</span>
-<span class="nc" id="L775">    text.append(&quot;=== CONFIGURATION ===\n&quot;);</span>
-<span class="nc" id="L776">    return text.toString();</span>
+<span class="nc" id="L833">    StringBuilder text = new StringBuilder();</span>
+<span class="nc" id="L834">    text.append(&quot;=== CONFIGURATION ===\n&quot;);</span>
+<span class="nc" id="L835">    text.append(&quot;type: &quot; + wordAnnotationTypes.size() + &quot; x wordAnnotation&quot;);</span>
+<span class="nc" id="L836">    text.append(printConfigTypes(wordAnnotationTypes));</span>
+<span class="nc" id="L837">    text.append(&quot;=== CONFIGURATION ===\n&quot;);</span>
+<span class="nc" id="L838">    return text.toString();</span>
   }
 
   /**
@@ -784,25 +846,25 @@ import mtas.analysis.util.MtasParserException;
    */
   private String printConfigTypes(
       HashMap&lt;?, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; types) {
-<span class="nc" id="L787">    StringBuilder text = new StringBuilder();</span>
-<span class="nc bnc" id="L788" title="All 2 branches missed.">    for (Entry&lt;?, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; entry : types</span>
-<span class="nc" id="L789">        .entrySet()) {</span>
-<span class="nc" id="L790">      text.append(&quot;- &quot; + entry.getKey() + &quot;: &quot; + entry.getValue().items.size()</span>
+<span class="nc" id="L849">    StringBuilder text = new StringBuilder();</span>
+<span class="nc bnc" id="L850" title="All 2 branches missed.">    for (Entry&lt;?, MtasParserType&lt;MtasParserMapping&lt;?&gt;&gt;&gt; entry : types</span>
+<span class="nc" id="L851">        .entrySet()) {</span>
+<span class="nc" id="L852">      text.append(&quot;- &quot; + entry.getKey() + &quot;: &quot; + entry.getValue().items.size()</span>
           + &quot; mapping(s)\n&quot;);
-<span class="nc bnc" id="L792" title="All 2 branches missed.">      for (int i = 0; i &lt; entry.getValue().items.size(); i++) {</span>
-<span class="nc" id="L793">        text.append(&quot;\t&quot; + entry.getValue().items.get(i) + &quot;\n&quot;);</span>
+<span class="nc bnc" id="L854" title="All 2 branches missed.">      for (int i = 0; i &lt; entry.getValue().items.size(); i++) {</span>
+<span class="nc" id="L855">        text.append(&quot;\t&quot; + entry.getValue().items.get(i) + &quot;\n&quot;);</span>
       }
-<span class="nc" id="L795">    }</span>
-<span class="nc" id="L796">    return text.toString();</span>
+<span class="nc" id="L857">    }</span>
+<span class="nc" id="L858">    return text.toString();</span>
   }
 
   /**
    * The Class MtasCRMAncestors.
    */
-<span class="nc" id="L802">  private static class MtasCRMAncestors {</span>
+<span class="nc" id="L864">  private static class MtasCRMAncestors {</span>
 
     /** The unknown. */
-<span class="nc" id="L805">    public int unknown = 0;</span>
+<span class="nc" id="L867">    public int unknown = 0;</span>
   }
 
   /**
@@ -822,10 +884,10 @@ import mtas.analysis.util.MtasParserException;
      * @param type the type
      * @param split the split
      */
-<span class="nc" id="L825">    public MtasCRMParserFunction(String type, String split) {</span>
-<span class="nc" id="L826">      this.split = split;</span>
-<span class="nc" id="L827">      output = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L828">    }</span>
+<span class="nc" id="L887">    public MtasCRMParserFunction(String type, String split) {</span>
+<span class="nc" id="L888">      this.split = split;</span>
+<span class="nc" id="L889">      output = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L890">    }</span>
 
   }
 
@@ -846,10 +908,10 @@ import mtas.analysis.util.MtasParserException;
      * @param name the name
      * @param value the value
      */
-<span class="nc" id="L849">    public MtasCRMParserFunctionOutput(String name, String value) {</span>
-<span class="nc" id="L850">      this.name = name;</span>
-<span class="nc" id="L851">      this.value = value;</span>
-<span class="nc" id="L852">    }</span>
+<span class="nc" id="L911">    public MtasCRMParserFunctionOutput(String name, String value) {</span>
+<span class="nc" id="L912">      this.name = name;</span>
+<span class="nc" id="L913">      this.value = value;</span>
+<span class="nc" id="L914">    }</span>
 
     /**
      * Creates the.
@@ -858,10 +920,10 @@ import mtas.analysis.util.MtasParserException;
      * @return the mtas CRM parser function output
      */
     public MtasCRMParserFunctionOutput create(String originalValue) {
-<span class="nc bnc" id="L861" title="All 2 branches missed.">      if (value != null) {</span>
-<span class="nc" id="L862">        return this;</span>
+<span class="nc bnc" id="L923" title="All 2 branches missed.">      if (value != null) {</span>
+<span class="nc" id="L924">        return this;</span>
       } else {
-<span class="nc" id="L864">        return new MtasCRMParserFunctionOutput(name, originalValue);</span>
+<span class="nc" id="L926">        return new MtasCRMParserFunctionOutput(name, originalValue);</span>
       }
     }
 
@@ -872,7 +934,7 @@ import mtas.analysis.util.MtasParserException;
      */
     @Override
     public String toString() {
-<span class="nc" id="L875">      return &quot;MtasCRMParserFunctionOutput[&quot; + name + &quot;,&quot; + value + &quot;]&quot;;</span>
+<span class="nc" id="L937">      return &quot;MtasCRMParserFunctionOutput[&quot; + name + &quot;,&quot; + value + &quot;]&quot;;</span>
     }
   }
 
@@ -885,13 +947,13 @@ import mtas.analysis.util.MtasParserException;
     /**
      * Instantiates a new mtas CRM parser mapping word annotation.
      */
-<span class="nc" id="L888">    public MtasCRMParserMappingWordAnnotation() {</span>
-<span class="nc" id="L889">      super();</span>
-<span class="nc" id="L890">      this.position = SOURCE_OWN;</span>
-<span class="nc" id="L891">      this.realOffset = SOURCE_OWN;</span>
-<span class="nc" id="L892">      this.offset = SOURCE_ANCESTOR_WORD;</span>
-<span class="nc" id="L893">      this.type = MAPPING_TYPE_WORD_ANNOTATION;</span>
-<span class="nc" id="L894">    }</span>
+<span class="nc" id="L950">    public MtasCRMParserMappingWordAnnotation() {</span>
+<span class="nc" id="L951">      super();</span>
+<span class="nc" id="L952">      this.position = SOURCE_OWN;</span>
+<span class="nc" id="L953">      this.realOffset = SOURCE_OWN;</span>
+<span class="nc" id="L954">      this.offset = SOURCE_ANCESTOR_WORD;</span>
+<span class="nc" id="L955">      this.type = MAPPING_TYPE_WORD_ANNOTATION;</span>
+<span class="nc" id="L956">    }</span>
 
     /*
      * (non-Javadoc)
@@ -900,7 +962,7 @@ import mtas.analysis.util.MtasParserException;
      */
     @Override
     protected MtasCRMParserMappingWordAnnotation self() {
-<span class="nc" id="L903">      return this;</span>
+<span class="nc" id="L965">      return this;</span>
     }
   }
 
@@ -913,13 +975,13 @@ import mtas.analysis.util.MtasParserException;
     /**
      * Instantiates a new mtas CRM parser mapping CRM sentence.
      */
-<span class="nc" id="L916">    public MtasCRMParserMappingCRMSentence() {</span>
-<span class="nc" id="L917">      super();</span>
-<span class="nc" id="L918">      this.position = SOURCE_OWN;</span>
-<span class="nc" id="L919">      this.realOffset = SOURCE_OWN;</span>
-<span class="nc" id="L920">      this.offset = SOURCE_OWN;</span>
-<span class="nc" id="L921">      this.type = MAPPING_TYPE_GROUP;</span>
-<span class="nc" id="L922">    }</span>
+<span class="nc" id="L978">    public MtasCRMParserMappingCRMSentence() {</span>
+<span class="nc" id="L979">      super();</span>
+<span class="nc" id="L980">      this.position = SOURCE_OWN;</span>
+<span class="nc" id="L981">      this.realOffset = SOURCE_OWN;</span>
+<span class="nc" id="L982">      this.offset = SOURCE_OWN;</span>
+<span class="nc" id="L983">      this.type = MAPPING_TYPE_GROUP;</span>
+<span class="nc" id="L984">    }</span>
 
     /*
      * (non-Javadoc)
@@ -928,7 +990,7 @@ import mtas.analysis.util.MtasParserException;
      */
     @Override
     protected MtasCRMParserMappingCRMSentence self() {
-<span class="nc" id="L931">      return this;</span>
+<span class="nc" id="L993">      return this;</span>
     }
   }
 
@@ -941,13 +1003,13 @@ import mtas.analysis.util.MtasParserException;
     /**
      * Instantiates a new mtas CRM parser mapping CRM pair.
      */
-<span class="nc" id="L944">    public MtasCRMParserMappingCRMPair() {</span>
-<span class="nc" id="L945">      super();</span>
-<span class="nc" id="L946">      this.position = SOURCE_OWN;</span>
-<span class="nc" id="L947">      this.realOffset = SOURCE_OWN;</span>
-<span class="nc" id="L948">      this.offset = SOURCE_OWN;</span>
-<span class="nc" id="L949">      this.type = MAPPING_TYPE_RELATION;</span>
-<span class="nc" id="L950">    }</span>
+<span class="nc" id="L1006">    public MtasCRMParserMappingCRMPair() {</span>
+<span class="nc" id="L1007">      super();</span>
+<span class="nc" id="L1008">      this.position = SOURCE_OWN;</span>
+<span class="nc" id="L1009">      this.realOffset = SOURCE_OWN;</span>
+<span class="nc" id="L1010">      this.offset = SOURCE_OWN;</span>
+<span class="nc" id="L1011">      this.type = MAPPING_TYPE_RELATION;</span>
+<span class="nc" id="L1012">    }</span>
 
     /*
      * (non-Javadoc)
@@ -956,7 +1018,7 @@ import mtas.analysis.util.MtasParserException;
      */
     @Override
     protected MtasCRMParserMappingCRMPair self() {
-<span class="nc" id="L959">      return this;</span>
+<span class="nc" id="L1021">      return this;</span>
     }
   }
 

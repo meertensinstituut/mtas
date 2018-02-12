@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Status.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.codec.util</a> &gt; <span class="el_source">Status.java</span></div><h1>Status.java</h1><pre class="source lang-java linenums">package mtas.codec.util;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+<span class="fc" id="L8">public class Status {</span>
+  
+  public final static String TYPE_SEGMENT = &quot;segment&quot;;
+
+  public final static String KEY_NUMBER = &quot;number&quot;;
+  public final static String KEY_NUMBEROFDOCUMENTS = &quot;numberOfDocuments&quot;;
+  
+<span class="fc" id="L15">  public volatile Integer numberSegmentsFinished = null;</span>
+<span class="fc" id="L16">  public volatile Integer numberSegmentsTotal = null;</span>
+  
+<span class="fc" id="L18">  public volatile Integer subNumberSegmentsTotal = null;</span>
+<span class="fc" id="L19">  public volatile Integer subNumberSegmentsFinishedTotal = null;</span>
+<span class="fc" id="L20">  public volatile Map&lt;String,Integer&gt; subNumberSegmentsFinished = new ConcurrentHashMap&lt;&gt;();</span>
+  
+<span class="fc" id="L22">  public volatile Long numberDocumentsFound = null;</span>
+<span class="fc" id="L23">  public volatile Long numberDocumentsFinished = null;</span>
+<span class="fc" id="L24">  public volatile Long numberDocumentsTotal = null;</span>
+  
+<span class="fc" id="L26">  public volatile Long subNumberDocumentsTotal = null;</span>
+<span class="fc" id="L27">  public volatile Long subNumberDocumentsFinishedTotal = null;</span>
+<span class="fc" id="L28">  public volatile Map&lt;String,Long&gt; subNumberDocumentsFinished = new ConcurrentHashMap&lt;&gt;();</span>
+  
+  public void init(long numberOfDocuments, int numberOfSegments) throws IOException {
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">    if(numberDocumentsTotal==null) {</span>
+<span class="fc" id="L32">      numberDocumentsTotal = numberOfDocuments;</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">    } else if(numberDocumentsTotal!=numberOfDocuments) {</span>
+<span class="nc" id="L34">      throw new IOException(&quot;conflict number of documents: &quot;+numberDocumentsTotal+&quot; / &quot;+numberOfDocuments);</span>
+    }
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">    if(numberSegmentsTotal==null) {</span>
+<span class="fc" id="L37">      numberSegmentsTotal = numberOfSegments;</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">    } else if(numberSegmentsTotal!=numberOfSegments) {</span>
+<span class="nc" id="L39">      throw new IOException(&quot;conflict number of segments: &quot;+numberSegmentsTotal+&quot; / &quot;+numberOfSegments);</span>
+    }
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">    numberDocumentsFinished = (numberDocumentsFinished==null) ? Long.valueOf(0) : numberDocumentsFinished;</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">    if(numberSegmentsFinished==null) {</span>
+<span class="fc" id="L43">      numberSegmentsFinished = 0;</span>
+    }
+<span class="fc" id="L45">    subNumberDocumentsTotal = numberDocumentsTotal * subNumberDocumentsFinished.size();</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">    subNumberDocumentsFinishedTotal = (subNumberDocumentsFinishedTotal==null) ? Long.valueOf(0) : subNumberDocumentsFinishedTotal;</span>
+<span class="fc" id="L47">    subNumberSegmentsTotal = numberOfSegments * subNumberSegmentsFinished.size();</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">    if(subNumberSegmentsFinishedTotal ==null) {</span>
+<span class="fc" id="L49">      subNumberSegmentsFinishedTotal = 0;</span>
+    }  
+<span class="fc" id="L51">  }</span>
+  
+  public void addSubs(Set&lt;String&gt; subItems) {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    for(String subItem : subItems) {</span>
+<span class="fc" id="L55">      addSub(subItem);</span>
+<span class="fc" id="L56">    }</span>
+<span class="fc" id="L57">  }</span>
+  
+  public void addSub(String subItem) {
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    if(!subNumberSegmentsFinished.containsKey(subItem)) {</span>
+<span class="fc" id="L61">      subNumberSegmentsFinished.put(subItem, 0);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">      if(numberSegmentsTotal!=null) {</span>
+<span class="nc" id="L63">        subNumberSegmentsTotal += numberSegmentsTotal;</span>
+      }
+    }
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if(!subNumberDocumentsFinished.containsKey(subItem)) {</span>
+<span class="fc" id="L67">      subNumberDocumentsFinished.put(subItem, Long.valueOf(0));</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">      if(numberDocumentsTotal!=null) {</span>
+<span class="nc" id="L69">        subNumberDocumentsTotal += numberDocumentsTotal;</span>
+      }
+    }
+<span class="fc" id="L72">  }</span>
+  
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

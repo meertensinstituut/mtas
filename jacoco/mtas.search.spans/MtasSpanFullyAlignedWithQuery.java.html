@@ -290,6 +290,11 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
 <span class="nc" id="L290">      w2.spanWeight.extractTerms(terms);</span>
 <span class="nc" id="L291">    }</span>
 
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return w1.spanWeight.isCacheable(arg0) &amp;&amp; w2.spanWeight.isCacheable(arg0);
+//    }
+
   }
 
   /**
@@ -307,9 +312,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      * @param spans the spans
      */
     public MtasSpanFullyAlignedWithQuerySpans(
-<span class="fc" id="L310">        MtasSpanFullyAlignedWithQuery query, Spans spans) {</span>
-<span class="pc bpc" id="L311" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
-<span class="fc" id="L312">    }</span>
+<span class="fc" id="L315">        MtasSpanFullyAlignedWithQuery query, Spans spans) {</span>
+<span class="pc bpc" id="L316" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
+<span class="fc" id="L317">    }</span>
 
   }
 
@@ -326,9 +331,9 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
      *
      * @param spanWeight the span weight
      */
-<span class="fc" id="L329">    public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {</span>
-<span class="fc" id="L330">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L331">    }</span>
+<span class="fc" id="L334">    public MtasSpanFullyAlignedWithQueryWeight(SpanWeight spanWeight) {</span>
+<span class="fc" id="L335">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L336">    }</span>
   }
 
 }

@@ -5,6 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Map.Entry;
 
 import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
@@ -18,21 +21,30 @@ import mtas.codec.util.CodecComponent.ComponentSpan;
 import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecUtil;
+import mtas.codec.util.Status;
 import mtas.solr.handler.component.util.MtasSolrResultMerge;
+import mtas.solr.handler.util.MtasSolrStatus;
+import mtas.solr.handler.util.MtasSolrStatus.ShardStatus;
 import mtas.solr.search.MtasSolrCollectionCache;
 import mtas.solr.handler.component.util.MtasSolrComponentDocument;
 import mtas.solr.handler.component.util.MtasSolrComponentFacet;
 import mtas.solr.handler.component.util.MtasSolrComponentGroup;
+import mtas.solr.handler.MtasRequestHandler;
+import mtas.solr.handler.MtasRequestHandler.ShardInformation;
 import mtas.solr.handler.component.util.MtasSolrComponentCollection;
 import mtas.solr.handler.component.util.MtasSolrComponentKwic;
 import mtas.solr.handler.component.util.MtasSolrComponentList;
 import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
 import mtas.solr.handler.component.util.MtasSolrComponentStats;
+import mtas.solr.handler.component.util.MtasSolrComponentStatus;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.core.SolrInfoBean;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
@@ -43,10 +55,10 @@ import org.apache.solr.search.SolrIndexSearcher;
 /**
  * The Class MtasSolrSearchComponent.
  */
-<span class="fc" id="L46">public class MtasSolrSearchComponent extends SearchComponent {</span>
+<span class="fc" id="L58">public class MtasSolrSearchComponent extends SearchComponent {</span>
 
   /** The log. */
-<span class="fc" id="L49">  private static Log log = LogFactory.getLog(MtasSolrSearchComponent.class);</span>
+<span class="fc" id="L61">  private static Log log = LogFactory.getLog(MtasSolrSearchComponent.class);</span>
 
   /** The search component. */
   MtasSolrSearchComponent searchComponent;
@@ -63,50 +75,53 @@ import org.apache.solr.search.SolrIndexSearcher;
   /** The Constant CONFIG_COLLECTION_MAXIMUM_OVERFLOW. */
   public static final String CONFIG_COLLECTION_MAXIMUM_OVERFLOW = &quot;collectionMaximumOverflow&quot;;
 
+  /** The Constant NAME. */
+  public static final String NAME = &quot;mtas&quot;;
+
   /** The Constant PARAM_MTAS. */
   public static final String PARAM_MTAS = &quot;mtas&quot;;
 
   /** The Constant STAGE_TERMVECTOR_MISSING_TOP. */
-<span class="fc" id="L70">  public static final int STAGE_TERMVECTOR_MISSING_TOP = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L85">  public static final int STAGE_TERMVECTOR_MISSING_TOP = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 10;
 
   /** The Constant STAGE_TERMVECTOR_MISSING_KEY. */
-<span class="fc" id="L74">  public static final int STAGE_TERMVECTOR_MISSING_KEY = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L89">  public static final int STAGE_TERMVECTOR_MISSING_KEY = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 11;
 
   /** The Constant STAGE_TERMVECTOR_FINISH. */
-<span class="fc" id="L78">  public static final int STAGE_TERMVECTOR_FINISH = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L93">  public static final int STAGE_TERMVECTOR_FINISH = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 12;
 
   /** The Constant STAGE_LIST. */
-<span class="fc" id="L82">  public static final int STAGE_LIST = ResponseBuilder.STAGE_EXECUTE_QUERY + 20;</span>
+<span class="fc" id="L97">  public static final int STAGE_LIST = ResponseBuilder.STAGE_EXECUTE_QUERY + 20;</span>
 
   /** The Constant STAGE_PREFIX. */
-<span class="fc" id="L85">  public static final int STAGE_PREFIX = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L100">  public static final int STAGE_PREFIX = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 30;
 
   /** The Constant STAGE_STATS. */
-<span class="fc" id="L89">  public static final int STAGE_STATS = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L104">  public static final int STAGE_STATS = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 40;
 
   /** The Constant STAGE_FACET. */
-<span class="fc" id="L93">  public static final int STAGE_FACET = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L108">  public static final int STAGE_FACET = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 50;
 
   /** The Constant STAGE_GROUP. */
-<span class="fc" id="L97">  public static final int STAGE_GROUP = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L112">  public static final int STAGE_GROUP = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 60;
 
   /** The Constant STAGE_COLLECTION_INIT. */
-<span class="fc" id="L101">  public static final int STAGE_COLLECTION_INIT = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L116">  public static final int STAGE_COLLECTION_INIT = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 70;
 
   /** The Constant STAGE_COLLECTION_FINISH. */
-<span class="fc" id="L105">  public static final int STAGE_COLLECTION_FINISH = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc" id="L120">  public static final int STAGE_COLLECTION_FINISH = ResponseBuilder.STAGE_EXECUTE_QUERY</span>
       + 71;
 
   /** The Constant STAGE_DOCUMENT. */
-<span class="fc" id="L109">  public static final int STAGE_DOCUMENT = ResponseBuilder.STAGE_GET_FIELDS</span>
+<span class="fc" id="L124">  public static final int STAGE_DOCUMENT = ResponseBuilder.STAGE_GET_FIELDS</span>
       + 10;
 
   /** The mtas solr result merge. */
@@ -139,8 +154,17 @@ import org.apache.solr.search.SolrIndexSearcher;
   /** The search collection. */
   private MtasSolrComponentCollection searchCollection;
 
+  /** The search status. */
+  private MtasSolrComponentStatus searchStatus;
+
   /** The collection cache. */
-<span class="fc" id="L143">  private MtasSolrCollectionCache collectionCache = null;</span>
+<span class="fc" id="L161">  private MtasSolrCollectionCache collectionCache = null;</span>
+
+  /** The request handler. */
+<span class="fc" id="L164">  private MtasRequestHandler requestHandler = null;</span>
+
+  /** The request handler name. */
+<span class="fc" id="L167">  private String requestHandlerName = null;</span>
 
   /*
    * (non-Javadoc)
@@ -151,44 +175,45 @@ import org.apache.solr.search.SolrIndexSearcher;
    */
   @Override
   public void init(NamedList args) {
-<span class="fc" id="L154">    super.init(args);   </span>
+<span class="fc" id="L178">    super.init(args);</span>
     // init components
-<span class="fc" id="L156">    searchDocument = new MtasSolrComponentDocument(this);</span>
-<span class="fc" id="L157">    searchKwic = new MtasSolrComponentKwic(this);</span>
-<span class="fc" id="L158">    searchList = new MtasSolrComponentList(this);</span>
-<span class="fc" id="L159">    searchGroup = new MtasSolrComponentGroup(this);</span>
-<span class="fc" id="L160">    searchTermvector = new MtasSolrComponentTermvector(this);</span>
-<span class="fc" id="L161">    searchPrefix = new MtasSolrComponentPrefix(this);</span>
-<span class="fc" id="L162">    searchStats = new MtasSolrComponentStats(this);</span>
-<span class="fc" id="L163">    searchFacet = new MtasSolrComponentFacet(this);</span>
-<span class="fc" id="L164">    searchCollection = new MtasSolrComponentCollection(this);</span>
+<span class="fc" id="L180">    searchStatus = new MtasSolrComponentStatus(this);</span>
+<span class="fc" id="L181">    searchDocument = new MtasSolrComponentDocument(this);</span>
+<span class="fc" id="L182">    searchKwic = new MtasSolrComponentKwic(this);</span>
+<span class="fc" id="L183">    searchList = new MtasSolrComponentList(this);</span>
+<span class="fc" id="L184">    searchGroup = new MtasSolrComponentGroup(this);</span>
+<span class="fc" id="L185">    searchTermvector = new MtasSolrComponentTermvector(this);</span>
+<span class="fc" id="L186">    searchPrefix = new MtasSolrComponentPrefix(this);</span>
+<span class="fc" id="L187">    searchStats = new MtasSolrComponentStats(this);</span>
+<span class="fc" id="L188">    searchFacet = new MtasSolrComponentFacet(this);</span>
+<span class="fc" id="L189">    searchCollection = new MtasSolrComponentCollection(this);</span>
     // init collection
-<span class="fc" id="L166">    String collectionCacheDirectory = null;</span>
-<span class="fc" id="L167">    Long collectionLifetime = null;</span>
-<span class="fc" id="L168">    Integer collectionMaximumNumber = null;</span>
-<span class="fc" id="L169">    Integer collectionMaximumOverflow = null;</span>
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_CACHE_DIRECTORY) != null</span>
-<span class="pc bpc" id="L171" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_CACHE_DIRECTORY) instanceof String) {</span>
-<span class="fc" id="L172">      collectionCacheDirectory = (String) args</span>
-<span class="fc" id="L173">          .get(CONFIG_COLLECTION_CACHE_DIRECTORY);</span>
+<span class="fc" id="L191">    String collectionCacheDirectory = null;</span>
+<span class="fc" id="L192">    Long collectionLifetime = null;</span>
+<span class="fc" id="L193">    Integer collectionMaximumNumber = null;</span>
+<span class="fc" id="L194">    Integer collectionMaximumOverflow = null;</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_CACHE_DIRECTORY) != null</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_CACHE_DIRECTORY) instanceof String) {</span>
+<span class="fc" id="L197">      collectionCacheDirectory = (String) args</span>
+<span class="fc" id="L198">          .get(CONFIG_COLLECTION_CACHE_DIRECTORY);</span>
     }
-<span class="pc bpc" id="L175" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_LIFETIME) != null</span>
-<span class="pc bpc" id="L176" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_LIFETIME) instanceof Long) {</span>
-<span class="fc" id="L177">      collectionLifetime = (Long) args.get(CONFIG_COLLECTION_LIFETIME);</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_LIFETIME) != null</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_LIFETIME) instanceof Long) {</span>
+<span class="fc" id="L202">      collectionLifetime = (Long) args.get(CONFIG_COLLECTION_LIFETIME);</span>
     }
-<span class="pc bpc" id="L179" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER) != null</span>
-<span class="pc bpc" id="L180" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER) instanceof Integer) {</span>
-<span class="fc" id="L181">      collectionMaximumNumber = (Integer) args</span>
-<span class="fc" id="L182">          .get(CONFIG_COLLECTION_MAXIMUM_NUMBER);</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER) != null</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER) instanceof Integer) {</span>
+<span class="fc" id="L206">      collectionMaximumNumber = (Integer) args</span>
+<span class="fc" id="L207">          .get(CONFIG_COLLECTION_MAXIMUM_NUMBER);</span>
     }
-<span class="pc bpc" id="L184" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW) != null</span>
-<span class="pc bpc" id="L185" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW) instanceof Integer) {</span>
-<span class="fc" id="L186">      collectionMaximumNumber = (Integer) args</span>
-<span class="fc" id="L187">          .get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW);</span>
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">    if (args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW) != null</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">        &amp;&amp; args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW) instanceof Integer) {</span>
+<span class="fc" id="L211">      collectionMaximumNumber = (Integer) args</span>
+<span class="fc" id="L212">          .get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW);</span>
     }
-<span class="fc" id="L189">    collectionCache = new MtasSolrCollectionCache(collectionCacheDirectory,</span>
+<span class="fc" id="L214">    collectionCache = new MtasSolrCollectionCache(collectionCacheDirectory,</span>
         collectionLifetime, collectionMaximumNumber, collectionMaximumOverflow);
-<span class="fc" id="L191">  }</span>
+<span class="fc" id="L216">  }</span>
 
   /*
    * (non-Javadoc)
@@ -197,7 +222,7 @@ import org.apache.solr.search.SolrIndexSearcher;
    */
   @Override
   public String getDescription() {
-<span class="nc" id="L200">    return &quot;Mtas&quot;;</span>
+<span class="nc" id="L225">    return &quot;Mtas&quot;;</span>
   }
 
   /**
@@ -206,7 +231,7 @@ import org.apache.solr.search.SolrIndexSearcher;
    * @return the collection cache
    */
   public MtasSolrCollectionCache getCollectionCache() {
-<span class="fc" id="L209">    return collectionCache;</span>
+<span class="fc" id="L234">    return collectionCache;</span>
   }
 
   /*
@@ -218,61 +243,92 @@ import org.apache.solr.search.SolrIndexSearcher;
    */
   @Override
   public void prepare(ResponseBuilder rb) throws IOException {
-    //System.out
-    //.println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
-    //+ &quot; - &quot; + rb.req.getParams().getBool(&quot;isShard&quot;, false) + &quot; PREPARE &quot;
-    //+ rb.stage + &quot; &quot; + rb.req.getParamString());
-<span class="fc bfc" id="L225" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
-<span class="fc" id="L226">      mtasSolrResultMerge = new MtasSolrResultMerge();</span>
-<span class="fc" id="L227">      ComponentFields mtasFields = new ComponentFields();</span>
-      // get settings document
-<span class="fc" id="L229">      if (rb.req.getParams()</span>
-<span class="pc bpc" id="L230" title="1 of 2 branches missed.">          .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
-<span class="nc" id="L231">        searchDocument.prepare(rb, mtasFields);</span>
-      }
-      // get settings kwic
-<span class="pc bpc" id="L234" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,</span>
-          false)) {
-<span class="nc" id="L236">        searchKwic.prepare(rb, mtasFields);</span>
-      }
-      // get settings list
-<span class="pc bpc" id="L239" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,</span>
-          false)) {
-<span class="nc" id="L241">        searchList.prepare(rb, mtasFields);</span>
-      }
-      // get settings group
-<span class="fc bfc" id="L244" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,</span>
-          false)) {
-<span class="fc" id="L246">        searchGroup.prepare(rb, mtasFields);</span>
-      }
-      // get settings termvector
-<span class="fc" id="L249">      if (rb.req.getParams()</span>
-<span class="fc bfc" id="L250" title="All 2 branches covered.">          .getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {</span>
-<span class="fc" id="L251">        searchTermvector.prepare(rb, mtasFields);</span>
-      }
-      // get settings prefix
-<span class="fc bfc" id="L254" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,</span>
-          false)) {
-<span class="fc" id="L256">        searchPrefix.prepare(rb, mtasFields);</span>
-      }
-      // get settings stats
-<span class="fc bfc" id="L259" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,</span>
-          false)) {
-<span class="fc" id="L261">        searchStats.prepare(rb, mtasFields);</span>
-      }
-      // get settings facet
-<span class="pc bpc" id="L264" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,</span>
-          false)) {
-<span class="nc" id="L266">        searchFacet.prepare(rb, mtasFields);</span>
-      }
-      // get settings collection
-<span class="fc" id="L269">      if (rb.req.getParams()</span>
-<span class="fc bfc" id="L270" title="All 2 branches covered.">          .getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {</span>
-<span class="fc" id="L271">        searchCollection.prepare(rb, mtasFields);</span>
-      }
-<span class="fc" id="L273">      rb.req.getContext().put(ComponentFields.class, mtasFields);</span>
+    // System.out
+    // .println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
+    // + &quot; - &quot; + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + &quot; PREPARE &quot; + rb.stage + &quot; &quot; + rb.req.getParamString());
+    // always create status
+<span class="fc" id="L251">    initializeRequestHandler(rb);</span>
+<span class="fc" id="L252">    MtasSolrStatus solrStatus = new MtasSolrStatus(</span>
+<span class="fc" id="L253">        rb.req.getOriginalParams().toQueryString(),</span>
+<span class="fc" id="L254">        rb.req.getParams().getBool(ShardParams.IS_SHARD, false), rb.shards,</span>
+        rb.rsp);
+<span class="fc" id="L256">    rb.req.getContext().put(MtasSolrStatus.class, solrStatus);</span>
+<span class="fc" id="L257">    solrStatus.setStage(rb.stage);</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
+      try {
+        // initialize
+<span class="fc" id="L261">        mtasSolrResultMerge = new MtasSolrResultMerge();</span>
+        // prepare components
+<span class="fc" id="L263">        ComponentFields mtasFields = new ComponentFields();</span>
+        // get settings status
+<span class="fc" id="L265">        if (rb.req.getParams()</span>
+<span class="fc bfc" id="L266" title="All 2 branches covered.">            .getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS, false)) {</span>
+<span class="fc" id="L267">          searchStatus.prepare(rb, mtasFields);</span>
+<span class="fc" id="L268">          mtasFields.status.handler = requestHandlerName;</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">          if (mtasFields.status.key != null) {</span>
+<span class="fc" id="L270">            solrStatus.setKey(mtasFields.status.key);</span>
+          }
+        }
+        // now, register status
+<span class="fc" id="L274">        registerStatus(solrStatus);</span>
+        // get settings document
+<span class="fc" id="L276">        if (rb.req.getParams()</span>
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
+<span class="nc" id="L278">          searchDocument.prepare(rb, mtasFields);</span>
+        }
+        // get settings kwic
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,</span>
+            false)) {
+<span class="nc" id="L283">          searchKwic.prepare(rb, mtasFields);</span>
+        }
+        // get settings list
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">        if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,</span>
+            false)) {
+<span class="nc" id="L288">          searchList.prepare(rb, mtasFields);</span>
+        }
+        // get settings group
+<span class="fc bfc" id="L291" title="All 2 branches covered.">        if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,</span>
+            false)) {
+<span class="fc" id="L293">          searchGroup.prepare(rb, mtasFields);</span>
+        }
+        // get settings termvector
+<span class="fc bfc" id="L296" title="All 2 branches covered.">        if (rb.req.getParams().getBool(</span>
+            MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+<span class="fc" id="L298">          searchTermvector.prepare(rb, mtasFields);</span>
+        }
+        // get settings prefix
+<span class="fc" id="L301">        if (rb.req.getParams()</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">            .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {</span>
+<span class="fc" id="L303">          searchPrefix.prepare(rb, mtasFields);</span>
+        }
+        // get settings stats
+<span class="fc bfc" id="L306" title="All 2 branches covered.">        if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,</span>
+            false)) {
+<span class="fc" id="L308">          searchStats.prepare(rb, mtasFields);</span>
+        }
+        // get settings facet
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">        if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,</span>
+            false)) {
+<span class="nc" id="L313">          searchFacet.prepare(rb, mtasFields);</span>
+        }
+        // get settings collection
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        if (rb.req.getParams().getBool(</span>
+            MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+<span class="fc" id="L318">          searchCollection.prepare(rb, mtasFields);</span>
+        }
+<span class="fc" id="L320">        rb.req.getContext().put(ComponentFields.class, mtasFields);</span>
+<span class="nc" id="L321">      } catch (IOException e) {</span>
+<span class="nc" id="L322">        solrStatus.setError(e);</span>
+      } finally {
+<span class="pc" id="L324">        checkStatus(solrStatus);</span>
+<span class="pc" id="L325">      }</span>
+    } else {
+      // register and check status
+<span class="fc" id="L328">      registerStatus(solrStatus);</span>
+<span class="fc" id="L329">      checkStatus(solrStatus);</span>
     }
-<span class="fc" id="L275">  }</span>
+<span class="fc" id="L331">  }</span>
 
   /*
    * (non-Javadoc)
@@ -285,215 +341,298 @@ import org.apache.solr.search.SolrIndexSearcher;
   public void process(ResponseBuilder rb) throws IOException {
     // System.out
     // .println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
-    // + &quot; - &quot; + rb.req.getParams().getBool(&quot;isShard&quot;, false) + &quot; PROCESS &quot;
-    // + rb.stage + &quot; &quot; + rb.req.getParamString());
-<span class="fc" id="L290">    ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="fc bfc" id="L291" title="All 2 branches covered.">    if (mtasFields != null) {</span>
-<span class="fc" id="L292">      DocSet docSet = rb.getResults().docSet;</span>
-<span class="fc" id="L293">      DocList docList = rb.getResults().docList;</span>
-<span class="pc bpc" id="L294" title="4 of 18 branches missed.">      if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic</span>
-          || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
-          || mtasFields.doCollection || mtasFields.doTermVector
-          || mtasFields.doPrefix) {
-<span class="fc" id="L298">        SolrIndexSearcher searcher = rb.req.getSearcher();</span>
-<span class="fc" id="L299">        ArrayList&lt;Integer&gt; docSetList = null;</span>
-<span class="fc" id="L300">        ArrayList&lt;Integer&gt; docListList = null;</span>
-<span class="fc bfc" id="L301" title="All 2 branches covered.">        if (docSet != null) {</span>
-<span class="fc" id="L302">          docSetList = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L303">          Iterator&lt;Integer&gt; docSetIterator = docSet.iterator();</span>
-<span class="fc bfc" id="L304" title="All 2 branches covered.">          while (docSetIterator.hasNext()) {</span>
-<span class="fc" id="L305">            docSetList.add(docSetIterator.next());</span>
-          }
-<span class="fc" id="L307">          Collections.sort(docSetList);</span>
-        }
-<span class="pc bpc" id="L309" title="1 of 2 branches missed.">        if (docList != null) {</span>
-<span class="fc" id="L310">          docListList = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L311">          Iterator&lt;Integer&gt; docListIterator = docList.iterator();</span>
-<span class="fc bfc" id="L312" title="All 2 branches covered.">          while (docListIterator.hasNext()) {</span>
-<span class="fc" id="L313">            docListList.add(docListIterator.next());</span>
-          }
-<span class="fc" id="L315">          Collections.sort(docListList);</span>
-        }
-<span class="fc bfc" id="L317" title="All 2 branches covered.">        for (String field : mtasFields.list.keySet()) {</span>
-          try {
-<span class="fc" id="L319">            CodecUtil.collectField(field, searcher, searcher.getRawReader(),</span>
-<span class="fc" id="L320">                docListList, docSetList, mtasFields.list.get(field));</span>
-<span class="nc" id="L321">          } catch (IllegalAccessException | IllegalArgumentException</span>
-              | InvocationTargetException e) {
-<span class="nc" id="L323">            log.error(e);</span>
-<span class="nc" id="L324">            throw new IOException(e);</span>
-<span class="fc" id="L325">          }</span>
-<span class="fc" id="L326">        }</span>
-<span class="fc bfc" id="L327" title="All 2 branches covered.">        for (ComponentCollection collection : mtasFields.collection) {</span>
-<span class="fc" id="L328">          CodecUtil.collectCollection(searcher.getRawReader(), docSetList,</span>
-              collection);
-<span class="fc" id="L330">        }</span>
-<span class="fc" id="L331">        NamedList&lt;Object&gt; mtasResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="pc bpc" id="L332" title="1 of 2 branches missed.">        if (mtasFields.doDocument) {</span>
-<span class="nc" id="L333">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasDocumentResponses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L334" title="All 2 branches missed.">          for (String field : mtasFields.list.keySet()) {</span>
-            for (ComponentDocument document : mtasFields.list
-<span class="nc bnc" id="L336" title="All 2 branches missed.">                .get(field).documentList) {</span>
-<span class="nc" id="L337">              mtasDocumentResponses.add(searchDocument.create(document, false));</span>
-<span class="nc" id="L338">            }</span>
-<span class="nc" id="L339">          }</span>
-          // add to response
-<span class="nc" id="L341">          mtasResponse.add(&quot;document&quot;, mtasDocumentResponses);</span>
-        }
-<span class="pc bpc" id="L343" title="1 of 2 branches missed.">        if (mtasFields.doKwic) {</span>
-<span class="nc" id="L344">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasKwicResponses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L345" title="All 2 branches missed.">          for (String field : mtasFields.list.keySet()) {</span>
-<span class="nc bnc" id="L346" title="All 2 branches missed.">            for (ComponentKwic kwic : mtasFields.list.get(field).kwicList) {</span>
-<span class="nc" id="L347">              mtasKwicResponses.add(searchKwic.create(kwic, false));</span>
-<span class="nc" id="L348">            }</span>
-<span class="nc" id="L349">          }</span>
-          // add to response
-<span class="nc" id="L351">          mtasResponse.add(&quot;kwic&quot;, mtasKwicResponses);</span>
-        }
-<span class="pc bpc" id="L353" title="1 of 2 branches missed.">        if (mtasFields.doFacet) {</span>
-<span class="nc" id="L354">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasFacetResponses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L355" title="All 2 branches missed.">          for (String field : mtasFields.list.keySet()) {</span>
-<span class="nc bnc" id="L356" title="All 2 branches missed.">            for (ComponentFacet facet : mtasFields.list.get(field).facetList) {</span>
-<span class="nc bnc" id="L357" title="All 2 branches missed.">              if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="nc" id="L358">                mtasFacetResponses.add(searchFacet.create(facet, true));</span>
-              } else {
-<span class="nc" id="L360">                mtasFacetResponses.add(searchFacet.create(facet, false));</span>
+    // + &quot; - &quot; + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + &quot; PROCESS &quot; + rb.stage + &quot; &quot; + rb.req.getParamString());
+<span class="fc" id="L346">    MtasSolrStatus solrStatus = Objects.requireNonNull(</span>
+<span class="fc" id="L347">        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),</span>
+        &quot;couldn't find status&quot;);
+<span class="fc" id="L349">    solrStatus.setStage(rb.stage);</span>
+    try {
+<span class="fc bfc" id="L351" title="All 2 branches covered.">      if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
+        try {
+<span class="fc" id="L353">          ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="pc bpc" id="L354" title="1 of 2 branches missed.">          if (mtasFields != null) {</span>
+<span class="fc" id="L355">            DocSet docSet = rb.getResults().docSet;</span>
+<span class="fc" id="L356">            DocList docList = rb.getResults().docList;</span>
+<span class="pc bpc" id="L357" title="5 of 20 branches missed.">            if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic</span>
+                || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
+                || mtasFields.doCollection || mtasFields.doTermVector
+                || mtasFields.doPrefix || mtasFields.doStatus) {
+<span class="fc" id="L361">              SolrIndexSearcher searcher = rb.req.getSearcher();</span>
+<span class="fc" id="L362">              ArrayList&lt;Integer&gt; docSetList = null;</span>
+<span class="fc" id="L363">              ArrayList&lt;Integer&gt; docListList = null;</span>
+              // initialise docSetList
+<span class="fc bfc" id="L365" title="All 2 branches covered.">              if (docSet != null) {</span>
+<span class="fc" id="L366">                docSetList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L367">                Iterator&lt;Integer&gt; docSetIterator = docSet.iterator();</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">                while (docSetIterator.hasNext()) {</span>
+<span class="fc" id="L369">                  docSetList.add(docSetIterator.next());</span>
+                }
+<span class="fc" id="L371">                Collections.sort(docSetList);</span>
               }
-<span class="nc" id="L362">            }</span>
-<span class="nc" id="L363">          }</span>
-          // add to response
-<span class="nc" id="L365">          mtasResponse.add(&quot;facet&quot;, mtasFacetResponses);</span>
-        }
-<span class="fc bfc" id="L367" title="All 2 branches covered.">        if (mtasFields.doCollection) {</span>
-<span class="fc" id="L368">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasCollectionResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L369" title="All 2 branches covered.">          for (ComponentCollection collection : mtasFields.collection) {</span>
-<span class="fc bfc" id="L370" title="All 2 branches covered.">            if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="fc" id="L371">              mtasCollectionResponses</span>
-<span class="fc" id="L372">                  .add(searchCollection.create(collection, true));</span>
-            } else {
-<span class="fc" id="L374">              mtasCollectionResponses</span>
-<span class="fc" id="L375">                  .add(searchCollection.create(collection, false));</span>
-            }
-<span class="fc" id="L377">          }</span>
-          // add to response
-<span class="fc" id="L379">          mtasResponse.add(&quot;collection&quot;, mtasCollectionResponses);</span>
-        }
-<span class="pc bpc" id="L381" title="1 of 2 branches missed.">        if (mtasFields.doList) {</span>
-<span class="nc" id="L382">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasListResponses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L383" title="All 2 branches missed.">          for (String field : mtasFields.list.keySet()) {</span>
-<span class="nc bnc" id="L384" title="All 2 branches missed.">            for (ComponentList list : mtasFields.list.get(field).listList) {</span>
-<span class="nc" id="L385">              mtasListResponses.add(searchList.create(list, false));</span>
-<span class="nc" id="L386">            }</span>
-<span class="nc" id="L387">          }</span>
-          // add to response
-<span class="nc" id="L389">          mtasResponse.add(&quot;list&quot;, mtasListResponses);</span>
-        }
-<span class="fc bfc" id="L391" title="All 2 branches covered.">        if (mtasFields.doGroup) {</span>
-<span class="fc" id="L392">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasGroupResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L393" title="All 2 branches covered.">          for (String field : mtasFields.list.keySet()) {</span>
-<span class="fc bfc" id="L394" title="All 2 branches covered.">            for (ComponentGroup group : mtasFields.list.get(field).groupList) {</span>
-<span class="pc bpc" id="L395" title="1 of 2 branches missed.">              if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="nc" id="L396">                mtasGroupResponses.add(searchGroup.create(group, true));</span>
-              } else {
-<span class="fc" id="L398">                mtasGroupResponses.add(searchGroup.create(group, false));</span>
+              // initialise docListList
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">              if (docList != null) {</span>
+<span class="fc" id="L375">                docListList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L376">                Iterator&lt;Integer&gt; docListIterator = docList.iterator();</span>
+<span class="fc bfc" id="L377" title="All 2 branches covered.">                while (docListIterator.hasNext()) {</span>
+<span class="fc" id="L378">                  docListList.add(docListIterator.next());</span>
+                }
+<span class="fc" id="L380">                Collections.sort(docListList);</span>
               }
-<span class="fc" id="L400">            }</span>
-<span class="fc" id="L401">          }</span>
-          // add to response
-<span class="fc" id="L403">          mtasResponse.add(&quot;group&quot;, mtasGroupResponses);</span>
-        }
-<span class="fc bfc" id="L405" title="All 2 branches covered.">        if (mtasFields.doTermVector) {</span>
-<span class="fc" id="L406">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasTermVectorResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L407" title="All 2 branches covered.">          for (String field : mtasFields.list.keySet()) {</span>
-            for (ComponentTermVector termVector : mtasFields.list
-<span class="fc bfc" id="L409" title="All 2 branches covered.">                .get(field).termVectorList) {</span>
-<span class="fc bfc" id="L410" title="All 2 branches covered.">              if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="fc" id="L411">                mtasTermVectorResponses</span>
-<span class="fc" id="L412">                    .add(searchTermvector.create(termVector, true));</span>
-              } else {
-<span class="fc" id="L414">                mtasTermVectorResponses</span>
-<span class="fc" id="L415">                    .add(searchTermvector.create(termVector, false));</span>
+<span class="fc" id="L382">              solrStatus.status().addSubs(mtasFields.list.keySet());</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">              for (String field : mtasFields.list.keySet()) {</span>
+                try {
+<span class="fc" id="L385">                  CodecUtil.collectField(field, searcher,</span>
+<span class="fc" id="L386">                      searcher.getRawReader(), docListList, docSetList,</span>
+<span class="fc" id="L387">                      mtasFields.list.get(field), solrStatus.status());</span>
+<span class="nc" id="L388">                } catch (IllegalAccessException | IllegalArgumentException</span>
+                    | InvocationTargetException e) {
+<span class="nc" id="L390">                  log.error(e);</span>
+<span class="nc" id="L391">                  throw new IOException(e);</span>
+<span class="fc" id="L392">                }</span>
+<span class="fc" id="L393">              }</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">              for (ComponentCollection collection : mtasFields.collection) {</span>
+<span class="fc" id="L395">                CodecUtil.collectCollection(searcher.getRawReader(), docSetList,</span>
+                    collection);
+<span class="fc" id="L397">              }</span>
+<span class="fc" id="L398">              NamedList&lt;Object&gt; mtasResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="fc bfc" id="L399" title="All 2 branches covered.">              if (mtasFields.doStatus) {</span>
+                // add to response
+<span class="fc" id="L401">                SimpleOrderedMap&lt;Object&gt; statusResponse = searchStatus</span>
+<span class="fc" id="L402">                    .create(mtasFields.status, false);</span>
+<span class="fc bfc" id="L403" title="All 2 branches covered.">                if (statusResponse != null) {</span>
+<span class="fc" id="L404">                  mtasResponse.add(MtasSolrComponentStatus.NAME,</span>
+<span class="fc" id="L405">                      searchStatus.create(mtasFields.status, false));</span>
+                }
               }
-<span class="fc" id="L417">            }</span>
-<span class="fc" id="L418">          }</span>
-          // add to response
-<span class="fc" id="L420">          mtasResponse.add(&quot;termvector&quot;, mtasTermVectorResponses);</span>
-        }
-<span class="fc bfc" id="L422" title="All 2 branches covered.">        if (mtasFields.doPrefix) {</span>
-<span class="fc" id="L423">          ArrayList&lt;NamedList&lt;?&gt;&gt; mtasPrefixResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L424" title="All 2 branches covered.">          for (String field : mtasFields.list.keySet()) {</span>
-<span class="pc bpc" id="L425" title="1 of 2 branches missed.">            if (mtasFields.list.get(field).prefix != null) {</span>
-<span class="fc bfc" id="L426" title="All 2 branches covered.">              if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="fc" id="L427">                mtasPrefixResponses.add(searchPrefix</span>
-<span class="fc" id="L428">                    .create(mtasFields.list.get(field).prefix, true));</span>
-              } else {
-<span class="fc" id="L430">                mtasPrefixResponses.add(searchPrefix</span>
-<span class="fc" id="L431">                    .create(mtasFields.list.get(field).prefix, false));</span>
+<span class="pc bpc" id="L408" title="1 of 2 branches missed.">              if (mtasFields.doDocument) {</span>
+<span class="nc" id="L409">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasDocumentResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">                for (String field : mtasFields.list.keySet()) {</span>
+                  for (ComponentDocument document : mtasFields.list
+<span class="nc bnc" id="L412" title="All 2 branches missed.">                      .get(field).documentList) {</span>
+<span class="nc" id="L413">                    mtasDocumentResponses</span>
+<span class="nc" id="L414">                        .add(searchDocument.create(document, false));</span>
+<span class="nc" id="L415">                  }</span>
+<span class="nc" id="L416">                }</span>
+                // add to response
+<span class="nc" id="L418">                mtasResponse.add(MtasSolrComponentDocument.NAME,</span>
+                    mtasDocumentResponses);
               }
-            }
-<span class="fc" id="L434">          }</span>
-<span class="fc" id="L435">          mtasResponse.add(&quot;prefix&quot;, mtasPrefixResponses);</span>
-        }
-<span class="fc bfc" id="L437" title="All 2 branches covered.">        if (mtasFields.doStats) {</span>
-<span class="fc" id="L438">          NamedList&lt;Object&gt; mtasStatsResponse = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="pc bpc" id="L439" title="1 of 6 branches missed.">          if (mtasFields.doStatsPositions || mtasFields.doStatsTokens</span>
-              || mtasFields.doStatsSpans) {
-<span class="fc bfc" id="L441" title="All 2 branches covered.">            if (mtasFields.doStatsTokens) {</span>
-<span class="fc" id="L442">              ArrayList&lt;Object&gt; mtasStatsTokensResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L443" title="All 2 branches covered.">              for (String field : mtasFields.list.keySet()) {</span>
-                for (ComponentToken token : mtasFields.list
-<span class="fc bfc" id="L445" title="All 2 branches covered.">                    .get(field).statsTokenList) {</span>
-<span class="fc bfc" id="L446" title="All 2 branches covered.">                  if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="fc" id="L447">                    mtasStatsTokensResponses</span>
-<span class="fc" id="L448">                        .add(searchStats.create(token, true));</span>
+<span class="pc bpc" id="L421" title="1 of 2 branches missed.">              if (mtasFields.doKwic) {</span>
+<span class="nc" id="L422">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasKwicResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L423" title="All 2 branches missed.">                for (String field : mtasFields.list.keySet()) {</span>
+                  for (ComponentKwic kwic : mtasFields.list
+<span class="nc bnc" id="L425" title="All 2 branches missed.">                      .get(field).kwicList) {</span>
+<span class="nc" id="L426">                    mtasKwicResponses.add(searchKwic.create(kwic, false));</span>
+<span class="nc" id="L427">                  }</span>
+<span class="nc" id="L428">                }</span>
+                // add to response
+<span class="nc" id="L430">                mtasResponse.add(MtasSolrComponentKwic.NAME, mtasKwicResponses);</span>
+              }
+<span class="pc bpc" id="L432" title="1 of 2 branches missed.">              if (mtasFields.doFacet) {</span>
+<span class="nc" id="L433">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasFacetResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L434" title="All 2 branches missed.">                for (String field : mtasFields.list.keySet()) {</span>
+                  for (ComponentFacet facet : mtasFields.list
+<span class="nc bnc" id="L436" title="All 2 branches missed.">                      .get(field).facetList) {</span>
+<span class="nc bnc" id="L437" title="All 2 branches missed.">                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                        false)) {
+<span class="nc" id="L439">                      mtasFacetResponses.add(searchFacet.create(facet, true));</span>
+                    } else {
+<span class="nc" id="L441">                      mtasFacetResponses.add(searchFacet.create(facet, false));</span>
+                    }
+<span class="nc" id="L443">                  }</span>
+<span class="nc" id="L444">                }</span>
+                // add to response
+<span class="nc" id="L446">                mtasResponse.add(MtasSolrComponentFacet.NAME,</span>
+                    mtasFacetResponses);
+              }
+<span class="fc bfc" id="L449" title="All 2 branches covered.">              if (mtasFields.doCollection) {</span>
+<span class="fc" id="L450">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasCollectionResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L451" title="All 2 branches covered.">                for (ComponentCollection collection : mtasFields.collection) {</span>
+<span class="fc bfc" id="L452" title="All 2 branches covered.">                  if (rb.req.getParams().getBool(ShardParams.IS_SHARD, false)) {</span>
+<span class="fc" id="L453">                    mtasCollectionResponses</span>
+<span class="fc" id="L454">                        .add(searchCollection.create(collection, true));</span>
                   } else {
-<span class="fc" id="L450">                    mtasStatsTokensResponses</span>
-<span class="fc" id="L451">                        .add(searchStats.create(token, false));</span>
+<span class="fc" id="L456">                    mtasCollectionResponses</span>
+<span class="fc" id="L457">                        .add(searchCollection.create(collection, false));</span>
                   }
-<span class="fc" id="L453">                }</span>
-<span class="fc" id="L454">              }</span>
-<span class="fc" id="L455">              mtasStatsResponse.add(&quot;tokens&quot;, mtasStatsTokensResponses);</span>
-            }
-<span class="fc bfc" id="L457" title="All 2 branches covered.">            if (mtasFields.doStatsPositions) {</span>
-<span class="fc" id="L458">              ArrayList&lt;Object&gt; mtasStatsPositionsResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L459" title="All 2 branches covered.">              for (String field : mtasFields.list.keySet()) {</span>
-                for (ComponentPosition position : mtasFields.list
-<span class="fc bfc" id="L461" title="All 2 branches covered.">                    .get(field).statsPositionList) {</span>
-<span class="fc bfc" id="L462" title="All 2 branches covered.">                  if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="fc" id="L463">                    mtasStatsPositionsResponses</span>
-<span class="fc" id="L464">                        .add(searchStats.create(position, true));</span>
-                  } else {
-<span class="fc" id="L466">                    mtasStatsPositionsResponses</span>
-<span class="fc" id="L467">                        .add(searchStats.create(position, false));</span>
+<span class="fc" id="L459">                }</span>
+                // add to response
+<span class="fc" id="L461">                mtasResponse.add(MtasSolrComponentCollection.NAME,</span>
+                    mtasCollectionResponses);
+              }
+<span class="pc bpc" id="L464" title="1 of 2 branches missed.">              if (mtasFields.doList) {</span>
+<span class="nc" id="L465">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasListResponses = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L466" title="All 2 branches missed.">                for (String field : mtasFields.list.keySet()) {</span>
+                  for (ComponentList list : mtasFields.list
+<span class="nc bnc" id="L468" title="All 2 branches missed.">                      .get(field).listList) {</span>
+<span class="nc" id="L469">                    mtasListResponses.add(searchList.create(list, false));</span>
+<span class="nc" id="L470">                  }</span>
+<span class="nc" id="L471">                }</span>
+                // add to response
+<span class="nc" id="L473">                mtasResponse.add(MtasSolrComponentList.NAME, mtasListResponses);</span>
+              }
+<span class="fc bfc" id="L475" title="All 2 branches covered.">              if (mtasFields.doGroup) {</span>
+<span class="fc" id="L476">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasGroupResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L477" title="All 2 branches covered.">                for (String field : mtasFields.list.keySet()) {</span>
+                  for (ComponentGroup group : mtasFields.list
+<span class="fc bfc" id="L479" title="All 2 branches covered.">                      .get(field).groupList) {</span>
+<span class="pc bpc" id="L480" title="1 of 2 branches missed.">                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                        false)) {
+<span class="nc" id="L482">                      mtasGroupResponses.add(searchGroup.create(group, true));</span>
+                    } else {
+<span class="fc" id="L484">                      mtasGroupResponses.add(searchGroup.create(group, false));</span>
+                    }
+<span class="fc" id="L486">                  }</span>
+<span class="fc" id="L487">                }</span>
+                // add to response
+<span class="fc" id="L489">                mtasResponse.add(MtasSolrComponentGroup.NAME,</span>
+                    mtasGroupResponses);
+              }
+<span class="fc bfc" id="L492" title="All 2 branches covered.">              if (mtasFields.doTermVector) {</span>
+<span class="fc" id="L493">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasTermVectorResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L494" title="All 2 branches covered.">                for (String field : mtasFields.list.keySet()) {</span>
+                  for (ComponentTermVector termVector : mtasFields.list
+<span class="fc bfc" id="L496" title="All 2 branches covered.">                      .get(field).termVectorList) {</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                        false)) {
+<span class="fc" id="L499">                      mtasTermVectorResponses</span>
+<span class="fc" id="L500">                          .add(searchTermvector.create(termVector, true));</span>
+                    } else {
+<span class="fc" id="L502">                      mtasTermVectorResponses</span>
+<span class="fc" id="L503">                          .add(searchTermvector.create(termVector, false));</span>
+                    }
+<span class="fc" id="L505">                  }</span>
+<span class="fc" id="L506">                }</span>
+                // add to response
+<span class="fc" id="L508">                mtasResponse.add(MtasSolrComponentTermvector.NAME,</span>
+                    mtasTermVectorResponses);
+              }
+<span class="fc bfc" id="L511" title="All 2 branches covered.">              if (mtasFields.doPrefix) {</span>
+<span class="fc" id="L512">                ArrayList&lt;NamedList&lt;?&gt;&gt; mtasPrefixResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L513" title="All 2 branches covered.">                for (String field : mtasFields.list.keySet()) {</span>
+<span class="pc bpc" id="L514" title="1 of 2 branches missed.">                  if (mtasFields.list.get(field).prefix != null) {</span>
+<span class="fc bfc" id="L515" title="All 2 branches covered.">                    if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                        false)) {
+<span class="fc" id="L517">                      mtasPrefixResponses.add(searchPrefix</span>
+<span class="fc" id="L518">                          .create(mtasFields.list.get(field).prefix, true));</span>
+                    } else {
+<span class="fc" id="L520">                      mtasPrefixResponses.add(searchPrefix</span>
+<span class="fc" id="L521">                          .create(mtasFields.list.get(field).prefix, false));</span>
+                    }
                   }
-<span class="fc" id="L469">                }</span>
-<span class="fc" id="L470">              }</span>
-<span class="fc" id="L471">              mtasStatsResponse.add(&quot;positions&quot;, mtasStatsPositionsResponses);</span>
-            }
-<span class="fc bfc" id="L473" title="All 2 branches covered.">            if (mtasFields.doStatsSpans) {</span>
-<span class="fc" id="L474">              ArrayList&lt;Object&gt; mtasStatsSpansResponses = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L475" title="All 2 branches covered.">              for (String field : mtasFields.list.keySet()) {</span>
-                for (ComponentSpan span : mtasFields.list
-<span class="fc bfc" id="L477" title="All 2 branches covered.">                    .get(field).statsSpanList) {</span>
-<span class="fc bfc" id="L478" title="All 2 branches covered.">                  if (rb.req.getParams().getBool(&quot;isShard&quot;, false)) {</span>
-<span class="fc" id="L479">                    mtasStatsSpansResponses.add(searchStats.create(span, true));</span>
-                  } else {
-<span class="fc" id="L481">                    mtasStatsSpansResponses</span>
-<span class="fc" id="L482">                        .add(searchStats.create(span, false));</span>
+<span class="fc" id="L524">                }</span>
+<span class="fc" id="L525">                mtasResponse.add(MtasSolrComponentPrefix.NAME,</span>
+                    mtasPrefixResponses);
+              }
+<span class="fc bfc" id="L528" title="All 2 branches covered.">              if (mtasFields.doStats) {</span>
+<span class="fc" id="L529">                NamedList&lt;Object&gt; mtasStatsResponse = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="pc bpc" id="L530" title="1 of 6 branches missed.">                if (mtasFields.doStatsPositions || mtasFields.doStatsTokens</span>
+                    || mtasFields.doStatsSpans) {
+<span class="fc bfc" id="L532" title="All 2 branches covered.">                  if (mtasFields.doStatsTokens) {</span>
+<span class="fc" id="L533">                    ArrayList&lt;Object&gt; mtasStatsTokensResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L534" title="All 2 branches covered.">                    for (String field : mtasFields.list.keySet()) {</span>
+                      for (ComponentToken token : mtasFields.list
+<span class="fc bfc" id="L536" title="All 2 branches covered.">                          .get(field).statsTokenList) {</span>
+<span class="fc bfc" id="L537" title="All 2 branches covered.">                        if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                            false)) {
+<span class="fc" id="L539">                          mtasStatsTokensResponses</span>
+<span class="fc" id="L540">                              .add(searchStats.create(token, true));</span>
+                        } else {
+<span class="fc" id="L542">                          mtasStatsTokensResponses</span>
+<span class="fc" id="L543">                              .add(searchStats.create(token, false));</span>
+                        }
+<span class="fc" id="L545">                      }</span>
+<span class="fc" id="L546">                    }</span>
+<span class="fc" id="L547">                    mtasStatsResponse.add(MtasSolrComponentStats.NAME_TOKENS,</span>
+                        mtasStatsTokensResponses);
                   }
-<span class="fc" id="L484">                }</span>
-<span class="fc" id="L485">              }</span>
-<span class="fc" id="L486">              mtasStatsResponse.add(&quot;spans&quot;, mtasStatsSpansResponses);</span>
+<span class="fc bfc" id="L550" title="All 2 branches covered.">                  if (mtasFields.doStatsPositions) {</span>
+<span class="fc" id="L551">                    ArrayList&lt;Object&gt; mtasStatsPositionsResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L552" title="All 2 branches covered.">                    for (String field : mtasFields.list.keySet()) {</span>
+                      for (ComponentPosition position : mtasFields.list
+<span class="fc bfc" id="L554" title="All 2 branches covered.">                          .get(field).statsPositionList) {</span>
+<span class="fc bfc" id="L555" title="All 2 branches covered.">                        if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                            false)) {
+<span class="fc" id="L557">                          mtasStatsPositionsResponses</span>
+<span class="fc" id="L558">                              .add(searchStats.create(position, true));</span>
+                        } else {
+<span class="fc" id="L560">                          mtasStatsPositionsResponses</span>
+<span class="fc" id="L561">                              .add(searchStats.create(position, false));</span>
+                        }
+<span class="fc" id="L563">                      }</span>
+<span class="fc" id="L564">                    }</span>
+<span class="fc" id="L565">                    mtasStatsResponse.add(MtasSolrComponentStats.NAME_POSITIONS,</span>
+                        mtasStatsPositionsResponses);
+                  }
+<span class="fc bfc" id="L568" title="All 2 branches covered.">                  if (mtasFields.doStatsSpans) {</span>
+<span class="fc" id="L569">                    ArrayList&lt;Object&gt; mtasStatsSpansResponses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L570" title="All 2 branches covered.">                    for (String field : mtasFields.list.keySet()) {</span>
+                      for (ComponentSpan span : mtasFields.list
+<span class="fc bfc" id="L572" title="All 2 branches covered.">                          .get(field).statsSpanList) {</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">                        if (rb.req.getParams().getBool(ShardParams.IS_SHARD,</span>
+                            false)) {
+<span class="fc" id="L575">                          mtasStatsSpansResponses</span>
+<span class="fc" id="L576">                              .add(searchStats.create(span, true));</span>
+                        } else {
+<span class="fc" id="L578">                          mtasStatsSpansResponses</span>
+<span class="fc" id="L579">                              .add(searchStats.create(span, false));</span>
+                        }
+<span class="fc" id="L581">                      }</span>
+<span class="fc" id="L582">                    }</span>
+<span class="fc" id="L583">                    mtasStatsResponse.add(MtasSolrComponentStats.NAME_SPANS,</span>
+                        mtasStatsSpansResponses);
+                  }
+                  // add to response
+<span class="fc" id="L587">                  mtasResponse.add(MtasSolrComponentStats.NAME,</span>
+                      mtasStatsResponse);
+                }
+              }
+              // add to response
+<span class="fc bfc" id="L592" title="All 2 branches covered.">              if (mtasResponse.size() &gt; 0) {</span>
+<span class="fc" id="L593">                rb.rsp.add(NAME, mtasResponse);</span>
+              }
             }
-            // add to response
-<span class="fc" id="L489">            mtasResponse.add(&quot;stats&quot;, mtasStatsResponse);</span>
           }
-        }
-        // add to response
-<span class="fc" id="L493">        rb.rsp.add(&quot;mtas&quot;, mtasResponse);</span>
+<span class="nc" id="L597">        } catch (IOException e) {</span>
+<span class="nc" id="L598">          errorStatus(solrStatus, e);</span>
+<span class="fc" id="L599">        }</span>
       }
-    }
-<span class="fc" id="L496">  }</span>
+<span class="pc bpc" id="L601" title="1 of 2 branches missed.">      if (!solrStatus.error()) {</span>
+        // always set status segments
+<span class="fc bfc" id="L603" title="All 2 branches covered.">        if (solrStatus.status().numberSegmentsTotal == null) {</span>
+<span class="fc" id="L604">          solrStatus.status().numberSegmentsTotal = rb.req.getSearcher()</span>
+<span class="fc" id="L605">              .getRawReader().leaves().size();</span>
+<span class="fc" id="L606">          solrStatus.status().numberSegmentsFinished = solrStatus</span>
+<span class="fc" id="L607">              .status().numberSegmentsTotal;</span>
+        }
+        // always try to set number of documents
+<span class="fc bfc" id="L610" title="All 2 branches covered.">        if (solrStatus.status().numberDocumentsTotal == null) {</span>
+          SolrIndexSearcher searcher;
+<span class="pc bpc" id="L612" title="1 of 2 branches missed.">          if ((searcher = rb.req.getSearcher()) != null) {</span>
+<span class="fc" id="L613">            solrStatus.status().numberDocumentsTotal = (long) searcher</span>
+<span class="fc" id="L614">                .numDocs();</span>
+<span class="pc bpc" id="L615" title="1 of 2 branches missed.">            if (rb.getResults().docList != null) {</span>
+<span class="fc" id="L616">              solrStatus</span>
+<span class="fc" id="L617">                  .status().numberDocumentsFinished = rb.getResults().docList</span>
+<span class="fc" id="L618">                      .matches();</span>
+<span class="fc" id="L619">              solrStatus.status().numberDocumentsFound = rb.getResults().docList</span>
+<span class="fc" id="L620">                  .matches();</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">            } else if (rb.getResults().docSet != null) {</span>
+<span class="nc" id="L622">              solrStatus.status().numberDocumentsFinished = (long) rb</span>
+<span class="nc" id="L623">                  .getResults().docSet.size();</span>
+<span class="nc" id="L624">              solrStatus</span>
+<span class="nc" id="L625">                  .status().numberDocumentsFound = (long) rb.getResults().docSet</span>
+<span class="nc" id="L626">                      .size();</span>
+            }
+          }
+        }
+      }
+    } finally {
+<span class="pc" id="L632">      checkStatus(solrStatus);</span>
+<span class="pc" id="L633">      finishStatus(solrStatus);</span>
+<span class="fc" id="L634">    }</span>
+<span class="fc" id="L635">  }</span>
 
   /*
    * (non-Javadoc)
@@ -507,44 +646,61 @@ import org.apache.solr.search.SolrIndexSearcher;
   @Override
   public void modifyRequest(ResponseBuilder rb, SearchComponent who,
       ShardRequest sreq) {
-    // System.out.println(System.nanoTime() + &quot; - &quot; +
-    // Thread.currentThread().getId() + &quot; - &quot;
-    // + rb.req.getParams().getBool(&quot;isShard&quot;, false) + &quot; MODIFY REQUEST &quot;
-    // + rb.stage + &quot; &quot; + rb.req.getParamString());
-<span class="fc bfc" id="L514" title="All 2 branches covered.">    if (sreq.params.getBool(PARAM_MTAS, false)) {</span>
-<span class="fc bfc" id="L515" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {</span>
-<span class="fc" id="L516">        searchStats.modifyRequest(rb, who, sreq);</span>
-      }
-<span class="fc bfc" id="L518" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR,</span>
+    // System.out
+    // .println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
+    // + &quot; - &quot; + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + &quot; MODIFY REQUEST &quot; + rb.stage + &quot; &quot; + rb.req.getParamString());
+<span class="fc" id="L653">    MtasSolrStatus solrStatus = Objects.requireNonNull(</span>
+<span class="fc" id="L654">        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),</span>
+        &quot;couldn't find status&quot;);
+<span class="fc" id="L656">    solrStatus.setStage(rb.stage);</span>
+<span class="fc bfc" id="L657" title="All 2 branches covered.">    if (sreq.params.getBool(PARAM_MTAS, false)) {</span>
+<span class="pc bpc" id="L658" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS,</span>
           false)) {
-<span class="fc" id="L520">        searchTermvector.modifyRequest(rb, who, sreq);</span>
+<span class="nc" id="L660">        searchStatus.modifyRequest(rb, who, sreq);</span>
+<span class="pc bpc" id="L661" title="1 of 2 branches missed.">      } else if (requestHandler != null) {</span>
+<span class="fc" id="L662">        sreq.params.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS,</span>
+            CommonParams.TRUE);
       }
-<span class="fc bfc" id="L522" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,</span>
+<span class="pc bpc" id="L665" title="1 of 2 branches missed.">      if (requestHandler != null) {</span>
+<span class="fc" id="L666">        sreq.params.add(</span>
+            MtasSolrComponentStatus.PARAM_MTAS_STATUS + &quot;.&quot;
+                + MtasSolrComponentStatus.NAME_MTAS_STATUS_KEY,
+<span class="fc" id="L669">            solrStatus.shardKey(rb.stage));</span>
+      }
+<span class="fc bfc" id="L671" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {</span>
+<span class="fc" id="L672">        searchStats.modifyRequest(rb, who, sreq);</span>
+      }
+<span class="fc bfc" id="L674" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR,</span>
           false)) {
-<span class="fc" id="L524">        searchPrefix.modifyRequest(rb, who, sreq);</span>
+<span class="fc" id="L676">        searchTermvector.modifyRequest(rb, who, sreq);</span>
       }
-<span class="pc bpc" id="L526" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {</span>
-<span class="nc" id="L527">        searchFacet.modifyRequest(rb, who, sreq);</span>
-      }
-<span class="fc bfc" id="L529" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION,</span>
+<span class="fc bfc" id="L678" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,</span>
           false)) {
-<span class="fc" id="L531">        searchCollection.modifyRequest(rb, who, sreq);</span>
+<span class="fc" id="L680">        searchPrefix.modifyRequest(rb, who, sreq);</span>
       }
-<span class="pc bpc" id="L533" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {</span>
-<span class="nc" id="L534">        searchGroup.modifyRequest(rb, who, sreq);</span>
+<span class="pc bpc" id="L682" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {</span>
+<span class="nc" id="L683">        searchFacet.modifyRequest(rb, who, sreq);</span>
       }
-<span class="pc bpc" id="L536" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {</span>
-<span class="nc" id="L537">        searchList.modifyRequest(rb, who, sreq);</span>
-      }
-<span class="pc bpc" id="L539" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,</span>
+<span class="fc bfc" id="L685" title="All 2 branches covered.">      if (sreq.params.getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION,</span>
           false)) {
-<span class="nc" id="L541">        searchDocument.modifyRequest(rb, who, sreq);</span>
+<span class="fc" id="L687">        searchCollection.modifyRequest(rb, who, sreq);</span>
       }
-<span class="pc bpc" id="L543" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {</span>
-<span class="nc" id="L544">        searchKwic.modifyRequest(rb, who, sreq);</span>
+<span class="pc bpc" id="L689" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc" id="L690">        searchGroup.modifyRequest(rb, who, sreq);</span>
+      }
+<span class="pc bpc" id="L692" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {</span>
+<span class="nc" id="L693">        searchList.modifyRequest(rb, who, sreq);</span>
+      }
+<span class="pc bpc" id="L695" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT,</span>
+          false)) {
+<span class="nc" id="L697">        searchDocument.modifyRequest(rb, who, sreq);</span>
+      }
+<span class="pc bpc" id="L699" title="1 of 2 branches missed.">      if (sreq.params.getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {</span>
+<span class="nc" id="L700">        searchKwic.modifyRequest(rb, who, sreq);</span>
       }
     }
-<span class="fc" id="L547">  }</span>
+<span class="fc" id="L703">  }</span>
 
   /*
    * (non-Javadoc)
@@ -557,9 +713,16 @@ import org.apache.solr.search.SolrIndexSearcher;
   public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
     // System.out
     // .println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
-    // + &quot; - &quot; + rb.req.getParams().getBool(&quot;isShard&quot;, false)
+    // + &quot; - &quot; + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
     // + &quot; HANDLERESPONSES &quot; + rb.stage + &quot; &quot; + rb.req.getParamString());
-<span class="fc" id="L562">  }</span>
+<span class="fc" id="L718">    MtasSolrStatus solrStatus = Objects.requireNonNull(</span>
+<span class="fc" id="L719">        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),</span>
+        &quot;couldn't find status&quot;);
+<span class="fc" id="L721">    solrStatus.setStage(rb.stage);</span>
+<span class="fc bfc" id="L722" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
+      // do nothing
+    }
+<span class="fc" id="L725">  }</span>
 
   /*
    * (non-Javadoc)
@@ -572,48 +735,61 @@ import org.apache.solr.search.SolrIndexSearcher;
   public void finishStage(ResponseBuilder rb) {
     // System.out
     // .println(System.nanoTime() + &quot; - &quot; + Thread.currentThread().getId()
-    // + &quot; - &quot; + rb.req.getParams().getBool(&quot;isShard&quot;, false)
+    // + &quot; - &quot; + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
     // + &quot; FINISHRESPONSES &quot; + rb.stage + &quot; &quot; + rb.req.getParamString());
-<span class="fc bfc" id="L577" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
-<span class="fc bfc" id="L578" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,</span>
-          false)) {
-<span class="fc" id="L580">        searchStats.finishStage(rb);</span>
+<span class="fc" id="L740">    MtasSolrStatus solrStatus = Objects.requireNonNull(</span>
+<span class="fc" id="L741">        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),</span>
+        &quot;couldn't find status&quot;);
+<span class="fc" id="L743">    solrStatus.setStage(rb.stage);</span>
+<span class="fc bfc" id="L744" title="All 2 branches covered.">    if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {</span>
+<span class="fc" id="L745">      Status status = solrStatus.status();</span>
+<span class="pc bpc" id="L746" title="1 of 2 branches missed.">      if(status.numberDocumentsFound == null) {</span>
+<span class="fc" id="L747">        status.numberDocumentsFound = rb.getNumberDocumentsFound();</span>
       }
-<span class="fc" id="L582">      if (rb.req.getParams()</span>
-<span class="fc bfc" id="L583" title="All 2 branches covered.">          .getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {</span>
-<span class="fc" id="L584">        searchTermvector.finishStage(rb);</span>
-      }
-<span class="fc bfc" id="L586" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,</span>
-          false)) {
-<span class="fc" id="L588">        searchPrefix.finishStage(rb);</span>
-      }
-<span class="pc bpc" id="L590" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,</span>
-          false)) {
-<span class="nc" id="L592">        searchFacet.finishStage(rb);</span>
-      }
-<span class="fc" id="L594">      if (rb.req.getParams()</span>
-<span class="fc bfc" id="L595" title="All 2 branches covered.">          .getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {</span>
-<span class="fc" id="L596">        searchCollection.finishStage(rb);</span>
-      }
-<span class="pc bpc" id="L598" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,</span>
-          false)) {
-<span class="nc" id="L600">        searchGroup.finishStage(rb);</span>
-      }
-<span class="pc bpc" id="L602" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,</span>
-          false)) {
-<span class="nc" id="L604">        searchList.finishStage(rb);</span>
-      }
-<span class="fc" id="L606">      if (rb.req.getParams()</span>
-<span class="pc bpc" id="L607" title="1 of 2 branches missed.">          .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
-<span class="nc" id="L608">        searchDocument.finishStage(rb);</span>
-      }
-<span class="pc bpc" id="L610" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,</span>
-          false)) {
-<span class="nc" id="L612">        searchKwic.finishStage(rb);</span>
-      }
-<span class="fc" id="L614">      mtasSolrResultMerge.merge(rb);</span>
+      // try to finish status from get fields stage
+<span class="fc bfc" id="L750" title="All 2 branches covered.">    } else if (rb.stage &gt;= ResponseBuilder.STAGE_GET_FIELDS) {</span>
+<span class="fc" id="L751">      finishStatus(solrStatus);</span>
     }
-<span class="fc" id="L616">  }</span>
+<span class="fc bfc" id="L753" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
+<span class="fc bfc" id="L754" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS,</span>
+          false)) {
+<span class="fc" id="L756">        searchStats.finishStage(rb);</span>
+      }
+<span class="fc" id="L758">      if (rb.req.getParams()</span>
+<span class="fc bfc" id="L759" title="All 2 branches covered.">          .getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {</span>
+<span class="fc" id="L760">        searchTermvector.finishStage(rb);</span>
+      }
+<span class="fc bfc" id="L762" title="All 2 branches covered.">      if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX,</span>
+          false)) {
+<span class="fc" id="L764">        searchPrefix.finishStage(rb);</span>
+      }
+<span class="pc bpc" id="L766" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET,</span>
+          false)) {
+<span class="nc" id="L768">        searchFacet.finishStage(rb);</span>
+      }
+<span class="fc" id="L770">      if (rb.req.getParams()</span>
+<span class="fc bfc" id="L771" title="All 2 branches covered.">          .getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {</span>
+<span class="fc" id="L772">        searchCollection.finishStage(rb);</span>
+      }
+<span class="pc bpc" id="L774" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP,</span>
+          false)) {
+<span class="nc" id="L776">        searchGroup.finishStage(rb);</span>
+      }
+<span class="pc bpc" id="L778" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST,</span>
+          false)) {
+<span class="nc" id="L780">        searchList.finishStage(rb);</span>
+      }
+<span class="fc" id="L782">      if (rb.req.getParams()</span>
+<span class="pc bpc" id="L783" title="1 of 2 branches missed.">          .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
+<span class="nc" id="L784">        searchDocument.finishStage(rb);</span>
+      }
+<span class="pc bpc" id="L786" title="1 of 2 branches missed.">      if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC,</span>
+          false)) {
+<span class="nc" id="L788">        searchKwic.finishStage(rb);</span>
+      }
+<span class="fc" id="L790">      mtasSolrResultMerge.merge(rb);</span>
+    }
+<span class="fc" id="L792">  }</span>
 
   /*
    * (non-Javadoc)
@@ -624,88 +800,91 @@ import org.apache.solr.search.SolrIndexSearcher;
    */
   @Override
   public int distributedProcess(ResponseBuilder rb) throws IOException {
-    // System.out.println(System.nanoTime() + &quot; - &quot; +
-    // Thread.currentThread().getId() + &quot; - &quot;
-    // + rb.req.getParams().getBool(&quot;isShard&quot;, false) + &quot; DISTIRBUTEDPROCESS &quot;
-    // + rb.stage + &quot; &quot; + rb.req.getParamString());
-    // distributed processes
-<span class="fc bfc" id="L632" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
-<span class="fc bfc" id="L633" title="All 6 branches covered.">      if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP</span>
+    // System.out.println(System.nanoTime() + &quot; - &quot;
+    // + Thread.currentThread().getId() + &quot; - &quot;
+    // + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+    // + &quot; DISTIRBUTEDPROCESS &quot; + rb.stage + &quot; &quot; + rb.req.getParamString());
+<span class="fc" id="L807">    MtasSolrStatus solrStatus = Objects.requireNonNull(</span>
+<span class="fc" id="L808">        (MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class),</span>
+        &quot;couldn't find status&quot;);
+<span class="fc" id="L810">    solrStatus.setStage(rb.stage);</span>
+<span class="fc bfc" id="L811" title="All 2 branches covered.">    if (rb.req.getParams().getBool(PARAM_MTAS, false)) {</span>
+<span class="fc bfc" id="L812" title="All 6 branches covered.">      if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP</span>
           || rb.stage == STAGE_TERMVECTOR_MISSING_KEY
           || rb.stage == STAGE_TERMVECTOR_FINISH) {
-<span class="fc" id="L636">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="fc" id="L637">        searchTermvector.distributedProcess(rb, mtasFields);</span>
-<span class="pc bpc" id="L638" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_LIST) {</span>
-<span class="nc" id="L639">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="nc" id="L640">        searchList.distributedProcess(rb, mtasFields);</span>
-<span class="pc bfc" id="L641" title="All 2 branches covered.">      } else if (rb.stage == STAGE_PREFIX) {</span>
-<span class="fc" id="L642">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="fc" id="L643">        searchPrefix.distributedProcess(rb, mtasFields);</span>
-<span class="fc bfc" id="L644" title="All 2 branches covered.">      } else if (rb.stage == STAGE_STATS) {</span>
-<span class="fc" id="L645">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="fc" id="L646">        searchStats.distributedProcess(rb, mtasFields);</span>
-<span class="pc bpc" id="L647" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_FACET) {</span>
-<span class="nc" id="L648">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="nc" id="L649">        searchFacet.distributedProcess(rb, mtasFields);</span>
-<span class="pc bfc" id="L650" title="All 4 branches covered.">      } else if (rb.stage == STAGE_COLLECTION_INIT</span>
+<span class="fc" id="L815">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="fc" id="L816">        searchTermvector.distributedProcess(rb, mtasFields);</span>
+<span class="pc bpc" id="L817" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_LIST) {</span>
+<span class="nc" id="L818">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="nc" id="L819">        searchList.distributedProcess(rb, mtasFields);</span>
+<span class="pc bfc" id="L820" title="All 2 branches covered.">      } else if (rb.stage == STAGE_PREFIX) {</span>
+<span class="fc" id="L821">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="fc" id="L822">        searchPrefix.distributedProcess(rb, mtasFields);</span>
+<span class="fc bfc" id="L823" title="All 2 branches covered.">      } else if (rb.stage == STAGE_STATS) {</span>
+<span class="fc" id="L824">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="fc" id="L825">        searchStats.distributedProcess(rb, mtasFields);</span>
+<span class="pc bpc" id="L826" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_FACET) {</span>
+<span class="nc" id="L827">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="nc" id="L828">        searchFacet.distributedProcess(rb, mtasFields);</span>
+<span class="pc bfc" id="L829" title="All 4 branches covered.">      } else if (rb.stage == STAGE_COLLECTION_INIT</span>
           || rb.stage == STAGE_COLLECTION_FINISH) {
-<span class="fc" id="L652">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="fc" id="L653">        searchCollection.distributedProcess(rb, mtasFields);</span>
-<span class="pc bpc" id="L654" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_GROUP) {</span>
-<span class="nc" id="L655">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="nc" id="L656">        searchGroup.distributedProcess(rb, mtasFields);</span>
-<span class="pc bpc" id="L657" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_DOCUMENT) {</span>
-<span class="nc" id="L658">        ComponentFields mtasFields = getMtasFields(rb);</span>
-<span class="nc" id="L659">        searchDocument.distributedProcess(rb, mtasFields);</span>
+<span class="fc" id="L831">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="fc" id="L832">        searchCollection.distributedProcess(rb, mtasFields);</span>
+<span class="pc bpc" id="L833" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_GROUP) {</span>
+<span class="nc" id="L834">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="nc" id="L835">        searchGroup.distributedProcess(rb, mtasFields);</span>
+<span class="pc bpc" id="L836" title="1 of 2 branches missed.">      } else if (rb.stage == STAGE_DOCUMENT) {</span>
+<span class="nc" id="L837">        ComponentFields mtasFields = getMtasFields(rb);</span>
+<span class="nc" id="L838">        searchDocument.distributedProcess(rb, mtasFields);</span>
       }
       // compute new stage and return if not finished
-<span class="fc bfc" id="L662" title="All 4 branches covered.">      if (rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
+<span class="fc bfc" id="L841" title="All 4 branches covered.">      if (rb.stage &gt;= ResponseBuilder.STAGE_EXECUTE_QUERY</span>
           &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_GET_FIELDS) {
-<span class="fc bfc" id="L664" title="All 2 branches covered.">        if (rb.stage &lt; STAGE_TERMVECTOR_MISSING_TOP</span>
-<span class="fc bfc" id="L665" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
+<span class="fc bfc" id="L843" title="All 2 branches covered.">        if (rb.stage &lt; STAGE_TERMVECTOR_MISSING_TOP</span>
+<span class="fc bfc" id="L844" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
                 MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-<span class="fc" id="L667">          return STAGE_TERMVECTOR_MISSING_TOP;</span>
-<span class="fc bfc" id="L668" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_TERMVECTOR_MISSING_KEY</span>
-<span class="fc bfc" id="L669" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
+<span class="fc" id="L846">          return STAGE_TERMVECTOR_MISSING_TOP;</span>
+<span class="fc bfc" id="L847" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_TERMVECTOR_MISSING_KEY</span>
+<span class="fc bfc" id="L848" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
                 MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-<span class="fc" id="L671">          return STAGE_TERMVECTOR_MISSING_KEY;</span>
-<span class="fc bfc" id="L672" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_TERMVECTOR_FINISH</span>
-<span class="fc bfc" id="L673" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
+<span class="fc" id="L850">          return STAGE_TERMVECTOR_MISSING_KEY;</span>
+<span class="fc bfc" id="L851" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_TERMVECTOR_FINISH</span>
+<span class="fc bfc" id="L852" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
                 MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-<span class="fc" id="L675">          return STAGE_TERMVECTOR_FINISH;</span>
-<span class="fc bfc" id="L676" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_LIST &amp;&amp; rb.req.getParams()</span>
-<span class="pc bpc" id="L677" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {</span>
-<span class="nc" id="L678">          return STAGE_LIST;</span>
-<span class="fc bfc" id="L679" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_PREFIX &amp;&amp; rb.req.getParams()</span>
-<span class="fc bfc" id="L680" title="All 2 branches covered.">            .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {</span>
-<span class="fc" id="L681">          return STAGE_PREFIX;</span>
-<span class="fc bfc" id="L682" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_STATS &amp;&amp; rb.req.getParams()</span>
-<span class="fc bfc" id="L683" title="All 2 branches covered.">            .getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {</span>
-<span class="fc" id="L684">          return STAGE_STATS;</span>
-<span class="fc bfc" id="L685" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_FACET &amp;&amp; rb.req.getParams()</span>
-<span class="pc bpc" id="L686" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {</span>
-<span class="nc" id="L687">          return STAGE_FACET;</span>
-<span class="fc bfc" id="L688" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_GROUP &amp;&amp; rb.req.getParams()</span>
-<span class="pc bpc" id="L689" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {</span>
-<span class="nc" id="L690">          return STAGE_GROUP;</span>
-<span class="fc bfc" id="L691" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_COLLECTION_INIT</span>
-<span class="fc bfc" id="L692" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
+<span class="fc" id="L854">          return STAGE_TERMVECTOR_FINISH;</span>
+<span class="fc bfc" id="L855" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_LIST &amp;&amp; rb.req.getParams()</span>
+<span class="pc bpc" id="L856" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {</span>
+<span class="nc" id="L857">          return STAGE_LIST;</span>
+<span class="fc bfc" id="L858" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_PREFIX &amp;&amp; rb.req.getParams()</span>
+<span class="fc bfc" id="L859" title="All 2 branches covered.">            .getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {</span>
+<span class="fc" id="L860">          return STAGE_PREFIX;</span>
+<span class="fc bfc" id="L861" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_STATS &amp;&amp; rb.req.getParams()</span>
+<span class="fc bfc" id="L862" title="All 2 branches covered.">            .getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {</span>
+<span class="fc" id="L863">          return STAGE_STATS;</span>
+<span class="fc bfc" id="L864" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_FACET &amp;&amp; rb.req.getParams()</span>
+<span class="pc bpc" id="L865" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {</span>
+<span class="nc" id="L866">          return STAGE_FACET;</span>
+<span class="fc bfc" id="L867" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_GROUP &amp;&amp; rb.req.getParams()</span>
+<span class="pc bpc" id="L868" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {</span>
+<span class="nc" id="L869">          return STAGE_GROUP;</span>
+<span class="fc bfc" id="L870" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_COLLECTION_INIT</span>
+<span class="fc bfc" id="L871" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
                 MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-<span class="fc" id="L694">          return STAGE_COLLECTION_INIT;</span>
-<span class="fc bfc" id="L695" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_COLLECTION_FINISH</span>
-<span class="fc bfc" id="L696" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
+<span class="fc" id="L873">          return STAGE_COLLECTION_INIT;</span>
+<span class="fc bfc" id="L874" title="All 2 branches covered.">        } else if (rb.stage &lt; STAGE_COLLECTION_FINISH</span>
+<span class="fc bfc" id="L875" title="All 2 branches covered.">            &amp;&amp; rb.req.getParams().getBool(</span>
                 MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-<span class="fc" id="L698">          return STAGE_COLLECTION_FINISH;</span>
+<span class="fc" id="L877">          return STAGE_COLLECTION_FINISH;</span>
         }
-<span class="pc bpc" id="L700" title="1 of 4 branches missed.">      } else if (rb.stage &gt;= ResponseBuilder.STAGE_GET_FIELDS</span>
+<span class="pc bpc" id="L879" title="1 of 4 branches missed.">      } else if (rb.stage &gt;= ResponseBuilder.STAGE_GET_FIELDS</span>
           &amp;&amp; rb.stage &lt; ResponseBuilder.STAGE_DONE) {
-<span class="pc bpc" id="L702" title="1 of 2 branches missed.">        if (rb.stage &lt; STAGE_DOCUMENT &amp;&amp; rb.req.getParams()</span>
-<span class="pc bpc" id="L703" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
-<span class="nc" id="L704">          return STAGE_DOCUMENT;</span>
+<span class="pc bpc" id="L881" title="1 of 2 branches missed.">        if (rb.stage &lt; STAGE_DOCUMENT &amp;&amp; rb.req.getParams()</span>
+<span class="pc bpc" id="L882" title="1 of 2 branches missed.">            .getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {</span>
+<span class="nc" id="L883">          return STAGE_DOCUMENT;</span>
         }
       }
     }
-<span class="fc" id="L708">    return ResponseBuilder.STAGE_DONE;</span>
+<span class="fc" id="L887">    return ResponseBuilder.STAGE_DONE;</span>
   }
 
   /**
@@ -716,8 +895,120 @@ import org.apache.solr.search.SolrIndexSearcher;
    */
 
   private ComponentFields getMtasFields(ResponseBuilder rb) {
-<span class="fc" id="L719">    return (ComponentFields) rb.req.getContext().get(ComponentFields.class);</span>
+<span class="fc" id="L898">    return (ComponentFields) rb.req.getContext().get(ComponentFields.class);</span>
   }
+
+  /**
+   * Initialize request handler.
+   *
+   * @param rb the rb
+   */
+  private void initializeRequestHandler(ResponseBuilder rb) {
+<span class="fc bfc" id="L907" title="All 2 branches covered.">    if (requestHandler == null) {</span>
+      // try to initialize
+<span class="pc bpc" id="L909" title="1 of 2 branches missed.">      for (Entry&lt;String, SolrInfoBean&gt; entry : rb.req.getCore()</span>
+<span class="fc" id="L910">          .getInfoRegistry().entrySet()) {</span>
+<span class="pc bpc" id="L911" title="1 of 2 branches missed.">        if (entry.getValue() instanceof MtasRequestHandler) {</span>
+<span class="fc" id="L912">          requestHandlerName = entry.getKey();</span>
+<span class="fc" id="L913">          requestHandler = (MtasRequestHandler) entry.getValue();</span>
+<span class="fc" id="L914">          break;</span>
+        }
+<span class="nc" id="L916">      }</span>
+    }
+<span class="fc" id="L918">  }</span>
+
+  /**
+   * Check status.
+   *
+   * @param status the status
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private void checkStatus(MtasSolrStatus status) throws IOException {
+<span class="pc bpc" id="L927" title="1 of 2 branches missed.">    if (!status.finished()) {</span>
+<span class="pc bpc" id="L928" title="1 of 2 branches missed.">      if (status.error()) {</span>
+<span class="nc" id="L929">        status.setFinished();</span>
+<span class="nc bnc" id="L930" title="All 2 branches missed.">        if (requestHandler != null) {</span>
+<span class="nc" id="L931">          requestHandler.finishStatus(status);</span>
+        }
+<span class="nc" id="L933">        throw new IOException(status.errorMessage());</span>
+<span class="pc bpc" id="L934" title="1 of 2 branches missed.">      } else if (status.abort()) {</span>
+<span class="nc" id="L935">        status.setFinished();</span>
+<span class="nc bnc" id="L936" title="All 2 branches missed.">        if (requestHandler != null) {</span>
+<span class="nc" id="L937">          requestHandler.finishStatus(status);</span>
+        }
+<span class="nc" id="L939">        throw new IOException(status.abortMessage());</span>
+      }
+    }
+<span class="fc" id="L942">  }</span>
+
+  /**
+   * Register status.
+   *
+   * @param solrStatus the solr status
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private void registerStatus(MtasSolrStatus solrStatus) throws IOException {
+<span class="pc bpc" id="L951" title="1 of 2 branches missed.">    if (requestHandler != null) {</span>
+<span class="fc" id="L952">      Map&lt;String, ShardStatus&gt; shards = solrStatus.getShards();</span>
+<span class="fc bfc" id="L953" title="All 2 branches covered.">      if (shards != null) {</span>
+<span class="fc" id="L954">        Status status = solrStatus.status();</span>
+<span class="fc" id="L955">        status.numberDocumentsTotal = Long.valueOf(0);</span>
+<span class="fc" id="L956">        status.numberSegmentsTotal = 0;</span>
+<span class="fc bfc" id="L957" title="All 2 branches covered.">        for (Entry&lt;String, ShardStatus&gt; entry : shards.entrySet()) {</span>
+          // get shard info
+<span class="fc" id="L959">          ShardInformation shardInformation = requestHandler</span>
+<span class="fc" id="L960">              .getShardInformation(entry.getKey());</span>
+<span class="pc bpc" id="L961" title="1 of 2 branches missed.">          if (shardInformation == null) {</span>
+<span class="nc" id="L962">            throw new IOException(&quot;no shard information &quot; + entry.getKey());</span>
+          }
+<span class="fc" id="L964">          ShardStatus shardStatus = entry.getValue();</span>
+<span class="fc" id="L965">          shardStatus.name = shardInformation.name;</span>
+<span class="fc" id="L966">          shardStatus.location = entry.getKey();</span>
+<span class="fc" id="L967">          shardStatus.mtasHandler = shardInformation.mtasHandler;</span>
+<span class="fc" id="L968">          shardStatus.numberDocumentsTotal = shardInformation.numberOfDocuments;</span>
+<span class="fc" id="L969">          shardStatus.numberSegmentsTotal = shardInformation.numberOfSegments;</span>
+<span class="fc" id="L970">          status.numberDocumentsTotal += shardInformation.numberOfDocuments;</span>
+<span class="fc" id="L971">          status.numberSegmentsTotal += shardInformation.numberOfSegments;</span>
+<span class="fc" id="L972">        }</span>
+      }
+<span class="fc" id="L974">      requestHandler.registerStatus(solrStatus);</span>
+    }
+<span class="fc" id="L976">  }</span>
+
+  /**
+   * Error status.
+   *
+   * @param status the status
+   * @param exception the exception
+   */
+  private void errorStatus(MtasSolrStatus status, IOException exception) {
+    try {
+<span class="nc" id="L986">      status.setError(exception);</span>
+<span class="nc bnc" id="L987" title="All 2 branches missed.">      if (requestHandler != null) {</span>
+<span class="nc" id="L988">        requestHandler.finishStatus(status);</span>
+      }
+<span class="nc" id="L990">    } catch (IOException e) {</span>
+<span class="nc" id="L991">      log.error(e);</span>
+<span class="nc" id="L992">    }</span>
+<span class="nc" id="L993">  }</span>
+
+  /**
+   * Finish status.
+   *
+   * @param status the status
+   */
+  private void finishStatus(MtasSolrStatus status) {
+<span class="pc bpc" id="L1001" title="1 of 2 branches missed.">    if (!status.finished()) {</span>
+<span class="fc" id="L1002">      status.setFinished();</span>
+<span class="pc bpc" id="L1003" title="1 of 2 branches missed.">      if (requestHandler != null) {</span>
+        try {
+<span class="fc" id="L1005">          requestHandler.finishStatus(status);</span>
+<span class="nc" id="L1006">        } catch (IOException e) {</span>
+<span class="nc" id="L1007">          log.error(e);</span>
+<span class="fc" id="L1008">        }</span>
+      }
+    }
+<span class="fc" id="L1011">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

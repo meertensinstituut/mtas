@@ -185,6 +185,11 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
 <span class="nc" id="L185">      return new MtasSimScorer();</span>
     }
 
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return true;
+//    }
+
   }
 
   /*
@@ -195,10 +200,10 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L198">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc bnc" id="L199" title="All 2 branches missed.">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot; + start</span>
+<span class="nc" id="L203">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">    buffer.append(this.getClass().getSimpleName() + &quot;([&quot; + start</span>
         + (start != end ? &quot;,&quot; + end : &quot;&quot;) + &quot;])&quot;);
-<span class="nc" id="L201">    return buffer.toString();</span>
+<span class="nc" id="L206">    return buffer.toString();</span>
   }
 
   /*
@@ -208,14 +213,14 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L211" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L212">      return true;</span>
-<span class="pc bpc" id="L213" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L214">      return false;</span>
-<span class="fc bfc" id="L215" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L216">      return false;</span>
-<span class="fc" id="L217">    final MtasSpanPositionQuery that = (MtasSpanPositionQuery) obj;</span>
-<span class="pc bpc" id="L218" title="3 of 6 branches missed.">    return field.equals(that.field) &amp;&amp; start == that.start &amp;&amp; end == that.end;</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L217">      return true;</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L219">      return false;</span>
+<span class="fc bfc" id="L220" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L221">      return false;</span>
+<span class="fc" id="L222">    final MtasSpanPositionQuery that = (MtasSpanPositionQuery) obj;</span>
+<span class="pc bpc" id="L223" title="3 of 6 branches missed.">    return field.equals(that.field) &amp;&amp; start == that.start &amp;&amp; end == that.end;</span>
   }
 
   /*
@@ -225,11 +230,11 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L228">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L229">    h = (h * 7) ^ field.hashCode();</span>
-<span class="fc" id="L230">    h = (h * 13) ^ start;</span>
-<span class="fc" id="L231">    h = (h * 17) ^ end;</span>
-<span class="fc" id="L232">    return h;</span>
+<span class="fc" id="L233">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L234">    h = (h * 7) ^ field.hashCode();</span>
+<span class="fc" id="L235">    h = (h * 13) ^ start;</span>
+<span class="fc" id="L236">    h = (h * 17) ^ end;</span>
+<span class="fc" id="L237">    return h;</span>
   }
 
 }

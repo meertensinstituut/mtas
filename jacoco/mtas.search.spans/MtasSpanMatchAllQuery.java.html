@@ -185,6 +185,11 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
 <span class="nc" id="L185">      return new MtasSimScorer();</span>
     }
 
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return true;
+//    }
+
   }
 
   /*
@@ -195,9 +200,9 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public String toString(String field) {
-<span class="nc" id="L198">    StringBuilder buffer = new StringBuilder();</span>
-<span class="nc" id="L199">    buffer.append(this.getClass().getSimpleName() + &quot;([])&quot;);</span>
-<span class="nc" id="L200">    return buffer.toString();</span>
+<span class="nc" id="L203">    StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L204">    buffer.append(this.getClass().getSimpleName() + &quot;([])&quot;);</span>
+<span class="nc" id="L205">    return buffer.toString();</span>
   }
 
   /*
@@ -207,14 +212,14 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="fc bfc" id="L210" title="All 2 branches covered.">    if (this == obj)</span>
-<span class="fc" id="L211">      return true;</span>
-<span class="pc bpc" id="L212" title="1 of 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L213">      return false;</span>
-<span class="fc bfc" id="L214" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
-<span class="fc" id="L215">      return false;</span>
-<span class="fc" id="L216">    final MtasSpanMatchAllQuery that = (MtasSpanMatchAllQuery) obj;</span>
-<span class="fc" id="L217">    return field.equals(that.field);</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">    if (this == obj)</span>
+<span class="fc" id="L216">      return true;</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L218">      return false;</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">    if (getClass() != obj.getClass())</span>
+<span class="fc" id="L220">      return false;</span>
+<span class="fc" id="L221">    final MtasSpanMatchAllQuery that = (MtasSpanMatchAllQuery) obj;</span>
+<span class="fc" id="L222">    return field.equals(that.field);</span>
   }
 
   /*
@@ -224,9 +229,9 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
    */
   @Override
   public int hashCode() {
-<span class="fc" id="L227">    int h = this.getClass().getSimpleName().hashCode();</span>
-<span class="fc" id="L228">    h = (h * 7) ^ field.hashCode();</span>
-<span class="fc" id="L229">    return h;</span>
+<span class="fc" id="L232">    int h = this.getClass().getSimpleName().hashCode();</span>
+<span class="fc" id="L233">    h = (h * 7) ^ field.hashCode();</span>
+<span class="fc" id="L234">    return h;</span>
   }
 
 }

@@ -202,6 +202,11 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     public void extractTerms(Set&lt;Term&gt; terms) {
 <span class="nc" id="L203">      subWeight.extractTerms(terms);</span>
 <span class="nc" id="L204">    }</span>
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return subWeight.isCacheable(arg0);
+//    }
 
   }
 

@@ -64,57 +64,56 @@ public class MtasCQLQParser extends QParser {
   public MtasCQLQParser(String qstr, SolrParams localParams, SolrParams params,
       SolrQueryRequest req) {
 <span class="fc" id="L66">    super(qstr, localParams, params, req);</span>
-
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_FIELD) != null)</span>
-<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_FIELD).length == 1)) {</span>
-<span class="fc" id="L70">      field = localParams.getParams(MTAS_CQL_QPARSER_FIELD)[0];</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_FIELD) != null)</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_FIELD).length == 1)) {</span>
+<span class="fc" id="L69">      field = localParams.getParams(MTAS_CQL_QPARSER_FIELD)[0];</span>
     }
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_QUERY) != null)</span>
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_QUERY).length == 1)) {</span>
-<span class="fc" id="L74">      cql = localParams.getParams(MTAS_CQL_QPARSER_QUERY)[0];</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_QUERY) != null)</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_QUERY).length == 1)) {</span>
+<span class="fc" id="L73">      cql = localParams.getParams(MTAS_CQL_QPARSER_QUERY)[0];</span>
     }
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_IGNORE) != null)</span>
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_IGNORE).length == 1)) {</span>
-<span class="nc" id="L78">      ignoreQuery = localParams.getParams(MTAS_CQL_QPARSER_IGNORE)[0];</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_IGNORE) != null)</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_IGNORE).length == 1)) {</span>
+<span class="nc" id="L77">      ignoreQuery = localParams.getParams(MTAS_CQL_QPARSER_IGNORE)[0];</span>
     }
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH) != null)</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH) != null)</span>
         &amp;&amp; (localParams
-<span class="nc bnc" id="L82" title="All 2 branches missed.">            .getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH).length == 1)) {</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            .getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH).length == 1)) {</span>
       try {
-<span class="nc" id="L84">        maximumIgnoreLength = Integer.parseInt(</span>
-<span class="nc" id="L85">            localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH)[0]);</span>
-<span class="nc" id="L86">      } catch (NumberFormatException e) {</span>
-<span class="nc" id="L87">        maximumIgnoreLength = null;</span>
-<span class="nc" id="L88">      }</span>
+<span class="nc" id="L83">        maximumIgnoreLength = Integer.parseInt(</span>
+<span class="nc" id="L84">            localParams.getParams(MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH)[0]);</span>
+<span class="nc" id="L85">      } catch (NumberFormatException e) {</span>
+<span class="nc" id="L86">        maximumIgnoreLength = null;</span>
+<span class="nc" id="L87">      }</span>
     }
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_PREFIX) != null)</span>
-<span class="nc bnc" id="L91" title="All 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_PREFIX).length == 1)) {</span>
-<span class="nc" id="L92">      defaultPrefix = localParams.getParams(MTAS_CQL_QPARSER_PREFIX)[0];</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">    if ((localParams.getParams(MTAS_CQL_QPARSER_PREFIX) != null)</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        &amp;&amp; (localParams.getParams(MTAS_CQL_QPARSER_PREFIX).length == 1)) {</span>
+<span class="nc" id="L91">      defaultPrefix = localParams.getParams(MTAS_CQL_QPARSER_PREFIX)[0];</span>
     }
-<span class="fc" id="L94">    variables = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L95">    Iterator&lt;String&gt; it = localParams.getParameterNamesIterator();</span>
-<span class="fc bfc" id="L96" title="All 2 branches covered.">    while (it.hasNext()) {</span>
-<span class="fc" id="L97">      String item = it.next();</span>
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">      if (item.startsWith(&quot;variable_&quot;)) {</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (localParams.getParams(item).length == 0</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">            || (localParams.getParams(item).length == 1</span>
-<span class="nc bnc" id="L101" title="All 2 branches missed.">                &amp;&amp; localParams.getParams(item)[0].isEmpty())) {</span>
-<span class="nc" id="L102">          variables.put(item.substring(9), new String[0]);</span>
+<span class="fc" id="L93">    variables = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L94">    Iterator&lt;String&gt; it = localParams.getParameterNamesIterator();</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    while (it.hasNext()) {</span>
+<span class="fc" id="L96">      String item = it.next();</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">      if (item.startsWith(&quot;variable_&quot;)) {</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (localParams.getParams(item).length == 0</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">            || (localParams.getParams(item).length == 1</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                &amp;&amp; localParams.getParams(item)[0].isEmpty())) {</span>
+<span class="nc" id="L101">          variables.put(item.substring(9), new String[0]);</span>
         } else {
-<span class="nc" id="L104">          ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L105" title="All 2 branches missed.">          for (int i = 0; i &lt; localParams.getParams(item).length; i++) {</span>
-<span class="nc" id="L106">            String[] subList = localParams.getParams(item)[i]</span>
-<span class="nc" id="L107">                .split(&quot;(?&lt;!\\\\),&quot;);</span>
-<span class="nc bnc" id="L108" title="All 2 branches missed.">            for (int j = 0; j &lt; subList.length; j++) {</span>
-<span class="nc" id="L109">              list.add(subList[j].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
+<span class="nc" id="L103">          ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">          for (int i = 0; i &lt; localParams.getParams(item).length; i++) {</span>
+<span class="nc" id="L105">            String[] subList = localParams.getParams(item)[i]</span>
+<span class="nc" id="L106">                .split(&quot;(?&lt;!\\\\),&quot;);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            for (int j = 0; j &lt; subList.length; j++) {</span>
+<span class="nc" id="L108">              list.add(subList[j].replace(&quot;\\,&quot;, &quot;,&quot;).replace(&quot;\\\\&quot;, &quot;\\&quot;));</span>
             }
           }
-<span class="nc" id="L112">          variables.put(item.substring(9),</span>
-<span class="nc" id="L113">              list.toArray(new String[list.size()]));</span>
+<span class="nc" id="L111">          variables.put(item.substring(9),</span>
+<span class="nc" id="L112">              list.toArray(new String[list.size()]));</span>
         }
       }
-<span class="fc" id="L116">    }    </span>
-<span class="fc" id="L117">  }</span>
+<span class="fc" id="L115">    }    </span>
+<span class="fc" id="L116">  }</span>
 
   /*
    * (non-Javadoc)
@@ -123,33 +122,33 @@ public class MtasCQLQParser extends QParser {
    */
   @Override
   public Query parse() throws SyntaxError {
-<span class="pc bpc" id="L126" title="1 of 2 branches missed.">    if (field == null) {</span>
-<span class="nc" id="L127">      throw new SyntaxError(&quot;no &quot; + MTAS_CQL_QPARSER_FIELD);</span>
-<span class="pc bpc" id="L128" title="1 of 2 branches missed.">    } else if (cql == null) {</span>
-<span class="nc" id="L129">      throw new SyntaxError(&quot;no &quot; + MTAS_CQL_QPARSER_QUERY);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (field == null) {</span>
+<span class="nc" id="L126">      throw new SyntaxError(&quot;no &quot; + MTAS_CQL_QPARSER_FIELD);</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">    } else if (cql == null) {</span>
+<span class="nc" id="L128">      throw new SyntaxError(&quot;no &quot; + MTAS_CQL_QPARSER_QUERY);</span>
     } else {
-<span class="fc" id="L131">      MtasSpanQuery q = null;</span>
-<span class="fc" id="L132">      MtasSpanQuery iq = null;</span>
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">      if (ignoreQuery != null) {</span>
-<span class="nc" id="L134">        Reader ignoreReader = new BufferedReader(new StringReader(ignoreQuery));</span>
-<span class="nc" id="L135">        MtasCQLParser ignoreParser = new MtasCQLParser(ignoreReader);</span>
+<span class="fc" id="L130">      MtasSpanQuery q = null;</span>
+<span class="fc" id="L131">      MtasSpanQuery iq = null;</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">      if (ignoreQuery != null) {</span>
+<span class="nc" id="L133">        Reader ignoreReader = new BufferedReader(new StringReader(ignoreQuery));</span>
+<span class="nc" id="L134">        MtasCQLParser ignoreParser = new MtasCQLParser(ignoreReader);</span>
         try {
-<span class="nc" id="L137">          iq = ignoreParser.parse(field, null, null, null, null);</span>
-<span class="nc" id="L138">        } catch (mtas.parser.cql.TokenMgrError</span>
+<span class="nc" id="L136">          iq = ignoreParser.parse(field, null, null, null, null);</span>
+<span class="nc" id="L137">        } catch (mtas.parser.cql.TokenMgrError</span>
             | mtas.parser.cql.ParseException e) {
-<span class="nc" id="L140">          throw new SyntaxError(e);</span>
-<span class="nc" id="L141">        }</span>
+<span class="nc" id="L139">          throw new SyntaxError(e);</span>
+<span class="nc" id="L140">        }</span>
       }
-<span class="fc" id="L143">      Reader queryReader = new BufferedReader(new StringReader(cql));</span>
-<span class="fc" id="L144">      MtasCQLParser queryParser = new MtasCQLParser(queryReader);</span>
+<span class="fc" id="L142">      Reader queryReader = new BufferedReader(new StringReader(cql));</span>
+<span class="fc" id="L143">      MtasCQLParser queryParser = new MtasCQLParser(queryReader);</span>
       try {
-<span class="fc" id="L146">        q = queryParser.parse(field, defaultPrefix, variables, iq,</span>
+<span class="fc" id="L145">        q = queryParser.parse(field, defaultPrefix, variables, iq,</span>
             maximumIgnoreLength);
-<span class="nc" id="L148">      } catch (mtas.parser.cql.TokenMgrError</span>
+<span class="nc" id="L147">      } catch (mtas.parser.cql.TokenMgrError</span>
           | mtas.parser.cql.ParseException e) {
-<span class="nc" id="L150">        throw new SyntaxError(e);</span>
-<span class="fc" id="L151">      }</span>
-<span class="fc" id="L152">      return q;</span>
+<span class="nc" id="L149">        throw new SyntaxError(e);</span>
+<span class="fc" id="L150">      }</span>
+<span class="fc" id="L151">      return q;</span>
     }
   }
 

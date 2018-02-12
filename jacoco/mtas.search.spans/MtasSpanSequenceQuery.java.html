@@ -564,6 +564,19 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
 <span class="nc" id="L564">        ignoreWeight.extractTerms(terms);</span>
       }
 <span class="nc" id="L566">    }</span>
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {      
+//      for(MtasSpanSequenceQueryWeight sqw : subWeights) {
+//        if(!sqw.spanWeight.isCacheable(arg0)) {
+//          return false;
+//        }
+//      }
+//      if(ignoreWeight!=null) {
+//        return ignoreWeight.isCacheable(arg0);
+//      }
+//      return true;            
+//    }
 
   }
 
@@ -586,10 +599,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      * @param optional the optional
      */
     public MtasSpanSequenceQuerySpans(MtasSpanSequenceQuery query, Spans spans,
-<span class="fc" id="L589">        boolean optional) {</span>
-<span class="pc bpc" id="L590" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
-<span class="fc" id="L591">      this.optional = optional;</span>
-<span class="fc" id="L592">    }</span>
+<span class="fc" id="L602">        boolean optional) {</span>
+<span class="pc bpc" id="L603" title="1 of 2 branches missed.">      this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);</span>
+<span class="fc" id="L604">      this.optional = optional;</span>
+<span class="fc" id="L605">    }</span>
   }
 
   /**
@@ -610,10 +623,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
      * @param optional the optional
      */
     public MtasSpanSequenceQueryWeight(SpanWeight spanWeight,
-<span class="fc" id="L613">        boolean optional) {</span>
-<span class="fc" id="L614">      this.spanWeight = spanWeight;</span>
-<span class="fc" id="L615">      this.optional = optional;</span>
-<span class="fc" id="L616">    }</span>
+<span class="fc" id="L626">        boolean optional) {</span>
+<span class="fc" id="L627">      this.spanWeight = spanWeight;</span>
+<span class="fc" id="L628">      this.optional = optional;</span>
+<span class="fc" id="L629">    }</span>
   }
 
 }

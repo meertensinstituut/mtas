@@ -285,6 +285,11 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
     public void extractTerms(Set&lt;Term&gt; terms) {
 <span class="nc" id="L286">      subWeight.extractTerms(terms);</span>
 <span class="nc" id="L287">    }</span>
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return subWeight.isCacheable(arg0);
+//    }
 
   }
 

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasPennTreebankReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasPennTreebankReader.java</span></div><h1>MtasPennTreebankReader.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
+public class MtasPennTreebankReader {
+
+  private Reader reader;
+  private int bufferPosition;
+  private int readPosition;
+  private boolean eof;
+
+  private char nextBracket;
+  private String[] nextStrings;
+  private int counterBracket;
+
+  private int currentEvent;
+  private int currentPosition;
+  private int currentStringPosition;
+
+  private static final int EVENT_INIT = 0;
+  
+  public static final int EVENT_STARTBRACKET = 1;
+  public static final int EVENT_ENDBRACKET = 2;
+  public static final int EVENT_NODE = 3;
+  public static final int EVENT_STRING = 4;
+  public static final int EVENT_EOF = 5;
+  
+  private static final char CHARACTER_BRACKETSTART = '(';
+  private static final char CHARACTER_BRACKETEND = ')';
+  private static final char CHARACTER_CURLYBRACKETSTART = '{';
+  private static final char CHARACTER_CURLYBRACKETEND = '}';
+  
+  private static final int DEFAULTCHARBUFFERSIZE = 8192;
+  private int charBufferSize;
+  private char[] charBuffer;
+
+<span class="nc" id="L40">  public MtasPennTreebankReader(Reader reader) throws IOException {</span>
+<span class="nc" id="L41">    this.reader = reader;</span>
+<span class="nc" id="L42">    nextBracket = 0;</span>
+<span class="nc" id="L43">    nextStrings = null;</span>
+<span class="nc" id="L44">    counterBracket = 0;</span>
+<span class="nc" id="L45">    readPosition = -1;</span>
+<span class="nc" id="L46">    bufferPosition = 0;</span>
+<span class="nc" id="L47">    currentEvent = EVENT_INIT;</span>
+<span class="nc" id="L48">    charBuffer = null;</span>
+<span class="nc" id="L49">    charBufferSize = 0;</span>
+<span class="nc" id="L50">    eof = false;</span>
+<span class="nc" id="L51">    next();</span>
+<span class="nc" id="L52">  }</span>
+
+  public int getEventType() {
+<span class="nc" id="L55">    return currentEvent;</span>
+  }
+
+  public int getPosition() {
+<span class="nc" id="L59">    return currentPosition;</span>
+  }
+
+  public String getString() throws IOException {
+<span class="nc bnc" id="L63" title="All 4 branches missed.">    if (currentEvent == EVENT_NODE || currentEvent == EVENT_STRING) {</span>
+<span class="nc" id="L64">      return nextStrings[currentStringPosition];</span>
+    } else {
+<span class="nc" id="L66">      throw new IOException(&quot;unexpected state&quot;);</span>
+    }
+  }
+
+  public boolean next() throws IOException {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">    if (currentEvent == EVENT_EOF) {</span>
+<span class="nc" id="L72">      return false;</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    } else if (currentEvent == EVENT_INIT) {</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">      if (findBracket()) {</span>
+<span class="nc" id="L75">        currentPosition = 0;</span>
+<span class="nc" id="L76">        currentStringPosition = -1;</span>
+<span class="nc" id="L77">        currentEvent = EVENT_STRING;       </span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (findNextString()) {</span>
+<span class="nc" id="L79">          throw new IOException(&quot;string without opening bracket&quot;);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        } else if (nextBracket == CHARACTER_BRACKETSTART) {</span>
+<span class="nc" id="L81">          currentEvent = EVENT_STARTBRACKET;</span>
+<span class="nc" id="L82">          currentPosition = readPosition;</span>
+<span class="nc" id="L83">          return true;</span>
+        } else {
+<span class="nc" id="L85">          throw new IOException(&quot;unexpected state&quot;);</span>
+        }        
+      } else {
+<span class="nc" id="L88">        currentEvent = EVENT_EOF;</span>
+<span class="nc" id="L89">        return false;</span>
+      }      
+<span class="nc bnc" id="L91" title="All 4 branches missed.">    } else if (currentEvent == EVENT_NODE || currentEvent == EVENT_STRING) {</span>
+<span class="nc" id="L92">      currentEvent = EVENT_STRING;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">      if (findNextString()) {</span>
+<span class="nc" id="L94">        return true;</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      } else if (nextBracket == CHARACTER_BRACKETSTART) {</span>
+<span class="nc" id="L96">        currentEvent = EVENT_STARTBRACKET;</span>
+<span class="nc" id="L97">        currentPosition = readPosition;</span>
+<span class="nc" id="L98">        return true;</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">      } else if (nextBracket == CHARACTER_BRACKETEND) {</span>
+<span class="nc" id="L100">        currentEvent = EVENT_ENDBRACKET;</span>
+<span class="nc" id="L101">        currentPosition = readPosition;</span>
+<span class="nc" id="L102">        return true;</span>
+      } else {
+<span class="nc" id="L104">        throw new IOException(&quot;unexpected state&quot;);</span>
+      }
+<span class="nc bnc" id="L106" title="All 4 branches missed.">    } else if (currentEvent == EVENT_STARTBRACKET</span>
+        || currentEvent == EVENT_ENDBRACKET) {
+<span class="nc bnc" id="L108" title="All 2 branches missed.">      if (findBracket()) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (currentEvent == EVENT_STARTBRACKET) {</span>
+<span class="nc" id="L110">          currentEvent = EVENT_NODE;</span>
+        } else {
+<span class="nc" id="L112">          currentEvent = EVENT_STRING;</span>
+        }  
+<span class="nc" id="L114">        currentStringPosition = -1;</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (findNextString()) {</span>
+<span class="nc" id="L116">          return true;</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        } else if (nextBracket == CHARACTER_BRACKETSTART) {</span>
+<span class="nc" id="L118">          currentEvent = EVENT_STARTBRACKET;</span>
+<span class="nc" id="L119">          currentPosition = readPosition;</span>
+<span class="nc" id="L120">          return true;</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        } else if (nextBracket == CHARACTER_BRACKETEND) {</span>
+<span class="nc" id="L122">          currentEvent = EVENT_ENDBRACKET;</span>
+<span class="nc" id="L123">          currentPosition = readPosition;</span>
+<span class="nc" id="L124">          return true;</span>
+        } else {
+<span class="nc" id="L126">          throw new IOException(&quot;unexpected state&quot;);</span>
+        }
+      } else {
+<span class="nc" id="L129">        currentEvent = EVENT_EOF;</span>
+<span class="nc" id="L130">        return false;</span>
+      }
+    } else {
+<span class="nc" id="L133">      throw new IOException(&quot;unexpected state&quot;);</span>
+    }
+  }
+
+  private boolean findNextString() throws IOException {
+<span class="nc bnc" id="L138" title="All 4 branches missed.">    if (currentEvent == EVENT_NODE || currentEvent == EVENT_STRING) {</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">      while (currentStringPosition &lt; (nextStrings.length - 1)) {</span>
+<span class="nc" id="L140">        currentStringPosition++;</span>
+<span class="nc" id="L141">        currentPosition++;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (currentStringPosition &gt; 0) {</span>
+<span class="nc" id="L143">          currentPosition += nextStrings[currentStringPosition - 1].length();</span>
+        }
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (!nextStrings[currentStringPosition].trim().isEmpty()) {</span>
+<span class="nc" id="L146">          return true;</span>
+        }
+      }
+<span class="nc bnc" id="L149" title="All 2 branches missed.">      if (currentStringPosition &gt; 0) {</span>
+<span class="nc" id="L150">        currentPosition += 1 + nextStrings[currentStringPosition - 1].length();</span>
+      }
+<span class="nc" id="L152">      return false;</span>
+    } else {
+<span class="nc" id="L154">      throw new IOException(&quot;unexpected state&quot;);</span>
+    }
+  }
+
+  private boolean findBracket() throws IOException {    
+<span class="nc" id="L159">    StringBuilder sBuilder = new StringBuilder(&quot;&quot;);</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">    while (!eof) {</span>
+<span class="nc" id="L161">      char c = nextCharacter();</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">      if (c == CHARACTER_BRACKETSTART) {</span>
+<span class="nc" id="L163">        counterBracket++;</span>
+<span class="nc" id="L164">        nextStrings = createStrings(sBuilder.toString());</span>
+<span class="nc" id="L165">        nextBracket = c;</span>
+<span class="nc" id="L166">        return true;</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">      } else if (c == CHARACTER_BRACKETEND) {</span>
+<span class="nc" id="L168">        counterBracket--;</span>
+<span class="nc" id="L169">        nextStrings = createStrings(sBuilder.toString());</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if (counterBracket &lt; 0) {</span>
+<span class="nc" id="L171">          throw new IOException(&quot;bracket mismatch&quot;);</span>
+<span class="nc bnc" id="L172" title="All 4 branches missed.">        } else if (nextBracket == CHARACTER_BRACKETSTART</span>
+            &amp;&amp; nextStrings.length == 0) {
+<span class="nc" id="L174">          throw new IOException(&quot;empty brackets&quot;);</span>
+        }
+<span class="nc" id="L176">        nextBracket = c;</span>
+<span class="nc" id="L177">        return true;</span>
+      } else {
+<span class="nc" id="L179">        sBuilder.append(c);</span>
+      }      
+<span class="nc" id="L181">    }</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">    if (eof) {</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">      if(!sBuilder.toString().trim().isEmpty()) {    </span>
+<span class="nc" id="L184">        throw new IOException(&quot;string without closing bracket&quot;);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">      } else if(counterBracket!=0) {</span>
+<span class="nc" id="L186">        throw new IOException(&quot;unclosed bracket(s)&quot;);</span>
+      }
+    }
+<span class="nc bnc" id="L189" title="All 2 branches missed.">    if (counterBracket != 0) {</span>
+<span class="nc" id="L190">      throw new IOException(&quot;bracket mismatch&quot;);</span>
+    } else {
+<span class="nc" id="L192">      return false;</span>
+    }
+  }
+
+  private char nextCharacter() throws IOException {
+<span class="nc bnc" id="L197" title="All 2 branches missed.">    if(charBuffer==null) {</span>
+<span class="nc" id="L198">      charBuffer = new char[DEFAULTCHARBUFFERSIZE];</span>
+<span class="nc" id="L199">      charBufferSize = reader.read(charBuffer, 0, charBuffer.length);</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">      eof = (charBufferSize &gt; 0) ? false : true;</span>
+    }
+<span class="nc bnc" id="L202" title="All 2 branches missed.">    if (bufferPosition &lt; charBufferSize) {</span>
+<span class="nc" id="L203">      readPosition++;</span>
+<span class="nc" id="L204">      char c = charBuffer[bufferPosition];</span>
+<span class="nc" id="L205">      bufferPosition++;</span>
+      // refill buffer if needed
+<span class="nc bnc" id="L207" title="All 2 branches missed.">      if (bufferPosition == charBufferSize) {</span>
+<span class="nc" id="L208">        bufferPosition = 0;</span>
+<span class="nc" id="L209">        charBufferSize = reader.read(charBuffer, 0, charBuffer.length);</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (charBufferSize &lt;= 0) {</span>
+<span class="nc" id="L211">          eof = true;</span>
+        }
+      }
+<span class="nc" id="L214">      return c;</span>
+    } else {
+<span class="nc" id="L216">      throw new IOException(&quot;no (more) characters in reader&quot;);</span>
+    }
+  }
+  
+  public static String[] createStrings(String s) throws IOException {  
+<span class="nc" id="L221">    return createStrings(s, null);</span>
+  }
+  
+  public static String[] createStrings(String s, String splitRegexp) throws IOException {  
+<span class="nc" id="L225">    final String pattern = Pattern.quote(Character.toString(CHARACTER_CURLYBRACKETSTART))+&quot;.*&quot;+Pattern.quote(Character.toString(CHARACTER_CURLYBRACKETEND));</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">    splitRegexp = (splitRegexp==null) ? &quot;\\s&quot; : splitRegexp;</span>
+<span class="nc" id="L227">    String[] initialList = s.split(splitRegexp, -1);</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">    if(s.indexOf(CHARACTER_CURLYBRACKETSTART)==-1) {</span>
+<span class="nc" id="L229">      return initialList;</span>
+    } else {
+<span class="nc" id="L231">      String[] finalList = new String[initialList.length];</span>
+<span class="nc" id="L232">      int j = 0;</span>
+<span class="nc" id="L233">      boolean withinCurlyBracket = false;</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">      for(int i=0; i&lt;initialList.length; i++) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        if(withinCurlyBracket) {</span>
+<span class="nc" id="L236">          finalList[j-1] = finalList[j-1] + &quot; &quot; + initialList[i]; </span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">          if(initialList[i].indexOf(CHARACTER_CURLYBRACKETEND)!=-1) {</span>
+<span class="nc" id="L238">            String item = CHARACTER_CURLYBRACKETSTART+initialList[i];</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">            if(item.replaceAll(pattern, &quot;&quot;).indexOf(CHARACTER_CURLYBRACKETSTART)==-1) {</span>
+<span class="nc" id="L240">              withinCurlyBracket = false;</span>
+            } 
+<span class="nc" id="L242">          }</span>
+        } else {
+<span class="nc" id="L244">          finalList[j] = initialList[i];</span>
+<span class="nc" id="L245">          j++;</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">          if(initialList[i].indexOf(CHARACTER_CURLYBRACKETSTART)!=-1) {</span>
+<span class="nc" id="L247">            String item = initialList[i];</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">            if(item.replaceAll(pattern, &quot;&quot;).indexOf(CHARACTER_CURLYBRACKETSTART)!=-1) {</span>
+<span class="nc" id="L249">              withinCurlyBracket = true; </span>
+            }
+          }
+        }      
+      }
+<span class="nc bnc" id="L254" title="All 2 branches missed.">      if(withinCurlyBracket) {</span>
+<span class="nc" id="L255">        throw new IOException(&quot;unclosed curly bracket for &quot;+s);</span>
+      }
+<span class="nc" id="L257">      return Arrays.copyOf(finalList, j); </span>
+    }  
+  }  
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

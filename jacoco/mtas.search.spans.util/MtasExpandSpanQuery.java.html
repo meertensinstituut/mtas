@@ -290,6 +290,11 @@ public class MtasExpandSpanQuery extends MtasSpanQuery {
     public void extractTerms(Set&lt;Term&gt; terms) {
 <span class="nc" id="L291">      subWeight.extractTerms(terms);</span>
 <span class="nc" id="L292">    }</span>
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return subWeight.isCacheable(arg0);
+//    }
 
   }
 

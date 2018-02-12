@@ -5,25 +5,41 @@ import java.util.Map;
 
 import org.apache.lucene.util.BytesRef;
 
+import mtas.analysis.token.MtasToken;
+
 public abstract class Distance {
 
   protected final String prefix;
   protected final String base;
-  protected final Double maximum;
+  public final Double minimum;
+  public final Double maximum;
   protected final Map&lt;String,String&gt; parameters;
+  protected final int prefixOffset;
+  
+  private static final double DOUBLE_TOLERANCE = 5E-16;
   
   public static final String NAME = &quot;distance&quot;;
   
-<span class="nc" id="L17">  public Distance(String prefix, String base, Double maximum, Map&lt;String,String&gt; parameters) throws IOException {</span>
-<span class="nc" id="L18">    this.prefix = prefix;</span>
-<span class="nc" id="L19">    this.base = base;</span>
-<span class="nc" id="L20">    this.maximum = maximum;   </span>
-<span class="nc" id="L21">    this.parameters = parameters;</span>
-<span class="nc" id="L22">  }</span>
+<span class="nc" id="L23">  public Distance(String prefix, String base, Double minimum, Double maximum, Map&lt;String,String&gt; parameters) throws IOException {</span>
+<span class="nc" id="L24">    this.prefix = prefix;</span>
+<span class="nc" id="L25">    this.base = base;</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">    this.minimum = minimum==null?null:minimum-DOUBLE_TOLERANCE;   </span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">    this.maximum = maximum==null?null:maximum+DOUBLE_TOLERANCE;   </span>
+<span class="nc" id="L28">    this.parameters = parameters;</span>
+<span class="nc" id="L29">    prefixOffset = prefix.length() + MtasToken.DELIMITER.length();</span>
+<span class="nc" id="L30">  }</span>
     
+  public abstract double compute(BytesRef term);
+  
   public abstract double compute(String key);
   
-  public abstract boolean validate(BytesRef term);
+  public boolean validate(BytesRef term) {
+<span class="nc bnc" id="L37" title="All 4 branches missed.">    return validateMaximum(term) &amp;&amp; validateMinimum(term);</span>
+  }
+  
+  public abstract boolean validateMaximum(BytesRef term);
+  
+  public abstract boolean validateMinimum(BytesRef term);
   
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
