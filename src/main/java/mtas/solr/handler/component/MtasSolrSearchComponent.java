@@ -75,6 +75,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The Constant CONFIG_COLLECTION_MAXIMUM_OVERFLOW. */
   public static final String CONFIG_COLLECTION_MAXIMUM_OVERFLOW = "collectionMaximumOverflow";
 
+  /** The Constant NAME. */
   public static final String NAME = "mtas";
 
   /** The Constant PARAM_MTAS. */
@@ -162,6 +163,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /** The request handler. */
   private MtasRequestHandler requestHandler = null;
 
+  /** The request handler name. */
   private String requestHandlerName = null;
 
   /*
@@ -265,7 +267,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
           searchStatus.prepare(rb, mtasFields);
           mtasFields.status.handler = requestHandlerName;
           if (mtasFields.status.key != null) {
-            solrStatus.setKey(mtasFields.status.key);            
+            solrStatus.setKey(mtasFields.status.key);
           }
         }
         // now, register status
@@ -396,11 +398,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
               NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
               if (mtasFields.doStatus) {
                 // add to response
-                SimpleOrderedMap<Object> statusResponse = searchStatus.create(mtasFields.status, false);
-                if(statusResponse!=null) {
-                  mtasResponse.add(MtasSolrComponentStatus.NAME,                
-                    searchStatus.create(mtasFields.status, false));
-                }  
+                SimpleOrderedMap<Object> statusResponse = searchStatus
+                    .create(mtasFields.status, false);
+                if (statusResponse != null) {
+                  mtasResponse.add(MtasSolrComponentStatus.NAME,
+                      searchStatus.create(mtasFields.status, false));
+                }
               }
               if (mtasFields.doDocument) {
                 ArrayList<NamedList<?>> mtasDocumentResponses = new ArrayList<>();
@@ -586,33 +589,45 @@ public class MtasSolrSearchComponent extends SearchComponent {
                 }
               }
               // add to response
-              if(mtasResponse.size()>0) {
+              if (mtasResponse.size() > 0) {
                 rb.rsp.add(NAME, mtasResponse);
-              }  
+              }
             }
           }
         } catch (IOException e) {
           errorStatus(solrStatus, e);
         }
       }
-      if(!solrStatus.error()) {
-        //always set status segments
-        if(solrStatus.status().numberSegmentsTotal==null) {          
-          solrStatus.status().numberSegmentsTotal = rb.req.getSearcher().getRawReader().leaves().size();
-          solrStatus.status().numberSegmentsFinished = solrStatus.status().numberSegmentsTotal;          
-        }  
-        //always try to set number of documents
-        if(solrStatus.status().numberDocumentsTotal==null) {
-          solrStatus.status().numberDocumentsTotal = (long) rb.req.getSearcher().numDocs();
-          if(rb.getResults().docList!=null) {
-            solrStatus.status().numberDocumentsFinished = rb.getResults().docList.matches();
-            solrStatus.status().numberDocumentsFound = rb.getResults().docList.matches();
-          } else if(rb.getResults().docSet!=null) {
-            solrStatus.status().numberDocumentsFinished = (long) rb.getResults().docSet.size();
-            solrStatus.status().numberDocumentsFound = (long) rb.getResults().docSet.size();
+      if (!solrStatus.error()) {
+        // always set status segments
+        if (solrStatus.status().numberSegmentsTotal == null) {
+          solrStatus.status().numberSegmentsTotal = rb.req.getSearcher()
+              .getRawReader().leaves().size();
+          solrStatus.status().numberSegmentsFinished = solrStatus
+              .status().numberSegmentsTotal;
+        }
+        // always try to set number of documents
+        if (solrStatus.status().numberDocumentsTotal == null) {
+          SolrIndexSearcher searcher;
+          if ((searcher = rb.req.getSearcher()) != null) {
+            solrStatus.status().numberDocumentsTotal = (long) searcher
+                .numDocs();
+            if (rb.getResults().docList != null) {
+              solrStatus
+                  .status().numberDocumentsFinished = rb.getResults().docList
+                      .matches();
+              solrStatus.status().numberDocumentsFound = rb.getResults().docList
+                  .matches();
+            } else if (rb.getResults().docSet != null) {
+              solrStatus.status().numberDocumentsFinished = (long) rb
+                  .getResults().docSet.size();
+              solrStatus
+                  .status().numberDocumentsFound = (long) rb.getResults().docSet
+                      .size();
+            }
           }
         }
-      }  
+      }
     } finally {
       checkStatus(solrStatus);
       finishStatus(solrStatus);
@@ -728,8 +743,9 @@ public class MtasSolrSearchComponent extends SearchComponent {
     solrStatus.setStage(rb.stage);
     if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {
       Status status = solrStatus.status();
-      status.numberDocumentsFound = (status.numberDocumentsFound == null)
-          ? rb.getNumberDocumentsFound() : status.numberDocumentsFound;
+      if(status.numberDocumentsFound == null) {
+        status.numberDocumentsFound = rb.getNumberDocumentsFound();
+      }
       // try to finish status from get fields stage
     } else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS) {
       finishStatus(solrStatus);
@@ -874,8 +890,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Gets the mtas fields.
    *
-   * @param rb
-   *          the rb
+   * @param rb the rb
    * @return the mtas fields
    */
 
@@ -886,10 +901,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
   /**
    * Initialize request handler.
    *
-   * @param rb
-   *          the rb
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
+   * @param rb the rb
    */
   private void initializeRequestHandler(ResponseBuilder rb) {
     if (requestHandler == null) {
@@ -905,6 +917,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
+  /**
+   * Check status.
+   *
+   * @param status the status
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void checkStatus(MtasSolrStatus status) throws IOException {
     if (!status.finished()) {
       if (status.error()) {
@@ -923,6 +941,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
+  /**
+   * Register status.
+   *
+   * @param solrStatus the solr status
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private void registerStatus(MtasSolrStatus solrStatus) throws IOException {
     if (requestHandler != null) {
       Map<String, ShardStatus> shards = solrStatus.getShards();
@@ -934,10 +958,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
           // get shard info
           ShardInformation shardInformation = requestHandler
               .getShardInformation(entry.getKey());
-          if(shardInformation==null) {
-            throw new IOException("no shard information "+entry.getKey());
+          if (shardInformation == null) {
+            throw new IOException("no shard information " + entry.getKey());
           }
-          ShardStatus shardStatus = entry.getValue();          
+          ShardStatus shardStatus = entry.getValue();
           shardStatus.name = shardInformation.name;
           shardStatus.location = entry.getKey();
           shardStatus.mtasHandler = shardInformation.mtasHandler;
@@ -951,6 +975,12 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
+  /**
+   * Error status.
+   *
+   * @param status the status
+   * @param exception the exception
+   */
   private void errorStatus(MtasSolrStatus status, IOException exception) {
     try {
       status.setError(exception);
@@ -962,6 +992,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
     }
   }
 
+  /**
+   * Finish status.
+   *
+   * @param status the status
+   */
   private void finishStatus(MtasSolrStatus status) {
     if (!status.finished()) {
       status.setFinished();

@@ -3,7 +3,6 @@ package mtas.search.spans;
 import java.io.IOException;
 import java.util.HashSet;
 
-import org.apache.lucene.search.ConjunctionDISI;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import mtas.search.spans.MtasSpanFollowedByQuery.MtasSpanFollowedByQuerySpans;

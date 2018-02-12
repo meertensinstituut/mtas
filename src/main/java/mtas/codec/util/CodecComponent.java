@@ -1925,6 +1925,8 @@ public class CodecComponent {
 
     /** The version. */
     public String version;
+    
+    public String originalVersion;
 
     /** The id. */
     public String id;
@@ -1950,6 +1952,7 @@ public class CodecComponent {
       this.key = key;
       this.action = action;
       this.version = null;
+      this.originalVersion = null;
       values = new HashSet<>();
     }
 
@@ -2029,11 +2032,12 @@ public class CodecComponent {
      * @throws IOException
      *           Signals that an I/O exception has occurred.
      */
-    public void setPostVariables(String id, HashSet<String> values)
+    public void setPostVariables(String id, HashSet<String> values, String originalVersion)
         throws IOException {
       if (action.equals(ACTION_POST)) {
         this.id = id;
         this.values = values;
+        this.originalVersion = originalVersion;
       } else {
         throw new IOException("not allowed with action " + action);
       }
@@ -2163,6 +2167,14 @@ public class CodecComponent {
      */
     public String action() {
       return action;
+    }
+    
+    public String originalVersion() throws IOException {
+      if(action.equals(ACTION_POST)) {
+        return originalVersion;
+      } else {
+        throw new IOException("unexpected call for "+action);
+      }
     }
 
     /**

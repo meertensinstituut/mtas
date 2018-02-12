@@ -269,6 +269,11 @@ public class MtasSpanPrecededByQuery extends MtasSpanQuery {
       w1.spanWeight.extractTerms(terms);
       w2.spanWeight.extractTerms(terms);
     }
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return w1.spanWeight.isCacheable(arg0) && w2.spanWeight.isCacheable(arg0);
+//    }
 
   }
 

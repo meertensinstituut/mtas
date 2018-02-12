@@ -564,6 +564,19 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
         ignoreWeight.extractTerms(terms);
       }
     }
+    
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {      
+//      for(MtasSpanSequenceQueryWeight sqw : subWeights) {
+//        if(!sqw.spanWeight.isCacheable(arg0)) {
+//          return false;
+//        }
+//      }
+//      if(ignoreWeight!=null) {
+//        return ignoreWeight.isCacheable(arg0);
+//      }
+//      return true;            
+//    }
 
   }
 

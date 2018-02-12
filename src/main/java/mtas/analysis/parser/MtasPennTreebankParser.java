@@ -108,8 +108,8 @@ public class MtasPennTreebankParser extends MtasParser {
     tokenCollection = new MtasTokenCollection();
     MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
     List<Level> levels = new ArrayList<>();
-    Map<String,MtasToken> referencesNode = new HashMap<>();
-    Map<String,List<MtasToken>> referencesNullElement = new HashMap<>();
+//    Map<String,MtasToken> referencesNode = new HashMap<>();
+//    Map<String,List<MtasToken>> referencesNullElement = new HashMap<>();
     try {
       MtasPennTreebankReader treebankReader = new MtasPennTreebankReader(
           reader);
@@ -163,8 +163,8 @@ public class MtasPennTreebankParser extends MtasParser {
             levels.clear();
             level = null;
             ignore = false;
-            referencesNode.clear();
-            referencesNullElement.clear();
+//            referencesNode.clear();
+//            referencesNullElement.clear();
           }
           break;
         case MtasPennTreebankReader.EVENT_NODE:
@@ -205,15 +205,17 @@ public class MtasPennTreebankParser extends MtasParser {
             stringValue = treebankReader.getString();
             stringOffsetStart = treebankReader.getPosition();
             stringOffsetEnd = stringOffsetStart + stringValue.length();
-            level.offsetStart = level.offsetStart == null ? stringOffsetStart
-                : level.offsetStart;
+            if(level.offsetStart == null) {
+              level.offsetStart = stringOffsetStart;
+            }
             level.offsetEnd = stringOffsetEnd;
             if (stringValue.startsWith(NODE_CODE_PREFIX)) {
               codePositions.add(position);
               stringValue = stringValue.substring(NODE_CODE_PREFIX.length(),
                   stringValue.length());
-              codeOffsetStart = (codeOffsetStart == null) ? stringOffsetStart
-                  : codeOffsetStart;
+              if(codeOffsetStart == null) {
+                codeOffsetStart = stringOffsetStart;
+              }
               codeOffsetEnd = stringOffsetEnd;
             }
             // register position
@@ -401,7 +403,7 @@ public class MtasPennTreebankParser extends MtasParser {
   /**
    * The Class Level.
    */
-  public class Level {
+  public static class Level {
 
     /** The node. */
     public String node;

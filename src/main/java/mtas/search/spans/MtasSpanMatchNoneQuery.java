@@ -147,6 +147,11 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
       return new MtasSimScorer();
     }
 
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return true;
+//    }
+
   }
 
   /*

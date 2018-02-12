@@ -707,6 +707,7 @@ public class MtasSolrStatus {
                     getString(response.getResponse(),
                         MtasSolrComponentStatus.NAME, NAME_ABORT));
                 if (stage.equals(currentStage)) {
+                  shardStatus.stage = stage;
                   shardStatus.stageNumberDocumentsFinished = getLong(
                       response.getResponse(), MtasSolrComponentStatus.NAME,
                       NAME_STATUS_DOCUMENT_NUMBER_FINISHED);
@@ -771,10 +772,10 @@ public class MtasSolrStatus {
   /**
    * The Class StageStatus.
    */
-  public class StageStatus {
+  public static class StageStatus {
 
     /** The stage. */
-    public int stage;
+    private int stage;
 
     public boolean checked;
     
@@ -829,6 +830,10 @@ public class MtasSolrStatus {
       stageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,
           numberOfDocumentsFound);
       return stageOutput;
+    }
+    
+    public int stage() {
+      return stage;
     }
   }
 

@@ -65,6 +65,9 @@ public class MtasSolrComponentCollection
   /** The Constant NAME_MTAS_COLLECTION_KEY. */
   public static final String NAME_MTAS_COLLECTION_KEY = "key";
 
+  /** The Constant NAME_MTAS_COLLECTION_VERSION. */
+  public static final String NAME_MTAS_COLLECTION_VERSION = "version";
+
   /** The search component. */
   private MtasSolrSearchComponent searchComponent;
 
@@ -97,6 +100,7 @@ public class MtasSolrComponentCollection
     if (!ids.isEmpty()) {
       int tmpCounter = 0;
       String[] keys = new String[ids.size()];
+      String[] versions = new String[ids.size()];
       String[] actions = new String[ids.size()];
       String[] fields = new String[ids.size()];
       String[] collectionIds = new String[ids.size()];
@@ -109,6 +113,9 @@ public class MtasSolrComponentCollection
         keys[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_KEY,
             String.valueOf(tmpCounter)).trim();
+        versions[tmpCounter] = rb.req.getParams().get(
+            PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_VERSION,
+            null);
         fields[tmpCounter] = rb.req.getParams().get(
             PARAM_MTAS_COLLECTION + "." + id + "." + NAME_MTAS_COLLECTION_FIELD,
             null);
@@ -145,6 +152,8 @@ public class MtasSolrComponentCollection
       mtasFields.doCollection = true;
       MtasSolrResultUtil.compareAndCheck(keys, actions,
           NAME_MTAS_COLLECTION_KEY, NAME_MTAS_COLLECTION_ACTION, true);
+      MtasSolrResultUtil.compareAndCheck(keys, versions,
+          NAME_MTAS_COLLECTION_KEY, NAME_MTAS_COLLECTION_VERSION, true);
       MtasSolrResultUtil.compareAndCheck(keys, fields, NAME_MTAS_COLLECTION_KEY,
           NAME_MTAS_COLLECTION_FIELD, false);
       MtasSolrResultUtil.compareAndCheck(keys, collectionIds,
@@ -211,7 +220,7 @@ public class MtasSolrComponentCollection
               componentCollection = new ComponentCollection(keys[i],
                   ComponentCollection.ACTION_POST);
               componentCollection.setPostVariables(collectionIds[i],
-                  stringToStringValues(posts[i]));
+                  stringToStringValues(posts[i]), versions[i]);
               mtasFields.collection.add(componentCollection);
             } else {
               throw new IOException(
@@ -358,7 +367,7 @@ public class MtasSolrComponentCollection
           componentCollection.version = searchComponent.getCollectionCache()
               .create(componentCollection.id,
                   componentCollection.values().size(),
-                  componentCollection.values());
+                  componentCollection.values(), null);
         }
         data.setCreate(searchComponent.getCollectionCache().now(),
             searchComponent.getCollectionCache().check(componentCollection.id));
@@ -394,7 +403,7 @@ public class MtasSolrComponentCollection
           componentCollection.version = searchComponent.getCollectionCache()
               .create(componentCollection.id,
                   componentCollection.values().size(),
-                  componentCollection.values());
+                  componentCollection.values(), componentCollection.originalVersion());
         }
         // add status to result
         data.setPost(searchComponent.getCollectionCache().now(),
@@ -406,7 +415,7 @@ public class MtasSolrComponentCollection
           componentCollection.version = searchComponent.getCollectionCache()
               .create(componentCollection.id,
                   componentCollection.values().size(),
-                  componentCollection.values());
+                  componentCollection.values(), null);
         }
         // add status to result
         data.setImport(searchComponent.getCollectionCache().now(),
@@ -443,7 +452,8 @@ public class MtasSolrComponentCollection
             // mtas response
             NamedList<Object> mtasResponse = null;
             try {
-              mtasResponse = (NamedList<Object>) rb.rsp.getValues().get(MtasSolrSearchComponent.NAME);
+              mtasResponse = (NamedList<Object>) rb.rsp.getValues()
+                  .get(MtasSolrSearchComponent.NAME);
             } catch (ClassCastException e) {
               log.debug(e);
               mtasResponse = null;
@@ -551,7 +561,8 @@ public class MtasSolrComponentCollection
     // + rb.stage + " " + rb.req.getParamString());
     NamedList<Object> mtasResponse = null;
     try {
-      mtasResponse = (NamedList<Object>) rb.rsp.getValues().get(MtasSolrSearchComponent.NAME);
+      mtasResponse = (NamedList<Object>) rb.rsp.getValues()
+          .get(MtasSolrSearchComponent.NAME);
     } catch (ClassCastException e) {
       log.debug(e);
       mtasResponse = null;
@@ -562,8 +573,7 @@ public class MtasSolrComponentCollection
         Map<String, MtasSolrCollectionResult> index = new HashMap<>();
         ArrayList<Object> mtasResponseCollection;
         try {
-          mtasResponseCollection = (ArrayList<Object>) mtasResponse
-              .get(NAME);
+          mtasResponseCollection = (ArrayList<Object>) mtasResponse.get(NAME);
           for (Object item : mtasResponseCollection) {
             if (item instanceof SimpleOrderedMap) {
               SimpleOrderedMap<Object> itemMap = (SimpleOrderedMap<Object>) item;
@@ -666,7 +676,7 @@ public class MtasSolrComponentCollection
               componentCollection.version = searchComponent.getCollectionCache()
                   .create(componentCollection.id,
                       componentCollection.values().size(),
-                      componentCollection.values());
+                      componentCollection.values(), null);
             }
             if (index.containsKey(componentCollection.id)) {
               index.get(componentCollection.id).setCreate(
@@ -689,6 +699,10 @@ public class MtasSolrComponentCollection
                   PARAM_MTAS_COLLECTION + "." + id + "."
                       + NAME_MTAS_COLLECTION_ACTION,
                   ComponentCollection.ACTION_POST);
+              paramsNewRequest.add(
+                  PARAM_MTAS_COLLECTION + "." + id + "."
+                      + NAME_MTAS_COLLECTION_VERSION,
+                      componentCollection.version);
               paramsNewRequest.add(
                   PARAM_MTAS_COLLECTION + "." + id + "."
                       + NAME_MTAS_COLLECTION_POST,
@@ -717,8 +731,7 @@ public class MtasSolrComponentCollection
         // just rewrite
         ArrayList<Object> mtasResponseCollection;
         try {
-          mtasResponseCollection = (ArrayList<Object>) mtasResponse
-              .get(NAME);
+          mtasResponseCollection = (ArrayList<Object>) mtasResponse.get(NAME);
           if (mtasResponseCollection != null) {
             MtasSolrResultUtil.rewrite(mtasResponseCollection, searchComponent);
           }

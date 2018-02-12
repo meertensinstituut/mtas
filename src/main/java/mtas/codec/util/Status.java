@@ -39,11 +39,15 @@ public class Status {
       throw new IOException("conflict number of segments: "+numberSegmentsTotal+" / "+numberOfSegments);
     }
     numberDocumentsFinished = (numberDocumentsFinished==null) ? Long.valueOf(0) : numberDocumentsFinished;
-    numberSegmentsFinished = (numberSegmentsFinished==null) ? 0 : numberSegmentsFinished;
+    if(numberSegmentsFinished==null) {
+      numberSegmentsFinished = 0;
+    }
     subNumberDocumentsTotal = numberDocumentsTotal * subNumberDocumentsFinished.size();
     subNumberDocumentsFinishedTotal = (subNumberDocumentsFinishedTotal==null) ? Long.valueOf(0) : subNumberDocumentsFinishedTotal;
     subNumberSegmentsTotal = numberOfSegments * subNumberSegmentsFinished.size();
-    subNumberSegmentsFinishedTotal = (subNumberSegmentsFinishedTotal ==null) ? 0 : subNumberSegmentsFinishedTotal;    
+    if(subNumberSegmentsFinishedTotal ==null) {
+      subNumberSegmentsFinishedTotal = 0;
+    }  
   }
   
   public void addSubs(Set<String> subItems) {

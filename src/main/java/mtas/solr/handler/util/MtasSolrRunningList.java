@@ -18,7 +18,9 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
    * Instantiates a new mtas solr list.
    */
   public MtasSolrRunningList() {
-    this(null);
+    super();
+    timeout = null;
+    garbageTimeout = null;
   }
 
   /**

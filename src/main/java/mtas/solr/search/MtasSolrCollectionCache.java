@@ -147,7 +147,7 @@ public class MtasSolrCollectionCache {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public String create(Integer size, HashSet<String> data) throws IOException {
-    return create(null, size, data);
+    return create(null, size, data, null);
   }
 
   /**
@@ -159,16 +159,20 @@ public class MtasSolrCollectionCache {
    * @return the string
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public String create(String id, Integer size, HashSet<String> data)
+  public String create(String id, Integer size, HashSet<String> data, String originalVersion)
       throws IOException {
     if (collectionCachePath != null) {
       // initialization
       Date date = clear();
-      // create always new version
+      // create always new version, unless explicit original version is provided
       String version;
-      do {
-        version = UUID.randomUUID().toString();
-      } while (versionToItem.containsKey(version));
+      if(originalVersion!=null&&versionToItem.containsKey(originalVersion)) {
+        version = originalVersion;
+      } else {
+        do {
+          version = UUID.randomUUID().toString();
+        } while (versionToItem.containsKey(version));
+      }  
       // create new item
       MtasSolrCollectionCacheItem item;
       if (id != null) {
@@ -195,7 +199,6 @@ public class MtasSolrCollectionCache {
         // don't store data in memory
         item.data = null;
         // return version
-        // System.out.println("STORED: " + version + " - " + item.size);
         return version;
       } catch (IOException e) {
         idToVersion.remove(id);

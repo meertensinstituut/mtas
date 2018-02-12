@@ -150,6 +150,11 @@ public class MtasSpanEndQuery extends MtasSpanQuery {
       spanWeight.extractTerms(terms);
     }
 
+//    @Override
+//    public boolean isCacheable(LeafReaderContext arg0) {
+//      return spanWeight.isCacheable(arg0);
+//    }
+
   }
 
   /*

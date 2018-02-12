@@ -421,7 +421,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * The Class ShardInformation.
    */
-  public class ShardInformation {
+  public static class ShardInformation {
 
     /** The Constant NAME_NAME. */
     public final static String NAME_NAME = "name";
@@ -439,7 +439,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     public String name = null;
 
     /** The location. */
-    public String location;
+    private String location;
 
     /**
      * Instantiates a new shard information.
@@ -448,6 +448,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
      */
     public ShardInformation(String location) {
       this.location = location;
+    }
+    
+    public String location() {
+      return location;
     }
   }
 

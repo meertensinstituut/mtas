@@ -234,6 +234,11 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
       }
 
     }
+
+    @Override
+    public boolean isCacheable(LeafReaderContext arg0) {
+      return false;
+    }
   }
 
   /*

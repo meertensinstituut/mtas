@@ -8,11 +8,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -442,6 +445,23 @@ public class MtasSolrTestDistributedSearchConsistency {
           listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
           entry.getKey().equals(COLLECTION_DISTRIBUTED) ? 2 : 0);
     }
+
+    // compute parts not intersecting distributed
+    listList = createResults(paramsList, Arrays.asList(collectionsParts));
+    Map<String, QueryResponse> listDeleteParts = createResults(paramsList,
+        Arrays.asList(collectionsParts));
+    List<String> deletableParts = new ArrayList<>();
+    for (Entry<String, QueryResponse> entry : listDeleteParts.entrySet()) {
+      // check create
+      NamedList<Object> listCreateItem1 = MtasSolrBase
+          .getFromMtasCollectionList(entry.getValue().getResponse(), "list",
+              "idCreate");
+      String versionPart = (String) listCreateItem1.get("version");
+      if (versionPart != null && !listCreateVersion.get(COLLECTION_DISTRIBUTED)
+          .equals(versionPart)) {
+        deletableParts.add(entry.getKey());
+      }
+    }
     // delete
     ModifiableSolrParams paramsDelete = new ModifiableSolrParams();
     paramsDelete.set("q", "*:*");
@@ -455,10 +475,10 @@ public class MtasSolrTestDistributedSearchConsistency {
     paramsDelete.set("mtas.collection.1.action", "delete");
     paramsDelete.set("mtas.collection.1.id", "idPost");
     // delete on parts
-    createResults(paramsDelete, Arrays.asList(collectionsParts));
+    createResults(paramsDelete, deletableParts);
     // recheck on parts
     Map<String, QueryResponse> listCheckParts = createResults(paramsCheck,
-        Arrays.asList(collectionsParts));
+        deletableParts);
     for (Entry<String, QueryResponse> entry : listCheckParts.entrySet()) {
       NamedList<Object> listItemCheck1 = MtasSolrBase
           .getFromMtasCollection(entry.getValue().getResponse(), "check1");
@@ -480,13 +500,13 @@ public class MtasSolrTestDistributedSearchConsistency {
               "idCreate");
       createCollectionAssertions(listCreateItem1, entry.getKey(), "idCreate",
           listCreateVersion.get(entry.getKey()),
-          listCreateSize.get(entry.getKey()), 0);
+          listCreateSize.get(entry.getKey()), entry.getKey().equals(COLLECTION_DISTRIBUTED) ? (collectionsParts.length - deletableParts.size()): 0);
       // check post
       NamedList<Object> listPostItem1 = MtasSolrBase.getFromMtasCollectionList(
           entry.getValue().getResponse(), "list", "idPost");
       createCollectionAssertions(listPostItem1, entry.getKey(), "idPost",
           listPostVersion.get(entry.getKey()), listPostSize.get(entry.getKey()),
-          0);
+          entry.getKey().equals(COLLECTION_DISTRIBUTED) ? (collectionsParts.length - deletableParts.size()): 0);
     }
     // recheck on all, assuming empty parts, autofix
     listCheck = createResults(paramsCheck, Arrays.asList(collections));
@@ -667,21 +687,25 @@ public class MtasSolrTestDistributedSearchConsistency {
           || collections.contains(COLLECTION_ALL_OPTIMIZED)) {
         list.put(COLLECTION_ALL_OPTIMIZED,
             client.query(COLLECTION_ALL_OPTIMIZED, params));
+        // System.out.println(COLLECTION_ALL_OPTIMIZED+"\t"+params);
       }
       if (collections == null
           || collections.contains(COLLECTION_ALL_MULTIPLE_SEGMENTS)) {
         list.put(COLLECTION_ALL_MULTIPLE_SEGMENTS,
             client.query(COLLECTION_ALL_MULTIPLE_SEGMENTS, params));
+        // System.out.println(COLLECTION_ALL_MULTIPLE_SEGMENTS+"\t"+params);
       }
       if (collections == null
           || collections.contains(COLLECTION_PART1_OPTIMIZED)) {
         list.put(COLLECTION_PART1_OPTIMIZED,
             client.query(COLLECTION_PART1_OPTIMIZED, params));
+        // System.out.println(COLLECTION_PART1_OPTIMIZED+"\t"+params);
       }
       if (collections == null
           || collections.contains(COLLECTION_PART2_MULTIPLE_SEGMENTS)) {
         list.put(COLLECTION_PART2_MULTIPLE_SEGMENTS,
             client.query(COLLECTION_PART2_MULTIPLE_SEGMENTS, params));
+        // System.out.println(COLLECTION_PART2_MULTIPLE_SEGMENTS+"\t"+params);
       }
       params.set("collection", COLLECTION_PART1_OPTIMIZED + ","
           + COLLECTION_PART2_MULTIPLE_SEGMENTS);
@@ -690,6 +714,7 @@ public class MtasSolrTestDistributedSearchConsistency {
             client.query(COLLECTION_DISTRIBUTED, params));
       }
     } catch (SolrServerException | IOException e) {
+      // System.out.println(e.getMessage());
       log.error(e);
     }
     return list;
@@ -839,13 +864,13 @@ public class MtasSolrTestDistributedSearchConsistency {
     assertTrue(collection + ": create - id incorrect, '" + id
         + "' not equal to '" + create.get("id") + "'",
         ((String) create.get("id")).equals(id));
-    assertTrue(
-        collection + ": create - no valid version, '" + version
-            + "' not equal to '" + create.get("version") + "'",
+    assertTrue(collection + ": create - no valid version",
         create.get("version") != null
             && create.get("version") instanceof String);
     if (version != null) {
-      assertTrue(collection + ": create - version incorrect",
+      assertTrue(
+          collection + ": create - version incorrect, '" + version
+              + "' not equal to '" + create.get("version") + "'",
           ((String) create.get("version")).equals(version));
     }
     assertTrue(collection + ": create - no valid size",
@@ -876,8 +901,8 @@ public class MtasSolrTestDistributedSearchConsistency {
    * Creates the cloud.
    */
   private static void createCloud() {
-    Path dataPath = Paths.get("src" + File.separator + "test"
-        + File.separator + "resources" + File.separator + "data");
+    Path dataPath = Paths.get("src" + File.separator + "test" + File.separator
+        + "resources" + File.separator + "data");
     String solrxml = MiniSolrCloudCluster.DEFAULT_CLOUD_SOLR_XML;
     JettyConfig jettyConfig = JettyConfig.builder().setContext("/solr").build();
     File cloudBase = Files.createTempDir();
@@ -924,6 +949,7 @@ public class MtasSolrTestDistributedSearchConsistency {
         client.add(COLLECTION_PART2_MULTIPLE_SEGMENTS, solrDocuments.get(3));
         client.commit(COLLECTION_PART2_MULTIPLE_SEGMENTS);
       } catch (Exception e) {
+        e.printStackTrace();
         log.error(e);
       }
     } else {

@@ -114,14 +114,19 @@ public class MtasCRMParser extends MtasBasicParser {
                   if(nameFilter!=null && value!=null && replace!=null) {
                     String[] names = nameFilter.split(Pattern.quote(","));
                     for(String name : names) {
-                      HashMap<String, String> nameMap;
-                      if(!filterReplace.containsKey(name)) {
-                        nameMap = new HashMap<>();
-                        filterReplace.put(Integer.parseInt(name), nameMap);
-                      } else {
-                        nameMap = filterReplace.get(name);
-                      }
-                      nameMap.put(value, replace);
+                      try {
+                        int nameInt = Integer.parseInt(name);
+                        HashMap<String, String> nameMap;
+                        if(!filterReplace.containsKey(nameInt)) {
+                          nameMap = new HashMap<>();
+                          filterReplace.put(nameInt, nameMap);
+                        } else {
+                          nameMap = filterReplace.get(nameInt);
+                        }
+                        nameMap.put(value, replace);
+                      } catch (NumberFormatException e) {
+                        log.info(e);                        
+                      }                      
                     }                    
                   } else {
                     throw new MtasConfigException("no name, value or replace for filter "
