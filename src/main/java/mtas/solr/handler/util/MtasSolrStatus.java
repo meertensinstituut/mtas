@@ -2,6 +2,7 @@ package mtas.solr.handler.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -434,12 +435,20 @@ public class MtasSolrStatus {
     }
   }
 
+  public SimpleOrderedMap<Object> createListOutput() {
+    return createOutput(false);
+  }
+  
+  public SimpleOrderedMap<Object> createItemOutput() {
+    return createOutput(false);
+  }
+  
   /**
    * Creates the output.
    *
    * @return the simple ordered map
    */
-  public SimpleOrderedMap<Object> createOutput() {
+  private SimpleOrderedMap<Object> createOutput(boolean detailed) {
     checkResponseOnException();
     SimpleOrderedMap<Object> output = new SimpleOrderedMap<>();
     updateShardInfo();
@@ -455,10 +464,16 @@ public class MtasSolrStatus {
     if (totalTime != null) {
       output.add(NAME_TIME_TOTAL, totalTime);
     }
-    output.add(NAME_TIME_START, startTime);
+    output.add(NAME_TIME_START, (new Date(startTime)).toString());
     output.add(NAME_SHARDREQUEST, shardRequest);
     if (shardNumberTotal > 0) {
-      output.add(NAME_STATUS_DISTRIBUTED, createShardsOutput());
+      if(detailed) {
+        output.add(NAME_STATUS_DISTRIBUTED, createShardsOutput());
+      } else {
+        output.add(NAME_STATUS_DISTRIBUTED, true);
+      }
+    } else if(detailed) {
+      output.add(NAME_STATUS_DISTRIBUTED, false);
     }
     if (status.numberSegmentsTotal != null) {
       output.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, status.numberSegmentsTotal);
@@ -766,7 +781,7 @@ public class MtasSolrStatus {
    */
   @Override
   public String toString() {
-    return createOutput().toString();
+    return createItemOutput().toString();
   }
 
   /**

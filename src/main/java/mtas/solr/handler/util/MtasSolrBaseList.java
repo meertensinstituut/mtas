@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
 /**
- * The Class MtasSolrList.
+ * The Class MtasSolrBaseList.
  */
 public abstract class MtasSolrBaseList {
 
@@ -31,9 +31,18 @@ public abstract class MtasSolrBaseList {
   /** The Constant NAME_LIST. */
   private final static String NAME_LIST = "list";
 
-  /** The Constant NAME_SIZE. */
-  private final static String NAME_SIZE = "size";
+  /** The Constant NAME_SIZE_TOTAL. */
+  private final static String NAME_SIZE_TOTAL = "sizeTotal";
 
+  /** The Constant NAME_SIZE_NORMAL. */
+  private final static String NAME_SIZE_NORMAL = "sizeNormal";
+
+  /** The Constant NAME_SIZE_SHARDREQUESTS. */
+  private final static String NAME_SIZE_SHARDREQUESTS = "sizeShardRequests";
+
+  /**
+   * Instantiates a new mtas solr base list.
+   */
   public MtasSolrBaseList() {
     list = Collections.synchronizedList(new ArrayList<MtasSolrStatus>());
     index = Collections.synchronizedMap(new HashMap<>());
@@ -65,13 +74,17 @@ public abstract class MtasSolrBaseList {
         garbageCollect();
       } else {
         garbageCollect();
-        //retry
-        if (!index.containsKey(status.key())) {
+        // retry
+        MtasSolrStatus oldStatus = index.get(status.key());
+        if (oldStatus == null) {
           index.put(status.key(), status);
-        } else {          
-          throw new IOException("key "+status.key()+" already exists in");
-        }          
-      }            
+        } else if(oldStatus.finished()) {
+          remove(oldStatus);
+          index.put(status.key(), status);
+        } else {
+          throw new IOException("key " + status.key() + " already exists");
+        }
+      }
     }
   }
 
@@ -140,33 +153,80 @@ public abstract class MtasSolrBaseList {
   }
 
   /**
-   * Creates the output.
+   * Creates the list output.
    *
    * @param shardRequests the shard requests
    * @return the simple ordered map
    */
-  public SimpleOrderedMap<Object> createOutput(boolean shardRequests) {
+  public SimpleOrderedMap<Object> createListOutput(boolean shardRequests) {
     garbageCollect();
     SimpleOrderedMap<Object> output = new SimpleOrderedMap<>();
     output.add(NAME_ENABLED, enabled());
     output.add(NAME_ENABLED, true);
-    int n = list.size();
-    output.add(NAME_SIZE, n);
-    if (n > 0) {
+    int numberTotal = list.size();
+    ListData listData = new ListData();
+    if (numberTotal > 0) {
       // create list
-      List<SimpleOrderedMap<Object>> outputList = new ArrayList<>();
       list.stream()
           .collect(Collectors.collectingAndThen(Collectors.toList(), lst -> {
             Collections.reverse(lst);
             return lst.stream();
           })).forEach((item) -> {
-            if (shardRequests || !item.shardRequest()) {
-              outputList.add(item.createOutput());
+            if (item.shardRequest()) {
+              listData.addShardRequest();
+              if (shardRequests) {
+                listData.outputList.add(item.createItemOutput());
+              }
+            } else {
+              listData.addNormal();
+              listData.outputList.add(item.createItemOutput());
             }
           });
-      output.add(NAME_LIST, outputList);
     }
+    output.add(NAME_SIZE_TOTAL, numberTotal);
+    output.add(NAME_SIZE_NORMAL, listData.numberNormal);
+    output.add(NAME_SIZE_SHARDREQUESTS, listData.numberShardRequests);
+    output.add(NAME_LIST, listData.outputList);
     return output;
+  }
+
+  /**
+   * The Class ListData.
+   */
+  class ListData {
+    
+    /** The output list. */
+    private List<SimpleOrderedMap<Object>> outputList;
+    
+    /** The number normal. */
+    private int numberNormal;
+    
+    /** The number shard requests. */
+    private int numberShardRequests;
+
+    /**
+     * Instantiates a new list data.
+     */
+    public ListData() {
+      outputList = new ArrayList<>();
+      numberNormal = 0;
+      numberShardRequests = 0;
+    }
+
+    /**
+     * Adds the normal.
+     */
+    public void addNormal() {
+      numberNormal++;
+    }
+
+    /**
+     * Adds the shard request.
+     */
+    public void addShardRequest() {
+      numberShardRequests++;
+    }
+
   }
 
 }

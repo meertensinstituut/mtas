@@ -3619,16 +3619,19 @@ public class CodecCollector {
           }
         }
       }
-//      try {
-//        System.out.println("ACCEPT: " + term.utf8ToString()+" ("+termVector.distances.size()+")");
-//        for (SubComponentDistance item : termVector.distances) {
-//          System.out.println(
-//              item.hashCode() + "\t" + term.utf8ToString()+"\t"+item.getDistance().getClass().getName()+"\t"+item.getDistance().minimum+"\t"+item.getDistance().maximum
-//                  + "\t" + item.getDistance().validate(term)+"\t"+item.getDistance().compute(term));
-//        }
-//      } catch (Exception e) {
-//        System.out.println("PROBLEEM: "+e.getMessage());
-//      }
+      // try {
+      // System.out.println("ACCEPT: " + term.utf8ToString()+"
+      // ("+termVector.distances.size()+")");
+      // for (SubComponentDistance item : termVector.distances) {
+      // System.out.println(
+      // item.hashCode() + "\t" +
+      // term.utf8ToString()+"\t"+item.getDistance().getClass().getName()+"\t"+item.getDistance().minimum+"\t"+item.getDistance().maximum
+      // + "\t" +
+      // item.getDistance().validate(term)+"\t"+item.getDistance().compute(term));
+      // }
+      // } catch (Exception e) {
+      // System.out.println("PROBLEEM: "+e.getMessage());
+      // }
       return true;
     }
   }

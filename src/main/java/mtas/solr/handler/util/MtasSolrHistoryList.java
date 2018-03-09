@@ -53,8 +53,8 @@ public class MtasSolrHistoryList extends MtasSolrBaseList {
   }
     
   @Override
-  public SimpleOrderedMap<Object> createOutput(boolean shardRequests) {
-    SimpleOrderedMap<Object> output = super.createOutput(shardRequests);
+  public SimpleOrderedMap<Object> createListOutput(boolean shardRequests) {
+    SimpleOrderedMap<Object> output = super.createListOutput(shardRequests);
     output.add(NAME_SOFTLIMIT, softLimit);
     output.add(NAME_HARDLIMIT, hardLimit);
     return output;

@@ -1,6 +1,7 @@
 package mtas.solr.search;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;

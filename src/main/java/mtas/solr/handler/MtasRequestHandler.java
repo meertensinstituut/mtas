@@ -202,15 +202,15 @@ public class MtasRequestHandler extends RequestHandlerBase {
       } else if (action.equals(ACTION_RUNNING)) {
         boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,
             false);
-        rsp.add(ACTION_RUNNING, running.createOutput(shardRequests));
+        rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests));
       } else if (action.equals(ACTION_HISTORY)) {
         boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,
             false);
-        rsp.add(ACTION_HISTORY, history.createOutput(shardRequests));
+        rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests));
       } else if (action.equals(ACTION_ERROR)) {
         boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,
             false);
-        rsp.add(ACTION_ERROR, error.createOutput(shardRequests));
+        rsp.add(ACTION_ERROR, error.createListOutput(shardRequests));
       } else if (action.equals(ACTION_STATUS)) {
         String key = req.getParams().get(PARAM_KEY, null);
         String abort = req.getParams().get(PARAM_ABORT, null);
@@ -221,7 +221,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
           if (abort != null && !solrStatus.finished()) {
             solrStatus.setError(abort);
           }
-          rsp.add(ACTION_STATUS, solrStatus.createOutput());
+          rsp.add(ACTION_STATUS, solrStatus.createItemOutput());
         } else {
           rsp.add(ACTION_STATUS, null);
         }
