@@ -390,7 +390,9 @@ abstract class MtasXMLParser extends MtasBasicParser {
             log.debug("start of document");
             String encodingScheme = streamReader.getCharacterEncodingScheme();
             if (encodingScheme == null) {
-              throw new MtasParserException("No encodingScheme found");
+              //ignore for now
+              log.info("No encodingScheme found, assume utf-8");
+              //throw new MtasParserException("No encodingScheme found");              
             } else if (!encodingScheme.equalsIgnoreCase("utf-8")) {
               throw new MtasParserException(
                   "XML not UTF-8 encoded but '" + encodingScheme + "'");
