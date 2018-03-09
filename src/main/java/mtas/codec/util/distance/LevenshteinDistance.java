@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.lucene.util.BytesRef;
 
-import mtas.analysis.token.MtasToken;
-
 /**
  * The Class LevenshteinDistance.
  */
