@@ -12,7 +12,7 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
   private Integer garbageTimeout;
 
   /** The Constant GARBAGE_FACTOR. */
-  private final static Integer GARBAGE_FACTOR = 1000;
+  private static final Integer GARBAGE_FACTOR = 1000;
 
   /**
    * Instantiates a new mtas solr list.

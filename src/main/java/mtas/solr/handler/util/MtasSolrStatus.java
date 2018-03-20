@@ -440,7 +440,7 @@ public class MtasSolrStatus {
   }
   
   public SimpleOrderedMap<Object> createItemOutput() {
-    return createOutput(false);
+    return createOutput(true);
   }
   
   /**

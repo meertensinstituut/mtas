@@ -9,8 +9,8 @@ public class MtasSolrHistoryList extends MtasSolrBaseList {
   private int softLimit;
   private int hardLimit;
   
-  private final static String NAME_SOFTLIMIT = "softLimit";
-  private final static String NAME_HARDLIMIT = "hardLimit";
+  private static final String NAME_SOFTLIMIT = "softLimit";
+  private static final String NAME_HARDLIMIT = "hardLimit";
   
   public MtasSolrHistoryList() {
     super();
