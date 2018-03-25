@@ -76,7 +76,7 @@ RUN service apache2 stop && \
     printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh && \
     printf "echo \"  Timestamp ${timestamp}\"\n" >> /start.sh && \
     printf "echo \"  Lucene/Solr version ${currentLuceneVersion}\"\n" >> /start.sh && \
-    printf "echo \"  Mtas release ${currentDevelopmentRelease}\"\n" >> /start.sh && \
+    printf "echo \"  Mtas release ${project.version}\"\n" >> /start.sh && \
     printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \
     printf "echo \"=======================================================================\"\n" >> /start.sh && \
     printf "echo\n" >> /start.sh && \
