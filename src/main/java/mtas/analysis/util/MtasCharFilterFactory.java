@@ -158,6 +158,10 @@ public class MtasCharFilterFactory extends CharFilterFactory
       return null;
     }
   }
+  
+  public Reader create(Reader input, String configuration) throws IOException {
+    return create(input, configuration, null);
+  }
 
   /**
    * Creates the.
@@ -167,26 +171,29 @@ public class MtasCharFilterFactory extends CharFilterFactory
    * @return the reader
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public Reader create(Reader input, String configuration) throws IOException {
+  public Reader create(Reader input, String configuration, String defaultConfiguration) throws IOException {
+    if(defaultConfiguration==null) {
+      defaultConfiguration = defaultArgument;
+    }
     if (configs != null && configs.size() > 0) {
-      if (configuration == null && defaultArgument == null) {
+      if (configuration == null && defaultConfiguration == null) {
         throw new IOException("no (default)configuration");
       } else if (configuration == null) {
-        if (configs.get(defaultArgument) != null) {
-          return create(input, configs.get(defaultArgument));
+        if (configs.get(defaultConfiguration) != null) {
+          return create(input, configs.get(defaultConfiguration));
         } else {
           throw new IOException(
-              "default configuration " + defaultArgument + " not available");
+              "default configuration " + defaultConfiguration + " not available");
         }
       } else {
         MtasConfiguration config = configs.get(configuration);
         if (config == null) {
-          if (defaultArgument != null) {
-            if (configs.get(defaultArgument) != null) {
-              return create(input, configs.get(defaultArgument));
+          if (defaultConfiguration != null) {
+            if (configs.get(defaultConfiguration) != null) {
+              return create(input, configs.get(defaultConfiguration));
             } else {
               throw new IOException("configuration " + configuration
-                  + " not found and default configuration " + defaultArgument
+                  + " not found and default configuration " + defaultConfiguration
                   + " not available");
             }
           } else {

@@ -1,6 +1,7 @@
 package mtas.analysis.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,9 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -120,20 +121,23 @@ public class MtasFetchData {
       if (postfix != null) {
         file = file + postfix;
       }
-      GZIPInputStream in;
-      try {
-        in = new GZIPInputStream(new FileInputStream(file));
-        return new InputStreamReader(in, StandardCharsets.UTF_8);
-      } catch (IOException e1) {
-        log.debug(e1);
+      Path path = (new File(file)).toPath();
+      if(Files.isReadable(path)) {
         try {
-          String text = new String(Files.readAllBytes(Paths.get(file)),
-              StandardCharsets.UTF_8);
-          return new StringReader(text);
-        } catch (IOException e2) {
-          log.debug(e2);
-          throw new MtasParserException(e2.getMessage());
-        }
+          return new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), StandardCharsets.UTF_8);
+        } catch (IOException e1) {
+          log.debug(e1);
+          try {
+            String text = new String(Files.readAllBytes(Paths.get(file)),
+                StandardCharsets.UTF_8);
+            return new StringReader(text);
+          } catch (IOException e2) {
+            log.debug(e2);
+            throw new MtasParserException(e2.getMessage());
+          }
+        } 
+      } else {
+        throw new MtasParserException("file '"+file+"' does not exists or not readable");
       }
     } else {
       throw new MtasParserException("no valid file: " + file);

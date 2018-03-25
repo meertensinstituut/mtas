@@ -119,6 +119,10 @@ public class MtasTokenizerFactory extends TokenizerFactory
     return tokenizer;
   }
 
+  public MtasTokenizer create(String configuration) throws IOException {
+    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
+  }
+  
   /**
    * Creates the.
    *
@@ -126,8 +130,12 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @return the mtas tokenizer
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer create(String configuration) throws IOException {
-    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
+  public MtasTokenizer create(String configuration, String defaultConfiguration) throws IOException {
+    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration, defaultConfiguration);
+  }
+  
+  public MtasTokenizer create(AttributeFactory factory, String configuration) throws IOException {
+    return create(factory, configuration, null);
   }
 
   /**
@@ -138,27 +146,30 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @return the mtas tokenizer
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer create(AttributeFactory factory, String configuration)
+  public MtasTokenizer create(AttributeFactory factory, String configuration, String defaultConfiguration)
       throws IOException {
+    if(defaultConfiguration==null) {
+      defaultConfiguration = defaultArgument;
+    }
     if (configs != null && configs.size() > 0) {
-      if (configuration == null && defaultArgument == null) {
+      if (configuration == null && defaultConfiguration == null) {
         throw new IOException("no (default)configuration");
       } else if (configuration == null) {
-        if (configs.get(defaultArgument) != null) {
-          return new MtasTokenizer(factory, configs.get(defaultArgument));
+        if (configs.get(defaultConfiguration) != null) {
+          return new MtasTokenizer(factory, configs.get(defaultConfiguration));
         } else {
           throw new IOException(
-              "default configuration " + defaultArgument + " not available");
+              "default configuration " + defaultConfiguration + " not available");
         }
       } else {
         MtasConfiguration config = configs.get(configuration);
         if (config == null) {
-          if (defaultArgument != null) {
-            if (configs.get(defaultArgument) != null) {
-              return new MtasTokenizer(factory, configs.get(defaultArgument));
+          if (defaultConfiguration != null) {
+            if (configs.get(defaultConfiguration) != null) {
+              return new MtasTokenizer(factory, configs.get(defaultConfiguration));
             } else {
               throw new IOException("configuration " + configuration
-                  + " not found and default configuration " + defaultArgument
+                  + " not found and default configuration " + defaultConfiguration
                   + " not available");
             }
           } else {

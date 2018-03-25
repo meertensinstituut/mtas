@@ -1190,8 +1190,7 @@
     </arr>
   </requestHandler>
   
-  <requestHandler name="/mtas"
-                  class="mtas.solr.handler.MtasRequestHandler"/>
+  <requestHandler name="/mtas" class="mtas.solr.handler.MtasRequestHandler"/>
 
   <!-- Clustering Component. (Omitted here. See the default Solr example for a typical configuration.) -->
 
@@ -1576,8 +1575,6 @@
 
   <queryParser name="mtas_cql" class="mtas.solr.search.MtasSolrCQLQParserPlugin"/>
   <queryParser name="mtas_join" class="mtas.solr.search.MtasSolrJoinQParserPlugin"/>
-  <queryParser name="collection" class="dev.solr.plugin.collection.CollectionQueryParser"/>
-  <queryResponseWriter name="collection" class="dev.solr.plugin.collection.CollectionQueryResponseWriter"/>
   
   <!-- Function Parsers
 

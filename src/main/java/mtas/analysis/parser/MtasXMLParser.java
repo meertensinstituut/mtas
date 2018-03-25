@@ -374,7 +374,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     tokenCollection = new MtasTokenCollection();
     MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
     XMLInputFactory factory = XMLInputFactory.newInstance();
-    try {
+    try {      
       XMLStreamReader streamReader = factory.createXMLStreamReader(reader);
       QName qname;
       try {
@@ -839,7 +839,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
       assert unknownAncestors == 0 : "error in administration unknownAncestors";
       assert hasRoot : "no " + rootTag;
     } catch (XMLStreamException e) {
-      log.debug(e);
+      log.debug(e);      
       throw new MtasParserException("No valid XML: " + e.getMessage());
     }
 

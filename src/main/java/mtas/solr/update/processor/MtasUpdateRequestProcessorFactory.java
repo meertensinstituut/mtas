@@ -308,7 +308,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             // create reader
             Reader reader = new StringReader(storedValue);
             // configuration
-            String configuration = config.fieldTypeDefaultConfiguration
+            String configuration = null;
+            String defaultConfiguration = config.fieldTypeDefaultConfiguration
                 .get(fieldType);
             if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {
               Object obj = doc.getFieldValue(
@@ -322,7 +323,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               for (CharFilterFactory charFilterFactory : charFilterFactories) {
                 if (charFilterFactory instanceof MtasCharFilterFactory) {
                   reader = ((MtasCharFilterFactory) charFilterFactory)
-                      .create(reader, configuration);
+                      .create(reader, configuration, defaultConfiguration);
                 } else {
                   reader = charFilterFactory.create(reader);
                 }
@@ -333,7 +334,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 }
               }
             }
-
+            
             sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
 
             // tokenizerFactory
@@ -341,8 +342,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             int numberOfPositions = 0;
             int numberOfTokens = 0;
             Set<String> prefixes = new HashSet<>();
-            try {
-              MtasTokenizer tokenizer = tokenizerFactory.create(configuration);
+            try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {              
               tokenizer.setReader(sizeReader);
               tokenizer.reset();
               // attributes

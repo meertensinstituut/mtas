@@ -230,8 +230,7 @@ public final class MtasTokenizer extends Tokenizer {
     tokenCollection = null;
     try {
       Constructor<?> c = Class.forName(parserName)
-          .getDeclaredConstructor(MtasConfiguration.class);
-      // try {
+          .getDeclaredConstructor(MtasConfiguration.class);      
       Object p = c.newInstance(parserConfiguration);
       if (p instanceof MtasParser) {
         MtasParser parser = (MtasParser) p;
