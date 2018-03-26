@@ -193,7 +193,7 @@ public abstract class MtasSolrBaseList {
   /**
    * The Class ListData.
    */
-  class ListData {
+  static class ListData {
     
     /** The output list. */
     private List<SimpleOrderedMap<Object>> outputList;
