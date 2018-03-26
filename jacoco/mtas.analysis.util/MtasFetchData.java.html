@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MtasFetchData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MTAS</a> &gt; <a href="index.source.html" class="el_package">mtas.analysis.util</a> &gt; <span class="el_source">MtasFetchData.java</span></div><h1>MtasFetchData.java</h1><pre class="source lang-java linenums">package mtas.analysis.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,9 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 public class MtasFetchData {
 
   /** The Constant log. */
-<span class="fc" id="L26">  private static final Log log = LogFactory.getLog(MtasFetchData.class);</span>
+<span class="fc" id="L27">  private static final Log log = LogFactory.getLog(MtasFetchData.class);</span>
 
   /** The reader. */
   Reader reader;
@@ -33,9 +34,9 @@ public class MtasFetchData {
    *
    * @param input the input
    */
-<span class="fc" id="L36">  public MtasFetchData(Reader input) {</span>
-<span class="fc" id="L37">    reader = input;</span>
-<span class="fc" id="L38">  }</span>
+<span class="fc" id="L37">  public MtasFetchData(Reader input) {</span>
+<span class="fc" id="L38">    reader = input;</span>
+<span class="fc" id="L39">  }</span>
 
   /**
    * Gets the string.
@@ -44,15 +45,15 @@ public class MtasFetchData {
    * @throws MtasParserException the mtas parser exception
    */
   private String getString() throws MtasParserException {
-<span class="fc" id="L47">    String text = null;</span>
-<span class="fc" id="L48">    BufferedReader bufferedReader = new BufferedReader(reader, 2048);</span>
+<span class="fc" id="L48">    String text = null;</span>
+<span class="fc" id="L49">    BufferedReader bufferedReader = new BufferedReader(reader, 2048);</span>
     try {
-<span class="fc" id="L50">      text = IOUtils.toString(bufferedReader);</span>
-<span class="fc" id="L51">      bufferedReader.close();</span>
-<span class="fc" id="L52">      return text;</span>
-<span class="nc" id="L53">    } catch (IOException e) {</span>
-<span class="nc" id="L54">      log.debug(e);</span>
-<span class="nc" id="L55">      throw new MtasParserException(&quot;couldn't read text&quot;);</span>
+<span class="fc" id="L51">      text = IOUtils.toString(bufferedReader);</span>
+<span class="fc" id="L52">      bufferedReader.close();</span>
+<span class="fc" id="L53">      return text;</span>
+<span class="nc" id="L54">    } catch (IOException e) {</span>
+<span class="nc" id="L55">      log.debug(e);</span>
+<span class="nc" id="L56">      throw new MtasParserException(&quot;couldn't read text&quot;);</span>
     }
   }
 
@@ -66,39 +67,39 @@ public class MtasFetchData {
    */
   public Reader getUrl(String prefix, String postfix)
       throws MtasParserException {
-<span class="nc" id="L69">    String url = getString();</span>
-<span class="nc bnc" id="L70" title="All 4 branches missed.">    if ((url != null) &amp;&amp; !url.equals(&quot;&quot;)) {</span>
-<span class="nc bnc" id="L71" title="All 2 branches missed.">      if (prefix != null) {</span>
-<span class="nc" id="L72">        url = prefix + url;</span>
+<span class="nc" id="L70">    String url = getString();</span>
+<span class="nc bnc" id="L71" title="All 4 branches missed.">    if ((url != null) &amp;&amp; !url.equals(&quot;&quot;)) {</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">      if (prefix != null) {</span>
+<span class="nc" id="L73">        url = prefix + url;</span>
       }
-<span class="nc bnc" id="L74" title="All 2 branches missed.">      if (postfix != null) {</span>
-<span class="nc" id="L75">        url = url + postfix;</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">      if (postfix != null) {</span>
+<span class="nc" id="L76">        url = url + postfix;</span>
       }
-<span class="nc bnc" id="L77" title="All 4 branches missed.">      if (url.startsWith(&quot;http://&quot;) || url.startsWith(&quot;https://&quot;)) {</span>
-<span class="nc" id="L78">        BufferedReader in = null;</span>
+<span class="nc bnc" id="L78" title="All 4 branches missed.">      if (url.startsWith(&quot;http://&quot;) || url.startsWith(&quot;https://&quot;)) {</span>
+<span class="nc" id="L79">        BufferedReader in = null;</span>
         try {
-<span class="nc" id="L80">          URLConnection connection = new URL(url).openConnection();</span>
-<span class="nc" id="L81">          connection.setRequestProperty(&quot;Accept-Encoding&quot;, &quot;gzip&quot;);</span>
-<span class="nc" id="L82">          connection.setReadTimeout(10000);</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">          if (connection.getHeaderField(&quot;Content-Encoding&quot;) != null</span>
-<span class="nc bnc" id="L84" title="All 2 branches missed.">              &amp;&amp; connection.getHeaderField(&quot;Content-Encoding&quot;).equals(&quot;gzip&quot;)) {</span>
-<span class="nc" id="L85">            in = new BufferedReader(new InputStreamReader(</span>
-<span class="nc" id="L86">                new GZIPInputStream(connection.getInputStream()),</span>
+<span class="nc" id="L81">          URLConnection connection = new URL(url).openConnection();</span>
+<span class="nc" id="L82">          connection.setRequestProperty(&quot;Accept-Encoding&quot;, &quot;gzip&quot;);</span>
+<span class="nc" id="L83">          connection.setReadTimeout(10000);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">          if (connection.getHeaderField(&quot;Content-Encoding&quot;) != null</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">              &amp;&amp; connection.getHeaderField(&quot;Content-Encoding&quot;).equals(&quot;gzip&quot;)) {</span>
+<span class="nc" id="L86">            in = new BufferedReader(new InputStreamReader(</span>
+<span class="nc" id="L87">                new GZIPInputStream(connection.getInputStream()),</span>
                 StandardCharsets.UTF_8));
           } else {
-<span class="nc" id="L89">            in = new BufferedReader(new InputStreamReader(</span>
-<span class="nc" id="L90">                connection.getInputStream(), StandardCharsets.UTF_8));</span>
+<span class="nc" id="L90">            in = new BufferedReader(new InputStreamReader(</span>
+<span class="nc" id="L91">                connection.getInputStream(), StandardCharsets.UTF_8));</span>
           }
-<span class="nc" id="L92">          return in;</span>
-<span class="nc" id="L93">        } catch (IOException ex) {</span>
-<span class="nc" id="L94">          log.debug(ex);</span>
-<span class="nc" id="L95">          throw new MtasParserException(&quot;couldn't get &quot; + url);</span>
+<span class="nc" id="L93">          return in;</span>
+<span class="nc" id="L94">        } catch (IOException ex) {</span>
+<span class="nc" id="L95">          log.debug(ex);</span>
+<span class="nc" id="L96">          throw new MtasParserException(&quot;couldn't get &quot; + url);</span>
         }
       } else {
-<span class="nc" id="L98">        throw new MtasParserException(&quot;no valid url: &quot; + url);</span>
+<span class="nc" id="L99">        throw new MtasParserException(&quot;no valid url: &quot; + url);</span>
       }
     } else {
-<span class="nc" id="L101">      throw new MtasParserException(&quot;no valid url: &quot; + url);</span>
+<span class="nc" id="L102">      throw new MtasParserException(&quot;no valid url: &quot; + url);</span>
     }
   }
 
@@ -112,31 +113,34 @@ public class MtasFetchData {
    */
   public Reader getFile(String prefix, String postfix)
       throws MtasParserException {
-<span class="fc" id="L115">    String file = getString();</span>
-<span class="pc bpc" id="L116" title="2 of 4 branches missed.">    if ((file != null) &amp;&amp; !file.equals(&quot;&quot;)) {</span>
-<span class="pc bpc" id="L117" title="1 of 2 branches missed.">      if (prefix != null) {</span>
-<span class="nc" id="L118">        file = prefix + file;</span>
+<span class="fc" id="L116">    String file = getString();</span>
+<span class="pc bpc" id="L117" title="2 of 4 branches missed.">    if ((file != null) &amp;&amp; !file.equals(&quot;&quot;)) {</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">      if (prefix != null) {</span>
+<span class="nc" id="L119">        file = prefix + file;</span>
       }
-<span class="fc bfc" id="L120" title="All 2 branches covered.">      if (postfix != null) {</span>
-<span class="fc" id="L121">        file = file + postfix;</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">      if (postfix != null) {</span>
+<span class="fc" id="L122">        file = file + postfix;</span>
       }
-      GZIPInputStream in;
-      try {
-<span class="fc" id="L125">        in = new GZIPInputStream(new FileInputStream(file));</span>
-<span class="fc" id="L126">        return new InputStreamReader(in, StandardCharsets.UTF_8);</span>
-<span class="nc" id="L127">      } catch (IOException e1) {</span>
-<span class="nc" id="L128">        log.debug(e1);</span>
+<span class="fc" id="L124">      Path path = (new File(file)).toPath();</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">      if(Files.isReadable(path)) {</span>
         try {
-<span class="nc" id="L130">          String text = new String(Files.readAllBytes(Paths.get(file)),</span>
-              StandardCharsets.UTF_8);
-<span class="nc" id="L132">          return new StringReader(text);</span>
-<span class="nc" id="L133">        } catch (IOException e2) {</span>
-<span class="nc" id="L134">          log.debug(e2);</span>
-<span class="nc" id="L135">          throw new MtasParserException(e2.getMessage());</span>
-        }
+<span class="fc" id="L127">          return new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), StandardCharsets.UTF_8);</span>
+<span class="nc" id="L128">        } catch (IOException e1) {</span>
+<span class="nc" id="L129">          log.debug(e1);</span>
+          try {
+<span class="nc" id="L131">            String text = new String(Files.readAllBytes(Paths.get(file)),</span>
+                StandardCharsets.UTF_8);
+<span class="nc" id="L133">            return new StringReader(text);</span>
+<span class="nc" id="L134">          } catch (IOException e2) {</span>
+<span class="nc" id="L135">            log.debug(e2);</span>
+<span class="nc" id="L136">            throw new MtasParserException(e2.getMessage());</span>
+          }
+        } 
+      } else {
+<span class="nc" id="L140">        throw new MtasParserException(&quot;file '&quot;+file+&quot;' does not exists or not readable&quot;);</span>
       }
     } else {
-<span class="nc" id="L139">      throw new MtasParserException(&quot;no valid file: &quot; + file);</span>
+<span class="nc" id="L143">      throw new MtasParserException(&quot;no valid file: &quot; + file);</span>
     }
   }
 
@@ -146,7 +150,7 @@ public class MtasFetchData {
    * @return the default
    */
   public Reader getDefault() {
-<span class="nc" id="L149">    return reader;</span>
+<span class="nc" id="L153">    return reader;</span>
   }
 
 }

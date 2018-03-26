@@ -7,8 +7,6 @@ import java.util.Map.Entry;
 
 import org.apache.lucene.util.BytesRef;
 
-import mtas.analysis.token.MtasToken;
-
 /**
  * The Class DamerauLevenshteinDistance.
  */
@@ -34,19 +32,19 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    */
   public DamerauLevenshteinDistance(String prefix, String base, Double minimum, Double maximum,
       Map&lt;String, String&gt; parameters) throws IOException {
-<span class="nc" id="L37">    super(prefix, base, minimum, maximum, parameters);</span>
-<span class="nc" id="L38">    transpositionDistance = defaultTranspositionDistance;</span>
-<span class="nc bnc" id="L39" title="All 2 branches missed.">    if (parameters != null) {</span>
-<span class="nc bnc" id="L40" title="All 2 branches missed.">      for (Entry&lt;String, String&gt; entry : parameters.entrySet()) {</span>
-<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (entry.getKey().equals(PARAMETER_TRANSPOSITIONDISTANCE)) {</span>
-<span class="nc" id="L42">          transpositionDistance = Double.parseDouble(entry.getValue());</span>
+<span class="nc" id="L35">    super(prefix, base, minimum, maximum, parameters);</span>
+<span class="nc" id="L36">    transpositionDistance = defaultTranspositionDistance;</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">    if (parameters != null) {</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">      for (Entry&lt;String, String&gt; entry : parameters.entrySet()) {</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (entry.getKey().equals(PARAMETER_TRANSPOSITIONDISTANCE)) {</span>
+<span class="nc" id="L40">          transpositionDistance = Double.parseDouble(entry.getValue());</span>
         }
-<span class="nc" id="L44">      }</span>
+<span class="nc" id="L42">      }</span>
     }
-<span class="nc bnc" id="L46" title="All 2 branches missed.">    if (transpositionDistance &lt; 0) {</span>
-<span class="nc" id="L47">      throw new IOException(&quot;distances should be zero or positive&quot;);</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">    if (transpositionDistance &lt; 0) {</span>
+<span class="nc" id="L45">      throw new IOException(&quot;distances should be zero or positive&quot;);</span>
     }
-<span class="nc" id="L49">  }</span>
+<span class="nc" id="L47">  }</span>
 
   /*
    * (non-Javadoc)
@@ -57,43 +55,43 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    */
   @Override
   public boolean validateMaximum(BytesRef term) {
-<span class="nc bnc" id="L60" title="All 2 branches missed.">    if (maximum == null) {</span>
-<span class="nc" id="L61">      return true;</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">    if (maximum == null) {</span>
+<span class="nc" id="L59">      return true;</span>
     } else {
-<span class="nc" id="L63">      double[][] state = _start();</span>
+<span class="nc" id="L61">      double[][] state = _start();</span>
       char ch1;
-<span class="nc" id="L65">      char ch2 = 0x00;</span>
-<span class="nc" id="L66">      int i = term.offset + prefixOffset;</span>
-<span class="nc bnc" id="L67" title="All 2 branches missed.">      for (; i &lt; term.length; i++) {</span>
-<span class="nc" id="L68">        ch1 = (char) term.bytes[i];</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (ch1 == 0x00) {</span>
-<span class="nc" id="L70">          break;</span>
+<span class="nc" id="L63">      char ch2 = 0x00;</span>
+<span class="nc" id="L64">      int i = term.offset + prefixOffset;</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">      for (; i &lt; term.length; i++) {</span>
+<span class="nc" id="L66">        ch1 = (char) term.bytes[i];</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (ch1 == 0x00) {</span>
+<span class="nc" id="L68">          break;</span>
         }
-<span class="nc" id="L72">        state = _step(state, ch1, ch2);</span>
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (!_can_match(state)) {</span>
-<span class="nc" id="L74">          return false;</span>
+<span class="nc" id="L70">        state = _step(state, ch1, ch2);</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (!_can_match(state)) {</span>
+<span class="nc" id="L72">          return false;</span>
         }
-<span class="nc" id="L76">        ch2 = ch1;</span>
+<span class="nc" id="L74">        ch2 = ch1;</span>
       }
-<span class="nc" id="L78">      return _is_match(state);</span>
+<span class="nc" id="L76">      return _is_match(state);</span>
     }
   }
   
   @Override
   public double compute(BytesRef term) {
-<span class="nc" id="L84">    double[][] state = _start();</span>
+<span class="nc" id="L82">    double[][] state = _start();</span>
     char ch1;
-<span class="nc" id="L86">    char ch2 = 0x00;</span>
-<span class="nc" id="L87">    int i = term.offset + prefixOffset;</span>
-<span class="nc bnc" id="L88" title="All 2 branches missed.">    for (; i &lt; term.length; i++) {</span>
-<span class="nc" id="L89">      ch1 = (char) term.bytes[i];</span>
-<span class="nc bnc" id="L90" title="All 2 branches missed.">      if (ch1 == 0x00) {</span>
-<span class="nc" id="L91">        break;</span>
+<span class="nc" id="L84">    char ch2 = 0x00;</span>
+<span class="nc" id="L85">    int i = term.offset + prefixOffset;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">    for (; i &lt; term.length; i++) {</span>
+<span class="nc" id="L87">      ch1 = (char) term.bytes[i];</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">      if (ch1 == 0x00) {</span>
+<span class="nc" id="L89">        break;</span>
       }
-<span class="nc" id="L93">      state = _step(state, ch1, ch2);</span>
-<span class="nc" id="L94">      ch2 = ch1;</span>
+<span class="nc" id="L91">      state = _step(state, ch1, ch2);</span>
+<span class="nc" id="L92">      ch2 = ch1;</span>
     }
-<span class="nc" id="L96">    return _distance(state);</span>
+<span class="nc" id="L94">    return _distance(state);</span>
   }
 
   /*
@@ -103,16 +101,16 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    */
   @Override
   public double compute(String key) {
-<span class="nc" id="L106">    double[][] state = _start();</span>
-<span class="nc" id="L107">    char ch2 = 0x00;</span>
-<span class="nc bnc" id="L108" title="All 2 branches missed.">    for (char ch1 : key.toCharArray()) {</span>
-<span class="nc bnc" id="L109" title="All 2 branches missed.">      if (ch1 == 0x00) {</span>
-<span class="nc" id="L110">        break;</span>
+<span class="nc" id="L104">    double[][] state = _start();</span>
+<span class="nc" id="L105">    char ch2 = 0x00;</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">    for (char ch1 : key.toCharArray()) {</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">      if (ch1 == 0x00) {</span>
+<span class="nc" id="L108">        break;</span>
       }
-<span class="nc" id="L112">      state = _step(state, ch1, ch2);</span>
-<span class="nc" id="L113">      ch2 = ch1;</span>
+<span class="nc" id="L110">      state = _step(state, ch1, ch2);</span>
+<span class="nc" id="L111">      ch2 = ch1;</span>
     }
-<span class="nc" id="L115">    return _distance(state);</span>
+<span class="nc" id="L113">    return _distance(state);</span>
   }
 
   /**
@@ -121,11 +119,11 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @return the double[][]
    */
   private double[][] _start() {
-<span class="nc" id="L124">    double[][] startState = new double[3][];</span>
-<span class="nc" id="L125">    startState[0] = new double[initialState.length];</span>
-<span class="nc" id="L126">    startState[1] = new double[initialState.length];</span>
-<span class="nc" id="L127">    startState[2] = Arrays.copyOf(initialState, initialState.length);</span>
-<span class="nc" id="L128">    return startState;</span>
+<span class="nc" id="L122">    double[][] startState = new double[3][];</span>
+<span class="nc" id="L123">    startState[0] = new double[initialState.length];</span>
+<span class="nc" id="L124">    startState[1] = new double[initialState.length];</span>
+<span class="nc" id="L125">    startState[2] = Arrays.copyOf(initialState, initialState.length);</span>
+<span class="nc" id="L126">    return startState;</span>
   }
 
   /**
@@ -138,21 +136,21 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    */
   private double[][] _step(double[][] state, char ch1, char ch2) {
     double cost;
-<span class="nc" id="L141">    _shift(state);</span>
-<span class="nc" id="L142">    state[2][0] = state[1][0] + deletionDistance;</span>
-<span class="nc bnc" id="L143" title="All 2 branches missed.">    for (int i = 0; i &lt; base.length(); i++) {</span>
-<span class="nc bnc" id="L144" title="All 2 branches missed.">      cost = (base.charAt(i) == ch1) ? 0 : replaceDistance;</span>
-<span class="nc" id="L145">      state[2][i + 1] = Math.min(state[2][i] + insertionDistance,</span>
+<span class="nc" id="L139">    _shift(state);</span>
+<span class="nc" id="L140">    state[2][0] = state[1][0] + deletionDistance;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">    for (int i = 0; i &lt; base.length(); i++) {</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">      cost = (base.charAt(i) == ch1) ? 0 : replaceDistance;</span>
+<span class="nc" id="L143">      state[2][i + 1] = Math.min(state[2][i] + insertionDistance,</span>
           state[1][i] + cost);
-<span class="nc" id="L147">      state[2][i + 1] = Math.min(state[2][i + 1],</span>
+<span class="nc" id="L145">      state[2][i + 1] = Math.min(state[2][i + 1],</span>
           state[1][i + 1] + deletionDistance);
-<span class="nc bnc" id="L149" title="All 6 branches missed.">      if (i &gt; 0 &amp;&amp; ch2 != 0x00 &amp;&amp; (base.charAt(i - 1) == ch1)</span>
-<span class="nc bnc" id="L150" title="All 2 branches missed.">          &amp;&amp; (base.charAt(i) == ch2)) {</span>
-<span class="nc" id="L151">        state[2][i + 1] = Math.min(state[2][i + 1],</span>
+<span class="nc bnc" id="L147" title="All 6 branches missed.">      if (i &gt; 0 &amp;&amp; ch2 != 0x00 &amp;&amp; (base.charAt(i - 1) == ch1)</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">          &amp;&amp; (base.charAt(i) == ch2)) {</span>
+<span class="nc" id="L149">        state[2][i + 1] = Math.min(state[2][i + 1],</span>
             state[0][i - 1] + transpositionDistance);
       }
     }
-<span class="nc" id="L155">    return state;</span>
+<span class="nc" id="L153">    return state;</span>
   }
 
   /**
@@ -161,11 +159,11 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @param state the state
    */
   private void _shift(double[][] state) {
-<span class="nc" id="L164">    double[] tmpState = state[0];</span>
-<span class="nc" id="L165">    state[0] = state[1];</span>
-<span class="nc" id="L166">    state[1] = state[2];</span>
-<span class="nc" id="L167">    state[2] = tmpState;</span>
-<span class="nc" id="L168">  }</span>
+<span class="nc" id="L162">    double[] tmpState = state[0];</span>
+<span class="nc" id="L163">    state[0] = state[1];</span>
+<span class="nc" id="L164">    state[1] = state[2];</span>
+<span class="nc" id="L165">    state[2] = tmpState;</span>
+<span class="nc" id="L166">  }</span>
 
   /**
    * Checks if is match.
@@ -174,7 +172,7 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @return true, if successful
    */
   private boolean _is_match(double[][] state) {
-<span class="nc bnc" id="L177" title="All 2 branches missed.">    return state[2][state[2].length - 1] &lt; maximum;</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">    return state[2][state[2].length - 1] &lt; maximum;</span>
   }
 
   /**
@@ -184,12 +182,12 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @return true, if successful
    */
   private boolean _can_match(double[][] state) {
-<span class="nc bnc" id="L187" title="All 2 branches missed.">    for (double d : state[2]) {</span>
-<span class="nc bnc" id="L188" title="All 2 branches missed.">      if (d &lt; maximum) {</span>
-<span class="nc" id="L189">        return true;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">    for (double d : state[2]) {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">      if (d &lt; maximum) {</span>
+<span class="nc" id="L187">        return true;</span>
       }
     }
-<span class="nc" id="L192">    return false;</span>
+<span class="nc" id="L190">    return false;</span>
   }
 
   /**
@@ -199,7 +197,7 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
    * @return the double
    */
   private double _distance(double[][] state) {
-<span class="nc" id="L202">    return state[2][state[2].length - 1];</span>
+<span class="nc" id="L200">    return state[2][state[2].length - 1];</span>
   }
 
 }

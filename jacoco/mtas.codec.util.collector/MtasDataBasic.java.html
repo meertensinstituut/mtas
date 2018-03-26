@@ -159,7 +159,7 @@ abstract class MtasDataBasic&lt;T1 extends Number &amp; Comparable&lt;T1&gt;, T2
 <span class="pc bpc" id="L159" title="1 of 2 branches missed.">    if (number &gt; 0) {</span>
 <span class="fc" id="L160">      T1 valueSum = null;</span>
 <span class="fc bfc" id="L161" title="All 2 branches covered.">      for (int i = 0; i &lt; number; i++) {</span>
-<span class="fc bfc" id="L162" title="All 2 branches covered.">        valueSum = (i == 0) ? values[i] : operations.add11(valueSum, values[i]);</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        valueSum = (i == 0) ? values[i] : operations.add11(valueSum, values[i]);</span>
       }
 <span class="fc bfc" id="L164" title="All 2 branches covered.">      if (currentExisting) {</span>
 <span class="fc" id="L165">        newBasicValueSumList[newPosition] = operations</span>

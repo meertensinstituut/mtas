@@ -33,17 +33,17 @@ MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingRelation,2,19,0,0,1,
 MTAS,mtas.analysis.parser,MtasBasicParser.MtasParserVariableValue,9,0,0,0,4,0,1,0,1,0
 MTAS,mtas.analysis.parser,MtasChatParser,16,0,0,0,7,0,2,0,2,0
 MTAS,mtas.analysis.parser,MtasSketchParser,1180,0,124,0,214,0,68,0,6,0
-MTAS,mtas.analysis.parser,MtasXMLParser,1290,1815,149,214,179,389,127,67,4,6
+MTAS,mtas.analysis.parser,MtasXMLParser,1289,1815,149,214,179,389,127,67,4,6
 MTAS,mtas.analysis.parser,MtasBasicParser,1995,1683,360,202,390,355,221,85,6,19
-MTAS,mtas.analysis.parser,MtasCRMParser.MtasCRMParserFunction,11,0,0,0,4,0,1,0,1,0
 MTAS,mtas.analysis.parser,MtasXMLParser.MtasXMLParserMappingGroupAnnotation,10,26,3,1,3,10,3,2,1,2
+MTAS,mtas.analysis.parser,MtasCRMParser.MtasCRMParserFunction,11,0,0,0,4,0,1,0,1,0
 MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorConfig,0,53,0,0,0,12,0,1,0,1
 MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorFactory,135,445,22,38,24,103,20,15,0,5
 MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorResultReader,82,102,5,7,14,30,5,8,0,7
 MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorResultReader.new Iterator() {...},32,84,7,9,11,20,6,6,0,4
 MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorResultWriter,77,100,15,3,23,30,10,6,1,6
-MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessor,117,347,22,26,23,94,20,9,1,4
-MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorSizeReader,4,28,0,0,2,8,1,3,1,3
+MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessor,147,360,28,28,23,96,24,9,1,4
+MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorSizeReader,0,32,0,0,0,10,0,4,0,4
 MTAS,mtas.solr.update.processor,MtasUpdateRequestProcessorResultItem,9,40,4,6,3,12,4,2,0,1
 MTAS,mtas.analysis.token,MtasOffset,17,28,0,0,1,9,1,4,1,4
 MTAS,mtas.analysis.token,MtasTokenString,19,9,0,0,6,4,3,2,3,2
@@ -55,7 +55,7 @@ MTAS,mtas.analysis.token,MtasTokenCollection.new Comparator() {...},54,84,8,10,3
 MTAS,mtas.analysis.token,MtasTokenCollection.new Iterator() {...},4,25,0,0,1,4,1,3,1,3
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionResponseDouble,39,54,7,7,8,17,8,5,2,4
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionResponse,0,6,0,0,0,3,0,1,0,1
-MTAS,mtas.parser.function.util,MtasFunctionParserFunctionBasic,1233,1701,348,250,167,273,277,112,0,12
+MTAS,mtas.parser.function.util,MtasFunctionParserFunctionBasic,1233,1701,347,251,167,273,276,113,0,12
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionDefault,28,58,6,6,5,13,5,4,1,2
 MTAS,mtas.parser.function.util,MtasFunctionParserItem,60,218,5,7,5,45,5,12,0,11
 MTAS,mtas.parser.function.util,MtasFunctionParserFunctionResponseLong,55,39,9,5,12,13,9,4,2,4
@@ -74,8 +74,8 @@ MTAS,mtas.search.spans.util,MtasDisabledTwoPhaseIteratorSpans,67,18,2,0,14,6,10,
 MTAS,mtas.search.spans.util,MtasExtendedTermSpans,78,89,9,9,24,26,8,7,2,4
 MTAS,mtas.search.spans.util,MtasExpandSpans,67,432,17,49,22,97,20,29,3,13
 MTAS,mtas.search.spans.util,MtasExpandSpanQuery.MtasExpandWeight,44,105,5,11,11,22,7,5,2,2
-MTAS,mtas.search.spans.util,MtasExpandSpans.new TwoPhaseIterator() {...},0,16,0,0,0,3,0,3,0,3
 MTAS,mtas.search.spans.util,MtasSpanUniquePositionQuery,38,106,2,8,8,24,4,10,2,7
+MTAS,mtas.search.spans.util,MtasExpandSpans.new TwoPhaseIterator() {...},0,16,0,0,0,3,0,3,0,3
 MTAS,mtas.search.spans.util,MtasExpandSpans.new TwoPhaseIterator() {...},1,25,2,2,0,4,2,3,0,3
 MTAS,mtas.search.spans.util,MtasSpanQuery,9,80,1,15,2,20,2,16,1,9
 MTAS,mtas.search.spans.util,MtasMaximumExpandSpanQuery.MtasMaximumExpandWeight,44,105,5,11,11,22,7,5,2,2
@@ -112,8 +112,8 @@ MTAS,mtas.solr.handler.component.util,MtasSolrComponentStatus,13,117,1,9,5,32,4,
 MTAS,mtas.solr.handler.component.util,MtasSolrCollectionResult,322,513,71,85,40,104,61,38,3,9
 MTAS,mtas.solr.handler.component.util,MtasSolrMtasResult,546,388,59,43,96,84,44,16,2,7
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentDocument,1032,10,66,0,158,5,38,2,5,2
-MTAS,mtas.solr.handler.component.util,MtasSolrComponentPrefix,83,436,26,38,22,93,21,19,0,8
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentTermvector,1908,3283,158,250,206,580,125,92,0,13
+MTAS,mtas.solr.handler.component.util,MtasSolrComponentPrefix,83,436,26,38,22,93,21,19,0,8
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentKwic,1575,3,108,0,260,2,60,1,6,1
 MTAS,mtas.solr.handler.component.util,MtasSolrComponentCollection,417,1764,89,149,73,334,78,60,0,11
 MTAS,mtas.solr.schema,MtasPreAnalyzedField,13,126,1,1,2,31,1,3,0,3
@@ -128,8 +128,8 @@ MTAS,mtas.search.spans,MtasSpanPrecededByQuery.MtasSpanPrecededByQuerySpans,4,9,
 MTAS,mtas.search.spans,MtasSpanSequenceQuery,238,781,43,105,44,167,39,48,3,10
 MTAS,mtas.search.spans,MtasSpanContainingQuery,94,179,28,28,18,37,26,10,2,6
 MTAS,mtas.search.spans,MtasSpanFollowedByQuery.MtasSpanFollowedByQuerySpans,4,9,1,1,0,3,1,1,0,1
-MTAS,mtas.search.spans,MtasSpanSequenceQuery.SpanSequenceWeight,51,117,11,11,13,28,9,6,1,3
 MTAS,mtas.search.spans,MtasSpanSequenceSpans.QueueItem,0,174,2,20,0,41,2,13,0,4
+MTAS,mtas.search.spans,MtasSpanSequenceQuery.SpanSequenceWeight,51,117,11,11,13,28,9,6,1,3
 MTAS,mtas.search.spans,MtasSpanSequenceQuery.MtasSpanSequenceQueryWeight,0,9,0,0,0,4,0,1,0,1
 MTAS,mtas.search.spans,MtasSpanPrecededBySpans,172,242,40,38,49,63,33,21,6,9
 MTAS,mtas.search.spans,MtasSpanStartSpans,26,79,11,11,4,15,12,11,2,10
@@ -158,15 +158,15 @@ MTAS,mtas.search.spans,MtasSpanPositionSpans,88,146,10,8,23,38,12,9,6,6
 MTAS,mtas.search.spans,MtasSpanFollowedByQuery.MtasSpanFollowedByQueryWeight,0,6,0,0,0,3,0,1,0,1
 MTAS,mtas.search.spans,MtasSpanOrQuery,131,286,30,34,33,59,23,17,1,7
 MTAS,mtas.search.spans,MtasSpanIntersectingQuery.MtasSpanIntersectingQueryWeight,0,6,0,0,0,3,0,1,0,1
-MTAS,mtas.search.spans,MtasSpanMatchAllQuery.SpanAllWeight,45,95,3,7,13,21,5,5,3,2
 MTAS,mtas.search.spans,MtasSpanPositionQuery,45,98,6,8,4,21,6,8,1,6
+MTAS,mtas.search.spans,MtasSpanMatchAllQuery.SpanAllWeight,45,95,3,7,13,21,5,5,3,2
 MTAS,mtas.search.spans,MtasSpanStartQuery.SpanTermWeight,10,24,0,0,4,6,2,2,2,2
 MTAS,mtas.search.spans,MtasSpanMatchNoneQuery,59,33,8,4,12,10,7,5,2,4
 MTAS,mtas.search.spans,MtasSpanFullyAlignedWithQuery.SpanFullyAlignedWithWeight,24,56,1,1,7,12,3,2,2,2
 MTAS,mtas.search.spans,MtasSpanPositionQuery.SpanAllWeight,30,87,2,6,9,18,5,4,3,2
 MTAS,mtas.search.spans,MtasSpanPrecededByQuery.MtasSpanPrecededByQueryWeight,0,6,0,0,0,3,0,1,0,1
-MTAS,mtas.search.spans,MtasSpanEndQuery.SpanTermWeight,10,24,0,0,4,6,2,2,2,2
 MTAS,mtas.search.spans,MtasSpanFullyAlignedWithQuery,147,262,35,45,29,51,34,15,3,6
+MTAS,mtas.search.spans,MtasSpanEndQuery.SpanTermWeight,10,24,0,0,4,6,2,2,2,2
 MTAS,mtas.search.spans,MtasSpanIntersectingQuery.MtasSpanIntersectingQuerySpans,4,9,1,1,0,3,1,1,0,1
 MTAS,mtas.search.spans,MtasSpanPrecededByQuery.SpanPrecededByWeight,24,56,1,1,7,12,3,2,2,2
 MTAS,mtas.search.spans,MtasSpanSequenceItem,458,130,81,21,86,32,47,13,2,7
@@ -215,7 +215,7 @@ MTAS,mtas.parser.function,TokenMgrError,175,0,17,0,37,0,18,0,6,0
 MTAS,mtas.parser.function,MtasFunctionParserTokenManager,366,701,82,71,84,149,62,45,7,14
 MTAS,mtas.parser.function,SimpleCharStream,797,269,45,15,136,61,53,16,26,12
 MTAS,mtas.codec.util,CodecComponent.ComponentFields,0,55,0,0,0,18,0,1,0,1
-MTAS,mtas.codec.util,CodecInfo,550,653,57,49,122,136,49,29,12,13
+MTAS,mtas.codec.util,CodecInfo,556,647,58,48,123,135,50,28,12,13
 MTAS,mtas.codec.util,CodecComponent.ComponentFacet,764,0,70,0,107,0,40,0,5,0
 MTAS,mtas.codec.util,CodecInfo.FieldReferences,0,18,0,0,0,7,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.Match,54,9,10,0,12,4,7,1,2,1
@@ -226,19 +226,19 @@ MTAS,mtas.codec.util,CodecSearchTree.MtasTreeHit,57,27,0,0,6,10,2,1,2,1
 MTAS,mtas.codec.util,CodecComponent.SubComponentDistance,195,0,16,0,33,0,11,0,3,0
 MTAS,mtas.codec.util,CodecComponent,3,0,0,0,2,0,1,0,1,0
 MTAS,mtas.codec.util,CodecCollector.TermvectorNumberBasic,0,14,0,0,0,4,0,1,0,1
-MTAS,mtas.codec.util,CodecCollector.TermvectorNumberFull,0,14,0,0,0,5,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.ComponentCollection,408,108,38,8,92,33,27,11,4,11
+MTAS,mtas.codec.util,CodecCollector.TermvectorNumberFull,0,14,0,0,0,5,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.ComponentSpan,6,213,11,27,3,42,11,13,0,5
 MTAS,mtas.codec.util,CodecComponent.ComponentToken,0,58,0,4,0,13,0,3,0,1
 MTAS,mtas.codec.util,CodecSearchTree.IntervalItem,0,9,0,0,0,4,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.ListToken,22,0,0,0,7,0,1,0,1,0
 MTAS,mtas.codec.util,CodecComponent.ComponentPrefix,20,98,7,13,4,24,7,8,0,5
 MTAS,mtas.codec.util,DataCollector,117,98,13,7,13,8,9,4,1,2
-MTAS,mtas.codec.util,CodecComponent.ComponentField,0,59,0,0,0,14,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.KwicToken,16,0,0,0,5,0,1,0,1,0
+MTAS,mtas.codec.util,CodecComponent.ComponentField,0,59,0,0,0,14,0,1,0,1
 MTAS,mtas.codec.util,CodecComponent.ComponentGroup,47,359,9,31,4,68,9,13,0,2
 MTAS,mtas.codec.util,CodecComponent.ComponentDocument,134,0,20,0,32,0,11,0,1,0
-MTAS,mtas.codec.util,CodecCollector,6368,4147,1017,599,1218,901,613,239,16,28
+MTAS,mtas.codec.util,CodecCollector,6393,4122,1020,596,1222,897,615,237,16,28
 MTAS,mtas.codec.util,CodecComponent.KwicHit,16,0,0,0,5,0,1,0,1,0
 MTAS,mtas.codec.util,CodecComponent.ComponentKwic,151,0,26,0,29,0,14,0,1,0
 MTAS,mtas.codec.util,CodecCollector.RegisterStatus,0,9,0,0,0,4,0,1,0,1
@@ -253,7 +253,7 @@ MTAS,mtas.codec.util,CodecComponent.ComponentTermVector,222,323,48,66,27,69,42,1
 MTAS,mtas.codec.util,CodecComponent.GroupHit,85,1908,53,247,25,312,51,109,0,10
 MTAS,mtas.codec.util,CodecUtil,127,382,30,38,22,73,24,21,3,8
 MTAS,mtas.analysis.util,MtasParserException,3,4,0,0,2,2,1,1,1,1
-MTAS,mtas.analysis.util,MtasTokenizerFactory,246,183,23,29,27,48,18,16,0,8
+MTAS,mtas.analysis.util,MtasTokenizerFactory,243,195,23,31,28,51,19,18,1,9
 MTAS,mtas.analysis.util,MtasConfigException,7,0,0,0,4,0,2,0,2,0
 MTAS,mtas.analysis.util,MtasConfiguration,278,422,36,57,36,121,30,28,2,6
 MTAS,mtas.analysis.util,MtasBufferedReader,705,0,112,0,161,0,72,0,16,0
@@ -261,13 +261,14 @@ MTAS,mtas.analysis.util,MtasPrefixTokenFilterFactory,7,10,0,0,1,3,1,1,1,1
 MTAS,mtas.analysis.util,MtasPennTreebankReader,649,0,98,0,147,0,59,0,10,0
 MTAS,mtas.analysis.util,MtasPrefixTokenFilterFactory.MtasPrefixTokenFilter,140,0,16,0,25,0,12,0,4,0
 MTAS,mtas.analysis.util,MtasBufferedReader.new Iterator() {...},50,0,8,0,13,0,7,0,3,0
-MTAS,mtas.analysis.util,MtasFetchData,192,62,19,5,36,16,13,5,2,4
-MTAS,mtas.analysis.util,MtasCharFilterFactory,257,222,23,37,31,53,19,19,0,8
-MTAS,mtas.solr.handler.util,MtasSolrStatus,894,238,112,16,175,62,75,18,17,12
-MTAS,mtas.solr.handler.util,MtasSolrBaseList,165,61,16,2,39,16,17,3,8,3
+MTAS,mtas.analysis.util,MtasFetchData,206,69,20,6,37,17,14,5,2,4
+MTAS,mtas.analysis.util,MtasCharFilterFactory,249,233,23,39,31,56,19,21,0,9
+MTAS,mtas.solr.handler.util,MtasSolrStatus,921,238,116,16,181,62,79,18,19,12
+MTAS,mtas.solr.handler.util,MtasSolrBaseList,207,61,18,2,49,16,18,3,8,3
 MTAS,mtas.solr.handler.util,MtasSolrHistoryList,29,90,8,8,6,23,7,9,1,7
 MTAS,mtas.solr.handler.util,MtasSolrRunningList,11,67,4,4,4,12,5,5,1,5
 MTAS,mtas.solr.handler.util,MtasSolrStatus.ShardStatus,268,64,54,0,65,17,31,1,4,1
+MTAS,mtas.solr.handler.util,MtasSolrBaseList.ListData,28,0,0,0,9,0,3,0,3,0
 MTAS,mtas.solr.handler.util,MtasSolrStatus.StageStatus,65,0,4,0,21,0,7,0,5,0
 MTAS,mtas.search,MtasCollector,7,0,0,0,4,0,4,0,4,0
 MTAS,mtas.codec.util.distance,MorseDistance,913,0,80,0,148,0,54,0,14,0
@@ -288,7 +289,7 @@ MTAS,mtas.codec.util.collector,MtasDataItemDoubleBasic,178,0,32,0,29,0,23,0,7,0
 MTAS,mtas.codec.util.collector,MtasDataItemAdvanced,443,172,80,22,73,33,56,12,2,4
 MTAS,mtas.codec.util.collector,MtasDataLongFull,445,76,69,3,79,8,50,3,14,3
 MTAS,mtas.codec.util.collector,MtasDataCollectorResult,133,287,18,42,13,68,19,20,1,8
-MTAS,mtas.codec.util.collector,MtasDataBasic,277,538,35,27,46,103,24,23,4,12
+MTAS,mtas.codec.util.collector,MtasDataBasic,284,531,36,26,46,103,25,22,4,12
 MTAS,mtas.codec.util.collector,MtasDataItemNumberComparator,239,88,42,8,36,17,28,7,4,6
 MTAS,mtas.codec.util.collector,MtasDataLongOperations,69,85,22,12,21,18,23,11,6,11
 MTAS,mtas.codec.util.collector,MtasDataAdvanced,364,1055,28,40,51,188,24,26,4,12

@@ -2,6 +2,7 @@
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -121,10 +122,10 @@ public class MtasSolrStatus {
   private String key;
 
   /** The current stage. */
-<span class="fc" id="L124">  private Integer currentStage = null;</span>
+<span class="fc" id="L125">  private Integer currentStage = null;</span>
 
   /** The shard key. */
-<span class="fc" id="L127">  private String shardKey = null;</span>
+<span class="fc" id="L128">  private String shardKey = null;</span>
 
   /** The shard stage keys. */
   private Map&lt;Integer, String&gt; shardStageKeys;
@@ -195,45 +196,45 @@ public class MtasSolrStatus {
    *          the rsp
    */
   public MtasSolrStatus(String request, boolean shardRequest, String[] shards,
-<span class="fc" id="L198">      SolrQueryResponse rsp) {</span>
-<span class="fc" id="L199">    key = null;</span>
-<span class="fc" id="L200">    status = new Status();</span>
-<span class="fc" id="L201">    this.request = request;</span>
-<span class="fc" id="L202">    this.shardRequest = shardRequest;</span>
-<span class="fc" id="L203">    abortMessage = null;</span>
-<span class="fc" id="L204">    abortStatus = false;</span>
-<span class="fc" id="L205">    errorMessage = null;</span>
-<span class="fc" id="L206">    errorStatus = false;</span>
-<span class="fc" id="L207">    startTime = System.currentTimeMillis();</span>
-<span class="fc" id="L208">    totalTime = null;</span>
-<span class="fc" id="L209">    finished = false;</span>
-<span class="pc bpc" id="L210" title="1 of 4 branches missed.">    if (shards != null &amp;&amp; shards.length &gt; 0) {</span>
-<span class="fc" id="L211">      this.shards = new ConcurrentHashMap&lt;&gt;();</span>
-<span class="fc" id="L212">      this.shardStageKeys = new ConcurrentHashMap&lt;&gt;();</span>
-<span class="fc" id="L213">      this.shardStageStatus = new ConcurrentHashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L214" title="All 2 branches covered.">      for (String shard : shards) {</span>
-<span class="fc bfc" id="L215" title="All 2 branches covered.">        if (shard == null) {</span>
-<span class="fc" id="L216">          shardNumberTotal = 0;</span>
-<span class="fc" id="L217">          this.shards = null;</span>
-<span class="fc" id="L218">          this.shardStageKeys = null;</span>
-<span class="fc" id="L219">          this.shardStageStatus = null;</span>
-<span class="fc" id="L220">          break;</span>
+<span class="fc" id="L199">      SolrQueryResponse rsp) {</span>
+<span class="fc" id="L200">    key = null;</span>
+<span class="fc" id="L201">    status = new Status();</span>
+<span class="fc" id="L202">    this.request = request;</span>
+<span class="fc" id="L203">    this.shardRequest = shardRequest;</span>
+<span class="fc" id="L204">    abortMessage = null;</span>
+<span class="fc" id="L205">    abortStatus = false;</span>
+<span class="fc" id="L206">    errorMessage = null;</span>
+<span class="fc" id="L207">    errorStatus = false;</span>
+<span class="fc" id="L208">    startTime = System.currentTimeMillis();</span>
+<span class="fc" id="L209">    totalTime = null;</span>
+<span class="fc" id="L210">    finished = false;</span>
+<span class="pc bpc" id="L211" title="1 of 4 branches missed.">    if (shards != null &amp;&amp; shards.length &gt; 0) {</span>
+<span class="fc" id="L212">      this.shards = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L213">      this.shardStageKeys = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L214">      this.shardStageStatus = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">      for (String shard : shards) {</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">        if (shard == null) {</span>
+<span class="fc" id="L217">          shardNumberTotal = 0;</span>
+<span class="fc" id="L218">          this.shards = null;</span>
+<span class="fc" id="L219">          this.shardStageKeys = null;</span>
+<span class="fc" id="L220">          this.shardStageStatus = null;</span>
+<span class="fc" id="L221">          break;</span>
         }
-<span class="fc" id="L222">        this.shards.put(shard, new ShardStatus());</span>
+<span class="fc" id="L223">        this.shards.put(shard, new ShardStatus());</span>
       }
     } else {
-<span class="fc" id="L225">      shardNumberTotal = 0;</span>
-<span class="fc" id="L226">      this.shards = null;</span>
-<span class="fc" id="L227">      this.shardStageKeys = null;</span>
-<span class="fc" id="L228">      this.shardStageStatus = null;</span>
+<span class="fc" id="L226">      shardNumberTotal = 0;</span>
+<span class="fc" id="L227">      this.shards = null;</span>
+<span class="fc" id="L228">      this.shardStageKeys = null;</span>
+<span class="fc" id="L229">      this.shardStageStatus = null;</span>
     }
-<span class="fc bfc" id="L230" title="All 2 branches covered.">    shardNumberTotal = shards == null ? 0 : shards.length;</span>
-<span class="fc" id="L231">    shardInfoUpdate = null;</span>
-<span class="fc" id="L232">    shardInfoUpdated = false;</span>
-<span class="fc" id="L233">    shardInfoNeedUpdate = true;</span>
-<span class="fc" id="L234">    shardInfoError = false;</span>
-<span class="fc" id="L235">    this.rsp = rsp;</span>
-<span class="fc" id="L236">  }</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">    shardNumberTotal = shards == null ? 0 : shards.length;</span>
+<span class="fc" id="L232">    shardInfoUpdate = null;</span>
+<span class="fc" id="L233">    shardInfoUpdated = false;</span>
+<span class="fc" id="L234">    shardInfoNeedUpdate = true;</span>
+<span class="fc" id="L235">    shardInfoError = false;</span>
+<span class="fc" id="L236">    this.rsp = rsp;</span>
+<span class="fc" id="L237">  }</span>
 
   /**
    * Key.
@@ -241,8 +242,8 @@ public class MtasSolrStatus {
    * @return the string
    */
   public final String key() {
-<span class="fc bfc" id="L244" title="All 2 branches covered.">    key = (key == null) ? UUID.randomUUID().toString() : key;</span>
-<span class="fc" id="L245">    return key;</span>
+<span class="fc bfc" id="L245" title="All 2 branches covered.">    key = (key == null) ? UUID.randomUUID().toString() : key;</span>
+<span class="fc" id="L246">    return key;</span>
   }
 
   /**
@@ -253,15 +254,15 @@ public class MtasSolrStatus {
    * @return the string
    */
   public final String shardKey(int stage) {
-<span class="pc bpc" id="L256" title="1 of 2 branches missed.">    if (shardStageKeys == null) {</span>
-<span class="nc" id="L257">      return null;</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">    if (shardStageKeys == null) {</span>
+<span class="nc" id="L258">      return null;</span>
     } else {
-<span class="fc" id="L259">      shardKey = shardStageKeys.get(stage);</span>
-<span class="fc bfc" id="L260" title="All 2 branches covered.">      if (shardKey == null) {</span>
-<span class="fc" id="L261">        shardKey = UUID.randomUUID().toString();</span>
-<span class="fc" id="L262">        shardStageKeys.put(stage, shardKey);</span>
+<span class="fc" id="L260">      shardKey = shardStageKeys.get(stage);</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">      if (shardKey == null) {</span>
+<span class="fc" id="L262">        shardKey = UUID.randomUUID().toString();</span>
+<span class="fc" id="L263">        shardStageKeys.put(stage, shardKey);</span>
       }
-<span class="fc" id="L264">      return shardKey;</span>
+<span class="fc" id="L265">      return shardKey;</span>
     }
   }
 
@@ -272,8 +273,8 @@ public class MtasSolrStatus {
    *          the new stage
    */
   public final void setStage(int stage) {
-<span class="fc" id="L275">    this.currentStage = stage;</span>
-<span class="fc" id="L276">  }</span>
+<span class="fc" id="L276">    this.currentStage = stage;</span>
+<span class="fc" id="L277">  }</span>
 
   /**
    * Sets the abort.
@@ -282,9 +283,9 @@ public class MtasSolrStatus {
    *          the new abort
    */
   public final void setAbort(String message) {
-<span class="nc" id="L285">    this.abortMessage = Objects.requireNonNull(message, &quot;message required&quot;);</span>
-<span class="nc" id="L286">    this.abortStatus = true;</span>
-<span class="nc" id="L287">  }</span>
+<span class="nc" id="L286">    this.abortMessage = Objects.requireNonNull(message, &quot;message required&quot;);</span>
+<span class="nc" id="L287">    this.abortStatus = true;</span>
+<span class="nc" id="L288">  }</span>
 
   /**
    * Sets the error.
@@ -295,10 +296,10 @@ public class MtasSolrStatus {
    *           Signals that an I/O exception has occurred.
    */
   public final void setError(IOException exception) throws IOException {
-<span class="nc" id="L298">    Objects.requireNonNull(exception, &quot;exception required&quot;);</span>
-<span class="nc" id="L299">    errorMessage = exception.getMessage();</span>
-<span class="nc" id="L300">    errorStatus = true;</span>
-<span class="nc" id="L301">    throw exception;</span>
+<span class="nc" id="L299">    Objects.requireNonNull(exception, &quot;exception required&quot;);</span>
+<span class="nc" id="L300">    errorMessage = exception.getMessage();</span>
+<span class="nc" id="L301">    errorStatus = true;</span>
+<span class="nc" id="L302">    throw exception;</span>
   }
 
   /**
@@ -308,21 +309,21 @@ public class MtasSolrStatus {
    *          the new error
    */
   public final void setError(String error) {
-<span class="nc" id="L311">    this.errorMessage = Objects.requireNonNull(error, &quot;error required&quot;);</span>
-<span class="nc" id="L312">    this.errorStatus = true;</span>
-<span class="nc" id="L313">  }</span>
+<span class="nc" id="L312">    this.errorMessage = Objects.requireNonNull(error, &quot;error required&quot;);</span>
+<span class="nc" id="L313">    this.errorStatus = true;</span>
+<span class="nc" id="L314">  }</span>
 
   /**
    * Sets the finished.
    */
   public final void setFinished() {
-<span class="pc bpc" id="L319" title="1 of 2 branches missed.">    if (!finished) {</span>
-<span class="fc" id="L320">      totalTime = ((Long) (System.currentTimeMillis() - startTime)).intValue();</span>
-<span class="fc" id="L321">      shardInfoUpdated = false;</span>
-<span class="fc" id="L322">      finished = true;</span>
-<span class="fc" id="L323">      rsp = null;</span>
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">    if (!finished) {</span>
+<span class="fc" id="L321">      totalTime = ((Long) (System.currentTimeMillis() - startTime)).intValue();</span>
+<span class="fc" id="L322">      shardInfoUpdated = false;</span>
+<span class="fc" id="L323">      finished = true;</span>
+<span class="fc" id="L324">      rsp = null;</span>
     }
-<span class="fc" id="L325">  }</span>
+<span class="fc" id="L326">  }</span>
 
   /**
    * Sets the key.
@@ -333,12 +334,12 @@ public class MtasSolrStatus {
    *           Signals that an I/O exception has occurred.
    */
   public void setKey(String key) throws IOException {
-<span class="pc bpc" id="L336" title="1 of 2 branches missed.">    if (this.key != null) {</span>
-<span class="nc" id="L337">      throw new IOException(&quot;key already set&quot;);</span>
+<span class="pc bpc" id="L337" title="1 of 2 branches missed.">    if (this.key != null) {</span>
+<span class="nc" id="L338">      throw new IOException(&quot;key already set&quot;);</span>
     } else {
-<span class="fc" id="L339">      this.key = Objects.requireNonNull(key, &quot;key required&quot;);</span>
+<span class="fc" id="L340">      this.key = Objects.requireNonNull(key, &quot;key required&quot;);</span>
     }
-<span class="fc" id="L341">  }</span>
+<span class="fc" id="L342">  }</span>
 
   /**
    * Shard request.
@@ -346,7 +347,7 @@ public class MtasSolrStatus {
    * @return true, if successful
    */
   public final boolean shardRequest() {
-<span class="nc" id="L349">    return shardRequest;</span>
+<span class="nc" id="L350">    return shardRequest;</span>
   }
 
   /**
@@ -355,7 +356,7 @@ public class MtasSolrStatus {
    * @return the shards
    */
   public final Map&lt;String, ShardStatus&gt; getShards() {
-<span class="fc" id="L358">    return shards;</span>
+<span class="fc" id="L359">    return shards;</span>
   }
 
   /**
@@ -364,7 +365,7 @@ public class MtasSolrStatus {
    * @return the status
    */
   public final Status status() {
-<span class="fc" id="L367">    return status;</span>
+<span class="fc" id="L368">    return status;</span>
   }
 
   /**
@@ -373,7 +374,7 @@ public class MtasSolrStatus {
    * @return true, if successful
    */
   public final boolean error() {
-<span class="fc" id="L376">    return errorStatus;</span>
+<span class="fc" id="L377">    return errorStatus;</span>
   }
 
   /**
@@ -382,7 +383,7 @@ public class MtasSolrStatus {
    * @return true, if successful
    */
   public final boolean abort() {
-<span class="fc" id="L385">    return abortStatus;</span>
+<span class="fc" id="L386">    return abortStatus;</span>
   }
 
   /**
@@ -391,7 +392,7 @@ public class MtasSolrStatus {
    * @return true, if successful
    */
   public final boolean finished() {
-<span class="fc" id="L394">    return finished;</span>
+<span class="fc" id="L395">    return finished;</span>
   }
 
   /**
@@ -400,7 +401,7 @@ public class MtasSolrStatus {
    * @return the string
    */
   public final String abortMessage() {
-<span class="nc" id="L403">    return Objects.requireNonNull(abortMessage, &quot;no abortMessage available&quot;);</span>
+<span class="nc" id="L404">    return Objects.requireNonNull(abortMessage, &quot;no abortMessage available&quot;);</span>
   }
 
   /**
@@ -409,7 +410,7 @@ public class MtasSolrStatus {
    * @return the string
    */
   public final String errorMessage() {
-<span class="nc" id="L412">    return Objects.requireNonNull(errorMessage, &quot;no errorMessage available&quot;);</span>
+<span class="nc" id="L413">    return Objects.requireNonNull(errorMessage, &quot;no errorMessage available&quot;);</span>
   }
 
   /**
@@ -418,78 +419,92 @@ public class MtasSolrStatus {
    * @return the start time
    */
   public final Long getStartTime() {
-<span class="fc" id="L421">    return startTime;</span>
+<span class="fc" id="L422">    return startTime;</span>
   }
 
   /**
    * Check response on exception.
    */
   private void checkResponseOnException() {
-<span class="nc bnc" id="L428" title="All 4 branches missed.">    if (!finished &amp;&amp; rsp != null) {</span>
+<span class="nc bnc" id="L429" title="All 4 branches missed.">    if (!finished &amp;&amp; rsp != null) {</span>
       Exception e;
-<span class="nc bnc" id="L430" title="All 2 branches missed.">      if ((e = rsp.getException()) != null) {</span>
-<span class="nc" id="L431">        setError(e.getMessage());</span>
-<span class="nc" id="L432">        setFinished();</span>
+<span class="nc bnc" id="L431" title="All 2 branches missed.">      if ((e = rsp.getException()) != null) {</span>
+<span class="nc" id="L432">        setError(e.getMessage());</span>
+<span class="nc" id="L433">        setFinished();</span>
       }
     }
-<span class="nc" id="L435">  }</span>
+<span class="nc" id="L436">  }</span>
 
+  public SimpleOrderedMap&lt;Object&gt; createListOutput() {
+<span class="nc" id="L439">    return createOutput(false);</span>
+  }
+  
+  public SimpleOrderedMap&lt;Object&gt; createItemOutput() {
+<span class="nc" id="L443">    return createOutput(true);</span>
+  }
+  
   /**
    * Creates the output.
    *
    * @return the simple ordered map
    */
-  public SimpleOrderedMap&lt;Object&gt; createOutput() {
-<span class="nc" id="L443">    checkResponseOnException();</span>
-<span class="nc" id="L444">    SimpleOrderedMap&lt;Object&gt; output = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L445">    updateShardInfo();</span>
-<span class="nc" id="L446">    output.add(NAME_KEY, key);</span>
-<span class="nc" id="L447">    output.add(NAME_REQUEST, request);</span>
-<span class="nc bnc" id="L448" title="All 2 branches missed.">    if (errorStatus) {</span>
-<span class="nc" id="L449">      output.add(NAME_ERROR, errorMessage);</span>
+  private SimpleOrderedMap&lt;Object&gt; createOutput(boolean detailed) {
+<span class="nc" id="L452">    checkResponseOnException();</span>
+<span class="nc" id="L453">    SimpleOrderedMap&lt;Object&gt; output = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L454">    updateShardInfo();</span>
+<span class="nc" id="L455">    output.add(NAME_KEY, key);</span>
+<span class="nc" id="L456">    output.add(NAME_REQUEST, request);</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">    if (errorStatus) {</span>
+<span class="nc" id="L458">      output.add(NAME_ERROR, errorMessage);</span>
     }
-<span class="nc bnc" id="L451" title="All 2 branches missed.">    if (abortStatus) {</span>
-<span class="nc" id="L452">      output.add(NAME_ABORT, abortMessage);</span>
+<span class="nc bnc" id="L460" title="All 2 branches missed.">    if (abortStatus) {</span>
+<span class="nc" id="L461">      output.add(NAME_ABORT, abortMessage);</span>
     }
-<span class="nc" id="L454">    output.add(NAME_FINISHED, finished);</span>
-<span class="nc bnc" id="L455" title="All 2 branches missed.">    if (totalTime != null) {</span>
-<span class="nc" id="L456">      output.add(NAME_TIME_TOTAL, totalTime);</span>
+<span class="nc" id="L463">    output.add(NAME_FINISHED, finished);</span>
+<span class="nc bnc" id="L464" title="All 2 branches missed.">    if (totalTime != null) {</span>
+<span class="nc" id="L465">      output.add(NAME_TIME_TOTAL, totalTime);</span>
     }
-<span class="nc" id="L458">    output.add(NAME_TIME_START, startTime);</span>
-<span class="nc" id="L459">    output.add(NAME_SHARDREQUEST, shardRequest);</span>
-<span class="nc bnc" id="L460" title="All 2 branches missed.">    if (shardNumberTotal &gt; 0) {</span>
-<span class="nc" id="L461">      output.add(NAME_STATUS_DISTRIBUTED, createShardsOutput());</span>
+<span class="nc" id="L467">    output.add(NAME_TIME_START, (new Date(startTime)).toString());</span>
+<span class="nc" id="L468">    output.add(NAME_SHARDREQUEST, shardRequest);</span>
+<span class="nc bnc" id="L469" title="All 2 branches missed.">    if (shardNumberTotal &gt; 0) {</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">      if(detailed) {</span>
+<span class="nc" id="L471">        output.add(NAME_STATUS_DISTRIBUTED, createShardsOutput());</span>
+      } else {
+<span class="nc" id="L473">        output.add(NAME_STATUS_DISTRIBUTED, true);</span>
+      }
+<span class="nc bnc" id="L475" title="All 2 branches missed.">    } else if(detailed) {</span>
+<span class="nc" id="L476">      output.add(NAME_STATUS_DISTRIBUTED, false);</span>
     }
-<span class="nc bnc" id="L463" title="All 2 branches missed.">    if (status.numberSegmentsTotal != null) {</span>
-<span class="nc" id="L464">      output.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, status.numberSegmentsTotal);</span>
-<span class="nc" id="L465">      output.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L478" title="All 2 branches missed.">    if (status.numberSegmentsTotal != null) {</span>
+<span class="nc" id="L479">      output.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, status.numberSegmentsTotal);</span>
+<span class="nc" id="L480">      output.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED,</span>
           status.numberSegmentsFinished);
-<span class="nc bnc" id="L467" title="All 2 branches missed.">      if (!status.subNumberSegmentsFinished.isEmpty()) {</span>
-<span class="nc" id="L468">        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">      if (!status.subNumberSegmentsFinished.isEmpty()) {</span>
+<span class="nc" id="L483">        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED,</span>
             status.subNumberSegmentsFinished);
-<span class="nc" id="L470">        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL,</span>
+<span class="nc" id="L485">        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL,</span>
             status.subNumberSegmentsTotal);
-<span class="nc" id="L472">        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
+<span class="nc" id="L487">        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
             status.subNumberSegmentsFinishedTotal);
       }
     }
-<span class="nc bnc" id="L476" title="All 2 branches missed.">    if (status.numberDocumentsTotal != null) {</span>
-<span class="nc" id="L477">      output.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL,</span>
+<span class="nc bnc" id="L491" title="All 2 branches missed.">    if (status.numberDocumentsTotal != null) {</span>
+<span class="nc" id="L492">      output.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL,</span>
           status.numberDocumentsTotal);
-<span class="nc" id="L479">      output.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,</span>
+<span class="nc" id="L494">      output.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,</span>
           status.numberDocumentsFound);
-<span class="nc" id="L481">      output.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED,</span>
+<span class="nc" id="L496">      output.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED,</span>
           status.numberDocumentsFinished);
-<span class="nc bnc" id="L483" title="All 2 branches missed.">      if (!status.subNumberDocumentsFinished.isEmpty()) {</span>
-<span class="nc" id="L484">        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">      if (!status.subNumberDocumentsFinished.isEmpty()) {</span>
+<span class="nc" id="L499">        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED,</span>
             status.subNumberDocumentsFinished);
-<span class="nc" id="L486">        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL,</span>
+<span class="nc" id="L501">        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL,</span>
             status.subNumberDocumentsTotal);
-<span class="nc" id="L488">        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
+<span class="nc" id="L503">        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
             status.subNumberDocumentsFinishedTotal);
       }
     }
-<span class="nc" id="L492">    return output;</span>
+<span class="nc" id="L507">    return output;</span>
   }
 
   /**
@@ -498,22 +513,22 @@ public class MtasSolrStatus {
    * @return the simple ordered map
    */
   private final SimpleOrderedMap&lt;Object&gt; createShardsOutput() {
-<span class="nc" id="L501">    SimpleOrderedMap&lt;Object&gt; output = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc bnc" id="L502" title="All 4 branches missed.">    if (shardStageStatus != null &amp;&amp; !shardStageStatus.isEmpty()) {</span>
-<span class="nc" id="L503">      List&lt;SimpleOrderedMap&lt;Object&gt;&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L504" title="All 2 branches missed.">      for (StageStatus stageStatus : shardStageStatus.values()) {</span>
-<span class="nc" id="L505">        list.add(stageStatus.createOutput());</span>
-<span class="nc" id="L506">      }</span>
-<span class="nc" id="L507">      output.add(NAME_STATUS_STAGES, list);</span>
+<span class="nc" id="L516">    SimpleOrderedMap&lt;Object&gt; output = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc bnc" id="L517" title="All 4 branches missed.">    if (shardStageStatus != null &amp;&amp; !shardStageStatus.isEmpty()) {</span>
+<span class="nc" id="L518">      List&lt;SimpleOrderedMap&lt;Object&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L519" title="All 2 branches missed.">      for (StageStatus stageStatus : shardStageStatus.values()) {</span>
+<span class="nc" id="L520">        list.add(stageStatus.createOutput());</span>
+<span class="nc" id="L521">      }</span>
+<span class="nc" id="L522">      output.add(NAME_STATUS_STAGES, list);</span>
     }
-<span class="nc bnc" id="L509" title="All 4 branches missed.">    if (shards != null &amp;&amp; !shards.isEmpty()) {</span>
-<span class="nc" id="L510">      List&lt;SimpleOrderedMap&lt;Object&gt;&gt; list = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L511" title="All 2 branches missed.">      for (ShardStatus shardStatus : shards.values()) {</span>
-<span class="nc" id="L512">        list.add(shardStatus.createOutput());</span>
-<span class="nc" id="L513">      }</span>
-<span class="nc" id="L514">      output.add(NAME_STATUS_SHARDS, list);</span>
+<span class="nc bnc" id="L524" title="All 4 branches missed.">    if (shards != null &amp;&amp; !shards.isEmpty()) {</span>
+<span class="nc" id="L525">      List&lt;SimpleOrderedMap&lt;Object&gt;&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L526" title="All 2 branches missed.">      for (ShardStatus shardStatus : shards.values()) {</span>
+<span class="nc" id="L527">        list.add(shardStatus.createOutput());</span>
+<span class="nc" id="L528">      }</span>
+<span class="nc" id="L529">      output.add(NAME_STATUS_SHARDS, list);</span>
     }
-<span class="nc" id="L516">    return output;</span>
+<span class="nc" id="L531">    return output;</span>
   }
 
   /**
@@ -526,11 +541,11 @@ public class MtasSolrStatus {
    * @return the integer
    */
   private final Integer getInteger(NamedList&lt;Object&gt; response, String... args) {
-<span class="nc" id="L529">    Object objectItem = response.findRecursive(args);</span>
-<span class="nc bnc" id="L530" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Integer) {</span>
-<span class="nc" id="L531">      return (Integer) objectItem;</span>
+<span class="nc" id="L544">    Object objectItem = response.findRecursive(args);</span>
+<span class="nc bnc" id="L545" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Integer) {</span>
+<span class="nc" id="L546">      return (Integer) objectItem;</span>
     } else {
-<span class="nc" id="L533">      return null;</span>
+<span class="nc" id="L548">      return null;</span>
     }
   }
 
@@ -545,12 +560,12 @@ public class MtasSolrStatus {
    */
   private final Map&lt;String, Integer&gt; getIntegerMap(NamedList&lt;Object&gt; response,
       String... args) {
-<span class="nc" id="L548">    Object objectItem = response.findRecursive(args);</span>
-<span class="nc" id="L549">    Map&lt;String, Integer&gt; result = null;</span>
-<span class="nc bnc" id="L550" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Map) {</span>
-<span class="nc" id="L551">      result = (Map) objectItem;</span>
+<span class="nc" id="L563">    Object objectItem = response.findRecursive(args);</span>
+<span class="nc" id="L564">    Map&lt;String, Integer&gt; result = null;</span>
+<span class="nc bnc" id="L565" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Map) {</span>
+<span class="nc" id="L566">      result = (Map) objectItem;</span>
     } 
-<span class="nc" id="L553">    return result;</span>
+<span class="nc" id="L568">    return result;</span>
   }
 
   /**
@@ -563,11 +578,11 @@ public class MtasSolrStatus {
    * @return the long
    */
   private final Long getLong(NamedList&lt;Object&gt; response, String... args) {
-<span class="nc" id="L566">    Object objectItem = response.findRecursive(args);</span>
-<span class="nc bnc" id="L567" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Long) {</span>
-<span class="nc" id="L568">      return (Long) objectItem;</span>
+<span class="nc" id="L581">    Object objectItem = response.findRecursive(args);</span>
+<span class="nc bnc" id="L582" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Long) {</span>
+<span class="nc" id="L583">      return (Long) objectItem;</span>
     } else {
-<span class="nc" id="L570">      return null;</span>
+<span class="nc" id="L585">      return null;</span>
     }
   }
 
@@ -582,11 +597,11 @@ public class MtasSolrStatus {
    */
   private final Map&lt;String, Long&gt; getLongMap(NamedList&lt;Object&gt; response,
       String... args) {
-<span class="nc" id="L585">    Object objectItem = response.findRecursive(args);</span>
-<span class="nc bnc" id="L586" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Map) {</span>
-<span class="nc" id="L587">      return (Map) objectItem;</span>
+<span class="nc" id="L600">    Object objectItem = response.findRecursive(args);</span>
+<span class="nc bnc" id="L601" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Map) {</span>
+<span class="nc" id="L602">      return (Map) objectItem;</span>
     } else {
-<span class="nc" id="L589">      return null;</span>
+<span class="nc" id="L604">      return null;</span>
     }
   }
 
@@ -600,11 +615,11 @@ public class MtasSolrStatus {
    * @return the string
    */
   private final String getString(NamedList&lt;Object&gt; response, String... args) {
-<span class="nc" id="L603">    Object objectItem = response.findRecursive(args);</span>
-<span class="nc bnc" id="L604" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof String) {</span>
-<span class="nc" id="L605">      return (String) objectItem;</span>
+<span class="nc" id="L618">    Object objectItem = response.findRecursive(args);</span>
+<span class="nc bnc" id="L619" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof String) {</span>
+<span class="nc" id="L620">      return (String) objectItem;</span>
     } else {
-<span class="nc" id="L607">      return null;</span>
+<span class="nc" id="L622">      return null;</span>
     }
   }
 
@@ -618,144 +633,144 @@ public class MtasSolrStatus {
    * @return the boolean
    */
   private final Boolean getBoolean(NamedList&lt;Object&gt; response, String... args) {
-<span class="nc" id="L621">    Object objectItem = response.findRecursive(args);</span>
-<span class="nc" id="L622">    Boolean result = null;</span>
-<span class="nc bnc" id="L623" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Boolean) {</span>
-<span class="nc" id="L624">      result = (Boolean) objectItem;</span>
+<span class="nc" id="L636">    Object objectItem = response.findRecursive(args);</span>
+<span class="nc" id="L637">    Boolean result = null;</span>
+<span class="nc bnc" id="L638" title="All 4 branches missed.">    if (objectItem != null &amp;&amp; objectItem instanceof Boolean) {</span>
+<span class="nc" id="L639">      result = (Boolean) objectItem;</span>
     } 
-<span class="nc" id="L626">    return result;</span>
+<span class="nc" id="L641">    return result;</span>
   }
 
   /**
    * Update shard info.
    */
   private final void updateShardInfo() {
-<span class="nc" id="L633">    final long expirationTime = 1000;</span>
+<span class="nc" id="L648">    final long expirationTime = 1000;</span>
     // don't update too much
-<span class="nc bnc" id="L635" title="All 4 branches missed.">    if (shardKey == null</span>
-<span class="nc" id="L636">        || (shardInfoUpdated &amp;&amp; Objects.requireNonNull(shardInfoUpdate,</span>
-<span class="nc bnc" id="L637" title="All 2 branches missed.">            &quot;update expire time not set&quot;) &lt; System.currentTimeMillis())) {</span>
-<span class="nc" id="L638">      return;</span>
+<span class="nc bnc" id="L650" title="All 4 branches missed.">    if (shardKey == null</span>
+<span class="nc" id="L651">        || (shardInfoUpdated &amp;&amp; Objects.requireNonNull(shardInfoUpdate,</span>
+<span class="nc bnc" id="L652" title="All 2 branches missed.">            &quot;update expire time not set&quot;) &lt; System.currentTimeMillis())) {</span>
+<span class="nc" id="L653">      return;</span>
     }
     // and only if necessary
-<span class="nc bnc" id="L641" title="All 6 branches missed.">    if (!shardInfoUpdated || !finished || shardInfoNeedUpdate) {</span>
+<span class="nc bnc" id="L656" title="All 6 branches missed.">    if (!shardInfoUpdated || !finished || shardInfoNeedUpdate) {</span>
       ShardStatus shardStatus;
       StageStatus stageStatus;
       QueryResponse response;
       SolrClient solrClient;
       // reset
-<span class="nc" id="L647">      shardInfoError = false;</span>
+<span class="nc" id="L662">      shardInfoError = false;</span>
       // get list of relevant stages
-<span class="nc" id="L649">      Set&lt;Integer&gt; stagesList = new HashSet&lt;&gt;();</span>
-<span class="nc bnc" id="L650" title="All 2 branches missed.">      for (Integer stage : shardStageKeys.keySet()) {</span>
-<span class="nc bnc" id="L651" title="All 2 branches missed.">        if (!shardStageStatus.containsKey(stage)</span>
-<span class="nc bnc" id="L652" title="All 2 branches missed.">            || !shardStageStatus.get(stage).finished) {</span>
-<span class="nc" id="L653">          stagesList.add(stage);</span>
+<span class="nc" id="L664">      Set&lt;Integer&gt; stagesList = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L665" title="All 2 branches missed.">      for (Integer stage : shardStageKeys.keySet()) {</span>
+<span class="nc bnc" id="L666" title="All 2 branches missed.">        if (!shardStageStatus.containsKey(stage)</span>
+<span class="nc bnc" id="L667" title="All 2 branches missed.">            || !shardStageStatus.get(stage).finished) {</span>
+<span class="nc" id="L668">          stagesList.add(stage);</span>
         }
-<span class="nc" id="L655">      }</span>
+<span class="nc" id="L670">      }</span>
       // loop for this list over shards
-<span class="nc bnc" id="L657" title="All 2 branches missed.">      for (Entry&lt;String, ShardStatus&gt; entry : shards.entrySet()) {</span>
-<span class="nc" id="L658">        shardStatus = entry.getValue();</span>
-<span class="nc" id="L659">        solrClient = null;</span>
+<span class="nc bnc" id="L672" title="All 2 branches missed.">      for (Entry&lt;String, ShardStatus&gt; entry : shards.entrySet()) {</span>
+<span class="nc" id="L673">        shardStatus = entry.getValue();</span>
+<span class="nc" id="L674">        solrClient = null;</span>
         // then loop over stages
-<span class="nc bnc" id="L661" title="All 2 branches missed.">        for (Integer stage : stagesList) {</span>
+<span class="nc bnc" id="L676" title="All 2 branches missed.">        for (Integer stage : stagesList) {</span>
           // get shardStage
-<span class="nc bnc" id="L663" title="All 2 branches missed.">          if (!shardStageStatus.containsKey(stage)) {</span>
-<span class="nc" id="L664">            stageStatus = new StageStatus(stage);</span>
-<span class="nc" id="L665">            shardStageStatus.put(stage, stageStatus);</span>
+<span class="nc bnc" id="L678" title="All 2 branches missed.">          if (!shardStageStatus.containsKey(stage)) {</span>
+<span class="nc" id="L679">            stageStatus = new StageStatus(stage);</span>
+<span class="nc" id="L680">            shardStageStatus.put(stage, stageStatus);</span>
           } else {
-<span class="nc" id="L667">            stageStatus = shardStageStatus.get(stage);</span>
+<span class="nc" id="L682">            stageStatus = shardStageStatus.get(stage);</span>
           }
-<span class="nc bnc" id="L669" title="All 2 branches missed.">          if (shardStatus.finishedStages.contains(stage)) {</span>
-<span class="nc" id="L670">            stageStatus.add(true,</span>
-<span class="nc" id="L671">                shardStatus.numberDocumentsFoundStage.get(stage));</span>
+<span class="nc bnc" id="L684" title="All 2 branches missed.">          if (shardStatus.finishedStages.contains(stage)) {</span>
+<span class="nc" id="L685">            stageStatus.add(true,</span>
+<span class="nc" id="L686">                shardStatus.numberDocumentsFoundStage.get(stage));</span>
           } else {
             // create request
-<span class="nc" id="L674">            ModifiableSolrParams solrParams = new ModifiableSolrParams();</span>
-<span class="nc" id="L675">            solrParams.add(CommonParams.QT, shardStatus.mtasHandler);</span>
-<span class="nc" id="L676">            solrParams.add(MtasRequestHandler.PARAM_ACTION,</span>
+<span class="nc" id="L689">            ModifiableSolrParams solrParams = new ModifiableSolrParams();</span>
+<span class="nc" id="L690">            solrParams.add(CommonParams.QT, shardStatus.mtasHandler);</span>
+<span class="nc" id="L691">            solrParams.add(MtasRequestHandler.PARAM_ACTION,</span>
                 MtasRequestHandler.ACTION_STATUS);
-<span class="nc" id="L678">            solrParams.add(MtasRequestHandler.PARAM_KEY,</span>
-<span class="nc" id="L679">                shardStageKeys.get(stage));</span>
+<span class="nc" id="L693">            solrParams.add(MtasRequestHandler.PARAM_KEY,</span>
+<span class="nc" id="L694">                shardStageKeys.get(stage));</span>
             // set solrClient
-<span class="nc bnc" id="L681" title="All 2 branches missed.">            if (solrClient == null) {</span>
-<span class="nc" id="L682">              solrClient = new HttpSolrClient.Builder(shardStatus.location)</span>
-<span class="nc" id="L683">                  .build();</span>
+<span class="nc bnc" id="L696" title="All 2 branches missed.">            if (solrClient == null) {</span>
+<span class="nc" id="L697">              solrClient = new HttpSolrClient.Builder(shardStatus.location)</span>
+<span class="nc" id="L698">                  .build();</span>
             }
             try {
-<span class="nc" id="L686">              response = solrClient.query(solrParams);</span>
+<span class="nc" id="L701">              response = solrClient.query(solrParams);</span>
               // check for response
-<span class="nc" id="L688">              if (response.getResponse()</span>
-<span class="nc bnc" id="L689" title="All 2 branches missed.">                  .findRecursive(MtasSolrComponentStatus.NAME) != null) {</span>
-<span class="nc" id="L690">                shardStatus.numberDocumentsFoundStage.put(stage,</span>
-<span class="nc" id="L691">                    getLong(response.getResponse(),</span>
+<span class="nc" id="L703">              if (response.getResponse()</span>
+<span class="nc bnc" id="L704" title="All 2 branches missed.">                  .findRecursive(MtasSolrComponentStatus.NAME) != null) {</span>
+<span class="nc" id="L705">                shardStatus.numberDocumentsFoundStage.put(stage,</span>
+<span class="nc" id="L706">                    getLong(response.getResponse(),</span>
                         MtasSolrComponentStatus.NAME,
                         NAME_STATUS_DOCUMENT_NUMBER_FOUND));
-<span class="nc" id="L694">                shardStatus.timeStage.put(stage,</span>
-<span class="nc" id="L695">                    getInteger(response.getResponse(),</span>
+<span class="nc" id="L709">                shardStatus.timeStage.put(stage,</span>
+<span class="nc" id="L710">                    getInteger(response.getResponse(),</span>
                         MtasSolrComponentStatus.NAME, NAME_TIME_TOTAL));
-<span class="nc" id="L697">                stageStatus.add(</span>
-<span class="nc" id="L698">                    shardStatus.setFinishedStage(stage,</span>
-<span class="nc" id="L699">                        getBoolean(response.getResponse(),</span>
+<span class="nc" id="L712">                stageStatus.add(</span>
+<span class="nc" id="L713">                    shardStatus.setFinishedStage(stage,</span>
+<span class="nc" id="L714">                        getBoolean(response.getResponse(),</span>
                             MtasSolrComponentStatus.NAME, NAME_FINISHED)),
-<span class="nc" id="L701">                    shardStatus.numberDocumentsFoundStage.get(stage));</span>
-<span class="nc bnc" id="L702" title="All 4 branches missed.">                shardInfoError = shardStatus.setErrorStage(stage,</span>
-<span class="nc" id="L703">                    getString(response.getResponse(),</span>
+<span class="nc" id="L716">                    shardStatus.numberDocumentsFoundStage.get(stage));</span>
+<span class="nc bnc" id="L717" title="All 4 branches missed.">                shardInfoError = shardStatus.setErrorStage(stage,</span>
+<span class="nc" id="L718">                    getString(response.getResponse(),</span>
                         MtasSolrComponentStatus.NAME, NAME_ERROR))
                     || shardInfoError;
-<span class="nc" id="L706">                shardStatus.setAbortStage(stage,</span>
-<span class="nc" id="L707">                    getString(response.getResponse(),</span>
+<span class="nc" id="L721">                shardStatus.setAbortStage(stage,</span>
+<span class="nc" id="L722">                    getString(response.getResponse(),</span>
                         MtasSolrComponentStatus.NAME, NAME_ABORT));
-<span class="nc bnc" id="L709" title="All 2 branches missed.">                if (stage.equals(currentStage)) {</span>
-<span class="nc" id="L710">                  shardStatus.stage = stage;</span>
-<span class="nc" id="L711">                  shardStatus.stageNumberDocumentsFinished = getLong(</span>
-<span class="nc" id="L712">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_DOCUMENT_NUMBER_FINISHED);
-<span class="nc" id="L714">                  shardStatus.stageSubNumberDocumentsFinished = getLongMap(</span>
-<span class="nc" id="L715">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED);
-<span class="nc" id="L717">                  shardStatus.stageSubNumberDocumentsTotal = getLong(</span>
-<span class="nc" id="L718">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL);
-<span class="nc" id="L720">                  shardStatus.stageSubNumberDocumentsFinishedTotal = getLong(</span>
-<span class="nc" id="L721">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL);
-<span class="nc" id="L723">                  shardStatus.stageNumberSegmentsFinished = getInteger(</span>
-<span class="nc" id="L724">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
-<span class="nc" id="L726">                  shardStatus.stageSubNumberSegmentsFinished = getIntegerMap(</span>
+<span class="nc bnc" id="L724" title="All 2 branches missed.">                if (stage.equals(currentStage)) {</span>
+<span class="nc" id="L725">                  shardStatus.stage = stage;</span>
+<span class="nc" id="L726">                  shardStatus.stageNumberDocumentsFinished = getLong(</span>
 <span class="nc" id="L727">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED);
-<span class="nc" id="L729">                  shardStatus.stageSubNumberSegmentsTotal = getInteger(</span>
+                      NAME_STATUS_DOCUMENT_NUMBER_FINISHED);
+<span class="nc" id="L729">                  shardStatus.stageSubNumberDocumentsFinished = getLongMap(</span>
 <span class="nc" id="L730">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL);
-<span class="nc" id="L732">                  shardStatus.stageSubNumberSegmentsFinishedTotal = getInteger(</span>
+                      NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED);
+<span class="nc" id="L732">                  shardStatus.stageSubNumberDocumentsTotal = getLong(</span>
 <span class="nc" id="L733">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
+                      NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL);
+<span class="nc" id="L735">                  shardStatus.stageSubNumberDocumentsFinishedTotal = getLong(</span>
+<span class="nc" id="L736">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
+                      NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL);
+<span class="nc" id="L738">                  shardStatus.stageNumberSegmentsFinished = getInteger(</span>
+<span class="nc" id="L739">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
+                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
+<span class="nc" id="L741">                  shardStatus.stageSubNumberSegmentsFinished = getIntegerMap(</span>
+<span class="nc" id="L742">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
+                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED);
+<span class="nc" id="L744">                  shardStatus.stageSubNumberSegmentsTotal = getInteger(</span>
+<span class="nc" id="L745">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
+                      NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL);
+<span class="nc" id="L747">                  shardStatus.stageSubNumberSegmentsFinishedTotal = getInteger(</span>
+<span class="nc" id="L748">                      response.getResponse(), MtasSolrComponentStatus.NAME,</span>
                       NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
                 }
-<span class="nc bnc" id="L736" title="All 6 branches missed.">              } else if (!finished &amp;&amp; currentStage.equals(stage)</span>
+<span class="nc bnc" id="L751" title="All 6 branches missed.">              } else if (!finished &amp;&amp; currentStage.equals(stage)</span>
                   &amp;&amp; !stageStatus.checked) {
-<span class="nc" id="L738">                stageStatus.finished = false;</span>
+<span class="nc" id="L753">                stageStatus.finished = false;</span>
               }
-<span class="nc" id="L740">            } catch (SolrServerException | IOException e) {</span>
-<span class="nc bnc" id="L741" title="All 2 branches missed.">              shardInfoError = shardInfoError</span>
-<span class="nc bnc" id="L742" title="All 2 branches missed.">                  || shardStatus.setErrorStage(stage, e.getMessage());</span>
-<span class="nc" id="L743">            }</span>
+<span class="nc" id="L755">            } catch (SolrServerException | IOException e) {</span>
+<span class="nc bnc" id="L756" title="All 2 branches missed.">              shardInfoError = shardInfoError</span>
+<span class="nc bnc" id="L757" title="All 2 branches missed.">                  || shardStatus.setErrorStage(stage, e.getMessage());</span>
+<span class="nc" id="L758">            }</span>
           }
-<span class="nc" id="L745">        }</span>
-<span class="nc" id="L746">      }</span>
-<span class="nc bnc" id="L747" title="All 2 branches missed.">      if (!shardInfoError) {</span>
-<span class="nc bnc" id="L748" title="All 2 branches missed.">        for(StageStatus item : shardStageStatus.values()) {</span>
-<span class="nc" id="L749">          item.checked = true;</span>
-<span class="nc" id="L750">        }</span>
-<span class="nc" id="L751">        shardInfoUpdated = true;</span>
-<span class="nc" id="L752">        shardInfoUpdate = System.currentTimeMillis() + expirationTime;</span>
+<span class="nc" id="L760">        }</span>
+<span class="nc" id="L761">      }</span>
+<span class="nc bnc" id="L762" title="All 2 branches missed.">      if (!shardInfoError) {</span>
+<span class="nc bnc" id="L763" title="All 2 branches missed.">        for(StageStatus item : shardStageStatus.values()) {</span>
+<span class="nc" id="L764">          item.checked = true;</span>
+<span class="nc" id="L765">        }</span>
+<span class="nc" id="L766">        shardInfoUpdated = true;</span>
+<span class="nc" id="L767">        shardInfoUpdate = System.currentTimeMillis() + expirationTime;</span>
       } else {
-<span class="nc" id="L754">        shardInfoUpdated = false;</span>
-<span class="nc" id="L755">        shardInfoUpdate = null;</span>
+<span class="nc" id="L769">        shardInfoUpdated = false;</span>
+<span class="nc" id="L770">        shardInfoUpdate = null;</span>
       }
     }
-<span class="nc" id="L758">  }</span>
+<span class="nc" id="L773">  }</span>
 
   
 
@@ -766,7 +781,7 @@ public class MtasSolrStatus {
    */
   @Override
   public String toString() {
-<span class="nc" id="L769">    return createOutput().toString();</span>
+<span class="nc" id="L784">    return createItemOutput().toString();</span>
   }
 
   /**
@@ -794,30 +809,30 @@ public class MtasSolrStatus {
      * @param stage
      *          the stage
      */
-<span class="nc" id="L797">    public StageStatus(int stage) {</span>
-<span class="nc" id="L798">      this.stage = stage;</span>
-<span class="nc" id="L799">      reset();</span>
-<span class="nc" id="L800">    }</span>
+<span class="nc" id="L812">    public StageStatus(int stage) {</span>
+<span class="nc" id="L813">      this.stage = stage;</span>
+<span class="nc" id="L814">      reset();</span>
+<span class="nc" id="L815">    }</span>
 
     /**
      * Reset.
      */
     public void reset() {
-<span class="nc" id="L806">      finished = true;</span>
-<span class="nc" id="L807">      checked = false;</span>
-<span class="nc" id="L808">      numberOfDocumentsFound = 0;</span>
-<span class="nc" id="L809">      numberOfShards = 0;</span>
-<span class="nc" id="L810">    }</span>
+<span class="nc" id="L821">      finished = true;</span>
+<span class="nc" id="L822">      checked = false;</span>
+<span class="nc" id="L823">      numberOfDocumentsFound = 0;</span>
+<span class="nc" id="L824">      numberOfShards = 0;</span>
+<span class="nc" id="L825">    }</span>
 
     public void add(boolean finished, Long numberOfDocumentsFound) {
-<span class="nc bnc" id="L813" title="All 2 branches missed.">      if (!finished) {</span>
-<span class="nc" id="L814">        this.finished = false;</span>
+<span class="nc bnc" id="L828" title="All 2 branches missed.">      if (!finished) {</span>
+<span class="nc" id="L829">        this.finished = false;</span>
       }
-<span class="nc bnc" id="L816" title="All 2 branches missed.">      if (numberOfDocumentsFound != null) {</span>
-<span class="nc" id="L817">        this.numberOfDocumentsFound += numberOfDocumentsFound;</span>
+<span class="nc bnc" id="L831" title="All 2 branches missed.">      if (numberOfDocumentsFound != null) {</span>
+<span class="nc" id="L832">        this.numberOfDocumentsFound += numberOfDocumentsFound;</span>
       }
-<span class="nc" id="L819">      numberOfShards++;</span>
-<span class="nc" id="L820">    }</span>
+<span class="nc" id="L834">      numberOfShards++;</span>
+<span class="nc" id="L835">    }</span>
 
     /**
      * Creates the output.
@@ -825,22 +840,22 @@ public class MtasSolrStatus {
      * @return the simple ordered map
      */
     public SimpleOrderedMap&lt;Object&gt; createOutput() {
-<span class="nc" id="L828">      SimpleOrderedMap&lt;Object&gt; stageOutput = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L829">      stageOutput.add(NAME_FINISHED, finished);</span>
-<span class="nc" id="L830">      stageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,</span>
-<span class="nc" id="L831">          numberOfDocumentsFound);</span>
-<span class="nc" id="L832">      return stageOutput;</span>
+<span class="nc" id="L843">      SimpleOrderedMap&lt;Object&gt; stageOutput = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L844">      stageOutput.add(NAME_FINISHED, finished);</span>
+<span class="nc" id="L845">      stageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,</span>
+<span class="nc" id="L846">          numberOfDocumentsFound);</span>
+<span class="nc" id="L847">      return stageOutput;</span>
     }
     
     public int stage() {
-<span class="nc" id="L836">      return stage;</span>
+<span class="nc" id="L851">      return stage;</span>
     }
   }
 
   /**
    * The Class ShardStatus.
    */
-<span class="fc" id="L843">  public class ShardStatus {</span>
+<span class="fc" id="L858">  public class ShardStatus {</span>
 
     /** The name. */
     public String name;
@@ -852,52 +867,52 @@ public class MtasSolrStatus {
     public String mtasHandler;
 
     /** The number segments total. */
-<span class="fc" id="L855">    public Integer numberSegmentsTotal = null;</span>
+<span class="fc" id="L870">    public Integer numberSegmentsTotal = null;</span>
 
     /** The number documents total. */
-<span class="fc" id="L858">    public Long numberDocumentsTotal = null;</span>
+<span class="fc" id="L873">    public Long numberDocumentsTotal = null;</span>
 
     /** The number documents found stage. */
-<span class="fc" id="L861">    public Map&lt;Integer, Long&gt; numberDocumentsFoundStage = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L876">    public Map&lt;Integer, Long&gt; numberDocumentsFoundStage = new HashMap&lt;&gt;();</span>
 
     /** The error stage. */
-<span class="fc" id="L864">    public Map&lt;Integer, String&gt; errorStage = null;</span>
+<span class="fc" id="L879">    public Map&lt;Integer, String&gt; errorStage = null;</span>
 
     /** The abort stage. */
-<span class="fc" id="L867">    public Map&lt;Integer, String&gt; abortStage = null;</span>
+<span class="fc" id="L882">    public Map&lt;Integer, String&gt; abortStage = null;</span>
 
     /** The stage. */
-<span class="fc" id="L870">    public Integer stage = null;</span>
+<span class="fc" id="L885">    public Integer stage = null;</span>
 
     /** The time stage. */
-<span class="fc" id="L873">    public Map&lt;Integer, Integer&gt; timeStage = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L888">    public Map&lt;Integer, Integer&gt; timeStage = new HashMap&lt;&gt;();</span>
 
     /** The finished stages. */
-<span class="fc" id="L876">    public Set&lt;Integer&gt; finishedStages = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L891">    public Set&lt;Integer&gt; finishedStages = new HashSet&lt;&gt;();</span>
 
     /** The stage number segments finished. */
-<span class="fc" id="L879">    public Integer stageNumberSegmentsFinished = null;</span>
+<span class="fc" id="L894">    public Integer stageNumberSegmentsFinished = null;</span>
 
     /** The stage sub number segments total. */
-<span class="fc" id="L882">    public Integer stageSubNumberSegmentsTotal = null;</span>
+<span class="fc" id="L897">    public Integer stageSubNumberSegmentsTotal = null;</span>
 
     /** The stage sub number segments finished total. */
-<span class="fc" id="L885">    public Integer stageSubNumberSegmentsFinishedTotal = null;</span>
+<span class="fc" id="L900">    public Integer stageSubNumberSegmentsFinishedTotal = null;</span>
 
     /** The stage sub number segments finished. */
-<span class="fc" id="L888">    public Map&lt;String, Integer&gt; stageSubNumberSegmentsFinished = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L903">    public Map&lt;String, Integer&gt; stageSubNumberSegmentsFinished = new HashMap&lt;&gt;();</span>
 
     /** The stage number documents finished. */
-<span class="fc" id="L891">    public Long stageNumberDocumentsFinished = null;</span>
+<span class="fc" id="L906">    public Long stageNumberDocumentsFinished = null;</span>
 
     /** The stage sub number documents total. */
-<span class="fc" id="L894">    public Long stageSubNumberDocumentsTotal = null;</span>
+<span class="fc" id="L909">    public Long stageSubNumberDocumentsTotal = null;</span>
 
     /** The stage sub number documents finished total. */
-<span class="fc" id="L897">    public Long stageSubNumberDocumentsFinishedTotal = null;</span>
+<span class="fc" id="L912">    public Long stageSubNumberDocumentsFinishedTotal = null;</span>
 
     /** The stage sub number documents finished. */
-<span class="fc" id="L900">    public Map&lt;String, Long&gt; stageSubNumberDocumentsFinished = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L915">    public Map&lt;String, Long&gt; stageSubNumberDocumentsFinished = new HashMap&lt;&gt;();</span>
 
     /**
      * Creates the output.
@@ -905,80 +920,80 @@ public class MtasSolrStatus {
      * @return the simple ordered map
      */
     public SimpleOrderedMap&lt;Object&gt; createOutput() {
-<span class="nc" id="L908">      SimpleOrderedMap&lt;Object&gt; shardOutput = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc bnc" id="L909" title="All 2 branches missed.">      if (name != null) {</span>
-<span class="nc" id="L910">        shardOutput.add(NAME_STATUS_NAME, name);</span>
+<span class="nc" id="L923">      SimpleOrderedMap&lt;Object&gt; shardOutput = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc bnc" id="L924" title="All 2 branches missed.">      if (name != null) {</span>
+<span class="nc" id="L925">        shardOutput.add(NAME_STATUS_NAME, name);</span>
       }
-<span class="nc bnc" id="L912" title="All 2 branches missed.">      if (numberSegmentsTotal != null) {</span>
-<span class="nc" id="L913">        shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, numberSegmentsTotal);</span>
+<span class="nc bnc" id="L927" title="All 2 branches missed.">      if (numberSegmentsTotal != null) {</span>
+<span class="nc" id="L928">        shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, numberSegmentsTotal);</span>
       }
-<span class="nc bnc" id="L915" title="All 2 branches missed.">      if (numberDocumentsTotal != null) {</span>
-<span class="nc" id="L916">        shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL,</span>
+<span class="nc bnc" id="L930" title="All 2 branches missed.">      if (numberDocumentsTotal != null) {</span>
+<span class="nc" id="L931">        shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL,</span>
             numberDocumentsTotal);
       }
       // stages
-<span class="nc" id="L920">      Map&lt;Integer, SimpleOrderedMap&lt;Object&gt;&gt; shardStagesOutput = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L921" title="All 2 branches missed.">      for (Integer s : shardStageKeys.keySet()) {</span>
-<span class="nc bnc" id="L922" title="All 2 branches missed.">        if (numberDocumentsFoundStage.containsKey(s)) {</span>
-<span class="nc" id="L923">          SimpleOrderedMap&lt;Object&gt; shardStageOutput = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L924">          shardStageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,</span>
-<span class="nc" id="L925">              numberDocumentsFoundStage.get(s));</span>
-<span class="nc" id="L926">          shardStageOutput.add(NAME_STATUS_TIME, timeStage.get(s));</span>
-<span class="nc" id="L927">          shardStageOutput.add(NAME_STATUS_FINISHED,</span>
-<span class="nc" id="L928">              finishedStages.contains(s));</span>
-<span class="nc bnc" id="L929" title="All 4 branches missed.">          if (errorStage != null &amp;&amp; errorStage.containsKey(s)) {</span>
-<span class="nc" id="L930">            shardStageOutput.add(NAME_STATUS_ERROR, errorStage.get(s));</span>
+<span class="nc" id="L935">      Map&lt;Integer, SimpleOrderedMap&lt;Object&gt;&gt; shardStagesOutput = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L936" title="All 2 branches missed.">      for (Integer s : shardStageKeys.keySet()) {</span>
+<span class="nc bnc" id="L937" title="All 2 branches missed.">        if (numberDocumentsFoundStage.containsKey(s)) {</span>
+<span class="nc" id="L938">          SimpleOrderedMap&lt;Object&gt; shardStageOutput = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L939">          shardStageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,</span>
+<span class="nc" id="L940">              numberDocumentsFoundStage.get(s));</span>
+<span class="nc" id="L941">          shardStageOutput.add(NAME_STATUS_TIME, timeStage.get(s));</span>
+<span class="nc" id="L942">          shardStageOutput.add(NAME_STATUS_FINISHED,</span>
+<span class="nc" id="L943">              finishedStages.contains(s));</span>
+<span class="nc bnc" id="L944" title="All 4 branches missed.">          if (errorStage != null &amp;&amp; errorStage.containsKey(s)) {</span>
+<span class="nc" id="L945">            shardStageOutput.add(NAME_STATUS_ERROR, errorStage.get(s));</span>
           }
-<span class="nc bnc" id="L932" title="All 4 branches missed.">          if (abortStage != null &amp;&amp; abortStage.containsKey(s)) {</span>
-<span class="nc" id="L933">            shardStageOutput.add(NAME_STATUS_ABORT, abortStage.get(s));</span>
+<span class="nc bnc" id="L947" title="All 4 branches missed.">          if (abortStage != null &amp;&amp; abortStage.containsKey(s)) {</span>
+<span class="nc" id="L948">            shardStageOutput.add(NAME_STATUS_ABORT, abortStage.get(s));</span>
           }
-<span class="nc" id="L935">          shardStagesOutput.put(s, shardStageOutput);</span>
+<span class="nc" id="L950">          shardStagesOutput.put(s, shardStageOutput);</span>
         }
-<span class="nc" id="L937">      }</span>
-<span class="nc bnc" id="L938" title="All 2 branches missed.">      if (!shardStagesOutput.isEmpty()) {</span>
-<span class="nc" id="L939">        shardOutput.add(NAME_STATUS_STAGES, shardStagesOutput);</span>
+<span class="nc" id="L952">      }</span>
+<span class="nc bnc" id="L953" title="All 2 branches missed.">      if (!shardStagesOutput.isEmpty()) {</span>
+<span class="nc" id="L954">        shardOutput.add(NAME_STATUS_STAGES, shardStagesOutput);</span>
       }
       // (last) active stage
-<span class="nc bnc" id="L942" title="All 2 branches missed.">      if (stage != null) {</span>
-<span class="nc" id="L943">        SimpleOrderedMap&lt;Object&gt; shardStageOutput = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L944">        shardStageOutput.add(NAME_STATUS_STAGE, stage);</span>
-<span class="nc bnc" id="L945" title="All 2 branches missed.">        if (stageNumberSegmentsFinished != null) {</span>
-<span class="nc" id="L946">          shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L957" title="All 2 branches missed.">      if (stage != null) {</span>
+<span class="nc" id="L958">        SimpleOrderedMap&lt;Object&gt; shardStageOutput = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L959">        shardStageOutput.add(NAME_STATUS_STAGE, stage);</span>
+<span class="nc bnc" id="L960" title="All 2 branches missed.">        if (stageNumberSegmentsFinished != null) {</span>
+<span class="nc" id="L961">          shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED,</span>
               stageNumberSegmentsFinished);
         }
-<span class="nc bnc" id="L949" title="All 2 branches missed.">        if (stageSubNumberSegmentsFinishedTotal != null) {</span>
-<span class="nc" id="L950">          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
+<span class="nc bnc" id="L964" title="All 2 branches missed.">        if (stageSubNumberSegmentsFinishedTotal != null) {</span>
+<span class="nc" id="L965">          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
               stageSubNumberSegmentsFinishedTotal);
         }
-<span class="nc bnc" id="L953" title="All 2 branches missed.">        if (stageSubNumberSegmentsTotal != null) {</span>
-<span class="nc" id="L954">          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL,</span>
+<span class="nc bnc" id="L968" title="All 2 branches missed.">        if (stageSubNumberSegmentsTotal != null) {</span>
+<span class="nc" id="L969">          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL,</span>
               stageSubNumberSegmentsTotal);
         }
-<span class="nc bnc" id="L957" title="All 2 branches missed.">        if (stageSubNumberSegmentsFinished != null</span>
-<span class="nc bnc" id="L958" title="All 2 branches missed.">            &amp;&amp; !stageSubNumberSegmentsFinished.isEmpty()) {</span>
-<span class="nc" id="L959">          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L972" title="All 2 branches missed.">        if (stageSubNumberSegmentsFinished != null</span>
+<span class="nc bnc" id="L973" title="All 2 branches missed.">            &amp;&amp; !stageSubNumberSegmentsFinished.isEmpty()) {</span>
+<span class="nc" id="L974">          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED,</span>
               stageSubNumberSegmentsFinished);
         }
-<span class="nc bnc" id="L962" title="All 2 branches missed.">        if (stageNumberDocumentsFinished != null) {</span>
-<span class="nc" id="L963">          shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L977" title="All 2 branches missed.">        if (stageNumberDocumentsFinished != null) {</span>
+<span class="nc" id="L978">          shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED,</span>
               stageNumberDocumentsFinished);
         }
-<span class="nc bnc" id="L966" title="All 2 branches missed.">        if (stageSubNumberDocumentsTotal != null) {</span>
-<span class="nc" id="L967">          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL,</span>
+<span class="nc bnc" id="L981" title="All 2 branches missed.">        if (stageSubNumberDocumentsTotal != null) {</span>
+<span class="nc" id="L982">          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL,</span>
               stageSubNumberDocumentsTotal);
         }
-<span class="nc bnc" id="L970" title="All 2 branches missed.">        if (stageSubNumberDocumentsFinishedTotal != null) {</span>
-<span class="nc" id="L971">          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
+<span class="nc bnc" id="L985" title="All 2 branches missed.">        if (stageSubNumberDocumentsFinishedTotal != null) {</span>
+<span class="nc" id="L986">          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL,</span>
               stageSubNumberDocumentsFinishedTotal);
         }
-<span class="nc bnc" id="L974" title="All 2 branches missed.">        if (stageSubNumberDocumentsFinished != null</span>
-<span class="nc bnc" id="L975" title="All 2 branches missed.">            &amp;&amp; !stageSubNumberDocumentsFinished.isEmpty()) {</span>
-<span class="nc" id="L976">          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED,</span>
+<span class="nc bnc" id="L989" title="All 2 branches missed.">        if (stageSubNumberDocumentsFinished != null</span>
+<span class="nc bnc" id="L990" title="All 2 branches missed.">            &amp;&amp; !stageSubNumberDocumentsFinished.isEmpty()) {</span>
+<span class="nc" id="L991">          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED,</span>
               stageSubNumberDocumentsFinished);
         }
-<span class="nc" id="L979">        shardOutput.add(NAME_STATUS_LAST, shardStageOutput);</span>
+<span class="nc" id="L994">        shardOutput.add(NAME_STATUS_LAST, shardStageOutput);</span>
       }
-<span class="nc" id="L981">      return shardOutput;</span>
+<span class="nc" id="L996">      return shardOutput;</span>
     }
 
     /**
@@ -991,15 +1006,15 @@ public class MtasSolrStatus {
      * @return true, if successful
      */
     public boolean setFinishedStage(Integer stage, Boolean finished) {
-<span class="nc bnc" id="L994" title="All 2 branches missed.">      if (finished != null) {</span>
-<span class="nc bnc" id="L995" title="All 2 branches missed.">        if (finished) {</span>
-<span class="nc" id="L996">          finishedStages.add(stage);</span>
-<span class="nc" id="L997">          return true;</span>
+<span class="nc bnc" id="L1009" title="All 2 branches missed.">      if (finished != null) {</span>
+<span class="nc bnc" id="L1010" title="All 2 branches missed.">        if (finished) {</span>
+<span class="nc" id="L1011">          finishedStages.add(stage);</span>
+<span class="nc" id="L1012">          return true;</span>
         } else {
-<span class="nc" id="L999">          finishedStages.remove(stage);</span>
+<span class="nc" id="L1014">          finishedStages.remove(stage);</span>
         }
       }
-<span class="nc" id="L1002">      return false;</span>
+<span class="nc" id="L1017">      return false;</span>
     }
 
     /**
@@ -1012,14 +1027,14 @@ public class MtasSolrStatus {
      * @return true, if successful
      */
     public boolean setErrorStage(Integer stage, String error) {
-<span class="nc bnc" id="L1015" title="All 2 branches missed.">      if (error != null) {</span>
-<span class="nc bnc" id="L1016" title="All 2 branches missed.">        if (errorStage == null) {</span>
-<span class="nc" id="L1017">          errorStage = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L1030" title="All 2 branches missed.">      if (error != null) {</span>
+<span class="nc bnc" id="L1031" title="All 2 branches missed.">        if (errorStage == null) {</span>
+<span class="nc" id="L1032">          errorStage = new HashMap&lt;&gt;();</span>
         }
-<span class="nc" id="L1019">        errorStage.put(stage, error);</span>
-<span class="nc" id="L1020">        return true;</span>
+<span class="nc" id="L1034">        errorStage.put(stage, error);</span>
+<span class="nc" id="L1035">        return true;</span>
       } else {
-<span class="nc" id="L1022">        return false;</span>
+<span class="nc" id="L1037">        return false;</span>
       }
     }
 
@@ -1033,14 +1048,14 @@ public class MtasSolrStatus {
      * @return true, if successful
      */
     public boolean setAbortStage(Integer stage, String abort) {
-<span class="nc bnc" id="L1036" title="All 2 branches missed.">      if (abort != null) {</span>
-<span class="nc bnc" id="L1037" title="All 2 branches missed.">        if (abortStage == null) {</span>
-<span class="nc" id="L1038">          abortStage = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L1051" title="All 2 branches missed.">      if (abort != null) {</span>
+<span class="nc bnc" id="L1052" title="All 2 branches missed.">        if (abortStage == null) {</span>
+<span class="nc" id="L1053">          abortStage = new HashMap&lt;&gt;();</span>
         }
-<span class="nc" id="L1040">        abortStage.put(stage, abort);</span>
-<span class="nc" id="L1041">        return true;</span>
+<span class="nc" id="L1055">        abortStage.put(stage, abort);</span>
+<span class="nc" id="L1056">        return true;</span>
       } else {
-<span class="nc" id="L1043">        return false;</span>
+<span class="nc" id="L1058">        return false;</span>
       }
     }
 

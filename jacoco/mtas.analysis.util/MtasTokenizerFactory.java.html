@@ -119,6 +119,10 @@ public class MtasTokenizerFactory extends TokenizerFactory
 <span class="fc" id="L119">    return tokenizer;</span>
   }
 
+  public MtasTokenizer create(String configuration) throws IOException {
+<span class="nc" id="L123">    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);</span>
+  }
+  
   /**
    * Creates the.
    *
@@ -126,8 +130,12 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @return the mtas tokenizer
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer create(String configuration) throws IOException {
-<span class="fc" id="L130">    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);</span>
+  public MtasTokenizer create(String configuration, String defaultConfiguration) throws IOException {
+<span class="fc" id="L134">    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration, defaultConfiguration);</span>
+  }
+  
+  public MtasTokenizer create(AttributeFactory factory, String configuration) throws IOException {
+<span class="fc" id="L138">    return create(factory, configuration, null);</span>
   }
 
   /**
@@ -138,41 +146,44 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @return the mtas tokenizer
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public MtasTokenizer create(AttributeFactory factory, String configuration)
+  public MtasTokenizer create(AttributeFactory factory, String configuration, String defaultConfiguration)
       throws IOException {
-<span class="pc bpc" id="L143" title="1 of 4 branches missed.">    if (configs != null &amp;&amp; configs.size() &gt; 0) {</span>
-<span class="pc bpc" id="L144" title="3 of 4 branches missed.">      if (configuration == null &amp;&amp; defaultArgument == null) {</span>
-<span class="nc" id="L145">        throw new IOException(&quot;no (default)configuration&quot;);</span>
-<span class="pc bpc" id="L146" title="1 of 2 branches missed.">      } else if (configuration == null) {</span>
-<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (configs.get(defaultArgument) != null) {</span>
-<span class="nc" id="L148">          return new MtasTokenizer(factory, configs.get(defaultArgument));</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    if(defaultConfiguration==null) {</span>
+<span class="fc" id="L152">      defaultConfiguration = defaultArgument;</span>
+    }
+<span class="pc bpc" id="L154" title="1 of 4 branches missed.">    if (configs != null &amp;&amp; configs.size() &gt; 0) {</span>
+<span class="pc bpc" id="L155" title="3 of 4 branches missed.">      if (configuration == null &amp;&amp; defaultConfiguration == null) {</span>
+<span class="nc" id="L156">        throw new IOException(&quot;no (default)configuration&quot;);</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">      } else if (configuration == null) {</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (configs.get(defaultConfiguration) != null) {</span>
+<span class="nc" id="L159">          return new MtasTokenizer(factory, configs.get(defaultConfiguration));</span>
         } else {
-<span class="nc" id="L150">          throw new IOException(</span>
-              &quot;default configuration &quot; + defaultArgument + &quot; not available&quot;);
+<span class="nc" id="L161">          throw new IOException(</span>
+              &quot;default configuration &quot; + defaultConfiguration + &quot; not available&quot;);
         }
       } else {
-<span class="fc" id="L154">        MtasConfiguration config = configs.get(configuration);</span>
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (config == null) {</span>
-<span class="nc bnc" id="L156" title="All 2 branches missed.">          if (defaultArgument != null) {</span>
-<span class="nc bnc" id="L157" title="All 2 branches missed.">            if (configs.get(defaultArgument) != null) {</span>
-<span class="nc" id="L158">              return new MtasTokenizer(factory, configs.get(defaultArgument));</span>
+<span class="fc" id="L165">        MtasConfiguration config = configs.get(configuration);</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">        if (config == null) {</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">          if (defaultConfiguration != null) {</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            if (configs.get(defaultConfiguration) != null) {</span>
+<span class="nc" id="L169">              return new MtasTokenizer(factory, configs.get(defaultConfiguration));</span>
             } else {
-<span class="nc" id="L160">              throw new IOException(&quot;configuration &quot; + configuration</span>
-                  + &quot; not found and default configuration &quot; + defaultArgument
+<span class="nc" id="L171">              throw new IOException(&quot;configuration &quot; + configuration</span>
+                  + &quot; not found and default configuration &quot; + defaultConfiguration
                   + &quot; not available&quot;);
             }
           } else {
-<span class="nc" id="L165">            throw new IOException(&quot;configuration &quot; + configuration</span>
+<span class="nc" id="L176">            throw new IOException(&quot;configuration &quot; + configuration</span>
                 + &quot; not available and no default configuration&quot;);
           }
         } else {
-<span class="fc" id="L169">          return new MtasTokenizer(factory, config);</span>
+<span class="fc" id="L180">          return new MtasTokenizer(factory, config);</span>
         }
       }
-<span class="pc bpc" id="L172" title="1 of 2 branches missed.">    } else if (config != null) {</span>
-<span class="fc" id="L173">      return new MtasTokenizer(factory, config);</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">    } else if (config != null) {</span>
+<span class="fc" id="L184">      return new MtasTokenizer(factory, config);</span>
     } else {
-<span class="nc" id="L175">      throw new IOException(&quot;no configuration&quot;);</span>
+<span class="nc" id="L186">      throw new IOException(&quot;no configuration&quot;);</span>
     }
   }
 
@@ -183,42 +194,42 @@ public class MtasTokenizerFactory extends TokenizerFactory
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private void init(ResourceLoader resourceLoader) throws IOException {
-<span class="pc bpc" id="L186" title="2 of 4 branches missed.">    if (config == null &amp;&amp; configs == null) {</span>
-<span class="fc bfc" id="L187" title="All 2 branches covered.">      if (resourceLoader == null) {</span>
-<span class="fc" id="L188">        return;</span>
-<span class="pc bpc" id="L189" title="3 of 6 branches missed.">      } else if (configFileArgument == null &amp;&amp; configArgument == null &amp;&amp; analyzerArgument==null) {</span>
-<span class="nc" id="L190">        throw new IOException(&quot;no configuration&quot;);</span>
+<span class="pc bpc" id="L197" title="2 of 4 branches missed.">    if (config == null &amp;&amp; configs == null) {</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">      if (resourceLoader == null) {</span>
+<span class="fc" id="L199">        return;</span>
+<span class="pc bpc" id="L200" title="3 of 6 branches missed.">      } else if (configFileArgument == null &amp;&amp; configArgument == null &amp;&amp; analyzerArgument==null) {</span>
+<span class="nc" id="L201">        throw new IOException(&quot;no configuration&quot;);</span>
       } else {
-<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (configFileArgument != null) {</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (configFileArgument != null) {</span>
           try {
-<span class="fc" id="L194">            config = MtasConfiguration.readConfiguration(</span>
-<span class="fc" id="L195">                resourceLoader.openResource(configFileArgument));</span>
-<span class="nc" id="L196">          } catch (IOException e) {</span>
-<span class="nc" id="L197">            throw new IOException(</span>
+<span class="fc" id="L205">            config = MtasConfiguration.readConfiguration(</span>
+<span class="fc" id="L206">                resourceLoader.openResource(configFileArgument));</span>
+<span class="nc" id="L207">          } catch (IOException e) {</span>
+<span class="nc" id="L208">            throw new IOException(</span>
                 &quot;Problem loading configuration from &quot; + configFileArgument, e);
-<span class="fc" id="L199">          }</span>
+<span class="fc" id="L210">          }</span>
         }
-<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (configArgument != null) {</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (configArgument != null) {</span>
           try {
-<span class="fc" id="L203">            configs = MtasConfiguration.readMtasTokenizerConfigurations(</span>
+<span class="fc" id="L214">            configs = MtasConfiguration.readMtasTokenizerConfigurations(</span>
                 resourceLoader, configArgument);
-<span class="nc" id="L205">          } catch (IOException e) {</span>
-<span class="nc" id="L206">            throw new IOException(</span>
+<span class="nc" id="L216">          } catch (IOException e) {</span>
+<span class="nc" id="L217">            throw new IOException(</span>
                 &quot;Problem loading configurations from &quot; + configArgument, e);
-<span class="fc" id="L208">          }</span>
+<span class="fc" id="L219">          }</span>
         }
-<span class="pc bpc" id="L210" title="1 of 2 branches missed.">        if (analyzerArgument != null) {</span>
-<span class="nc" id="L211">          configs = null;</span>
-<span class="nc" id="L212">          config = new MtasConfiguration();</span>
-<span class="nc" id="L213">          MtasConfiguration subConfig = new MtasConfiguration();</span>
-<span class="nc" id="L214">          subConfig.name = &quot;parser&quot;;</span>
-<span class="nc" id="L215">          subConfig.attributes.put(&quot;name&quot;, analyzerArgument);</span>
-<span class="nc" id="L216">          subConfig.attributes.put(ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);</span>
-<span class="nc" id="L217">          config.children.add(subConfig);</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">        if (analyzerArgument != null) {</span>
+<span class="nc" id="L222">          configs = null;</span>
+<span class="nc" id="L223">          config = new MtasConfiguration();</span>
+<span class="nc" id="L224">          MtasConfiguration subConfig = new MtasConfiguration();</span>
+<span class="nc" id="L225">          subConfig.name = &quot;parser&quot;;</span>
+<span class="nc" id="L226">          subConfig.attributes.put(&quot;name&quot;, analyzerArgument);</span>
+<span class="nc" id="L227">          subConfig.attributes.put(ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);</span>
+<span class="nc" id="L228">          config.children.add(subConfig);</span>
         }
       }
     }
-<span class="fc" id="L221">  }</span>
+<span class="fc" id="L232">  }</span>
 
   /*
    * (non-Javadoc)
@@ -228,8 +239,8 @@ public class MtasTokenizerFactory extends TokenizerFactory
    */
   @Override
   public void inform(ResourceLoader loader) throws IOException {
-<span class="fc" id="L231">    init(loader);</span>
-<span class="fc" id="L232">  }</span>
+<span class="fc" id="L242">    init(loader);</span>
+<span class="fc" id="L243">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

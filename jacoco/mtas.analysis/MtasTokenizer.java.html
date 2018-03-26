@@ -230,26 +230,25 @@ public final class MtasTokenizer extends Tokenizer {
 <span class="fc" id="L230">    tokenCollection = null;</span>
     try {
 <span class="fc" id="L232">      Constructor&lt;?&gt; c = Class.forName(parserName)</span>
-<span class="fc" id="L233">          .getDeclaredConstructor(MtasConfiguration.class);</span>
-      // try {
-<span class="fc" id="L235">      Object p = c.newInstance(parserConfiguration);</span>
-<span class="pc bpc" id="L236" title="1 of 2 branches missed.">      if (p instanceof MtasParser) {</span>
-<span class="fc" id="L237">        MtasParser parser = (MtasParser) p;</span>
-<span class="fc" id="L238">        tokenCollection = parser.createTokenCollection(reader);</span>
-<span class="fc" id="L239">        return;</span>
+<span class="fc" id="L233">          .getDeclaredConstructor(MtasConfiguration.class);      </span>
+<span class="fc" id="L234">      Object p = c.newInstance(parserConfiguration);</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">      if (p instanceof MtasParser) {</span>
+<span class="fc" id="L236">        MtasParser parser = (MtasParser) p;</span>
+<span class="fc" id="L237">        tokenCollection = parser.createTokenCollection(reader);</span>
+<span class="fc" id="L238">        return;</span>
       } else {
-<span class="nc" id="L241">        throw new MtasConfigException(&quot;no instance of MtasParser&quot;);</span>
+<span class="nc" id="L240">        throw new MtasConfigException(&quot;no instance of MtasParser&quot;);</span>
       }
-<span class="nc" id="L243">    } catch (MtasParserException e) {</span>
-<span class="nc" id="L244">      log.debug(e);</span>
-<span class="nc" id="L245">      tokenCollection = new MtasTokenCollection();</span>
-<span class="nc" id="L246">      throw new MtasParserException(e.getMessage());</span>
-<span class="nc" id="L247">    } catch (NoSuchMethodException | InvocationTargetException</span>
+<span class="nc" id="L242">    } catch (MtasParserException e) {</span>
+<span class="nc" id="L243">      log.debug(e);</span>
+<span class="nc" id="L244">      tokenCollection = new MtasTokenCollection();</span>
+<span class="nc" id="L245">      throw new MtasParserException(e.getMessage());</span>
+<span class="nc" id="L246">    } catch (NoSuchMethodException | InvocationTargetException</span>
         | IllegalAccessException | ClassNotFoundException
         | InstantiationException e) {
-<span class="nc" id="L250">      log.debug(e);</span>
-<span class="nc" id="L251">      throw new MtasConfigException(</span>
-<span class="nc" id="L252">          e.getClass().getName() + &quot; : '&quot; + e.getMessage() + &quot;'&quot;);</span>
+<span class="nc" id="L249">      log.debug(e);</span>
+<span class="nc" id="L250">      throw new MtasConfigException(</span>
+<span class="nc" id="L251">          e.getClass().getName() + &quot; : '&quot; + e.getMessage() + &quot;'&quot;);</span>
     }
 
   }
@@ -262,15 +261,15 @@ public final class MtasTokenizer extends Tokenizer {
   private void readConfigurationFile(final String configFile) {
     InputStream is;
     try {
-<span class="nc" id="L265">      is = new FileInputStream(configFile);</span>
-<span class="nc" id="L266">      processConfiguration(MtasConfiguration.readConfiguration(is));</span>
-<span class="nc" id="L267">      is.close();</span>
-<span class="nc" id="L268">    } catch (FileNotFoundException e) {</span>
-<span class="nc" id="L269">      log.error(&quot;Couldn't find &quot; + configFile, e);</span>
-<span class="nc" id="L270">    } catch (IOException e) {</span>
-<span class="nc" id="L271">      log.error(&quot;Couldn't read &quot; + configFile, e);</span>
-<span class="nc" id="L272">    }</span>
-<span class="nc" id="L273">  }</span>
+<span class="nc" id="L264">      is = new FileInputStream(configFile);</span>
+<span class="nc" id="L265">      processConfiguration(MtasConfiguration.readConfiguration(is));</span>
+<span class="nc" id="L266">      is.close();</span>
+<span class="nc" id="L267">    } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L268">      log.error(&quot;Couldn't find &quot; + configFile, e);</span>
+<span class="nc" id="L269">    } catch (IOException e) {</span>
+<span class="nc" id="L270">      log.error(&quot;Couldn't read &quot; + configFile, e);</span>
+<span class="nc" id="L271">    }</span>
+<span class="nc" id="L272">  }</span>
 
   /**
    * Process configuration.
@@ -280,41 +279,41 @@ public final class MtasTokenizer extends Tokenizer {
    */
   private void processConfiguration(final MtasConfiguration config)
       throws IOException {
-<span class="fc" id="L283">    HashMap&lt;String, Integer&gt; indexEncodingMapper = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L284">    indexEncodingMapper.put(&quot;payload&quot;, MtasPayloadEncoder.ENCODE_PAYLOAD);</span>
-<span class="fc" id="L285">    indexEncodingMapper.put(&quot;offset&quot;, MtasPayloadEncoder.ENCODE_OFFSET);</span>
-<span class="fc" id="L286">    indexEncodingMapper.put(&quot;realoffset&quot;, MtasPayloadEncoder.ENCODE_REALOFFSET);</span>
-<span class="fc" id="L287">    indexEncodingMapper.put(&quot;parent&quot;, MtasPayloadEncoder.ENCODE_PARENT);</span>
+<span class="fc" id="L282">    HashMap&lt;String, Integer&gt; indexEncodingMapper = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L283">    indexEncodingMapper.put(&quot;payload&quot;, MtasPayloadEncoder.ENCODE_PAYLOAD);</span>
+<span class="fc" id="L284">    indexEncodingMapper.put(&quot;offset&quot;, MtasPayloadEncoder.ENCODE_OFFSET);</span>
+<span class="fc" id="L285">    indexEncodingMapper.put(&quot;realoffset&quot;, MtasPayloadEncoder.ENCODE_REALOFFSET);</span>
+<span class="fc" id="L286">    indexEncodingMapper.put(&quot;parent&quot;, MtasPayloadEncoder.ENCODE_PARENT);</span>
     // process
-<span class="pc bpc" id="L289" title="1 of 2 branches missed.">    if (config != null) {</span>
-<span class="fc bfc" id="L290" title="All 2 branches covered.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
-<span class="fc bfc" id="L291" title="All 2 branches covered.">        if (config.children.get(i).name.equals(CONFIGURATION_MTAS_INDEX)) {</span>
-<span class="fc" id="L292">          MtasConfiguration index = config.children.get(i);</span>
-<span class="fc bfc" id="L293" title="All 2 branches covered.">          for (int j = 0; j &lt; index.children.size(); j++) {</span>
-<span class="pc bpc" id="L294" title="1 of 2 branches missed.">            if (indexEncodingMapper.containsKey(index.children.get(j).name)) {</span>
-<span class="fc" id="L295">              String value = index.children.get(j).attributes.get(CONFIGURATION_MTAS_INDEX_ATTRIBUTE);</span>
-<span class="pc bpc" id="L296" title="1 of 4 branches missed.">              if ((value.equals(VALUE_TRUE)) || (value.equals(VALUE_1))) {</span>
-<span class="fc" id="L297">                encodingFlags |= indexEncodingMapper</span>
-<span class="fc" id="L298">                    .get(index.children.get(j).name);</span>
-<span class="pc bpc" id="L299" title="3 of 4 branches missed.">              } else if ((value.equals(VALUE_FALSE)) || (value.equals(VALUE_0))) {</span>
-<span class="fc" id="L300">                encodingFlags &amp;= ~indexEncodingMapper</span>
-<span class="fc" id="L301">                    .get(index.children.get(j).name);</span>
+<span class="pc bpc" id="L288" title="1 of 2 branches missed.">    if (config != null) {</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">      for (int i = 0; i &lt; config.children.size(); i++) {</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        if (config.children.get(i).name.equals(CONFIGURATION_MTAS_INDEX)) {</span>
+<span class="fc" id="L291">          MtasConfiguration index = config.children.get(i);</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">          for (int j = 0; j &lt; index.children.size(); j++) {</span>
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">            if (indexEncodingMapper.containsKey(index.children.get(j).name)) {</span>
+<span class="fc" id="L294">              String value = index.children.get(j).attributes.get(CONFIGURATION_MTAS_INDEX_ATTRIBUTE);</span>
+<span class="pc bpc" id="L295" title="1 of 4 branches missed.">              if ((value.equals(VALUE_TRUE)) || (value.equals(VALUE_1))) {</span>
+<span class="fc" id="L296">                encodingFlags |= indexEncodingMapper</span>
+<span class="fc" id="L297">                    .get(index.children.get(j).name);</span>
+<span class="pc bpc" id="L298" title="3 of 4 branches missed.">              } else if ((value.equals(VALUE_FALSE)) || (value.equals(VALUE_0))) {</span>
+<span class="fc" id="L299">                encodingFlags &amp;= ~indexEncodingMapper</span>
+<span class="fc" id="L300">                    .get(index.children.get(j).name);</span>
               }
             }
           }
-<span class="pc bpc" id="L305" title="1 of 2 branches missed.">        } else if (config.children.get(i).name.equals(CONFIGURATION_MTAS_PARSER)) {</span>
-<span class="pc bpc" id="L306" title="1 of 2 branches missed.">          if (config.children.get(i).attributes.containsKey(CONFIGURATION_MTAS_PARSER_ATTRIBUTE)) {</span>
-<span class="fc" id="L307">            parserName = config.children.get(i).attributes.get(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);</span>
-<span class="fc" id="L308">            parserConfiguration = config.children.get(i);</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">        } else if (config.children.get(i).name.equals(CONFIGURATION_MTAS_PARSER)) {</span>
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">          if (config.children.get(i).attributes.containsKey(CONFIGURATION_MTAS_PARSER_ATTRIBUTE)) {</span>
+<span class="fc" id="L306">            parserName = config.children.get(i).attributes.get(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);</span>
+<span class="fc" id="L307">            parserConfiguration = config.children.get(i);</span>
           } else {
-<span class="nc" id="L310">            throw new IOException(&quot;no parser configuration&quot;);</span>
+<span class="nc" id="L309">            throw new IOException(&quot;no parser configuration&quot;);</span>
           }
         }
       }
     } else {
-<span class="nc" id="L315">      throw new IOException(&quot;no (valid) configuration&quot;);</span>
+<span class="nc" id="L314">      throw new IOException(&quot;no (valid) configuration&quot;);</span>
     }
-<span class="fc" id="L317">  }</span>
+<span class="fc" id="L316">  }</span>
 
   /*
    * (non-Javadoc)
@@ -323,14 +322,14 @@ public final class MtasTokenizer extends Tokenizer {
    */
   @Override
   public boolean equals(Object obj) {
-<span class="nc bnc" id="L326" title="All 2 branches missed.">    if (this == obj)</span>
-<span class="nc" id="L327">      return true;</span>
-<span class="nc bnc" id="L328" title="All 2 branches missed.">    if (obj == null)</span>
-<span class="nc" id="L329">      return false;</span>
-<span class="nc bnc" id="L330" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
-<span class="nc" id="L331">      return false;</span>
-<span class="nc" id="L332">    final MtasTokenizer that = (MtasTokenizer) obj;</span>
-<span class="nc" id="L333">    return super.equals(that);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">    if (this == obj)</span>
+<span class="nc" id="L326">      return true;</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">    if (obj == null)</span>
+<span class="nc" id="L328">      return false;</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">    if (getClass() != obj.getClass())</span>
+<span class="nc" id="L330">      return false;</span>
+<span class="nc" id="L331">    final MtasTokenizer that = (MtasTokenizer) obj;</span>
+<span class="nc" id="L332">    return super.equals(that);</span>
   }
 
   /*
@@ -340,7 +339,7 @@ public final class MtasTokenizer extends Tokenizer {
    */
   @Override
   public int hashCode() {
-<span class="nc" id="L343">    return super.hashCode();</span>
+<span class="nc" id="L342">    return super.hashCode();</span>
   }
 
 }

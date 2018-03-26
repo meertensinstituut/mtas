@@ -308,41 +308,41 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             // create reader
 <span class="fc" id="L309">            Reader reader = new StringReader(storedValue);</span>
             // configuration
-<span class="fc" id="L311">            String configuration = config.fieldTypeDefaultConfiguration</span>
-<span class="fc" id="L312">                .get(fieldType);</span>
-<span class="pc bpc" id="L313" title="1 of 2 branches missed.">            if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {</span>
-<span class="fc" id="L314">              Object obj = doc.getFieldValue(</span>
-<span class="fc" id="L315">                  config.fieldTypeConfigurationFromField.get(fieldType));</span>
-<span class="pc bpc" id="L316" title="1 of 2 branches missed.">              if (obj != null) {</span>
-<span class="fc" id="L317">                configuration = obj.toString();</span>
+<span class="fc" id="L311">            String configuration = null;</span>
+<span class="fc" id="L312">            String defaultConfiguration = config.fieldTypeDefaultConfiguration</span>
+<span class="fc" id="L313">                .get(fieldType);</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {</span>
+<span class="fc" id="L315">              Object obj = doc.getFieldValue(</span>
+<span class="fc" id="L316">                  config.fieldTypeConfigurationFromField.get(fieldType));</span>
+<span class="pc bpc" id="L317" title="1 of 2 branches missed.">              if (obj != null) {</span>
+<span class="fc" id="L318">                configuration = obj.toString();</span>
               }
             }
             // charFilterFactories
-<span class="pc bpc" id="L321" title="1 of 2 branches missed.">            if (charFilterFactories != null) {</span>
-<span class="fc bfc" id="L322" title="All 2 branches covered.">              for (CharFilterFactory charFilterFactory : charFilterFactories) {</span>
-<span class="pc bpc" id="L323" title="1 of 2 branches missed.">                if (charFilterFactory instanceof MtasCharFilterFactory) {</span>
-<span class="fc" id="L324">                  reader = ((MtasCharFilterFactory) charFilterFactory)</span>
-<span class="fc" id="L325">                      .create(reader, configuration);</span>
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">            if (charFilterFactories != null) {</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">              for (CharFilterFactory charFilterFactory : charFilterFactories) {</span>
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">                if (charFilterFactory instanceof MtasCharFilterFactory) {</span>
+<span class="fc" id="L325">                  reader = ((MtasCharFilterFactory) charFilterFactory)</span>
+<span class="fc" id="L326">                      .create(reader, configuration, defaultConfiguration);</span>
                 } else {
-<span class="nc" id="L327">                  reader = charFilterFactory.create(reader);</span>
+<span class="nc" id="L328">                  reader = charFilterFactory.create(reader);</span>
                 }
-<span class="pc bpc" id="L329" title="1 of 2 branches missed.">                if (reader == null) {</span>
-<span class="nc" id="L330">                  throw new IOException(</span>
-<span class="nc" id="L331">                      &quot;charFilter &quot; + charFilterFactory.getClass().getName()</span>
+<span class="pc bpc" id="L330" title="1 of 2 branches missed.">                if (reader == null) {</span>
+<span class="nc" id="L331">                  throw new IOException(</span>
+<span class="nc" id="L332">                      &quot;charFilter &quot; + charFilterFactory.getClass().getName()</span>
                           + &quot; returns null&quot;);
                 }
               }
             }
-
-<span class="fc" id="L337">            sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);</span>
+            
+<span class="fc" id="L338">            sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);</span>
 
             // tokenizerFactory
-<span class="fc" id="L340">            result = new MtasUpdateRequestProcessorResultWriter(storedValue);</span>
-<span class="fc" id="L341">            int numberOfPositions = 0;</span>
-<span class="fc" id="L342">            int numberOfTokens = 0;</span>
-<span class="fc" id="L343">            Set&lt;String&gt; prefixes = new HashSet&lt;&gt;();</span>
-            try {
-<span class="fc" id="L345">              MtasTokenizer tokenizer = tokenizerFactory.create(configuration);</span>
+<span class="fc" id="L341">            result = new MtasUpdateRequestProcessorResultWriter(storedValue);</span>
+<span class="fc" id="L342">            int numberOfPositions = 0;</span>
+<span class="fc" id="L343">            int numberOfTokens = 0;</span>
+<span class="fc" id="L344">            Set&lt;String&gt; prefixes = new HashSet&lt;&gt;();</span>
+<span class="pc" id="L345">            try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {              </span>
 <span class="fc" id="L346">              tokenizer.setReader(sizeReader);</span>
 <span class="fc" id="L347">              tokenizer.reset();</span>
               // attributes
@@ -395,7 +395,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 <span class="pc bpc" id="L395" title="1 of 2 branches missed.">              if (result.getTokenNumber() &gt; 0) {</span>
 <span class="fc" id="L396">                doc.addField(field, result.getFileName());</span>
               }
-            } finally {
+<span class="pc bpc" id="L398" title="6 of 8 branches missed.">            } finally {</span>
 <span class="pc" id="L399">              result.close();</span>
 <span class="fc" id="L400">            }</span>
             // update size
@@ -507,8 +507,8 @@ class MtasUpdateRequestProcessorSizeReader extends Reader {
   }
 
   public void close() throws IOException {
-<span class="nc" id="L510">    reader.close();</span>
-<span class="nc" id="L511">  }</span>
+<span class="fc" id="L510">    reader.close();</span>
+<span class="fc" id="L511">  }</span>
 
   public long getTotalReadSize() {
 <span class="fc" id="L514">    return totalReadSize;</span>

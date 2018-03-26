@@ -202,15 +202,15 @@ public class MtasRequestHandler extends RequestHandlerBase {
 <span class="nc bnc" id="L202" title="All 2 branches missed.">      } else if (action.equals(ACTION_RUNNING)) {</span>
 <span class="nc" id="L203">        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,</span>
             false);
-<span class="nc" id="L205">        rsp.add(ACTION_RUNNING, running.createOutput(shardRequests));</span>
+<span class="nc" id="L205">        rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests));</span>
 <span class="nc bnc" id="L206" title="All 2 branches missed.">      } else if (action.equals(ACTION_HISTORY)) {</span>
 <span class="nc" id="L207">        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,</span>
             false);
-<span class="nc" id="L209">        rsp.add(ACTION_HISTORY, history.createOutput(shardRequests));</span>
+<span class="nc" id="L209">        rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests));</span>
 <span class="nc bnc" id="L210" title="All 2 branches missed.">      } else if (action.equals(ACTION_ERROR)) {</span>
 <span class="nc" id="L211">        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,</span>
             false);
-<span class="nc" id="L213">        rsp.add(ACTION_ERROR, error.createOutput(shardRequests));</span>
+<span class="nc" id="L213">        rsp.add(ACTION_ERROR, error.createListOutput(shardRequests));</span>
 <span class="nc bnc" id="L214" title="All 2 branches missed.">      } else if (action.equals(ACTION_STATUS)) {</span>
 <span class="nc" id="L215">        String key = req.getParams().get(PARAM_KEY, null);</span>
 <span class="nc" id="L216">        String abort = req.getParams().get(PARAM_ABORT, null);</span>
@@ -221,7 +221,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
 <span class="nc bnc" id="L221" title="All 4 branches missed.">          if (abort != null &amp;&amp; !solrStatus.finished()) {</span>
 <span class="nc" id="L222">            solrStatus.setError(abort);</span>
           }
-<span class="nc" id="L224">          rsp.add(ACTION_STATUS, solrStatus.createOutput());</span>
+<span class="nc" id="L224">          rsp.add(ACTION_STATUS, solrStatus.createItemOutput());</span>
         } else {
 <span class="nc" id="L226">          rsp.add(ACTION_STATUS, null);</span>
         }

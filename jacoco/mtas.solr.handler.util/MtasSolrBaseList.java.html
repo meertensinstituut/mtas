@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.solr.common.util.SimpleOrderedMap;
 
 /**
- * The Class MtasSolrList.
+ * The Class MtasSolrBaseList.
  */
 public abstract class MtasSolrBaseList {
 
@@ -31,13 +31,22 @@ public abstract class MtasSolrBaseList {
   /** The Constant NAME_LIST. */
   private final static String NAME_LIST = &quot;list&quot;;
 
-  /** The Constant NAME_SIZE. */
-  private final static String NAME_SIZE = &quot;size&quot;;
+  /** The Constant NAME_SIZE_TOTAL. */
+  private final static String NAME_SIZE_TOTAL = &quot;sizeTotal&quot;;
 
-<span class="fc" id="L37">  public MtasSolrBaseList() {</span>
-<span class="fc" id="L38">    list = Collections.synchronizedList(new ArrayList&lt;MtasSolrStatus&gt;());</span>
-<span class="fc" id="L39">    index = Collections.synchronizedMap(new HashMap&lt;&gt;());</span>
-<span class="fc" id="L40">  }</span>
+  /** The Constant NAME_SIZE_NORMAL. */
+  private final static String NAME_SIZE_NORMAL = &quot;sizeNormal&quot;;
+
+  /** The Constant NAME_SIZE_SHARDREQUESTS. */
+  private final static String NAME_SIZE_SHARDREQUESTS = &quot;sizeShardRequests&quot;;
+
+  /**
+   * Instantiates a new mtas solr base list.
+   */
+<span class="fc" id="L46">  public MtasSolrBaseList() {</span>
+<span class="fc" id="L47">    list = Collections.synchronizedList(new ArrayList&lt;MtasSolrStatus&gt;());</span>
+<span class="fc" id="L48">    index = Collections.synchronizedMap(new HashMap&lt;&gt;());</span>
+<span class="fc" id="L49">  }</span>
 
   /**
    * Gets the.
@@ -47,7 +56,7 @@ public abstract class MtasSolrBaseList {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public final MtasSolrStatus get(String key) throws IOException {
-<span class="nc" id="L50">    return index.get(Objects.requireNonNull(key, &quot;no key provided&quot;));</span>
+<span class="nc" id="L59">    return index.get(Objects.requireNonNull(key, &quot;no key provided&quot;));</span>
   }
 
   /**
@@ -57,23 +66,27 @@ public abstract class MtasSolrBaseList {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public void add(MtasSolrStatus status) throws IOException {
-<span class="fc" id="L60">    Objects.requireNonNull(status);</span>
-<span class="pc bpc" id="L61" title="1 of 2 branches missed.">    if (enabled) {</span>
-<span class="fc" id="L62">      list.add(status);</span>
-<span class="pc bpc" id="L63" title="1 of 2 branches missed.">      if (!index.containsKey(status.key())) {</span>
-<span class="fc" id="L64">        index.put(status.key(), status);</span>
-<span class="fc" id="L65">        garbageCollect();</span>
+<span class="fc" id="L69">    Objects.requireNonNull(status);</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">    if (enabled) {</span>
+<span class="fc" id="L71">      list.add(status);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">      if (!index.containsKey(status.key())) {</span>
+<span class="fc" id="L73">        index.put(status.key(), status);</span>
+<span class="fc" id="L74">        garbageCollect();</span>
       } else {
-<span class="nc" id="L67">        garbageCollect();</span>
-        //retry
-<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (!index.containsKey(status.key())) {</span>
-<span class="nc" id="L70">          index.put(status.key(), status);</span>
-        } else {          
-<span class="nc" id="L72">          throw new IOException(&quot;key &quot;+status.key()+&quot; already exists in&quot;);</span>
-        }          
-      }            
+<span class="nc" id="L76">        garbageCollect();</span>
+        // retry
+<span class="nc" id="L78">        MtasSolrStatus oldStatus = index.get(status.key());</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (oldStatus == null) {</span>
+<span class="nc" id="L80">          index.put(status.key(), status);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        } else if(oldStatus.finished()) {</span>
+<span class="nc" id="L82">          remove(oldStatus);</span>
+<span class="nc" id="L83">          index.put(status.key(), status);</span>
+        } else {
+<span class="nc" id="L85">          throw new IOException(&quot;key &quot; + status.key() + &quot; already exists&quot;);</span>
+        }
+      }
     }
-<span class="fc" id="L76">  }</span>
+<span class="fc" id="L89">  }</span>
 
   /**
    * Removes the.
@@ -81,10 +94,10 @@ public abstract class MtasSolrBaseList {
    * @param status the status
    */
   public final void remove(MtasSolrStatus status) {
-<span class="fc" id="L84">    Objects.requireNonNull(status);</span>
-<span class="fc" id="L85">    list.remove(status);</span>
-<span class="fc" id="L86">    index.remove(status.key());</span>
-<span class="fc" id="L87">  }</span>
+<span class="fc" id="L97">    Objects.requireNonNull(status);</span>
+<span class="fc" id="L98">    list.remove(status);</span>
+<span class="fc" id="L99">    index.remove(status.key());</span>
+<span class="fc" id="L100">  }</span>
 
   /**
    * Garbage collect.
@@ -95,9 +108,9 @@ public abstract class MtasSolrBaseList {
    * Reset.
    */
   public final void reset() {
-<span class="nc" id="L98">    list.clear();</span>
-<span class="nc" id="L99">    index.clear();</span>
-<span class="nc" id="L100">  }</span>
+<span class="nc" id="L111">    list.clear();</span>
+<span class="nc" id="L112">    index.clear();</span>
+<span class="nc" id="L113">  }</span>
 
   /**
    * Update key.
@@ -106,17 +119,17 @@ public abstract class MtasSolrBaseList {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public final void updateKey(String key) throws IOException {
-<span class="nc" id="L109">    Objects.requireNonNull(key, &quot;old key required&quot;);</span>
-<span class="nc bnc" id="L110" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
-<span class="nc" id="L111">      MtasSolrStatus status = index.get(key);</span>
-<span class="nc" id="L112">      index.remove(key);</span>
-<span class="nc bnc" id="L113" title="All 2 branches missed.">      if (!index.containsKey(status.key())) {</span>
-<span class="nc" id="L114">        index.put(status.key(), status);</span>
+<span class="nc" id="L122">    Objects.requireNonNull(key, &quot;old key required&quot;);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    if (index.containsKey(key)) {</span>
+<span class="nc" id="L124">      MtasSolrStatus status = index.get(key);</span>
+<span class="nc" id="L125">      index.remove(key);</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">      if (!index.containsKey(status.key())) {</span>
+<span class="nc" id="L127">        index.put(status.key(), status);</span>
       } else {
-<span class="nc" id="L116">        throw new IOException(&quot;key already exists&quot;);</span>
+<span class="nc" id="L129">        throw new IOException(&quot;key already exists&quot;);</span>
       }
     }
-<span class="nc" id="L119">  }</span>
+<span class="nc" id="L132">  }</span>
 
   /**
    * Sets the enabled.
@@ -124,11 +137,11 @@ public abstract class MtasSolrBaseList {
    * @param flag the new enabled
    */
   public final void setEnabled(boolean flag) {
-<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (enabled != flag) {</span>
-<span class="nc" id="L128">      reset();</span>
-<span class="nc" id="L129">      enabled = flag;</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">    if (enabled != flag) {</span>
+<span class="nc" id="L141">      reset();</span>
+<span class="nc" id="L142">      enabled = flag;</span>
     }
-<span class="nc" id="L131">  }</span>
+<span class="nc" id="L144">  }</span>
 
   /**
    * Enabled.
@@ -136,37 +149,84 @@ public abstract class MtasSolrBaseList {
    * @return true, if successful
    */
   public final boolean enabled() {
-<span class="nc" id="L139">    return enabled;</span>
+<span class="nc" id="L152">    return enabled;</span>
   }
 
   /**
-   * Creates the output.
+   * Creates the list output.
    *
    * @param shardRequests the shard requests
    * @return the simple ordered map
    */
-  public SimpleOrderedMap&lt;Object&gt; createOutput(boolean shardRequests) {
-<span class="nc" id="L149">    garbageCollect();</span>
-<span class="nc" id="L150">    SimpleOrderedMap&lt;Object&gt; output = new SimpleOrderedMap&lt;&gt;();</span>
-<span class="nc" id="L151">    output.add(NAME_ENABLED, enabled());</span>
-<span class="nc" id="L152">    output.add(NAME_ENABLED, true);</span>
-<span class="nc" id="L153">    int n = list.size();</span>
-<span class="nc" id="L154">    output.add(NAME_SIZE, n);</span>
-<span class="nc bnc" id="L155" title="All 2 branches missed.">    if (n &gt; 0) {</span>
+  public SimpleOrderedMap&lt;Object&gt; createListOutput(boolean shardRequests) {
+<span class="nc" id="L162">    garbageCollect();</span>
+<span class="nc" id="L163">    SimpleOrderedMap&lt;Object&gt; output = new SimpleOrderedMap&lt;&gt;();</span>
+<span class="nc" id="L164">    output.add(NAME_ENABLED, enabled());</span>
+<span class="nc" id="L165">    output.add(NAME_ENABLED, true);</span>
+<span class="nc" id="L166">    int numberTotal = list.size();</span>
+<span class="nc" id="L167">    ListData listData = new ListData();</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">    if (numberTotal &gt; 0) {</span>
       // create list
-<span class="nc" id="L157">      List&lt;SimpleOrderedMap&lt;Object&gt;&gt; outputList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L158">      list.stream()</span>
-<span class="nc" id="L159">          .collect(Collectors.collectingAndThen(Collectors.toList(), lst -&gt; {</span>
-<span class="nc" id="L160">            Collections.reverse(lst);</span>
-<span class="nc" id="L161">            return lst.stream();</span>
-<span class="nc" id="L162">          })).forEach((item) -&gt; {</span>
-<span class="nc bnc" id="L163" title="All 4 branches missed.">            if (shardRequests || !item.shardRequest()) {</span>
-<span class="nc" id="L164">              outputList.add(item.createOutput());</span>
+<span class="nc" id="L170">      list.stream()</span>
+<span class="nc" id="L171">          .collect(Collectors.collectingAndThen(Collectors.toList(), lst -&gt; {</span>
+<span class="nc" id="L172">            Collections.reverse(lst);</span>
+<span class="nc" id="L173">            return lst.stream();</span>
+<span class="nc" id="L174">          })).forEach((item) -&gt; {</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            if (item.shardRequest()) {</span>
+<span class="nc" id="L176">              listData.addShardRequest();</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">              if (shardRequests) {</span>
+<span class="nc" id="L178">                listData.outputList.add(item.createItemOutput());</span>
+              }
+            } else {
+<span class="nc" id="L181">              listData.addNormal();</span>
+<span class="nc" id="L182">              listData.outputList.add(item.createItemOutput());</span>
             }
-<span class="nc" id="L166">          });</span>
-<span class="nc" id="L167">      output.add(NAME_LIST, outputList);</span>
+<span class="nc" id="L184">          });</span>
     }
-<span class="nc" id="L169">    return output;</span>
+<span class="nc" id="L186">    output.add(NAME_SIZE_TOTAL, numberTotal);</span>
+<span class="nc" id="L187">    output.add(NAME_SIZE_NORMAL, listData.numberNormal);</span>
+<span class="nc" id="L188">    output.add(NAME_SIZE_SHARDREQUESTS, listData.numberShardRequests);</span>
+<span class="nc" id="L189">    output.add(NAME_LIST, listData.outputList);</span>
+<span class="nc" id="L190">    return output;</span>
+  }
+
+  /**
+   * The Class ListData.
+   */
+  static class ListData {
+    
+    /** The output list. */
+    private List&lt;SimpleOrderedMap&lt;Object&gt;&gt; outputList;
+    
+    /** The number normal. */
+    private int numberNormal;
+    
+    /** The number shard requests. */
+    private int numberShardRequests;
+
+    /**
+     * Instantiates a new list data.
+     */
+<span class="nc" id="L210">    public ListData() {</span>
+<span class="nc" id="L211">      outputList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L212">      numberNormal = 0;</span>
+<span class="nc" id="L213">      numberShardRequests = 0;</span>
+<span class="nc" id="L214">    }</span>
+
+    /**
+     * Adds the normal.
+     */
+    public void addNormal() {
+<span class="nc" id="L220">      numberNormal++;</span>
+<span class="nc" id="L221">    }</span>
+
+    /**
+     * Adds the shard request.
+     */
+    public void addShardRequest() {
+<span class="nc" id="L227">      numberShardRequests++;</span>
+<span class="nc" id="L228">    }</span>
+
   }
 
 }

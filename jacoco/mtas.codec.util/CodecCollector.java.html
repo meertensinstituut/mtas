@@ -1829,13 +1829,13 @@ public class CodecCollector {
 <span class="fc" id="L1829">                    occurencesInCurrentDocument.add(hit);</span>
                   } else {
 <span class="fc" id="L1831">                    occurencesSum.put(hitKey, occurencesSum.get(hitKey) + 1);</span>
-<span class="fc bfc" id="L1832" title="All 2 branches covered.">                    if (!occurencesInCurrentDocument.contains(hitKey)) {</span>
-<span class="pc bpc" id="L1833" title="1 of 2 branches missed.">                      if (occurencesN.containsKey(hitKey)) {</span>
-<span class="fc" id="L1834">                        occurencesN.put(hitKey, occurencesN.get(hitKey) + 1);</span>
+<span class="pc bpc" id="L1832" title="1 of 2 branches missed.">                    if (!occurencesInCurrentDocument.contains(hitKey)) {</span>
+<span class="nc bnc" id="L1833" title="All 2 branches missed.">                      if (occurencesN.containsKey(hitKey)) {</span>
+<span class="nc" id="L1834">                        occurencesN.put(hitKey, occurencesN.get(hitKey) + 1);</span>
                       } else {
 <span class="nc" id="L1836">                        occurencesN.put(hitKey, 1);</span>
                       }
-<span class="fc" id="L1838">                      occurencesInCurrentDocument.add(hitKey);</span>
+<span class="nc" id="L1838">                      occurencesInCurrentDocument.add(hitKey);</span>
                     }
                   }
 <span class="fc" id="L1841">                }</span>
@@ -1844,8 +1844,8 @@ public class CodecCollector {
 <span class="fc" id="L1844">                    int tmpNumber = occurencesN.get(groupHit);</span>
 <span class="fc" id="L1845">                    maximumNumberOfDocuments = Math</span>
 <span class="fc" id="L1846">                        .max(maximumNumberOfDocuments, tmpNumber);</span>
-<span class="fc bfc" id="L1847" title="All 2 branches covered.">                    if (tmpNumber &gt; boundaryMinimumNumberOfDocuments) {</span>
-<span class="fc" id="L1848">                      administrationOccurrences.add(groupHit);</span>
+<span class="pc bpc" id="L1847" title="1 of 2 branches missed.">                    if (tmpNumber &gt; boundaryMinimumNumberOfDocuments) {</span>
+<span class="nc" id="L1848">                      administrationOccurrences.add(groupHit);</span>
                     }
 <span class="fc" id="L1850">                  }</span>
                   // collect spans
@@ -3619,17 +3619,20 @@ public class CodecCollector {
           }
         }
 <span class="nc" id="L3621">      }</span>
-//      try {
-//        System.out.println(&quot;ACCEPT: &quot; + term.utf8ToString()+&quot; (&quot;+termVector.distances.size()+&quot;)&quot;);
-//        for (SubComponentDistance item : termVector.distances) {
-//          System.out.println(
-//              item.hashCode() + &quot;\t&quot; + term.utf8ToString()+&quot;\t&quot;+item.getDistance().getClass().getName()+&quot;\t&quot;+item.getDistance().minimum+&quot;\t&quot;+item.getDistance().maximum
-//                  + &quot;\t&quot; + item.getDistance().validate(term)+&quot;\t&quot;+item.getDistance().compute(term));
-//        }
-//      } catch (Exception e) {
-//        System.out.println(&quot;PROBLEEM: &quot;+e.getMessage());
-//      }
-<span class="nc" id="L3632">      return true;</span>
+      // try {
+      // System.out.println(&quot;ACCEPT: &quot; + term.utf8ToString()+&quot;
+      // (&quot;+termVector.distances.size()+&quot;)&quot;);
+      // for (SubComponentDistance item : termVector.distances) {
+      // System.out.println(
+      // item.hashCode() + &quot;\t&quot; +
+      // term.utf8ToString()+&quot;\t&quot;+item.getDistance().getClass().getName()+&quot;\t&quot;+item.getDistance().minimum+&quot;\t&quot;+item.getDistance().maximum
+      // + &quot;\t&quot; +
+      // item.getDistance().validate(term)+&quot;\t&quot;+item.getDistance().compute(term));
+      // }
+      // } catch (Exception e) {
+      // System.out.println(&quot;PROBLEEM: &quot;+e.getMessage());
+      // }
+<span class="nc" id="L3635">      return true;</span>
     }
   }
 
@@ -3644,33 +3647,33 @@ public class CodecCollector {
    */
   private static boolean needSecondRoundTermvector(
       List&lt;ComponentTermVector&gt; termVectorList) throws IOException {
-<span class="fc" id="L3647">    boolean needSecondRound = false;</span>
-<span class="fc bfc" id="L3648" title="All 2 branches covered.">    for (ComponentTermVector termVector : termVectorList) {</span>
-<span class="fc bfc" id="L3649" title="All 4 branches covered.">      if (!termVector.full &amp;&amp; termVector.list == null) {</span>
+<span class="fc" id="L3650">    boolean needSecondRound = false;</span>
+<span class="fc bfc" id="L3651" title="All 2 branches covered.">    for (ComponentTermVector termVector : termVectorList) {</span>
+<span class="fc bfc" id="L3652" title="All 4 branches covered.">      if (!termVector.full &amp;&amp; termVector.list == null) {</span>
         boolean doCheck;
-<span class="fc bfc" id="L3651" title="All 2 branches covered.">        doCheck = termVector.subComponentFunction.dataCollector.segmentRegistration != null</span>
+<span class="fc bfc" id="L3654" title="All 2 branches covered.">        doCheck = termVector.subComponentFunction.dataCollector.segmentRegistration != null</span>
             &amp;&amp; (termVector.subComponentFunction.dataCollector.segmentRegistration
-<span class="fc bfc" id="L3653" title="All 2 branches covered.">                .equals(MtasDataCollector.SEGMENT_SORT_ASC)</span>
+<span class="fc bfc" id="L3656" title="All 2 branches covered.">                .equals(MtasDataCollector.SEGMENT_SORT_ASC)</span>
                 || termVector.subComponentFunction.dataCollector.segmentRegistration
-<span class="pc bpc" id="L3655" title="2 of 4 branches missed.">                    .equals(MtasDataCollector.SEGMENT_SORT_DESC))</span>
+<span class="pc bpc" id="L3658" title="2 of 4 branches missed.">                    .equals(MtasDataCollector.SEGMENT_SORT_DESC))</span>
             &amp;&amp; termVector.number &gt; 0;
-<span class="fc bfc" id="L3657" title="All 2 branches covered.">        doCheck |= termVector.subComponentFunction.dataCollector.segmentRegistration != null</span>
+<span class="fc bfc" id="L3660" title="All 2 branches covered.">        doCheck |= termVector.subComponentFunction.dataCollector.segmentRegistration != null</span>
             &amp;&amp; (termVector.subComponentFunction.dataCollector.segmentRegistration
-<span class="pc bpc" id="L3659" title="1 of 2 branches missed.">                .equals(MtasDataCollector.SEGMENT_BOUNDARY_ASC)</span>
+<span class="pc bpc" id="L3662" title="1 of 2 branches missed.">                .equals(MtasDataCollector.SEGMENT_BOUNDARY_ASC)</span>
                 || termVector.subComponentFunction.dataCollector.segmentRegistration
-<span class="pc bpc" id="L3661" title="3 of 4 branches missed.">                    .equals(MtasDataCollector.SEGMENT_BOUNDARY_DESC))</span>
+<span class="pc bpc" id="L3664" title="3 of 4 branches missed.">                    .equals(MtasDataCollector.SEGMENT_BOUNDARY_DESC))</span>
             &amp;&amp; termVector.number &gt; 0;
-<span class="fc bfc" id="L3663" title="All 2 branches covered.">        if (doCheck) {</span>
-<span class="fc" id="L3664">          termVector.subComponentFunction.dataCollector.recomputeSegmentKeys();</span>
-<span class="fc" id="L3665">          if (!termVector.subComponentFunction.dataCollector</span>
-<span class="fc bfc" id="L3666" title="All 2 branches covered.">              .checkExistenceNecessaryKeys()) {</span>
-<span class="fc" id="L3667">            needSecondRound = true;</span>
+<span class="fc bfc" id="L3666" title="All 2 branches covered.">        if (doCheck) {</span>
+<span class="fc" id="L3667">          termVector.subComponentFunction.dataCollector.recomputeSegmentKeys();</span>
+<span class="fc" id="L3668">          if (!termVector.subComponentFunction.dataCollector</span>
+<span class="fc bfc" id="L3669" title="All 2 branches covered.">              .checkExistenceNecessaryKeys()) {</span>
+<span class="fc" id="L3670">            needSecondRound = true;</span>
           }
-<span class="fc" id="L3669">          termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();</span>
+<span class="fc" id="L3672">          termVector.subComponentFunction.dataCollector.reduceToSegmentKeys();</span>
         }
       }
-<span class="fc" id="L3672">    }</span>
-<span class="fc" id="L3673">    return needSecondRound;</span>
+<span class="fc" id="L3675">    }</span>
+<span class="fc" id="L3676">    return needSecondRound;</span>
   }
 
   /**
@@ -3687,10 +3690,10 @@ public class CodecCollector {
     /**
      * Instantiates a new termvector number basic.
      */
-<span class="fc" id="L3690">    TermvectorNumberBasic() {</span>
-<span class="fc" id="L3691">      valueSum = new long[] { 0 };</span>
-<span class="fc" id="L3692">      docNumber = 0;</span>
-<span class="fc" id="L3693">    }</span>
+<span class="fc" id="L3693">    TermvectorNumberBasic() {</span>
+<span class="fc" id="L3694">      valueSum = new long[] { 0 };</span>
+<span class="fc" id="L3695">      docNumber = 0;</span>
+<span class="fc" id="L3696">    }</span>
   }
 
   /**
@@ -3713,11 +3716,11 @@ public class CodecCollector {
      * @param maxSize
      *          the max size
      */
-<span class="fc" id="L3716">    TermvectorNumberFull(int maxSize) {</span>
-<span class="fc" id="L3717">      args = new long[maxSize];</span>
-<span class="fc" id="L3718">      positions = new int[maxSize];</span>
-<span class="fc" id="L3719">      docNumber = 0;</span>
-<span class="fc" id="L3720">    }</span>
+<span class="fc" id="L3719">    TermvectorNumberFull(int maxSize) {</span>
+<span class="fc" id="L3720">      args = new long[maxSize];</span>
+<span class="fc" id="L3721">      positions = new int[maxSize];</span>
+<span class="fc" id="L3722">      docNumber = 0;</span>
+<span class="fc" id="L3723">    }</span>
   }
 
   /**
@@ -3739,10 +3742,10 @@ public class CodecCollector {
      * @param force
      *          the force
      */
-<span class="fc" id="L3742">    RegisterStatus(long sortValue, boolean force) {</span>
-<span class="fc" id="L3743">      this.sortValue = sortValue;</span>
-<span class="fc" id="L3744">      this.force = force;</span>
-<span class="fc" id="L3745">    }</span>
+<span class="fc" id="L3745">    RegisterStatus(long sortValue, boolean force) {</span>
+<span class="fc" id="L3746">      this.sortValue = sortValue;</span>
+<span class="fc" id="L3747">      this.force = force;</span>
+<span class="fc" id="L3748">    }</span>
   }
 
   /**
@@ -3771,132 +3774,132 @@ public class CodecCollector {
       ComponentTermVector termVector, TermvectorNumberBasic number,
       Integer termNumberMaximum, Integer segmentNumber, boolean forceAccept,
       String[] mutableKey) throws IOException {
-<span class="fc" id="L3774">    long value = termVector.subComponentFunction.parserFunction</span>
-<span class="fc" id="L3775">        .getValueLong(number.valueSum, 0);</span>
-<span class="fc" id="L3776">    long sortValue = 0;</span>
-<span class="fc" id="L3777">    if (termVector.subComponentFunction.sortType</span>
-<span class="fc bfc" id="L3778" title="All 2 branches covered.">        .equals(CodecUtil.STATS_TYPE_SUM)) {</span>
-<span class="fc" id="L3779">      sortValue = value;</span>
-<span class="fc" id="L3780">    } else if (termVector.subComponentFunction.sortType</span>
-<span class="pc bpc" id="L3781" title="1 of 2 branches missed.">        .equals(CodecUtil.STATS_TYPE_N)) {</span>
-<span class="nc" id="L3782">      sortValue = number.docNumber;</span>
+<span class="fc" id="L3777">    long value = termVector.subComponentFunction.parserFunction</span>
+<span class="fc" id="L3778">        .getValueLong(number.valueSum, 0);</span>
+<span class="fc" id="L3779">    long sortValue = 0;</span>
+<span class="fc" id="L3780">    if (termVector.subComponentFunction.sortType</span>
+<span class="fc bfc" id="L3781" title="All 2 branches covered.">        .equals(CodecUtil.STATS_TYPE_SUM)) {</span>
+<span class="fc" id="L3782">      sortValue = value;</span>
+<span class="fc" id="L3783">    } else if (termVector.subComponentFunction.sortType</span>
+<span class="pc bpc" id="L3784" title="1 of 2 branches missed.">        .equals(CodecUtil.STATS_TYPE_N)) {</span>
+<span class="nc" id="L3785">      sortValue = number.docNumber;</span>
     }
-<span class="fc" id="L3784">    boolean addItem = false;</span>
-<span class="fc" id="L3785">    boolean addItemForced = false;</span>
-<span class="fc" id="L3786">    MtasDataCollector&lt;Long, ?&gt; dataCollector = (MtasDataCollector&lt;Long, ?&gt;) termVector.subComponentFunction.dataCollector;</span>
+<span class="fc" id="L3787">    boolean addItem = false;</span>
+<span class="fc" id="L3788">    boolean addItemForced = false;</span>
+<span class="fc" id="L3789">    MtasDataCollector&lt;Long, ?&gt; dataCollector = (MtasDataCollector&lt;Long, ?&gt;) termVector.subComponentFunction.dataCollector;</span>
     // sort on term
-<span class="fc bfc" id="L3788" title="All 2 branches covered.">    if (termVector.subComponentFunction.sortType.equals(CodecUtil.SORT_TERM)) {</span>
-<span class="fc" id="L3789">      addItem = true;</span>
-<span class="fc" id="L3790">      addItemForced = true;</span>
+<span class="fc bfc" id="L3791" title="All 2 branches covered.">    if (termVector.subComponentFunction.sortType.equals(CodecUtil.SORT_TERM)) {</span>
+<span class="fc" id="L3792">      addItem = true;</span>
+<span class="fc" id="L3793">      addItemForced = true;</span>
       // sort on sum or n
-<span class="fc" id="L3792">    } else if (termVector.subComponentFunction.sortType</span>
-<span class="pc bpc" id="L3793" title="1 of 2 branches missed.">        .equals(CodecUtil.STATS_TYPE_SUM)</span>
+<span class="fc" id="L3795">    } else if (termVector.subComponentFunction.sortType</span>
+<span class="pc bpc" id="L3796" title="1 of 2 branches missed.">        .equals(CodecUtil.STATS_TYPE_SUM)</span>
         || termVector.subComponentFunction.sortType
-<span class="nc bnc" id="L3795" title="All 2 branches missed.">            .equals(CodecUtil.STATS_TYPE_N)) {</span>
+<span class="nc bnc" id="L3798" title="All 2 branches missed.">            .equals(CodecUtil.STATS_TYPE_N)) {</span>
       // always accept
-<span class="fc bfc" id="L3797" title="All 2 branches covered.">      if (forceAccept) {</span>
-<span class="fc" id="L3798">        addItem = true;</span>
-<span class="fc" id="L3799">        addItemForced = addItem;</span>
+<span class="fc bfc" id="L3800" title="All 2 branches covered.">      if (forceAccept) {</span>
+<span class="fc" id="L3801">        addItem = true;</span>
+<span class="fc" id="L3802">        addItemForced = addItem;</span>
         // check boundary
-<span class="pc bpc" id="L3801" title="1 of 2 branches missed.">      } else if (termVector.boundaryRegistration) {</span>
-<span class="nc" id="L3802">        addItem = dataCollector.validateSegmentBoundary(sortValue);</span>
-<span class="nc bnc" id="L3803" title="All 2 branches missed.">        if (addItem) {</span>
-<span class="nc bnc" id="L3804" title="All 2 branches missed.">          if (mutableKey[0] == null) {</span>
-<span class="nc" id="L3805">            mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
+<span class="pc bpc" id="L3804" title="1 of 2 branches missed.">      } else if (termVector.boundaryRegistration) {</span>
+<span class="nc" id="L3805">        addItem = dataCollector.validateSegmentBoundary(sortValue);</span>
+<span class="nc bnc" id="L3806" title="All 2 branches missed.">        if (addItem) {</span>
+<span class="nc bnc" id="L3807" title="All 2 branches missed.">          if (mutableKey[0] == null) {</span>
+<span class="nc" id="L3808">            mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
           }
-<span class="nc" id="L3807">          String segmentStatus = dataCollector.validateSegmentValue(</span>
-<span class="nc" id="L3808">              mutableKey[0], sortValue, termNumberMaximum, segmentNumber,</span>
+<span class="nc" id="L3810">          String segmentStatus = dataCollector.validateSegmentValue(</span>
+<span class="nc" id="L3811">              mutableKey[0], sortValue, termNumberMaximum, segmentNumber,</span>
               false);
-<span class="nc bnc" id="L3810" title="All 2 branches missed.">          if (segmentStatus != null) {</span>
-<span class="nc bnc" id="L3811" title="All 2 branches missed.">            if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {</span>
-<span class="nc" id="L3812">              addItemForced = true;</span>
+<span class="nc bnc" id="L3813" title="All 2 branches missed.">          if (segmentStatus != null) {</span>
+<span class="nc bnc" id="L3814" title="All 2 branches missed.">            if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {</span>
+<span class="nc" id="L3815">              addItemForced = true;</span>
             }
           } else {
             // shouldn't happen
           }
-<span class="nc" id="L3817">        }</span>
+<span class="nc" id="L3820">        }</span>
         // no boundary
       } else {
-<span class="fc" id="L3820">        String segmentStatus = dataCollector.validateSegmentValue(sortValue,</span>
-<span class="fc" id="L3821">            termNumberMaximum, segmentNumber);</span>
-<span class="fc bfc" id="L3822" title="All 2 branches covered.">        if (segmentStatus != null) {</span>
+<span class="fc" id="L3823">        String segmentStatus = dataCollector.validateSegmentValue(sortValue,</span>
+<span class="fc" id="L3824">            termNumberMaximum, segmentNumber);</span>
+<span class="fc bfc" id="L3825" title="All 2 branches covered.">        if (segmentStatus != null) {</span>
           boolean possibleAddItem;
-<span class="fc bfc" id="L3824" title="All 2 branches covered.">          if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY_OR_NEW)) {</span>
-<span class="fc" id="L3825">            possibleAddItem = true;</span>
-<span class="fc" id="L3826">          } else if (segmentStatus</span>
-<span class="pc bpc" id="L3827" title="1 of 2 branches missed.">              .equals(MtasDataCollector.SEGMENT_POSSIBLE_KEY)) {</span>
-<span class="fc" id="L3828">            mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
-<span class="fc" id="L3829">            segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],</span>
-<span class="fc" id="L3830">                sortValue, termNumberMaximum, segmentNumber, true);</span>
-<span class="fc bfc" id="L3831" title="All 2 branches covered.">            if (segmentStatus != null) {</span>
-<span class="fc" id="L3832">              possibleAddItem = true;</span>
+<span class="fc bfc" id="L3827" title="All 2 branches covered.">          if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY_OR_NEW)) {</span>
+<span class="fc" id="L3828">            possibleAddItem = true;</span>
+<span class="fc" id="L3829">          } else if (segmentStatus</span>
+<span class="pc bpc" id="L3830" title="1 of 2 branches missed.">              .equals(MtasDataCollector.SEGMENT_POSSIBLE_KEY)) {</span>
+<span class="fc" id="L3831">            mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
+<span class="fc" id="L3832">            segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],</span>
+<span class="fc" id="L3833">                sortValue, termNumberMaximum, segmentNumber, true);</span>
+<span class="fc bfc" id="L3834" title="All 2 branches covered.">            if (segmentStatus != null) {</span>
+<span class="fc" id="L3835">              possibleAddItem = true;</span>
             } else {
-<span class="fc" id="L3834">              possibleAddItem = false;</span>
+<span class="fc" id="L3837">              possibleAddItem = false;</span>
             }
           } else {
             // should never happen?
-<span class="nc" id="L3838">            possibleAddItem = false;</span>
+<span class="nc" id="L3841">            possibleAddItem = false;</span>
           }
           // further checks, passed initial
-<span class="fc bfc" id="L3841" title="All 2 branches covered.">          if (possibleAddItem) {</span>
-<span class="fc bfc" id="L3842" title="All 2 branches covered.">            if (mutableKey[0] == null) {</span>
-<span class="fc" id="L3843">              mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
+<span class="fc bfc" id="L3844" title="All 2 branches covered.">          if (possibleAddItem) {</span>
+<span class="fc bfc" id="L3845" title="All 2 branches covered.">            if (mutableKey[0] == null) {</span>
+<span class="fc" id="L3846">              mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
             }
-<span class="fc" id="L3845">            segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],</span>
-<span class="fc" id="L3846">                sortValue, termNumberMaximum, segmentNumber, false);</span>
-<span class="pc bpc" id="L3847" title="1 of 2 branches missed.">            if (segmentStatus != null) {</span>
-<span class="fc" id="L3848">              addItem = true;</span>
-<span class="fc bfc" id="L3849" title="All 2 branches covered.">              if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {</span>
-<span class="fc" id="L3850">                addItemForced = true;</span>
+<span class="fc" id="L3848">            segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],</span>
+<span class="fc" id="L3849">                sortValue, termNumberMaximum, segmentNumber, false);</span>
+<span class="pc bpc" id="L3850" title="1 of 2 branches missed.">            if (segmentStatus != null) {</span>
+<span class="fc" id="L3851">              addItem = true;</span>
+<span class="fc bfc" id="L3852" title="All 2 branches covered.">              if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {</span>
+<span class="fc" id="L3853">                addItemForced = true;</span>
               }
             }
           }
-<span class="fc" id="L3854">        } else {</span>
-<span class="fc" id="L3855">          addItem = false;</span>
+<span class="fc" id="L3857">        } else {</span>
+<span class="fc" id="L3858">          addItem = false;</span>
         }
-<span class="fc" id="L3857">      }</span>
+<span class="fc" id="L3860">      }</span>
       // don't sort?
     } else {
-<span class="nc" id="L3860">      addItem = false;</span>
+<span class="nc" id="L3863">      addItem = false;</span>
     }
-<span class="fc bfc" id="L3862" title="All 2 branches covered.">    if (addItem) {</span>
-<span class="fc" id="L3863">      boolean computeFull = false;</span>
-<span class="fc bfc" id="L3864" title="All 2 branches covered.">      if (mutableKey[0] == null) {</span>
-<span class="fc" id="L3865">        mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
+<span class="fc bfc" id="L3865" title="All 2 branches covered.">    if (addItem) {</span>
+<span class="fc" id="L3866">      boolean computeFull = false;</span>
+<span class="fc bfc" id="L3867" title="All 2 branches covered.">      if (mutableKey[0] == null) {</span>
+<span class="fc" id="L3868">        mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
       }
       // check dataCollector type
-<span class="fc" id="L3868">      if (termVector.subComponentFunction.statsType</span>
-<span class="fc bfc" id="L3869" title="All 2 branches covered.">          .equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="fc" id="L3870">        dataCollector.add(mutableKey[0], value, number.docNumber);</span>
+<span class="fc" id="L3871">      if (termVector.subComponentFunction.statsType</span>
+<span class="fc bfc" id="L3872" title="All 2 branches covered.">          .equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="fc" id="L3873">        dataCollector.add(mutableKey[0], value, number.docNumber);</span>
       } else {
-<span class="fc" id="L3872">        computeFull = true;</span>
+<span class="fc" id="L3875">        computeFull = true;</span>
       }
       // functions
-<span class="pc bpc" id="L3875" title="1 of 2 branches missed.">      if (termVector.functions != null) {</span>
-<span class="pc bpc" id="L3876" title="1 of 2 branches missed.">        for (SubComponentFunction function : termVector.functions) {</span>
-<span class="nc bnc" id="L3877" title="All 2 branches missed.">          if (function.parserFunction.sumRule()</span>
-<span class="nc bnc" id="L3878" title="All 2 branches missed.">              &amp;&amp; !function.parserFunction.needPositions()</span>
-<span class="nc bnc" id="L3879" title="All 2 branches missed.">              &amp;&amp; function.statsType.equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="nc bnc" id="L3880" title="All 2 branches missed.">            if (function.dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
-<span class="nc" id="L3881">              long valueFunction = function.parserFunction</span>
-<span class="nc" id="L3882">                  .getValueLong(number.valueSum, 0);</span>
-<span class="nc" id="L3883">              function.dataCollector.add(mutableKey[0], valueFunction,</span>
+<span class="pc bpc" id="L3878" title="1 of 2 branches missed.">      if (termVector.functions != null) {</span>
+<span class="pc bpc" id="L3879" title="1 of 2 branches missed.">        for (SubComponentFunction function : termVector.functions) {</span>
+<span class="nc bnc" id="L3880" title="All 2 branches missed.">          if (function.parserFunction.sumRule()</span>
+<span class="nc bnc" id="L3881" title="All 2 branches missed.">              &amp;&amp; !function.parserFunction.needPositions()</span>
+<span class="nc bnc" id="L3882" title="All 2 branches missed.">              &amp;&amp; function.statsType.equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="nc bnc" id="L3883" title="All 2 branches missed.">            if (function.dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
+<span class="nc" id="L3884">              long valueFunction = function.parserFunction</span>
+<span class="nc" id="L3885">                  .getValueLong(number.valueSum, 0);</span>
+<span class="nc" id="L3886">              function.dataCollector.add(mutableKey[0], valueFunction,</span>
                   number.docNumber);
-<span class="nc bnc" id="L3885" title="All 2 branches missed.">            } else if (function.dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
-<span class="nc" id="L3886">              double valueFunction = function.parserFunction</span>
-<span class="nc" id="L3887">                  .getValueDouble(number.valueSum, 0);</span>
-<span class="nc" id="L3888">              function.dataCollector.add(mutableKey[0], valueFunction,</span>
+<span class="nc bnc" id="L3888" title="All 2 branches missed.">            } else if (function.dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
+<span class="nc" id="L3889">              double valueFunction = function.parserFunction</span>
+<span class="nc" id="L3890">                  .getValueDouble(number.valueSum, 0);</span>
+<span class="nc" id="L3891">              function.dataCollector.add(mutableKey[0], valueFunction,</span>
                   number.docNumber);
-<span class="nc" id="L3890">            }</span>
+<span class="nc" id="L3893">            }</span>
           } else {
-<span class="nc" id="L3892">            computeFull = true;</span>
+<span class="nc" id="L3895">            computeFull = true;</span>
           }
-<span class="nc" id="L3894">        }</span>
+<span class="nc" id="L3897">        }</span>
       }
       // add as full?
-<span class="fc bfc" id="L3897" title="All 2 branches covered.">      return computeFull ? new RegisterStatus(sortValue, addItemForced) : null;</span>
+<span class="fc bfc" id="L3900" title="All 2 branches covered.">      return computeFull ? new RegisterStatus(sortValue, addItemForced) : null;</span>
     } else {
-<span class="fc" id="L3899">      return null;</span>
+<span class="fc" id="L3902">      return null;</span>
     }
   }
 
@@ -3923,42 +3926,42 @@ public class CodecCollector {
       ComponentTermVector termVector, TermvectorNumberBasic number,
       Integer termNumberMaximum, Integer segmentNumber, String[] mutableKey)
       throws IOException {
-<span class="nc" id="L3926">    long sortValue = 0;</span>
-<span class="nc" id="L3927">    if (termVector.subComponentFunction.sortDirection</span>
-<span class="nc bnc" id="L3928" title="All 2 branches missed.">        .equals(CodecUtil.SORT_DESC)</span>
+<span class="nc" id="L3929">    long sortValue = 0;</span>
+<span class="nc" id="L3930">    if (termVector.subComponentFunction.sortDirection</span>
+<span class="nc bnc" id="L3931" title="All 2 branches missed.">        .equals(CodecUtil.SORT_DESC)</span>
         &amp;&amp; termVector.subComponentFunction.sortType
-<span class="nc bnc" id="L3930" title="All 2 branches missed.">            .equals(CodecUtil.STATS_TYPE_SUM)) {</span>
-<span class="nc" id="L3931">      sortValue = termVector.subComponentFunction.parserFunction</span>
-<span class="nc" id="L3932">          .getValueLong(number.valueSum, 0);</span>
-<span class="nc" id="L3933">    } else if (termVector.subComponentFunction.sortDirection</span>
-<span class="nc bnc" id="L3934" title="All 2 branches missed.">        .equals(CodecUtil.SORT_DESC)</span>
+<span class="nc bnc" id="L3933" title="All 2 branches missed.">            .equals(CodecUtil.STATS_TYPE_SUM)) {</span>
+<span class="nc" id="L3934">      sortValue = termVector.subComponentFunction.parserFunction</span>
+<span class="nc" id="L3935">          .getValueLong(number.valueSum, 0);</span>
+<span class="nc" id="L3936">    } else if (termVector.subComponentFunction.sortDirection</span>
+<span class="nc bnc" id="L3937" title="All 2 branches missed.">        .equals(CodecUtil.SORT_DESC)</span>
         &amp;&amp; termVector.subComponentFunction.sortType
-<span class="nc bnc" id="L3936" title="All 2 branches missed.">            .equals(CodecUtil.STATS_TYPE_N)) {</span>
-<span class="nc" id="L3937">      sortValue = number.docNumber;</span>
+<span class="nc bnc" id="L3939" title="All 2 branches missed.">            .equals(CodecUtil.STATS_TYPE_N)) {</span>
+<span class="nc" id="L3940">      sortValue = number.docNumber;</span>
     } else {
-<span class="nc" id="L3939">      return true;</span>
+<span class="nc" id="L3942">      return true;</span>
     }
-<span class="nc" id="L3941">    MtasDataCollector&lt;Long, ?&gt; dataCollector = (MtasDataCollector&lt;Long, ?&gt;) termVector.subComponentFunction.dataCollector;</span>
-<span class="nc bnc" id="L3942" title="All 2 branches missed.">    if (termVector.boundaryRegistration) {</span>
-<span class="nc" id="L3943">      return dataCollector.validateSegmentBoundary(sortValue);</span>
+<span class="nc" id="L3944">    MtasDataCollector&lt;Long, ?&gt; dataCollector = (MtasDataCollector&lt;Long, ?&gt;) termVector.subComponentFunction.dataCollector;</span>
+<span class="nc bnc" id="L3945" title="All 2 branches missed.">    if (termVector.boundaryRegistration) {</span>
+<span class="nc" id="L3946">      return dataCollector.validateSegmentBoundary(sortValue);</span>
     } else {
-<span class="nc" id="L3945">      String segmentStatus = dataCollector.validateSegmentValue(sortValue,</span>
-<span class="nc" id="L3946">          termNumberMaximum, segmentNumber);</span>
-<span class="nc bnc" id="L3947" title="All 2 branches missed.">      if (segmentStatus != null) {</span>
-<span class="nc bnc" id="L3948" title="All 2 branches missed.">        if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY_OR_NEW)) {</span>
-<span class="nc" id="L3949">          return true;</span>
-<span class="nc" id="L3950">        } else if (segmentStatus</span>
-<span class="nc bnc" id="L3951" title="All 2 branches missed.">            .equals(MtasDataCollector.SEGMENT_POSSIBLE_KEY)) {</span>
-<span class="nc" id="L3952">          mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
-<span class="nc" id="L3953">          segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],</span>
-<span class="nc" id="L3954">              sortValue, termNumberMaximum, segmentNumber, true);</span>
-<span class="nc bnc" id="L3955" title="All 2 branches missed.">          return segmentStatus != null;</span>
+<span class="nc" id="L3948">      String segmentStatus = dataCollector.validateSegmentValue(sortValue,</span>
+<span class="nc" id="L3949">          termNumberMaximum, segmentNumber);</span>
+<span class="nc bnc" id="L3950" title="All 2 branches missed.">      if (segmentStatus != null) {</span>
+<span class="nc bnc" id="L3951" title="All 2 branches missed.">        if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY_OR_NEW)) {</span>
+<span class="nc" id="L3952">          return true;</span>
+<span class="nc" id="L3953">        } else if (segmentStatus</span>
+<span class="nc bnc" id="L3954" title="All 2 branches missed.">            .equals(MtasDataCollector.SEGMENT_POSSIBLE_KEY)) {</span>
+<span class="nc" id="L3955">          mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
+<span class="nc" id="L3956">          segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],</span>
+<span class="nc" id="L3957">              sortValue, termNumberMaximum, segmentNumber, true);</span>
+<span class="nc bnc" id="L3958" title="All 2 branches missed.">          return segmentStatus != null;</span>
         } else {
           // should never happen?
-<span class="nc" id="L3958">          return false;</span>
+<span class="nc" id="L3961">          return false;</span>
         }
       } else {
-<span class="nc" id="L3961">        return false;</span>
+<span class="nc" id="L3964">        return false;</span>
       }
     }
   }
@@ -3981,60 +3984,60 @@ public class CodecCollector {
   private static void registerValue(BytesRef term,
       ComponentTermVector termVector, TermvectorNumberFull number,
       String[] mutableKey) throws IOException {
-<span class="pc bpc" id="L3984" title="1 of 2 branches missed.">    if (number.docNumber &gt; 0) {</span>
-<span class="fc bfc" id="L3985" title="All 2 branches covered.">      if (mutableKey[0] == null) {</span>
-<span class="fc" id="L3986">        mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
+<span class="pc bpc" id="L3987" title="1 of 2 branches missed.">    if (number.docNumber &gt; 0) {</span>
+<span class="fc bfc" id="L3988" title="All 2 branches covered.">      if (mutableKey[0] == null) {</span>
+<span class="fc" id="L3989">        mutableKey[0] = MtasToken.getPostfixFromValue(term);</span>
       }
-<span class="fc" id="L3988">      MtasDataCollector&lt;Long, ?&gt; dataCollector = (MtasDataCollector&lt;Long, ?&gt;) termVector.subComponentFunction.dataCollector;</span>
-<span class="fc" id="L3989">      long[] valuesLong = new long[number.docNumber];</span>
-<span class="fc bfc" id="L3990" title="All 2 branches covered.">      for (int i = 0; i &lt; number.docNumber; i++) {</span>
+<span class="fc" id="L3991">      MtasDataCollector&lt;Long, ?&gt; dataCollector = (MtasDataCollector&lt;Long, ?&gt;) termVector.subComponentFunction.dataCollector;</span>
+<span class="fc" id="L3992">      long[] valuesLong = new long[number.docNumber];</span>
+<span class="fc bfc" id="L3993" title="All 2 branches covered.">      for (int i = 0; i &lt; number.docNumber; i++) {</span>
         try {
-<span class="fc" id="L3992">          valuesLong[i] = termVector.subComponentFunction.parserFunction</span>
-<span class="fc" id="L3993">              .getValueLong(new long[] { number.args[i] }, number.positions[i]);</span>
-<span class="nc" id="L3994">        } catch (IOException e) {</span>
-<span class="nc" id="L3995">          log.debug(e);</span>
-<span class="nc" id="L3996">          dataCollector.error(mutableKey[0], e.getMessage());</span>
-<span class="fc" id="L3997">        }</span>
+<span class="fc" id="L3995">          valuesLong[i] = termVector.subComponentFunction.parserFunction</span>
+<span class="fc" id="L3996">              .getValueLong(new long[] { number.args[i] }, number.positions[i]);</span>
+<span class="nc" id="L3997">        } catch (IOException e) {</span>
+<span class="nc" id="L3998">          log.debug(e);</span>
+<span class="nc" id="L3999">          dataCollector.error(mutableKey[0], e.getMessage());</span>
+<span class="fc" id="L4000">        }</span>
       }
-<span class="fc" id="L3999">      if (!termVector.subComponentFunction.statsType</span>
-<span class="pc bpc" id="L4000" title="1 of 2 branches missed.">          .equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="fc" id="L4001">        dataCollector.add(mutableKey[0], valuesLong, valuesLong.length);</span>
+<span class="fc" id="L4002">      if (!termVector.subComponentFunction.statsType</span>
+<span class="pc bpc" id="L4003" title="1 of 2 branches missed.">          .equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="fc" id="L4004">        dataCollector.add(mutableKey[0], valuesLong, valuesLong.length);</span>
       }
-<span class="pc bpc" id="L4003" title="1 of 2 branches missed.">      for (SubComponentFunction function : termVector.functions) {</span>
-<span class="nc bnc" id="L4004" title="All 2 branches missed.">        if (!function.parserFunction.sumRule()</span>
-<span class="nc bnc" id="L4005" title="All 2 branches missed.">            || function.parserFunction.needPositions()</span>
-<span class="nc bnc" id="L4006" title="All 2 branches missed.">            || !function.statsType.equals(CodecUtil.STATS_BASIC)) {</span>
-<span class="nc bnc" id="L4007" title="All 2 branches missed.">          if (function.dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
-<span class="nc" id="L4008">            valuesLong = new long[number.docNumber];</span>
-<span class="nc bnc" id="L4009" title="All 2 branches missed.">            for (int i = 0; i &lt; number.docNumber; i++) {</span>
+<span class="pc bpc" id="L4006" title="1 of 2 branches missed.">      for (SubComponentFunction function : termVector.functions) {</span>
+<span class="nc bnc" id="L4007" title="All 2 branches missed.">        if (!function.parserFunction.sumRule()</span>
+<span class="nc bnc" id="L4008" title="All 2 branches missed.">            || function.parserFunction.needPositions()</span>
+<span class="nc bnc" id="L4009" title="All 2 branches missed.">            || !function.statsType.equals(CodecUtil.STATS_BASIC)) {</span>
+<span class="nc bnc" id="L4010" title="All 2 branches missed.">          if (function.dataType.equals(CodecUtil.DATA_TYPE_LONG)) {</span>
+<span class="nc" id="L4011">            valuesLong = new long[number.docNumber];</span>
+<span class="nc bnc" id="L4012" title="All 2 branches missed.">            for (int i = 0; i &lt; number.docNumber; i++) {</span>
               try {
-<span class="nc" id="L4011">                valuesLong[i] = function.parserFunction.getValueLong(</span>
+<span class="nc" id="L4014">                valuesLong[i] = function.parserFunction.getValueLong(</span>
                     new long[] { number.args[i] }, number.positions[i]);
-<span class="nc" id="L4013">              } catch (IOException e) {</span>
-<span class="nc" id="L4014">                log.debug(e);</span>
-<span class="nc" id="L4015">                function.dataCollector.error(mutableKey[0], e.getMessage());</span>
-<span class="nc" id="L4016">              }</span>
+<span class="nc" id="L4016">              } catch (IOException e) {</span>
+<span class="nc" id="L4017">                log.debug(e);</span>
+<span class="nc" id="L4018">                function.dataCollector.error(mutableKey[0], e.getMessage());</span>
+<span class="nc" id="L4019">              }</span>
             }
-<span class="nc" id="L4018">            function.dataCollector.add(mutableKey[0], valuesLong,</span>
+<span class="nc" id="L4021">            function.dataCollector.add(mutableKey[0], valuesLong,</span>
                 valuesLong.length);
-<span class="nc bnc" id="L4020" title="All 2 branches missed.">          } else if (function.dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
-<span class="nc" id="L4021">            double[] valuesDouble = new double[number.docNumber];</span>
-<span class="nc bnc" id="L4022" title="All 2 branches missed.">            for (int i = 0; i &lt; number.docNumber; i++) {</span>
+<span class="nc bnc" id="L4023" title="All 2 branches missed.">          } else if (function.dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {</span>
+<span class="nc" id="L4024">            double[] valuesDouble = new double[number.docNumber];</span>
+<span class="nc bnc" id="L4025" title="All 2 branches missed.">            for (int i = 0; i &lt; number.docNumber; i++) {</span>
               try {
-<span class="nc" id="L4024">                valuesDouble[i] = function.parserFunction.getValueDouble(</span>
+<span class="nc" id="L4027">                valuesDouble[i] = function.parserFunction.getValueDouble(</span>
                     new long[] { number.args[i] }, number.positions[i]);
-<span class="nc" id="L4026">              } catch (IOException e) {</span>
-<span class="nc" id="L4027">                log.debug(e);</span>
-<span class="nc" id="L4028">                function.dataCollector.error(mutableKey[0], e.getMessage());</span>
-<span class="nc" id="L4029">              }</span>
+<span class="nc" id="L4029">              } catch (IOException e) {</span>
+<span class="nc" id="L4030">                log.debug(e);</span>
+<span class="nc" id="L4031">                function.dataCollector.error(mutableKey[0], e.getMessage());</span>
+<span class="nc" id="L4032">              }</span>
             }
-<span class="nc" id="L4031">            function.dataCollector.add(mutableKey[0], valuesDouble,</span>
+<span class="nc" id="L4034">            function.dataCollector.add(mutableKey[0], valuesDouble,</span>
                 valuesDouble.length);
           }
         }
-<span class="nc" id="L4035">      }</span>
+<span class="nc" id="L4038">      }</span>
     }
-<span class="fc" id="L4037">  }</span>
+<span class="fc" id="L4040">  }</span>
 
   /**
    * Compute termvector number basic.
@@ -4049,16 +4052,16 @@ public class CodecCollector {
    */
   private static TermvectorNumberBasic computeTermvectorNumberBasic(
       TermsEnum termsEnum, LeafReader r) throws IOException {
-<span class="fc" id="L4052">    TermvectorNumberBasic result = new TermvectorNumberBasic();</span>
-<span class="pc bpc" id="L4053" title="1 of 2 branches missed.">    boolean hasDeletedDocuments = (r.getLiveDocs() != null);</span>
-<span class="pc bpc" id="L4054" title="1 of 2 branches missed.">    if (!hasDeletedDocuments) {</span>
-<span class="fc" id="L4055">      result.valueSum[0] = termsEnum.totalTermFreq();</span>
-<span class="fc" id="L4056">      result.docNumber = termsEnum.docFreq();</span>
-<span class="pc bpc" id="L4057" title="1 of 2 branches missed.">      if (result.valueSum[0] &gt; -1) {</span>
-<span class="fc" id="L4058">        return result;</span>
+<span class="fc" id="L4055">    TermvectorNumberBasic result = new TermvectorNumberBasic();</span>
+<span class="pc bpc" id="L4056" title="1 of 2 branches missed.">    boolean hasDeletedDocuments = (r.getLiveDocs() != null);</span>
+<span class="pc bpc" id="L4057" title="1 of 2 branches missed.">    if (!hasDeletedDocuments) {</span>
+<span class="fc" id="L4058">      result.valueSum[0] = termsEnum.totalTermFreq();</span>
+<span class="fc" id="L4059">      result.docNumber = termsEnum.docFreq();</span>
+<span class="pc bpc" id="L4060" title="1 of 2 branches missed.">      if (result.valueSum[0] &gt; -1) {</span>
+<span class="fc" id="L4061">        return result;</span>
       }
     }
-<span class="nc" id="L4061">    throw new IOException(&quot;should not call this&quot;);</span>
+<span class="nc" id="L4064">    throw new IOException(&quot;should not call this&quot;);</span>
   }
 
   /**
@@ -4083,34 +4086,34 @@ public class CodecCollector {
   private static TermvectorNumberBasic computeTermvectorNumberBasic(
       List&lt;Integer&gt; docSet, int termDocId, TermsEnum termsEnum, LeafReader r,
       LeafReaderContext lrc, PostingsEnum postingsEnum) throws IOException {
-<span class="fc" id="L4086">    TermvectorNumberBasic result = new TermvectorNumberBasic();</span>
-<span class="fc bfc" id="L4087" title="All 2 branches covered.">    boolean hasDeletedDocuments = (r.getLiveDocs() != null);</span>
-<span class="pc bpc" id="L4088" title="1 of 4 branches missed.">    if ((docSet.size() == r.numDocs()) &amp;&amp; !hasDeletedDocuments) {</span>
+<span class="fc" id="L4089">    TermvectorNumberBasic result = new TermvectorNumberBasic();</span>
+<span class="fc bfc" id="L4090" title="All 2 branches covered.">    boolean hasDeletedDocuments = (r.getLiveDocs() != null);</span>
+<span class="pc bpc" id="L4091" title="1 of 4 branches missed.">    if ((docSet.size() == r.numDocs()) &amp;&amp; !hasDeletedDocuments) {</span>
       try {
-<span class="fc" id="L4090">        return computeTermvectorNumberBasic(termsEnum, r);</span>
-<span class="nc" id="L4091">      } catch (IOException e) {</span>
-<span class="nc" id="L4092">        log.debug(&quot;problem&quot;, e);</span>
+<span class="fc" id="L4093">        return computeTermvectorNumberBasic(termsEnum, r);</span>
+<span class="nc" id="L4094">      } catch (IOException e) {</span>
+<span class="nc" id="L4095">        log.debug(&quot;problem&quot;, e);</span>
         // problem
       }
     }
-<span class="fc" id="L4096">    result.docNumber = 0;</span>
-<span class="fc" id="L4097">    result.valueSum[0] = 0;</span>
-<span class="fc" id="L4098">    int localTermDocId = termDocId;</span>
-<span class="fc" id="L4099">    Iterator&lt;Integer&gt; docIterator = docSet.iterator();</span>
-<span class="fc" id="L4100">    postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);</span>
+<span class="fc" id="L4099">    result.docNumber = 0;</span>
+<span class="fc" id="L4100">    result.valueSum[0] = 0;</span>
+<span class="fc" id="L4101">    int localTermDocId = termDocId;</span>
+<span class="fc" id="L4102">    Iterator&lt;Integer&gt; docIterator = docSet.iterator();</span>
+<span class="fc" id="L4103">    postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);</span>
     int docId;
-<span class="fc bfc" id="L4102" title="All 2 branches covered.">    while (docIterator.hasNext()) {</span>
-<span class="fc" id="L4103">      docId = docIterator.next() - lrc.docBase;</span>
-<span class="pc bpc" id="L4104" title="2 of 4 branches missed.">      if (docId &gt;= localTermDocId &amp;&amp; ((docId == localTermDocId)</span>
-<span class="fc bfc" id="L4105" title="All 2 branches covered.">          || ((localTermDocId = postingsEnum.advance(docId)) == docId))) {</span>
-<span class="fc" id="L4106">        result.docNumber++;</span>
-<span class="fc" id="L4107">        result.valueSum[0] += postingsEnum.freq();</span>
+<span class="fc bfc" id="L4105" title="All 2 branches covered.">    while (docIterator.hasNext()) {</span>
+<span class="fc" id="L4106">      docId = docIterator.next() - lrc.docBase;</span>
+<span class="pc bpc" id="L4107" title="2 of 4 branches missed.">      if (docId &gt;= localTermDocId &amp;&amp; ((docId == localTermDocId)</span>
+<span class="fc bfc" id="L4108" title="All 2 branches covered.">          || ((localTermDocId = postingsEnum.advance(docId)) == docId))) {</span>
+<span class="fc" id="L4109">        result.docNumber++;</span>
+<span class="fc" id="L4110">        result.valueSum[0] += postingsEnum.freq();</span>
       }
-<span class="pc bpc" id="L4109" title="1 of 2 branches missed.">      if (localTermDocId == DocIdSetIterator.NO_MORE_DOCS) {</span>
-<span class="nc" id="L4110">        break;</span>
+<span class="pc bpc" id="L4112" title="1 of 2 branches missed.">      if (localTermDocId == DocIdSetIterator.NO_MORE_DOCS) {</span>
+<span class="nc" id="L4113">        break;</span>
       }
     }
-<span class="fc" id="L4113">    return result;</span>
+<span class="fc" id="L4116">    return result;</span>
   }
 
   /**
@@ -4136,21 +4139,21 @@ public class CodecCollector {
       List&lt;Integer&gt; docSet, int termDocId, TermsEnum termsEnum,
       LeafReaderContext lrc, PostingsEnum postingsEnum,
       Map&lt;Integer, Integer&gt; positionsData) throws IOException {
-<span class="fc" id="L4139">    TermvectorNumberFull result = new TermvectorNumberFull(docSet.size());</span>
-<span class="fc" id="L4140">    Iterator&lt;Integer&gt; docIterator = docSet.iterator();</span>
-<span class="fc" id="L4141">    int localTermDocId = termDocId;</span>
-<span class="fc" id="L4142">    postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);</span>
-<span class="fc bfc" id="L4143" title="All 2 branches covered.">    while (docIterator.hasNext()) {</span>
-<span class="fc" id="L4144">      int docId = docIterator.next() - lrc.docBase;</span>
-<span class="fc bfc" id="L4145" title="All 4 branches covered.">      if (docId &gt;= localTermDocId &amp;&amp; ((docId == localTermDocId)</span>
-<span class="fc bfc" id="L4146" title="All 2 branches covered.">          || ((localTermDocId = postingsEnum.advance(docId)) == docId))) {</span>
-<span class="fc" id="L4147">        result.args[result.docNumber] = postingsEnum.freq();</span>
-<span class="pc bpc" id="L4148" title="1 of 2 branches missed.">        result.positions[result.docNumber] = (positionsData == null) ? 0</span>
-<span class="pc" id="L4149">            : positionsData.get(docId + lrc.docBase);</span>
-<span class="fc" id="L4150">        result.docNumber++;</span>
+<span class="fc" id="L4142">    TermvectorNumberFull result = new TermvectorNumberFull(docSet.size());</span>
+<span class="fc" id="L4143">    Iterator&lt;Integer&gt; docIterator = docSet.iterator();</span>
+<span class="fc" id="L4144">    int localTermDocId = termDocId;</span>
+<span class="fc" id="L4145">    postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.FREQS);</span>
+<span class="fc bfc" id="L4146" title="All 2 branches covered.">    while (docIterator.hasNext()) {</span>
+<span class="fc" id="L4147">      int docId = docIterator.next() - lrc.docBase;</span>
+<span class="fc bfc" id="L4148" title="All 4 branches covered.">      if (docId &gt;= localTermDocId &amp;&amp; ((docId == localTermDocId)</span>
+<span class="fc bfc" id="L4149" title="All 2 branches covered.">          || ((localTermDocId = postingsEnum.advance(docId)) == docId))) {</span>
+<span class="fc" id="L4150">        result.args[result.docNumber] = postingsEnum.freq();</span>
+<span class="pc bpc" id="L4151" title="1 of 2 branches missed.">        result.positions[result.docNumber] = (positionsData == null) ? 0</span>
+<span class="pc" id="L4152">            : positionsData.get(docId + lrc.docBase);</span>
+<span class="fc" id="L4153">        result.docNumber++;</span>
       }
-<span class="fc" id="L4152">    }</span>
-<span class="fc" id="L4153">    return result;</span>
+<span class="fc" id="L4155">    }</span>
+<span class="fc" id="L4156">    return result;</span>
   }
 
 }

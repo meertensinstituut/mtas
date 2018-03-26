@@ -9,8 +9,8 @@ public class MtasSolrHistoryList extends MtasSolrBaseList {
   private int softLimit;
   private int hardLimit;
   
-  private final static String NAME_SOFTLIMIT = &quot;softLimit&quot;;
-  private final static String NAME_HARDLIMIT = &quot;hardLimit&quot;;
+  private static final String NAME_SOFTLIMIT = &quot;softLimit&quot;;
+  private static final String NAME_HARDLIMIT = &quot;hardLimit&quot;;
   
   public MtasSolrHistoryList() {
 <span class="fc" id="L16">    super();</span>
@@ -53,8 +53,8 @@ public class MtasSolrHistoryList extends MtasSolrBaseList {
 <span class="fc" id="L53">  }</span>
     
   @Override
-  public SimpleOrderedMap&lt;Object&gt; createOutput(boolean shardRequests) {
-<span class="nc" id="L57">    SimpleOrderedMap&lt;Object&gt; output = super.createOutput(shardRequests);</span>
+  public SimpleOrderedMap&lt;Object&gt; createListOutput(boolean shardRequests) {
+<span class="nc" id="L57">    SimpleOrderedMap&lt;Object&gt; output = super.createListOutput(shardRequests);</span>
 <span class="nc" id="L58">    output.add(NAME_SOFTLIMIT, softLimit);</span>
 <span class="nc" id="L59">    output.add(NAME_HARDLIMIT, hardLimit);</span>
 <span class="nc" id="L60">    return output;</span>
