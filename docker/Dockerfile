@@ -1,7 +1,7 @@
 # Automatically generated Dockerfile 
 # - Build 2018-02-12 09:04
 # - Lucene/Solr version 7.2.1
-# - Mtas release 7.2.1.0 
+# - Mtas release 7.2.1.1 
 #
 
 FROM ubuntu:16.04
@@ -15,7 +15,7 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/v7.2.1.0/mtas-7.2.1.0.jar /root/lib/
+ADD https://github.com/meertensinstituut/mtas/releases/download/v7.2.1.1/mtas-7.2.1.1.jar /root/lib/
 
 RUN apt-get update && apt-get install -y locales lsof software-properties-common python-software-properties apache2 curl subversion && \
     locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en
@@ -85,7 +85,7 @@ RUN service apache2 stop && \
     mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && \
     echo "name=demo1" > demo1/core.properties && \
     cp lib/commons-math3-3.6.1.jar demo1/lib/ && \
-    cp lib/mtas-7.2.1.0.jar demo1/lib/ && \
+    cp lib/mtas-7.2.1.1.jar demo1/lib/ && \
     cp data/solrconfig.xml demo1/conf/ && \
     cp data/schemaBasic.xml demo1/conf/schema.xml && \
     cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ && \
