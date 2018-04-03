@@ -3086,10 +3086,11 @@ public class CodecCollector {
               if (termVector.functions != null) {
                 for (SubComponentFunction function : termVector.functions) {
                   function.dataCollector.initNewList(initSize);
-                  doBasic = doBasic ? (function.parserFunction.sumRule()
-                      && !function.parserFunction.needPositions()
-                      && function.dataCollector.getStatsType()
-                          .equals(CodecUtil.STATS_BASIC))
+                  doBasic = doBasic
+                      ? (function.parserFunction.sumRule()
+                          && !function.parserFunction.needPositions()
+                          && function.dataCollector.getStatsType()
+                              .equals(CodecUtil.STATS_BASIC))
                       : doBasic;
                 }
               }
@@ -3490,48 +3491,50 @@ public class CodecCollector {
                 .createAutomata(termVector.prefix, termVector.regexp,
                     automatonMap);
             for (CompiledAutomaton compiledAutomaton : listCompiledAutomata) {
-              termsEnum = t.intersect(compiledAutomaton, null);
-              termVector.subComponentFunction.dataCollector
-                  .initNewList(
-                      termVector.subComponentFunction.dataCollector.segmentKeys
-                          .size(),
-                      segmentName, segmentNumber, termVector.boundary);
-              RegisterStatus registerStatus = null;
-              if (termVector.functions != null) {
-                for (SubComponentFunction function : termVector.functions) {
-                  function.dataCollector.initNewList((int) t.size(),
-                      segmentName, segmentNumber, null);
+              if (!compiledAutomaton.type
+                  .equals(CompiledAutomaton.AUTOMATON_TYPE.NONE)) {
+                termsEnum = t.intersect(compiledAutomaton, null);
+                termVector.subComponentFunction.dataCollector.initNewList(
+                    termVector.subComponentFunction.dataCollector.segmentKeys
+                        .size(),
+                    segmentName, segmentNumber, termVector.boundary);
+                RegisterStatus registerStatus = null;
+                if (termVector.functions != null) {
+                  for (SubComponentFunction function : termVector.functions) {
+                    function.dataCollector.initNewList((int) t.size(),
+                        segmentName, segmentNumber, null);
+                  }
                 }
-              }
-              if (!docSet.isEmpty()) {
-                int termDocId;
-                while ((term = termsEnum.next()) != null) {
-                  if (validateTermWithStartValue(term, termVector)) {
-                    termDocId = -1;
-                    mutableKey[0] = null;
-                    // compute numbers;
-                    TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
-                        docSet, termDocId, termsEnum, r, lrc, postingsEnum);
-                    if (numberBasic.docNumber > 0) {
-                      registerStatus = registerValue(term, termVector,
-                          numberBasic, 0, segmentNumber, true, mutableKey);
-                      if (registerStatus != null) {
-                        TermvectorNumberFull numberFull = computeTermvectorNumberFull(
-                            docSet, termDocId, termsEnum, lrc, postingsEnum,
-                            positionsData);
-                        if (numberFull.docNumber > 0) {
-                          registerValue(term, termVector, numberFull,
-                              mutableKey);
+                if (!docSet.isEmpty()) {
+                  int termDocId;
+                  while ((term = termsEnum.next()) != null) {
+                    if (validateTermWithStartValue(term, termVector)) {
+                      termDocId = -1;
+                      mutableKey[0] = null;
+                      // compute numbers;
+                      TermvectorNumberBasic numberBasic = computeTermvectorNumberBasic(
+                          docSet, termDocId, termsEnum, r, lrc, postingsEnum);
+                      if (numberBasic.docNumber > 0) {
+                        registerStatus = registerValue(term, termVector,
+                            numberBasic, 0, segmentNumber, true, mutableKey);
+                        if (registerStatus != null) {
+                          TermvectorNumberFull numberFull = computeTermvectorNumberFull(
+                              docSet, termDocId, termsEnum, lrc, postingsEnum,
+                              positionsData);
+                          if (numberFull.docNumber > 0) {
+                            registerValue(term, termVector, numberFull,
+                                mutableKey);
+                          }
                         }
                       }
                     }
                   }
                 }
-              }
-              termVector.subComponentFunction.dataCollector.closeNewList();
-              if (termVector.functions != null) {
-                for (SubComponentFunction function : termVector.functions) {
-                  function.dataCollector.closeNewList();
+                termVector.subComponentFunction.dataCollector.closeNewList();
+                if (termVector.functions != null) {
+                  for (SubComponentFunction function : termVector.functions) {
+                    function.dataCollector.closeNewList();
+                  }
                 }
               }
             }

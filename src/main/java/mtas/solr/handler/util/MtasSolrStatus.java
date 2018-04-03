@@ -1,6 +1,8 @@
 package mtas.solr.handler.util;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -298,6 +300,9 @@ public class MtasSolrStatus {
   public final void setError(IOException exception) throws IOException {
     Objects.requireNonNull(exception, "exception required");
     errorMessage = exception.getMessage();
+    //StringWriter sw = new StringWriter();
+    //exception.printStackTrace(new PrintWriter(sw));
+    //errorMessage+="\n====\n"+sw.toString();
     errorStatus = true;
     throw exception;
   }
