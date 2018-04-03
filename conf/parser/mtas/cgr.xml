@@ -12,7 +12,20 @@
 	</index>
 	<!-- END MTAS INDEX CONFIGURATION -->
 
-
+  <filters>
+     <filter type="replace" name="4" value="*" replace="" />
+     <filter type="replace" name="4" value="#" replace="" />   
+     <filter type="replace" name="0,1,2,3" value="&amp;duitsekomma;" replace="/" />       
+     <filter type="replace" name="0,1,2,3" value="&amp;period;" replace="." />       
+     <filter type="replace" name="0,1,2,3" value="&amp;komma;" replace="," />       
+     <filter type="replace" name="0,1,2,3" value="&amp;unreadable;" replace="[unreadable]" />       
+     <filter type="replace" name="0,1,2,3" value="&amp;hyph;" replace="-" />       
+     <filter type="replace" name="0,1,2,3" value="&amp;semi;" replace=";" />       
+     <filter type="replace" name="0,1,2,3" value="&amp;colon;" replace=":" />       
+     <filter type="replace" name="0,1,2,3" value="&amp;2periods;" replace=".." />       
+     <filter type="replace" name="0,1,2,3" value="&amp;tilde;" replace="~" />       
+     <filter type="replace" name="0,1,2,3" value="&amp;quest;" replace="?" />       
+   </filters>
 
 	<!-- START CONFIGURATION MTAS FOLIA PARSER -->
 	<parser name="mtas.analysis.parser.MtasCRMParser">
