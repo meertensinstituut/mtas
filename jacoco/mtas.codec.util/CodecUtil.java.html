@@ -94,11 +94,11 @@ public class CodecUtil {
 
   /** The Constant STATS_TYPES. */
 <span class="fc" id="L96">  private static final List&lt;String&gt; STATS_TYPES = Arrays.asList(</span>
-<span class="fc" id="L97">      STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_KURTOSIS, STATS_TYPE_MAX,</span>
-<span class="fc" id="L98">      STATS_TYPE_MEAN, STATS_TYPE_MIN, STATS_TYPE_N, STATS_TYPE_MEDIAN,</span>
-<span class="fc" id="L99">      STATS_TYPE_POPULATIONVARIANCE, STATS_TYPE_QUADRATICMEAN,</span>
-<span class="fc" id="L100">      STATS_TYPE_SKEWNESS, STATS_TYPE_STANDARDDEVIATION, STATS_TYPE_SUM,</span>
-<span class="fc" id="L101">      STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS, STATS_TYPE_VARIANCE);</span>
+      STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_KURTOSIS, STATS_TYPE_MAX,
+      STATS_TYPE_MEAN, STATS_TYPE_MIN, STATS_TYPE_N, STATS_TYPE_MEDIAN,
+      STATS_TYPE_POPULATIONVARIANCE, STATS_TYPE_QUADRATICMEAN,
+      STATS_TYPE_SKEWNESS, STATS_TYPE_STANDARDDEVIATION, STATS_TYPE_SUM,
+      STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS, STATS_TYPE_VARIANCE);
 
   /** The Constant STATS_BASIC_TYPES. */
 <span class="fc" id="L104">  private static final List&lt;String&gt; STATS_BASIC_TYPES = Arrays</span>
@@ -106,10 +106,10 @@ public class CodecUtil {
 
   /** The Constant STATS_ADVANCED_TYPES. */
 <span class="fc" id="L108">  private static final List&lt;String&gt; STATS_ADVANCED_TYPES = Arrays.asList(</span>
-<span class="fc" id="L109">      STATS_TYPE_MAX, STATS_TYPE_MIN, STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS,</span>
-<span class="fc" id="L110">      STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_STANDARDDEVIATION,</span>
-<span class="fc" id="L111">      STATS_TYPE_VARIANCE, STATS_TYPE_POPULATIONVARIANCE,</span>
-<span class="fc" id="L112">      STATS_TYPE_QUADRATICMEAN);</span>
+      STATS_TYPE_MAX, STATS_TYPE_MIN, STATS_TYPE_SUMSQ, STATS_TYPE_SUMOFLOGS,
+      STATS_TYPE_GEOMETRICMEAN, STATS_TYPE_STANDARDDEVIATION,
+      STATS_TYPE_VARIANCE, STATS_TYPE_POPULATIONVARIANCE,
+      STATS_TYPE_QUADRATICMEAN);
 
   /** The Constant STATS_FULL_TYPES. */
 <span class="fc" id="L115">  private static final List&lt;String&gt; STATS_FULL_TYPES = Arrays</span>
@@ -162,7 +162,7 @@ public class CodecUtil {
 <span class="nc" id="L162">      throw new IOException(&quot;no fieldInfo&quot;);</span>
     } else {
 <span class="fc" id="L164">      String info = fieldInfo.getAttribute(</span>
-<span class="fc" id="L165">          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);</span>
+          MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
 <span class="pc bpc" id="L166" title="1 of 2 branches missed.">      if (info == null) {</span>
 <span class="nc" id="L167">        throw new IOException(&quot;no &quot;</span>
             + MtasCodecPostingsFormat.MTAS_FIELDINFO_ATTRIBUTE_PREFIX_SINGLE_POSITION);
@@ -255,11 +255,11 @@ public class CodecUtil {
 <span class="fc bfc" id="L255" title="All 2 branches covered.">        for (MtasSpanQuery sq : fieldStats.spanQueryList) {</span>
 <span class="fc" id="L256">          spansQueryWeight.put(sq, ((MtasSpanQuery) sq.rewrite(reader))</span>
 <span class="fc" id="L257">              .createWeight(searcher, false, boost));</span>
-        }
+<span class="fc" id="L258">        }</span>
       }
       // collect
 <span class="fc" id="L261">      CodecCollector.collectField(field, searcher, reader, rawReader,</span>
-<span class="fc" id="L262">          fullDocList, fullDocSet, fieldStats, spansQueryWeight, status);</span>
+          fullDocList, fullDocSet, fieldStats, spansQueryWeight, status);
     }
 <span class="fc" id="L264">  }</span>
 
@@ -305,18 +305,18 @@ public class CodecUtil {
 <span class="pc bpc" id="L305" title="1 of 2 branches missed.">        } else if (tmpStatsItem.equals(STATS_TYPE_ALL)) {</span>
 <span class="fc bfc" id="L306" title="All 2 branches covered.">          for (String type : STATS_TYPES) {</span>
 <span class="fc" id="L307">            statsItems.add(type);</span>
-          }
-<span class="pc bnc" id="L309" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
+<span class="fc" id="L308">          }</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">        } else if (STATS_FUNCTIONS.contains(tmpStatsItem)) {</span>
 <span class="nc bnc" id="L310" title="All 2 branches missed.">          if (m.group(3) == null) {</span>
 <span class="nc" id="L311">            throw new IOException(&quot;'&quot; + tmpStatsItem + &quot;' should be called as '&quot;</span>
-<span class="nc" id="L312">                + tmpStatsItem + &quot;()' with an optional argument&quot;);</span>
+                + tmpStatsItem + &quot;()' with an optional argument&quot;);
           } else {
 <span class="nc" id="L314">            functionItems.add(m.group(1).trim());</span>
           }
-<span class="nc" id="L316">        } else {</span>
+        } else {
 <span class="nc" id="L317">          throw new IOException(&quot;unknown statsType '&quot; + tmpStatsItem + &quot;'&quot;);</span>
         }
-      }
+<span class="fc" id="L319">      }</span>
     }
 <span class="pc bpc" id="L321" title="1 of 4 branches missed.">    if (statsItems.size() == 0 &amp;&amp; functionItems.size() == 0) {</span>
 <span class="fc" id="L322">      statsItems.add(STATS_TYPE_SUM);</span>
@@ -352,7 +352,7 @@ public class CodecUtil {
 <span class="fc bfc" id="L352" title="All 2 branches covered.">      } else if (statsType != STATS_ADVANCED</span>
 <span class="pc bpc" id="L353" title="1 of 2 branches missed.">          &amp;&amp; STATS_BASIC_TYPES.contains(statsItem)) {</span>
 <span class="fc" id="L354">        statsType = STATS_BASIC;</span>
-<span class="fc" id="L355">      } else {</span>
+      } else {
 <span class="fc" id="L356">        Matcher m = fpStatsFunctionItems.matcher(statsItem.trim());</span>
 <span class="pc bpc" id="L357" title="1 of 2 branches missed.">        if (m.find()) {</span>
 <span class="nc bnc" id="L358" title="All 2 branches missed.">          if (STATS_FUNCTIONS.contains(m.group(2).trim())) {</span>
@@ -361,13 +361,13 @@ public class CodecUtil {
           }
         }
       }
-    }
+<span class="fc" id="L364">    }</span>
 <span class="fc bfc" id="L365" title="All 4 branches covered.">    if (sortType != null &amp;&amp; STATS_TYPES.contains(sortType)) {</span>
 <span class="pc bpc" id="L366" title="1 of 2 branches missed.">      if (STATS_FULL_TYPES.contains(sortType)) {</span>
 <span class="nc" id="L367">        statsType = STATS_FULL;</span>
 <span class="pc bpc" id="L368" title="1 of 2 branches missed.">      } else if (STATS_ADVANCED_TYPES.contains(sortType)) {</span>
 <span class="nc bnc" id="L369" title="All 4 branches missed.">        statsType = (statsType == null || statsType != STATS_FULL)</span>
-<span class="nc" id="L370">            ? STATS_ADVANCED : statsType;</span>
+            ? STATS_ADVANCED : statsType;
       }
     }
 <span class="fc" id="L373">    return statsType;</span>
