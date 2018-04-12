@@ -267,6 +267,16 @@
 					</post>
 				</token>
 			</mapping>
+			<mapping type="group" name="note">
+        <token type="string" offset="false">
+          <pre>
+            <item type="name" />
+          </pre>
+          <post>
+            <item type="attribute" name="class" />
+          </post>
+        </token>
+      </mapping>
 			<!-- END GROUPS -->
 
 			<!-- START GROUP ANNOTATIONS -->
