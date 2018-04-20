@@ -205,6 +205,9 @@ public abstract class MtasBasicParser extends MtasParser {
   /** The Constant MAPPING_VALUE_NAME. */
   protected static final String MAPPING_VALUE_NAME = "name";
 
+  /** The Constant MAPPING_VALUE_NAME. */
+  protected static final String MAPPING_VALUE_NAMESPACE = "namespace";
+
   /** The Constant MAPPING_VALUE_PREFIX. */
   protected static final String MAPPING_VALUE_PREFIX = "prefix";
 
@@ -888,12 +891,18 @@ public abstract class MtasBasicParser extends MtasParser {
             // add attribute to value
           } else if (mappingValue.get(MAPPING_VALUE_TYPE)
               .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
-            String tmpValue = null;
+            String tmpValue = null;    
             if (mappingValue.get(MAPPING_VALUE_NAME).equals("#")) {
               tmpValue = checkObjects[0].getId();
             } else {
-              tmpValue = checkObjects[0]
+              String namespace = mappingValue.get(MAPPING_VALUE_NAMESPACE); 
+              if(namespace==null) {
+                tmpValue = checkObjects[0]
                   .getAttribute(mappingValue.get(MAPPING_VALUE_NAME));
+              } else {
+                tmpValue = checkObjects[0]
+                    .getOtherAttribute(namespace, mappingValue.get(MAPPING_VALUE_NAME));
+              }
             }
             String subvalue = computeFilteredPrefixedValue(
                 mappingValue.get(MAPPING_VALUE_TYPE), tmpValue,
@@ -1293,8 +1302,13 @@ public abstract class MtasBasicParser extends MtasParser {
                 .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
               String attributeCondition = mappingCondition
                   .get(MAPPING_VALUE_CONDITION);
-              String attributeValue = checkObject
-                  .getAttribute(mappingCondition.get("name"));
+              String namespace = mappingCondition.get(MAPPING_VALUE_NAMESPACE);
+              String attributeValue;
+              if(namespace==null) {
+                attributeValue = checkObject.getAttribute(mappingCondition.get(MAPPING_VALUE_NAME));
+              } else {
+                attributeValue = checkObject.getOtherAttribute(namespace, mappingCondition.get(MAPPING_VALUE_NAME));
+              }
               if ((attributeCondition == null) && (attributeValue == null)) {
                 if (!notCondition) {
                   throw new MtasParserException("attribute "
@@ -1985,6 +1999,8 @@ public abstract class MtasBasicParser extends MtasParser {
                         .get(MAPPING_VALUE_TYPE);
                     String nameAttribute = items.children.get(l).attributes
                         .get(MAPPING_VALUE_NAME);
+                    String namespaceAttribute = items.children.get(l).attributes
+                        .get(MAPPING_VALUE_NAMESPACE);
                     String prefixAttribute = items.children.get(l).attributes
                         .get(MAPPING_VALUE_PREFIX);
                     String filterAttribute = items.children.get(l).attributes
@@ -1999,7 +2015,7 @@ public abstract class MtasBasicParser extends MtasParser {
                       addName(mappingToken, items.name, prefixAttribute,
                           filterAttribute);
                     } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE)) {
-                      addAttribute(mappingToken, items.name, nameAttribute,
+                      addAttribute(mappingToken, items.name, nameAttribute, namespaceAttribute,
                           prefixAttribute, filterAttribute);
                     } else if (itemType.equals(ITEM_TYPE_TEXT)) {
                       addText(mappingToken, items.name, prefixAttribute,
@@ -2175,6 +2191,8 @@ public abstract class MtasBasicParser extends MtasParser {
               String itemType = items.children.get(l).attributes.get("type");
               String nameAttribute = items.children.get(l).attributes
                   .get(MAPPING_VALUE_NAME);
+              String namespaceAttribute = items.children.get(l).attributes
+                  .get(MAPPING_VALUE_NAMESPACE);
               String conditionAttribute = items.children.get(l).attributes
                   .get(MAPPING_VALUE_CONDITION);
               String filterAttribute = items.children.get(l).attributes
@@ -2189,7 +2207,7 @@ public abstract class MtasBasicParser extends MtasParser {
                 notAttribute = null;
               }
               if (itemType.equals(ITEM_TYPE_ATTRIBUTE)) {
-                conditionAttribute(nameAttribute, conditionAttribute,
+                conditionAttribute(nameAttribute, namespaceAttribute, conditionAttribute,
                     filterAttribute, notAttribute);
               } else if (itemType.equals(ITEM_TYPE_NAME)) {
                 conditionName(conditionAttribute, notAttribute);
@@ -2484,11 +2502,12 @@ public abstract class MtasBasicParser extends MtasParser {
      * @param filter the filter
      */
     private void addAttribute(MtasParserMappingToken mappingToken, String type,
-        String name, String prefix, String filter) {
+        String name, String namespace, String prefix, String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
       mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
       mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
       mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+      mapConstructionItem.put(MAPPING_VALUE_NAMESPACE, namespace);
       mapConstructionItem.put(MAPPING_VALUE_PREFIX, prefix);
       mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       if (name != null) {
@@ -2534,12 +2553,13 @@ public abstract class MtasBasicParser extends MtasParser {
      * @param filter the filter
      * @param not the not
      */
-    private void conditionAttribute(String name, String condition,
+    private void conditionAttribute(String name, String namespace, String condition,
         String filter, String not) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
       mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
       mapConstructionItem.put(MAPPING_VALUE_TYPE, PARSER_TYPE_ATTRIBUTE);
       mapConstructionItem.put(MAPPING_VALUE_NAME, name);
+      mapConstructionItem.put(MAPPING_VALUE_NAMESPACE, namespace);
       mapConstructionItem.put(MAPPING_VALUE_CONDITION, condition);
       mapConstructionItem.put(MAPPING_VALUE_FILTER, filter);
       mapConstructionItem.put(MAPPING_VALUE_NOT, not);
@@ -2899,6 +2919,9 @@ public abstract class MtasBasicParser extends MtasParser {
     /** The object attributes. */
     protected HashMap<String, String> objectAttributes = null;
 
+    /** The other object attributes. */
+    protected HashMap<String, HashMap<String, String>> objectOtherAttributes = null;
+
     /** The object positions. */
     private SortedSet<Integer> objectPositions = new TreeSet<>();
 
@@ -2940,6 +2963,7 @@ public abstract class MtasBasicParser extends MtasParser {
     MtasParserObject(MtasParserType type) {
       objectType = type;
       objectAttributes = new HashMap<>();
+      objectOtherAttributes = new HashMap<>();
     }
 
     /**
@@ -3050,6 +3074,22 @@ public abstract class MtasBasicParser extends MtasParser {
       } else {
         return null;
       }
+    }
+    
+    public String getOtherAttribute(String other, String name) {
+      if(other==null) {
+        return getAttribute(name);
+      } else {
+        if(objectOtherAttributes.containsKey(other)) {
+          if (name != null) {
+            return objectOtherAttributes.get(other).get(name);
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }        
+      }  
     }
 
     /**
