@@ -72,7 +72,9 @@
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLTitle_yearOfPublicationLabel" type="nederlab_text"
 		required="false" multiValued="false" indexed="true" stored="true" />
-	<field name="NLTitle_witnessYearMin" type="nederlab_int"
+	<field name="NLTitle_dateOfPublication" type="nederlab_date"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLTitle_witnessYearMin" type="nederlab_int"
 		required="false" multiValued="false" indexed="true" stored="true" />
 	<field name="NLTitle_witnessYearMax" type="nederlab_int"
 		required="false" multiValued="false" indexed="true" stored="true" />
@@ -379,7 +381,8 @@
 	<copyField source="NLTitle_yearOfPublicationMin" dest="NLMetadata" />
 	<copyField source="NLTitle_yearOfPublicationMax" dest="NLMetadata" />
 	<copyField source="NLTitle_yearOfPublicationLabel" dest="NLMetadata" />
-	<copyField source="NLTitle_witnessYearMin" dest="NLMetadata" />
+	<copyField source="NLTitle_dateOfPublication" dest="NLMetadata" />
+  <copyField source="NLTitle_witnessYearMin" dest="NLMetadata" />
   <copyField source="NLTitle_witnessYearMax" dest="NLMetadata" />
   <copyField source="NLTitle_textYearMin" dest="NLMetadata" />
   <copyField source="NLTitle_textYearMax" dest="NLMetadata" />

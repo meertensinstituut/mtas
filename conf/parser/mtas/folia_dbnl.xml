@@ -73,6 +73,7 @@
 					<item type="ancestor" number="0" />
 					<item type="ancestorWord" number="1" />
 					<item type="unknownAncestor" number="0" />
+					<item type="attribute" name="class" not="true" condition="contemporary" />
 				</condition>
 			</mapping>
 			<mapping type="wordAnnotation" name="lemma">
@@ -88,9 +89,27 @@
 					<item type="attribute" name="class" />
 					<item type="ancestor" number="0" />
 					<item type="unknownAncestor" number="0" />
+					<item type="attribute" name="set" condition="https://raw.githubusercontent.com/proycon/folia/master/setdefinitions/int_lemmaid_withcompounds.foliaset.ttl" not="true" />
 				</condition>
 			</mapping>
-			<mapping type="wordAnnotation" name="morphology">
+			<mapping type="wordAnnotation" name="lemma">
+        <token type="string" offset="false" realoffset="false" parent="false">
+          <pre>
+            <item type="name" />
+            <item type="string" value=".id" />
+          </pre>
+          <post>
+            <item type="attribute" name="class" />
+          </post>
+        </token>
+        <condition>
+          <item type="attribute" name="class" />
+          <item type="ancestor" number="0" />
+          <item type="unknownAncestor" number="0" />
+          <item type="attribute" name="set" condition="https://raw.githubusercontent.com/proycon/folia/master/setdefinitions/int_lemmaid_withcompounds.foliaset.ttl" />
+        </condition>
+      </mapping>
+      <mapping type="wordAnnotation" name="morphology">
 				<condition>
 					<item type="ancestor" number="0" />
 					<item type="unknownAncestor" number="0" />
@@ -154,6 +173,7 @@
 					<item type="attribute" name="subset" />
 				</condition>
 			</mapping>
+			<!-- WORD ANNOTATIONS - MODERN -->
 			<mapping type="wordAnnotation" name="alignment">
         <condition>
           <item type="ancestor" number="0" />
@@ -369,6 +389,23 @@
         </condition>
       </mapping>
       <!-- END RELATIONS -->
+      
+      <!-- START RELATION ANNOTATIONS -->
+      <mapping type="relationAnnotation" name="alignment">
+        <token type="string" offset="false" realoffset="false" parent="false">
+          <pre>
+            <item type="ancestorRelationName" />
+            <item type="string" value=".href" />
+          </pre>
+          <post>
+            <item type="attribute" namespace="http://www.w3.org/1999/xlink" name="href" />
+          </post>
+        </token>
+        <condition>
+          <item type="attribute" namespace="http://www.w3.org/1999/xlink" name="href" />
+        </condition>
+      </mapping>
+      <!-- END RELATION ANNOTATIONS -->
 
 			<!-- START GROUPS -->
 			<mapping type="group" name="s">
