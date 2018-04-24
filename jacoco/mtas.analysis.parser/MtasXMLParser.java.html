@@ -39,7 +39,7 @@ import mtas.analysis.util.MtasConfiguration;
   /** The namespace URI. */
 <span class="fc" id="L40">  protected String namespaceURI = null;</span>
 
-  /** The namespace UR I id. */
+  /** The namespace URI  id. */
 <span class="fc" id="L43">  protected String namespaceURI_id = null;</span>
 
   /** The root tag. */
@@ -957,9 +957,20 @@ import mtas.analysis.util.MtasConfiguration;
 <span class="fc" id="L957">        currentObject.objectAttributes.put(</span>
 <span class="fc" id="L958">            streamReader.getAttributeLocalName(i),</span>
 <span class="fc" id="L959">            streamReader.getAttributeValue(i));</span>
+      } else {
+        HashMap&lt;String, String&gt; otherMap;
+<span class="pc bpc" id="L962" title="1 of 2 branches missed.">        if(!currentObject.objectOtherAttributes.containsKey(attributeNamespaceURI)) {</span>
+<span class="fc" id="L963">           otherMap = new HashMap&lt;&gt;();          </span>
+<span class="fc" id="L964">          currentObject.objectOtherAttributes.put(attributeNamespaceURI, otherMap);</span>
+        } else {
+<span class="nc" id="L966">          otherMap = currentObject.objectOtherAttributes.get(attributeNamespaceURI);</span>
+        }
+<span class="fc" id="L968">        otherMap.put(</span>
+<span class="fc" id="L969">            streamReader.getAttributeLocalName(i),</span>
+<span class="fc" id="L970">            streamReader.getAttributeValue(i));</span>
       }
     }
-<span class="fc" id="L962">  }</span>
+<span class="fc" id="L973">  }</span>
 
   /**
    * The Class MtasXMLParserMappingRelation.
@@ -970,13 +981,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping relation.
      */
-<span class="fc" id="L973">    public MtasXMLParserMappingRelation() {</span>
-<span class="fc" id="L974">      super();</span>
-<span class="fc" id="L975">      this.position = SOURCE_REFS;</span>
-<span class="fc" id="L976">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L977">      this.offset = SOURCE_REFS;</span>
-<span class="fc" id="L978">      this.type = MAPPING_TYPE_RELATION;</span>
-<span class="fc" id="L979">    }</span>
+<span class="fc" id="L984">    public MtasXMLParserMappingRelation() {</span>
+<span class="fc" id="L985">      super();</span>
+<span class="fc" id="L986">      this.position = SOURCE_REFS;</span>
+<span class="fc" id="L987">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L988">      this.offset = SOURCE_REFS;</span>
+<span class="fc" id="L989">      this.type = MAPPING_TYPE_RELATION;</span>
+<span class="fc" id="L990">    }</span>
 
     /*
      * (non-Javadoc)
@@ -985,7 +996,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingRelation self() {
-<span class="nc" id="L988">      return this;</span>
+<span class="nc" id="L999">      return this;</span>
     }
   }
 
@@ -998,13 +1009,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping relation annotation.
      */
-<span class="nc" id="L1001">    public MtasXMLParserMappingRelationAnnotation() {</span>
-<span class="nc" id="L1002">      super();</span>
-<span class="nc" id="L1003">      this.position = SOURCE_ANCESTOR_RELATION;</span>
-<span class="nc" id="L1004">      this.realOffset = SOURCE_OWN;</span>
-<span class="nc" id="L1005">      this.offset = SOURCE_ANCESTOR_RELATION;</span>
-<span class="nc" id="L1006">      this.type = MAPPING_TYPE_RELATION_ANNOTATION;</span>
-<span class="nc" id="L1007">    }</span>
+<span class="nc" id="L1012">    public MtasXMLParserMappingRelationAnnotation() {</span>
+<span class="nc" id="L1013">      super();</span>
+<span class="nc" id="L1014">      this.position = SOURCE_ANCESTOR_RELATION;</span>
+<span class="nc" id="L1015">      this.realOffset = SOURCE_OWN;</span>
+<span class="nc" id="L1016">      this.offset = SOURCE_ANCESTOR_RELATION;</span>
+<span class="nc" id="L1017">      this.type = MAPPING_TYPE_RELATION_ANNOTATION;</span>
+<span class="nc" id="L1018">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1013,7 +1024,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingRelationAnnotation self() {
-<span class="nc" id="L1016">      return this;</span>
+<span class="nc" id="L1027">      return this;</span>
     }
 
   }
@@ -1027,13 +1038,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping group.
      */
-<span class="fc" id="L1030">    public MtasXMLParserMappingGroup() {</span>
-<span class="fc" id="L1031">      super();</span>
-<span class="fc" id="L1032">      this.position = SOURCE_OWN;</span>
-<span class="fc" id="L1033">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1034">      this.offset = SOURCE_OWN;</span>
-<span class="fc" id="L1035">      this.type = MAPPING_TYPE_GROUP;</span>
-<span class="fc" id="L1036">    }</span>
+<span class="fc" id="L1041">    public MtasXMLParserMappingGroup() {</span>
+<span class="fc" id="L1042">      super();</span>
+<span class="fc" id="L1043">      this.position = SOURCE_OWN;</span>
+<span class="fc" id="L1044">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1045">      this.offset = SOURCE_OWN;</span>
+<span class="fc" id="L1046">      this.type = MAPPING_TYPE_GROUP;</span>
+<span class="fc" id="L1047">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1042,7 +1053,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingGroup self() {
-<span class="nc" id="L1045">      return this;</span>
+<span class="nc" id="L1056">      return this;</span>
     }
   }
 
@@ -1055,13 +1066,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping group annotation.
      */
-<span class="fc" id="L1058">    public MtasXMLParserMappingGroupAnnotation() {</span>
-<span class="fc" id="L1059">      super();</span>
-<span class="fc" id="L1060">      this.position = SOURCE_ANCESTOR_GROUP;</span>
-<span class="fc" id="L1061">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1062">      this.offset = SOURCE_ANCESTOR_GROUP;</span>
-<span class="fc" id="L1063">      this.type = MAPPING_TYPE_GROUP_ANNOTATION;</span>
-<span class="fc" id="L1064">    }</span>
+<span class="fc" id="L1069">    public MtasXMLParserMappingGroupAnnotation() {</span>
+<span class="fc" id="L1070">      super();</span>
+<span class="fc" id="L1071">      this.position = SOURCE_ANCESTOR_GROUP;</span>
+<span class="fc" id="L1072">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1073">      this.offset = SOURCE_ANCESTOR_GROUP;</span>
+<span class="fc" id="L1074">      this.type = MAPPING_TYPE_GROUP_ANNOTATION;</span>
+<span class="fc" id="L1075">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1070,7 +1081,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingGroupAnnotation self() {
-<span class="nc" id="L1073">      return this;</span>
+<span class="nc" id="L1084">      return this;</span>
     }
 
     /*
@@ -1082,12 +1093,12 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected void setStartEnd(String start, String end) {
-<span class="fc" id="L1085">      super.setStartEnd(start, end);</span>
-<span class="pc bpc" id="L1086" title="3 of 4 branches missed.">      if (start != null &amp;&amp; end != null) {</span>
-<span class="nc" id="L1087">        position = SOURCE_REFS;</span>
-<span class="nc" id="L1088">        offset = SOURCE_REFS;</span>
+<span class="fc" id="L1096">      super.setStartEnd(start, end);</span>
+<span class="pc bpc" id="L1097" title="3 of 4 branches missed.">      if (start != null &amp;&amp; end != null) {</span>
+<span class="nc" id="L1098">        position = SOURCE_REFS;</span>
+<span class="nc" id="L1099">        offset = SOURCE_REFS;</span>
       }
-<span class="fc" id="L1090">    }</span>
+<span class="fc" id="L1101">    }</span>
 
   }
 
@@ -1100,13 +1111,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping word.
      */
-<span class="fc" id="L1103">    public MtasXMLParserMappingWord() {</span>
-<span class="fc" id="L1104">      super();</span>
-<span class="fc" id="L1105">      this.position = SOURCE_OWN;</span>
-<span class="fc" id="L1106">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1107">      this.offset = SOURCE_OWN;</span>
-<span class="fc" id="L1108">      this.type = MAPPING_TYPE_WORD;</span>
-<span class="fc" id="L1109">    }</span>
+<span class="fc" id="L1114">    public MtasXMLParserMappingWord() {</span>
+<span class="fc" id="L1115">      super();</span>
+<span class="fc" id="L1116">      this.position = SOURCE_OWN;</span>
+<span class="fc" id="L1117">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1118">      this.offset = SOURCE_OWN;</span>
+<span class="fc" id="L1119">      this.type = MAPPING_TYPE_WORD;</span>
+<span class="fc" id="L1120">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1115,7 +1126,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingWord self() {
-<span class="nc" id="L1118">      return this;</span>
+<span class="nc" id="L1129">      return this;</span>
     }
   }
 
@@ -1128,13 +1139,13 @@ import mtas.analysis.util.MtasConfiguration;
     /**
      * Instantiates a new mtas XML parser mapping word annotation.
      */
-<span class="fc" id="L1131">    public MtasXMLParserMappingWordAnnotation() {</span>
-<span class="fc" id="L1132">      super();</span>
-<span class="fc" id="L1133">      this.position = SOURCE_OWN;</span>
-<span class="fc" id="L1134">      this.realOffset = SOURCE_OWN;</span>
-<span class="fc" id="L1135">      this.offset = SOURCE_ANCESTOR_WORD;</span>
-<span class="fc" id="L1136">      this.type = MAPPING_TYPE_WORD_ANNOTATION;</span>
-<span class="fc" id="L1137">    }</span>
+<span class="fc" id="L1142">    public MtasXMLParserMappingWordAnnotation() {</span>
+<span class="fc" id="L1143">      super();</span>
+<span class="fc" id="L1144">      this.position = SOURCE_OWN;</span>
+<span class="fc" id="L1145">      this.realOffset = SOURCE_OWN;</span>
+<span class="fc" id="L1146">      this.offset = SOURCE_ANCESTOR_WORD;</span>
+<span class="fc" id="L1147">      this.type = MAPPING_TYPE_WORD_ANNOTATION;</span>
+<span class="fc" id="L1148">    }</span>
 
     /*
      * (non-Javadoc)
@@ -1143,7 +1154,7 @@ import mtas.analysis.util.MtasConfiguration;
      */
     @Override
     protected MtasXMLParserMappingWordAnnotation self() {
-<span class="nc" id="L1146">      return this;</span>
+<span class="nc" id="L1157">      return this;</span>
     }
   }
 
