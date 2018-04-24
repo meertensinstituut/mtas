@@ -192,6 +192,65 @@
     required="false" multiValued="true" indexed="true" stored="true" />
 
 
+	<!-- component NLDocumentPart -->
+	<field name="NLDocumentPart_title" type="nederlab_text"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_subtitle" type="nederlab_text"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_genre" type="nederlab_string" required="false"
+    multiValued="true" indexed="true" stored="true" />
+  <field name="NLDocumentPart_primaryLanguage" type="nederlab_string"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_parentTitleID" type="nederlab_uuid"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_parentDependentTitleID" type="nederlab_uuid"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLPersonRef_personID" type="nederlab_uuid"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLPersonRef_role" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <dynamicField name="NLDocumentPart_NLPersonRef_personID_role_*"
+    type="nederlab_uuid" required="false" multiValued="true" indexed="true"
+    stored="true" />  
+	<field name="NLDocumentPart_startPage" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_endPage" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_anchor" type="nederlab_string"
+    required="false" multiValued="false" indexed="true" stored="true" />  
+  <field name="NLDocumentPart_yearOfPublicationMin" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_yearOfPublicationMax" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_yearOfPublicationApprox" type="nederlab_boolean"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_yearOfPublicationLabel" type="nederlab_text"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_dateOfPublication" type="nederlab_date"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_witnessYearMin" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_witnessYearMax" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_witnessYearApprox" type="nederlab_boolean"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_textYearMin" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_textYearMax" type="nederlab_int"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_textYearApprox" type="nederlab_boolean"
+    required="false" multiValued="false" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLLocalization_localizationPlace" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLLocalization_localizationProvince" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLLocalization_localizationCountry" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLLocalization_localizationRegion" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />
+  <field name="NLDocumentPart_NLLocalization_localizationKloekecode" type="nederlab_string"
+    required="false" multiValued="true" indexed="true" stored="true" />  
+  
 	<!-- component NLPerson -->
 	<field name="NLPerson_NLPersonName_nameId" type="nederlab_uuid"
 		required="false" multiValued="true" indexed="true" stored="true" />
@@ -357,6 +416,7 @@
 		indexed="true" stored="true" />
 	<field name="NLContent_mtasSource_size" type="nederlab_int"
 		indexed="true" stored="true" />
+		
 	<!-- Combined Field Metadata -->
 	<field name="NLMetadata" type="nederlab_text" required="false"
 		multiValued="true" indexed="true" stored="false" />
@@ -418,6 +478,24 @@
   <copyField source="NLDependentTitle_NLLocalization_localizationCountry" dest="NLMetadata" />
   <copyField source="NLDependentTitle_NLLocalization_localizationRegion" dest="NLMetadata" />
   <copyField source="NLDependentTitle_NLLocalization_localizationKloekecode" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_title" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_subtitle" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_genre" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_yearOfPublicationMin" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_yearOfPublicationMax" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_yearOfPublicationLabel" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_dateOfPublication" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_witnessYearMin" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_witnessYearMax" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_textYearMin" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_textYearMax" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_primaryLanguage" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_NLPersonRef_role" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_NLLocalization_localizationPlace" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_NLLocalization_localizationProvince" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_NLLocalization_localizationCountry" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_NLLocalization_localizationRegion" dest="NLMetadata" />
+  <copyField source="NLDocumentPart_NLLocalization_localizationKloekecode" dest="NLMetadata" />
   <copyField source="NLPerson_NLPersonName_lastName" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_firstName" dest="NLMetadata" />
 	<copyField source="NLPerson_NLPersonName_infixes" dest="NLMetadata" />
@@ -495,26 +573,6 @@
 		<analyzer type="query">
 			<tokenizer class="solr.StandardTokenizerFactory" />
 			<filter class="solr.LowerCaseFilterFactory" />
-		</analyzer>
-	</fieldType>
-
-	<fieldType name="mtas_text_example_test" class="solr.TextField"
-		postingsFormat="MtasCodec">
-		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				configFile="mtas/folia_test.xml" />
-		</analyzer>
-	</fieldType>
-
-	<fieldType name="mtas_text_example_local" class="solr.TextField"
-		postingsFormat="MtasCodec">
-		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				type="file" prefix="/local/data/" />
-			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				configFile="mtas/folia_test.xml" />
 		</analyzer>
 	</fieldType>
 

@@ -257,6 +257,24 @@
 					</post>
 				</token>
 			</mapping>
+			<mapping type="group" name="div">
+        <token type="string" offset="false">
+          <pre>
+            <item type="string" value="documentPart" />
+          </pre>          
+        </token>
+        <token type="string" offset="false">
+          <pre>
+            <item type="string" value="documentPart.anchor" />
+          </pre>
+          <post>
+            <item type="attribute" name="metadata" />
+          </post>
+        </token>
+        <condition>
+          <item type="attribute" name="metadata" />
+        </condition>
+      </mapping>
 			<mapping type="group" name="head">
 				<token type="string" offset="false">
 					<pre>
