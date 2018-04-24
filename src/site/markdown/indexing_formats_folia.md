@@ -23,6 +23,7 @@ The [configuration file](indexing_configuration.html#configuration) defining the
 * [groups](indexing_formats_folia.html#group) : containing one or multiple words
 * [groupAnnotations](indexing_formats_folia.html#groupAnnotation) occurring within a group 
 * [relations](indexing_formats_folia.html#relation) : containing one or multiple references
+* [relationAnnotations](indexing_formats_folia.html#relationAnnotation) : occuring within a relation
 * [references](indexing_formats_folia.html#reference) : elements referring to (typically) words by id
 
 Inside the *mappings* part of the configuration file, all elements are defined that may be mapped onto the index structure : *words*, *wordAnnotations*, *groups*, *groupAnnotations* and *relations*. Outside the *mappings* part the references can be defined, since a reference itself will never be mapped directly onto the index structure. 
@@ -183,6 +184,27 @@ Elements containing one or multiple [references](index_formats_folia.html#refere
   </condition>
 </mapping>
 ```
+
+<a name="relationAnnotation"></a>**Relation annotations**
+
+Elements within a [relation](index_formats_folia.html#relation) can be defined as *relationAnnotation*.
+
+```xml
+<mapping type="relationAnnotation" name="lang">
+  <token type="string" offset="false" realoffset="false" parent="false">
+    <pre>
+      <item type="name" />
+    </pre>
+    <post>
+      <item type="attribute" name="class" />
+    </post>
+  </token>
+  <condition>
+    <item type="attribute" name="href" />
+  </condition>
+</mapping>
+```
+
 
 <a name="reference"></a>**References**
 

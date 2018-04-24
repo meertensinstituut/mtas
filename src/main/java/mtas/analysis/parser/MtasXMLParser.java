@@ -39,7 +39,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   /** The namespace URI. */
   protected String namespaceURI = null;
 
-  /** The namespace UR I id. */
+  /** The namespace URI  id. */
   protected String namespaceURI_id = null;
 
   /** The root tag. */
@@ -955,6 +955,17 @@ abstract class MtasXMLParser extends MtasBasicParser {
       }
       if (namespaceURI == null || attributeNamespaceURI.equals(namespaceURI)) {
         currentObject.objectAttributes.put(
+            streamReader.getAttributeLocalName(i),
+            streamReader.getAttributeValue(i));
+      } else {
+        HashMap<String, String> otherMap;
+        if(!currentObject.objectOtherAttributes.containsKey(attributeNamespaceURI)) {
+           otherMap = new HashMap<>();          
+          currentObject.objectOtherAttributes.put(attributeNamespaceURI, otherMap);
+        } else {
+          otherMap = currentObject.objectOtherAttributes.get(attributeNamespaceURI);
+        }
+        otherMap.put(
             streamReader.getAttributeLocalName(i),
             streamReader.getAttributeValue(i));
       }

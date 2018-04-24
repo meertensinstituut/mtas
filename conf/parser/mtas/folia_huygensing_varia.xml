@@ -20,7 +20,7 @@
 		<!-- START GENERAL SETTINGS MTAS FOLIA PARSER -->
 		<autorepair value="true" />
 		<makeunique value="true" />
-		<!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
+    <!-- END GENERAL SETTINGS MTAS FOLIA PARSER -->
 
 		<!-- START REFERENCES -->
 		<references>
@@ -73,7 +73,6 @@
 					<item type="ancestor" number="0" />
 					<item type="ancestorWord" number="1" />
 					<item type="unknownAncestor" number="0" />
-					<item type="attribute" name="class" not="true" condition="contemporary" />
 				</condition>
 			</mapping>
 			<mapping type="wordAnnotation" name="lemma">
@@ -89,31 +88,9 @@
 					<item type="attribute" name="class" />
 					<item type="ancestor" number="0" />
 					<item type="unknownAncestor" number="0" />
-					<item type="attribute" name="set" condition="https://raw.githubusercontent.com/proycon/folia/master/setdefinitions/int_lemmaid_withcompounds.foliaset.ttl" not="true" />
 				</condition>
 			</mapping>
-			<mapping type="wordAnnotation" name="lemma">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="name" />
-            <item type="string" value=".id" />
-          </pre>
-          <post>
-            <item type="attribute" name="class" />
-          </post>
-        </token>
-        <condition>
-          <item type="attribute" name="class" />
-          <item type="ancestor" number="0" />
-          <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="set" condition="https://raw.githubusercontent.com/proycon/folia/master/setdefinitions/int_lemmaid_withcompounds.foliaset.ttl" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="morphology">
-				<condition>
-					<item type="ancestor" number="0" />
-					<item type="unknownAncestor" number="0" />
-				</condition>
+			<mapping type="wordAnnotation" name="morphology">
 			</mapping>
 			<mapping type="wordAnnotation" name="morpheme">
 				<condition>
@@ -131,8 +108,7 @@
 					</post>
 				</token>
 				<condition>
-					<item type="ancestor" number="2" />
-          <item type="ancestorName" distance="0" condition="morpheme" />
+					<item type="ancestorName" distance="0" condition="morpheme" />
 				</condition>
 			</mapping>
 			<mapping type="wordAnnotation" name="pos">
@@ -173,126 +149,6 @@
 					<item type="attribute" name="subset" />
 				</condition>
 			</mapping>
-			<!-- WORD ANNOTATIONS - MODERN -->
-			<mapping type="wordAnnotation" name="alignment">
-        <condition>
-          <item type="ancestor" number="0" />
-          <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="class" condition="modernization" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="aref">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="string" value="modern.t" />
-          </pre>
-          <post>
-            <item type="attribute" name="t" />
-          </post>
-        </token>
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="string" value="modern.t_lc" />
-          </pre>
-          <post>
-            <item type="attribute" name="t" filter="ascii,lowercase" />
-          </post>
-        </token>
-        <condition>
-          <item type="ancestor" number="1" />
-          <item type="ancestorName" distance="0" condition="alignment" />
-          <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="t" />
-        </condition>
-      </mapping>
-			<mapping type="wordAnnotation" name="alt">
-				<condition>
-					<item type="ancestor" number="0" />
-					<item type="unknownAncestor" number="0" />
-				</condition>
-			</mapping>
-			<mapping type="wordAnnotation" name="morphology">
-        <condition>
-          <item type="ancestor" number="1" />
-          <item type="unknownAncestor" number="0" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="morpheme">
-        <condition>
-          <item type="ancestor" number="2" />
-          <item type="ancestorName" condition="morphology" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="t">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="ancestorName" prefix="modern." />
-          </pre>
-          <post>
-            <item type="text" />
-          </post>
-        </token>
-        <condition>
-          <item type="ancestor" number="3" />
-          <item type="ancestorName" distance="0" condition="morpheme" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="pos">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="name" prefix="modern." />
-          </pre>
-          <post>
-            <item type="attribute" name="head" />
-          </post>
-          <payload>
-            <item type="attribute" name="confidence" />
-          </payload>
-        </token>
-        <condition>
-          <item type="ancestor" number="1" />
-          <item type="ancestorName" distance="0" condition="alt" />
-          <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="class" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="feat">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="name" prefix="modern." />
-            <item type="attribute" name="subset" prefix="." />
-          </pre>
-          <post>
-            <item type="attribute" name="class" />
-          </post>
-          <payload>
-            <item type="ancestorAttribute" distance="0" name="confidence" />
-          </payload>
-        </token>
-        <condition>
-          <item type="ancestor" number="2" />
-          <item type="ancestorName" distance="1" condition="alt" />
-          <item type="unknownAncestor" number="0" />
-          <item type="attribute" name="class" />
-          <item type="attribute" name="subset" />
-        </condition>
-      </mapping>
-      <mapping type="wordAnnotation" name="lemma">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="name" prefix="modern." />
-          </pre>
-          <post>
-            <item type="attribute" name="class" />
-          </post>
-        </token>
-        <condition>
-          <item type="attribute" name="class" />
-          <item type="ancestor" number="1" />
-          <item type="ancestorName" distance="0" condition="alt" />
-          <item type="unknownAncestor" number="0" />
-        </condition>
-      </mapping>
 			<!-- END WORD ANNOTATIONS -->
 
 			<!-- START RELATIONS -->
@@ -368,44 +224,7 @@
 					<item type="ancestorName" condition="entities" />
 				</condition>
 			</mapping>
-			<mapping type="relation" name="altlayers">			  
-      </mapping>
-      <mapping type="relation" name="entity">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="name" />
-          </pre>
-          <post>
-            <item type="attribute" name="class" />
-          </post>
-          <payload>
-            <item type="attribute" name="confidence" />
-          </payload>
-        </token>
-        <condition>
-          <item type="ancestor" number="2" />
-          <item type="ancestorName" distance="0" condition="entities" />
-          <item type="ancestorName" distance="1" condition="altlayers" />
-        </condition>
-      </mapping>
-      <!-- END RELATIONS -->
-      
-      <!-- START RELATION ANNOTATIONS -->
-      <mapping type="relationAnnotation" name="alignment">
-        <token type="string" offset="false" realoffset="false" parent="false">
-          <pre>
-            <item type="ancestorRelationName" />
-            <item type="string" value=".href" />
-          </pre>
-          <post>
-            <item type="attribute" namespace="http://www.w3.org/1999/xlink" name="href" />
-          </post>
-        </token>
-        <condition>
-          <item type="attribute" namespace="http://www.w3.org/1999/xlink" name="href" />
-        </condition>
-      </mapping>
-      <!-- END RELATION ANNOTATIONS -->
+			<!-- END RELATIONS -->
 
 			<!-- START GROUPS -->
 			<mapping type="group" name="s">
@@ -438,6 +257,24 @@
 					</post>
 				</token>
 			</mapping>
+			<mapping type="group" name="div">
+        <token type="string" offset="false">
+          <pre>
+            <item type="string" value="documentPart" />
+          </pre>          
+        </token>
+        <token type="string" offset="false">
+          <pre>
+            <item type="string" value="documentPart.anchor" />
+          </pre>
+          <post>
+            <item type="attribute" name="metadata" />
+          </post>
+        </token>
+        <condition>
+          <item type="attribute" name="metadata" />
+        </condition>
+      </mapping>
 			<mapping type="group" name="head">
 				<token type="string" offset="false">
 					<pre>
@@ -448,7 +285,7 @@
 					</post>
 				</token>
 			</mapping>
-			<mapping type="group" name="event">
+			<mapping type="group" name="note">
         <token type="string" offset="false">
           <pre>
             <item type="name" />
