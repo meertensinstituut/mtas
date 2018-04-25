@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -429,7 +430,9 @@ public class MtasSolrCollectionCache {
     Long timestamp = date.getTime();
     HashSet<String> idsToBeRemoved = new HashSet<>();
     // check expiration
-    for (Entry<String, Long> entry : expirationVersion.entrySet()) {
+    Iterator<Entry<String, Long>> expirationVersionEntryIterator = expirationVersion.entrySet().iterator();
+    while(expirationVersionEntryIterator.hasNext()) {
+      Entry<String, Long> entry = expirationVersionEntryIterator.next();
       if (entry.getValue() < timestamp) {
         String version = entry.getKey();
         if (versionToItem.containsKey(version)) {
@@ -451,8 +454,9 @@ public class MtasSolrCollectionCache {
           (Entry<String, Long> ele1, Entry<String, Long> ele2) -> ele2
               .getValue().compareTo(ele1.getValue()));
       aList.subList(maximumNumber, aList.size()).clear();
-      for (Entry<String, MtasSolrCollectionCacheItem> entry : versionToItem
-          .entrySet()) {
+      Iterator<Entry<String, MtasSolrCollectionCacheItem>> versionToItemEntryIterator = versionToItem.entrySet().iterator();
+      while(versionToItemEntryIterator.hasNext()) {
+        Entry<String, MtasSolrCollectionCacheItem> entry = versionToItemEntryIterator.next();
         if (!expirationVersion.containsKey(entry.getKey())) {
           idsToBeRemoved.add(entry.getValue().id);
         }
