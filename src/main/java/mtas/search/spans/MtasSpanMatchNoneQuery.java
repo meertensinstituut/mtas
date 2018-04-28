@@ -201,5 +201,10 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
     }
     return h;
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

@@ -628,5 +628,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       this.optional = optional;
     }
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

@@ -335,5 +335,10 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
       this.spanWeight = spanWeight;
     }
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

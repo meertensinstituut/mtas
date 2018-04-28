@@ -324,5 +324,10 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
       this.spanWeight = spanWeight;
     }
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

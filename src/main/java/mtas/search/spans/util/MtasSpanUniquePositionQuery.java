@@ -137,6 +137,11 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     super.disableTwoPhaseIterator();
     clause.disableTwoPhaseIterator();
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return clause.isMatchAllPositionsQuery();
+  }
 
   /**
    * The Class SpanUniquePositionWeight.

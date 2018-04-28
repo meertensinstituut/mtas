@@ -373,5 +373,10 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     bigQuery.disableTwoPhaseIterator();
     smallQuery.disableTwoPhaseIterator();
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

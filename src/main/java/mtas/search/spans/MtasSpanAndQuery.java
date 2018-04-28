@@ -199,5 +199,10 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
       item.disableTwoPhaseIterator();
     }
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

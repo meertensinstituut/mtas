@@ -383,5 +383,10 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
 //    }
 
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

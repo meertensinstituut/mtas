@@ -236,5 +236,10 @@ public class MtasSpanPositionQuery extends MtasSpanQuery {
     h = (h * 17) ^ end;
     return h;
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

@@ -72,6 +72,8 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.SortedDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
+import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -363,6 +365,7 @@ public class CodecCollector {
     // results
     Map<Integer, Integer> positionsData = null;
     Map<Integer, Integer> tokensData = null;
+    Set<MtasSpanQuery> spansNumberByPositions = null;
     Map<MtasSpanQuery, Map<Integer, Integer>> spansNumberData = null;
     Map<MtasSpanQuery, Map<Integer, List<Match>>> spansMatchData = null;
     Map<String, SortedMap<String, int[]>> facetData = null;
@@ -389,6 +392,7 @@ public class CodecCollector {
     // compute from spans for selected docs
     if (!fieldInfo.spanQueryList.isEmpty()) {
       // check for statsSpans
+      spansNumberByPositions = new HashSet<>();
       spansNumberData = new HashMap<>();
       spansMatchData = new HashMap<>();
       facetData = new HashMap<>();
@@ -518,7 +522,10 @@ public class CodecCollector {
             Iterator<Integer> docIterator = docSet.iterator();
             // numeric or sorted
             if (fi.getDocValuesType().equals(DocValuesType.NUMERIC)
-                || fi.getDocValuesType().equals(DocValuesType.SORTED)) {
+                || fi.getDocValuesType().equals(DocValuesType.SORTED)
+                || fi.getDocValuesType().equals(DocValuesType.SORTED_SET)
+                || fi.getDocValuesType().equals(DocValuesType.SORTED_NUMERIC)
+                || fi.getDocValuesType().equals(DocValuesType.BINARY)) {
               // create map of values to corresponding docIds
               Map<Object, List<Integer>> facetDataSubList = new HashMap<>();
               // numeric
@@ -539,7 +546,56 @@ public class CodecCollector {
                     }
                   }
                 }
-                // sorted
+              // sorted numeric
+              } else if (fi.getDocValuesType().equals(DocValuesType.SORTED_NUMERIC)) {
+                SortedNumericDocValues docValues = r.getContext().reader()
+                    .getSortedNumericDocValues(entry.getKey());
+                int docId;
+                while (docIterator.hasNext()) {
+                  docId = docIterator.next() - lrc.docBase;
+                  if (docValues.advanceExact(docId)) {
+                    int n = docValues.docValueCount();
+                    for(int i =0; i<n; i++) {
+                      long value = docValues.nextValue();
+                      if (!facetDataSubList.containsKey(value)) {
+                        List<Integer> facetDataSubListItem = new ArrayList<>();
+                        facetDataSubListItem.add(docId + lrc.docBase);
+                        facetDataSubList.put(value, facetDataSubListItem);
+                      } else {
+                        facetDataSubList.get(value).add(docId + lrc.docBase);
+                      }  
+                    }                    
+                  }
+                }
+             // sorted set
+              } else if (fi.getDocValuesType().equals(DocValuesType.SORTED_SET)) {
+                SortedSetDocValues docValues = r.getContext().reader()
+                    .getSortedSetDocValues(entry.getKey());
+                int docId;
+                Map<Long, String> dictionary = new HashMap<>();
+                while (docIterator.hasNext()) {
+                  docId = docIterator.next() - lrc.docBase;
+                  if (docValues.advanceExact(docId)) {
+                    long tmpValue;
+                    String value;
+                    while((tmpValue=docValues.nextOrd()) != SortedSetDocValues.NO_MORE_ORDS) {
+                      if(!dictionary.containsKey(tmpValue)) {
+                        value = docValues.lookupOrd(tmpValue).utf8ToString();
+                        dictionary.put(tmpValue, value);
+                      } else {
+                        value = dictionary.get(tmpValue);
+                      }
+                      if (!facetDataSubList.containsKey(value)) {
+                        List<Integer> facetDataSubListItem = new ArrayList<>();
+                        facetDataSubListItem.add(docId + lrc.docBase);
+                        facetDataSubList.put(value, facetDataSubListItem);
+                      } else {
+                        facetDataSubList.get(value).add(docId + lrc.docBase);
+                      }
+                    }
+                  }
+                }
+              // sorted
               } else if (fi.getDocValuesType().equals(DocValuesType.SORTED)) {
                 SortedDocValues docValues = r.getContext().reader()
                     .getSortedDocValues(entry.getKey());
@@ -549,7 +605,7 @@ public class CodecCollector {
                   if (docValues.advanceExact(docId)) {
                     String value = docValues.binaryValue().utf8ToString();
                     if (!facetDataSubList.containsKey(value)) {
-                      List<Integer> facetDataSubListItem = new ArrayList<Integer>();
+                      List<Integer> facetDataSubListItem = new ArrayList<>();
                       facetDataSubListItem.add(docId + lrc.docBase);
                       facetDataSubList.put(value, facetDataSubListItem);
                     } else {
@@ -661,19 +717,32 @@ public class CodecCollector {
         }
       }
 
+      // collect matches and numbers for queries
       for (MtasSpanQuery sq : fieldInfo.spanQueryList) {
-        // what to collect
+        // what to collect : numbers
         if (spansNumberData.containsKey(sq)) {
           numberData = spansNumberData.get(sq);
         } else {
           numberData = null;
         }
+        // what to collect: matches
         if (spansMatchData.containsKey(sq)) {
           matchData = spansMatchData.get(sq);
         } else {
           matchData = null;
         }
-        if ((numberData != null) || (matchData != null)) {
+        boolean doNormalCollection = true;
+        // if only number is needed, possibly termvectors can be used
+        if ((numberData != null) && (matchData == null)) {
+          if (sq.isMatchAllPositionsQuery()) {
+            spansNumberByPositions.add(sq);
+            needPositions = true;
+            doNormalCollection = false;
+          }
+        }
+        // collect (if termvector collection didn't work)
+        if (doNormalCollection
+            && ((numberData != null) || (matchData != null))) {
           Spans spans = spansQueryWeight.get(sq).getSpans(lrc,
               SpanWeight.Postings.POSITIONS);
           if (spans != null) {
@@ -756,6 +825,11 @@ public class CodecCollector {
         positionsData = new HashMap<>();
         for (int docId : docSet) {
           positionsData.put(docId, 0);
+        }
+      }
+      if (spansNumberByPositions != null && spansNumberData != null) {
+        for (MtasSpanQuery sq : spansNumberByPositions) {
+          spansNumberData.put(sq, positionsData);
         }
       }
     }

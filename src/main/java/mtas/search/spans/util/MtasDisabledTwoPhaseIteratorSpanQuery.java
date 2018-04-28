@@ -125,6 +125,11 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     super.disableTwoPhaseIterator();
     subQuery.disableTwoPhaseIterator();
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
   /**
    * The Class MtasDisabledTwoPhaseIteratorWeight.

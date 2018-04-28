@@ -130,5 +130,10 @@ public class MtasCQLParserWordPositionQuery extends MtasSpanQuery {
     super.disableTwoPhaseIterator();
     query.disableTwoPhaseIterator();
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

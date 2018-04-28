@@ -132,7 +132,9 @@ public abstract class MtasSpanQuery extends SpanQuery {
   public final boolean isSinglePositionQuery() {
     return singlePositionQuery;
   }
-
+  
+  public abstract boolean isMatchAllPositionsQuery();
+  
   /*
    * (non-Javadoc)
    * 

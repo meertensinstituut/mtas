@@ -216,4 +216,9 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
     query.disableTwoPhaseIterator();
   }
 
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
+
 }

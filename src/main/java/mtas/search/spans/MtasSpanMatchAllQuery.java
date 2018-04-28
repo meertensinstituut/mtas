@@ -233,5 +233,10 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
     h = (h * 7) ^ field.hashCode();
     return h;
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return true;
+  }
 
 }

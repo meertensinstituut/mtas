@@ -121,4 +121,9 @@ public class MtasSpanTermQuery extends MtasSpanQuery {
     return baseQuery.hashCode();
   }
 
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
+  
 }

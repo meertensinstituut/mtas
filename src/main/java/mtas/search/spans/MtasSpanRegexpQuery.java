@@ -176,5 +176,10 @@ public class MtasSpanRegexpQuery extends MtasSpanQuery {
     h += (singlePosition ? 1 : 0);
     return h;
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }

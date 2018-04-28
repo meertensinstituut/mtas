@@ -315,5 +315,10 @@ public class MtasSpanFollowedByQuery extends MtasSpanQuery {
       this.spanWeight = spanWeight;
     }
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+    return false;
+  }
 
 }
