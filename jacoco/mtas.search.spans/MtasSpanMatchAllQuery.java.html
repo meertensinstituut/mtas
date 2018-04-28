@@ -136,10 +136,10 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
 <span class="fc" id="L136">          hasMethod = false;</span>
 <span class="fc" id="L137">          Method[] methods = r.getClass().getMethods();</span>
 <span class="fc bfc" id="L138" title="All 2 branches covered.">          for (Method m : methods) {</span>
-<span class="fc bfc" id="L139" title="All 2 branches covered.">            if (m.getName().equals(METHOD_GET_DELEGATE)) {</span>
-<span class="fc" id="L140">              hasMethod = true;</span>
-<span class="fc" id="L141">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
-<span class="fc" id="L142">              break;</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">            if (m.getName().equals(METHOD_GET_DELEGATE)) {</span>
+<span class="nc" id="L140">              hasMethod = true;</span>
+<span class="nc" id="L141">              r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="nc" id="L142">              break;</span>
             }
           }
 <span class="fc" id="L145">        }</span>
@@ -232,6 +232,11 @@ public class MtasSpanMatchAllQuery extends MtasSpanQuery {
 <span class="fc" id="L232">    int h = this.getClass().getSimpleName().hashCode();</span>
 <span class="fc" id="L233">    h = (h * 7) ^ field.hashCode();</span>
 <span class="fc" id="L234">    return h;</span>
+  }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="fc" id="L239">    return true;</span>
   }
 
 }

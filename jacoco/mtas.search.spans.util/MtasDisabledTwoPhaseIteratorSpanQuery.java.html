@@ -125,6 +125,11 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
 <span class="nc" id="L125">    super.disableTwoPhaseIterator();</span>
 <span class="nc" id="L126">    subQuery.disableTwoPhaseIterator();</span>
 <span class="nc" id="L127">  }</span>
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="nc" id="L131">    return false;</span>
+  }
 
   /**
    * The Class MtasDisabledTwoPhaseIteratorWeight.
@@ -143,11 +148,11 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public MtasDisabledTwoPhaseIteratorWeight(SpanWeight subWeight,
-<span class="fc" id="L146">        IndexSearcher searcher, boolean needsScores, float boost) throws IOException {</span>
-<span class="pc bpc" id="L147" title="1 of 2 branches missed.">      super(subQuery, searcher,</span>
-<span class="pc" id="L148">          needsScores ? getTermContexts(subWeight) : null, boost);</span>
-<span class="fc" id="L149">      this.subWeight = subWeight;</span>
-<span class="fc" id="L150">    }</span>
+<span class="fc" id="L151">        IndexSearcher searcher, boolean needsScores, float boost) throws IOException {</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">      super(subQuery, searcher,</span>
+<span class="pc" id="L153">          needsScores ? getTermContexts(subWeight) : null, boost);</span>
+<span class="fc" id="L154">      this.subWeight = subWeight;</span>
+<span class="fc" id="L155">    }</span>
 
     /*
      * (non-Javadoc)
@@ -158,8 +163,8 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L161">      subWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L162">    }</span>
+<span class="nc" id="L166">      subWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L167">    }</span>
 
     /*
      * (non-Javadoc)
@@ -172,8 +177,8 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
-<span class="fc" id="L175">      return new MtasDisabledTwoPhaseIteratorSpans(</span>
-<span class="fc" id="L176">          subWeight.getSpans(ctx, requiredPostings));</span>
+<span class="fc" id="L180">      return new MtasDisabledTwoPhaseIteratorSpans(</span>
+<span class="fc" id="L181">          subWeight.getSpans(ctx, requiredPostings));</span>
     }
 
     /*
@@ -183,8 +188,8 @@ public class MtasDisabledTwoPhaseIteratorSpanQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L186">      subWeight.extractTerms(terms);</span>
-<span class="nc" id="L187">    }</span>
+<span class="nc" id="L191">      subWeight.extractTerms(terms);</span>
+<span class="nc" id="L192">    }</span>
     
 //    @Override
 //    public boolean isCacheable(LeafReaderContext arg0) {

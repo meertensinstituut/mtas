@@ -199,6 +199,11 @@ public class MtasSpanAndQuery extends MtasSpanQuery {
 <span class="nc" id="L199">      item.disableTwoPhaseIterator();</span>
 <span class="nc" id="L200">    }</span>
 <span class="nc" id="L201">  }</span>
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="nc" id="L205">    return false;</span>
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -335,6 +335,11 @@ public class MtasSpanFullyAlignedWithQuery extends MtasSpanQuery {
 <span class="fc" id="L335">      this.spanWeight = spanWeight;</span>
 <span class="fc" id="L336">    }</span>
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="nc" id="L341">    return false;</span>
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

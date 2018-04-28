@@ -201,6 +201,11 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
     }
 <span class="nc" id="L202">    return h;</span>
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="nc" id="L207">    return false;</span>
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

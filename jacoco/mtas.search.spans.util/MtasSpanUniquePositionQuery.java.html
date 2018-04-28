@@ -137,6 +137,11 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
 <span class="fc" id="L137">    super.disableTwoPhaseIterator();</span>
 <span class="fc" id="L138">    clause.disableTwoPhaseIterator();</span>
 <span class="fc" id="L139">  }</span>
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="fc" id="L143">    return clause.isMatchAllPositionsQuery();</span>
+  }
 
   /**
    * The Class SpanUniquePositionWeight.
@@ -156,10 +161,10 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      */
     public SpanUniquePositionWeight(SpanWeight subWeight,
         IndexSearcher searcher, Map&lt;Term, TermContext&gt; terms, float boost)
-<span class="fc" id="L159">        throws IOException {</span>
-<span class="fc" id="L160">      super(MtasSpanUniquePositionQuery.this, searcher, terms, boost);</span>
-<span class="fc" id="L161">      this.subWeight = subWeight;</span>
-<span class="fc" id="L162">    }</span>
+<span class="fc" id="L164">        throws IOException {</span>
+<span class="fc" id="L165">      super(MtasSpanUniquePositionQuery.this, searcher, terms, boost);</span>
+<span class="fc" id="L166">      this.subWeight = subWeight;</span>
+<span class="fc" id="L167">    }</span>
 
     /*
      * (non-Javadoc)
@@ -170,8 +175,8 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L173">      subWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L174">    }</span>
+<span class="nc" id="L178">      subWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L179">    }</span>
 
     /*
      * (non-Javadoc)
@@ -184,11 +189,11 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
-<span class="fc" id="L187">      Spans subSpan = subWeight.getSpans(context, requiredPostings);</span>
-<span class="fc bfc" id="L188" title="All 2 branches covered.">      if (subSpan == null) {</span>
-<span class="fc" id="L189">        return null;</span>
+<span class="fc" id="L192">      Spans subSpan = subWeight.getSpans(context, requiredPostings);</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">      if (subSpan == null) {</span>
+<span class="fc" id="L194">        return null;</span>
       } else {
-<span class="fc" id="L191">        return new MtasSpanUniquePositionSpans(MtasSpanUniquePositionQuery.this,</span>
+<span class="fc" id="L196">        return new MtasSpanUniquePositionSpans(MtasSpanUniquePositionQuery.this,</span>
             subSpan);
       }
     }
@@ -200,8 +205,8 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L203">      subWeight.extractTerms(terms);</span>
-<span class="nc" id="L204">    }</span>
+<span class="nc" id="L208">      subWeight.extractTerms(terms);</span>
+<span class="nc" id="L209">    }</span>
     
 //    @Override
 //    public boolean isCacheable(LeafReaderContext arg0) {

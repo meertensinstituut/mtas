@@ -373,6 +373,11 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
 <span class="fc" id="L373">    bigQuery.disableTwoPhaseIterator();</span>
 <span class="fc" id="L374">    smallQuery.disableTwoPhaseIterator();</span>
 <span class="fc" id="L375">  }</span>
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="fc" id="L379">    return false;</span>
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

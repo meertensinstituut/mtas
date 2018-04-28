@@ -184,6 +184,11 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
 <span class="fc" id="L184">    super.disableTwoPhaseIterator();</span>
 <span class="fc" id="L185">    query.disableTwoPhaseIterator();</span>
 <span class="fc" id="L186">  }</span>
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="nc" id="L190">    return false;</span>
+  }
 
   /**
    * The Class MtasMaximumExpandWeight.
@@ -208,11 +213,11 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public MtasMaximumExpandWeight(SpanWeight subWeight, IndexSearcher searcher,
-<span class="fc" id="L211">        boolean needsScores, float boost) throws IOException {</span>
-<span class="pc bpc" id="L212" title="1 of 2 branches missed.">      super(MtasMaximumExpandSpanQuery.this, searcher,</span>
-<span class="pc" id="L213">          needsScores ? getTermContexts(subWeight) : null, boost);</span>
-<span class="fc" id="L214">      this.subWeight = subWeight;</span>
-<span class="fc" id="L215">    }</span>
+<span class="fc" id="L216">        boolean needsScores, float boost) throws IOException {</span>
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">      super(MtasMaximumExpandSpanQuery.this, searcher,</span>
+<span class="pc" id="L218">          needsScores ? getTermContexts(subWeight) : null, boost);</span>
+<span class="fc" id="L219">      this.subWeight = subWeight;</span>
+<span class="fc" id="L220">    }</span>
 
     /*
      * (non-Javadoc)
@@ -223,8 +228,8 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTermContexts(Map&lt;Term, TermContext&gt; contexts) {
-<span class="nc" id="L226">      subWeight.extractTermContexts(contexts);</span>
-<span class="nc" id="L227">    }</span>
+<span class="nc" id="L231">      subWeight.extractTermContexts(contexts);</span>
+<span class="nc" id="L232">    }</span>
 
     /*
      * (non-Javadoc)
@@ -237,40 +242,40 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
     @Override
     public Spans getSpans(LeafReaderContext ctx, Postings requiredPostings)
         throws IOException {
-<span class="fc" id="L240">      Spans spans = subWeight.getSpans(ctx, requiredPostings);</span>
-<span class="pc bpc" id="L241" title="2 of 6 branches missed.">      if ((maximumLeft == 0 &amp;&amp; maximumRight == 0) || spans == null) {</span>
-<span class="nc" id="L242">        return spans;</span>
+<span class="fc" id="L245">      Spans spans = subWeight.getSpans(ctx, requiredPostings);</span>
+<span class="pc bpc" id="L246" title="2 of 6 branches missed.">      if ((maximumLeft == 0 &amp;&amp; maximumRight == 0) || spans == null) {</span>
+<span class="nc" id="L247">        return spans;</span>
       } else {
         try {
           // get leafreader
-<span class="fc" id="L246">          LeafReader r = ctx.reader();</span>
+<span class="fc" id="L251">          LeafReader r = ctx.reader();</span>
           // get delegate
-<span class="fc" id="L248">          Boolean hasMethod = true;</span>
-<span class="fc bfc" id="L249" title="All 2 branches covered.">          while (hasMethod) {</span>
-<span class="fc" id="L250">            hasMethod = false;</span>
-<span class="fc" id="L251">            Method[] methods = r.getClass().getMethods();</span>
-<span class="fc bfc" id="L252" title="All 2 branches covered.">            for (Method m : methods) {</span>
-<span class="pc bpc" id="L253" title="1 of 2 branches missed.">              if (m.getName().equals(METHOD_GET_DELEGATE)) {</span>
-<span class="nc" id="L254">                hasMethod = true;</span>
-<span class="nc" id="L255">                r = (LeafReader) m.invoke(r, (Object[]) null);</span>
-<span class="nc" id="L256">                break;</span>
+<span class="fc" id="L253">          Boolean hasMethod = true;</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">          while (hasMethod) {</span>
+<span class="fc" id="L255">            hasMethod = false;</span>
+<span class="fc" id="L256">            Method[] methods = r.getClass().getMethods();</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">            for (Method m : methods) {</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">              if (m.getName().equals(METHOD_GET_DELEGATE)) {</span>
+<span class="nc" id="L259">                hasMethod = true;</span>
+<span class="nc" id="L260">                r = (LeafReader) m.invoke(r, (Object[]) null);</span>
+<span class="nc" id="L261">                break;</span>
               }
             }
-<span class="fc" id="L259">          } // get fieldsproducer</span>
-<span class="fc" id="L260">          Method fpm = r.getClass().getMethod(METHOD_GET_POSTINGS_READER,</span>
+<span class="fc" id="L264">          } // get fieldsproducer</span>
+<span class="fc" id="L265">          Method fpm = r.getClass().getMethod(METHOD_GET_POSTINGS_READER,</span>
               (Class&lt;?&gt;[]) null);
-<span class="fc" id="L262">          FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
+<span class="fc" id="L267">          FieldsProducer fp = (FieldsProducer) fpm.invoke(r, (Object[]) null);</span>
           // get MtasFieldsProducer using terms
-<span class="fc" id="L264">          Terms t = fp.terms(field);</span>
-<span class="pc bpc" id="L265" title="1 of 2 branches missed.">          if (t == null) {</span>
-<span class="nc" id="L266">            return new MtasSpanMatchNoneSpans(MtasMaximumExpandSpanQuery.this);</span>
+<span class="fc" id="L269">          Terms t = fp.terms(field);</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">          if (t == null) {</span>
+<span class="nc" id="L271">            return new MtasSpanMatchNoneSpans(MtasMaximumExpandSpanQuery.this);</span>
           } else {
-<span class="fc" id="L268">            CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
-<span class="fc" id="L269">            return new MtasMaximumExpandSpans(MtasMaximumExpandSpanQuery.this,</span>
-<span class="fc" id="L270">                mtasCodecInfo, query.getField(), spans);</span>
+<span class="fc" id="L273">            CodecInfo mtasCodecInfo = CodecInfo.getCodecInfoFromTerms(t);</span>
+<span class="fc" id="L274">            return new MtasMaximumExpandSpans(MtasMaximumExpandSpanQuery.this,</span>
+<span class="fc" id="L275">                mtasCodecInfo, query.getField(), spans);</span>
           }
-<span class="nc" id="L272">        } catch (Exception e) {</span>
-<span class="nc" id="L273">          throw new IOException(&quot;Can't get reader&quot;, e);</span>
+<span class="nc" id="L277">        } catch (Exception e) {</span>
+<span class="nc" id="L278">          throw new IOException(&quot;Can't get reader&quot;, e);</span>
         }
 
       }
@@ -283,8 +288,8 @@ public class MtasMaximumExpandSpanQuery extends MtasSpanQuery {
      */
     @Override
     public void extractTerms(Set&lt;Term&gt; terms) {
-<span class="nc" id="L286">      subWeight.extractTerms(terms);</span>
-<span class="nc" id="L287">    }</span>
+<span class="nc" id="L291">      subWeight.extractTerms(terms);</span>
+<span class="nc" id="L292">    }</span>
     
 //    @Override
 //    public boolean isCacheable(LeafReaderContext arg0) {

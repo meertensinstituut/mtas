@@ -324,6 +324,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 <span class="fc" id="L324">      this.spanWeight = spanWeight;</span>
 <span class="fc" id="L325">    }</span>
   }
+  
+  @Override
+  public boolean isMatchAllPositionsQuery() {
+<span class="nc" id="L330">    return false;</span>
+  }
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
