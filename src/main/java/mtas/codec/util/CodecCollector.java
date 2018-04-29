@@ -3447,7 +3447,7 @@ public class CodecCollector {
                               registerStatus);
                         }
                       }
-                    }
+                    } 
                     // stop after termCounterMaximum
                     if (termVector.subComponentFunction.sortType
                         .equals(CodecUtil.SORT_TERM)
