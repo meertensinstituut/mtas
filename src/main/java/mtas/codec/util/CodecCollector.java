@@ -21,6 +21,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenString;
@@ -827,9 +828,10 @@ public class CodecCollector {
           positionsData.put(docId, 0);
         }
       }
-      if (spansNumberByPositions != null && spansNumberData != null) {
+      if (spansNumberByPositions != null && spansNumberData != null) {        
         for (MtasSpanQuery sq : spansNumberByPositions) {
-          spansNumberData.put(sq, positionsData);
+          Map<Integer,Integer> numberData = spansNumberData.get(sq);
+          positionsData.forEach((k,v) -> numberData.put(k,v!=null?v:0));          
         }
       }
     }
