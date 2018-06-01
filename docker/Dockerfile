@@ -1,11 +1,11 @@
 # Automatically generated Dockerfile 
-# - Build 2018-04-30 13:28
-# - Lucene/Solr version 7.3.0
-# - Mtas release 7.3.0.3 
+# - Build 2018-06-01 18:58
+# - Lucene/Solr version 7.3.1
+# - Mtas release 7.3.1.0 
 #
 
 FROM ubuntu:16.04
-MAINTAINER Matthijs Brouwer, Meertens Institute
+MAINTAINER Matthijs Brouwer, Textexploration.org
 
 EXPOSE 8983 80
   
@@ -15,7 +15,7 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/v7.3.0.3/mtas-7.3.0.3.jar /root/lib/
+ADD https://github.com/textexploration/mtas/releases/download/v7.3.1.0/mtas-7.3.1.0.jar /root/lib/
 
 RUN apt-get update && apt-get install -y locales lsof software-properties-common python-software-properties apache2 curl subversion && \
     locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en
@@ -32,7 +32,7 @@ RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binarie
     tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 && \
     rm lib/commons-math3-3.6.1-bin.tar.gz
     
-RUN svn export https://github.com/meertensinstituut/mtas/trunk/docker/ data 
+RUN svn export https://github.com/textexploration/mtas/trunk/docker/ data 
 
 RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get update && \
@@ -40,17 +40,17 @@ RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get install -y oracle-java8-installer && \
     rm -rf /var/lib/apt/lists/*
 
-RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/7.3.0/solr-7.3.0.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
+RUN solrurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/lucene/solr/7.3.1/solr-7.3.1.tgz' |   grep -o '<strong>[^<]*</strong>' |   sed 's/<[^>]*>//g' |   head -1) && \
     if echo "$solrurl" | grep -q '^.*[^ ].*$'; then \
-      curl -f -o /root/solr-7.3.0.tgz -O $solrurl || true; \
+      curl -f -o /root/solr-7.3.1.tgz -O $solrurl || true; \
     fi && \
-    if [ ! -f /root/solr-7.3.0.tgz ]; then \
-      echo "Solr 7.3.0 not found in mirror, falling back to apache archive"; \ 
-      solrurl="http://archive.apache.org/dist/lucene/solr/7.3.0/solr-7.3.0.tgz"; \
-      curl -f -o /root/solr-7.3.0.tgz -O $solrurl; \ 
+    if [ ! -f /root/solr-7.3.1.tgz ]; then \
+      echo "Solr 7.3.1 not found in mirror, falling back to apache archive"; \ 
+      solrurl="http://archive.apache.org/dist/lucene/solr/7.3.1/solr-7.3.1.tgz"; \
+      curl -f -o /root/solr-7.3.1.tgz -O $solrurl; \ 
     fi && \    
-    tar xzf solr-7.3.0.tgz solr-7.3.0/bin/install_solr_service.sh --strip-components=2 && \
-    bash ./install_solr_service.sh solr-7.3.0.tgz && rm install_solr_service.sh && rm -rf solr-7.3.0.tgz
+    tar xzf solr-7.3.1.tgz solr-7.3.1/bin/install_solr_service.sh --strip-components=2 && \
+    bash ./install_solr_service.sh solr-7.3.1.tgz && rm install_solr_service.sh && rm -rf solr-7.3.1.tgz
     
 RUN service apache2 stop && \
     echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf && \
@@ -74,10 +74,10 @@ RUN service apache2 stop && \
     chmod -R 755 /var/www/html && \
     printf "echo\n" >> /start.sh && \
     printf "echo \"================ Mtas -- Multi Tier Annotation Search =================\"\n" >> /start.sh && \
-    printf "echo \"  Timestamp 2018-04-30 13:28\"\n" >> /start.sh && \
-    printf "echo \"  Lucene/Solr version 7.3.0\"\n" >> /start.sh && \
-    printf "echo \"  Mtas release 7.3.0.3\"\n" >> /start.sh && \
-    printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \
+    printf "echo \"  Timestamp 2018-06-01 18:58\"\n" >> /start.sh && \
+    printf "echo \"  Lucene/Solr version 7.3.1\"\n" >> /start.sh && \
+    printf "echo \"  Mtas release 7.3.1.0\"\n" >> /start.sh && \
+    printf "echo \"  See https://textexploration.github.io/mtas/ for more information\"\n" >> /start.sh && \
     printf "echo \"=======================================================================\"\n" >> /start.sh && \
     printf "echo\n" >> /start.sh && \
     printf "service solr start\nservice apache2 start\n" >> /start.sh && \
@@ -85,7 +85,7 @@ RUN service apache2 stop && \
     mkdir demo1 && mkdir demo1/lib && mkdir demo1/conf && \
     echo "name=demo1" > demo1/core.properties && \
     cp lib/commons-math3-3.6.1.jar demo1/lib/ && \
-    cp lib/mtas-7.3.0.3.jar demo1/lib/ && \
+    cp lib/mtas-7.3.1.0.jar demo1/lib/ && \
     cp data/solrconfig.xml demo1/conf/ && \
     cp data/schemaBasic.xml demo1/conf/schema.xml && \
     cp -r data/mtas demo1/conf/ && cp data/mtas.xml demo1/conf/ && \
