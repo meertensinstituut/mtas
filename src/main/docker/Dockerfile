@@ -5,7 +5,7 @@
 #
 
 FROM ubuntu:16.04
-MAINTAINER Matthijs Brouwer, Meertens Institute
+MAINTAINER Matthijs Brouwer, Textexploration.org
 
 EXPOSE 8983 80
   
@@ -15,7 +15,7 @@ WORKDIR "/root"
 
 RUN mkdir lib 
 
-ADD https://github.com/meertensinstituut/mtas/releases/download/v${project.version}/mtas-${project.version}.jar /root/lib/
+ADD https://github.com/textexploration/mtas/releases/download/v${project.version}/mtas-${project.version}.jar /root/lib/
 
 RUN apt-get update && apt-get install -y locales lsof software-properties-common python-software-properties apache2 curl subversion && \
     locale-gen en_US.UTF-8 en_US && update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en
@@ -32,7 +32,7 @@ RUN mathurl=$(curl -s 'http://www.apache.org/dyn/closer.lua/commons/math/binarie
     tar xzf lib/commons-math3-3.6.1-bin.tar.gz -C lib commons-math3-3.6.1/commons-math3-3.6.1.jar --strip-components=1 && \
     rm lib/commons-math3-3.6.1-bin.tar.gz
     
-RUN svn export https://github.com/meertensinstituut/mtas/trunk/docker/ data 
+RUN svn export https://github.com/textexploration/mtas/trunk/docker/ data 
 
 RUN add-apt-repository -y ppa:webupd8team/java && \
     apt-get update && \
@@ -77,7 +77,7 @@ RUN service apache2 stop && \
     printf "echo \"  Timestamp ${timestamp}\"\n" >> /start.sh && \
     printf "echo \"  Lucene/Solr version ${currentLuceneVersion}\"\n" >> /start.sh && \
     printf "echo \"  Mtas release ${project.version}\"\n" >> /start.sh && \
-    printf "echo \"  See https://meertensinstituut.github.io/mtas/ for more information\"\n" >> /start.sh && \
+    printf "echo \"  See https://textexploration.github.io/mtas/ for more information\"\n" >> /start.sh && \
     printf "echo \"=======================================================================\"\n" >> /start.sh && \
     printf "echo\n" >> /start.sh && \
     printf "service solr start\nservice apache2 start\n" >> /start.sh && \

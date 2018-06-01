@@ -3,12 +3,12 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<currentLuceneVersion>7.3.0</currentLuceneVersion>
+		<currentLuceneVersion>7.3.1</currentLuceneVersion>
 	</properties>
 	<scm>
-		<connection>scm:git:https://github.com/meertensinstituut/mtas.git</connection>
-		<url>http://github.com/meertensinstituut/mtas</url>
-		<developerConnection>scm:git:https://github.com/meertensinstituut/mtas.git</developerConnection>
+		<connection>scm:git:https://github.com/textexploration/mtas.git</connection>
+		<url>http://github.com/textexploration/mtas</url>
+		<developerConnection>scm:git:https://github.com/textexploration/mtas.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
@@ -22,9 +22,9 @@
 		</repository>
 	</distributionManagement>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.knaw.meertens.mtas</groupId>
+	<groupId>org.textexploration.mtas</groupId>
 	<artifactId>mtas</artifactId>
-	<version>7.3.0.4-SNAPSHOT</version>
+	<version>7.3.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<licenses>
 		<license>
@@ -34,19 +34,15 @@
 	</licenses>
 	<name>MTAS</name>
 	<description>Multi Tier Annotation Search, a Solr/Lucene based library and plugin providing search and analysis on annotated and structured text.</description>
-	<url>https://meertensinstituut.github.io/mtas/</url>
+	<url>https://textexploration.github.io/mtas/</url>
 	<organization>
-		<name>Meertens Institute</name>
-		<url>http://www.meertens.knaw.nl/</url>
+		<name>Text Exploration</name>
+		<url>https://www.textexploration.org/</url>
 	</organization>
 	<developers>
 		<developer>
 			<name>Matthijs Brouwer</name>
 			<url>https://nl.linkedin.com/in/brouwermatthijs/</url>
-		</developer>
-		<developer>
-			<name>Marc Kemps-Snijders</name>
-			<url>https://nl.linkedin.com/in/marc-kemps-snijders-1b33753</url>
 		</developer>
 	</developers>
 	<build>
