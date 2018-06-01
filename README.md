@@ -1,20 +1,20 @@
 # Multi Tier Annotation Search
 
-See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/) for more documentation and instructions.
+See [textexploration.github.io/mtas/](https://textexploration.github.io/mtas/) for more documentation and instructions.
 
 ---
 
-A [docker](https://hub.docker.com/r/meertensinstituut/mtas/) image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To pull and run
+A [docker](https://hub.docker.com/r/textexploration/mtas/) image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To pull and run
 
 ```console
-docker pull meertensinstituut/mtas
-docker run -t -i -p 8080:80 --name mtas meertensinstituut/mtas
+docker pull textexploration/mtas
+docker run -t -i -p 8080:80 --name mtas textexploration/mtas
 ```
 
 Or to build and run
 
 ```console
-docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/Dockerfile
+docker build -t mtas https://raw.githubusercontent.com/textexploration/mtas/master/docker/Dockerfile
 docker run -t -i -p 8080:80 --name mtas mtas
 ```
 
