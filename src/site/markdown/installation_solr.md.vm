@@ -1,5 +1,5 @@
 #Apache Solr
-#set($metadata = $xml.read("http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
+#set($metadata = $xml.read("http://central.maven.org/maven2/org/textexploration/mtas/mtas/maven-metadata.xml"))
 #set($version = $metadata.versioning.latest)
 #set($fullversion = $version.getText())
 #set($versionnumbers = $StringUtils.split($fullversion,"."))

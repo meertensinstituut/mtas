@@ -1,6 +1,6 @@
 #Download
 
-#set($metadata = $xml.read("http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
+#set($metadata = $xml.read("http://central.maven.org/maven2/org/textexploration/mtas/mtas/maven-metadata.xml"))
 
 **Latest release**
 
@@ -32,13 +32,13 @@
       <td>${fullversion}</td>
       <td><a href='http://archive.apache.org/dist/lucene/solr/${majorversion}.${minorversion}.${incrementalversion}/'>${majorversion}.${minorversion}.${incrementalversion}</a></td>
       <td>${mtasversion}</td>
-      <td><a href='https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
+      <td><a href='https://github.com/textexploration/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
+      <td><a href='https://github.com/textexploration/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
+      <td><a href='https://github.com/textexploration/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
     </tr>   
     </tbody>
 </table>
@@ -74,17 +74,17 @@
       <td>${fullversion}</td>
       <td><a href='http://archive.apache.org/dist/lucene/solr/${majorversion}.${minorversion}.${incrementalversion}/'>${majorversion}.${minorversion}.${incrementalversion}</a></td>
       <td>${mtasversion}</td>
-      <td><a href='https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
-      <td><a href='https://github.com/meertensinstituut/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
-      <td><a href='http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
+      <td><a href='https://github.com/textexploration/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar'>Binary (jar)</a></td>
+      <td><a href='https://github.com/textexploration/mtas/archive/v${fullversion}.tar.gz'>Source (tgz)</a></td>
+      <td><a href='https://github.com/textexploration/mtas/archive/v${fullversion}.zip'>Source (zip)</a></td>
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}.pom'>pom</a></td>      
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}.jar'>jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}-javadoc.jar'>javadoc.jar</a></td>      
+      <td><a href='http://central.maven.org/maven2/org/textexploration/mtas/mtas/${fullversion}/mtas-${fullversion}-sources.jar'>sources.jar</a></td>      
     </tr>
 #end    
 #end    
     </tbody>
 </table>
 
-See also the [Maven Central Repository](https://mvnrepository.com/artifact/nl.knaw.meertens.mtas/mtas) and [GitHub Releases](https://github.com/meertensinstituut/mtas/releases).
+See also the [Maven Central Repository](https://mvnrepository.com/artifact/org.textexploration.mtas/mtas) and [GitHub Releases](https://github.com/textexploration/mtas/releases).
