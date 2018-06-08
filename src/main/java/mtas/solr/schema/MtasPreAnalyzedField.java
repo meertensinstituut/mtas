@@ -34,6 +34,9 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
   /** The Constant SET_PREFIX. */
   private final static String SET_PREFIX = "setPrefix";
 
+  /** The Constant SET_PREFIX_NUMBERS. */
+  private final static String SET_PREFIX_NUMBERS = "setPrefixNumbers";
+
   /** The follow index analyzer. */
   public String followIndexAnalyzer = null;
 
@@ -57,6 +60,9 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
 
   /** The set prefix. */
   public String setPrefix = null;
+
+  /** The set prefixNumbers. */
+  public String setPrefixNumbers = null;
 
   /*
    * (non-Javadoc)
@@ -86,6 +92,7 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
     setSize = args.get(SET_SIZE);
     setError = args.get(SET_ERROR);
     setPrefix = args.get(SET_PREFIX);
+    setPrefixNumbers = args.get(SET_PREFIX_NUMBERS);
     if (followIndexAnalyzer == null) {
       throw new RuntimeException("No " + FOLLOW_INDEX_ANALYZER
           + " for fieldType " + this.getTypeName());
@@ -98,6 +105,7 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
     args.remove(SET_SIZE);
     args.remove(SET_ERROR);
     args.remove(SET_PREFIX);
+    args.remove(SET_PREFIX_NUMBERS);
     super.setArgs(schema, args);
   }
 

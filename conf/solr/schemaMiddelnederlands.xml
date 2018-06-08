@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="middelnederlands" version="1.6">
+
+	<field name="_version_" type="middelnederlands_long" indexed="true"
+		stored="true" />
+
+	<!-- core -->
+	<field name="id" type="middelnederlands_uuid"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="versionId" type="middelnederlands_uuid"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="sourceRef" type="middelnederlands_string"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="sourceCollection" type="middelnederlands_string"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="ingestTime" type="middelnederlands_date"
+		required="true" multiValued="false" indexed="true" stored="true" />
+	<field name="modificationTime" type="middelnederlands_date"
+		multiValued="false" indexed="true" stored="true" />
+	
+	<!-- title -->
+	<field name="title" type="middelnederlands_text" required="false"
+		multiValued="false" indexed="true" stored="true" />
+	
+	<!-- type -->	
+	<field name="type" type="middelnederlands_string" required="false"
+		multiValued="false" indexed="true" stored="true" />
+
+	<!-- date -->	
+	<field name="year" type="middelnederlands_int"
+		multiValued="false" indexed="true" stored="true" />
+
+	<!-- location -->	
+	<field name="localizationKloekecode" type="middelnederlands_string"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="localizationTown" type="middelnederlands_text" 
+	    multiValued="false" indexed="true" stored="true" />
+	<field name="localizationProvince" type="middelnederlands_text" 
+	    multiValued="false" indexed="true" stored="true" />
+	<field name="localizationCountry" type="middelnederlands_text" 
+	    multiValued="false" indexed="true" stored="true" />
+
+	<!-- text -->
+	<field name="text" type="middelnederlands_mtas" indexed="true"
+		stored="true" />
+	<field name="textAvailable" type="middelnederlands_boolean"
+		multiValued="false" indexed="true" stored="true" />
+	<field name="textError" type="middelnederlands_string"
+		indexed="true" stored="true" />
+	<field name="textNumberOfTokens" type="middelnederlands_int"
+		indexed="true" stored="true" />
+	<field name="textNumberOfPositions" type="middelnederlands_int"
+		indexed="true" stored="true" />
+	<field name="textSize" type="middelnederlands_int" 
+	    indexed="true" stored="true" />
+	<field name="textPrefix" type="middelnederlands_string"
+     	multiValued="true" indexed="true" stored="true" />
+    <dynamicField name="textPrefix_*" type="middelnederlands_int"
+		required="false" multiValued="false" indexed="true" stored="true" />		 
+  		
+	<!-- metadata -->
+	<field name="metadata" type="middelnederlands_text" required="false"
+		multiValued="true" indexed="true" stored="false" />
+	<copyField source="id" dest="metadata" />
+    <copyField source="versionId" dest="metadata" />
+    <copyField source="sourceRef" dest="metadata" />
+    <copyField source="sourceCollection" dest="metadata" />
+    <copyField source="title" dest="metadata" />
+    <copyField source="type" dest="metadata" />
+    <copyField source="year" dest="metadata" />
+    <copyField source="localizationKloekecode" dest="metadata" />
+    <copyField source="localizationTown" dest="metadata" />
+    <copyField source="localizationProvince" dest="metadata" />
+    <copyField source="localizationCountry" dest="metadata" />
+
+	<uniqueKey>versionId</uniqueKey>
+
+	<fieldType name="middelnederlands_string" class="solr.StrField" sortMissingLast="true" />
+	<fieldType name="middelnederlands_uuid" class="solr.StrField" sortMissingLast="true" />
+	<fieldType name="middelnederlands_boolean" class="solr.BoolField" sortMissingLast="true" docValues="true" />
+	<fieldType name="middelnederlands_int" class="solr.IntPointField" docValues="true" />
+	<fieldType name="middelnederlands_long" class="solr.LongPointField" docValues="true" />
+	<fieldType name="middelnederlands_date" class="solr.DatePointField" docValues="true" />
+	<fieldtype name="middelnederlands_binary" class="solr.BinaryField" />
+
+	<fieldType name="middelnederlands_text" class="solr.TextField"
+		positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.StandardTokenizerFactory" />
+			<filter class="solr.LowerCaseFilterFactory" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="middelnederlands_mtas_example_config" class="solr.TextField"
+		postingsFormat="MtasCodec">
+		<analyzer type="index">
+			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
+				config="mtas.xml" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
+				config="mtas.xml" />
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="middelnederlands_mtas" class="mtas.solr.schema.MtasPreAnalyzedField"
+		followIndexAnalyzer="middelnederlands_mtas_example_config" defaultConfiguration="default"
+		configurationFromField="sourceCollection"
+		setNumberOfTokens="textNumberOfTokens"
+		setNumberOfPositions="textNumberOfPositions" setSize="textSize"
+		setError="textError" setPrefix="textPrefix" setPrefixNumbers="textPrefix_" postingsFormat="MtasCodec">
+		<analyzer type="query">
+			<tokenizer class="solr.WhitespaceTokenizerFactory" />
+			<filter class="mtas.analysis.util.MtasPrefixTokenFilterFactory"
+				prefix="t" />
+		</analyzer>
+	</fieldType>
+
+</schema>

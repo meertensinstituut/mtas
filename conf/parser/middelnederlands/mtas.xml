@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+  <configurations type="mtas.analysis.util.MtasTokenizerFactory">
+    <configuration name="CRM" file="mtas/crm.xml" />
+    <configuration name="CGR" file="mtas/cgr.xml" />
+  </configurations>
+  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
+    <configuration name="CRM" type="file" prefix="/home/matthijs/Projecten/TextExploration/Indexer/CRM/data/files/" postfix=".txt" />
+    <configuration name="CGR" type="file" prefix="/home/matthijs/Projecten/TextExploration/Indexer/CGR/data/files/" postfix=".txt" />
+  </configurations>
+</mtas>

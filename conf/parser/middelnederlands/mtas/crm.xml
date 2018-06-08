@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mtas>
+
+	<!-- START MTAS INDEX CONFIGURATION -->
+	<index>
+		<!-- START GENERAL SETTINGS MTAS INDEX PROCESS -->
+		<payload index="false" />
+		<offset index="false" />
+		<realoffset index="false" />
+		<parent index="true" />
+		<!-- END GENERAL SETTINGS MTAS INDEX PROCESS -->
+	</index>
+	<!-- END MTAS INDEX CONFIGURATION -->
+
+	<!-- START CONFIGURATION MTAS FOLIA PARSER -->
+	<parser name="mtas.analysis.parser.MtasCRMParser">
+
+		<!-- START GENERAL SETTINGS MTAS PARSER -->
+		<autorepair value="true" />
+		<makeunique value="true" />
+		<!-- END GENERAL SETTINGS MTAS PARSER -->
+
+		    <filters>
+      <filter type="replace" name="4" value="*" replace="" />
+      <filter type="replace" name="4" value="#" replace="" />   
+      <filter type="replace" name="0,1,2,3" value="&amp;excl;" replace="!" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;duitsekomma;" replace="/" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;period;" replace="." />       
+      <filter type="replace" name="0,1,2,3" value="&amp;komma;" replace="," />       
+      <filter type="replace" name="0,1,2,3" value="&amp;unreadable;" replace="[unreadable]" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;hyph;" replace="-" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;semi;" replace=";" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;colon;" replace=":" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;2periods;" replace=".." />       
+      <filter type="replace" name="0,1,2,3" value="&amp;tilde;" replace="~" />       
+      <filter type="replace" name="0,1,2,3" value="&amp;quest;" replace="?" />      
+      <filter type="replace" name="0,1,2,3" value="u&amp;r;" replace="ů" /> 
+      <filter type="replace" name="0,1,2,3" value="U&amp;r;" replace="Ů" /> 
+      <filter type="replace" name="0,1,2,3" value="o&amp;r;" replace="o̊" /> 
+      <filter type="replace" name="0,1,2,3" value="O&amp;r;" replace="O̊" /> 
+      <filter type="replace" name="0,1,2,3" value="a&amp;r;" replace="å" /> 
+      <filter type="replace" name="0,1,2,3" value="A&amp;r;" replace="Å" /> 
+      <filter type="replace" name="0,1,2,3" value="d&amp;r;" replace="d̊̊" /> 
+      <filter type="replace" name="0,1,2,3" value="D&amp;r;" replace="D̊" /> 
+      <filter type="replace" name="0,1,2,3" value="e&amp;r;" replace="e̊" /> 
+      <filter type="replace" name="0,1,2,3" value="E&amp;r;" replace="E̊" /> 
+      <filter type="replace" name="0,1,2,3" value="g&amp;r;" replace="g̊̊" /> 
+      <filter type="replace" name="0,1,2,3" value="G&amp;r;" replace="G̊" />      
+      <filter type="replace" name="0,1,2,3" value="y&amp;r;" replace="ẙ" />
+      <filter type="replace" name="0,1,2,3" value="Y&amp;r;" replace="Y̊" />      
+      <filter type="replace" name="0,1,2,3" value="s&amp;r;" replace="s̊" />
+      <filter type="replace" name="0,1,2,3" value="S&amp;r;" replace="S̊̊" />
+      <filter type="replace" name="0,1,2,3" value="w&amp;r;" replace="ẘ" />
+      <filter type="replace" name="0,1,2,3" value="W&amp;r;" replace="W̊" />
+      <filter type="replace" name="0,1,2,3" value="h&amp;r;" replace="h°" />
+      <filter type="replace" name="0,1,2,3" value="H&amp;r;" replace="H°" />
+      <filter type="replace" name="0,1,2,3" value="t&amp;r;" replace="t°" />
+      <filter type="replace" name="0,1,2,3" value="T&amp;r;" replace="T°" />
+      <filter type="replace" name="0,1,2,3" value="r&amp;r;" replace="r°" />
+      <filter type="replace" name="0,1,2,3" value="R&amp;r;" replace="R°" />
+      <filter type="replace" name="0,1,2,3" value="m&amp;r;" replace="m°" />
+      <filter type="replace" name="0,1,2,3" value="M&amp;r;" replace="M°" />
+      <filter type="replace" name="0,1,2,3" value="x&amp;r;" replace="x°" />
+      <filter type="replace" name="0,1,2,3" value="X&amp;r;" replace="X°" />
+      <filter type="replace" name="0,1,2,3" value="l&amp;r;" replace="l°" />
+      <filter type="replace" name="0,1,2,3" value="L&amp;r;" replace="L°" />
+      <filter type="replace" name="0,1,2,3" value="c&amp;r;" replace="c°" />
+      <filter type="replace" name="0,1,2,3" value="C&amp;r;" replace="C°" />
+      <filter type="replace" name="0,1,2,3" value="v&amp;r;" replace="v°" />
+      <filter type="replace" name="0,1,2,3" value="V&amp;r;" replace="V°" />
+      <filter type="replace" name="0,1,2,3" value="i&amp;r;" replace="i°" />
+      <filter type="replace" name="0,1,2,3" value="I&amp;r;" replace="I°" />
+      <filter type="replace" name="0,1,2,3" value="j&amp;r;" replace="j°" />
+      <filter type="replace" name="0,1,2,3" value="J&amp;r;" replace="J°" />
+      <filter type="replace" name="0,1,2,3" value="n&amp;r;" replace="n°" />
+      <filter type="replace" name="0,1,2,3" value="N&amp;r;" replace="N°" />
+      <filter type="replace" name="0,1,2,3" value="a&amp;uml;" replace="ä" />
+      <filter type="replace" name="0,1,2,3" value="A&amp;uml;" replace="Ä" />
+      <filter type="replace" name="0,1,2,3" value="e&amp;uml;" replace="ë" />
+      <filter type="replace" name="0,1,2,3" value="E&amp;uml;" replace="Ë" />
+      <filter type="replace" name="0,1,2,3" value="y&amp;uml;" replace="ÿ" />
+      <filter type="replace" name="0,1,2,3" value="Y&amp;uml;" replace="Ÿ" />
+      <filter type="replace" name="0,1,2,3" value="u&amp;uml;" replace="ü" />
+      <filter type="replace" name="0,1,2,3" value="U&amp;uml;" replace="Ü" />̈
+      <filter type="replace" name="0,1,2,3" value="v&amp;uml;" replace="v̈" />
+      <filter type="replace" name="0,1,2,3" value="V&amp;uml;" replace="V̈" />
+      <filter type="replace" name="0,1,2,3" value="o&amp;uml;" replace="ö" />
+      <filter type="replace" name="0,1,2,3" value="O&amp;uml;" replace="Ö" />
+      <filter type="replace" name="0,1,2,3" value="o&amp;grave;" replace="ò" />
+      <filter type="replace" name="0,1,2,3" value="O&amp;grave;" replace="Ò" />
+      <filter type="replace" name="0,1,2,3" value="e&amp;super;" replace="&#x034F;&#x0364;" />
+      <filter type="replace" name="0,1,2,3" value="v&amp;super;" replace="&#x034F;&#x036E;" /> 
+      <filter type="replace" name="0,1,2,3" value="r&amp;super;" replace="&#x034F;&#x036C;" />
+      <filter type="replace" name="0,1,2,3" value="i&amp;super;" replace="&#x034F;&#x0365;" />
+      <filter type="replace" name="0,1,2,3" value="o&amp;super;" replace="&#x034F;&#x0366;" />
+      <filter type="replace" name="0,1,2,3" value="&amp;r;" replace="&#x034F;&#x030A;" />
+    </filters>
+
+    <mappings>
+
+			<mapping type="word">
+			</mapping>
+
+			<mapping type="wordAnnotation" name="2">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="t" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="2">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="t_lc" />
+					</pre>
+					<post>
+						<item type="text" filter="ascii,lowercase" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="0">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="t0" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="0">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="t0_lc" />
+					</pre>
+					<post>
+						<item type="text" filter="ascii,lowercase" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="1">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="t1" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="1">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="t1_lc" />
+					</pre>
+					<post>
+						<item type="text" filter="ascii,lowercase" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="3">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="lemma" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="4">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="string" value="code" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+
+			<mapping type="crmPair" name="6">
+				<condition>
+					<item type="text" not="true" condition="-" />
+				</condition>
+			</mapping>
+			<mapping type="crmPair" name="part">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+
+			<mapping type="crmSentence" name="7">
+				<token type="string" offset="false" parent="false">
+          <pre>
+            <item type="string" value="s"/>
+          </pre>
+          <post>
+            <item type="text" />
+          </post>
+        </token>
+        <condition>
+					<item type="text" not="true" condition="-" />
+					<item type="text" not="true" condition="2" />
+          <item type="text" not="true" condition="4" />
+          <item type="text" not="true" condition="5" />
+          <item type="text" not="true" condition="6" />
+          <item type="text" not="true" condition="8" />
+				</condition>
+			</mapping>
+			<mapping type="crmClause" name="7">
+			  <token type="string" offset="false" parent="false">
+          <pre>
+            <item type="string" value="sc"/>
+          </pre>
+          <post>
+            <item type="text" />
+          </post>
+        </token>
+				<condition>
+          <item type="text" not="true" condition="-" />
+          <item type="text" not="true" condition="0" />
+          <item type="text" not="true" condition="1" />
+        </condition>
+			</mapping>
+			<mapping type="crmClause" name="7">
+			  <condition>			  
+          <item type="text" not="true" condition="-" />
+        </condition>
+			</mapping>
+			
+			<mapping type="wordAnnotation" name="pos">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.getal">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.persoon">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.ntype">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.pvtijd">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.wvorm">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.numtype">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.vwtype">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.lwtype">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.form">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+			<mapping type="wordAnnotation" name="feat.probleemgeval">
+				<token type="string" offset="false" parent="false">
+					<pre>
+						<item type="name" />
+					</pre>
+					<post>
+						<item type="text" />
+					</post>
+				</token>
+			</mapping>
+		</mappings>
+
+		<functions>
+			<function type="crmPair" name="6" split="+">
+				<condition value="">
+					<output name="part" />
+				</condition>
+			</function>
+			<function type="wordAnnotation" name="4" split="+">
+				<condition value="000,001,002,003,004,005,006,009">
+					<output name="pos" value="N" />
+					<output name="feat.getal" value="ev" />
+				</condition>
+				<condition value="010,011,012,013,014,015,016,019">
+					<output name="pos" value="N" />
+					<output name="feat.getal" value="mv" />
+				</condition>
+				<condition value="020,021,022,023,024,025,026,029">
+					<output name="pos" value="N" />
+					<output name="feat.ntype" value="eigen" />
+				</condition>
+				<condition value="090,091,092,093,094,095,096,099">
+					<output name="pos" value="N" />
+					<output name="feat.probleemgeval" />
+				</condition>
+				<condition value="100,101,102,103,104,105,106,109">
+					<output name="pos" value="ADJ" />
+					<output name="feat.getal" value="ev" />
+				</condition>
+				<condition value="110,111,112,113,114,115,116,119">
+					<output name="pos" value="ADJ" />
+					<output name="feat.getal" value="mv" />
+				</condition>
+				<condition value="190,191,192,193,194,195,196,199">
+					<output name="pos" value="ADJ" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition value="200,201,202,203,204,205,206,209">
+					<output name="pos" value="WW" />
+					<output name="feat.pvtijd" value="tgw" />
+				</condition>
+				<condition value="210,211,212,213,214,215,216,219">
+					<output name="pos" value="WW" />
+					<output name="feat.pvtijd" value="tgw" />
+				</condition>
+				<condition value="220,221,222,223,224,225,226,229">
+					<output name="pos" value="WW" />
+					<output name="feat.pvtijd" value="verl" />
+				</condition>
+				<condition value="230,231,232,233,234,235,236,239">
+					<output name="pos" value="WW" />
+					<output name="feat.pvtijd" value="verl" />
+				</condition>
+				<condition value="240,241,242,243,244,245,246,249">
+					<output name="pos" value="WW" />
+				</condition>
+				<condition value="250,251,252,253,254,255,256,259">
+					<output name="pos" value="WW" />
+					<output name="feat.wvorm" value="inf" />
+				</condition>
+				<condition value="260,261,262,263,264,265,266,269">
+					<output name="pos" value="WW" />
+					<output name="feat.wvorm" value="inf" />
+				</condition>
+				<condition value="270,271,272,273,274,275,276,279">
+					<output name="pos" value="WW" />
+				</condition>
+				<condition value="280,281,282,283,284,285,286,289">
+					<output name="pos" value="WW" />
+				</condition>
+				<condition value="290,291,292,293,294,295,296,299">
+					<output name="pos" value="WW" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+
+				<condition value="300,301,302,303,304,305,306,309">
+					<output name="pos" value="TW" />
+					<output name="feat.numtype" value="hoofd" />
+				</condition>
+				<condition value="310,311,312,313,314,315,316,319">
+					<output name="pos" value="TW" />
+					<output name="feat.numtype" value="rang" />
+				</condition>
+				<condition value="320,321,322,323,324,325,326,329">
+					<output name="pos" value="TW" />
+				</condition>
+				<condition value="390,391,392,393,394,395,396,399">
+					<output name="pos" value="TW" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition value="401">
+					<output name="pos" value="VNW" />
+					<output name="feat.getal" value="ev" />
+					<output name="feat.persoon" value="1" />
+				</condition>
+				<condition value="402">
+					<output name="pos" value="VNW" />
+					<output name="feat.getal" value="ev" />
+					<output name="feat.persoon" value="2" />
+				</condition>
+				<condition value="403">
+					<output name="pos" value="VNW" />
+					<output name="feat.getal" value="ev" />
+					<output name="feat.persoon" value="3" />
+				</condition>
+				<condition value="404">
+					<output name="pos" value="VNW" />
+					<output name="feat.getal" value="mv" />
+					<output name="feat.persoon" value="1" />
+				</condition>
+				<condition value="405">
+					<output name="pos" value="VNW" />
+					<output name="feat.getal" value="mv" />
+					<output name="feat.persoon" value="2" />
+				</condition>
+				<condition value="406">
+					<output name="pos" value="VNW" />
+					<output name="feat.getal" value="mv" />
+					<output name="feat.persoon" value="3" />
+				</condition>
+				<condition value="409">
+					<output name="pos" value="VNW" />
+					<output name="feat.probleemgeval" />
+				</condition>
+				<condition value="410,411,412,413,414,415,416,419">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="aanw" />
+				</condition>
+				<condition value="420,421,422,423,424,425,426,429">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="betr" />
+				</condition>
+				<condition value="430,431,432,433,434,435,436,439">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="vb" />
+				</condition>
+				<condition value="434,441,442,443,444,445,446,449">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="vb" />
+				</condition>
+				<condition value="440,441,442,443,444,445,446,449">
+					<output name="pos" value="VNW" />
+					<output name="feat.lwtype" value="onbep" />
+				</condition>
+				<condition value="450,451,452,453,454,455,456,459">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="bez" />
+				</condition>
+				<condition value="461">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.getal" value="ev" />
+					<output name="feat.persoon" value="1" />
+				</condition>
+				<condition value="462">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.getal" value="ev" />
+					<output name="feat.persoon" value="2" />
+				</condition>
+				<condition value="463">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.getal" value="ev" />
+					<output name="feat.persoon" value="3" />
+				</condition>
+				<condition value="464">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.getal" value="mv" />
+					<output name="feat.persoon" value="1" />
+				</condition>
+				<condition value="465">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.getal" value="mv" />
+					<output name="feat.persoon" value="2" />
+				</condition>
+				<condition value="466">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.getal" value="mv" />
+					<output name="feat.persoon" value="3" />
+				</condition>
+				<condition value="469">
+					<output name="pos" value="VNW" />
+					<output name="feat.vwtype" value="refl" />
+					<output name="feat.probleemgeval" />
+				</condition>
+				<condition value="470,471,472,473,474,475,476,479">
+					<output name="pos" value="LID" />
+				</condition>
+				<condition value="480,481,482,483,484,485,486,489">
+					<output name="pos" value="LID" />
+				</condition>
+				<condition value="490,491,492,493,494,495,496,499">
+					<output name="pos" value="VNW" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition value="500,501,502,503,504,505,506,509">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="510,511,512,513,514,515,516,519">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="520,521,522,523,524,525,526,529">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="530,531,532,533,534,535,536,539">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="540,541,542,543,544,545,546,549">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="550,551,552,553,554,555,556,559">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="560,561,562,563,564,565,566,569">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="590,591,592,593,594,595,596,599">
+					<output name="pos" value="BW" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition value="600,601,602,603,604,605,606,609">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="610,611,612,613,614,615,616,619">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="620,621,622,623,624,625,626,629">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="630,631,632,633,634,635,636,639">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="640,641,642,643,644,645,646,649">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="650,651,652,653,654,655,656,659">
+					<output name="pos" value="BW" />
+				</condition>
+				<condition value="690,691,692,693,694,695,696,699">
+					<output name="pos" value="BW" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition value="700,701,702,703,704,705,706,709">
+					<output name="pos" value="VZ" />
+				</condition>
+				<condition value="790,791,792,793,794,795,796,799">
+					<output name="pos" value="VZ" />
+				</condition>
+
+				<condition value="800,801,802,803,804,805,806,809">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="810,811,812,813,814,815,816,819">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="820,821,822,823,824,825,826,829">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="830,831,832,833,834,835,836,839">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="840,841,842,843,844,845,846,849">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="850,851,852,853,854,855,856,859">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="860,861,862,863,864,865,866,869">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="870,871,872,873,874,875,876,879">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="880,881,882,883,884,885,886,889">
+					<output name="pos" value="VG" />
+				</condition>
+				<condition value="890,891,892,893,894,895,896,899">
+					<output name="pos" value="VG" />
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition value="900,901,902,903,904,905,906,909">
+					<output name="feat.probleemgeval" />
+				</condition>
+				<condition value="900,901,902,903,904,905,906,909">
+					<output name="feat.probleemgeval" />
+				</condition>
+				<condition value="990,991,992,993,994,995,996,999">
+					<output name="feat.probleemgeval" />
+				</condition>
+
+				<condition
+					value="001,011,021,091,101,111,191,201,211,221,231,241,251,261,271,281,291,301,311,321,391,411,421,431,441,451,471,481,491,501,511,521,531,541,551,561,591,601,611,621,631,641,651,691,701,791,801,811,821,831,841,851,861,871,881,891,901,911,991">
+					<output name="feat.form" value="-e" />
+				</condition>
+				<condition
+					value="002,012,022,092,102,112,192,202,212,222,232,242,252,262,272,282,292,302,312,322,392,412,422,432,442,452,472,482,492,502,512,522,532,542,552,562,592,602,612,622,632,642,652,692,702,792,802,812,822,832,842,852,862,872,882,892,902,912,992">
+					<output name="feat.form" value="-s/-th" />
+				</condition>
+				<condition
+					value="003,013,023,093,103,113,193,203,213,223,233,243,253,263,273,283,293,303,313,323,393,413,423,433,443,453,473,483,493,503,513,523,533,543,553,563,593,603,613,623,633,643,653,693,703,793,803,813,823,833,843,853,863,873,883,893,903,913,993">
+					<output name="feat.form" value="-t" />
+				</condition>
+				<condition
+					value="004,014,024,094,104,114,194,204,214,224,234,244,254,264,274,284,294,304,314,324,394,414,424,434,444,454,474,484,494,504,514,524,534,544,554,564,594,604,614,624,634,644,654,694,704,794,804,814,824,834,844,854,864,874,884,894,904,914,994">
+					<output name="feat.form" value="-n" />
+				</condition>
+				<condition
+					value="005,015,025,095,105,115,195,205,215,225,235,245,255,265,275,285,295,305,315,325,395,415,425,435,445,455,475,485,495,505,515,525,535,545,555,565,595,605,615,625,635,645,655,695,705,795,805,815,825,835,845,855,865,875,885,895,905,915,995">
+					<output name="feat.form" value="-r/-re" />
+				</condition>
+				<condition
+					value="006,016,026,096,106,116,196,206,216,226,236,246,256,266,276,286,296,306,316,326,396,416,426,436,446,456,476,486,496,506,516,526,536,546,556,566,596,606,616,626,636,646,656,696,706,796,806,816,826,836,846,856,866,876,886,896,906,916,996">
+					<output name="feat.form" value="-a" />
+				</condition>
+				<condition value="009,019,029,099">
+					<output name="feat.form" value="unclear" />
+				</condition>
+
+			</function>
+		</functions>
+
+	</parser>
+	<!-- END CONFIGURATION MTAS FOLIA PARSER -->
+
+
+</mtas>

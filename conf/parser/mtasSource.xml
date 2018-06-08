@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<mtas>
-  <configurations type="mtas.analysis.util.MtasTokenizerFactory">
-    <configuration name="EDBO" file="mtasSource/folia_edbo.xml" />
-  </configurations>
-  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
-    <configuration name="EDBO" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-  </configurations>
-</mtas>
