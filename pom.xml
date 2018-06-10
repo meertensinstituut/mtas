@@ -46,6 +46,22 @@
 		</developer>
 	</developers>
 	<build>
+	  <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>project.properties</include>
+        </includes>  
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>project.properties</exclude>
+        </excludes>  
+        <filtering>false</filtering>
+      </resource>
+    </resources>
 		<plugins>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

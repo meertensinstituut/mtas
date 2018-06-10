@@ -1,21 +1,15 @@
 package mtas.solr.handler.component.util;
 
 import java.io.IOException;
-import java.util.Map.Entry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.SimpleOrderedMap;
-import org.apache.solr.core.SolrInfoBean;
 import org.apache.solr.handler.component.ResponseBuilder;
 import org.apache.solr.handler.component.SearchComponent;
 import org.apache.solr.handler.component.ShardRequest;
 
-import mtas.codec.util.Status;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentStatus;
-import mtas.solr.handler.MtasRequestHandler;
 import mtas.solr.handler.MtasRequestHandler.ShardInformation;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 

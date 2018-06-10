@@ -34,9 +34,6 @@ import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenString;
 import mtas.codec.util.CodecSearchTree.MtasTreeHit;
 import mtas.codec.util.collector.MtasDataCollector;
-import mtas.codec.util.distance.LevenshteinDistance;
-import mtas.codec.util.distance.MorseDistance;
-import mtas.codec.util.distance.DamerauLevenshteinDistance;
 import mtas.codec.util.distance.Distance;
 import mtas.parser.function.MtasFunctionParser;
 import mtas.parser.function.ParseException;
@@ -50,6 +47,7 @@ import org.apache.lucene.util.BytesRef;
 import org.noggit.JSONParser;
 import org.noggit.ObjectBuilder;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class CodecComponent.
  */
@@ -67,7 +65,11 @@ public class CodecComponent {
    */
   public static class ComponentFields {
 
+    /** The status. */
     public ComponentStatus status;
+    
+    /** The version. */
+    public ComponentVersion version;
 
     /** The list. */
     public Map<String, ComponentField> list;
@@ -113,6 +115,9 @@ public class CodecComponent {
 
     /** The do status. */
     public boolean doStatus;
+    
+    /** The do version. */
+    public boolean doVersion;
 
     /**
      * Instantiates a new component fields.
@@ -134,6 +139,7 @@ public class CodecComponent {
       doFacet = false;
       doCollection = false;
       doStatus = false;
+      doVersion = false;
     }
   }
 
@@ -1338,56 +1344,32 @@ public class CodecComponent {
     /**
      * Instantiates a new component term vector.
      *
-     * @param key
-     *          the key
-     * @param prefix
-     *          the prefix
-     * @param distanceKey
-     *          the distance key
-     * @param distanceType
-     *          the distance type
-     * @param distanceBase
-     *          the distance base
-     * @param distanceParameter
-     *          the distance parameter
-     * @param distanceMaximum
-     *          the distance maximum
-     * @param regexp
-     *          the regexp
-     * @param full
-     *          the full
-     * @param type
-     *          the type
-     * @param sortType
-     *          the sort type
-     * @param sortDirection
-     *          the sort direction
-     * @param startValue
-     *          the start value
-     * @param number
-     *          the number
-     * @param functionKey
-     *          the function key
-     * @param functionExpression
-     *          the function expression
-     * @param functionType
-     *          the function type
-     * @param boundary
-     *          the boundary
-     * @param list
-     *          the list
-     * @param listRegexp
-     *          the list regexp
-     * @param ignoreRegexp
-     *          the ignore regexp
-     * @param ignoreList
-     *          the ignore list
-     * @param ignoreListRegexp
-     *          the ignore list regexp
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
-     * @throws ParseException
-     *           the parse exception
+     * @param key          the key
+     * @param prefix          the prefix
+     * @param distanceKey          the distance key
+     * @param distanceType          the distance type
+     * @param distanceBase          the distance base
+     * @param distanceParameter          the distance parameter
+     * @param distanceMinimum the distance minimum
+     * @param distanceMaximum          the distance maximum
+     * @param regexp          the regexp
+     * @param full          the full
+     * @param type          the type
+     * @param sortType          the sort type
+     * @param sortDirection          the sort direction
+     * @param startValue          the start value
+     * @param number          the number
+     * @param functionKey          the function key
+     * @param functionExpression          the function expression
+     * @param functionType          the function type
+     * @param boundary          the boundary
+     * @param list          the list
+     * @param listRegexp          the list regexp
+     * @param ignoreRegexp          the ignore regexp
+     * @param ignoreList          the ignore list
+     * @param ignoreListRegexp          the ignore list regexp
+     * @throws IOException           Signals that an I/O exception has occurred.
+     * @throws ParseException           the parse exception
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ComponentTermVector(String key, String prefix, String[] distanceKey,
@@ -1571,15 +1553,39 @@ public class CodecComponent {
    */
   public static class ComponentStatus implements BasicComponent {
 
+    /** The handler. */
     public String handler;
+    
+    /** The name. */
     public String name;
+    
+    /** The key. */
     public String key;
+    
+    /** The number of documents. */
     public Integer numberOfDocuments;
+    
+    /** The number of segments. */
     public Integer numberOfSegments;
+    
+    /** The get mtas handler. */
     public boolean getMtasHandler;
+    
+    /** The get number of documents. */
     public boolean getNumberOfDocuments;
+    
+    /** The get number of segments. */
     public boolean getNumberOfSegments;
 
+    /**
+     * Instantiates a new component status.
+     *
+     * @param name the name
+     * @param key the key
+     * @param getMtasHandler the get mtas handler
+     * @param getNumberOfDocuments the get number of documents
+     * @param getNumberOfSegments the get number of segments
+     */
     public ComponentStatus(String name, String key, boolean getMtasHandler,
         boolean getNumberOfDocuments, boolean getNumberOfSegments) {
       this.name = Objects.requireNonNull(name, "no name");
@@ -1593,7 +1599,17 @@ public class CodecComponent {
     }
 
   }
+  
+  /**
+   * The Class ComponentVersion.
+   */
+  public static class ComponentVersion implements BasicComponent {
+	  public ComponentVersion() {
+		  
+	  }
+  }
 
+  
   /**
    * The Interface ComponentStats.
    */
@@ -1926,6 +1942,7 @@ public class CodecComponent {
     /** The version. */
     public String version;
     
+    /** The original version. */
     public String originalVersion;
 
     /** The id. */
@@ -2025,12 +2042,10 @@ public class CodecComponent {
     /**
      * Sets the post variables.
      *
-     * @param id
-     *          the id
-     * @param values
-     *          the values
-     * @throws IOException
-     *           Signals that an I/O exception has occurred.
+     * @param id          the id
+     * @param values          the values
+     * @param originalVersion the original version
+     * @throws IOException           Signals that an I/O exception has occurred.
      */
     public void setPostVariables(String id, HashSet<String> values, String originalVersion)
         throws IOException {
@@ -2169,6 +2184,12 @@ public class CodecComponent {
       return action;
     }
     
+    /**
+     * Original version.
+     *
+     * @return the string
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public String originalVersion() throws IOException {
       if(action.equals(ACTION_POST)) {
         return originalVersion;
@@ -2282,6 +2303,7 @@ public class CodecComponent {
     /** The prefix. */
     public String prefix;
 
+    /** The minimum. */
     public Double minimum;
     
     /** The maximum. */
@@ -2305,18 +2327,13 @@ public class CodecComponent {
     /**
      * Instantiates a new sub component distance.
      *
-     * @param key
-     *          the key
-     * @param type
-     *          the type
-     * @param prefix
-     *          the prefix
-     * @param base
-     *          the base
-     * @param parameters
-     *          the parameters
-     * @param maximum
-     *          the maximum
+     * @param key          the key
+     * @param type          the type
+     * @param prefix          the prefix
+     * @param base          the base
+     * @param parameters          the parameters
+     * @param minimum the minimum
+     * @param maximum          the maximum
      */
     public SubComponentDistance(String key, String type, String prefix,
         String base, Map<String, String> parameters, String minimum, String maximum) {
@@ -2361,6 +2378,12 @@ public class CodecComponent {
       return distance;
     }
 
+    /**
+     * Creates the class name.
+     *
+     * @param type the type
+     * @return the string
+     */
     private String createClassName(String type) {
       final char DASH = '-';
       Objects.requireNonNull(type, "Type is obligatory");

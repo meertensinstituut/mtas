@@ -21,8 +21,6 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenString;
 import mtas.codec.MtasCodecPostingsFormat;

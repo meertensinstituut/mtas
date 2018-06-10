@@ -38,6 +38,8 @@ import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
 import mtas.solr.handler.component.util.MtasSolrComponentStats;
 import mtas.solr.handler.component.util.MtasSolrComponentStatus;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
+import mtas.solr.handler.component.util.MtasSolrComponentVersion;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.params.CommonParams;
@@ -156,6 +158,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
 
   /** The search status. */
   private MtasSolrComponentStatus searchStatus;
+  
+  private MtasSolrComponentVersion searchVersion;
 
   /** The collection cache. */
   private MtasSolrCollectionCache collectionCache = null;
@@ -178,6 +182,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
     super.init(args);
     // init components
     searchStatus = new MtasSolrComponentStatus(this);
+    searchVersion = new MtasSolrComponentVersion(this);
     searchDocument = new MtasSolrComponentDocument(this);
     searchKwic = new MtasSolrComponentKwic(this);
     searchList = new MtasSolrComponentList(this);
@@ -261,6 +266,11 @@ public class MtasSolrSearchComponent extends SearchComponent {
         mtasSolrResultMerge = new MtasSolrResultMerge();
         // prepare components
         ComponentFields mtasFields = new ComponentFields();
+        // get settings version
+        if (rb.req.getParams()
+            .getBool(MtasSolrComponentVersion.PARAM_MTAS_VERSION, false)) {
+          searchVersion.prepare(rb, mtasFields); 
+        }
         // get settings status
         if (rb.req.getParams()
             .getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS, false)) {
@@ -357,7 +367,7 @@ public class MtasSolrSearchComponent extends SearchComponent {
             if (mtasFields.doStats || mtasFields.doDocument || mtasFields.doKwic
                 || mtasFields.doList || mtasFields.doGroup || mtasFields.doFacet
                 || mtasFields.doCollection || mtasFields.doTermVector
-                || mtasFields.doPrefix || mtasFields.doStatus) {
+                || mtasFields.doPrefix || mtasFields.doStatus || mtasFields.doVersion) {
               SolrIndexSearcher searcher = rb.req.getSearcher();
               ArrayList<Integer> docSetList = null;
               ArrayList<Integer> docListList = null;
@@ -396,6 +406,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
                     collection);
               }
               NamedList<Object> mtasResponse = new SimpleOrderedMap<>();
+              if (mtasFields.doVersion) {
+                SimpleOrderedMap<Object> versionResponse = searchVersion.create(mtasFields.version, false);
+                mtasResponse.add(MtasSolrComponentVersion.NAME, versionResponse);
+              }
               if (mtasFields.doStatus) {
                 // add to response
                 SimpleOrderedMap<Object> statusResponse = searchStatus
