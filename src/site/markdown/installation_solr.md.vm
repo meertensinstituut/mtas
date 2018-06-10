@@ -165,9 +165,13 @@ an obligatory attribute `followIndexAnalyzer` referring to the additional fieldT
 we defined before. The optional attribute `defaultConfiguration` contains the name 
 of the default configuration to be used, and the obligatory attribute 
 `configurationFromField` contains the name of the field defining the required 
-configuration. The optional attributes `setNumberOfTokens`, 
-`setNumberOfPositions`, `setSize`, `setPrefix` and `setError` define fields that may be filled
-with respectively number of tokens, number of positions, filesize, prefixes and possible errors.
+configuration. 
+
+The optional attributes `setNumberOfTokens`, `setNumberOfPositions`, `setSize`, `setPrefix` and 
+`setError` define fields that may be filled with respectively number of tokens, number of positions, 
+filesize, prefixes and possible errors. The optional attribute `setPrefixNumbers` defines a prefix to be used
+for adding for each occurring prefix a field with a name constructed from this `setPrefixNumbers` value 
+followed by the prefix, and containing the number of occurrences of this prefix.
 
 **Example of a Mtas configuration file**
 
