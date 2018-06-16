@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Implementation-Title: MTAS
+Implementation-Version: 7.3.1.2-SNAPSHOT
+Mtas-version: org.textexploration.mtas
+Archiver-Version: Plexus Archiver
+Built-By: matthijs
+Specification-Vendor: Text Exploration
+Specification-Title: MTAS
+Implementation-Vendor-Id: org.textexploration.mtas
+Mtas-artifactId: org.textexploration.mtas
+Mtas-timestamp: 2018-06-16 09:57
+Mtas-groupId: org.textexploration.mtas
+Implementation-Vendor: Text Exploration
+Created-By: Apache Maven 3.5.2
+Build-Jdk: 1.8.0_171
+Specification-Version: 0.0
+Implementation-URL: https://textexploration.github.io/mtas/
+
