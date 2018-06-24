@@ -312,7 +312,7 @@ public class MtasSolrStatus {
    *          the new error
    */
   public final void setError(String error) {
-    this.errorMessage = Objects.requireNonNull(error, "error required");
+	this.errorMessage = Objects.requireNonNull(error, "error required");
     this.errorStatus = true;
   }
 
@@ -428,14 +428,16 @@ public class MtasSolrStatus {
   /**
    * Check response on exception.
    */
-  private void checkResponseOnException() {
-    if (!finished && rsp != null) {
+  public boolean checkResponseForException() {
+	if (!finished && rsp != null) {
       Exception e;
       if ((e = rsp.getException()) != null) {
         setError(e.getMessage());
         setFinished();
+        return true;
       }
     }
+	return false;
   }
 
   public SimpleOrderedMap<Object> createListOutput() {
@@ -452,7 +454,7 @@ public class MtasSolrStatus {
    * @return the simple ordered map
    */
   private SimpleOrderedMap<Object> createOutput(boolean detailed) {
-    checkResponseOnException();
+    //checkResponseOnException();
     SimpleOrderedMap<Object> output = new SimpleOrderedMap<>();
     updateShardInfo();
     output.add(NAME_KEY, key);

@@ -42,6 +42,7 @@ import mtas.solr.handler.component.util.MtasSolrComponentVersion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.ExitableDirectoryReader;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.NamedList;
@@ -189,17 +190,25 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		if (args.get(CONFIG_COLLECTION_CACHE_DIRECTORY) != null
 				&& args.get(CONFIG_COLLECTION_CACHE_DIRECTORY) instanceof String) {
 			collectionCacheDirectory = (String) args.get(CONFIG_COLLECTION_CACHE_DIRECTORY);
+		} else {
+			log.error("no " + CONFIG_COLLECTION_CACHE_DIRECTORY + " defined for " + this.getClass().getSimpleName());
 		}
 		if (args.get(CONFIG_COLLECTION_LIFETIME) != null && args.get(CONFIG_COLLECTION_LIFETIME) instanceof Long) {
 			collectionLifetime = (Long) args.get(CONFIG_COLLECTION_LIFETIME);
+		} else {
+			log.error("no " + CONFIG_COLLECTION_LIFETIME + " defined for " + this.getClass().getSimpleName());
 		}
 		if (args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER) != null
 				&& args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER) instanceof Integer) {
 			collectionMaximumNumber = (Integer) args.get(CONFIG_COLLECTION_MAXIMUM_NUMBER);
+		} else {
+			log.error("no " + CONFIG_COLLECTION_MAXIMUM_NUMBER + " defined for " + this.getClass().getSimpleName());
 		}
 		if (args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW) != null
 				&& args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW) instanceof Integer) {
 			collectionMaximumNumber = (Integer) args.get(CONFIG_COLLECTION_MAXIMUM_OVERFLOW);
+		} else {
+			log.error("no " + CONFIG_COLLECTION_MAXIMUM_OVERFLOW + " defined for " + this.getClass().getSimpleName());
 		}
 		collectionCache = new MtasSolrCollectionCache(collectionCacheDirectory, collectionLifetime,
 				collectionMaximumNumber, collectionMaximumOverflow);
@@ -300,6 +309,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
 					searchCollection.prepare(rb, mtasFields);
 				}
 				rb.req.getContext().put(ComponentFields.class, mtasFields);
+			} catch (ExitableDirectoryReader.ExitingReaderException e) {
+				solrStatus.setError(e.getMessage());
 			} catch (IOException e) {
 				solrStatus.setError(e);
 			} finally {
@@ -570,6 +581,8 @@ public class MtasSolrSearchComponent extends SearchComponent {
 					}
 				}
 			}
+		} catch (ExitableDirectoryReader.ExitingReaderException e) {
+			solrStatus.setError(e.getMessage());
 		} finally {
 			checkStatus(solrStatus);
 			finishStatus(solrStatus);
@@ -587,54 +600,57 @@ public class MtasSolrSearchComponent extends SearchComponent {
 	 */
 	@Override
 	public void modifyRequest(ResponseBuilder rb, SearchComponent who, ShardRequest sreq) {
-		// System.out
-		// .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-		// + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
-		// + " MODIFY REQUEST " + rb.stage + " " + rb.req.getParamString());
+		 // System.out
+		 // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
+		 // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+		 // + " MODIFY REQUEST " + rb.stage + " " + rb.req.getParamString());
 		MtasSolrStatus solrStatus = Objects
 				.requireNonNull((MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class), "couldn't find status");
 		solrStatus.setStage(rb.stage);
-		if (sreq.params.getBool(PARAM_MTAS, false)) {
-			if (sreq.params.getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS, false)) {
-				searchStatus.modifyRequest(rb, who, sreq);
-			} else if (requestHandler != null) {
-				sreq.params.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS, CommonParams.TRUE);
+		try {
+			if (sreq.params.getBool(PARAM_MTAS, false)) {
+				if (sreq.params.getBool(MtasSolrComponentStatus.PARAM_MTAS_STATUS, false)) {
+					searchStatus.modifyRequest(rb, who, sreq);
+				} else if (requestHandler != null) {
+					sreq.params.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS, CommonParams.TRUE);
+				}
+				if (requestHandler != null) {
+					sreq.params.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS + "."
+							+ MtasSolrComponentStatus.NAME_MTAS_STATUS_KEY, solrStatus.shardKey(rb.stage));
+				}
+				if (sreq.params.getBool(MtasSolrComponentVersion.PARAM_MTAS_VERSION, false)) {
+					searchVersion.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
+					searchStats.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+					searchTermvector.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
+					searchPrefix.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
+					searchFacet.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+					searchCollection.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
+					searchGroup.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
+					searchList.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+					searchDocument.modifyRequest(rb, who, sreq);
+				}
+				if (sreq.params.getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {
+					searchKwic.modifyRequest(rb, who, sreq);
+				}
 			}
-			if (requestHandler != null) {
-				sreq.params.add(
-						MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_KEY,
-						solrStatus.shardKey(rb.stage));
-			}
-			if (sreq.params.getBool(MtasSolrComponentVersion.PARAM_MTAS_VERSION, false)) {
-				searchVersion.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
-				searchStats.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-				searchTermvector.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
-				searchPrefix.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
-				searchFacet.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-				searchCollection.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
-				searchGroup.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
-				searchList.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
-				searchDocument.modifyRequest(rb, who, sreq);
-			}
-			if (sreq.params.getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {
-				searchKwic.modifyRequest(rb, who, sreq);
-			}
+		} catch (ExitableDirectoryReader.ExitingReaderException e) {
+			solrStatus.setError(e.getMessage());
 		}
 	}
 
@@ -647,15 +663,20 @@ public class MtasSolrSearchComponent extends SearchComponent {
 	 */
 	@Override
 	public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
-		// System.out
-		// .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-		// + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
-		// + " HANDLERESPONSES " + rb.stage + " " + rb.req.getParamString());
+		 // System.out
+		 // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
+		 // + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+		 // + " HANDLERESPONSES " + rb.stage + " " + rb.req.getParamString());
 		MtasSolrStatus solrStatus = Objects
 				.requireNonNull((MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class), "couldn't find status");
 		solrStatus.setStage(rb.stage);
-		if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-			// do nothing
+		try {
+			if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
+
+				// do nothing
+			}
+		} catch (ExitableDirectoryReader.ExitingReaderException e) {
+			solrStatus.setError(e.getMessage());
 		}
 	}
 
@@ -668,54 +689,58 @@ public class MtasSolrSearchComponent extends SearchComponent {
 	 */
 	@Override
 	public void finishStage(ResponseBuilder rb) {
-		// System.out
-		// .println(System.nanoTime() + " - " + Thread.currentThread().getId()
-		// + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
-		// + " FINISHRESPONSES " + rb.stage + " " + rb.req.getParamString());
+		 // System.out
+		 // .println(System.nanoTime() + " - " + Thread.currentThread().getId()
+		 //  + " - " + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+		 // + " FINISHRESPONSES " + rb.stage + " " + rb.req.getParamString());
 		MtasSolrStatus solrStatus = Objects
 				.requireNonNull((MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class), "couldn't find status");
 		solrStatus.setStage(rb.stage);
-		if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {
-			Status status = solrStatus.status();
-			if (status.numberDocumentsFound == null) {
-				status.numberDocumentsFound = rb.getNumberDocumentsFound();
+		try {
+			if (rb.stage == ResponseBuilder.STAGE_EXECUTE_QUERY) {
+				Status status = solrStatus.status();
+				if (status.numberDocumentsFound == null) {
+					status.numberDocumentsFound = rb.getNumberDocumentsFound();
+				}
+				// try to finish status from get fields stage
+			} else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS) {
+				finishStatus(solrStatus);
 			}
-			// try to finish status from get fields stage
-		} else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS) {
-			finishStatus(solrStatus);
-		}
-		if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-			if (rb.req.getParams().getBool(MtasSolrComponentVersion.PARAM_MTAS_VERSION, false)) {
-				searchVersion.finishStage(rb);
+			if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
+				if (rb.req.getParams().getBool(MtasSolrComponentVersion.PARAM_MTAS_VERSION, false)) {
+					searchVersion.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
+					searchStats.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+					searchTermvector.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
+					searchPrefix.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
+					searchFacet.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+					searchCollection.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
+					searchGroup.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
+					searchList.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+					searchDocument.finishStage(rb);
+				}
+				if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {
+					searchKwic.finishStage(rb);
+				}
+				mtasSolrResultMerge.merge(rb);
 			}
-			if (rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
-				searchStats.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-				searchTermvector.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
-				searchPrefix.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
-				searchFacet.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-				searchCollection.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
-				searchGroup.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
-				searchList.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
-				searchDocument.finishStage(rb);
-			}
-			if (rb.req.getParams().getBool(MtasSolrComponentKwic.PARAM_MTAS_KWIC, false)) {
-				searchKwic.finishStage(rb);
-			}
-			mtasSolrResultMerge.merge(rb);
+		} catch (ExitableDirectoryReader.ExitingReaderException e) {
+			solrStatus.setError(e.getMessage());
 		}
 	}
 
@@ -728,79 +753,86 @@ public class MtasSolrSearchComponent extends SearchComponent {
 	 */
 	@Override
 	public int distributedProcess(ResponseBuilder rb) throws IOException {
-		// System.out.println(System.nanoTime() + " - "
-		// + Thread.currentThread().getId() + " - "
-		// + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
-		// + " DISTIRBUTEDPROCESS " + rb.stage + " " + rb.req.getParamString());
+		 // System.out.println(System.nanoTime() + " - "
+		 // + Thread.currentThread().getId() + " - "
+		 // + rb.req.getParams().getBool(ShardParams.IS_SHARD, false)
+		 // + " DISTIRBUTEDPROCESS " + rb.stage + " " + rb.req.getParamString());
 		MtasSolrStatus solrStatus = Objects
 				.requireNonNull((MtasSolrStatus) rb.req.getContext().get(MtasSolrStatus.class), "couldn't find status");
 		solrStatus.setStage(rb.stage);
-		if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
-			if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP || rb.stage == STAGE_TERMVECTOR_MISSING_KEY
-					|| rb.stage == STAGE_TERMVECTOR_FINISH) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchTermvector.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_LIST) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchList.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_PREFIX) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchPrefix.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_STATS) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchStats.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_FACET) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchFacet.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_COLLECTION_INIT || rb.stage == STAGE_COLLECTION_FINISH) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchCollection.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_GROUP) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchGroup.distributedProcess(rb, mtasFields);
-			} else if (rb.stage == STAGE_DOCUMENT) {
-				ComponentFields mtasFields = getMtasFields(rb);
-				searchDocument.distributedProcess(rb, mtasFields);
-			}
-			// compute new stage and return if not finished
-			if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
-				if (rb.stage < STAGE_TERMVECTOR_MISSING_TOP
-						&& rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-					return STAGE_TERMVECTOR_MISSING_TOP;
-				} else if (rb.stage < STAGE_TERMVECTOR_MISSING_KEY
-						&& rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-					return STAGE_TERMVECTOR_MISSING_KEY;
-				} else if (rb.stage < STAGE_TERMVECTOR_FINISH
-						&& rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
-					return STAGE_TERMVECTOR_FINISH;
-				} else if (rb.stage < STAGE_LIST
-						&& rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
-					return STAGE_LIST;
-				} else if (rb.stage < STAGE_PREFIX
-						&& rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
-					return STAGE_PREFIX;
-				} else if (rb.stage < STAGE_STATS
-						&& rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
-					return STAGE_STATS;
-				} else if (rb.stage < STAGE_FACET
-						&& rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
-					return STAGE_FACET;
-				} else if (rb.stage < STAGE_GROUP
-						&& rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
-					return STAGE_GROUP;
-				} else if (rb.stage < STAGE_COLLECTION_INIT
-						&& rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-					return STAGE_COLLECTION_INIT;
-				} else if (rb.stage < STAGE_COLLECTION_FINISH
-						&& rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
-					return STAGE_COLLECTION_FINISH;
+		try {
+			if (rb.req.getParams().getBool(PARAM_MTAS, false)) {
+				if (rb.stage == STAGE_TERMVECTOR_MISSING_TOP || rb.stage == STAGE_TERMVECTOR_MISSING_KEY
+						|| rb.stage == STAGE_TERMVECTOR_FINISH) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchTermvector.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_LIST) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchList.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_PREFIX) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchPrefix.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_STATS) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchStats.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_FACET) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchFacet.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_COLLECTION_INIT || rb.stage == STAGE_COLLECTION_FINISH) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchCollection.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_GROUP) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchGroup.distributedProcess(rb, mtasFields);
+				} else if (rb.stage == STAGE_DOCUMENT) {
+					ComponentFields mtasFields = getMtasFields(rb);
+					searchDocument.distributedProcess(rb, mtasFields);
 				}
-			} else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS && rb.stage < ResponseBuilder.STAGE_DONE) {
-				if (rb.stage < STAGE_DOCUMENT
-						&& rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
-					return STAGE_DOCUMENT;
+				// compute new stage and return if not finished
+				if (rb.stage >= ResponseBuilder.STAGE_EXECUTE_QUERY && rb.stage < ResponseBuilder.STAGE_GET_FIELDS) {
+					if (rb.stage < STAGE_TERMVECTOR_MISSING_TOP
+							&& rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+						return STAGE_TERMVECTOR_MISSING_TOP;
+					} else if (rb.stage < STAGE_TERMVECTOR_MISSING_KEY
+							&& rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+						return STAGE_TERMVECTOR_MISSING_KEY;
+					} else if (rb.stage < STAGE_TERMVECTOR_FINISH
+							&& rb.req.getParams().getBool(MtasSolrComponentTermvector.PARAM_MTAS_TERMVECTOR, false)) {
+						return STAGE_TERMVECTOR_FINISH;
+					} else if (rb.stage < STAGE_LIST
+							&& rb.req.getParams().getBool(MtasSolrComponentList.PARAM_MTAS_LIST, false)) {
+						return STAGE_LIST;
+					} else if (rb.stage < STAGE_PREFIX
+							&& rb.req.getParams().getBool(MtasSolrComponentPrefix.PARAM_MTAS_PREFIX, false)) {
+						return STAGE_PREFIX;
+					} else if (rb.stage < STAGE_STATS
+							&& rb.req.getParams().getBool(MtasSolrComponentStats.PARAM_MTAS_STATS, false)) {
+						return STAGE_STATS;
+					} else if (rb.stage < STAGE_FACET
+							&& rb.req.getParams().getBool(MtasSolrComponentFacet.PARAM_MTAS_FACET, false)) {
+						return STAGE_FACET;
+					} else if (rb.stage < STAGE_GROUP
+							&& rb.req.getParams().getBool(MtasSolrComponentGroup.PARAM_MTAS_GROUP, false)) {
+						return STAGE_GROUP;
+					} else if (rb.stage < STAGE_COLLECTION_INIT
+							&& rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+						return STAGE_COLLECTION_INIT;
+					} else if (rb.stage < STAGE_COLLECTION_FINISH
+							&& rb.req.getParams().getBool(MtasSolrComponentCollection.PARAM_MTAS_COLLECTION, false)) {
+						return STAGE_COLLECTION_FINISH;
+					}
+				} else if (rb.stage >= ResponseBuilder.STAGE_GET_FIELDS && rb.stage < ResponseBuilder.STAGE_DONE) {
+					if (rb.stage < STAGE_DOCUMENT
+							&& rb.req.getParams().getBool(MtasSolrComponentDocument.PARAM_MTAS_DOCUMENT, false)) {
+						return STAGE_DOCUMENT;
+					}
 				}
 			}
+		} catch (ExitableDirectoryReader.ExitingReaderException e) {
+			solrStatus.setError(e.getMessage());
+			finishStatus(solrStatus);
+		} finally {
+		  checkStatus(solrStatus);
 		}
 		return ResponseBuilder.STAGE_DONE;
 	}
@@ -908,6 +940,17 @@ public class MtasSolrSearchComponent extends SearchComponent {
 	private void errorStatus(MtasSolrStatus status, IOException exception) {
 		try {
 			status.setError(exception);
+			if (requestHandler != null) {
+				requestHandler.finishStatus(status);
+			}
+		} catch (IOException e) {
+			log.error(e);
+		}
+	}
+
+	private void errorStatus(MtasSolrStatus status, String message) {
+		try {
+			status.setError(message);
 			if (requestHandler != null) {
 				requestHandler.finishStatus(status);
 			}

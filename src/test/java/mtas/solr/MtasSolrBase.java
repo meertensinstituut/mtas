@@ -50,7 +50,7 @@ public class MtasSolrBase {
 
   /** The log. */
   private static Log log = LogFactory.getLog(MtasSolrBase.class);
-
+  
   /**
    * Gets the num found.
    *

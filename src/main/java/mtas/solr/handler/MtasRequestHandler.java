@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,6 +38,7 @@ import mtas.solr.handler.util.MtasSolrHistoryList;
 import mtas.solr.handler.util.MtasSolrRunningList;
 import mtas.solr.handler.util.MtasSolrStatus;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class MtasRequestHandler.
  */
@@ -105,10 +107,18 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /** The shard index. */
   private Map<String, ShardInformation> shardIndex;
 
+  /** The status controller. */
+  private StatusController statusController;
+
+  /** The Constant defaultTimeout. */
   private static final int defaultTimeout = 3600;
-  private static final int defaultSoftLimit = 100;
-  private static final int defaultHardLimit = 200;
   
+  /** The Constant defaultSoftLimit. */
+  private static final int defaultSoftLimit = 100;
+  
+  /** The Constant defaultHardLimit. */
+  private static final int defaultHardLimit = 200;
+
   /**
    * Instantiates a new mtas request handler.
    */
@@ -118,18 +128,19 @@ public class MtasRequestHandler extends RequestHandlerBase {
     history = new MtasSolrHistoryList(defaultSoftLimit, defaultHardLimit);
     error = new MtasSolrHistoryList(defaultSoftLimit, defaultHardLimit);
     shardIndex = new HashMap<>();
+    // start controller
+    statusController = new StatusController();
+    statusController.start();
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * org.apache.solr.handler.RequestHandlerBase#handleRequestBody(org.apache.
+   * @see org.apache.solr.handler.RequestHandlerBase#handleRequestBody(org.apache.
    * solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse)
    */
   @Override
-  public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp)
-      throws IOException {    
+  public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws IOException {
     String action;
     if ((action = req.getParams().get(PARAM_ACTION)) != null) {
       // generate list of files
@@ -143,8 +154,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
           InputStream is;
           try {
             is = req.getCore().getResourceLoader().openResource(file);
-            rsp.add(ACTION_CONFIG_FILE,
-                IOUtils.toString(is, StandardCharsets.UTF_8));
+            rsp.add(ACTION_CONFIG_FILE, IOUtils.toString(is, StandardCharsets.UTF_8));
           } catch (IOException e) {
             log.debug(e);
             rsp.add(MESSAGE_ERROR, e.getMessage());
@@ -171,13 +181,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
           documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);
         }
         if (configuration != null && documentUrl != null) {
-          InputStream stream = IOUtils.toInputStream(configuration,
-              StandardCharsets.UTF_8);
+          InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
           try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {
-            MtasFetchData fetchData = new MtasFetchData(
-                new StringReader(documentUrl));
-            rsp.add(ACTION_MAPPING,
-                tokenizer.getList(fetchData.getUrl(null, null)));
+            MtasFetchData fetchData = new MtasFetchData(new StringReader(documentUrl));
+            rsp.add(ACTION_MAPPING, tokenizer.getList(fetchData.getUrl(null, null)));
             tokenizer.close();
           } catch (IOException | MtasParserException e) {
             log.debug(e);
@@ -186,11 +193,9 @@ public class MtasRequestHandler extends RequestHandlerBase {
             stream.close();
           }
         } else if (configuration != null && document != null) {
-          InputStream stream = IOUtils.toInputStream(configuration,
-              StandardCharsets.UTF_8);
+          InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
           try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {
-            rsp.add(ACTION_MAPPING,
-                tokenizer.getList(new StringReader(document)));
+            rsp.add(ACTION_MAPPING, tokenizer.getList(new StringReader(document)));
             tokenizer.close();
           } catch (IOException e) {
             log.debug(e);
@@ -200,23 +205,19 @@ public class MtasRequestHandler extends RequestHandlerBase {
           }
         }
       } else if (action.equals(ACTION_RUNNING)) {
-        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,
-            false);
+        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
         rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests));
       } else if (action.equals(ACTION_HISTORY)) {
-        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,
-            false);
+        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
         rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests));
       } else if (action.equals(ACTION_ERROR)) {
-        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS,
-            false);
+        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
         rsp.add(ACTION_ERROR, error.createListOutput(shardRequests));
       } else if (action.equals(ACTION_STATUS)) {
         String key = req.getParams().get(PARAM_KEY, null);
         String abort = req.getParams().get(PARAM_ABORT, null);
         MtasSolrStatus solrStatus = null;
-        if ((solrStatus = history.get(key)) != null
-            || (solrStatus = running.get(key)) != null
+        if ((solrStatus = history.get(key)) != null || (solrStatus = running.get(key)) != null
             || (solrStatus = error.get(key)) != null) {
           if (abort != null && !solrStatus.finished()) {
             solrStatus.setError(abort);
@@ -232,8 +233,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Gets the files.
    *
-   * @param dir the dir
-   * @param subDir the sub dir
+   * @param dir
+   *          the dir
+   * @param subDir
+   *          the sub dir
    * @return the files
    */
   private ArrayList<String> getFiles(String dir, String subDir) {
@@ -242,8 +245,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     File[] listOfFiles = (new File(fullDir)).listFiles();
     if (listOfFiles != null) {
       for (File file : listOfFiles) {
-        String fullName = subDir == null ? file.getName()
-            : subDir + File.separator + file.getName();
+        String fullName = subDir == null ? file.getName() : subDir + File.separator + file.getName();
         if (file.isFile()) {
           files.add(fullName);
         } else if (file.isDirectory()) {
@@ -267,13 +269,14 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Gets the params from JSON.
    *
-   * @param params the params
-   * @param json the json
+   * @param params
+   *          the params
+   * @param json
+   *          the json
    * @return the params from JSON
    */
   @SuppressWarnings("unchecked")
-  private static void getParamsFromJSON(Map<String, String> params,
-      String json) {
+  private static void getParamsFromJSON(Map<String, String> params, String json) {
     JSONParser parser = new JSONParser(json);
     try {
       Object o = ObjectBuilder.getVal(parser);
@@ -298,9 +301,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
         }
       }
     } catch (Exception e) {
-      log.debug(
-          "ignore parse exceptions at this stage, they may be caused by incomplete macro expansions",
-          e);
+      log.debug("ignore parse exceptions at this stage, they may be caused by incomplete macro expansions", e);
       return;
     }
   }
@@ -308,8 +309,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Register status.
    *
-   * @param item the item
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param item
+   *          the item
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void registerStatus(MtasSolrStatus item) throws IOException {
     history.add(item);
@@ -319,8 +322,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Finish status.
    *
-   * @param item the item
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param item
+   *          the item
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void finishStatus(MtasSolrStatus item) throws IOException {
     running.remove(item);
@@ -332,8 +337,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Check key.
    *
-   * @param key the key
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param key
+   *          the key
+   * @throws IOException
+   *           Signals that an I/O exception has occurred.
    */
   public void checkKey(String key) throws IOException {
     history.updateKey(key);
@@ -342,12 +349,12 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Gets the shard information.
    *
-   * @param shard the shard
+   * @param shard
+   *          the shard
    * @return the shard information
    */
   public ShardInformation getShardInformation(String shard) {
-    ShardInformation shardInformation = shardIndex
-        .get(Objects.requireNonNull(shard, "shard required"));
+    ShardInformation shardInformation = shardIndex.get(Objects.requireNonNull(shard, "shard required"));
     if (shardInformation == null) {
       shardInformation = createShardInformation(shard);
     }
@@ -357,7 +364,8 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /**
    * Creates the shard information.
    *
-   * @param shard the shard
+   * @param shard
+   *          the shard
    * @return the shard information
    */
   private ShardInformation createShardInformation(String shard) {
@@ -369,34 +377,32 @@ public class MtasRequestHandler extends RequestHandlerBase {
     solrParams.add(CommonParams.HEADER_ECHO_PARAMS, "none");
     solrParams.add(ShardParams.IS_SHARD, CommonParams.TRUE);
     solrParams.add(MtasSolrSearchComponent.PARAM_MTAS, CommonParams.TRUE);
-    solrParams.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS,
+    solrParams.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS, CommonParams.TRUE);
+    solrParams.add(
+        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER,
         CommonParams.TRUE);
     solrParams.add(
-        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "."
-            + MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER,
+        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS,
         CommonParams.TRUE);
     solrParams.add(
-        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "."
-            + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS,
-        CommonParams.TRUE);
-    solrParams.add(
-        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "."
-            + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS,
+        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS,
         CommonParams.TRUE);
     try {
       QueryResponse response = solrClient.query(solrParams);
-      Object mtasHandlerObject = Objects.requireNonNull(response.getResponse().findRecursive(
-          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-          MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER), "no number of segments for "+shard);
-      Object numberOfSegmentsObject = Objects.requireNonNull(response.getResponse().findRecursive(
-          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-          MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS), "no number of documents for "+shard);
-      Object numberOfDocumentsObject = Objects.requireNonNull(response.getResponse().findRecursive(
-          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-          MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS), "no name for "+shard);
-      Object nameObject = Objects.requireNonNull(response.getResponse().findRecursive(
-          MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-          ShardInformation.NAME_NAME), "no handler for "+shard);      
+      Object mtasHandlerObject = Objects.requireNonNull(
+          response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+              MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER),
+          "no number of segments for " + shard);
+      Object numberOfSegmentsObject = Objects.requireNonNull(
+          response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+              MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS),
+          "no number of documents for " + shard);
+      Object numberOfDocumentsObject = Objects.requireNonNull(
+          response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+              MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS),
+          "no name for " + shard);
+      Object nameObject = Objects.requireNonNull(response.getResponse().findRecursive(MtasSolrSearchComponent.NAME,
+          MtasSolrComponentStatus.NAME, ShardInformation.NAME_NAME), "no handler for " + shard);
       if (mtasHandlerObject instanceof String) {
         shardInformation.mtasHandler = (String) mtasHandlerObject;
       }
@@ -404,8 +410,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
         shardInformation.numberOfSegments = (Integer) numberOfSegmentsObject;
       }
       if (numberOfDocumentsObject instanceof Integer) {
-        shardInformation.numberOfDocuments = ((Integer) numberOfDocumentsObject)
-            .longValue();
+        shardInformation.numberOfDocuments = ((Integer) numberOfDocumentsObject).longValue();
       }
       if (nameObject instanceof String) {
         shardInformation.name = (String) nameObject;
@@ -416,6 +421,35 @@ public class MtasRequestHandler extends RequestHandlerBase {
       return null;
     }
     return shardInformation;
+  }
+
+  /**
+   * The Class StatusController.
+   */
+  public class StatusController extends Thread {
+
+    /* (non-Javadoc)
+     * @see java.lang.Thread#run()
+     */
+    @Override
+    public void run() {
+      List<MtasSolrStatus> statusWithException;
+      while (true) {
+        try {
+          Thread.sleep(1000);
+          statusWithException = running.checkForExceptions();
+          if (statusWithException != null) {
+            for (MtasSolrStatus item : statusWithException) {
+              finishStatus(item);
+            }
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+
+    }
+
   }
 
   /**
@@ -444,12 +478,18 @@ public class MtasRequestHandler extends RequestHandlerBase {
     /**
      * Instantiates a new shard information.
      *
-     * @param location the location
+     * @param location
+     *          the location
      */
     public ShardInformation(String location) {
       this.location = location;
     }
-    
+
+    /**
+     * Location.
+     *
+     * @return the string
+     */
     public String location() {
       return location;
     }

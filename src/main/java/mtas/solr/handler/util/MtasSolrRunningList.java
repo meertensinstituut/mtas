@@ -1,5 +1,9 @@
 package mtas.solr.handler.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+// TODO: Auto-generated Javadoc
 /**
  * The Class MtasSolrList.
  */
@@ -7,7 +11,7 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
 
   /** The timeout. */
   private Integer timeout;
-  
+
   /** The garbage timeout. */
   private Integer garbageTimeout;
 
@@ -26,7 +30,8 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
   /**
    * Instantiates a new mtas solr list.
    *
-   * @param timeout the timeout
+   * @param timeout
+   *          the timeout
    */
   public MtasSolrRunningList(Integer timeout) {
     super();
@@ -34,18 +39,36 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
     garbageTimeout = GARBAGE_FACTOR * timeout;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see mtas.solr.handler.util.MtasSolrBaseList#garbageCollect()
    */
   public final void garbageCollect() {
     if (timeout != null && !list.isEmpty()) {
       long boundaryTime = System.currentTimeMillis() - (garbageTimeout);
-      list.removeIf((MtasSolrStatus solrStatus) -> solrStatus.finished() || solrStatus
-          .getStartTime() < boundaryTime);
+      list.removeIf((MtasSolrStatus solrStatus) -> solrStatus.finished() || solrStatus.getStartTime() < boundaryTime);
       index.clear();
-      list.forEach((MtasSolrStatus solrStatus) -> index.put(solrStatus.key(),
-          solrStatus));
+      list.forEach((MtasSolrStatus solrStatus) -> index.put(solrStatus.key(), solrStatus));
     }
+  }
+
+  /**
+   * Check for exceptions.
+   *
+   * @return the list
+   */
+  public final List<MtasSolrStatus> checkForExceptions() {
+    List<MtasSolrStatus> statusWithException = null;
+    for (MtasSolrStatus item : list) {
+      if (item.checkResponseForException()) {
+        if (statusWithException == null) {
+          statusWithException = new ArrayList<>();
+        }
+        statusWithException.add(item);
+      }
+    }
+    return statusWithException;
   }
 
 }
