@@ -948,17 +948,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	private void errorStatus(MtasSolrStatus status, String message) {
-		try {
-			status.setError(message);
-			if (requestHandler != null) {
-				requestHandler.finishStatus(status);
-			}
-		} catch (IOException e) {
-			log.error(e);
-		}
-	}
-
 	/**
 	 * Finish status.
 	 *
