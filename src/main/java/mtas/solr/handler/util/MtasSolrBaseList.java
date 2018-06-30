@@ -17,8 +17,8 @@ import org.apache.solr.common.util.SimpleOrderedMap;
 public abstract class MtasSolrBaseList {
 
   /** The list. */
-  protected List<MtasSolrStatus> list;
-
+  protected List<MtasSolrStatus> data;
+  
   /** The index. */
   protected Map<String, MtasSolrStatus> index;
 
@@ -44,7 +44,7 @@ public abstract class MtasSolrBaseList {
    * Instantiates a new mtas solr base list.
    */
   public MtasSolrBaseList() {
-    list = Collections.synchronizedList(new ArrayList<MtasSolrStatus>());
+    data = Collections.synchronizedList(new ArrayList<MtasSolrStatus>());
     index = Collections.synchronizedMap(new HashMap<>());
   }
 
@@ -72,7 +72,7 @@ public abstract class MtasSolrBaseList {
   public void add(MtasSolrStatus status) throws IOException {
     Objects.requireNonNull(status);
     if (enabled) {
-      list.add(status);
+      data.add(status);
       if (!index.containsKey(status.key())) {
         index.put(status.key(), status);
         garbageCollect();
@@ -100,7 +100,7 @@ public abstract class MtasSolrBaseList {
    */
   public final void remove(MtasSolrStatus status) {
     Objects.requireNonNull(status);
-    list.remove(status);
+    data.remove(status);
     index.remove(status.key());
   }
 
@@ -113,7 +113,7 @@ public abstract class MtasSolrBaseList {
    * Reset.
    */
   public final void reset() {
-    list.clear();
+    data.clear();
     index.clear();
   }
 
@@ -172,11 +172,11 @@ public abstract class MtasSolrBaseList {
     SimpleOrderedMap<Object> output = new SimpleOrderedMap<>();
     output.add(NAME_ENABLED, enabled());
     output.add(NAME_ENABLED, true);
-    int numberTotal = list.size();
+    int numberTotal = data.size();
     ListData listData = new ListData();
 
-    synchronized (list) {
-      ListIterator<MtasSolrStatus> iter = list.listIterator(list.size());
+    synchronized (data) {
+      ListIterator<MtasSolrStatus> iter = data.listIterator(data.size());
       MtasSolrStatus item;
       int number = 0;
       while (iter.hasPrevious() && number < maxNumber) {

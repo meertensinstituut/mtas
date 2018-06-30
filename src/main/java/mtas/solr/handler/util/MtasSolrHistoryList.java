@@ -74,11 +74,11 @@ public class MtasSolrHistoryList extends MtasSolrBaseList {
   public void garbageCollect() {
     if (softLimit == 0) {
       reset();
-    } else if (list.size() > hardLimit) {
-      long boundaryTime = list.get(softLimit).getStartTime();
-      list.removeIf((MtasSolrStatus status) -> status.getStartTime() < boundaryTime);
+    } else if (data.size() > hardLimit) {
+      long boundaryTime = data.get(softLimit).getStartTime();
+      data.removeIf((MtasSolrStatus status) -> status.getStartTime() < boundaryTime);
       index.clear();
-      list.forEach((MtasSolrStatus status) -> index.put(status.key(), status));
+      data.forEach((MtasSolrStatus status) -> index.put(status.key(), status));
     }
   }
 

@@ -45,11 +45,11 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
    * @see mtas.solr.handler.util.MtasSolrBaseList#garbageCollect()
    */
   public final void garbageCollect() {
-    if (timeout != null && !list.isEmpty()) {
+    if (timeout != null && !data.isEmpty()) {
       long boundaryTime = System.currentTimeMillis() - (garbageTimeout);
-      list.removeIf((MtasSolrStatus solrStatus) -> solrStatus.finished() || solrStatus.getStartTime() < boundaryTime);
+      data.removeIf((MtasSolrStatus solrStatus) -> solrStatus.finished() || solrStatus.getStartTime() < boundaryTime);
       index.clear();
-      list.forEach((MtasSolrStatus solrStatus) -> index.put(solrStatus.key(), solrStatus));
+      data.forEach((MtasSolrStatus solrStatus) -> index.put(solrStatus.key(), solrStatus));
     }
   }
 
@@ -60,7 +60,7 @@ public class MtasSolrRunningList extends MtasSolrBaseList {
    */
   public final List<MtasSolrStatus> checkForExceptions() {
     List<MtasSolrStatus> statusWithException = null;
-    for (MtasSolrStatus item : list) {
+    for (MtasSolrStatus item : data) {
       if (item.checkResponseForException()) {
         if (statusWithException == null) {
           statusWithException = new ArrayList<>();

@@ -394,7 +394,6 @@ public class MtasRequestHandler extends RequestHandlerBase {
    */
   private ShardInformation createShardInformation(String shard) {
     ShardInformation shardInformation = new ShardInformation(shard);
-    SolrClient solrClient = new HttpSolrClient.Builder(shard).build();
     ModifiableSolrParams solrParams = new ModifiableSolrParams();
     solrParams.add(CommonParams.Q, "*:*");
     solrParams.add(CommonParams.ROWS, "0");
@@ -411,7 +410,8 @@ public class MtasRequestHandler extends RequestHandlerBase {
     solrParams.add(
         MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS,
         CommonParams.TRUE);
-    try {
+    SolrClient solrClient = new HttpSolrClient.Builder(shard).build();
+    try {  
       QueryResponse response = solrClient.query(solrParams);
       Object mtasHandlerObject = Objects.requireNonNull(
           response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
@@ -443,6 +443,14 @@ public class MtasRequestHandler extends RequestHandlerBase {
     } catch (NullPointerException | SolrServerException | IOException e) {
       log.error(e);
       return null;
+    } finally {
+      if (solrClient != null) {
+        try {
+          solrClient.close();
+        } catch (IOException e) {
+          log.error(e);
+        }
+      }
     }
     return shardInformation;
   }

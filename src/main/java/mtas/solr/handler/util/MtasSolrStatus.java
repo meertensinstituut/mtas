@@ -26,6 +26,7 @@ import mtas.codec.util.Status;
 import mtas.solr.handler.MtasRequestHandler;
 import mtas.solr.handler.component.util.MtasSolrComponentStatus;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class MtasSolrStatus.
  */
@@ -175,6 +176,7 @@ public class MtasSolrStatus {
   /** The shard info updated. */
   private volatile boolean shardInfoUpdated;
 
+  /** The shard info need update. */
   private volatile boolean shardInfoNeedUpdate;
 
   /** The shard info error. */
@@ -195,8 +197,7 @@ public class MtasSolrStatus {
    * @param rsp
    *          the rsp
    */
-  public MtasSolrStatus(String request, boolean shardRequest, String[] shards,
-      SolrQueryResponse rsp) {
+  public MtasSolrStatus(String request, boolean shardRequest, String[] shards, SolrQueryResponse rsp) {
     key = null;
     status = new Status();
     this.request = request;
@@ -298,9 +299,9 @@ public class MtasSolrStatus {
   public final void setError(IOException exception) throws IOException {
     Objects.requireNonNull(exception, "exception required");
     errorMessage = exception.getMessage();
-    //StringWriter sw = new StringWriter();
-    //exception.printStackTrace(new PrintWriter(sw));
-    //errorMessage+="\n====\n"+sw.toString();
+    // StringWriter sw = new StringWriter();
+    // exception.printStackTrace(new PrintWriter(sw));
+    // errorMessage+="\n====\n"+sw.toString();
     errorStatus = true;
     throw exception;
   }
@@ -312,7 +313,7 @@ public class MtasSolrStatus {
    *          the new error
    */
   public final void setError(String error) {
-	this.errorMessage = Objects.requireNonNull(error, "error required");
+    this.errorMessage = Objects.requireNonNull(error, "error required");
     this.errorStatus = true;
   }
 
@@ -427,9 +428,11 @@ public class MtasSolrStatus {
 
   /**
    * Check response on exception.
+   *
+   * @return true, if successful
    */
   public boolean checkResponseForException() {
-	if (!finished && rsp != null) {
+    if (!finished && rsp != null) {
       Exception e;
       if ((e = rsp.getException()) != null) {
         setError(e.getMessage());
@@ -437,24 +440,35 @@ public class MtasSolrStatus {
         return true;
       }
     }
-	return false;
+    return false;
   }
 
-  public SimpleOrderedMap<Object> createListOutput() {
-    return createOutput(false);
-  }
-  
-  public SimpleOrderedMap<Object> createItemOutput() {
-    return createOutput(true);
-  }
-  
   /**
-   * Creates the output.
+   * Creates the list output.
    *
    * @return the simple ordered map
    */
+  public SimpleOrderedMap<Object> createListOutput() {
+    return createOutput(false);
+  }
+
+  /**
+   * Creates the item output.
+   *
+   * @return the simple ordered map
+   */
+  public SimpleOrderedMap<Object> createItemOutput() {
+    return createOutput(true);
+  }
+
+  /**
+   * Creates the output.
+   *
+   * @param detailed the detailed
+   * @return the simple ordered map
+   */
   private SimpleOrderedMap<Object> createOutput(boolean detailed) {
-    //checkResponseOnException();
+    // checkResponseOnException();
     SimpleOrderedMap<Object> output = new SimpleOrderedMap<>();
     updateShardInfo();
     output.add(NAME_KEY, key);
@@ -472,41 +486,31 @@ public class MtasSolrStatus {
     output.add(NAME_TIME_START, (new Date(startTime)).toString());
     output.add(NAME_SHARDREQUEST, shardRequest);
     if (shardNumberTotal > 0) {
-      if(detailed) {
+      if (detailed) {
         output.add(NAME_STATUS_DISTRIBUTED, createShardsOutput());
       } else {
         output.add(NAME_STATUS_DISTRIBUTED, true);
       }
-    } else if(detailed) {
+    } else if (detailed) {
       output.add(NAME_STATUS_DISTRIBUTED, false);
     }
     if (status.numberSegmentsTotal != null) {
       output.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, status.numberSegmentsTotal);
-      output.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED,
-          status.numberSegmentsFinished);
+      output.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED, status.numberSegmentsFinished);
       if (!status.subNumberSegmentsFinished.isEmpty()) {
-        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED,
-            status.subNumberSegmentsFinished);
-        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL,
-            status.subNumberSegmentsTotal);
-        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL,
-            status.subNumberSegmentsFinishedTotal);
+        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED, status.subNumberSegmentsFinished);
+        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL, status.subNumberSegmentsTotal);
+        output.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL, status.subNumberSegmentsFinishedTotal);
       }
     }
     if (status.numberDocumentsTotal != null) {
-      output.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL,
-          status.numberDocumentsTotal);
-      output.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,
-          status.numberDocumentsFound);
-      output.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED,
-          status.numberDocumentsFinished);
+      output.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL, status.numberDocumentsTotal);
+      output.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND, status.numberDocumentsFound);
+      output.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED, status.numberDocumentsFinished);
       if (!status.subNumberDocumentsFinished.isEmpty()) {
-        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED,
-            status.subNumberDocumentsFinished);
-        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL,
-            status.subNumberDocumentsTotal);
-        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL,
-            status.subNumberDocumentsFinishedTotal);
+        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED, status.subNumberDocumentsFinished);
+        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL, status.subNumberDocumentsTotal);
+        output.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL, status.subNumberDocumentsFinishedTotal);
       }
     }
     return output;
@@ -563,13 +567,12 @@ public class MtasSolrStatus {
    *          the args
    * @return the integer map
    */
-  private final Map<String, Integer> getIntegerMap(NamedList<Object> response,
-      String... args) {
+  private final Map<String, Integer> getIntegerMap(NamedList<Object> response, String... args) {
     Object objectItem = response.findRecursive(args);
     Map<String, Integer> result = null;
     if (objectItem != null && objectItem instanceof Map) {
       result = (Map) objectItem;
-    } 
+    }
     return result;
   }
 
@@ -600,8 +603,7 @@ public class MtasSolrStatus {
    *          the args
    * @return the long map
    */
-  private final Map<String, Long> getLongMap(NamedList<Object> response,
-      String... args) {
+  private final Map<String, Long> getLongMap(NamedList<Object> response, String... args) {
     Object objectItem = response.findRecursive(args);
     if (objectItem != null && objectItem instanceof Map) {
       return (Map) objectItem;
@@ -642,7 +644,7 @@ public class MtasSolrStatus {
     Boolean result = null;
     if (objectItem != null && objectItem instanceof Boolean) {
       result = (Boolean) objectItem;
-    } 
+    }
     return result;
   }
 
@@ -652,31 +654,26 @@ public class MtasSolrStatus {
   private final void updateShardInfo() {
     final long expirationTime = 1000;
     // don't update too much
-    if (shardKey == null
-        || (shardInfoUpdated && Objects.requireNonNull(shardInfoUpdate,
-            "update expire time not set") < System.currentTimeMillis())) {
+    if (shardKey == null || (shardInfoUpdated
+        && Objects.requireNonNull(shardInfoUpdate, "update expire time not set") < System.currentTimeMillis())) {
       return;
     }
     // and only if necessary
     if (!shardInfoUpdated || !finished || shardInfoNeedUpdate) {
-      ShardStatus shardStatus;
-      StageStatus stageStatus;
-      QueryResponse response;
-      SolrClient solrClient;
       // reset
       shardInfoError = false;
       // get list of relevant stages
       Set<Integer> stagesList = new HashSet<>();
       for (Integer stage : shardStageKeys.keySet()) {
-        if (!shardStageStatus.containsKey(stage)
-            || !shardStageStatus.get(stage).finished) {
+        if (!shardStageStatus.containsKey(stage) || !shardStageStatus.get(stage).finished) {
           stagesList.add(stage);
         }
       }
       // loop for this list over shards
       for (Entry<String, ShardStatus> entry : shards.entrySet()) {
-        shardStatus = entry.getValue();
-        solrClient = null;
+        ShardStatus shardStatus = entry.getValue();
+        SolrClient solrClient = null;
+        StageStatus stageStatus;
         // then loop over stages
         for (Integer stage : stagesList) {
           // get shardStage
@@ -687,85 +684,71 @@ public class MtasSolrStatus {
             stageStatus = shardStageStatus.get(stage);
           }
           if (shardStatus.finishedStages.contains(stage)) {
-            stageStatus.add(true,
-                shardStatus.numberDocumentsFoundStage.get(stage));
+            stageStatus.add(true, shardStatus.numberDocumentsFoundStage.get(stage));
           } else {
             // create request
             ModifiableSolrParams solrParams = new ModifiableSolrParams();
             solrParams.add(CommonParams.QT, shardStatus.mtasHandler);
-            solrParams.add(MtasRequestHandler.PARAM_ACTION,
-                MtasRequestHandler.ACTION_STATUS);
-            solrParams.add(MtasRequestHandler.PARAM_KEY,
-                shardStageKeys.get(stage));
-            // set solrClient
-            if (solrClient == null) {
-              solrClient = new HttpSolrClient.Builder(shardStatus.location)
-                  .build();
-            }
+            solrParams.add(MtasRequestHandler.PARAM_ACTION, MtasRequestHandler.ACTION_STATUS);
+            solrParams.add(MtasRequestHandler.PARAM_KEY, shardStageKeys.get(stage));
+
             try {
-              response = solrClient.query(solrParams);
+              // set solrClient
+              solrClient = new HttpSolrClient.Builder(shardStatus.location).build();
+              // get response
+              QueryResponse response = solrClient.query(solrParams);
               // check for response
-              if (response.getResponse()
-                  .findRecursive(MtasSolrComponentStatus.NAME) != null) {
+              if (response.getResponse().findRecursive(MtasSolrComponentStatus.NAME) != null) {
                 shardStatus.numberDocumentsFoundStage.put(stage,
-                    getLong(response.getResponse(),
-                        MtasSolrComponentStatus.NAME,
-                        NAME_STATUS_DOCUMENT_NUMBER_FOUND));
+                    getLong(response.getResponse(), MtasSolrComponentStatus.NAME, NAME_STATUS_DOCUMENT_NUMBER_FOUND));
                 shardStatus.timeStage.put(stage,
-                    getInteger(response.getResponse(),
-                        MtasSolrComponentStatus.NAME, NAME_TIME_TOTAL));
+                    getInteger(response.getResponse(), MtasSolrComponentStatus.NAME, NAME_TIME_TOTAL));
                 stageStatus.add(
                     shardStatus.setFinishedStage(stage,
-                        getBoolean(response.getResponse(),
-                            MtasSolrComponentStatus.NAME, NAME_FINISHED)),
+                        getBoolean(response.getResponse(), MtasSolrComponentStatus.NAME, NAME_FINISHED)),
                     shardStatus.numberDocumentsFoundStage.get(stage));
                 shardInfoError = shardStatus.setErrorStage(stage,
-                    getString(response.getResponse(),
-                        MtasSolrComponentStatus.NAME, NAME_ERROR))
-                    || shardInfoError;
+                    getString(response.getResponse(), MtasSolrComponentStatus.NAME, NAME_ERROR)) || shardInfoError;
                 shardStatus.setAbortStage(stage,
-                    getString(response.getResponse(),
-                        MtasSolrComponentStatus.NAME, NAME_ABORT));
+                    getString(response.getResponse(), MtasSolrComponentStatus.NAME, NAME_ABORT));
                 if (stage.equals(currentStage)) {
                   shardStatus.stage = stage;
-                  shardStatus.stageNumberDocumentsFinished = getLong(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_DOCUMENT_NUMBER_FINISHED);
-                  shardStatus.stageSubNumberDocumentsFinished = getLongMap(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED);
-                  shardStatus.stageSubNumberDocumentsTotal = getLong(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL);
-                  shardStatus.stageSubNumberDocumentsFinishedTotal = getLong(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL);
-                  shardStatus.stageNumberSegmentsFinished = getInteger(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
-                  shardStatus.stageSubNumberSegmentsFinished = getIntegerMap(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED);
-                  shardStatus.stageSubNumberSegmentsTotal = getInteger(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL);
-                  shardStatus.stageSubNumberSegmentsFinishedTotal = getInteger(
-                      response.getResponse(), MtasSolrComponentStatus.NAME,
-                      NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
+                  shardStatus.stageNumberDocumentsFinished = getLong(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_DOCUMENT_NUMBER_FINISHED);
+                  shardStatus.stageSubNumberDocumentsFinished = getLongMap(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED);
+                  shardStatus.stageSubNumberDocumentsTotal = getLong(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL);
+                  shardStatus.stageSubNumberDocumentsFinishedTotal = getLong(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL);
+                  shardStatus.stageNumberSegmentsFinished = getInteger(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
+                  shardStatus.stageSubNumberSegmentsFinished = getIntegerMap(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED);
+                  shardStatus.stageSubNumberSegmentsTotal = getInteger(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL);
+                  shardStatus.stageSubNumberSegmentsFinishedTotal = getInteger(response.getResponse(),
+                      MtasSolrComponentStatus.NAME, NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL);
                 }
-              } else if (!finished && currentStage.equals(stage)
-                  && !stageStatus.checked) {
+              } else if (!finished && currentStage.equals(stage) && !stageStatus.checked) {
                 stageStatus.finished = false;
               }
             } catch (SolrServerException | IOException e) {
-              shardInfoError = shardInfoError
-                  || shardStatus.setErrorStage(stage, e.getMessage());
+              shardInfoError = shardInfoError || shardStatus.setErrorStage(stage, e.getMessage());
+            } finally {
+              if (solrClient != null) {
+                try {
+                  solrClient.close();
+                } catch (IOException e) {
+                  shardInfoError = shardInfoError || shardStatus.setErrorStage(stage, e.getMessage());
+                }
+              }
             }
           }
         }
       }
       if (!shardInfoError) {
-        for(StageStatus item : shardStageStatus.values()) {
+        for (StageStatus item : shardStageStatus.values()) {
           item.checked = true;
         }
         shardInfoUpdated = true;
@@ -776,8 +759,6 @@ public class MtasSolrStatus {
       }
     }
   }
-
-  
 
   /*
    * (non-Javadoc)
@@ -797,8 +778,9 @@ public class MtasSolrStatus {
     /** The stage. */
     private int stage;
 
+    /** The checked. */
     public boolean checked;
-    
+
     /** The finished. */
     public boolean finished;
 
@@ -829,6 +811,12 @@ public class MtasSolrStatus {
       numberOfShards = 0;
     }
 
+    /**
+     * Adds the.
+     *
+     * @param finished the finished
+     * @param numberOfDocumentsFound the number of documents found
+     */
     public void add(boolean finished, Long numberOfDocumentsFound) {
       if (!finished) {
         this.finished = false;
@@ -847,11 +835,15 @@ public class MtasSolrStatus {
     public SimpleOrderedMap<Object> createOutput() {
       SimpleOrderedMap<Object> stageOutput = new SimpleOrderedMap<>();
       stageOutput.add(NAME_FINISHED, finished);
-      stageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,
-          numberOfDocumentsFound);
+      stageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND, numberOfDocumentsFound);
       return stageOutput;
     }
-    
+
+    /**
+     * Stage.
+     *
+     * @return the int
+     */
     public int stage() {
       return stage;
     }
@@ -933,19 +925,16 @@ public class MtasSolrStatus {
         shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_TOTAL, numberSegmentsTotal);
       }
       if (numberDocumentsTotal != null) {
-        shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL,
-            numberDocumentsTotal);
+        shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_TOTAL, numberDocumentsTotal);
       }
       // stages
       Map<Integer, SimpleOrderedMap<Object>> shardStagesOutput = new HashMap<>();
       for (Integer s : shardStageKeys.keySet()) {
         if (numberDocumentsFoundStage.containsKey(s)) {
           SimpleOrderedMap<Object> shardStageOutput = new SimpleOrderedMap<>();
-          shardStageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND,
-              numberDocumentsFoundStage.get(s));
+          shardStageOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FOUND, numberDocumentsFoundStage.get(s));
           shardStageOutput.add(NAME_STATUS_TIME, timeStage.get(s));
-          shardStageOutput.add(NAME_STATUS_FINISHED,
-              finishedStages.contains(s));
+          shardStageOutput.add(NAME_STATUS_FINISHED, finishedStages.contains(s));
           if (errorStage != null && errorStage.containsKey(s)) {
             shardStageOutput.add(NAME_STATUS_ERROR, errorStage.get(s));
           }
@@ -963,38 +952,28 @@ public class MtasSolrStatus {
         SimpleOrderedMap<Object> shardStageOutput = new SimpleOrderedMap<>();
         shardStageOutput.add(NAME_STATUS_STAGE, stage);
         if (stageNumberSegmentsFinished != null) {
-          shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED,
-              stageNumberSegmentsFinished);
+          shardOutput.add(NAME_STATUS_SEGMENT_NUMBER_FINISHED, stageNumberSegmentsFinished);
         }
         if (stageSubNumberSegmentsFinishedTotal != null) {
-          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL,
-              stageSubNumberSegmentsFinishedTotal);
+          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED_TOTAL, stageSubNumberSegmentsFinishedTotal);
         }
         if (stageSubNumberSegmentsTotal != null) {
-          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL,
-              stageSubNumberSegmentsTotal);
+          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_TOTAL, stageSubNumberSegmentsTotal);
         }
-        if (stageSubNumberSegmentsFinished != null
-            && !stageSubNumberSegmentsFinished.isEmpty()) {
-          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED,
-              stageSubNumberSegmentsFinished);
+        if (stageSubNumberSegmentsFinished != null && !stageSubNumberSegmentsFinished.isEmpty()) {
+          shardOutput.add(NAME_STATUS_SEGMENT_SUB_NUMBER_FINISHED, stageSubNumberSegmentsFinished);
         }
         if (stageNumberDocumentsFinished != null) {
-          shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED,
-              stageNumberDocumentsFinished);
+          shardOutput.add(NAME_STATUS_DOCUMENT_NUMBER_FINISHED, stageNumberDocumentsFinished);
         }
         if (stageSubNumberDocumentsTotal != null) {
-          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL,
-              stageSubNumberDocumentsTotal);
+          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_TOTAL, stageSubNumberDocumentsTotal);
         }
         if (stageSubNumberDocumentsFinishedTotal != null) {
-          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL,
-              stageSubNumberDocumentsFinishedTotal);
+          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED_TOTAL, stageSubNumberDocumentsFinishedTotal);
         }
-        if (stageSubNumberDocumentsFinished != null
-            && !stageSubNumberDocumentsFinished.isEmpty()) {
-          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED,
-              stageSubNumberDocumentsFinished);
+        if (stageSubNumberDocumentsFinished != null && !stageSubNumberDocumentsFinished.isEmpty()) {
+          shardOutput.add(NAME_STATUS_DOCUMENT_SUB_NUMBER_FINISHED, stageSubNumberDocumentsFinished);
         }
         shardOutput.add(NAME_STATUS_LAST, shardStageOutput);
       }
