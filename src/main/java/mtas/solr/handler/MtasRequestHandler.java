@@ -77,6 +77,9 @@ public class MtasRequestHandler extends RequestHandlerBase {
   /** The Constant PARAM_KEY. */
   public static final String PARAM_KEY = "key";
 
+  /** The Constant PARAM_NUMBER. */
+  public static final String PARAM_NUMBER = "key";
+
   /** The Constant PARAM_ABORT. */
   public static final String PARAM_ABORT = "abort";
 
@@ -112,12 +115,15 @@ public class MtasRequestHandler extends RequestHandlerBase {
 
   /** The Constant defaultTimeout. */
   private static final int defaultTimeout = 3600;
-  
+
   /** The Constant defaultSoftLimit. */
   private static final int defaultSoftLimit = 100;
-  
+
   /** The Constant defaultHardLimit. */
   private static final int defaultHardLimit = 200;
+
+  /** The Constant defaultNumber. */
+  private static final int defaultNumber = 50;
 
   /**
    * Instantiates a new mtas request handler.
@@ -133,6 +139,13 @@ public class MtasRequestHandler extends RequestHandlerBase {
     statusController.start();
   }
 
+  /**
+   * Handle request body.
+   *
+   * @param req the req
+   * @param rsp the rsp
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   /*
    * (non-Javadoc)
    * 
@@ -204,15 +217,21 @@ public class MtasRequestHandler extends RequestHandlerBase {
             stream.close();
           }
         }
-      } else if (action.equals(ACTION_RUNNING)) {
+      } else if (action.equals(ACTION_RUNNING) || action.equals(ACTION_HISTORY) || action.equals(ACTION_ERROR)) {
         boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
-        rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests));
-      } else if (action.equals(ACTION_HISTORY)) {
-        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
-        rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests));
-      } else if (action.equals(ACTION_ERROR)) {
-        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
-        rsp.add(ACTION_ERROR, error.createListOutput(shardRequests));
+        int number;
+        try {
+          number = Integer.parseInt(req.getParams().get(PARAM_NUMBER));
+        } catch (NumberFormatException e) {
+          number = defaultNumber;
+        }
+        if (action.equals(ACTION_RUNNING)) {
+          rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests, number));
+        } else if (action.equals(ACTION_HISTORY)) {
+          rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests, number));
+        } else if (action.equals(ACTION_ERROR)) {
+          rsp.add(ACTION_ERROR, error.createListOutput(shardRequests, number));
+        }
       } else if (action.equals(ACTION_STATUS)) {
         String key = req.getParams().get(PARAM_KEY, null);
         String abort = req.getParams().get(PARAM_ABORT, null);
@@ -256,6 +275,11 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return files;
   }
 
+  /**
+   * Gets the description.
+   *
+   * @return the description
+   */
   /*
    * (non-Javadoc)
    * 
@@ -428,7 +452,9 @@ public class MtasRequestHandler extends RequestHandlerBase {
    */
   public class StatusController extends Thread {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Thread#run()
      */
     @Override
