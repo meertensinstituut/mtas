@@ -24,7 +24,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.request.QueryRequest;
@@ -243,7 +242,8 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.positions.0.key", "statsKey");
     params.set("mtas.stats.positions.0.type", "n,sum,mean");
     params.set("rows", "0");
-    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> request = new QueryRequest(params);
+    //request1.setContentWriter(contentWriter)
     NamedList<Object> response;
     try {
       response = server.request(request, "collection1");
@@ -282,7 +282,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.tokens.0.type", String.join(",", types));
     params.set("mtas.stats.tokens.0.minimum", 1);
     params.set("mtas.stats.tokens.0.maximum", 1000000);
-    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> request = new QueryRequest(params);
     NamedList<Object> response;
     try {
       response = server.request(request, "collection1");
@@ -316,7 +316,7 @@ public class MtasSolrTestSearchConsistency {
     // create full
     params.set("mtas.termvector.0.full", true);
     params.set("mtas.termvector.0.number", -1);
-    SolrRequest<?> requestFull = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> requestFull = new QueryRequest(params);
     NamedList<Object> responseFull;
     try {
       responseFull = server.request(requestFull, "collection1");
@@ -328,7 +328,7 @@ public class MtasSolrTestSearchConsistency {
     // create tests
     for (int number = 1; number <= 1000; number *= 10) {
       params.set("mtas.termvector.0.number", number);
-      SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+      SolrRequest<?> request = new QueryRequest(params);
       NamedList<Object> response;
       try {
         response = server.request(request, "collection1");
@@ -363,7 +363,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.termvector.0.type", String.join(",", types));
     // create full
     params.set("mtas.termvector.0.list", String.join(",", list));
-    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> request = new QueryRequest(params);
     NamedList<Object> response;
     try {
       response = server.request(request, "collection1");
@@ -392,7 +392,7 @@ public class MtasSolrTestSearchConsistency {
       params.set("mtas.stats.spans.1.query.0.value", "[t_lc=\"" + key + "\"]");
       params.set("mtas.stats.spans.1.type", String.join(",", types));
       params.set("rows", "0");
-      SolrRequest<?> requestStats = new QueryRequest(params, METHOD.POST);
+      SolrRequest<?> requestStats = new QueryRequest(params);
       NamedList<Object> responseStats;
       try {
         responseStats = server.request(requestStats, "collection1");
@@ -445,7 +445,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.termvector.0.listRegexp", true);
     params.set("mtas.termvector.0.ignoreList", ".*st.*,.*nm.*");
     params.set("mtas.termvector.0.ignoreListRegexp", true);
-    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> request = new QueryRequest(params);
     NamedList<Object> response;
     try {
       response = server.request(request, "collection1");
@@ -489,7 +489,7 @@ public class MtasSolrTestSearchConsistency {
     paramsCreate.set("mtas.collection.0.action", "create");
     paramsCreate.set("mtas.collection.0.id", "idCreate");
     paramsCreate.set("mtas.collection.0.field", "id");
-    SolrRequest<?> requestCreate = new QueryRequest(paramsCreate, METHOD.POST);
+    SolrRequest<?> requestCreate = new QueryRequest(paramsCreate);
     NamedList<Object> responseCreate;
     try {
       responseCreate = server.request(requestCreate, "collection1");
@@ -516,7 +516,7 @@ public class MtasSolrTestSearchConsistency {
     paramsPost.set("mtas.collection.0.action", "post");
     paramsPost.set("mtas.collection.0.id", "idPost");
     paramsPost.set("mtas.collection.0.post", "[1,2,3,4]");
-    SolrRequest<?> requestPost = new QueryRequest(paramsPost, METHOD.POST);
+    SolrRequest<?> requestPost = new QueryRequest(paramsPost);
     NamedList<Object> responsePost;
     try {
       responsePost = server.request(requestPost, "collection1");
@@ -540,7 +540,7 @@ public class MtasSolrTestSearchConsistency {
     paramsList.set("mtas.collection", "true");
     paramsList.set("mtas.collection.0.key", "list");
     paramsList.set("mtas.collection.0.action", "list");
-    SolrRequest<?> requestList1 = new QueryRequest(paramsList, METHOD.POST);
+    SolrRequest<?> requestList1 = new QueryRequest(paramsList);
     NamedList<Object> responseList1;
     try {
       responseList1 = server.request(requestList1, "collection1");
@@ -584,7 +584,7 @@ public class MtasSolrTestSearchConsistency {
     paramsCheck.set("mtas.collection.1.key", "check2");
     paramsCheck.set("mtas.collection.1.action", "check");
     paramsCheck.set("mtas.collection.1.id", "idPost");
-    SolrRequest<?> requestCheck = new QueryRequest(paramsCheck, METHOD.POST);
+    SolrRequest<?> requestCheck = new QueryRequest(paramsCheck);
     NamedList<Object> responseCheck;
     try {
       responseCheck = server.request(requestCheck, "collection1");
@@ -628,7 +628,7 @@ public class MtasSolrTestSearchConsistency {
     paramsDelete.set("mtas.collection.1.key", "delete2");
     paramsDelete.set("mtas.collection.1.action", "delete");
     paramsDelete.set("mtas.collection.1.id", "idPost");
-    SolrRequest<?> requestDelete = new QueryRequest(paramsDelete, METHOD.POST);
+    SolrRequest<?> requestDelete = new QueryRequest(paramsDelete);
     NamedList<Object> responseDelete;
     try {
       responseDelete = server.request(requestDelete, "collection1");
@@ -644,7 +644,7 @@ public class MtasSolrTestSearchConsistency {
         .getFromMtasCollection(responseDelete, "delete2");
     assertFalse("delete - post - no response", delete2 == null);
     // list (again)
-    SolrRequest<?> requestList2 = new QueryRequest(paramsList, METHOD.POST);
+    SolrRequest<?> requestList2 = new QueryRequest(paramsList);
     NamedList<Object> responseList2;
     try {
       responseList2 = server.request(requestList2, "collection1");
@@ -686,7 +686,7 @@ public class MtasSolrTestSearchConsistency {
     paramsPost.set("mtas.collection.2.action", "create");
     paramsPost.set("mtas.collection.2.id", "createSet1");
     paramsPost.set("mtas.collection.2.field", MtasSolrBase.FIELD_ID);
-    SolrRequest<?> requestPost = new QueryRequest(paramsPost, METHOD.POST);
+    SolrRequest<?> requestPost = new QueryRequest(paramsPost);
     NamedList<Object> responsePost;
     try {
       responsePost = server.request(requestPost, "collection1");
@@ -699,7 +699,7 @@ public class MtasSolrTestSearchConsistency {
     paramsSelect1.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
         + "\" collection=\"postSet1\"}");
     paramsSelect1.set("rows", "0");
-    SolrRequest<?> request1 = new QueryRequest(paramsSelect1, METHOD.POST);
+    SolrRequest<?> request1 = new QueryRequest(paramsSelect1);
     NamedList<Object> response1;
     try {
       response1 = server.request(request1, "collection1");
@@ -713,7 +713,7 @@ public class MtasSolrTestSearchConsistency {
     paramsSelect2.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
         + "\" collection=\"postSet2\"}");
     paramsSelect2.set("rows", "0");
-    SolrRequest<?> request2 = new QueryRequest(paramsSelect2, METHOD.POST);
+    SolrRequest<?> request2 = new QueryRequest(paramsSelect2);
     NamedList<Object> response2;
     try {
       response2 = server.request(request2, "collection1");
@@ -727,7 +727,7 @@ public class MtasSolrTestSearchConsistency {
     paramsSelect3.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
         + "\" collection=\"createSet1\"}");
     paramsSelect3.set("rows", "0");
-    SolrRequest<?> request3 = new QueryRequest(paramsSelect3, METHOD.POST);
+    SolrRequest<?> request3 = new QueryRequest(paramsSelect3);
     NamedList<Object> response3;
     try {
       response3 = server.request(request3, "collection1");
@@ -743,7 +743,7 @@ public class MtasSolrTestSearchConsistency {
             + "\" collection=\"postSet1\"}) OR ({!mtas_join field=\""
             + MtasSolrBase.FIELD_ID + "\" collection=\"postSet2\"})");
     paramsSelect4.set("rows", "0");
-    SolrRequest<?> request4 = new QueryRequest(paramsSelect4, METHOD.POST);
+    SolrRequest<?> request4 = new QueryRequest(paramsSelect4);
     NamedList<Object> response4;
     try {
       response4 = server.request(request4, "collection1");
@@ -771,7 +771,7 @@ public class MtasSolrTestSearchConsistency {
     paramsPost.set("mtas.collection.0.action", "post");
     paramsPost.set("mtas.collection.0.id", "setCreatedByPost");
     paramsPost.set("mtas.collection.0.post", "[1,3,4]");
-    SolrRequest<?> requestPost = new QueryRequest(paramsPost, METHOD.POST);
+    SolrRequest<?> requestPost = new QueryRequest(paramsPost);
     try {
       server.request(requestPost, "collection1");
     } catch (SolrServerException e) {
@@ -786,7 +786,7 @@ public class MtasSolrTestSearchConsistency {
     paramsImport.set("mtas.collection.0.action", "post");
     paramsImport.set("mtas.collection.0.id", "setCreatedByImport");
     paramsImport.set("mtas.collection.0.post", "[1,3,4]");
-    SolrRequest<?> requestImport = new QueryRequest(paramsImport, METHOD.POST);
+    SolrRequest<?> requestImport = new QueryRequest(paramsImport);
     try {
       server.request(requestImport, "collection1");
     } catch (SolrServerException e) {
@@ -797,7 +797,7 @@ public class MtasSolrTestSearchConsistency {
     paramsSelect1.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
         + "\" collection=\"setCreatedByPost\"}");
     paramsSelect1.set("rows", "0");
-    SolrRequest<?> request1 = new QueryRequest(paramsSelect1, METHOD.POST);
+    SolrRequest<?> request1 = new QueryRequest(paramsSelect1);
     NamedList<Object> response1;
     try {
       response1 = server.request(request1, "collection1");
@@ -811,7 +811,7 @@ public class MtasSolrTestSearchConsistency {
     paramsSelect2.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
         + "\" collection=\"setCreatedByImport\"}");
     paramsSelect2.set("rows", "0");
-    SolrRequest<?> request2 = new QueryRequest(paramsSelect2, METHOD.POST);
+    SolrRequest<?> request2 = new QueryRequest(paramsSelect2);
     NamedList<Object> response2;
     try {
       response2 = server.request(request2, "collection1");
@@ -842,7 +842,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.group.0.query.type", "cql");
     params.set("mtas.group.0.query.value", cql);
     params.set("mtas.group.0.grouping.hit.inside.prefixes", prefix);
-    SolrRequest<?> requestGroup = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> requestGroup = new QueryRequest(params);
     NamedList<Object> responseGroup = null;
     try {
       responseGroup = server.request(requestGroup, "collection1");
@@ -863,7 +863,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.spans.0.query.0.value", cql);
     params.set("mtas.stats.spans.0.type", "n,sum");
     params.set("rows", "0");
-    SolrRequest<?> requestStats = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> requestStats = new QueryRequest(params);
     NamedList<Object> responseStats = null;
     try {
       responseStats = server.request(requestStats, "collection1");
@@ -912,8 +912,7 @@ public class MtasSolrTestSearchConsistency {
               params.set("mtas.stats.spans.0.query.0.value", subcql);
               params.set("mtas.stats.spans.0.type", "n,sum");
               params.set("rows", "0");
-              SolrRequest<?> requestSubStats = new QueryRequest(params,
-                  METHOD.POST);
+              SolrRequest<?> requestSubStats = new QueryRequest(params);
               NamedList<Object> responseSubStats = null;
               try {
                 responseSubStats = server.request(requestSubStats,
@@ -1062,7 +1061,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.tokens.0.key", "statsKey");
     params.set("mtas.stats.tokens.0.type", "n,sum,sumsq");
     params.set("rows", "0");
-    SolrRequest<?> request = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> request = new QueryRequest(params);
     NamedList<Object> response1;
     NamedList<Object> response2;
     try {
@@ -1157,7 +1156,7 @@ public class MtasSolrTestSearchConsistency {
     for (Entry<String, String> entry : grouping.entrySet()) {
       params.set("mtas.group.0.grouping." + entry.getKey(), entry.getValue());
     }
-    SolrRequest<?> requestGroup = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> requestGroup = new QueryRequest(params);
     NamedList<Object> responseGroup = null;
     try {
       responseGroup = server.request(requestGroup, "collection1");
@@ -1179,7 +1178,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.spans.0.query.0.value", cql);
     params.set("mtas.stats.spans.0.type", "n,sum");
     params.set("rows", "0");
-    SolrRequest<?> requestStats = new QueryRequest(params, METHOD.POST);
+    SolrRequest<?> requestStats = new QueryRequest(params);
     NamedList<Object> responseStats = null;
     try {
       responseStats = server.request(requestStats, "collection1");
