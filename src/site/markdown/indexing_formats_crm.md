@@ -1,6 +1,6 @@
 #CRM
 
-For indexing CRM resources with format Corpus Van Reenen-Mulder/Adelheid, the *mtas.analysis.parser.MtasCRMParser* extending the *MtasBasicParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/mtas).
+For indexing CRM resources with format Corpus Van Reenen-Mulder/Adelheid, the *mtas.analysis.parser.MtasCRMParser* extending the *MtasBasicParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/nederlab/mtas).
 
 ```xml
 <!-- START CONFIGURATION MTAS PARSER -->
