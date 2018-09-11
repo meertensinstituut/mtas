@@ -1,5 +1,5 @@
 #Sketch Engine
-For indexing [Sketch Engine](https://www.sketchengine.co.uk/word-sketch-index-format/) resources, the *mtas.analysis.parser.MtasSketchParser* extending the *MtasBasicParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/mtas).
+For indexing [Sketch Engine](https://www.sketchengine.co.uk/word-sketch-index-format/) resources, the *mtas.analysis.parser.MtasSketchParser* extending the *MtasBasicParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/nederlab/mtas).
 
 ```xml
 <!-- START CONFIGURATION MTAS PARSER -->
