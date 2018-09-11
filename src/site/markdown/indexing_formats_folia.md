@@ -1,6 +1,6 @@
 #FoLiA
 
-For indexing [FoLiA](https://proycon.github.io/folia/) resources, the *mtas.analysis.parser.MtasFoliaParser* extending the abstract *MtasXMLParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/mtas).
+For indexing [FoLiA](https://proycon.github.io/folia/) resources, the *mtas.analysis.parser.MtasFoliaParser* extending the abstract *MtasXMLParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/nederlab/mtas).
 
 ```xml
 <!-- START CONFIGURATION MTAS PARSER -->
