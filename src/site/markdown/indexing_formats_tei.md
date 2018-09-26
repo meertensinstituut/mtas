@@ -1,6 +1,6 @@
 #TEI
 
-For indexing [ISO-TEI](http://www.tei-c.org/) resources, the *mtas.analysis.parser.MtasTEIParser* extending the abstract *MtasXMLParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/mtas).
+For indexing [ISO-TEI](http://www.tei-c.org/) resources, the *mtas.analysis.parser.MtasTEIParser* extending the abstract *MtasXMLParser* is available; full examples of configuration files are provided on [GitHub](https://github.com/textexploration/mtas/tree/master/conf/parser/nederlab/mtas).
 
 ```xml
 <!-- START CONFIGURATION MTAS PARSER -->
