@@ -1,15 +1,5 @@
 package mtas.parser;
 
-import static org.junit.Assert.*;
-
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import mtas.parser.cql.MtasCQLParser;
 import mtas.parser.cql.ParseException;
 import mtas.parser.cql.util.MtasCQLParserGroupQuery;
@@ -28,23 +18,19 @@ import mtas.search.spans.MtasSpanSequenceQuery;
 import mtas.search.spans.MtasSpanWithinQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 import mtas.search.spans.util.MtasSpanUniquePositionQuery;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-/**
- * The Class MtasCQLParserTestSentence.
- */
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
 public class MtasCQLParserTestSentence {
-
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasCQLParserTestSentence.class);
 
-  /**
-   * Test CQL parse.
-   *
-   * @param field the field
-   * @param defaultPrefix the default prefix
-   * @param cql the cql
-   * @param q the q
-   */
   private void testCQLParse(String field, String defaultPrefix, String cql,
       MtasSpanQuery q) {
     MtasCQLParser p = new MtasCQLParser(
@@ -59,14 +45,6 @@ public class MtasCQLParserTestSentence {
     }
   }
 
-  /**
-   * Test CQL equivalent.
-   *
-   * @param field the field
-   * @param defaultPrefix the default prefix
-   * @param cql1 the cql 1
-   * @param cql2 the cql 2
-   */
   private void testCQLEquivalent(String field, String defaultPrefix,
       String cql1, String cql2) {
     MtasCQLParser p1 = new MtasCQLParser(
@@ -83,11 +61,6 @@ public class MtasCQLParserTestSentence {
     }
   }
 
-  /**
-   * Basic test CQL 1.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL1() throws ParseException {
     String field = "testveld";
@@ -103,9 +76,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 2.
-   */
   @org.junit.Test
   public void basicTestCQL2() {
     String field = "testveld";
@@ -114,11 +84,6 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);
   }
 
-  /**
-   * Basic test CQL 3.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL3() throws ParseException {
     String field = "testveld";
@@ -131,11 +96,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 4.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL4() throws ParseException {
     String field = "testveld";
@@ -154,9 +114,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 5.
-   */
   @org.junit.Test
   public void basicTestCQL5() {
     String field = "testveld";
@@ -165,9 +122,6 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);
   }
 
-  /**
-   * Basic test CQL 6.
-   */
   @org.junit.Test
   public void basicTestCQL6() {
     String field = "testveld";
@@ -176,9 +130,6 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);
   }
 
-  /**
-   * Basic test CQL 7.
-   */
   @org.junit.Test
   public void basicTestCQL7() {
     String field = "testveld";
@@ -187,11 +138,6 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);
   }
 
-  /**
-   * Basic test CQL 8.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL8() throws ParseException {
     String field = "testveld";
@@ -210,11 +156,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 9.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL9() throws ParseException {
     String field = "testveld";
@@ -238,11 +179,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 10.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL10() throws ParseException {
     String field = "testveld";
@@ -262,11 +198,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 11.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL11() throws ParseException {
     String field = "testveld";
@@ -278,11 +209,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 12.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL12() throws ParseException {
     String field = "testveld";
@@ -294,11 +220,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 13.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL13() throws ParseException {
     String field = "testveld";
@@ -315,11 +236,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 14.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL14() throws ParseException {
     String field = "testveld";
@@ -336,11 +252,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 15.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL15() throws ParseException {
     String field = "testveld";
@@ -365,11 +276,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 16.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL16() throws ParseException {
     String field = "testveld";
@@ -385,9 +291,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 17.
-   */
   @org.junit.Test
   public void basicTestCQL17() {
     String field = "testveld";
@@ -404,11 +307,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 18.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL18() throws ParseException {
     String field = "testveld";
@@ -424,9 +322,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, "t_lc", cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 19.
-   */
   @org.junit.Test
   public void basicTestCQL19() {
     String field = "testveld";
@@ -444,9 +339,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 20.
-   */
   @org.junit.Test
   public void basicTestCQL20() {
     String field = "testveld";
@@ -467,9 +359,6 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql9, cql10);
   }
 
-  /**
-   * Basic test CQL 21.
-   */
   @org.junit.Test
   public void basicTestCQL21() {
     String field = "testveld";
@@ -478,11 +367,6 @@ public class MtasCQLParserTestSentence {
     testCQLEquivalent(field, null, cql1, cql2);
   }
 
-  /**
-   * Basic test CQL 22.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL22() throws ParseException {
     String field = "testveld";
@@ -497,11 +381,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 23.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL23() throws ParseException {
     String field = "testveld";
@@ -513,11 +392,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 24.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL24() throws ParseException {
     String field = "testveld";
@@ -530,11 +404,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 25.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL25() throws ParseException {
     String field = "testveld";
@@ -547,11 +416,6 @@ public class MtasCQLParserTestSentence {
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
 
-  /**
-   * Basic test CQL 26.
-   *
-   * @throws ParseException the parse exception
-   */
   @org.junit.Test
   public void basicTestCQL26() throws ParseException {
     String field = "testveld";
@@ -563,5 +427,4 @@ public class MtasCQLParserTestSentence {
     MtasSpanQuery q = new MtasSpanPrecededByQuery(q1, q2);
     testCQLParse(field, null, cql, new MtasSpanUniquePositionQuery(q));
   }
-
 }

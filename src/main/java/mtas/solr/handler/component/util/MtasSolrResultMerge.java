@@ -22,7 +22,6 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrResultMerge {
 
-	/** The Constant log. */
 	private static final Log log = LogFactory.getLog(MtasSolrResultMerge.class);
 
 	/**

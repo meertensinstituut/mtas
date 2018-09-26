@@ -25,58 +25,26 @@ import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
 
-/**
- * The Class MtasCRMParser.
- */
-
 public class MtasCRMParser extends MtasBasicParser {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasCRMParser.class);
 
-  /** The word type. */
   private MtasParserType<MtasParserMapping<?>> wordType = null;
-
-  /** The word annotation types. */
   private HashMap<String, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<>();
-
-  /** The crm sentence types. */
   private HashMap<String, MtasParserType<MtasParserMapping<?>>> crmSentenceTypes = new HashMap<>();
-
-  /** The crm clause types. */
   private HashMap<String, MtasParserType<MtasParserMapping<?>>> crmClauseTypes = new HashMap<>();
-
-  /** The crm pair types. */
   private HashMap<String, MtasParserType<MtasParserMapping<?>>> crmPairTypes = new HashMap<>();
-
-  /** The functions. */
   private HashMap<String, HashMap<String, MtasCRMParserFunction>> functions = new HashMap<>();
-
   private HashMap<Integer, HashMap<String, String>> filterReplace = new HashMap<>();
 
-  /** The Constant MAPPING_TYPE_CRM_SENTENCE. */
   protected static final String MAPPING_TYPE_CRM_SENTENCE = "crmSentence";
-
-  /** The Constant MAPPING_TYPE_CRM_CLAUSE. */
   protected static final String MAPPING_TYPE_CRM_CLAUSE = "crmClause";
-
-  /** The Constant MAPPING_TYPE_CRM_PAIR. */
   protected static final String MAPPING_TYPE_CRM_PAIR = "crmPair";
-
   protected static final String FILTER_TYPE_REPLACE = "replace";
 
-  
-  /** The history pair. */
   private HashMap<String, HashMap<String, MtasParserObject>> historyPair = new HashMap<>();
 
-  /** The pair pattern. */
   Pattern pairPattern = Pattern.compile("^([b|e])([a-z])([0-9]+)$");
 
-  /**
-   * Instantiates a new mtas CRM parser.
-   *
-   * @param config the config
-   */
   public MtasCRMParser(MtasConfiguration config) {
     super(config);
     try {
@@ -87,11 +55,6 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#initParser()
-   */
   @SuppressWarnings("unchecked")
   @Override
   protected void initParser() throws MtasConfigException {
@@ -269,11 +232,6 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#createTokenCollection(java.io.Reader)
-   */
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException {
@@ -469,23 +427,6 @@ public class MtasCRMParser extends MtasBasicParser {
     return list;
   }
   
-  /**
-   * Process word annotation.
-   *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param name the name
-   * @param text the text
-   * @param previousOffset the previous offset
-   * @param currentOffset the current offset
-   * @param unknownAncestors the unknown ancestors
-   * @param currentList the current list
-   * @param updateList the update list
-   * @param idPositions the id positions
-   * @param idOffsets the id offsets
-   * @return the list
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   private List<MtasCRMParserFunctionOutput> processWordAnnotation(
       MtasTokenIdFactory mtasTokenIdFactory, String name, String text,
       Integer previousOffset, Integer currentOffset,
@@ -555,25 +496,6 @@ public class MtasCRMParser extends MtasBasicParser {
     return functionOutputList;
   }
 
-  /**
-   * Process CRM sentence.
-   *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param name the name
-   * @param text the text
-   * @param currentOffset the current offset
-   * @param functionOutputList the function output list
-   * @param unknownAncestors the unknown ancestors
-   * @param currentList the current list
-   * @param updateList the update list
-   * @param idPositions the id positions
-   * @param idOffsets the id offsets
-   * @param previous the previous
-   * @param previousClause the previous clause
-   * @return the sets the
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   private Set<MtasParserObject> processCRMSentence(
       MtasTokenIdFactory mtasTokenIdFactory, String name, String text,
       Integer currentOffset,
@@ -608,24 +530,6 @@ public class MtasCRMParser extends MtasBasicParser {
     return new HashSet<>();
   }
 
-  /**
-   * Process CRM clause.
-   *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param name the name
-   * @param text the text
-   * @param currentOffset the current offset
-   * @param functionOutputList the function output list
-   * @param unknownAncestors the unknown ancestors
-   * @param currentList the current list
-   * @param updateList the update list
-   * @param idPositions the id positions
-   * @param idOffsets the id offsets
-   * @param previous the previous
-   * @return the sets the
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   private Set<MtasParserObject> processCRMClause(
       MtasTokenIdFactory mtasTokenIdFactory, String name, String text,
       Integer currentOffset,
@@ -658,20 +562,6 @@ public class MtasCRMParser extends MtasBasicParser {
     return new HashSet<>();
   }
 
-  /**
-   * Close previous.
-   *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param previous the previous
-   * @param currentOffset the current offset
-   * @param unknownAncestors the unknown ancestors
-   * @param currentList the current list
-   * @param updateList the update list
-   * @param idPositions the id positions
-   * @param idOffsets the id offsets
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   private void closePrevious(MtasTokenIdFactory mtasTokenIdFactory,
       Set<MtasParserObject> previous, Integer currentOffset,
       MtasCRMAncestors unknownAncestors,
@@ -691,23 +581,6 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
-  /**
-   * Process CRM pair.
-   *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param position the position
-   * @param name the name
-   * @param text the text
-   * @param currentOffset the current offset
-   * @param functionOutputList the function output list
-   * @param unknownAncestors the unknown ancestors
-   * @param currentList the current list
-   * @param updateList the update list
-   * @param idPositions the id positions
-   * @param idOffsets the id offsets
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   private void processCRMPair(MtasTokenIdFactory mtasTokenIdFactory,
       int position, String name, String text, Integer currentOffset,
       List<MtasCRMParserFunctionOutput> functionOutputList,
@@ -782,14 +655,6 @@ public class MtasCRMParser extends MtasBasicParser {
 
   }
 
-  /**
-   * Process functions.
-   *
-   * @param name the name
-   * @param text the text
-   * @param type the type
-   * @param functionOutputList the function output list
-   */
   private void processFunctions(String name, String text, String type,
       List<MtasCRMParserFunctionOutput> functionOutputList) {
     if (functions.containsKey(type) && functions.get(type).containsKey(name)
@@ -823,11 +688,6 @@ public class MtasCRMParser extends MtasBasicParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#printConfig()
-   */
   @Override
   public String printConfig() {
     StringBuilder text = new StringBuilder();
@@ -838,12 +698,6 @@ public class MtasCRMParser extends MtasBasicParser {
     return text.toString();
   }
 
-  /**
-   * Prints the config types.
-   *
-   * @param types the types
-   * @return the string
-   */
   private String printConfigTypes(
       HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     StringBuilder text = new StringBuilder();
@@ -858,67 +712,29 @@ public class MtasCRMParser extends MtasBasicParser {
     return text.toString();
   }
 
-  /**
-   * The Class MtasCRMAncestors.
-   */
   private static class MtasCRMAncestors {
-
-    /** The unknown. */
     public int unknown = 0;
   }
 
-  /**
-   * The Class MtasCRMParserFunction.
-   */
   private static class MtasCRMParserFunction {
-
-    /** The split. */
     public String split;
-
-    /** The output. */
     public Map<String, ArrayList<MtasCRMParserFunctionOutput>> output;
 
-    /**
-     * Instantiates a new mtas CRM parser function.
-     *
-     * @param type the type
-     * @param split the split
-     */
     public MtasCRMParserFunction(String type, String split) {
       this.split = split;
       output = new HashMap<>();
     }
-
   }
 
-  /**
-   * The Class MtasCRMParserFunctionOutput.
-   */
   private class MtasCRMParserFunctionOutput {
-
-    /** The name. */
     public String name;
-
-    /** The value. */
     public String value;
 
-    /**
-     * Instantiates a new mtas CRM parser function output.
-     *
-     * @param name the name
-     * @param value the value
-     */
     public MtasCRMParserFunctionOutput(String name, String value) {
       this.name = name;
       this.value = value;
     }
 
-    /**
-     * Creates the.
-     *
-     * @param originalValue the original value
-     * @return the mtas CRM parser function output
-     */
     public MtasCRMParserFunctionOutput create(String originalValue) {
       if (value != null) {
         return this;
@@ -927,26 +743,15 @@ public class MtasCRMParser extends MtasBasicParser {
       }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
       return "MtasCRMParserFunctionOutput[" + name + "," + value + "]";
     }
   }
 
-  /**
-   * The Class MtasCRMParserMappingWordAnnotation.
-   */
   private class MtasCRMParserMappingWordAnnotation
       extends MtasParserMapping<MtasCRMParserMappingWordAnnotation> {
 
-    /**
-     * Instantiates a new mtas CRM parser mapping word annotation.
-     */
     public MtasCRMParserMappingWordAnnotation() {
       super();
       this.position = SOURCE_OWN;
@@ -955,26 +760,15 @@ public class MtasCRMParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_WORD_ANNOTATION;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasParser.MtasParserMapping#self()
-     */
     @Override
     protected MtasCRMParserMappingWordAnnotation self() {
       return this;
     }
   }
 
-  /**
-   * The Class MtasCRMParserMappingCRMSentence.
-   */
   private class MtasCRMParserMappingCRMSentence
       extends MtasParserMapping<MtasCRMParserMappingCRMSentence> {
 
-    /**
-     * Instantiates a new mtas CRM parser mapping CRM sentence.
-     */
     public MtasCRMParserMappingCRMSentence() {
       super();
       this.position = SOURCE_OWN;
@@ -983,26 +777,14 @@ public class MtasCRMParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_GROUP;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
-     */
     @Override
     protected MtasCRMParserMappingCRMSentence self() {
       return this;
     }
   }
 
-  /**
-   * The Class MtasCRMParserMappingCRMPair.
-   */
   private class MtasCRMParserMappingCRMPair
       extends MtasParserMapping<MtasCRMParserMappingCRMPair> {
-
-    /**
-     * Instantiates a new mtas CRM parser mapping CRM pair.
-     */
     public MtasCRMParserMappingCRMPair() {
       super();
       this.position = SOURCE_OWN;
@@ -1011,15 +793,9 @@ public class MtasCRMParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_RELATION;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
-     */
     @Override
     protected MtasCRMParserMappingCRMPair self() {
       return this;
     }
   }
-
 }

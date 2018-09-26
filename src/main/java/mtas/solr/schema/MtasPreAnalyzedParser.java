@@ -1,9 +1,7 @@
 package mtas.solr.schema;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Iterator;
-
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultItem;
+import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -13,28 +11,18 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.util.AttributeSource;
-import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.AttributeSource.State;
+import org.apache.lucene.util.BytesRef;
 import org.apache.solr.schema.PreAnalyzedField.ParseResult;
 import org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser;
-import mtas.solr.update.processor.MtasUpdateRequestProcessorResultItem;
-import mtas.solr.update.processor.MtasUpdateRequestProcessorResultReader;
 
-/**
- * The Class MtasPreAnalyzedParser.
- */
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Iterator;
+
 public class MtasPreAnalyzedParser implements PreAnalyzedParser {
-
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasPreAnalyzedParser.class);
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#parse(java.io.
-   * Reader, org.apache.lucene.util.AttributeSource)
-   */
   @Override
   public ParseResult parse(Reader reader, AttributeSource parent)
       throws IOException {
@@ -51,7 +39,7 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
 
     try (
         MtasUpdateRequestProcessorResultReader result = new MtasUpdateRequestProcessorResultReader(
-            sb.toString());) {
+          sb.toString())) {
       iterator = result.getIterator();
       if (iterator != null && iterator.hasNext()) {
         res.str = result.getStoredStringValue();
@@ -99,16 +87,8 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
     return res;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.solr.schema.PreAnalyzedField.PreAnalyzedParser#toFormattedString
-   * (org.apache.lucene.document.Field)
-   */
   @Override
   public String toFormattedString(Field f) throws IOException {
     return this.getClass().getName() + " " + f.name();
   }
-
 }

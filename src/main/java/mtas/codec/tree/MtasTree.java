@@ -1,44 +1,23 @@
 package mtas.codec.tree;
 
-import java.util.TreeMap;
-import java.io.IOException;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-
 import mtas.analysis.token.MtasPosition;
 import mtas.analysis.token.MtasToken;
 
-/**
- * The Class MtasTree.
- *
- * @param <N> the number type
- */
+import java.io.IOException;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 abstract public class MtasTree<N extends MtasTreeNode<N>> {
-
-  /** The Constant SINGLE_POSITION_TREE. */
   final public static byte SINGLE_POSITION_TREE = 1;
-
-  /** The Constant STORE_ADDITIONAL_ID. */
   final public static byte STORE_ADDITIONAL_ID = 2;
 
-  /** The root. */
   protected N root;
-
-  /** The closed. */
   private Boolean closed;
 
-  /** The single point. */
   protected Boolean singlePoint;
-
-  /** The store prefix and term ref. */
   protected Boolean storePrefixAndTermRef;
 
-  /**
-   * Instantiates a new mtas tree.
-   *
-   * @param singlePoint the single point
-   * @param storePrefixAndTermRef the store prefix and term ref
-   */
   public MtasTree(boolean singlePoint, boolean storePrefixAndTermRef) {
     root = null;
     closed = false;
@@ -46,24 +25,12 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
     this.storePrefixAndTermRef = storePrefixAndTermRef;
   }
 
-  /**
-   * Adds the id from doc.
-   *
-   * @param docId the doc id
-   * @param reference the reference
-   */
   final public void addIdFromDoc(Integer docId, Long reference) {
     if (!closed && (docId != null)) {
       addSinglePoint(docId, 0, 0, docId, reference);
     }
   }
 
-  /**
-   * Adds the parent from token.
-   *
-   * @param token the token
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   final public void addParentFromToken(MtasToken token) throws IOException {
     if (!closed && (token != null)) {
       if (token.checkParentId()) {
@@ -73,12 +40,6 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
     }
   }
 
-  /**
-   * Adds the position and object from token.
-   *
-   * @param token the token
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   final public void addPositionAndObjectFromToken(MtasToken token)
       throws IOException {
     addPositionFromToken(token, token.getTokenRef());
@@ -88,13 +49,6 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
   // addPositionFromToken(token, token.getTermRef());
   // }
 
-  /**
-   * Adds the position from token.
-   *
-   * @param token the token
-   * @param ref the ref
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   final private void addPositionFromToken(MtasToken token, Long ref)
       throws IOException {
     int prefixId = storePrefixAndTermRef ? token.getPrefixId() : 0;
@@ -137,11 +91,6 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
     }
   }
 
-  /**
-   * Close.
-   *
-   * @return the n
-   */
   final public N close() {
     if (root == null) {
       addRangeEmpty(0, 0, 0, 0);
@@ -150,73 +99,27 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
     return root;
   }
 
-  /**
-   * Adds the single point.
-   *
-   * @param position the position
-   * @param additionalId the additional id
-   * @param additionalRef the additional ref
-   * @param id the id
-   * @param ref the ref
-   */
   abstract protected void addSinglePoint(int position, int additionalId,
       long additionalRef, Integer id, Long ref);
 
-  /**
-   * Adds the range.
-   *
-   * @param left the left
-   * @param right the right
-   * @param additionalId the additional id
-   * @param additionalRef the additional ref
-   * @param id the id
-   * @param ref the ref
-   */
   abstract protected void addRange(int left, int right, int additionalId,
       long additionalRef, Integer id, Long ref);
 
-  /**
-   * Adds the range empty.
-   *
-   * @param left the left
-   * @param right the right
-   * @param additionalId the additional id
-   * @param additionalRef the additional ref
-   */
   abstract protected void addRangeEmpty(int left, int right, int additionalId,
       long additionalRef);
 
-  /**
-   * Checks if is single point.
-   *
-   * @return true, if is single point
-   */
   final public boolean isSinglePoint() {
     return singlePoint;
   }
 
-  /**
-   * Checks if is store prefix and term ref.
-   *
-   * @return true, if is store prefix and term ref
-   */
   final public boolean isStorePrefixAndTermRef() {
     return storePrefixAndTermRef;
   }
 
-  /**
-   * Prints the balance.
-   */
   final public void printBalance() {
     printBalance(1, root);
   }
 
-  /**
-   * Prints the balance.
-   *
-   * @param p the p
-   * @param n the n
-   */
   final private void printBalance(Integer p, N n) {
     if (n != null) {
       printBalance((p + 1), n.leftChild);
@@ -232,5 +135,4 @@ abstract public class MtasTree<N extends MtasTreeNode<N>> {
       printBalance((p + 1), n.rightChild);
     }
   }
-
 }

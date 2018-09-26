@@ -14,52 +14,24 @@ import org.apache.lucene.util.BytesRef;
 
 import mtas.analysis.util.MtasParserException;
 
-/**
- * The Class MtasTokenCollection.
- */
 public class MtasTokenCollection {
-
-  /** The token collection. */
   private HashMap<Integer, MtasToken> tokenCollection = new HashMap<>();
-
-  /** The token collection index. */
   private ArrayList<Integer> tokenCollectionIndex = new ArrayList<>();
 
-  /**
-   * Instantiates a new mtas token collection.
-   */
   public MtasTokenCollection() {
     clear();
   }
 
-  /**
-   * Adds the.
-   *
-   * @param token the token
-   * @return the integer
-   */
   public Integer add(MtasToken token) {
     Integer id = token.getId();
     tokenCollection.put(id, token);
     return id;
   }
 
-  /**
-   * Gets the.
-   *
-   * @param id the id
-   * @return the mtas token
-   */
   public MtasToken get(Integer id) {
     return tokenCollection.get(id);
   }
 
-  /**
-   * Iterator.
-   *
-   * @return the iterator
-   * @throws MtasParserException the mtas parser exception
-   */
   public Iterator<MtasToken> iterator() throws MtasParserException {
     checkTokenCollectionIndex();
     return new Iterator<MtasToken>() {
@@ -83,11 +55,6 @@ public class MtasTokenCollection {
     };
   }
 
-  /**
-   * Prints the.
-   *
-   * @throws MtasParserException the mtas parser exception
-   */
   public void print() throws MtasParserException {
     Iterator<MtasToken> it = this.iterator();
     while (it.hasNext()) {
@@ -96,12 +63,6 @@ public class MtasTokenCollection {
     }
   }
 
-  /**
-   * Gets the list.
-   *
-   * @return the list
-   * @throws MtasParserException the mtas parser exception
-   */
   public String[][] getList() throws MtasParserException {
     String[][] result = new String[(tokenCollection.size() + 1)][];
     result[0] = new String[] { "id", "start real offset", "end real offset",
@@ -158,13 +119,6 @@ public class MtasTokenCollection {
     return result;
   }
 
-  /**
-   * Check.
-   *
-   * @param autoRepair the auto repair
-   * @param makeUnique the make unique
-   * @throws MtasParserException the mtas parser exception
-   */
   public void check(Boolean autoRepair, Boolean makeUnique)
       throws MtasParserException {
     if (autoRepair) {
@@ -186,9 +140,6 @@ public class MtasTokenCollection {
     }
   }
 
-  /**
-   * Make unique.
-   */
   private void makeUnique() {
     HashMap<String, ArrayList<MtasToken>> currentPositionTokens = new HashMap<>();
     ArrayList<MtasToken> currentValueTokens;
@@ -214,9 +165,6 @@ public class MtasTokenCollection {
     }
   }
 
-  /**
-   * Auto repair.
-   */
   private void autoRepair() {
     ArrayList<Integer> trash = new ArrayList<>();
     HashMap<Integer, Integer> translation = new HashMap<>();
@@ -290,11 +238,6 @@ public class MtasTokenCollection {
     }
   }
 
-  /**
-   * Check token collection index.
-   *
-   * @throws MtasParserException the mtas parser exception
-   */
   private void checkTokenCollectionIndex() throws MtasParserException {
     if (tokenCollectionIndex.size() != tokenCollection.size()) {
       MtasToken token;
@@ -340,11 +283,6 @@ public class MtasTokenCollection {
     }
   }
 
-  /**
-   * Gets the comp by name.
-   *
-   * @return the comp by name
-   */
   public Comparator<Integer> getCompByName() {
     return new Comparator<Integer>() {
       @Override
@@ -373,12 +311,8 @@ public class MtasTokenCollection {
     };
   }
 
-  /**
-   * Clear.
-   */
   private void clear() {
     tokenCollectionIndex.clear();
     tokenCollection.clear();
   }
-
 }

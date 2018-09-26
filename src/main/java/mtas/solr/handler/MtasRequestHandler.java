@@ -1,17 +1,13 @@
 package mtas.solr.handler;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import mtas.analysis.MtasTokenizer;
+import mtas.analysis.util.MtasFetchData;
+import mtas.analysis.util.MtasParserException;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
+import mtas.solr.handler.component.util.MtasSolrComponentStatus;
+import mtas.solr.handler.util.MtasSolrHistoryList;
+import mtas.solr.handler.util.MtasSolrRunningList;
+import mtas.solr.handler.util.MtasSolrStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,105 +25,53 @@ import org.apache.solr.response.SolrQueryResponse;
 import org.noggit.JSONParser;
 import org.noggit.ObjectBuilder;
 
-import mtas.analysis.MtasTokenizer;
-import mtas.analysis.util.MtasFetchData;
-import mtas.analysis.util.MtasParserException;
-import mtas.solr.handler.component.MtasSolrSearchComponent;
-import mtas.solr.handler.component.util.MtasSolrComponentStatus;
-import mtas.solr.handler.util.MtasSolrHistoryList;
-import mtas.solr.handler.util.MtasSolrRunningList;
-import mtas.solr.handler.util.MtasSolrStatus;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class MtasRequestHandler.
+ * Request handler that serves various bits of information about the mtas configuration.
  */
 public class MtasRequestHandler extends RequestHandlerBase {
-
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasRequestHandler.class);
 
-  /** The Constant MESSAGE_ERROR. */
   public static final String MESSAGE_ERROR = "error";
-
-  /** The Constant ACTION_CONFIG_FILES. */
   public static final String ACTION_CONFIG_FILES = "files";
-
-  /** The Constant ACTION_CONFIG_FILE. */
   public static final String ACTION_CONFIG_FILE = "file";
-
-  /** The Constant ACTION_MAPPING. */
   public static final String ACTION_MAPPING = "mapping";
-
-  /** The Constant ACTION_RUNNING. */
   public static final String ACTION_RUNNING = "running";
-
-  /** The Constant ACTION_HISTORY. */
   public static final String ACTION_HISTORY = "history";
-
-  /** The Constant ACTION_ERROR. */
   public static final String ACTION_ERROR = "error";
-
-  /** The Constant ACTION_STATUS. */
   public static final String ACTION_STATUS = "status";
-
-  /** The Constant PARAM_ACTION. */
   public static final String PARAM_ACTION = "action";
-
-  /** The Constant PARAM_KEY. */
   public static final String PARAM_KEY = "key";
-
-  /** The Constant PARAM_NUMBER. */
   public static final String PARAM_NUMBER = "key";
-
-  /** The Constant PARAM_ABORT. */
   public static final String PARAM_ABORT = "abort";
-
-  /** The Constant PARAM_SHARDREQUESTS. */
   public static final String PARAM_SHARDREQUESTS = "shardRequests";
-
-  /** The Constant PARAM_CONFIG_FILE. */
   public static final String PARAM_CONFIG_FILE = "file";
-
-  /** The Constant PARAM_MAPPING_CONFIGURATION. */
   public static final String PARAM_MAPPING_CONFIGURATION = "configuration";
-
-  /** The Constant PARAM_MAPPING_DOCUMENT. */
   public static final String PARAM_MAPPING_DOCUMENT = "document";
-
-  /** The Constant PARAM_MAPPING_DOCUMENT_URL. */
   public static final String PARAM_MAPPING_DOCUMENT_URL = "url";
 
-  /** The running. */
   private MtasSolrRunningList running;
-
-  /** The history. */
   private MtasSolrHistoryList history;
-
-  /** The error. */
   private MtasSolrHistoryList error;
-
-  /** The shard index. */
   private Map<String, ShardInformation> shardIndex;
-
-  /** The status controller. */
   private StatusController statusController;
 
-  /** The Constant defaultTimeout. */
   private static final int defaultTimeout = 3600;
-
-  /** The Constant defaultSoftLimit. */
   private static final int defaultSoftLimit = 100;
-
-  /** The Constant defaultHardLimit. */
   private static final int defaultHardLimit = 200;
-
-  /** The Constant defaultNumber. */
   private static final int defaultNumber = 50;
 
-  /**
-   * Instantiates a new mtas request handler.
-   */
   public MtasRequestHandler() {
     super();
     running = new MtasSolrRunningList(defaultTimeout);
@@ -139,125 +83,111 @@ public class MtasRequestHandler extends RequestHandlerBase {
     statusController.start();
   }
 
-  /**
-   * Handle request body.
-   *
-   * @param req the req
-   * @param rsp the rsp
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.solr.handler.RequestHandlerBase#handleRequestBody(org.apache.
-   * solr.request.SolrQueryRequest, org.apache.solr.response.SolrQueryResponse)
-   */
   @Override
   public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws IOException {
     String action;
     if ((action = req.getParams().get(PARAM_ACTION)) != null) {
       // generate list of files
-      if (action.equals(ACTION_CONFIG_FILES)) {
-        String configDir = req.getCore().getResourceLoader().getConfigDir();
-        rsp.add(ACTION_CONFIG_FILES, getFiles(configDir, null));
-        // get file
-      } else if (action.equals(ACTION_CONFIG_FILE)) {
-        String file = req.getParams().get(PARAM_CONFIG_FILE, null);
-        if (file != null && !file.contains("..") && !file.startsWith("/")) {
-          InputStream is;
+      switch (action) {
+        case ACTION_CONFIG_FILES:
+          String configDir = req.getCore().getResourceLoader().getConfigDir();
+          rsp.add(ACTION_CONFIG_FILES, getFiles(configDir, null));
+          // get file
+          break;
+        case ACTION_CONFIG_FILE:
+          String file = req.getParams().get(PARAM_CONFIG_FILE, null);
+          if (file != null && !file.contains("..") && !file.startsWith("/")) {
+            InputStream is;
+            try {
+              is = req.getCore().getResourceLoader().openResource(file);
+              rsp.add(ACTION_CONFIG_FILE, IOUtils.toString(is, StandardCharsets.UTF_8));
+            } catch (IOException e) {
+              log.debug(e);
+              rsp.add(MESSAGE_ERROR, e.getMessage());
+            }
+          }
+          // test mapping
+          break;
+        case ACTION_MAPPING: // dry run
+          String configuration = null;
+          String document = null;
+          String documentUrl = null;
+          if (req.getContentStreams() != null) {
+            Iterator<ContentStream> it = req.getContentStreams().iterator();
+            if (it.hasNext()) {
+              ContentStream cs = it.next();
+              Map<String, String> params = new HashMap<>();
+              getParamsFromJSON(params, IOUtils.toString(cs.getReader()));
+              configuration = params.get(PARAM_MAPPING_CONFIGURATION);
+              document = params.get(PARAM_MAPPING_DOCUMENT);
+              documentUrl = params.get(PARAM_MAPPING_DOCUMENT_URL);
+            }
+          } else {
+            configuration = req.getParams().get(PARAM_MAPPING_CONFIGURATION);
+            document = req.getParams().get(PARAM_MAPPING_DOCUMENT);
+            documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);
+          }
+          if (configuration != null && documentUrl != null) {
+            InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
+            try (MtasTokenizer tokenizer = new MtasTokenizer(stream)) {
+              MtasFetchData fetchData = new MtasFetchData(new StringReader(documentUrl));
+              rsp.add(ACTION_MAPPING, tokenizer.getList(fetchData.getUrl(null, null)));
+              tokenizer.close();
+            } catch (IOException | MtasParserException e) {
+              log.debug(e);
+              rsp.add(MESSAGE_ERROR, e.getMessage());
+            } finally {
+              stream.close();
+            }
+          } else if (configuration != null && document != null) {
+            InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
+            try (MtasTokenizer tokenizer = new MtasTokenizer(stream)) {
+              rsp.add(ACTION_MAPPING, tokenizer.getList(new StringReader(document)));
+              tokenizer.close();
+            } catch (IOException e) {
+              log.debug(e);
+              rsp.add(MESSAGE_ERROR, e.getMessage());
+            } finally {
+              stream.close();
+            }
+          }
+          break;
+        case ACTION_RUNNING:
+        case ACTION_HISTORY:
+        case ACTION_ERROR:
+          boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
+          int number;
           try {
-            is = req.getCore().getResourceLoader().openResource(file);
-            rsp.add(ACTION_CONFIG_FILE, IOUtils.toString(is, StandardCharsets.UTF_8));
-          } catch (IOException e) {
-            log.debug(e);
-            rsp.add(MESSAGE_ERROR, e.getMessage());
+            number = Integer.parseInt(req.getParams().get(PARAM_NUMBER));
+          } catch (NumberFormatException e) {
+            number = defaultNumber;
           }
-        }
-        // test mapping
-      } else if (action.equals(ACTION_MAPPING)) {
-        String configuration = null;
-        String document = null;
-        String documentUrl = null;
-        if (req.getContentStreams() != null) {
-          Iterator<ContentStream> it = req.getContentStreams().iterator();
-          if (it.hasNext()) {
-            ContentStream cs = it.next();
-            Map<String, String> params = new HashMap<>();
-            getParamsFromJSON(params, IOUtils.toString(cs.getReader()));
-            configuration = params.get(PARAM_MAPPING_CONFIGURATION);
-            document = params.get(PARAM_MAPPING_DOCUMENT);
-            documentUrl = params.get(PARAM_MAPPING_DOCUMENT_URL);
+          if (action.equals(ACTION_RUNNING)) {
+            rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests, number));
+          } else if (action.equals(ACTION_HISTORY)) {
+            rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests, number));
+          } else if (action.equals(ACTION_ERROR)) {
+            rsp.add(ACTION_ERROR, error.createListOutput(shardRequests, number));
           }
-        } else {
-          configuration = req.getParams().get(PARAM_MAPPING_CONFIGURATION);
-          document = req.getParams().get(PARAM_MAPPING_DOCUMENT);
-          documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);
-        }
-        if (configuration != null && documentUrl != null) {
-          InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
-          try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {
-            MtasFetchData fetchData = new MtasFetchData(new StringReader(documentUrl));
-            rsp.add(ACTION_MAPPING, tokenizer.getList(fetchData.getUrl(null, null)));
-            tokenizer.close();
-          } catch (IOException | MtasParserException e) {
-            log.debug(e);
-            rsp.add(MESSAGE_ERROR, e.getMessage());
-          } finally {
-            stream.close();
-          }
-        } else if (configuration != null && document != null) {
-          InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
-          try (MtasTokenizer tokenizer = new MtasTokenizer(stream);) {
-            rsp.add(ACTION_MAPPING, tokenizer.getList(new StringReader(document)));
-            tokenizer.close();
-          } catch (IOException e) {
-            log.debug(e);
-            rsp.add(MESSAGE_ERROR, e.getMessage());
-          } finally {
-            stream.close();
-          }
-        }
-      } else if (action.equals(ACTION_RUNNING) || action.equals(ACTION_HISTORY) || action.equals(ACTION_ERROR)) {
-        boolean shardRequests = req.getParams().getBool(PARAM_SHARDREQUESTS, false);
-        int number;
-        try {
-          number = Integer.parseInt(req.getParams().get(PARAM_NUMBER));
-        } catch (NumberFormatException e) {
-          number = defaultNumber;
-        }
-        if (action.equals(ACTION_RUNNING)) {
-          rsp.add(ACTION_RUNNING, running.createListOutput(shardRequests, number));
-        } else if (action.equals(ACTION_HISTORY)) {
-          rsp.add(ACTION_HISTORY, history.createListOutput(shardRequests, number));
-        } else if (action.equals(ACTION_ERROR)) {
-          rsp.add(ACTION_ERROR, error.createListOutput(shardRequests, number));
-        }
-      } else if (action.equals(ACTION_STATUS)) {
-        String key = req.getParams().get(PARAM_KEY, null);
-        String abort = req.getParams().get(PARAM_ABORT, null);
-        MtasSolrStatus solrStatus = null;
-        if ((solrStatus = history.get(key)) != null || (solrStatus = running.get(key)) != null
+          break;
+        case ACTION_STATUS:
+          String key = req.getParams().get(PARAM_KEY, null);
+          String abort = req.getParams().get(PARAM_ABORT, null);
+          MtasSolrStatus solrStatus = null;
+          if ((solrStatus = history.get(key)) != null || (solrStatus = running.get(key)) != null
             || (solrStatus = error.get(key)) != null) {
-          if (abort != null && !solrStatus.finished()) {
-            solrStatus.setError(abort);
+            if (abort != null && !solrStatus.finished()) {
+              solrStatus.setError(abort);
+            }
+            rsp.add(ACTION_STATUS, solrStatus.createItemOutput());
+          } else {
+            rsp.add(ACTION_STATUS, null);
           }
-          rsp.add(ACTION_STATUS, solrStatus.createItemOutput());
-        } else {
-          rsp.add(ACTION_STATUS, null);
-        }
+          break;
       }
     }
   }
 
-  /**
-   * Gets the files.
-   *
-   * @param dir
-   *          the dir
-   * @param subDir
-   *          the sub dir
-   * @return the files
-   */
   private ArrayList<String> getFiles(String dir, String subDir) {
     ArrayList<String> files = new ArrayList<>();
     String fullDir = subDir == null ? dir : dir + File.separator + subDir;
@@ -275,30 +205,11 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return files;
   }
 
-  /**
-   * Gets the description.
-   *
-   * @return the description
-   */
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.solr.handler.RequestHandlerBase#getDescription()
-   */
   @Override
   public String getDescription() {
     return "Mtas Request Handler";
   }
 
-  /**
-   * Gets the params from JSON.
-   *
-   * @param params
-   *          the params
-   * @param json
-   *          the json
-   * @return the params from JSON
-   */
   @SuppressWarnings("unchecked")
   private static void getParamsFromJSON(Map<String, String> params, String json) {
     JSONParser parser = new JSONParser(json);
@@ -330,27 +241,11 @@ public class MtasRequestHandler extends RequestHandlerBase {
     }
   }
 
-  /**
-   * Register status.
-   *
-   * @param item
-   *          the item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   public void registerStatus(MtasSolrStatus item) throws IOException {
     history.add(item);
     running.add(item);
   }
 
-  /**
-   * Finish status.
-   *
-   * @param item
-   *          the item
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   public void finishStatus(MtasSolrStatus item) throws IOException {
     running.remove(item);
     if (item.error()) {
@@ -358,25 +253,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
     }
   }
 
-  /**
-   * Check key.
-   *
-   * @param key
-   *          the key
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   public void checkKey(String key) throws IOException {
     history.updateKey(key);
   }
 
-  /**
-   * Gets the shard information.
-   *
-   * @param shard
-   *          the shard
-   * @return the shard information
-   */
   public ShardInformation getShardInformation(String shard) {
     ShardInformation shardInformation = shardIndex.get(Objects.requireNonNull(shard, "shard required"));
     if (shardInformation == null) {
@@ -385,13 +265,6 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return shardInformation;
   }
 
-  /**
-   * Creates the shard information.
-   *
-   * @param shard
-   *          the shard
-   * @return the shard information
-   */
   private ShardInformation createShardInformation(String shard) {
     ShardInformation shardInformation = new ShardInformation(shard);
     ModifiableSolrParams solrParams = new ModifiableSolrParams();
@@ -455,16 +328,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return shardInformation;
   }
 
-  /**
-   * The Class StatusController.
-   */
   public class StatusController extends Thread {
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Thread#run()
-     */
     @Override
     public void run() {
       List<MtasSolrStatus> statusWithException;
@@ -481,52 +345,24 @@ public class MtasRequestHandler extends RequestHandlerBase {
           e.printStackTrace();
         }
       }
-
     }
-
   }
 
-  /**
-   * The Class ShardInformation.
-   */
   public static class ShardInformation {
-
-    /** The Constant NAME_NAME. */
     public final static String NAME_NAME = "name";
-
-    /** The number of documents. */
     public Long numberOfDocuments = null;
-
-    /** The number of segments. */
     public Integer numberOfSegments = null;
-
-    /** The mtas handler. */
     public String mtasHandler = null;
-
-    /** The name. */
     public String name = null;
 
-    /** The location. */
     private String location;
 
-    /**
-     * Instantiates a new shard information.
-     *
-     * @param location
-     *          the location
-     */
     public ShardInformation(String location) {
       this.location = location;
     }
 
-    /**
-     * Location.
-     *
-     * @return the string
-     */
     public String location() {
       return location;
     }
   }
-
 }

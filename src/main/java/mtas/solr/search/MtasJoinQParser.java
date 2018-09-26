@@ -1,12 +1,12 @@
 package mtas.solr.search;
 
-import java.io.IOException;
+import mtas.solr.handler.component.MtasSolrSearchComponent;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.AutomatonQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.automaton.Automaton;
-import org.apache.lucene.search.AutomatonQuery;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.core.PluginBag.PluginHolder;
 import org.apache.solr.handler.component.SearchComponent;
@@ -14,33 +14,15 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.SyntaxError;
 
-import mtas.solr.handler.component.MtasSolrSearchComponent;
+import java.io.IOException;
 
-/**
- * The Class MtasJoinQParser.
- */
 public class MtasJoinQParser extends QParser {
-
-  /** The Constant MTAS_JOIN_QPARSER_COLLECTION. */
   public static final String MTAS_JOIN_QPARSER_COLLECTION = "collection";
-
-  /** The Constant MTAS_JOIN_QPARSER_FIELD. */
   public static final String MTAS_JOIN_QPARSER_FIELD = "field";
 
-  /** The id. */
   private String id = null;
-
-  /** The fields. */
   private String[] fields = null;
 
-  /**
-   * Instantiates a new mtas join Q parser.
-   *
-   * @param qstr the qstr
-   * @param localParams the local params
-   * @param params the params
-   * @param req the req
-   */
   public MtasJoinQParser(String qstr, SolrParams localParams, SolrParams params,
       SolrQueryRequest req) {
     super(qstr, localParams, params, req);
@@ -58,11 +40,6 @@ public class MtasJoinQParser extends QParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.solr.search.QParser#parse()
-   */
   @Override
   public Query parse() throws SyntaxError {
     if (id == null) {
@@ -103,5 +80,4 @@ public class MtasJoinQParser extends QParser {
       }
     }
   }
-
 }

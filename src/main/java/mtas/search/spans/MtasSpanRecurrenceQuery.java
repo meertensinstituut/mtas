@@ -1,9 +1,8 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
+import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -13,42 +12,18 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
-import mtas.search.spans.util.MtasSpanQuery;
-import mtas.search.spans.util.MtasSpanWeight;
-import mtas.search.spans.util.MtasSpans;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * The Class MtasSpanRecurrenceQuery.
- */
 public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
-
-  /** The query. */
   private MtasSpanQuery query;
-
-  /** The minimum recurrence. */
   private int minimumRecurrence;
-
-  /** The maximum recurrence. */
   private int maximumRecurrence;
-
-  /** The ignore query. */
   private MtasSpanQuery ignoreQuery;
-
-  /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
-
-  /** The field. */
   private String field;
 
-  /**
-   * Instantiates a new mtas span recurrence query.
-   *
-   * @param query the query
-   * @param minimumRecurrence the minimum recurrence
-   * @param maximumRecurrence the maximum recurrence
-   * @param ignoreQuery the ignore query
-   * @param maximumIgnoreLength the maximum ignore length
-   */
   public MtasSpanRecurrenceQuery(MtasSpanQuery query, int minimumRecurrence,
       int maximumRecurrence, MtasSpanQuery ignoreQuery,
       Integer maximumIgnoreLength) {
@@ -75,57 +50,26 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     setRecurrence(minimumRecurrence, maximumRecurrence);
   }
 
-  /**
-   * Gets the query.
-   *
-   * @return the query
-   */
   public MtasSpanQuery getQuery() {
     return query;
   }
 
-  /**
-   * Gets the ignore query.
-   *
-   * @return the ignore query
-   */
   public MtasSpanQuery getIgnoreQuery() {
     return ignoreQuery;
   }
 
-  /**
-   * Gets the maximum ignore length.
-   *
-   * @return the maximum ignore length
-   */
   public Integer getMaximumIgnoreLength() {
     return maximumIgnoreLength;
   }
 
-  /**
-   * Gets the minimum recurrence.
-   *
-   * @return the minimum recurrence
-   */
   public int getMinimumRecurrence() {
     return minimumRecurrence;
   }
 
-  /**
-   * Gets the maximum recurrence.
-   *
-   * @return the maximum recurrence
-   */
   public int getMaximumRecurrence() {
     return maximumRecurrence;
   }
 
-  /**
-   * Sets the recurrence.
-   *
-   * @param minimumRecurrence the minimum recurrence
-   * @param maximumRecurrence the maximum recurrence
-   */
   public void setRecurrence(int minimumRecurrence, int maximumRecurrence) {
     if (minimumRecurrence > maximumRecurrence) {
       throw new IllegalArgumentException(
@@ -157,22 +101,11 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     setWidth(minimum, maximum);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return field;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newQuery = query.rewrite(reader);
@@ -195,11 +128,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -212,11 +140,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -241,11 +164,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -255,13 +173,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     return h;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
       boolean needsScores, float boost) throws IOException {
@@ -275,11 +186,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
         needsScores ? getTermContexts(subWeight) : null, boost);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
-   */
   @Override
   public void disableTwoPhaseIterator() {
     super.disableTwoPhaseIterator();
@@ -289,30 +195,14 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
     }
   }
 
-  /**
-   * The Class SpanRecurrenceWeight.
-   */
   protected class SpanRecurrenceWeight extends MtasSpanWeight {
 
-    /** The sub weight. */
     final SpanWeight subWeight;
 
-    /** The ignore weight. */
     final SpanWeight ignoreWeight;
 
-    /** The maximum ignore length. */
     final Integer maximumIgnoreLength;
 
-    /**
-     * Instantiates a new span recurrence weight.
-     *
-     * @param subWeight the sub weight
-     * @param ignoreWeight the ignore weight
-     * @param maximumIgnoreLength the maximum ignore length
-     * @param searcher the searcher
-     * @param terms the terms
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     public SpanRecurrenceWeight(SpanWeight subWeight, SpanWeight ignoreWeight,
         Integer maximumIgnoreLength, IndexSearcher searcher,
         Map<Term, TermContext> terms, float boost) throws IOException {
@@ -322,26 +212,11 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
       this.maximumIgnoreLength = maximumIgnoreLength;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
-     * Map)
-     */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       subWeight.extractTermContexts(contexts);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
-     * index.LeafReaderContext,
-     * org.apache.lucene.search.spans.SpanWeight.Postings)
-     */
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
@@ -367,11 +242,6 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
       }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
-     */
     @Override
     public void extractTerms(Set<Term> terms) {
       subWeight.extractTerms(terms);
@@ -388,5 +258,4 @@ public class MtasSpanRecurrenceQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

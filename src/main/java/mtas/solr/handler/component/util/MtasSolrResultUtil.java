@@ -40,13 +40,10 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrResultUtil {
 
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasSolrResultUtil.class);
 
-  /** The Constant QUERY_TYPE_CQL. */
   public static final String QUERY_TYPE_CQL = "cql";
 
-  /** The Constant patternKeyStartGrouphit. */
   public static final Pattern patternKeyStartGrouphit = Pattern
       .compile("^" + GroupHit.KEY_START);
 

@@ -18,63 +18,26 @@ import java.util.Map;
  */
 public class MtasTokenizerFactory extends TokenizerFactory
     implements ResourceLoaderAware {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasTokenizerFactory.class);
 
-  /** The Constant ARGUMENT_CONFIGFILE. */
   public static final String ARGUMENT_CONFIGFILE = "configFile";
-
-  /** The Constant ARGUMENT_CONFIG. */
   public static final String ARGUMENT_CONFIG = "config";
-
-  /** The Constant ARGUMENT_ANALYZER. */
   public static final String ARGUMENT_PARSER = "parser";
-
-  /** The Constant ARGUMENT_PARSER_ARGS. */
   public static final String ARGUMENT_PARSER_ARGS = "parserArgs";
-
-  /** The Constant ARGUMENT_DEFAULT. */
   public static final String ARGUMENT_DEFAULT = "default";
 
-  /** The config argument. */
   private String configArgument;
-
-  /** The default argument. */
   private String defaultArgument;
-
-  /** The config file argument. */
   private String configFileArgument;
-
-  /** The analyzer argument. */
   private String analyzerArgument;
-
-  /** The parser arguments. */
   private String analyzerArgumentParserArgs;
-
-  /** The configs. */
   private HashMap<String, MtasConfiguration> configs = null;
-
-  /** The config. */
   private MtasConfiguration config = null;
 
-  /**
-   * Instantiates a new mtas tokenizer factory.
-   *
-   * @param args the args
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizerFactory(Map<String, String> args) throws IOException {
     this(args, null);
   }
 
-  /**
-   * Instantiates a new mtas tokenizer factory.
-   *
-   * @param args the args
-   * @param resourceLoader the resource loader
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizerFactory(Map<String, String> args,
       ResourceLoader resourceLoader) throws IOException {
     super(args);
@@ -101,13 +64,6 @@ public class MtasTokenizerFactory extends TokenizerFactory
     init(resourceLoader);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.analysis.util.TokenizerFactory#create(org.apache.lucene.
-   * util.AttributeFactory)
-   */
   @Override
   public MtasTokenizer create(AttributeFactory factory) {
     MtasTokenizer tokenizer = null;
@@ -123,13 +79,6 @@ public class MtasTokenizerFactory extends TokenizerFactory
     return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
   }
   
-  /**
-   * Creates the.
-   *
-   * @param configuration the configuration
-   * @return the mtas tokenizer
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizer create(String configuration, String defaultConfiguration) throws IOException {
     return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration, defaultConfiguration);
   }
@@ -138,14 +87,6 @@ public class MtasTokenizerFactory extends TokenizerFactory
     return create(factory, configuration, null);
   }
 
-  /**
-   * Creates the.
-   *
-   * @param factory the factory
-   * @param configuration the configuration
-   * @return the mtas tokenizer
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizer create(AttributeFactory factory, String configuration, String defaultConfiguration)
       throws IOException {
     if(defaultConfiguration==null) {
@@ -187,12 +128,6 @@ public class MtasTokenizerFactory extends TokenizerFactory
     }
   }
 
-  /**
-   * Inits the.
-   *
-   * @param resourceLoader the resource loader
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private void init(ResourceLoader resourceLoader) throws IOException {
     if (config == null && configs == null) {
       if (resourceLoader == null) {
@@ -231,15 +166,8 @@ public class MtasTokenizerFactory extends TokenizerFactory
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.analysis.util.ResourceLoaderAware#inform(org.apache.
-   * lucene.analysis.util.ResourceLoader)
-   */
   @Override
   public void inform(ResourceLoader loader) throws IOException {
     init(loader);
   }
-
 }

@@ -17,10 +17,8 @@ import org.apache.lucene.search.spans.Spans;
  */
 public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
 
-  /** The clause. */
   private MtasSpanQuery clause;
 
-  /** The field. */
   private String field;
 
   /**
@@ -148,7 +146,6 @@ public class MtasSpanUniquePositionQuery extends MtasSpanQuery {
    */
   public class SpanUniquePositionWeight extends MtasSpanWeight {
 
-    /** The sub weight. */
     final SpanWeight subWeight;
 
     /**

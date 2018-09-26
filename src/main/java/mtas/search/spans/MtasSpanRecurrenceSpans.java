@@ -1,70 +1,33 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import mtas.search.spans.util.MtasIgnoreItem;
+import mtas.search.spans.util.MtasSpans;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.TwoPhaseIterator;
 import org.apache.lucene.search.spans.SpanCollector;
 import org.apache.lucene.search.spans.Spans;
 
-import mtas.search.spans.util.MtasIgnoreItem;
-import mtas.search.spans.util.MtasSpans;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-/**
- * The Class MtasSpanRecurrenceSpans.
- */
 public class MtasSpanRecurrenceSpans extends MtasSpans {
-
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasSpanRecurrenceSpans.class);
-
-  /** The query. */
   private MtasSpanRecurrenceQuery query;
-
-  /** The spans. */
   private Spans spans;
-
-  /** The ignore item. */
   private MtasIgnoreItem ignoreItem;
 
-  /** The minimum recurrence. */
   int minimumRecurrence;
-
-  /** The maximum recurrence. */
   int maximumRecurrence;
-
-  /** The queue spans. */
   List<Match> queueSpans;
-
-  /** The queue matches. */
   List<Match> queueMatches;
-
-  /** The current match. */
   Match currentMatch;
-
-  /** The no more positions. */
   boolean noMorePositions;
-
-  /** The last start position. */
   int lastStartPosition; // startPosition of last retrieved span
-
-  /** The last span. */
   boolean lastSpan; // last span for this document added to queue
 
-  /**
-   * Instantiates a new mtas span recurrence spans.
-   *
-   * @param query the query
-   * @param spans the spans
-   * @param minimumRecurrence the minimum recurrence
-   * @param maximumRecurrence the maximum recurrence
-   * @param ignoreSpans the ignore spans
-   * @param maximumIgnoreLength the maximum ignore length
-   */
   public MtasSpanRecurrenceSpans(MtasSpanRecurrenceQuery query, Spans spans,
       int minimumRecurrence, int maximumRecurrence, Spans ignoreSpans,
       Integer maximumIgnoreLength) {
@@ -80,11 +43,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     resetQueue();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
-   */
   @Override
   public int nextStartPosition() throws IOException {
     if (findMatches()) {
@@ -99,11 +57,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#startPosition()
-   */
   @Override
   public int startPosition() {
     if (currentMatch == null) {
@@ -117,11 +70,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#endPosition()
-   */
   @Override
   public int endPosition() {
     if (currentMatch == null) {
@@ -135,54 +83,27 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#width()
-   */
   @Override
   public int width() {
     return 1;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
-   * .SpanCollector)
-   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans.collect(collector);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#docID()
-   */
   @Override
   public int docID() {
     return spans.docID();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
-   */
   @Override
   public int nextDoc() throws IOException {
     resetQueue();
     return (spans.nextDoc() == NO_MORE_DOCS) ? NO_MORE_DOCS : toMatchDoc();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
-   */
   @Override
   public int advance(int target) throws IOException {
     resetQueue();
@@ -190,9 +111,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
         : toMatchDoc();
   }
 
-  /**
-   * Reset queue.
-   */
   void resetQueue() {
     queueSpans.clear();
     queueMatches.clear();
@@ -202,12 +120,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     noMorePositions = false;
   }
 
-  /**
-   * To match doc.
-   *
-   * @return the int
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   int toMatchDoc() throws IOException {
     while (true) {
       if (findMatches()) {
@@ -220,12 +132,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Collect span.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   // try to get something in the queue of spans
   private boolean collectSpan() throws IOException {
     if (lastSpan) {
@@ -240,12 +146,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Find matches.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private boolean findMatches() throws IOException {
     // check for something in queue of matches
     if (!queueMatches.isEmpty()) {
@@ -291,13 +191,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Find matches.
-   *
-   * @param match the match
-   * @param n the n
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private void findMatches(Match match, int n) throws IOException {
     if (n > 0) {
       int largestMatchingEndPosition = match.endPosition();
@@ -343,13 +236,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Expand with ignore item.
-   *
-   * @param docId the doc id
-   * @param match the match
-   * @return the list
-   */
   private List<Match> expandWithIgnoreItem(int docId, Match match) {
     List<Match> list = new ArrayList<>();
     try {
@@ -366,51 +252,23 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
     return list;
   }
 
-  /**
-   * The Class Match.
-   */
   private static class Match {
-
-    /** The start position. */
     private int startPosition;
-
-    /** The end position. */
     private int endPosition;
 
-    /**
-     * Instantiates a new match.
-     *
-     * @param startPosition the start position
-     * @param endPosition the end position
-     */
     Match(int startPosition, int endPosition) {
       this.startPosition = startPosition;
       this.endPosition = endPosition;
     }
 
-    /**
-     * Start position.
-     *
-     * @return the int
-     */
     public int startPosition() {
       return startPosition;
     }
 
-    /**
-     * End position.
-     *
-     * @return the int
-     */
     public int endPosition() {
       return endPosition;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
       if (this == obj)
@@ -424,11 +282,6 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
           && endPosition == that.endPosition;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
       int h = this.getClass().getSimpleName().hashCode();
@@ -439,31 +292,16 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
 
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#cost()
-   */
   @Override
   public long cost() {
     return (spans == null) ? 0 : spans.cost();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#positionsCost()
-   */
   @Override
   public float positionsCost() {
     return 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
-   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
     if (spans == null || !query.twoPhaseIteratorAllowed()) {
@@ -473,5 +311,4 @@ public class MtasSpanRecurrenceSpans extends MtasSpans {
       return null;
     }
   }
-
 }

@@ -1,65 +1,31 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-
+import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.index.IndexReader;
 
-import mtas.search.spans.util.MtasSpanQuery;
+import java.io.IOException;
 
-/**
- * The Class MtasSpanSequenceItem.
- */
 public class MtasSpanSequenceItem {
-
-  /** The span query. */
   private MtasSpanQuery spanQuery;
-
-  /** The optional. */
   private boolean optional;
 
-  /**
-   * Instantiates a new mtas span sequence item.
-   *
-   * @param spanQuery the span query
-   * @param optional the optional
-   */
   public MtasSpanSequenceItem(MtasSpanQuery spanQuery, boolean optional) {
     this.spanQuery = spanQuery;
     this.optional = optional;
   }
 
-  /**
-   * Gets the query.
-   *
-   * @return the query
-   */
   public MtasSpanQuery getQuery() {
     return spanQuery;
   }
 
-  /**
-   * Sets the query.
-   *
-   * @param spanQuery the new query
-   */
   public void setQuery(MtasSpanQuery spanQuery) {
     this.spanQuery = spanQuery;
   }
 
-  /**
-   * Checks if is optional.
-   *
-   * @return true, if is optional
-   */
   public boolean isOptional() {
     return optional;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object o) {
     if (o instanceof MtasSpanSequenceItem) {
@@ -71,11 +37,6 @@ public class MtasSpanSequenceItem {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -84,13 +45,6 @@ public class MtasSpanSequenceItem {
     return h;
   }
 
-  /**
-   * Rewrite.
-   *
-   * @param reader the reader
-   * @return the mtas span sequence item
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasSpanSequenceItem rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newSpanQuery = spanQuery.rewrite(reader);
     if (!newSpanQuery.equals(spanQuery)) {
@@ -100,26 +54,12 @@ public class MtasSpanSequenceItem {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return "[" + spanQuery.toString() + " - "
         + (optional ? "OPTIONAL" : "NOT OPTIONAL") + "]";
   }
 
-  /**
-   * Merge.
-   *
-   * @param item1 the item 1
-   * @param item2 the item 2
-   * @param ignoreQuery the ignore query
-   * @param maximumIgnoreLength the maximum ignore length
-   * @return the mtas span sequence item
-   */
   public static MtasSpanSequenceItem merge(MtasSpanSequenceItem item1,
       MtasSpanSequenceItem item2, MtasSpanQuery ignoreQuery,
       Integer maximumIgnoreLength) {
@@ -141,18 +81,11 @@ public class MtasSpanSequenceItem {
             boolean checkCondition;
             checkCondition = ignoreQuery != null
                 && rq1.getIgnoreQuery() != null;
-            checkCondition = checkCondition
-                ? ignoreQuery.equals(rq1.getIgnoreQuery()) : false;
-            checkCondition = checkCondition
-                ? maximumIgnoreLength.equals(rq1.getMaximumIgnoreLength())
-                : false;
-            checkCondition = checkCondition ? rq2.getIgnoreQuery() != null
-                : false;
-            checkCondition = checkCondition
-                ? ignoreQuery.equals(rq2.getIgnoreQuery()) : false;
-            checkCondition = checkCondition
-                ? maximumIgnoreLength.equals(rq2.getMaximumIgnoreLength())
-                : false;
+            checkCondition = checkCondition && ignoreQuery.equals(rq1.getIgnoreQuery());
+            checkCondition = checkCondition && maximumIgnoreLength.equals(rq1.getMaximumIgnoreLength());
+            checkCondition = checkCondition && rq2.getIgnoreQuery() != null;
+            checkCondition = checkCondition && ignoreQuery.equals(rq2.getIgnoreQuery());
+            checkCondition = checkCondition && maximumIgnoreLength.equals(rq2.getMaximumIgnoreLength());
             if (checkCondition) {
               // at least one optional
               if (item1.optional || item2.optional) {
@@ -278,5 +211,4 @@ public class MtasSpanSequenceItem {
       return null;
     }
   }
-
 }

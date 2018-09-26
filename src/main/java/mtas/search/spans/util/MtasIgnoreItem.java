@@ -14,46 +14,32 @@ import org.apache.lucene.search.spans.Spans;
  */
 public class MtasIgnoreItem {
 
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasIgnoreItem.class);
 
-  /** The Constant DEFAULT_MAXIMUM_IGNORE_LENGTH. */
   public static final int DEFAULT_MAXIMUM_IGNORE_LENGTH = 10;
 
-  /** The ignore spans. */
   Spans ignoreSpans;
 
-  /** The current doc id. */
   int currentDocId;
 
-  /** The current position. */
   int currentPosition;
 
-  /** The minimum position. */
   int minimumPosition;
 
-  /** The maximum ignore length. */
   int maximumIgnoreLength;
 
-  /** The base start position list. */
   HashMap<Integer, HashSet<Integer>> baseStartPositionList;
 
-  /** The base end position list. */
   HashMap<Integer, HashSet<Integer>> baseEndPositionList;
 
-  /** The full end position list. */
   HashMap<Integer, HashSet<Integer>> fullEndPositionList;
 
-  /** The min base start position. */
   HashMap<Integer, Integer> minBaseStartPosition;
 
-  /** The max base end position. */
   HashMap<Integer, Integer> maxBaseEndPosition;
 
-  /** The min full start position. */
   HashMap<Integer, Integer> minFullStartPosition;
 
-  /** The max full end position. */
   HashMap<Integer, Integer> maxFullEndPosition;
 
   /**

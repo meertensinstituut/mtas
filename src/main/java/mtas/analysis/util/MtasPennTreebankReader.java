@@ -197,7 +197,7 @@ public class MtasPennTreebankReader {
     if(charBuffer==null) {
       charBuffer = new char[DEFAULTCHARBUFFERSIZE];
       charBufferSize = reader.read(charBuffer, 0, charBuffer.length);
-      eof = (charBufferSize > 0) ? false : true;
+      eof = charBufferSize <= 0;
     }
     if (bufferPosition < charBufferSize) {
       readPosition++;

@@ -11,7 +11,6 @@ import org.apache.lucene.search.spans.Spans;
  */
 public class MtasDisabledTwoPhaseIteratorSpans extends MtasSpans {
 
-  /** The sub spans. */
   private Spans subSpans;
 
   /**

@@ -25,24 +25,18 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentPrefix
     implements MtasSolrComponent<ComponentPrefix> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentPrefix.class);
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant NAME. */
   public static final String NAME = "prefix";
 
-  /** The Constant PARAM_MTAS_PREFIX. */
   public static final String PARAM_MTAS_PREFIX = MtasSolrSearchComponent.PARAM_MTAS
       + ".prefix";
 
-  /** The Constant NAME_MTAS_PREFIX_FIELD. */
   public static final String NAME_MTAS_PREFIX_FIELD = "field";
 
-  /** The Constant NAME_MTAS_PREFIX_KEY. */
   public static final String NAME_MTAS_PREFIX_KEY = "key";
 
   /**

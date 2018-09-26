@@ -33,42 +33,30 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentCollection
     implements MtasSolrComponent<ComponentCollection> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentCollection.class);
 
-  /** The Constant NAME. */
   public static final String NAME = "collection";
 
-  /** The Constant PARAM_MTAS_COLLECTION. */
   public static final String PARAM_MTAS_COLLECTION = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_COLLECTION_ACTION. */
   public static final String NAME_MTAS_COLLECTION_ACTION = "action";
 
-  /** The Constant NAME_MTAS_COLLECTION_ID. */
   public static final String NAME_MTAS_COLLECTION_ID = "id";
 
-  /** The Constant NAME_MTAS_COLLECTION_FIELD. */
   public static final String NAME_MTAS_COLLECTION_FIELD = "field";
 
-  /** The Constant NAME_MTAS_COLLECTION_POST. */
   public static final String NAME_MTAS_COLLECTION_POST = "post";
 
-  /** The Constant NAME_MTAS_COLLECTION_URL. */
   public static final String NAME_MTAS_COLLECTION_URL = "url";
 
-  /** The Constant NAME_MTAS_COLLECTION_COLLECTION. */
   public static final String NAME_MTAS_COLLECTION_COLLECTION = "collection";
 
-  /** The Constant NAME_MTAS_COLLECTION_KEY. */
   public static final String NAME_MTAS_COLLECTION_KEY = "key";
 
-  /** The Constant NAME_MTAS_COLLECTION_VERSION. */
   public static final String NAME_MTAS_COLLECTION_VERSION = "version";
 
-  /** The search component. */
   private MtasSolrSearchComponent searchComponent;
 
   /**
@@ -323,7 +311,7 @@ public class MtasSolrComponentCollection
       ComponentCollection componentCollection, Boolean encode)
       throws IOException {
     MtasSolrCollectionResult data = createMtasSolrCollectionResult(
-        componentCollection, encode ? false : true);
+      componentCollection, !encode);
     // Create response
     SimpleOrderedMap<Object> mtasCollectionResponse = new SimpleOrderedMap<>();
     mtasCollectionResponse.add("key", componentCollection.key);

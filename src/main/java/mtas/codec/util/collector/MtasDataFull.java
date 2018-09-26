@@ -1,5 +1,8 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.CodecUtil;
+import mtas.codec.util.DataCollector;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -7,53 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import mtas.codec.util.CodecUtil;
-import mtas.codec.util.DataCollector;
-
-/**
- * The Class MtasDataFull.
- *
- * @param <T1> the generic type
- * @param <T2> the generic type
- */
 abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataCollector<T1, T2> implements Serializable {
-
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The full value list. */
   protected T1[][] fullValueList = null;
-
-  /** The new full value list. */
   protected T1[][] newFullValueList = null;
-
-  /** The operations. */
   protected MtasDataOperations<T1, T2> operations;
 
-  /**
-   * Instantiates a new mtas data full.
-   *
-   * @param collectorType the collector type
-   * @param dataType the data type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param subCollectorTypes the sub collector types
-   * @param subDataTypes the sub data types
-   * @param subStatsTypes the sub stats types
-   * @param subStatsItems the sub stats items
-   * @param subSortTypes the sub sort types
-   * @param subSortDirections the sub sort directions
-   * @param subStart the sub start
-   * @param subNumber the sub number
-   * @param operations the operations
-   * @param segmentRegistration the segment registration
-   * @param boundary the boundary
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasDataFull(String collectorType, String dataType,
       SortedSet<String> statsItems, String sortType, String sortDirection,
       Integer start, Integer number, String[] subCollectorTypes,
@@ -69,25 +33,12 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     this.operations = operations;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String)
-   */
   @Override
   public final void error(String error) throws IOException {
     add(false);
     setError(newCurrentPosition, error, newCurrentExisting);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#error(java.lang.String[],
-   * java.lang.String)
-   */
   @Override
   public final void error(String key, String error) throws IOException {
     if (key != null) {
@@ -96,13 +47,6 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     }
   }
 
-  /**
-   * Sets the error.
-   *
-   * @param newPosition the new position
-   * @param error the error
-   * @param currentExisting the current existing
-   */
   protected void setError(int newPosition, String error,
       boolean currentExisting) {
     if (!currentExisting) {
@@ -117,11 +61,6 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#increaseNewListSize()
-   */
   @Override
   protected final void increaseNewListSize() throws IOException {
     // register old situation
@@ -136,11 +75,6 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     System.arraycopy(tmpNewFullValueList, 0, newFullValueList, 0, tmpOldSize);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataCollector#reduceToSegmentKeys()
-   */
   @Override
   public void reduceToSegmentKeys() {
     if (segmentRegistration != null && size > 0) {
@@ -158,12 +92,6 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.collector.MtasDataCollector#reduceToKeys(java.util.Set)
-   */
   @SuppressWarnings("unchecked")
   public void reduceToKeys(Set<String> keys) {
     if (size > 0) {
@@ -197,34 +125,16 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#copyToNew(int, int)
-   */
   @Override
   protected void copyToNew(int position, int newPosition) {
     newFullValueList[newPosition] = fullValueList[position];
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#copyFromNew()
-   */
   @Override
   protected void copyFromNew() {
     fullValueList = newFullValueList;
   }
 
-  /**
-   * Sets the value.
-   *
-   * @param newPosition the new position
-   * @param values the values
-   * @param number the number
-   * @param currentExisting the current existing
-   */
   protected void setValue(int newPosition, T1[] values, int number,
       boolean currentExisting) {
     if (number > 0) {
@@ -248,11 +158,6 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#remapData(int[][])
-   */
   @Override
   protected void remapData(int[][] mapping) throws IOException {
     super.remapData(mapping);
@@ -272,12 +177,6 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     fullValueList = newFullValueList;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#merge(mtas.codec.util.
-   * DataCollector.MtasDataCollector)
-   */
   @Override
   public void merge(MtasDataCollector<?, ?> newDataCollector,
       Map<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
@@ -333,37 +232,20 @@ abstract class MtasDataFull<T1 extends Number & Comparable<T1>, T2 extends Numbe
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int)
-   */
   @Override
   public final void initNewList(int maxNumberOfTerms) throws IOException {
     super.initNewList(maxNumberOfTerms);
-    initNewListBasic(maxNumberOfTerms);
+    initNewListBasic();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#initNewList(int,
-   * java.lang.String)
-   */
   @Override
   public final void initNewList(int maxNumberOfTerms, String segmentName,
       int segmentNumber, String boundary) throws IOException {
     super.initNewList(maxNumberOfTerms, segmentName, segmentNumber, boundary);
-    initNewListBasic(maxNumberOfTerms);
+    initNewListBasic();
   }
 
-  /**
-   * Inits the new list basic.
-   *
-   * @param maxNumberOfTerms the max number of terms
-   */
-  private void initNewListBasic(int maxNumberOfTerms) {
+  private void initNewListBasic() {
     newFullValueList = operations.createMatrix1(newSize);
   }
-
 }

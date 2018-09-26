@@ -14,34 +14,24 @@ import mtas.codec.util.CodecInfo.IndexDoc;
  */
 public class MtasMaximumExpandSpans extends MtasSpans {
 
-  /** The sub spans. */
   Spans subSpans;
 
-  /** The query. */
   MtasMaximumExpandSpanQuery query;
 
-  /** The min position. */
   int minPosition;
 
-  /** The max position. */
   int maxPosition;
 
-  /** The field. */
   String field;
 
-  /** The mtas codec info. */
   CodecInfo mtasCodecInfo;
 
-  /** The start position. */
   int startPosition;
 
-  /** The end position. */
   int endPosition;
 
-  /** The called next start position. */
   private boolean calledNextStartPosition;
 
-  /** The doc id. */
   int docId;
 
   /**
@@ -292,11 +282,7 @@ public class MtasMaximumExpandSpans extends MtasSpans {
           minPosition = NO_MORE_POSITIONS;
           maxPosition = NO_MORE_POSITIONS;
         }
-        if (goToNextStartPosition()) {
-          return true;
-        } else {
-          return false;
-        }
+        return goToNextStartPosition();
       }
     }
   }

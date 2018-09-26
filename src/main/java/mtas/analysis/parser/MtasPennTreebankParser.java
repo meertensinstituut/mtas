@@ -22,42 +22,19 @@ import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
 import mtas.analysis.util.MtasPennTreebankReader;
 
-/**
- * The Class MtasPennTreebankParser.
- */
 public class MtasPennTreebankParser extends MtasParser {
-
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasPennTreebankParser.class);
 
-  /** The Constant PENNTREEBANK_IGNORE. */
   private static final String PENNTREEBANK_IGNORE = "ignore";
-
-  /** The Constant PENNTREEBANK_NODE. */
   private static final String PENNTREEBANK_NODE = "node";
-
-  /** The Constant PENNTREEBANK_NODE_NAME. */
   private static final String PENNTREEBANK_NODE_NAME = "name";
-
-  /** The Constant NODE_CODE. */
   private static final String NODE_CODE = "CODE";
-
-  /** The Constant NODE_CODE_PREFIX. */
   private static final String NODE_CODE_PREFIX = "$";
-
-  /** The Constant STRING_SPLITTER. */
   private static final String STRING_SPLITTER = "_";
     
-  /** The ignore nodes. */
   private Set<String> ignoreNodes = new HashSet<>();
 
-  /**
-   * Instantiates a new mtas penn treebank parser.
-   *
-   * @param config
-   *          the config
-   */
   public MtasPennTreebankParser(MtasConfiguration config) {
     super(config);
     try {
@@ -68,11 +45,6 @@ public class MtasPennTreebankParser extends MtasParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#initParser()
-   */
   @Override
   protected void initParser() throws MtasConfigException {
     super.initParser();
@@ -94,11 +66,6 @@ public class MtasPennTreebankParser extends MtasParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#createTokenCollection(java.io.Reader)
-   */
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException {
@@ -244,28 +211,6 @@ public class MtasPennTreebankParser extends MtasParser {
 
   }
 
-  /**
-   * Creates the code mappings.
-   *
-   * @param mtasTokenIdFactory
-   *          the mtas token id factory
-   * @param level
-   *          the level
-   * @param stringValue
-   *          the string value
-   * @param offsetStart
-   *          the offset start
-   * @param offsetEnd
-   *          the offset end
-   * @param realOffsetStart
-   *          the real offset start
-   * @param realOffsetEnd
-   *          the real offset end
-   * @param codePositions
-   *          the code positions
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   private void createCodeMappings(MtasTokenIdFactory mtasTokenIdFactory,
       Level level, String stringValue, int offsetStart, int offsetEnd,
       int realOffsetStart, int realOffsetEnd, List<Integer> codePositions)
@@ -281,16 +226,6 @@ public class MtasPennTreebankParser extends MtasParser {
     level.tokens.add(token);
   }
 
-  /**
-   * Creates the node mappings.
-   *
-   * @param mtasTokenIdFactory
-   *          the mtas token id factory
-   * @param level
-   *          the level
-   * @param parentLevel
-   *          the parent level
-   */
   private void createNodeMappings(MtasTokenIdFactory mtasTokenIdFactory,
       Level level, Level parentLevel) {
     MtasToken nodeToken;
@@ -312,24 +247,6 @@ public class MtasPennTreebankParser extends MtasParser {
     }
   }
 
-  /**
-   * Creates the string mappings.
-   *
-   * @param mtasTokenIdFactory
-   *          the mtas token id factory
-   * @param level
-   *          the level
-   * @param stringValue
-   *          the string value
-   * @param offsetStart
-   *          the offset start
-   * @param offsetEnd
-   *          the offset end
-   * @param position
-   *          the position
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   private void createStringMappings(MtasTokenIdFactory mtasTokenIdFactory,
       Level level, String stringValue, int offsetStart, int offsetEnd,
       int position) throws IOException {
@@ -383,11 +300,6 @@ public class MtasPennTreebankParser extends MtasParser {
     return new String[0];
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#printConfig()
-   */
   @Override
   public String printConfig() {
     StringBuilder text = new StringBuilder();
@@ -397,44 +309,18 @@ public class MtasPennTreebankParser extends MtasParser {
     return text.toString();
   }
 
-  /**
-   * The Class Level.
-   */
   public static class Level {
-
-    /** The node. */
     public String node;
-
-    /** The offset start. */
     public Integer offsetStart;
-
-    /** The offset end. */
     public Integer offsetEnd;
-
-    /** The real offset start. */
     public Integer realOffsetStart;
-
-    /** The real offset end. */
     public Integer realOffsetEnd;
-
-    /** The ignore. */
     public boolean ignore;
-
-    /** The code. */
     public boolean code;
-
-    /** The position start. */
     public Integer positionStart;
-
-    /** The position end. */
     public Integer positionEnd;
+    public List<MtasToken> tokens;
 
-    /** The tokens. */
-    public List<MtasToken> tokens;    
-
-    /**
-     * Instantiates a new level.
-     */
     public Level() {
       node = null;
       offsetStart = null;
@@ -448,12 +334,6 @@ public class MtasPennTreebankParser extends MtasParser {
       tokens = new ArrayList<>();
     }
 
-    /**
-     * Adds the position.
-     *
-     * @param position
-     *          the position
-     */
     public void addPosition(int position) {
       positionStart = (positionStart == null) ? position
           : Math.min(positionStart, position);
@@ -461,21 +341,11 @@ public class MtasPennTreebankParser extends MtasParser {
           : Math.max(positionEnd, position);
     }
 
-    /**
-     * Adds the position range.
-     *
-     * @param startPosition
-     *          the start position
-     * @param endPosition
-     *          the end position
-     */
     public void addPositionRange(int startPosition, int endPosition) {
       positionStart = (positionStart == null) ? startPosition
           : Math.min(positionStart, startPosition);
       positionEnd = (positionEnd == null) ? endPosition
           : Math.max(positionEnd, endPosition);
     }
-
   }
-
 }

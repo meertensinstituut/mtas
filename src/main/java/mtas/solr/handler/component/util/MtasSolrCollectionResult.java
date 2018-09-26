@@ -18,28 +18,20 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrCollectionResult implements Serializable {
 
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The values. */
   private HashSet<String> values;
 
-  /** The id. */
   private String id;
 
-  /** The action. */
   private String action;
 
-  /** The now. */
   private Long now;
 
-  /** The list. */
   private List<SimpleOrderedMap<Object>> list;
 
-  /** The status. */
   public SimpleOrderedMap<Object> status;
 
-  /** The component collection. */
   private transient ComponentCollection componentCollection = null;
 
   /**

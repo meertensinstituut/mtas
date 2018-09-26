@@ -24,19 +24,14 @@ import mtas.search.spans.MtasSpanMatchNoneSpans;
  */
 public class MtasExpandSpanQuery extends MtasSpanQuery {
 
-  /** The query. */
   MtasSpanQuery query;
 
-  /** The minimum left. */
   int minimumLeft;
 
-  /** The maximum left. */
   int maximumLeft;
 
-  /** The minimum right. */
   int minimumRight;
 
-  /** The maximum right. */
   int maximumRight;
 
   /**
@@ -200,13 +195,10 @@ public class MtasExpandSpanQuery extends MtasSpanQuery {
    */
   private class MtasExpandWeight extends MtasSpanWeight {
 
-    /** The Constant METHOD_GET_DELEGATE. */
     private static final String METHOD_GET_DELEGATE = "getDelegate";
 
-    /** The Constant METHOD_GET_POSTINGS_READER. */
     private static final String METHOD_GET_POSTINGS_READER = "getPostingsReader";
 
-    /** The sub weight. */
     SpanWeight subWeight;
 
     /**

@@ -25,58 +25,40 @@ import mtas.codec.util.distance.Distance;
  */
 public class MtasSolrMtasResult implements Serializable {
 
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The data type. */
   public String dataType;
 
-  /** The stats type. */
   public String statsType;
 
-  /** The distances. */
   public List<SubComponentDistance> distances;
 
-  /** The sort type. */
   public String sortType;
 
-  /** The sort direction. */
   public String sortDirection;
 
-  /** The start. */
   public Integer start;
 
-  /** The number. */
   public Integer number;
 
-  /** The data collector. */
   public MtasDataCollector<?, ?> dataCollector = null;
 
-  /** The function data. */
   public Map<MtasDataCollector<?, ?>, HashMap<String, MtasSolrMtasResult>> functionData;
 
-  /** The sub data type. */
   private String[] subDataType;
 
-  /** The sub stats type. */
   private String[] subStatsType;
 
-  /** The sub stats items. */
   private SortedSet<String>[] subStatsItems;
 
-  /** The sub distances. */
   private List<SubComponentDistance>[] subDistances;
 
-  /** The sub sort type. */
   private String[] subSortType;
 
-  /** The sub sort direction. */
   private String[] subSortDirection;
 
-  /** The sub start. */
   private Integer[] subStart;
 
-  /** The sub number. */
   private Integer[] subNumber;
 
   /**

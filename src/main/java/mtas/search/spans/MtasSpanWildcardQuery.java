@@ -1,11 +1,8 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-
 import mtas.analysis.token.MtasToken;
 import mtas.codec.util.CodecUtil;
 import mtas.search.spans.util.MtasSpanQuery;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -17,44 +14,20 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
-/**
- * The Class MtasSpanWildcardQuery.
- */
+import java.io.IOException;
+
 public class MtasSpanWildcardQuery extends MtasSpanQuery {
-
-  /** The Constant MTAS_WILDCARD_EXPAND_BOUNDARY. */
   private static final int MTAS_WILDCARD_EXPAND_BOUNDARY = 1000000;
-
-  /** The prefix. */
   private String prefix;
-
-  /** The value. */
   private String value;
-
-  /** The single position. */
   private boolean singlePosition;
-
-  /** The term. */
   private Term term;
-
-  /** The query. */
   private SpanMultiTermQueryWrapper<WildcardQuery> query;
 
-  /**
-   * Instantiates a new mtas span wildcard query.
-   *
-   * @param term the term
-   */
   public MtasSpanWildcardQuery(Term term) {
     this(term, true);
   }
 
-  /**
-   * Instantiates a new mtas span wildcard query.
-   *
-   * @param term the term
-   * @param singlePosition the single position
-   */
   public MtasSpanWildcardQuery(Term term, boolean singlePosition) {
     super(singlePosition ? 1 : null, singlePosition ? 1 : null);
     WildcardQuery wcq = new WildcardQuery(term);
@@ -72,12 +45,6 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     Query q = query.rewrite(reader);
@@ -105,12 +72,6 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanTermQuery#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -124,23 +85,11 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return term.field();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
@@ -148,11 +97,6 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
         needsScores, boost);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -165,11 +109,6 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
     return term.equals(that.term) && singlePosition == that.singlePosition;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -182,5 +121,4 @@ public class MtasSpanWildcardQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

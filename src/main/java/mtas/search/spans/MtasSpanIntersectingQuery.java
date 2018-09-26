@@ -1,11 +1,8 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -14,30 +11,18 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
-import mtas.search.spans.util.MtasSpanQuery;
-import mtas.search.spans.util.MtasSpanWeight;
-import mtas.search.spans.util.MtasSpans;
 
-/**
- * The Class MtasSpanIntersectingQuery.
- */
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 public class MtasSpanIntersectingQuery extends MtasSpanQuery {
-
-  /** The field. */
   private String field;
-
-  /** The q 1. */
   private MtasSpanQuery q1;
-
-  /** The q 2. */
   private MtasSpanQuery q2;
 
-  /**
-   * Instantiates a new mtas span intersecting query.
-   *
-   * @param q1 the q 1
-   * @param q2 the q 2
-   */
   public MtasSpanIntersectingQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     super(q1 != null ? q1.getMinimumWidth() : null,
         q1 != null ? q1.getMaximumWidth() : null);
@@ -54,23 +39,11 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     this.q2 = q2;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return field;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
       boolean needsScores, float boost) throws IOException {
@@ -91,12 +64,6 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     }
   }
 
-  /**
-   * Gets the term contexts.
-   *
-   * @param items the items
-   * @return the term contexts
-   */
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanIntersectingQueryWeight> items) {
     List<SpanWeight> weights = new ArrayList<>();
@@ -106,11 +73,6 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return getTermContexts(weights);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -130,11 +92,6 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -147,11 +104,6 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return q1.equals(other.q1) && q2.equals(other.q2);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = Integer.rotateLeft(classHash(), 1);
@@ -161,16 +113,10 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     return h;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
-   * IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
-    MtasSpanQuery newQ1 = (MtasSpanQuery) q1.rewrite(reader);
-    MtasSpanQuery newQ2 = (MtasSpanQuery) q2.rewrite(reader);
+    MtasSpanQuery newQ1 = q1.rewrite(reader);
+    MtasSpanQuery newQ2 = q2.rewrite(reader);
     if (!newQ1.equals(q1) || !newQ2.equals(q2)) {
       return new MtasSpanIntersectingQuery(newQ1, newQ2).rewrite(reader);
     } else if (newQ1.equals(newQ2)) {
@@ -190,11 +136,6 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
-   */
   @Override
   public void disableTwoPhaseIterator() {
     super.disableTwoPhaseIterator();
@@ -202,26 +143,10 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
     q2.disableTwoPhaseIterator();
   }
 
-  /**
-   * The Class SpanIntersectingWeight.
-   */
   protected class SpanIntersectingWeight extends MtasSpanWeight {
-
-    /** The w 1. */
     MtasSpanIntersectingQueryWeight w1;
-
-    /** The w 2. */
     MtasSpanIntersectingQueryWeight w2;
 
-    /**
-     * Instantiates a new span intersecting weight.
-     *
-     * @param w1 the w 1
-     * @param w2 the w 2
-     * @param searcher the searcher
-     * @param terms the terms
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     public SpanIntersectingWeight(MtasSpanIntersectingQueryWeight w1,
         MtasSpanIntersectingQueryWeight w2, IndexSearcher searcher,
         Map<Term, TermContext> terms, float boost) throws IOException {
@@ -230,27 +155,12 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
       this.w2 = w2;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
-     * Map)
-     */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       w1.spanWeight.extractTermContexts(contexts);
       w2.spanWeight.extractTermContexts(contexts);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
-     * index.LeafReaderContext,
-     * org.apache.lucene.search.spans.SpanWeight.Postings)
-     */
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
@@ -268,11 +178,6 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
           s2);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
-     */
     @Override
     public void extractTerms(Set<Term> terms) {
       w1.spanWeight.extractTerms(terms);
@@ -286,40 +191,18 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
 
   }
 
-  /**
-   * The Class MtasSpanIntersectingQuerySpans.
-   */
   protected static class MtasSpanIntersectingQuerySpans {
-
-    /** The spans. */
     public Spans spans;
 
-    /**
-     * Instantiates a new mtas span intersecting query spans.
-     *
-     * @param query the query
-     * @param spans the spans
-     */
     public MtasSpanIntersectingQuerySpans(MtasSpanIntersectingQuery query,
         Spans spans) {
       this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
     }
-
   }
 
-  /**
-   * The Class MtasSpanIntersectingQueryWeight.
-   */
   private static class MtasSpanIntersectingQueryWeight {
-
-    /** The span weight. */
     public SpanWeight spanWeight;
 
-    /**
-     * Instantiates a new mtas span intersecting query weight.
-     *
-     * @param spanWeight the span weight
-     */
     public MtasSpanIntersectingQueryWeight(SpanWeight spanWeight) {
       this.spanWeight = spanWeight;
     }
@@ -329,5 +212,4 @@ public class MtasSpanIntersectingQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

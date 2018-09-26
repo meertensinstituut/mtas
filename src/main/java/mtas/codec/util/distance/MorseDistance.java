@@ -1,5 +1,8 @@
 package mtas.codec.util.distance;
 
+import mtas.analysis.token.MtasToken;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,58 +10,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.lucene.util.BytesRef;
-
-import mtas.analysis.token.MtasToken;
-
-/**
- * The Class MorseDistance.
- */
 public class MorseDistance extends Distance {
-
-  /** The initial state. */
   protected final double[] initialState;
-
-  /** The Constant defaultDeletionDistance. */
   protected final static double defaultDeletionDistance = 1.0;
-
-  /** The Constant defaultInsertionDistance. */
   protected final static double defaultInsertionDistance = 10.0;
-
-  /** The Constant defaultReplaceDistance. */
   protected final static double defaultReplaceDistance = 10.0;
-
-  /** The Constant defaultTranspositionDistance. */
   protected final static double defaultTranspositionDistance = 10.0;
-
-  /** The deletion distance. */
   protected double deletionDistance;
-
-  /** The insertion distance. */
   protected double insertionDistance;
-
-  /** The replace distance. */
   protected double replaceDistance;
-
-  /** The transposition distance. */
   protected double transpositionDistance;
-
-  /** The Constant PARAMETER_DELETIONDISTANCE. */
   protected final static String PARAMETER_DELETIONDISTANCE = "deletionDistance";
-
-  /** The Constant PARAMETER_INSERTIONDISTANCE. */
   protected final static String PARAMETER_INSERTIONDISTANCE = "insertionDistance";
-
-  /** The Constant PARAMETER_REPLACEDISTANCE. */
   protected final static String PARAMETER_REPLACEDISTANCE = "replaceDistance";
-
-  /** The Constant PARAMETER_TRANSPOSITIONDISTANCE. */
   protected final static String PARAMETER_TRANSPOSITIONDISTANCE = "transpositionDistance";
-
-  /** The morse base. */
   protected final String morseBase;
 
-  /** The Constant ALPHABET_MORSE. */
   private static final Map<Byte, String> ALPHABET_MORSE;
   static {
     Map<Byte, String> m = new HashMap<>();
@@ -101,15 +68,6 @@ public class MorseDistance extends Distance {
     ALPHABET_MORSE = Collections.unmodifiableMap(m);
   }
 
-  /**
-   * Instantiates a new morse distance.
-   *
-   * @param prefix the prefix
-   * @param base the base
-   * @param maximum the maximum
-   * @param parameters the parameters
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MorseDistance(String prefix, String base, Double minimum, Double maximum,
       Map<String, String> parameters) throws IOException {
     super(prefix, base, minimum, maximum, parameters);
@@ -141,12 +99,6 @@ public class MorseDistance extends Distance {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
-   */
   @Override
   public boolean validateMaximum(BytesRef term) {
     if (morseBase == null) {
@@ -229,11 +181,6 @@ public class MorseDistance extends Distance {
     }  
   }
 
-  /**
-   * Start.
-   *
-   * @return the double[][]
-   */
   private double[][] _start() {
     double[][] startState = new double[3][];
     startState[0] = new double[initialState.length];
@@ -242,14 +189,6 @@ public class MorseDistance extends Distance {
     return startState;
   }
 
-  /**
-   * Step.
-   *
-   * @param state the state
-   * @param ch1 the ch 1
-   * @param ch2 the ch 2
-   * @return the double[][]
-   */
   private double[][] _step(double[][] state, char ch1, char ch2) {
     double cost;
     _shift(state);
@@ -269,11 +208,6 @@ public class MorseDistance extends Distance {
     return state;
   }
 
-  /**
-   * Shift.
-   *
-   * @param state the state
-   */
   private void _shift(double[][] state) {
     double[] tmpState = state[0];
     state[0] = state[1];
@@ -281,22 +215,10 @@ public class MorseDistance extends Distance {
     state[2] = tmpState;
   }
 
-  /**
-   * Checks if is match.
-   *
-   * @param state the state
-   * @return true, if successful
-   */
   private boolean _is_match(double[][] state) {
     return state[2][state[2].length - 1] < maximum;
   }
 
-  /**
-   * Can match.
-   *
-   * @param state the state
-   * @return true, if successful
-   */
   private boolean _can_match(double[][] state) {
     for (double d : state[2]) {
       if (d < maximum) {
@@ -306,22 +228,10 @@ public class MorseDistance extends Distance {
     return false;
   }
 
-  /**
-   * Distance.
-   *
-   * @param state the state
-   * @return the double
-   */
   private double _distance(double[][] state) {
     return state[2][state[2].length - 1];
   }
 
-  /**
-   * Compute morse.
-   *
-   * @param term the term
-   * @return the string
-   */
   private String computeMorse(BytesRef term) {
     StringBuilder stringBuilder = new StringBuilder();
     int i = term.offset + prefixOffset;
@@ -350,5 +260,4 @@ public class MorseDistance extends Distance {
     }
     return stringBuilder.toString();
   }
-
 }

@@ -1,10 +1,7 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-
 import mtas.analysis.token.MtasToken;
 import mtas.search.spans.util.MtasSpanQuery;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -16,41 +13,19 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
-/**
- * The Class MtasSpanPrefixQuery.
- */
+import java.io.IOException;
+
 public class MtasSpanPrefixQuery extends MtasSpanQuery {
-
-  /** The prefix. */
   private String prefix;
-
-  /** The value. */
   private String value;
-
-  /** The single position. */
   private boolean singlePosition;
-
-  /** The term. */
   private Term term;
-
-  /** The query. */
   private SpanMultiTermQueryWrapper<PrefixQuery> query;
 
-  /**
-   * Instantiates a new mtas span prefix query.
-   *
-   * @param term the term
-   */
   public MtasSpanPrefixQuery(Term term) {
     this(term, true);
   }
 
-  /**
-   * Instantiates a new mtas span prefix query.
-   *
-   * @param term the term
-   * @param singlePosition the single position
-   */
   public MtasSpanPrefixQuery(Term term, boolean singlePosition) {
     super(singlePosition ? 1 : null, singlePosition ? 1 : null);
     PrefixQuery pfq = new PrefixQuery(term);
@@ -68,12 +43,6 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     Query q = query.rewrite(reader);
@@ -94,12 +63,6 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanTermQuery#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -113,23 +76,11 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return term.field();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
@@ -137,11 +88,6 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
         needsScores, boost);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -154,11 +100,6 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
     return other.term.equals(term) && (other.singlePosition == singlePosition);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -171,5 +112,4 @@ public class MtasSpanPrefixQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

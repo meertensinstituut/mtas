@@ -1,69 +1,32 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import mtas.search.spans.util.MtasMaximumExpandSpanQuery;
+import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.SpanWithinQuery;
-import mtas.search.spans.util.MtasMaximumExpandSpanQuery;
-import mtas.search.spans.util.MtasSpanQuery;
 
-/**
- * The Class MtasSpanWithinQuery.
- */
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MtasSpanWithinQuery extends MtasSpanQuery {
-
-  /** The base query. */
   private SpanWithinQuery baseQuery;
-
-  /** The small query. */
   private MtasSpanQuery smallQuery;
-
-  /** The big query. */
   private MtasSpanQuery bigQuery;
-
-  /** The left boundary big minimum. */
   private int leftBoundaryBigMinimum;
-
-  /** The left boundary big maximum. */
   private int leftBoundaryBigMaximum;
-
-  /** The right boundary big maximum. */
   private int rightBoundaryBigMaximum;
-
-  /** The right boundary big minimum. */
   private int rightBoundaryBigMinimum;
-
-  /** The auto adjust big query. */
   private boolean autoAdjustBigQuery;
 
-  /** The field. */
   String field;
-
-  /**
-   * Instantiates a new mtas span within query.
-   *
-   * @param q1 the q 1
-   * @param q2 the q 2
-   */
 
   public MtasSpanWithinQuery(MtasSpanQuery q1, MtasSpanQuery q2) {
     this(q1, q2, 0, 0, 0, 0, true);
   }
 
-  /**
-   * Instantiates a new mtas span within query.
-   *
-   * @param q1 the q 1
-   * @param q2 the q 2
-   * @param leftMinimum the left minimum
-   * @param leftMaximum the left maximum
-   * @param rightMinimum the right minimum
-   * @param rightMaximum the right maximum
-   * @param adjustBigQuery the adjust big query
-   */
   public MtasSpanWithinQuery(MtasSpanQuery q1, MtasSpanQuery q2,
       int leftMinimum, int leftMaximum, int rightMinimum, int rightMaximum,
       boolean adjustBigQuery) {
@@ -109,12 +72,6 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
-   * IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     MtasSpanQuery newBigQuery = bigQuery.rewrite(reader);
@@ -269,34 +226,17 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return field;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores, boost);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -318,11 +258,6 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -339,11 +274,6 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
         && rightBoundaryBigMaximum == that.rightBoundaryBigMaximum;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = Integer.rotateLeft(classHash(), 1);
@@ -362,11 +292,6 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
     return h;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
-   */
   @Override
   public void disableTwoPhaseIterator() {
     super.disableTwoPhaseIterator();
@@ -378,5 +303,4 @@ public class MtasSpanWithinQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

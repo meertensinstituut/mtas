@@ -1,5 +1,8 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.CodecUtil;
+import mtas.codec.util.DataCollector;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
@@ -10,56 +13,21 @@ import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import mtas.codec.util.CodecUtil;
-import mtas.codec.util.DataCollector;
-
-/**
- * The Class MtasDataCollectorResult.
- *
- * @param <T1> the generic type
- * @param <T2> the generic type
- */
 public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     implements Serializable {
 
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The list. */
   private SortedMap<String, MtasDataItem<T1, T2>> list;
-
-  /** The item. */
   private MtasDataItem<T1, T2> item;
-
-  /** The sort type. */
   private String sortType;
-
-  /** The sort direction. */
   private String sortDirection;
-
-  /** The collector type. */
   private String collectorType;
-
-  /** The last sort value. */
   private MtasDataItemNumberComparator lastSortValue;
 
-  /** The start key. */
   String startKey;
-
-  /** The end key. */
   String endKey;
 
-  /**
-   * Instantiates a new mtas data collector result.
-   *
-   * @param collectorType the collector type
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param basicList the basic list
-   * @param start the start
-   * @param number the number
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasDataCollectorResult(String collectorType, String sortType,
       String sortDirection,
       NavigableMap<String, MtasDataItem<T1, T2>> basicList, Integer start,
@@ -139,25 +107,12 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     }
   }
 
-  /**
-   * Instantiates a new mtas data collector result.
-   *
-   * @param collectorType the collector type
-   * @param item the item
-   */
   public MtasDataCollectorResult(String collectorType,
       MtasDataItem<T1, T2> item) {
     this(collectorType, null, null);
     this.item = item;
   }
 
-  /**
-   * Instantiates a new mtas data collector result.
-   *
-   * @param collectorType the collector type
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   */
   public MtasDataCollectorResult(String collectorType, String sortType,
       String sortDirection) {
     list = null;
@@ -168,24 +123,11 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     this.sortDirection = sortDirection;
   }
 
-  /**
-   * Gets the list.
-   *
-   * @return the list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public final SortedMap<String, MtasDataItem<T1, T2>> getList()
       throws IOException {
     return getList(true);
   }
 
-  /**
-   * Gets the list.
-   *
-   * @param reduce the reduce
-   * @return the list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public final SortedMap<String, MtasDataItem<T1, T2>> getList(boolean reduce)
       throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
@@ -199,12 +141,6 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     }
   }
 
-  /**
-   * Gets the comparator list.
-   *
-   * @return the comparator list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   @SuppressWarnings("rawtypes")
   public final Map<String, MtasDataItemNumberComparator> getComparatorList()
       throws IOException {
@@ -220,22 +156,11 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     }
   }
 
-  /**
-   * Gets the last sort value.
-   *
-   * @return the last sort value
-   */
   @SuppressWarnings("rawtypes")
   public final MtasDataItemNumberComparator getLastSortValue() {
     return lastSortValue;
   }
 
-  /**
-   * Gets the data.
-   *
-   * @return the data
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public final MtasDataItem<T1, T2> getData() throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
       return item;
@@ -244,11 +169,6 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuilder buffer = new StringBuilder();
@@ -257,5 +177,4 @@ public class MtasDataCollectorResult<T1 extends Number & Comparable<T1>, T2 exte
     buffer.append(")");
     return buffer.toString();
   }
-
 }

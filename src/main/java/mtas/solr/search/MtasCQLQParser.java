@@ -1,12 +1,5 @@
 package mtas.solr.search;
 
-import java.io.BufferedReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import mtas.parser.cql.MtasCQLParser;
 import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.search.Query;
@@ -15,52 +8,27 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.SyntaxError;
 
-/**
- * The Class MtasCQLQParser.
- */
+import java.io.BufferedReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+
 public class MtasCQLQParser extends QParser {
-
-  /** The Constant MTAS_CQL_QPARSER_FIELD. */
   public static final String MTAS_CQL_QPARSER_FIELD = "field";
-
-  /** The Constant MTAS_CQL_QPARSER_QUERY. */
   public static final String MTAS_CQL_QPARSER_QUERY = "query";
-
-  /** The Constant MTAS_CQL_QPARSER_IGNORE. */
   public static final String MTAS_CQL_QPARSER_IGNORE = "ignore";
-
-  /** The Constant MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH. */
   public static final String MTAS_CQL_QPARSER_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
-
-  /** The Constant MTAS_CQL_QPARSER_PREFIX. */
   public static final String MTAS_CQL_QPARSER_PREFIX = "prefix";
 
-  /** The field. */
   String field = null;
-
-  /** The cql. */
   String cql = null;
-
-  /** The ignore query. */
   String ignoreQuery = null;
-
-  /** The maximum ignore length. */
   Integer maximumIgnoreLength = null;
-
-  /** The default prefix. */
   String defaultPrefix = null;
-
-  /** The variables. */
   HashMap<String, String[]> variables = null;
 
-  /**
-   * Instantiates a new mtas CQLQ parser.
-   *
-   * @param qstr the qstr
-   * @param localParams the local params
-   * @param params the params
-   * @param req the req
-   */
   public MtasCQLQParser(String qstr, SolrParams localParams, SolrParams params,
       SolrQueryRequest req) {
     super(qstr, localParams, params, req);
@@ -115,11 +83,6 @@ public class MtasCQLQParser extends QParser {
     }    
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.solr.search.QParser#parse()
-   */
   @Override
   public Query parse() throws SyntaxError {
     if (field == null) {
@@ -151,6 +114,4 @@ public class MtasCQLQParser extends QParser {
       return q;
     }
   }
-
 }
- 

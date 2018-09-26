@@ -15,7 +15,7 @@ import mtas.codec.util.CodecComponent.ComponentFields;
  *
  * @param <T> the generic type
  */
-abstract public interface MtasSolrComponent<T extends BasicComponent> {
+public interface MtasSolrComponent<T extends BasicComponent> {
 
   /**
    * Prepare.
@@ -24,7 +24,7 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    * @param mtasFields the mtas fields
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract void prepare(ResponseBuilder rb, ComponentFields mtasFields)
+  void prepare(ResponseBuilder rb, ComponentFields mtasFields)
       throws IOException;
 
   /**
@@ -35,7 +35,7 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    * @return the simple ordered map
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract SimpleOrderedMap<Object> create(T response, Boolean encode)
+  SimpleOrderedMap<Object> create(T response, Boolean encode)
       throws IOException;
 
   /**
@@ -45,15 +45,15 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    * @param who the who
    * @param sreq the sreq
    */
-  public abstract void modifyRequest(ResponseBuilder rb, SearchComponent who,
-      ShardRequest sreq);
+  void modifyRequest(ResponseBuilder rb, SearchComponent who,
+                     ShardRequest sreq);
 
   /**
    * Finish stage.
    *
    * @param rb the rb
    */
-  public abstract void finishStage(ResponseBuilder rb);
+  void finishStage(ResponseBuilder rb);
 
   /**
    * Distributed process.
@@ -62,7 +62,7 @@ abstract public interface MtasSolrComponent<T extends BasicComponent> {
    * @param mtasFields the mtas fields
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public abstract void distributedProcess(ResponseBuilder rb,
-      ComponentFields mtasFields) throws IOException;
+  void distributedProcess(ResponseBuilder rb,
+                          ComponentFields mtasFields) throws IOException;
 
 }

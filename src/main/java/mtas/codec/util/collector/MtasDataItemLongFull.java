@@ -1,37 +1,20 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.CodecUtil;
+import org.apache.commons.lang.ArrayUtils;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang.ArrayUtils;
-import mtas.codec.util.CodecUtil;
 
-/**
- * The Class MtasDataItemLongFull.
- */
 class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
-
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The fp argument. */
   private static Pattern fpArgument = Pattern.compile("([^=,]+)=([^,]*)");
 
-  /**
-   * Instantiates a new mtas data item long full.
-   *
-   * @param value the value
-   * @param sub the sub
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param errorNumber the error number
-   * @param errorList the error list
-   * @param sourceNumber the source number
-   */
   public MtasDataItemLongFull(long[] value, MtasDataCollector<?, ?> sub,
       Set<String> statsItems, String sortType, String sortDirection,
       int errorNumber, Map<String, Integer> errorList, int sourceNumber) {
@@ -39,13 +22,6 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
         errorNumber, errorList, new MtasDataLongOperations(), sourceNumber);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataItemFull#getDistribution(java.lang.
-   * String)
-   */
   @Override
   protected HashMap<String, Object> getDistribution(String argument) {
     HashMap<String, Object> result = new LinkedHashMap<>();
@@ -140,11 +116,6 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public int compareTo(MtasDataItem<Long, Double> o) {
     int compare = 0;
@@ -157,11 +128,6 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     return sortDirection.equals(CodecUtil.SORT_DESC) ? -1 * compare : compare;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue1()
-   */
   @Override
   public MtasDataItemNumberComparator<Long> getCompareValue1() {
     createStats();
@@ -183,11 +149,6 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue2()
-   */
   @Override
   public MtasDataItemNumberComparator<Double> getCompareValue2() {
     createStats();
@@ -226,20 +187,10 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   public String toString() {
     return this.getClass().getSimpleName() + "[" + fullValues.length + "]";
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -254,16 +205,10 @@ class MtasDataItemLongFull extends MtasDataItemFull<Long, Double> {
     return (c1 != null && c2 != null && c1.equals(c2));
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ getComparableValue().hashCode();
     return h;
   }
-
 }

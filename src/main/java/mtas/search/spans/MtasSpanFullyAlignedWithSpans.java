@@ -1,58 +1,26 @@
 package mtas.search.spans;
 
+import mtas.search.spans.MtasSpanFullyAlignedWithQuery.MtasSpanFullyAlignedWithQuerySpans;
+import mtas.search.spans.util.MtasSpans;
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.spans.SpanCollector;
+
 import java.io.IOException;
 import java.util.HashSet;
 
-import org.apache.lucene.search.TwoPhaseIterator;
-import org.apache.lucene.search.spans.SpanCollector;
-import mtas.search.spans.MtasSpanFullyAlignedWithQuery.MtasSpanFullyAlignedWithQuerySpans;
-import mtas.search.spans.util.MtasSpans;
-
-/**
- * The Class MtasSpanFullyAlignedWithSpans.
- */
 public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
-
-  /** The query. */
   private MtasSpanFullyAlignedWithQuery query;
-
-  /** The spans 1. */
   private MtasSpanFullyAlignedWithQuerySpans spans1;
-
-  /** The spans 2. */
   private MtasSpanFullyAlignedWithQuerySpans spans2;
-
-  /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-
-  /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
-
-  /** The previous spans 2 start position. */
   private int previousSpans2StartPosition;
-
-  /** The previous spans 2 end positions. */
   private HashSet<Integer> previousSpans2EndPositions;
-
-  /** The called next start position. */
   private boolean calledNextStartPosition;
-
-  /** The no more positions. */
   private boolean noMorePositions;
-
-  /** The no more positions span 2. */
   private boolean noMorePositionsSpan2;
-
-  /** The doc id. */
   private int docId;
 
-  /**
-   * Instantiates a new mtas span fully aligned with spans.
-   *
-   * @param query the query
-   * @param spans1 the spans 1
-   * @param spans2 the spans 2
-   */
   public MtasSpanFullyAlignedWithSpans(MtasSpanFullyAlignedWithQuery query,
       MtasSpanFullyAlignedWithQuerySpans spans1,
       MtasSpanFullyAlignedWithQuerySpans spans2) {
@@ -64,11 +32,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     previousSpans2EndPositions = new HashSet<>();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
-   */
   @Override
   public int nextStartPosition() throws IOException {
     // no document
@@ -94,11 +57,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#startPosition()
-   */
   @Override
   public int startPosition() {
     if (calledNextStartPosition) {
@@ -112,11 +70,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#endPosition()
-   */
   @Override
   public int endPosition() {
     if (calledNextStartPosition) {
@@ -130,11 +83,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#width()
-   */
   @Override
   public int width() {
     if (calledNextStartPosition) {
@@ -148,44 +96,22 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
-   * .SpanCollector)
-   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans1.spans.collect(collector);
     spans2.spans.collect(collector);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#positionsCost()
-   */
   @Override
   public float positionsCost() {
     return 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#docID()
-   */
   @Override
   public int docID() {
     return docId;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
-   */
   @Override
   public int nextDoc() throws IOException {
     reset();
@@ -194,11 +120,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     return docId;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
-   */
   @Override
   public int advance(int target) throws IOException {
     reset();
@@ -244,12 +165,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Go to next doc.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
       return true;
@@ -274,12 +189,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Go to next start position.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition;
     int nextSpans1EndPosition;
@@ -336,9 +245,6 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     return false;
   }
 
-  /**
-   * Reset.
-   */
   private void reset() {
     calledNextStartPosition = false;
     noMorePositions = false;
@@ -349,21 +255,11 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
     previousSpans2EndPositions.clear();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#cost()
-   */
   @Override
   public long cost() {
     return 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
-   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
     if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
@@ -373,5 +269,4 @@ public class MtasSpanFullyAlignedWithSpans extends MtasSpans {
       return null;
     }
   }
-
 }

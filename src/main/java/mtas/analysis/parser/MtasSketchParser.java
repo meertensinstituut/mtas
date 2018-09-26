@@ -22,28 +22,13 @@ import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
 
-/**
- * The Class MtasSketchParser.
- */
 final public class MtasSketchParser extends MtasBasicParser {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasSketchParser.class);
 
-  /** The word type. */
   private MtasParserType<MtasParserMapping<?>> wordType = null;
-
-  /** The word annotation types. */
   private HashMap<Integer, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<>();
-
-  /** The group types. */
   private HashMap<String, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<>();
 
-  /**
-   * Instantiates a new mtas sketch parser.
-   *
-   * @param config the config
-   */
   public MtasSketchParser(MtasConfiguration config) {
     super(config);
     autorepair = true;
@@ -55,11 +40,6 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#initParser()
-   */
   @Override
   protected void initParser() throws MtasConfigException {
     super.initParser();
@@ -119,11 +99,6 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#createTokenCollection(java.io.Reader)
-   */
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
       throws MtasParserException, MtasConfigException {
@@ -338,11 +313,6 @@ final public class MtasSketchParser extends MtasBasicParser {
     return tokenCollection;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.analysis.parser.MtasParser#printConfig()
-   */
   @Override
   public String printConfig() {
     StringBuilder text = new StringBuilder();
@@ -353,12 +323,6 @@ final public class MtasSketchParser extends MtasBasicParser {
     return text.toString();
   }
 
-  /**
-   * Prints the config types.
-   *
-   * @param types the types
-   * @return the string
-   */
   private String printConfigTypes(
       HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     StringBuilder text = new StringBuilder();
@@ -373,15 +337,8 @@ final public class MtasSketchParser extends MtasBasicParser {
     return text.toString();
   }
 
-  /**
-   * The Class MtasSketchParserMappingWord.
-   */
   private class MtasSketchParserMappingWord
       extends MtasParserMapping<MtasSketchParserMappingWord> {
-
-    /**
-     * Instantiates a new mtas sketch parser mapping word.
-     */
     public MtasSketchParserMappingWord() {
       super();
       this.position = SOURCE_OWN;
@@ -390,26 +347,14 @@ final public class MtasSketchParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_WORD;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasBasicParser.MtasParserMapping#self()
-     */
     @Override
     protected MtasSketchParserMappingWord self() {
       return this;
     }
   }
 
-  /**
-   * The Class MtasSketchParserMappingWordAnnotation.
-   */
   private class MtasSketchParserMappingWordAnnotation
       extends MtasParserMapping<MtasSketchParserMappingWordAnnotation> {
-
-    /**
-     * Instantiates a new mtas sketch parser mapping word annotation.
-     */
     public MtasSketchParserMappingWordAnnotation() {
       super();
       this.position = SOURCE_OWN;
@@ -418,26 +363,14 @@ final public class MtasSketchParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_WORD_ANNOTATION;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasParser.MtasParserMapping#self()
-     */
     @Override
     protected MtasSketchParserMappingWordAnnotation self() {
       return this;
     }
   }
 
-  /**
-   * The Class MtasSketchParserMappingGroup.
-   */
   private class MtasSketchParserMappingGroup
       extends MtasParserMapping<MtasSketchParserMappingGroup> {
-
-    /**
-     * Instantiates a new mtas sketch parser mapping group.
-     */
     public MtasSketchParserMappingGroup() {
       super();
       this.position = SOURCE_OWN;
@@ -446,15 +379,9 @@ final public class MtasSketchParser extends MtasBasicParser {
       this.type = MAPPING_TYPE_GROUP;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see mtas.analysis.parser.MtasFoliaParser.MtasFoliaParserMapping#self()
-     */
     @Override
     protected MtasSketchParserMappingGroup self() {
       return this;
     }
   }
-
 }

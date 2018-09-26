@@ -18,32 +18,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * The Class MtasFetchData.
- */
 public class MtasFetchData {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasFetchData.class);
 
-  /** The reader. */
   Reader reader;
 
-  /**
-   * Instantiates a new mtas fetch data.
-   *
-   * @param input the input
-   */
   public MtasFetchData(Reader input) {
     reader = input;
   }
 
-  /**
-   * Gets the string.
-   *
-   * @return the string
-   * @throws MtasParserException the mtas parser exception
-   */
   private String getString() throws MtasParserException {
     String text = null;
     BufferedReader bufferedReader = new BufferedReader(reader, 2048);
@@ -57,14 +40,6 @@ public class MtasFetchData {
     }
   }
 
-  /**
-   * Gets the url.
-   *
-   * @param prefix the prefix
-   * @param postfix the postfix
-   * @return the url
-   * @throws MtasParserException the mtas parser exception
-   */
   public Reader getUrl(String prefix, String postfix)
       throws MtasParserException {
     String url = getString();
@@ -103,14 +78,6 @@ public class MtasFetchData {
     }
   }
 
-  /**
-   * Gets the file.
-   *
-   * @param prefix the prefix
-   * @param postfix the postfix
-   * @return the file
-   * @throws MtasParserException the mtas parser exception
-   */
   public Reader getFile(String prefix, String postfix)
       throws MtasParserException {
     String file = getString();
@@ -144,13 +111,7 @@ public class MtasFetchData {
     }
   }
 
-  /**
-   * Gets the default.
-   *
-   * @return the default
-   */
   public Reader getDefault() {
     return reader;
   }
-
 }

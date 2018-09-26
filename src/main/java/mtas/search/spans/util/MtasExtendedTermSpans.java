@@ -18,16 +18,12 @@ import org.apache.lucene.search.spans.TermSpans;
  */
 public class MtasExtendedTermSpans extends TermSpans {
 
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasExtendedTermSpans.class);
 
-  /** The mtas position. */
   protected MtasPosition mtasPosition = null;
 
-  /** The assume single position. */
   private boolean assumeSinglePosition;
 
-  /** The payload span collector. */
   private PayloadSpanCollector payloadSpanCollector;
 
   /**

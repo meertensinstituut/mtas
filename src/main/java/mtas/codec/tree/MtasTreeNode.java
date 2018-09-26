@@ -2,37 +2,18 @@ package mtas.codec.tree;
 
 import java.util.HashMap;
 
-/**
- * The Class MtasTreeNode.
- *
- * @param <N> the number type
- */
 abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
-
-  /** The left. */
   public int left;
-
-  /** The right. */
   public int right;
-
-  /** The max. */
   public int max;
 
-  /** The left child. */
   public N leftChild;
-
-  /** The right child. */
   public N rightChild;
 
-  /** The ids. */
   public HashMap<Integer, MtasTreeNodeId> ids;
 
-  // node with start and end position
   /**
-   * Instantiates a new mtas tree node.
-   *
-   * @param left the left
-   * @param right the right
+   * node with start and end position
    */
   public MtasTreeNode(int left, int right) {
     this.left = left;
@@ -41,14 +22,8 @@ abstract public class MtasTreeNode<N extends MtasTreeNode<N>> {
     this.ids = new HashMap<Integer, MtasTreeNodeId>();
   }
 
-  // add id to node
   /**
-   * Adds the id and ref.
-   *
-   * @param id the id
-   * @param ref the ref
-   * @param additionalId the additional id
-   * @param additionalRef the additional ref
+   * add id to node
    */
   final public void addIdAndRef(Integer id, Long ref, int additionalId,
       long additionalRef) {

@@ -34,96 +34,66 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentFacet
     implements MtasSolrComponent<ComponentFacet> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentFacet.class);
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant NAME. */
   public static final String NAME = "facet";
 
-  /** The Constant PARAM_MTAS_FACET. */
   public static final String PARAM_MTAS_FACET = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_FACET_KEY. */
   public static final String NAME_MTAS_FACET_KEY = "key";
 
-  /** The Constant NAME_MTAS_FACET_FIELD. */
   public static final String NAME_MTAS_FACET_FIELD = "field";
 
-  /** The Constant NAME_MTAS_FACET_QUERY. */
   private static final String NAME_MTAS_FACET_QUERY = "query";
 
-  /** The Constant NAME_MTAS_FACET_BASE. */
   private static final String NAME_MTAS_FACET_BASE = "base";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_TYPE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_TYPE = "type";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_VALUE = "value";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_PREFIX. */
   public static final String SUBNAME_MTAS_FACET_QUERY_PREFIX = "prefix";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_IGNORE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_IGNORE = "ignore";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_MAXIMUM_IGNORE_LENGTH. */
   public static final String SUBNAME_MTAS_FACET_QUERY_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_VARIABLE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_VARIABLE = "variable";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_FACET_QUERY_VARIABLE_NAME = "name";
 
-  /** The Constant SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_FACET_QUERY_VARIABLE_VALUE = "value";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_FIELD. */
   public static final String SUBNAME_MTAS_FACET_BASE_FIELD = "field";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_TYPE = "type";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_SORT_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_SORT_TYPE = "sort.type";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION. */
   public static final String SUBNAME_MTAS_FACET_BASE_SORT_DIRECTION = "sort.direction";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_NUMBER. */
   public static final String SUBNAME_MTAS_FACET_BASE_NUMBER = "number";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_MINIMUM. */
   public static final String SUBNAME_MTAS_FACET_BASE_MINIMUM = "minimum";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_MAXIMUM. */
   public static final String SUBNAME_MTAS_FACET_BASE_MAXIMUM = "maximum";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION = "function";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION_KEY. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION_KEY = "key";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION_EXPRESSION. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION_EXPRESSION = "expression";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE. */
   public static final String SUBNAME_MTAS_FACET_BASE_FUNCTION_TYPE = "type";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_RANGE. */
   public static final String SUBNAME_MTAS_FACET_BASE_RANGE = "range";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_RANGE_SIZE. */
   public static final String SUBNAME_MTAS_FACET_BASE_RANGE_SIZE = "size";
 
-  /** The Constant SUBNAME_MTAS_FACET_BASE_RANGE_BASE. */
   public static final String SUBNAME_MTAS_FACET_BASE_RANGE_BASE = "base";
 
   /**

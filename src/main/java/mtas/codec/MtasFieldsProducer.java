@@ -1,17 +1,5 @@
 package mtas.codec;
 
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.codecs.CodecUtil;
@@ -25,33 +13,25 @@ import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.Accountables;
 
-/**
- * The Class MtasFieldsProducer.
- */
+import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
 public class MtasFieldsProducer extends FieldsProducer {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasFieldsProducer.class);
-
-  /** The delegate fields producer. */
   private FieldsProducer delegateFieldsProducer;
-
-  /** The index input list. */
   private HashMap<String, IndexInput> indexInputList;
-
-  /** The index input offset list. */
   private HashMap<String, Long> indexInputOffsetList;
-
-  /** The version. */
   private int version;
 
-  /**
-   * Instantiates a new mtas fields producer.
-   *
-   * @param state the state
-   * @param name the name
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasFieldsProducer(SegmentReadState state, String name)
       throws IOException {
     String postingsFormatName = null;
@@ -101,15 +81,6 @@ public class MtasFieldsProducer extends FieldsProducer {
         .fieldsProducer(state);      
   }
 
-  /**
-   * Adds the index input to list.
-   *
-   * @param name the name
-   * @param in the in
-   * @param postingsFormatName the postings format name
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private String addIndexInputToList(String name, IndexInput in,
       String postingsFormatName) throws IOException {
     if (indexInputList.get(name) != null) {
@@ -132,21 +103,11 @@ public class MtasFieldsProducer extends FieldsProducer {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.index.Fields#iterator()
-   */
   @Override
   public Iterator<String> iterator() {
     return delegateFieldsProducer.iterator();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.codecs.FieldsProducer#close()
-   */
   @Override
   public void close() throws IOException {
     delegateFieldsProducer.close();
@@ -155,43 +116,23 @@ public class MtasFieldsProducer extends FieldsProducer {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.index.Fields#terms(java.lang.String)
-   */
   @Override
   public Terms terms(String field) throws IOException {
     return new MtasTerms(delegateFieldsProducer.terms(field), indexInputList,
         indexInputOffsetList, version);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.index.Fields#size()
-   */
   @Override
   public int size() {
     return delegateFieldsProducer.size();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.util.Accountable#ramBytesUsed()
-   */
   @Override
   public long ramBytesUsed() {
     // return BASE_RAM_BYTES_USED + delegateFieldsProducer.ramBytesUsed();
     return 3 * delegateFieldsProducer.ramBytesUsed();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.util.Accountable#getChildResources()
-   */
   @Override
   public Collection<Accountable> getChildResources() {
     List<Accountable> resources = new ArrayList<>();
@@ -202,38 +143,17 @@ public class MtasFieldsProducer extends FieldsProducer {
     return Collections.unmodifiableList(resources);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.codecs.FieldsProducer#checkIntegrity()
-   */
   @Override
   public void checkIntegrity() throws IOException {
     delegateFieldsProducer.checkIntegrity();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return getClass().getSimpleName() + "(delegate=" + delegateFieldsProducer
         + ")";
   }
 
-  /**
-   * Open mtas file.
-   *
-   * @param state the state
-   * @param name the name
-   * @param extension the extension
-   * @param minimum the minimum
-   * @param maximum the maximum
-   * @return the index input
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension, Integer minimum, Integer maximum) throws IOException {
     String fileName = IndexFileNames.segmentFileName(state.segmentInfo.name,
@@ -267,18 +187,8 @@ public class MtasFieldsProducer extends FieldsProducer {
     return object;
   }
 
-  /**
-   * Open mtas file.
-   *
-   * @param state the state
-   * @param name the name
-   * @param extension the extension
-   * @return the index input
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private IndexInput openMtasFile(SegmentReadState state, String name,
       String extension) throws IOException {
     return openMtasFile(state, name, extension, null, null);
   }
-
 }

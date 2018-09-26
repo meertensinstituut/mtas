@@ -37,121 +37,85 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentStats
     implements MtasSolrComponent<ComponentStats> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentStats.class);
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant NAME. */
   public static final String NAME = "stats";
   
   public static final String NAME_POSITIONS = "positions";
   public static final String NAME_TOKENS = "tokens";
   public static final String NAME_SPANS = "spans";
 
-  /** The Constant PARAM_MTAS_STATS. */
   public static final String PARAM_MTAS_STATS = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant PARAM_MTAS_STATS_POSITIONS. */
   public static final String PARAM_MTAS_STATS_POSITIONS = PARAM_MTAS_STATS
       + "." + NAME_POSITIONS;
 
-  /** The Constant NAME_MTAS_STATS_POSITIONS_FIELD. */
   public static final String NAME_MTAS_STATS_POSITIONS_FIELD = "field";
 
-  /** The Constant NAME_MTAS_STATS_POSITIONS_KEY. */
   public static final String NAME_MTAS_STATS_POSITIONS_KEY = "key";
 
-  /** The Constant NAME_MTAS_STATS_POSITIONS_TYPE. */
   public static final String NAME_MTAS_STATS_POSITIONS_TYPE = "type";
 
-  /** The Constant NAME_MTAS_STATS_POSITIONS_MINIMUM. */
   public static final String NAME_MTAS_STATS_POSITIONS_MINIMUM = "minimum";
 
-  /** The Constant NAME_MTAS_STATS_POSITIONS_MAXIMUM. */
   public static final String NAME_MTAS_STATS_POSITIONS_MAXIMUM = "maximum";
 
-  /** The Constant PARAM_MTAS_STATS_TOKENS. */
   public static final String PARAM_MTAS_STATS_TOKENS = PARAM_MTAS_STATS
       + "." + NAME_TOKENS;
 
-  /** The Constant NAME_MTAS_STATS_TOKENS_FIELD. */
   public static final String NAME_MTAS_STATS_TOKENS_FIELD = "field";
 
-  /** The Constant NAME_MTAS_STATS_TOKENS_KEY. */
   public static final String NAME_MTAS_STATS_TOKENS_KEY = "key";
 
-  /** The Constant NAME_MTAS_STATS_TOKENS_TYPE. */
   public static final String NAME_MTAS_STATS_TOKENS_TYPE = "type";
 
-  /** The Constant NAME_MTAS_STATS_TOKENS_MINIMUM. */
   public static final String NAME_MTAS_STATS_TOKENS_MINIMUM = "minimum";
 
-  /** The Constant NAME_MTAS_STATS_TOKENS_MAXIMUM. */
   public static final String NAME_MTAS_STATS_TOKENS_MAXIMUM = "maximum";
 
-  /** The Constant PARAM_MTAS_STATS_SPANS. */
   public static final String PARAM_MTAS_STATS_SPANS = PARAM_MTAS_STATS
       + "." + NAME_SPANS;
 
-  /** The Constant NAME_MTAS_STATS_SPANS_FIELD. */
   public static final String NAME_MTAS_STATS_SPANS_FIELD = "field";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_QUERY. */
   public static final String NAME_MTAS_STATS_SPANS_QUERY = "query";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_EXPAND. */
   public static final String NAME_MTAS_STATS_SPANS_EXPAND = "expand";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_KEY. */
   public static final String NAME_MTAS_STATS_SPANS_KEY = "key";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_TYPE. */
   public static final String NAME_MTAS_STATS_SPANS_TYPE = "type";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_MINIMUM. */
   public static final String NAME_MTAS_STATS_SPANS_MINIMUM = "minimum";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_MAXIMUM. */
   public static final String NAME_MTAS_STATS_SPANS_MAXIMUM = "maximum";
 
-  /** The Constant NAME_MTAS_STATS_SPANS_FUNCTION. */
   public static final String NAME_MTAS_STATS_SPANS_FUNCTION = "function";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION. */
   public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_EXPRESSION = "expression";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY. */
   public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_KEY = "key";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_FUNCTION_TYPE = "type";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_TYPE = "type";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VALUE = "value";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_IGNORE = "ignore";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_MAXIMUM_IGNORE_LENGTH = "maximumIgnoreLength";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_PREFIX = "prefix";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE = "variable";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_NAME = "name";
 
-  /** The Constant SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_STATS_SPANS_QUERY_VARIABLE_VALUE = "value";
 
   /**
@@ -478,12 +442,8 @@ public class MtasSolrComponentStats
           throw new IOException("no " + NAME_MTAS_STATS_SPANS_QUERY
               + " for mtas stats span " + id);
         }
-        if (rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + "." + id + "."
-            + NAME_MTAS_STATS_SPANS_EXPAND, false)) {
-          expand[tmpCounter] = true;
-        } else {
-          expand[tmpCounter] = false;
-        }
+        expand[tmpCounter] = rb.req.getParams().getBool(PARAM_MTAS_STATS_SPANS + "." + id + "."
+          + NAME_MTAS_STATS_SPANS_EXPAND, false);
         tmpCounter++;
       }
       String uniqueKeyField = rb.req.getSchema().getUniqueKeyField().getName();

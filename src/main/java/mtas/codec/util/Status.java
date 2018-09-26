@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Status {
-  
   public final static String TYPE_SEGMENT = "segment";
 
   public final static String KEY_NUMBER = "number";
@@ -55,8 +54,8 @@ public class Status {
       addSub(subItem);
     }
   }
-  
-  public void addSub(String subItem) {
+
+  private void addSub(String subItem) {
     if(!subNumberSegmentsFinished.containsKey(subItem)) {
       subNumberSegmentsFinished.put(subItem, 0);
       if(numberSegmentsTotal!=null) {
@@ -64,7 +63,7 @@ public class Status {
       }
     }
     if(!subNumberDocumentsFinished.containsKey(subItem)) {
-      subNumberDocumentsFinished.put(subItem, Long.valueOf(0));
+      subNumberDocumentsFinished.put(subItem, 0L);
       if(numberDocumentsTotal!=null) {
         subNumberDocumentsTotal += numberDocumentsTotal;
       }

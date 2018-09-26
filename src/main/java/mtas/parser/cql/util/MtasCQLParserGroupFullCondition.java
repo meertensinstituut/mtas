@@ -5,33 +5,14 @@ import mtas.search.spans.MtasSpanEndQuery;
 import mtas.search.spans.MtasSpanStartQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
-/**
- * The Class MtasCQLParserGroupFullCondition.
- */
-public class MtasCQLParserGroupFullCondition
-    extends MtasCQLParserBasicSentencePartCondition {
-
-  /** The Constant GROUP_FULL. */
+public class MtasCQLParserGroupFullCondition extends MtasCQLParserBasicSentencePartCondition {
   public static final String GROUP_FULL = "full";
-
-  /** The Constant GROUP_START. */
   public static final String GROUP_START = "start";
-
-  /** The Constant GROUP_END. */
   public static final String GROUP_END = "end";
 
-  /** The group condition. */
   private MtasCQLParserGroupCondition groupCondition;
-
-  /** The type. */
   private String type;
 
-  /**
-   * Instantiates a new mtas CQL parser group full condition.
-   *
-   * @param condition the condition
-   * @param type the type
-   */
   public MtasCQLParserGroupFullCondition(MtasCQLParserGroupCondition condition,
       String type) {
     minimumOccurence = 1;
@@ -48,44 +29,20 @@ public class MtasCQLParserGroupFullCondition
     }
   }
 
-  /**
-   * Gets the condition.
-   *
-   * @return the condition
-   */
   public MtasCQLParserGroupCondition getCondition() {
     return groupCondition;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#
-   * getMinimumOccurence()
-   */
   @Override
   public int getMinimumOccurence() {
     return minimumOccurence;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#
-   * getMaximumOccurence()
-   */
   @Override
   public int getMaximumOccurence() {
     return maximumOccurence;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#setOccurence(
-   * int, int)
-   */
   @Override
   public void setOccurence(int min, int max) throws ParseException {
     if ((min < 0) || (min > max) || (max < 1)) {
@@ -98,35 +55,16 @@ public class MtasCQLParserGroupFullCondition
     maximumOccurence = max;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#isOptional()
-   */
   @Override
   public boolean isOptional() {
     return optional;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#setOptional(
-   * boolean)
-   */
   @Override
   public void setOptional(boolean status) {
     optional = status;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#getQuery()
-   */
   @Override
   public MtasSpanQuery getQuery() throws ParseException {
     if (type.equals(MtasCQLParserGroupFullCondition.GROUP_START)) {
@@ -138,11 +76,6 @@ public class MtasCQLParserGroupFullCondition
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object object) {
     if (object == null)
@@ -156,11 +89,6 @@ public class MtasCQLParserGroupFullCondition
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -168,5 +96,4 @@ public class MtasCQLParserGroupFullCondition
     h = (h * 7) ^ type.hashCode();
     return h;
   }
-
 }

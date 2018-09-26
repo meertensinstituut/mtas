@@ -1,48 +1,22 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-
-import org.apache.lucene.search.TwoPhaseIterator;
-import org.apache.lucene.search.spans.SpanCollector;
 import mtas.search.spans.MtasSpanIntersectingQuery.MtasSpanIntersectingQuerySpans;
 import mtas.search.spans.util.MtasSpans;
+import org.apache.lucene.search.TwoPhaseIterator;
+import org.apache.lucene.search.spans.SpanCollector;
 
-/**
- * The Class MtasSpanIntersectingSpans.
- */
+import java.io.IOException;
+
 public class MtasSpanIntersectingSpans extends MtasSpans {
-
-  /** The query. */
   private MtasSpanIntersectingQuery query;
-
-  /** The spans 1. */
   private MtasSpanIntersectingQuerySpans spans1;
-
-  /** The spans 2. */
   private MtasSpanIntersectingQuerySpans spans2;
-
-  /** The called next start position. */
   private boolean calledNextStartPosition;
-
-  /** The no more positions. */
   private boolean noMorePositions;
-
-  /** The last spans 2 start position. */
   private int lastSpans2StartPosition;
-
-  /** The last spans 2 end position. */
   private int lastSpans2EndPosition;
-
-  /** The doc id. */
   private int docId;
 
-  /**
-   * Instantiates a new mtas span intersecting spans.
-   *
-   * @param query the query
-   * @param spans1 the spans 1
-   * @param spans2 the spans 2
-   */
   public MtasSpanIntersectingSpans(MtasSpanIntersectingQuery query,
       MtasSpanIntersectingQuerySpans spans1,
       MtasSpanIntersectingQuerySpans spans2) {
@@ -53,11 +27,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     this.spans2 = spans2;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#nextStartPosition()
-   */
   @Override
   public int nextStartPosition() throws IOException {
     // no document
@@ -83,11 +52,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#startPosition()
-   */
   @Override
   public int startPosition() {
     return calledNextStartPosition
@@ -95,11 +59,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
         : -1;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#endPosition()
-   */
   @Override
   public int endPosition() {
     return calledNextStartPosition
@@ -107,55 +66,28 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
         : -1;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#width()
-   */
   @Override
   public int width() {
     return calledNextStartPosition ? (noMorePositions ? 0
         : spans1.spans.endPosition() - spans1.spans.startPosition()) : 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.Spans#collect(org.apache.lucene.search.spans
-   * .SpanCollector)
-   */
   @Override
   public void collect(SpanCollector collector) throws IOException {
     spans1.spans.collect(collector);
     spans2.spans.collect(collector);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.Spans#positionsCost()
-   */
   @Override
   public float positionsCost() {
     return 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#docID()
-   */
   @Override
   public int docID() {
     return docId;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
-   */
   @Override
   public int nextDoc() throws IOException {
     reset();
@@ -164,11 +96,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     return docId;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
-   */
   @Override
   public int advance(int target) throws IOException {
     reset();
@@ -214,12 +141,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Go to next doc.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private boolean goToNextDoc() throws IOException {
     if (docId == NO_MORE_DOCS) {
       return true;
@@ -246,12 +167,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     }
   }
 
-  /**
-   * Go to next start position.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private boolean goToNextStartPosition() throws IOException {
     int nextSpans1StartPosition;
     int nextSpans1EndPosition;
@@ -290,9 +205,6 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     return false;
   }
 
-  /**
-   * Reset.
-   */
   private void reset() {
     calledNextStartPosition = false;
     noMorePositions = false;
@@ -300,21 +212,11 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
     lastSpans2EndPosition = -1;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.DocIdSetIterator#cost()
-   */
   @Override
   public long cost() {
     return 0;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpans#asTwoPhaseIterator()
-   */
   @Override
   public TwoPhaseIterator asTwoPhaseIterator() {
     if (spans1 == null || spans2 == null || !query.twoPhaseIteratorAllowed()) {
@@ -324,5 +226,4 @@ public class MtasSpanIntersectingSpans extends MtasSpans {
       return null;
     }
   }
-
 }

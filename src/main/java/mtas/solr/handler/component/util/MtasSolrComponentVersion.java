@@ -27,7 +27,6 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrComponentVersion implements MtasSolrComponent<ComponentVersion> {
 
-	/** The Constant log. */
 	private static final Log log = LogFactory.getLog(MtasSolrComponentVersion.class);
 
 	/** The search component. */
@@ -41,10 +40,8 @@ public class MtasSolrComponentVersion implements MtasSolrComponent<ComponentVers
 
 	String propertyTimestamp = null;
 
-	/** The Constant NAME. */
 	public static final String NAME = "version";
 
-	/** The Constant PARAM_MTAS_VERSION. */
 	public static final String PARAM_MTAS_VERSION = MtasSolrSearchComponent.PARAM_MTAS + "." + NAME;
 
 	public static final String NAME_MTAS_VERSION_VERSION = "version";

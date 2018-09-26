@@ -19,21 +19,16 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentStatus
     implements MtasSolrComponent<ComponentStatus> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentStatus.class);
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant NAME. */
   public static final String NAME = "status";
 
-  /** The Constant PARAM_MTAS_STATUS. */
   public static final String PARAM_MTAS_STATUS = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_STATUS_KEY. */
   public static final String NAME_MTAS_STATUS_KEY = "key";
 
   public static final String NAME_MTAS_STATUS_MTASHANDLER = "mtasHandler";

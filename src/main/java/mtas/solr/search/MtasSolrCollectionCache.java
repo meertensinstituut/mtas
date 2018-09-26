@@ -1,5 +1,14 @@
 package mtas.solr.search;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.automaton.Automata;
+import org.apache.lucene.util.automaton.Automaton;
+import org.apache.solr.common.util.Base64;
+import org.apache.solr.common.util.SimpleOrderedMap;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,62 +36,23 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.automaton.Automata;
-import org.apache.lucene.util.automaton.Automaton;
-import org.apache.solr.common.util.Base64;
-import org.apache.solr.common.util.SimpleOrderedMap;
 
-/**
- * The Class MtasSolrCollectionCache.
- */
 public class MtasSolrCollectionCache {
-
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrCollectionCache.class);
 
-  /** The Constant DEFAULT_LIFETIME. */
   private static final long DEFAULT_LIFETIME = 86400;
-
-  /** The Constant DEFAULT_MAXIMUM_NUMBER. */
   private static final int DEFAULT_MAXIMUM_NUMBER = 1000;
-
-  /** The Constant DEFAULT_MAXIMUM_OVERFLOW. */
   private static final int DEFAULT_MAXIMUM_OVERFLOW = 10;
 
-  /** The id to version. */
   private Map<String, String> idToVersion;
-
-  /** The version to item. */
   private Map<String, MtasSolrCollectionCacheItem> versionToItem;
-
-  /** The expiration version. */
   private Map<String, Long> expirationVersion;
-
-  /** The collection cache path. */
   private Path collectionCachePath;
-
-  /** The life time. */
   private long lifeTime;
-
-  /** The maximum number. */
   private int maximumNumber;
-
-  /** The maximum overflow. */
   private int maximumOverflow;
 
-  /**
-   * Instantiates a new mtas solr collection cache.
-   *
-   * @param cacheDirectory the cache directory
-   * @param lifeTime the life time
-   * @param maximumNumber the maximum number
-   * @param maximumOverflow the maximum overflow
-   */
   public MtasSolrCollectionCache(String cacheDirectory, Long lifeTime,
       Integer maximumNumber, Integer maximumOverflow) {
     this.lifeTime = (lifeTime != null && lifeTime > 0) ? lifeTime
@@ -139,27 +109,10 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Creates the.
-   *
-   * @param size the size
-   * @param data the data
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String create(Integer size, HashSet<String> data) throws IOException {
     return create(null, size, data, null);
   }
 
-  /**
-   * Creates the.
-   *
-   * @param id the id
-   * @param size the size
-   * @param data the data
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String create(String id, Integer size, HashSet<String> data, String originalVersion)
       throws IOException {
     if (collectionCachePath != null) {
@@ -191,7 +144,7 @@ public class MtasSolrCollectionCache {
       File file = collectionCachePath.resolve(version).toFile();
       try (OutputStream outputStream = new FileOutputStream(file);
           Writer outputStreamWriter = new OutputStreamWriter(outputStream,
-              StandardCharsets.UTF_8);) {
+            StandardCharsets.UTF_8)) {
         outputStreamWriter.write(encode(item));
         // set correct time to reconstruct administration on restart
         if (!file.setLastModified(date.getTime())) {
@@ -212,11 +165,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * List.
-   *
-   * @return the list
-   */
   public List<SimpleOrderedMap<Object>> list() {
     List<SimpleOrderedMap<Object>> list = new ArrayList<>();
     for (Entry<String, String> entry : idToVersion.entrySet()) {
@@ -230,13 +178,6 @@ public class MtasSolrCollectionCache {
     return list;
   }
 
-  /**
-   * Check.
-   *
-   * @param id the id
-   * @return the simple ordered map
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public SimpleOrderedMap<Object> check(String id) throws IOException {
     if (idToVersion.containsKey(id)) {
       String version = idToVersion.get(id);
@@ -262,22 +203,10 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Now.
-   *
-   * @return the long
-   */
   public long now() {
     return clear().getTime();
   }
 
-  /**
-   * Gets the data by id.
-   *
-   * @param id the id
-   * @return the data by id
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public HashSet<String> getDataById(String id) throws IOException {
     if (idToVersion.containsKey(id)) {
       return get(id);
@@ -286,13 +215,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Gets the automaton by id.
-   *
-   * @param id the id
-   * @return the automaton by id
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public Automaton getAutomatonById(String id) throws IOException {
     if (idToVersion.containsKey(id)) {
       List<BytesRef> bytesArray = new ArrayList<>();
@@ -310,11 +232,6 @@ public class MtasSolrCollectionCache {
     return null;
   }
 
-  /**
-   * Delete by id.
-   *
-   * @param id the id
-   */
   public void deleteById(String id) {
     if (idToVersion.containsKey(id)) {
       String version = idToVersion.remove(id);
@@ -327,13 +244,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Gets the.
-   *
-   * @param id the id
-   * @return the hash set
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private HashSet<String> get(String id) throws IOException {
     if (collectionCachePath != null) {
       Date date = clear();
@@ -364,13 +274,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Read.
-   *
-   * @param version the version
-   * @param time the time
-   * @return the mtas solr collection cache item
-   */
   private MtasSolrCollectionCacheItem read(String version, Long time) {
     try {
       Path path = collectionCachePath.resolve(version);
@@ -392,13 +295,6 @@ public class MtasSolrCollectionCache {
     return null;
   }
 
-  /**
-   * Verify.
-   *
-   * @param version the version
-   * @param time the time
-   * @return true, if successful
-   */
   private boolean verify(String version, Long time) {
     if (versionToItem.containsKey(version)) {
       Path path = collectionCachePath.resolve(version);
@@ -420,11 +316,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Clear.
-   *
-   * @return the date
-   */
   private Date clear() {
     Date date = new Date();
     Long timestamp = date.getTime();
@@ -469,13 +360,6 @@ public class MtasSolrCollectionCache {
     return date;
   }
 
-  /**
-   * Encode.
-   *
-   * @param o the o
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private String encode(MtasSolrCollectionCacheItem o) throws IOException {
     if (o != null) {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -490,13 +374,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Decode.
-   *
-   * @param s the s
-   * @return the mtas solr collection cache item
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private MtasSolrCollectionCacheItem decode(String s) throws IOException {
     byte[] bytes = Base64.base64ToByteArray(s);
     ObjectInputStream objectInputStream;
@@ -513,9 +390,6 @@ public class MtasSolrCollectionCache {
     }
   }
 
-  /**
-   * Empty.
-   */
   public void empty() {
     for (Entry<String, String> entry : idToVersion.entrySet()) {
       expirationVersion.remove(entry.getValue());
@@ -531,10 +405,6 @@ public class MtasSolrCollectionCache {
 }
 
 class MtasSolrCollectionCacheItem implements Serializable {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
   public String id;
   public Integer size;

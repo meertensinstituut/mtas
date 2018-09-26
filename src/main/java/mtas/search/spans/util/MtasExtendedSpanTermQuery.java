@@ -28,16 +28,12 @@ import org.apache.lucene.search.spans.Spans;
  */
 public class MtasExtendedSpanTermQuery extends SpanTermQuery {
 
-  /** The prefix. */
   private String prefix;
 
-  /** The value. */
   private String value;
 
-  /** The single position. */
   private boolean singlePosition;
 
-  /** The local term. */
   private Term localTerm;
 
   /**
@@ -107,10 +103,8 @@ public class MtasExtendedSpanTermQuery extends SpanTermQuery {
    */
   public class SpanTermWeight extends SpanWeight {
 
-    /** The Constant METHOD_GET_DELEGATE. */
     private static final String METHOD_GET_DELEGATE = "getDelegate";
 
-    /** The term context. */
     final TermContext termContext;
 
     /**

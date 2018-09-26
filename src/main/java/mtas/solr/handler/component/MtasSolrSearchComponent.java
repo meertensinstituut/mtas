@@ -1,19 +1,10 @@
 package mtas.solr.handler.component;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Map.Entry;
-
+import mtas.codec.util.CodecComponent.ComponentCollection;
 import mtas.codec.util.CodecComponent.ComponentDocument;
 import mtas.codec.util.CodecComponent.ComponentFacet;
 import mtas.codec.util.CodecComponent.ComponentFields;
 import mtas.codec.util.CodecComponent.ComponentGroup;
-import mtas.codec.util.CodecComponent.ComponentCollection;
 import mtas.codec.util.CodecComponent.ComponentKwic;
 import mtas.codec.util.CodecComponent.ComponentList;
 import mtas.codec.util.CodecComponent.ComponentPosition;
@@ -22,16 +13,12 @@ import mtas.codec.util.CodecComponent.ComponentTermVector;
 import mtas.codec.util.CodecComponent.ComponentToken;
 import mtas.codec.util.CodecUtil;
 import mtas.codec.util.Status;
-import mtas.solr.handler.component.util.MtasSolrResultMerge;
-import mtas.solr.handler.util.MtasSolrStatus;
-import mtas.solr.handler.util.MtasSolrStatus.ShardStatus;
-import mtas.solr.search.MtasSolrCollectionCache;
-import mtas.solr.handler.component.util.MtasSolrComponentDocument;
-import mtas.solr.handler.component.util.MtasSolrComponentFacet;
-import mtas.solr.handler.component.util.MtasSolrComponentGroup;
 import mtas.solr.handler.MtasRequestHandler;
 import mtas.solr.handler.MtasRequestHandler.ShardInformation;
 import mtas.solr.handler.component.util.MtasSolrComponentCollection;
+import mtas.solr.handler.component.util.MtasSolrComponentDocument;
+import mtas.solr.handler.component.util.MtasSolrComponentFacet;
+import mtas.solr.handler.component.util.MtasSolrComponentGroup;
 import mtas.solr.handler.component.util.MtasSolrComponentKwic;
 import mtas.solr.handler.component.util.MtasSolrComponentList;
 import mtas.solr.handler.component.util.MtasSolrComponentPrefix;
@@ -39,7 +26,10 @@ import mtas.solr.handler.component.util.MtasSolrComponentStats;
 import mtas.solr.handler.component.util.MtasSolrComponentStatus;
 import mtas.solr.handler.component.util.MtasSolrComponentTermvector;
 import mtas.solr.handler.component.util.MtasSolrComponentVersion;
-
+import mtas.solr.handler.component.util.MtasSolrResultMerge;
+import mtas.solr.handler.util.MtasSolrStatus;
+import mtas.solr.handler.util.MtasSolrStatus.ShardStatus;
+import mtas.solr.search.MtasSolrCollectionCache;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.ExitableDirectoryReader;
@@ -55,118 +45,54 @@ import org.apache.solr.search.DocList;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
 
-/**
- * The Class MtasSolrSearchComponent.
- */
-public class MtasSolrSearchComponent extends SearchComponent {
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
-	/** The log. */
+public class MtasSolrSearchComponent extends SearchComponent {
 	private static Log log = LogFactory.getLog(MtasSolrSearchComponent.class);
 
-	/** The search component. */
 	MtasSolrSearchComponent searchComponent;
 
-	/** The Constant CONFIG_COLLECTION_CACHE_DIRECTORY. */
 	public static final String CONFIG_COLLECTION_CACHE_DIRECTORY = "collectionCacheDirectory";
-
-	/** The Constant CONFIG_COLLECTION_LIFETIME. */
 	public static final String CONFIG_COLLECTION_LIFETIME = "collectionLifetime";
-
-	/** The Constant CONFIG_COLLECTION_MAXIMUM_NUMBER. */
 	public static final String CONFIG_COLLECTION_MAXIMUM_NUMBER = "collectionMaximumNumber";
-
-	/** The Constant CONFIG_COLLECTION_MAXIMUM_OVERFLOW. */
 	public static final String CONFIG_COLLECTION_MAXIMUM_OVERFLOW = "collectionMaximumOverflow";
-
-	/** The Constant NAME. */
 	public static final String NAME = "mtas";
-
-	/** The Constant PARAM_MTAS. */
 	public static final String PARAM_MTAS = "mtas";
-
-	/** The Constant STAGE_TERMVECTOR_MISSING_TOP. */
 	public static final int STAGE_TERMVECTOR_MISSING_TOP = ResponseBuilder.STAGE_EXECUTE_QUERY + 10;
-
-	/** The Constant STAGE_TERMVECTOR_MISSING_KEY. */
 	public static final int STAGE_TERMVECTOR_MISSING_KEY = ResponseBuilder.STAGE_EXECUTE_QUERY + 11;
-
-	/** The Constant STAGE_TERMVECTOR_FINISH. */
 	public static final int STAGE_TERMVECTOR_FINISH = ResponseBuilder.STAGE_EXECUTE_QUERY + 12;
-
-	/** The Constant STAGE_LIST. */
 	public static final int STAGE_LIST = ResponseBuilder.STAGE_EXECUTE_QUERY + 20;
-
-	/** The Constant STAGE_PREFIX. */
 	public static final int STAGE_PREFIX = ResponseBuilder.STAGE_EXECUTE_QUERY + 30;
-
-	/** The Constant STAGE_STATS. */
 	public static final int STAGE_STATS = ResponseBuilder.STAGE_EXECUTE_QUERY + 40;
-
-	/** The Constant STAGE_FACET. */
 	public static final int STAGE_FACET = ResponseBuilder.STAGE_EXECUTE_QUERY + 50;
-
-	/** The Constant STAGE_GROUP. */
 	public static final int STAGE_GROUP = ResponseBuilder.STAGE_EXECUTE_QUERY + 60;
-
-	/** The Constant STAGE_COLLECTION_INIT. */
 	public static final int STAGE_COLLECTION_INIT = ResponseBuilder.STAGE_EXECUTE_QUERY + 70;
-
-	/** The Constant STAGE_COLLECTION_FINISH. */
 	public static final int STAGE_COLLECTION_FINISH = ResponseBuilder.STAGE_EXECUTE_QUERY + 71;
-
-	/** The Constant STAGE_DOCUMENT. */
 	public static final int STAGE_DOCUMENT = ResponseBuilder.STAGE_GET_FIELDS + 10;
 
-	/** The mtas solr result merge. */
 	private MtasSolrResultMerge mtasSolrResultMerge;
-
-	/** The search stats. */
 	private MtasSolrComponentStats searchStats;
-
-	/** The search termvector. */
 	private MtasSolrComponentTermvector searchTermvector;
-
-	/** The search prefix. */
 	private MtasSolrComponentPrefix searchPrefix;
-
-	/** The search facet. */
 	private MtasSolrComponentFacet searchFacet;
-
-	/** The search group. */
 	private MtasSolrComponentGroup searchGroup;
-
-	/** The search list. */
 	private MtasSolrComponentList searchList;
-
-	/** The search kwic. */
 	private MtasSolrComponentKwic searchKwic;
-
-	/** The search document. */
 	private MtasSolrComponentDocument searchDocument;
-
-	/** The search collection. */
 	private MtasSolrComponentCollection searchCollection;
-
-	/** The search status. */
 	private MtasSolrComponentStatus searchStatus;
-
 	private MtasSolrComponentVersion searchVersion;
-
-	/** The collection cache. */
 	private MtasSolrCollectionCache collectionCache = null;
-
-	/** The request handler. */
 	private MtasRequestHandler requestHandler = null;
-
-	/** The request handler name. */
 	private String requestHandlerName = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.solr.handler.component.SearchComponent#init(org.apache.solr.
-	 * common.util.NamedList)
-	 */
 	@Override
 	public void init(NamedList args) {
 		super.init(args);
@@ -214,32 +140,15 @@ public class MtasSolrSearchComponent extends SearchComponent {
 				collectionMaximumNumber, collectionMaximumOverflow);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.solr.handler.component.SearchComponent#getDescription()
-	 */
 	@Override
 	public String getDescription() {
 		return "Mtas";
 	}
 
-	/**
-	 * Gets the collection cache.
-	 *
-	 * @return the collection cache
-	 */
 	public MtasSolrCollectionCache getCollectionCache() {
 		return collectionCache;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.solr.handler.component.SearchComponent#prepare(org.apache.solr.
-	 * handler.component.ResponseBuilder)
-	 */
 	@Override
 	public void prepare(ResponseBuilder rb) throws IOException {
 		// System.out
@@ -323,13 +232,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.solr.handler.component.SearchComponent#process(org.apache.solr.
-	 * handler.component.ResponseBuilder)
-	 */
 	@Override
 	public void process(ResponseBuilder rb) throws IOException {
 		// System.out
@@ -589,15 +491,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.solr.handler.component.SearchComponent#modifyRequest(org.apache.
-	 * solr.handler.component.ResponseBuilder,
-	 * org.apache.solr.handler.component.SearchComponent,
-	 * org.apache.solr.handler.component.ShardRequest)
-	 */
 	@Override
 	public void modifyRequest(ResponseBuilder rb, SearchComponent who, ShardRequest sreq) {
 		 // System.out
@@ -654,13 +547,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.solr.handler.component.SearchComponent#handleResponses(org.
-	 * apache.solr.handler.component.ResponseBuilder,
-	 * org.apache.solr.handler.component.ShardRequest)
-	 */
 	@Override
 	public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
 		 // System.out
@@ -680,13 +566,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.solr.handler.component.SearchComponent#distributedProcess(org.
-	 * apache.solr.handler.component.ResponseBuilder)
-	 */
 	@Override
 	public void finishStage(ResponseBuilder rb) {
 		 // System.out
@@ -744,13 +623,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.solr.handler.component.SearchComponent#distributedProcess(org.
-	 * apache.solr.handler.component.ResponseBuilder)
-	 */
 	@Override
 	public int distributedProcess(ResponseBuilder rb) throws IOException {
 		 // System.out.println(System.nanoTime() + " - "
@@ -837,24 +709,10 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		return ResponseBuilder.STAGE_DONE;
 	}
 
-	/**
-	 * Gets the mtas fields.
-	 *
-	 * @param rb
-	 *            the rb
-	 * @return the mtas fields
-	 */
-
 	private ComponentFields getMtasFields(ResponseBuilder rb) {
 		return (ComponentFields) rb.req.getContext().get(ComponentFields.class);
 	}
 
-	/**
-	 * Initialize request handler.
-	 *
-	 * @param rb
-	 *            the rb
-	 */
 	private void initializeRequestHandler(ResponseBuilder rb) {
 		if (requestHandler == null) {
 			// try to initialize
@@ -868,14 +726,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/**
-	 * Check status.
-	 *
-	 * @param status
-	 *            the status
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
 	private void checkStatus(MtasSolrStatus status) throws IOException {
 		if (!status.finished()) {
 			if (status.error()) {
@@ -894,14 +744,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/**
-	 * Register status.
-	 *
-	 * @param solrStatus
-	 *            the solr status
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 */
 	private void registerStatus(MtasSolrStatus solrStatus) throws IOException {
 		if (requestHandler != null) {
 			Map<String, ShardStatus> shards = solrStatus.getShards();
@@ -929,14 +771,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/**
-	 * Error status.
-	 *
-	 * @param status
-	 *            the status
-	 * @param exception
-	 *            the exception
-	 */
 	private void errorStatus(MtasSolrStatus status, IOException exception) {
 		try {
 			status.setError(exception);
@@ -948,12 +782,6 @@ public class MtasSolrSearchComponent extends SearchComponent {
 		}
 	}
 
-	/**
-	 * Finish status.
-	 *
-	 * @param status
-	 *            the status
-	 */
 	private void finishStatus(MtasSolrStatus status) {
 		if (!status.finished()) {
 			status.setFinished();
@@ -966,5 +794,4 @@ public class MtasSolrSearchComponent extends SearchComponent {
 			}
 		}
 	}
-
 }

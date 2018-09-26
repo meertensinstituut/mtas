@@ -1,9 +1,5 @@
 package mtas.parser.cql.util;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
 import mtas.analysis.token.MtasToken;
 import mtas.parser.cql.ParseException;
 import mtas.search.spans.MtasSpanMatchNoneQuery;
@@ -13,42 +9,24 @@ import mtas.search.spans.MtasSpanRegexpQuery;
 import mtas.search.spans.MtasSpanTermQuery;
 import mtas.search.spans.MtasSpanWildcardQuery;
 import mtas.search.spans.util.MtasSpanQuery;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 
-/**
- * The Class MtasCQLParserWordQuery.
- */
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 public class MtasCQLParserWordQuery extends MtasSpanQuery {
-
-  /** The query. */
   MtasSpanQuery query;
-
-  /** The term. */
   Term term;
 
-  /** The Constant MTAS_CQL_TERM_QUERY. */
   public static final String MTAS_CQL_TERM_QUERY = "term";
-
-  /** The Constant MTAS_CQL_REGEXP_QUERY. */
   public static final String MTAS_CQL_REGEXP_QUERY = "regexp";
-
-  /** The Constant MTAS_CQL_WILDCARD_QUERY. */
   public static final String MTAS_CQL_WILDCARD_QUERY = "wildcard";
-
-  /** The Constant MTAS_CQL_VARIABLE_QUERY. */
   public static final String MTAS_CQL_VARIABLE_QUERY = "variable";
 
-  /**
-   * Instantiates a new mtas CQL parser word query.
-   *
-   * @param field the field
-   * @param prefix the prefix
-   * @param variables the variables
-   */
   public MtasCQLParserWordQuery(String field, String prefix,
       Map<String, String[]> variables) {
     super(1, 1);
@@ -56,33 +34,12 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
     query = new MtasSpanPrefixQuery(term, true);
   }
 
-  /**
-   * Instantiates a new mtas CQL parser word query.
-   *
-   * @param field the field
-   * @param prefix the prefix
-   * @param value the value
-   * @param variables the variables
-   * @param usedVariables the used variables
-   * @throws ParseException the parse exception
-   */
   public MtasCQLParserWordQuery(String field, String prefix, String value,
       Map<String, String[]> variables, Set<String> usedVariables)
       throws ParseException {
     this(field, prefix, value, MTAS_CQL_REGEXP_QUERY, variables, usedVariables);
   }
 
-  /**
-   * Instantiates a new mtas CQL parser word query.
-   *
-   * @param field the field
-   * @param prefix the prefix
-   * @param value the value
-   * @param type the type
-   * @param variables the variables
-   * @param usedVariables the used variables
-   * @throws ParseException the parse exception
-   */
   public MtasCQLParserWordQuery(String field, String prefix, String value,
       String type, Map<String, String[]> variables, Set<String> usedVariables)
       throws ParseException {
@@ -131,55 +88,27 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return term.field();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     return query.rewrite(reader);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
     return query.createWeight(searcher, needsScores, boost);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     return query.toString(term.field());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -192,11 +121,6 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
     return query.equals(that.query);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -205,11 +129,6 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
     return h;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
-   */
   @Override
   public void disableTwoPhaseIterator() {
     super.disableTwoPhaseIterator();
@@ -220,5 +139,4 @@ public class MtasCQLParserWordQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

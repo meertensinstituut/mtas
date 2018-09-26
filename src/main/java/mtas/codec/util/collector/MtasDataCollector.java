@@ -1,5 +1,7 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.DataCollector;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,239 +11,89 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
-import mtas.codec.util.DataCollector;
-
-/**
- * The Class MtasDataCollector.
- *
- * @param <T1> the generic type
- * @param <T2> the generic type
- */
 public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     implements Serializable {
-
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The Constant SEGMENT_SORT_ASC. */
   public static final String SEGMENT_SORT_ASC = "segment_asc";
-
-  /** The Constant SEGMENT_SORT_DESC. */
   public static final String SEGMENT_SORT_DESC = "segment_desc";
-
-  /** The Constant SEGMENT_BOUNDARY_ASC. */
   public static final String SEGMENT_BOUNDARY_ASC = "segment_boundary_asc";
-
-  /** The Constant SEGMENT_BOUNDARY_DESC. */
   public static final String SEGMENT_BOUNDARY_DESC = "segment_boundary_desc";
-
-  /** The Constant SEGMENT_KEY. */
   public static final String SEGMENT_KEY = "key";
-
-  /** The Constant SEGMENT_NEW. */
   public static final String SEGMENT_NEW = "new";
-
-  /** The Constant SEGMENT_KEY_OR_NEW. */
   public static final String SEGMENT_KEY_OR_NEW = "key_or_new";
-
-  /** The Constant SEGMENT_POSSIBLE_KEY. */
   public static final String SEGMENT_POSSIBLE_KEY = "possible_key";
 
-  /** The size. */
   protected int size;
-
-  /** The position. */
   protected int position;
-
-  /** The collector type. */
-  // properties collector
-  protected String collectorType;
-
-  /** The stats type. */
+  protected String collectorType; // properties collector
   protected String statsType;
-
-  /** The data type. */
   protected String dataType;
-
-  /** The stats items. */
   private SortedSet<String> statsItems;
-
-  /** The sort type. */
   protected String sortType;
-
-  /** The sort direction. */
   protected String sortDirection;
-
-  /** The start. */
   protected Integer start;
-
-  /** The number. */
   protected Integer number;
-
-  /** The error number. */
-  // error
   protected int[] errorNumber;
-
-  /** The error list. */
   protected HashMap<String, Integer>[] errorList;
-
-  /** The key list. */
   protected String[] keyList;
-
-  /** The source number list. */
   protected int[] sourceNumberList;
-
-  /** The with total. */
   private boolean withTotal;
 
-  /** The segment registration. */
   public transient String segmentRegistration;
-
-  /** The segment key value list. */
   protected transient LinkedHashMap<String, Map<String, T1>> segmentKeyValueList;
-
-  /** The segment recompute key list. */
   public transient Map<String, Set<String>> segmentRecomputeKeyList;
-
-  /** The segment keys. */
   public transient Set<String> segmentKeys;
-
-  /** The segment values boundary. */
   protected transient Map<String, T1> segmentValuesBoundary;
-
-  /** The segment value boundary. */
   protected transient T1 segmentValueBoundary;
-
-  /** The segment value top list last. */
   protected transient Map<String, T1> segmentValueTopListLast;
-
-  /** The segment value top list. */
   protected transient ArrayList<T1> segmentValueTopList;
-
-  /** The segment name. */
   protected transient String segmentName;
-
-  /** The segment number. */
   protected transient int segmentNumber;
 
-  /** The has sub. */
   private boolean hasSub;
-
-  /** The sub collector types. */
   private String[] subCollectorTypes;
-
-  /** The sub data types. */
   private String[] subDataTypes;
-
-  /** The sub stats types. */
   private String[] subStatsTypes;
-
-  /** The sub stats items. */
   private SortedSet<String>[] subStatsItems;
-
-  /** The sub sort types. */
   private String[] subSortTypes;
-
-  /** The sub sort directions. */
   private String[] subSortDirections;
-
-  /** The sub start. */
   private Integer[] subStart;
-
-  /** The sub number. */
   private Integer[] subNumber;
 
-  /** The sub collector list next level. */
   protected MtasDataCollector<?, ?>[] subCollectorListNextLevel = null;
-
-  /** The sub collector next level. */
   protected MtasDataCollector<?, ?> subCollectorNextLevel = null;
-
-  /** The new size. */
   protected transient int newSize;
-
-  /** The new position. */
   protected transient int newPosition;
-
-  /** The new current position. */
   protected transient int newCurrentPosition;
-
-  /** The new current existing. */
   protected transient boolean newCurrentExisting;
-
-  /** The new key list. */
   protected transient String[] newKeyList = null;
-
-  /** The new source number list. */
   protected transient int[] newSourceNumberList = null;
-
-  /** The new error number. */
   protected transient int[] newErrorNumber;
-
-  /** The new error list. */
   protected transient HashMap<String, Integer>[] newErrorList;
 
-  /** The new known key found in segment. */
   public transient Set<String> newKnownKeyFoundInSegment;
 
-  /** The new sub collector types. */
   private transient String[] newSubCollectorTypes;
-
-  /** The new sub data types. */
   private transient String[] newSubDataTypes;
-
-  /** The new sub stats types. */
   private transient String[] newSubStatsTypes;
-
-  /** The new sub stats items. */
   private transient SortedSet<String>[] newSubStatsItems;
-
-  /** The new sub sort types. */
   private transient String[] newSubSortTypes;
-
-  /** The new sub sort directions. */
   private transient String[] newSubSortDirections;
-
-  /** The new sub start. */
   private transient Integer[] newSubStart;
-
-  /** The new sub number. */
   private transient Integer[] newSubNumber;
 
-  /** The new sub collector list next level. */
-  // subcollectors next level for adding
   protected transient MtasDataCollector<?, ?>[] newSubCollectorListNextLevel = null;
-
-  /** The new sub collector next level. */
   protected transient MtasDataCollector<?, ?> newSubCollectorNextLevel = null;
-
-  /** The closed. */
   protected transient boolean closed = false;
-
-  /** The result. */
   private transient MtasDataCollectorResult<T1, T2> result = null;
 
-  /**
-   * Instantiates a new mtas data collector.
-   *
-   * @param collectorType the collector type
-   * @param dataType the data type
-   * @param statsType the stats type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param segmentRegistration the segment registration
-   * @param boundary the boundary
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   @SuppressWarnings("unchecked")
   protected MtasDataCollector(String collectorType, String dataType,
       String statsType, SortedSet<String> statsItems, String sortType,
@@ -298,29 +150,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     subCollectorNextLevel = null;
   }
 
-  /**
-   * Instantiates a new mtas data collector.
-   *
-   * @param collectorType the collector type
-   * @param dataType the data type
-   * @param statsType the stats type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param subCollectorTypes the sub collector types
-   * @param subDataTypes the sub data types
-   * @param subStatsTypes the sub stats types
-   * @param subStatsItems the sub stats items
-   * @param subSortTypes the sub sort types
-   * @param subSortDirections the sub sort directions
-   * @param subStart the sub start
-   * @param subNumber the sub number
-   * @param segmentRegistration the segment registration
-   * @param boundary the boundary
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected MtasDataCollector(String collectorType, String dataType,
       String statsType, SortedSet<String> statsItems, String sortType,
       String sortDirection, Integer start, Integer number,
@@ -362,27 +191,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Merge.
-   *
-   * @param newDataCollector the new data collector
-   * @param map the map
-   * @param increaseSourceNumber the increase source number
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   abstract public void merge(MtasDataCollector<?, ?> newDataCollector,
       Map<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map,
       boolean increaseSourceNumber) throws IOException;
 
-  /**
-   * Inits the new list.
-   *
-   * @param maxNumberOfTerms the max number of terms
-   * @param segmentName the segment name
-   * @param segmentNumber the segment number
-   * @param boundary the boundary
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void initNewList(int maxNumberOfTerms, String segmentName,
       int segmentNumber, String boundary) throws IOException {
     if (closed) {
@@ -412,12 +224,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Inits the new list.
-   *
-   * @param maxNumberOfTerms the max number of terms
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void initNewList(int maxNumberOfTerms) throws IOException {
     if (closed) {
       result = null;
@@ -430,12 +236,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Inits the new list basic.
-   *
-   * @param maxNumberOfTerms the max number of terms
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   @SuppressWarnings("unchecked")
   private void initNewListBasic(int maxNumberOfTerms) throws IOException {
     if (!closed) {
@@ -456,11 +256,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Increase new list size.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   @SuppressWarnings("unchecked")
   protected void increaseNewListSize() throws IOException {
     if (!closed) {
@@ -490,13 +285,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Adds the.
-   *
-   * @param increaseSourceNumber the increase source number
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected final MtasDataCollector add(boolean increaseSourceNumber)
       throws IOException {
     if (!closed) {
@@ -551,14 +339,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Adds the.
-   *
-   * @param key the key
-   * @param increaseSourceNumber the increase source number
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected final MtasDataCollector add(String key,
       boolean increaseSourceNumber) throws IOException {
     if (!closed) {
@@ -655,96 +435,31 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Copy to new.
-   *
-   * @param position the position
-   * @param newPosition the new position
-   */
   protected abstract void copyToNew(int position, int newPosition);
 
-  /**
-   * Copy from new.
-   */
   protected abstract void copyFromNew();
 
-  /**
-   * Compare with boundary.
-   *
-   * @param value the value
-   * @param boundary the boundary
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected abstract boolean compareWithBoundary(T1 value, T1 boundary)
       throws IOException;
 
-  /**
-   * Last for computing segment.
-   *
-   * @param value the value
-   * @param boundary the boundary
-   * @return the t1
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected abstract T1 lastForComputingSegment(T1 value, T1 boundary)
       throws IOException;
 
-  /**
-   * Last for computing segment.
-   *
-   * @return the t1
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected abstract T1 lastForComputingSegment() throws IOException;
 
-  /**
-   * Boundary for segment.
-   *
-   * @param segmentName the segment name
-   * @return the t1
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected abstract T1 boundaryForSegment(String segmentName)
       throws IOException;
 
-  /**
-   * Boundary for segment computing.
-   *
-   * @param segmentName the segment name
-   * @return the t1
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected abstract T1 boundaryForSegmentComputing(String segmentName)
       throws IOException;
 
-  /**
-   * String to boundary.
-   *
-   * @param boundary the boundary
-   * @param segmentNumber the segment number
-   * @return the t1
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected abstract T1 stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException;
 
-  /**
-   * String to boundary.
-   *
-   * @param boundary the boundary
-   * @return the t1
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected T1 stringToBoundary(String boundary) throws IOException {
     return stringToBoundary(boundary, null);
   }
 
-  /**
-   * Close segment key value registration.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void closeSegmentKeyValueRegistration() throws IOException {
     if (!closed) {
       if (segmentRegistration != null) {
@@ -762,11 +477,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Recompute segment keys.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void recomputeSegmentKeys() throws IOException {
     if (!closed && segmentRegistration != null) {
       if (segmentRegistration.equals(SEGMENT_SORT_ASC)
@@ -831,28 +541,14 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Reduce to keys.
-   *
-   * @param keys the keys
-   */
   public abstract void reduceToKeys(Set<String> keys);
 
-  /**
-   * Reduce to segment keys.
-   */
   public void reduceToSegmentKeys() {
     if (segmentRegistration != null) {
       reduceToKeys(segmentKeys);
     }
   }
 
-  /**
-   * Check existence necessary keys.
-   *
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public boolean checkExistenceNecessaryKeys() throws IOException {
     if (!closed) {
       if (segmentRegistration != null) {
@@ -865,22 +561,8 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Validate segment boundary.
-   *
-   * @param o the o
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   abstract public boolean validateSegmentBoundary(Object o) throws IOException;
 
-  /**
-   * Validate with segment boundary.
-   *
-   * @param value the value
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected boolean validateWithSegmentBoundary(T1 value) throws IOException {
     if (!closed && segmentRegistration != null) {
       T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
@@ -892,15 +574,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     return false;
   }
 
-  /**
-   * Validate segment value.
-   *
-   * @param value the value
-   * @param maximumNumber the maximum number
-   * @param segmentNumber the segment number
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String validateSegmentValue(T1 value, int maximumNumber,
       int segmentNumber) throws IOException {
     if (!closed) {
@@ -926,17 +599,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Validate segment value.
-   *
-   * @param key the key
-   * @param value the value
-   * @param maximumNumber the maximum number
-   * @param segmentNumber the segment number
-   * @param test the test
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String validateSegmentValue(String key, T1 value, int maximumNumber,
       int segmentNumber, boolean test) throws IOException {
     if (!closed) {
@@ -997,15 +659,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Sets the error.
-   *
-   * @param newPosition the new position
-   * @param errorNumberItem the error number item
-   * @param errorListItem the error list item
-   * @param currentExisting the current existing
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected final void setError(int newPosition, int errorNumberItem,
       HashMap<String, Integer> errorListItem, boolean currentExisting)
       throws IOException {
@@ -1030,14 +683,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Sorted and unique.
-   *
-   * @param keyList the key list
-   * @param size the size
-   * @return true, if successful
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private boolean sortedAndUnique(String[] keyList, int size)
       throws IOException {
     if (!closed) {
@@ -1052,14 +697,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Compute sort and unique mapping.
-   *
-   * @param keyList the key list
-   * @param size the size
-   * @return the int[][]
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private int[][] computeSortAndUniqueMapping(String[] keyList, int size)
       throws IOException {
     if (!closed) {
@@ -1087,12 +724,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Remap data.
-   *
-   * @param mapping the mapping
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   protected void remapData(int[][] mapping) throws IOException {
     if (!closed) {
       // remap and merge keys
@@ -1149,11 +780,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Close new list.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void closeNewList() throws IOException {
     if (!closed) {
       if (segmentRegistration != null) {
@@ -1196,137 +822,40 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Gets the item.
-   *
-   * @param i the i
-   * @return the item
-   */
   abstract protected MtasDataItem<T1, T2> getItem(int i);
 
-  /**
-   * Checks for sub.
-   *
-   * @return true, if successful
-   */
   protected boolean hasSub() {
     return hasSub;
   }
 
-  /**
-   * Error.
-   *
-   * @param error the error
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract void error(String error) throws IOException;
 
-  /**
-   * Error.
-   *
-   * @param key the key
-   * @param error the error
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract void error(String key, String error) throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param valueSum the value sum
-   * @param valueN the value N
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(long valueSum, long valueN)
       throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param values the values
-   * @param number the number
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(long[] values, int number)
       throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param valueSum the value sum
-   * @param valueN the value N
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(double valueSum, long valueN)
       throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param values the values
-   * @param number the number
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(double[] values, int number)
       throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param key the key
-   * @param valueSum the value sum
-   * @param valueN the value N
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(String key, long valueSum, long valueN)
       throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param key the key
-   * @param values the values
-   * @param number the number
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(String key, long[] values, int number)
       throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param key the key
-   * @param valueSum the value sum
-   * @param valueN the value N
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(String key, double valueSum,
       long valueN) throws IOException;
 
-  /**
-   * Adds the.
-   *
-   * @param key the key
-   * @param values the values
-   * @param number the number
-   * @return the mtas data collector
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract MtasDataCollector add(String key, double[] values, int number)
       throws IOException;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuilder text = new StringBuilder();
@@ -1340,12 +869,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     return text.toString().trim();
   }
 
-  /**
-   * Gets the result.
-   *
-   * @return the result
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasDataCollectorResult<T1, T2> getResult() throws IOException {
     if (!closed) {
       close();
@@ -1353,12 +876,6 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     return result;
   }
 
-  /**
-   * Gets the key list.
-   *
-   * @return the key list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public Set<String> getKeyList() throws IOException {
     if (!closed) {
       close();
@@ -1366,20 +883,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     return new HashSet<>(Arrays.asList(keyList));
   }
 
-  /**
-   * Gets the stats items.
-   *
-   * @return the stats items
-   */
   public SortedSet<String> getStatsItems() {
     return statsItems;
   }
 
-  /**
-   * Close.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public void close() throws IOException {
     if (!closed) {
@@ -1442,56 +949,26 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     }
   }
 
-  /**
-   * Gets the collector type.
-   *
-   * @return the collector type
-   */
   public String getCollectorType() {
     return collectorType;
   }
 
-  /**
-   * Gets the stats type.
-   *
-   * @return the stats type
-   */
   public String getStatsType() {
     return statsType;
   }
 
-  /**
-   * Gets the data type.
-   *
-   * @return the data type
-   */
   public String getDataType() {
     return dataType;
   }
 
-  /**
-   * Gets the size.
-   *
-   * @return the size
-   */
   public int getSize() {
     return size;
   }
 
-  /**
-   * With total.
-   *
-   * @return true, if successful
-   */
   public boolean withTotal() {
     return withTotal;
   }
 
-  /**
-   * Sets the with total.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void setWithTotal() throws IOException {
     if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
       if (segmentName != null) {
@@ -1504,5 +981,4 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
           "can't get total for dataCollector of type " + collectorType);
     }
   }
-
 }

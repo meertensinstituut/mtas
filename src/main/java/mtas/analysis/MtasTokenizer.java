@@ -1,14 +1,5 @@
 package mtas.analysis;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Iterator;
 import mtas.analysis.parser.MtasParser;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
@@ -25,16 +16,22 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+
 /**
- * The Class MtasTokenizer.
+ * Tokenizer that delegates to an MtasParser.
  */
-
 public final class MtasTokenizer extends Tokenizer {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasTokenizer.class);
 
-  /** The Constant CONFIGURATION_MTAS. */
   public static final String CONFIGURATION_MTAS = "mtas";
 
   public static final String CONFIGURATION_MTAS_INDEX = "index";
@@ -48,92 +45,41 @@ public final class MtasTokenizer extends Tokenizer {
   private static final String VALUE_0 = "0";
   private static final String VALUE_1 = "1";
   
-  /** The current position. */
   private int currentPosition = 0;
-
-  /** The encoding flags. */
   private int encodingFlags = MtasPayloadEncoder.ENCODE_DEFAULT;
-
-  /** The parser name. */
   private String parserName = null;
-
-  /** The parser configuration. */
   private MtasConfiguration parserConfiguration = null;
-
-  /** The token collection. */
   private MtasTokenCollection tokenCollection;
-
-  /** The term att. */
   private final CharTermAttribute termAtt = addAttribute(
       CharTermAttribute.class);
-
-  /** The offset att. */
   private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-
-  /** The payload att. */
   private final PayloadAttribute payloadAtt = addAttribute(
       PayloadAttribute.class);
-
-  /** The position increment att. */
   private final PositionIncrementAttribute positionIncrementAtt = addAttribute(
       PositionIncrementAttribute.class);
-
-  /** The token collection iterator. */
   private Iterator<MtasToken> tokenCollectionIterator;
 
-  /**
-   * Instantiates a new mtas tokenizer.
-   */
   public MtasTokenizer() {
   }
 
-  /**
-   * Instantiates a new mtas tokenizer.
-   *
-   * @param configFileName the config file name
-   */
   public MtasTokenizer(final String configFileName) {
     readConfigurationFile(configFileName);
   }
 
-  /**
-   * Instantiates a new mtas tokenizer.
-   *
-   * @param config the config
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizer(final MtasConfiguration config) throws IOException {
     processConfiguration(config);
   }
 
-  /**
-   * Instantiates a new mtas tokenizer.
-   *
-   * @param reader the reader
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizer(final InputStream reader) throws IOException {
     processConfiguration(MtasConfiguration.readConfiguration(reader));
   }
 
-  /**
-   * Instantiates a new mtas tokenizer.
-   *
-   * @param factory the factory
-   * @param config the config
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasTokenizer(final AttributeFactory factory,
       final MtasConfiguration config) throws IOException {
     super(factory);
     processConfiguration(config);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.analysis.TokenStream#incrementToken()
-   */
   @Override
   public boolean incrementToken() throws IOException {
     clearAttributes();
@@ -158,11 +104,6 @@ public final class MtasTokenizer extends Tokenizer {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.analysis.Tokenizer#reset()
-   */
   @Override
   public void reset() throws IOException {
     super.reset();
@@ -176,12 +117,6 @@ public final class MtasTokenizer extends Tokenizer {
     }
   }
 
-  /**
-   * Prints the.
-   *
-   * @param r the r
-   * @throws MtasParserException the mtas parser exception
-   */
   public void print(final Reader r) throws MtasParserException {
     try {
       setReader(r);
@@ -197,13 +132,6 @@ public final class MtasTokenizer extends Tokenizer {
     }
   }
 
-  /**
-   * Gets the list.
-   *
-   * @param r the r
-   * @return the list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String[][] getList(final Reader r) throws IOException {
     try {
       setReader(r);
@@ -218,13 +146,6 @@ public final class MtasTokenizer extends Tokenizer {
     }
   }
 
-  /**
-   * Construct token collection.
-   *
-   * @param reader the reader
-   * @throws MtasConfigException the mtas config exception
-   * @throws MtasParserException the mtas parser exception
-   */
   private void constructTokenCollection(final Reader reader)
       throws MtasConfigException, MtasParserException {
     tokenCollection = null;
@@ -253,11 +174,6 @@ public final class MtasTokenizer extends Tokenizer {
 
   }
 
-  /**
-   * Read configuration file.
-   *
-   * @param configFile the config file
-   */
   private void readConfigurationFile(final String configFile) {
     InputStream is;
     try {
@@ -271,12 +187,6 @@ public final class MtasTokenizer extends Tokenizer {
     }
   }
 
-  /**
-   * Process configuration.
-   *
-   * @param config the config
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private void processConfiguration(final MtasConfiguration config)
       throws IOException {
     HashMap<String, Integer> indexEncodingMapper = new HashMap<>();
@@ -315,11 +225,6 @@ public final class MtasTokenizer extends Tokenizer {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.util.AttributeSource#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -332,14 +237,8 @@ public final class MtasTokenizer extends Tokenizer {
     return super.equals(that);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.util.AttributeSource#hashCode()
-   */
   @Override
   public int hashCode() {
     return super.hashCode();
   }
-
 }

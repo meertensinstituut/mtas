@@ -47,108 +47,74 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentTermvector
     implements MtasSolrComponent<ComponentTermVector> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentTermvector.class);
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant NAME. */
   public static final String NAME = "termvector";
 
-  /** The Constant PARAM_MTAS_TERMVECTOR. */
   public static final String PARAM_MTAS_TERMVECTOR = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_TERMVECTOR_FIELD. */
   public static final String NAME_MTAS_TERMVECTOR_FIELD = "field";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_KEY. */
   public static final String NAME_MTAS_TERMVECTOR_KEY = "key";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_PREFIX. */
   public static final String NAME_MTAS_TERMVECTOR_PREFIX = "prefix";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE = "distance";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_KEY. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE_KEY = "key";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_TYPE. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE_TYPE = "type";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_BASE. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE_BASE = "base";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE_PARAMETER = "parameter";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_MINIMUM. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE_MINIMUM = "minimum";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM. */
   public static final String NAME_MTAS_TERMVECTOR_DISTANCE_MAXIMUM = "maximum";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_REGEXP = "regexp";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_FULL. */
   public static final String NAME_MTAS_TERMVECTOR_FULL = "full";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_TYPE. */
   public static final String NAME_MTAS_TERMVECTOR_TYPE = "type";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_SORT_TYPE. */
   public static final String NAME_MTAS_TERMVECTOR_SORT_TYPE = "sort.type";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_SORT_DIRECTION. */
   public static final String NAME_MTAS_TERMVECTOR_SORT_DIRECTION = "sort.direction";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_START. */
   public static final String NAME_MTAS_TERMVECTOR_START = "start";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_NUMBER. */
   public static final String NAME_MTAS_TERMVECTOR_NUMBER = "number";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_NUMBER_SHARDS. */
   public static final String NAME_MTAS_TERMVECTOR_NUMBER_SHARDS = "number.shards";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_FUNCTION. */
   public static final String NAME_MTAS_TERMVECTOR_FUNCTION = "function";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION. */
   public static final String NAME_MTAS_TERMVECTOR_FUNCTION_EXPRESSION = "expression";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_FUNCTION_KEY. */
   public static final String NAME_MTAS_TERMVECTOR_FUNCTION_KEY = "key";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_FUNCTION_TYPE. */
   public static final String NAME_MTAS_TERMVECTOR_FUNCTION_TYPE = "type";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_BOUNDARY. */
   public static final String NAME_MTAS_TERMVECTOR_BOUNDARY = "boundary";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_LIST. */
   public static final String NAME_MTAS_TERMVECTOR_LIST = "list";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_LIST_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_LIST_REGEXP = "listRegexp";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_IGNORE_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_REGEXP = "ignoreRegexp";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_IGNORE_LIST. */
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_LIST = "ignoreList";
 
-  /** The Constant NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP. */
   public static final String NAME_MTAS_TERMVECTOR_IGNORE_LIST_REGEXP = "ignoreListRegexp";
 
-  /** The Constant SHARD_NUMBER_MULTIPLIER. */
   private static final int SHARD_NUMBER_MULTIPLIER = 2;
 
-  /** The Constant DEFAULT_NUMBER. */
   private static final int DEFAULT_NUMBER = 10;
 
   /**
@@ -376,8 +342,7 @@ public class MtasSolrComponentTermvector
         String[] distanceMaximum = distanceMaximums[i];
         String regexp = (regexps[i] == null) || (regexps[i].isEmpty()) ? null
             : regexps[i].trim();
-        Boolean full = (fulls[i] == null) || (!fulls[i].equals("true")) ? false
-            : true;
+        Boolean full = !((fulls[i] == null) || (!fulls[i].equals("true")));
         String startValue = (startValues[i] == null)
             || (startValues[i].isEmpty()) ? null : startValues[i].trim();
         int listNumber = (numbers[i] == null) || (numbers[i].isEmpty())
@@ -1006,13 +971,10 @@ public class MtasSolrComponentTermvector
                     field = (String) dataItem.get("field");
                     boolean doClear;
                     doClear = field != null && key != null;
-                    doClear = doClear ? recomputeFieldList.get(field) != null
-                        : false;
-                    doClear = doClear
-                        ? recomputeFieldList.get(field).containsKey(key)
-                        : false;
-                    doClear = doClear ? recomputeFieldList.get(field).get(key)
-                        .containsKey(shardAddress) : false;
+                    doClear = doClear && recomputeFieldList.get(field) != null;
+                    doClear = doClear && recomputeFieldList.get(field).containsKey(key);
+                    doClear = doClear && recomputeFieldList.get(field).get(key)
+                                                           .containsKey(shardAddress);
                     if (doClear) {
                       dataItem.clear();
                       dataItem.add("key", key);

@@ -1,30 +1,17 @@
 package mtas.codec.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import mtas.codec.tree.IntervalTree;
 import mtas.codec.tree.IntervalTreeNode;
 import mtas.codec.tree.MtasTree;
 import org.apache.lucene.store.IndexInput;
 
-/**
- * The Class CodecSearchTree.
- */
-public class CodecSearchTree {
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
-  /**
-   * Advance mtas tree.
-   *
-   * @param position the position
-   * @param in the in
-   * @param ref the ref
-   * @param objectRefApproxOffset the object ref approx offset
-   * @return the array list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
+public class CodecSearchTree {
   public static ArrayList<MtasTreeHit<?>> advanceMtasTree(int position,
       IndexInput in, long ref, long objectRefApproxOffset) throws IOException {
     ArrayList<MtasTreeHit<?>> list = new ArrayList<MtasTreeHit<?>>();
@@ -49,20 +36,6 @@ public class CodecSearchTree {
     return list;
   }
 
-  /**
-   * Advance mtas tree.
-   *
-   * @param treeItem the tree item
-   * @param position the position
-   * @param in the in
-   * @param isSinglePoint the is single point
-   * @param isStoreAdditionalId the is store additional id
-   * @param objectRefApproxOffset the object ref approx offset
-   * @param list the list
-   * @param nodeRefApproxOffset the node ref approx offset
-   * @param checkList the check list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private static void advanceMtasTree(MtasTreeItem treeItem, int position,
       IndexInput in, AtomicBoolean isSinglePoint,
       AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
@@ -108,32 +81,11 @@ public class CodecSearchTree {
     }
   }
 
-  /**
-   * Search mtas tree.
-   *
-   * @param position the position
-   * @param in the in
-   * @param ref the ref
-   * @param objectRefApproxOffset the object ref approx offset
-   * @return the array list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public static ArrayList<MtasTreeHit<?>> searchMtasTree(int position,
       IndexInput in, long ref, long objectRefApproxOffset) throws IOException {
     return searchMtasTree(position, position, in, ref, objectRefApproxOffset);
   }
 
-  /**
-   * Search mtas tree.
-   *
-   * @param startPosition the start position
-   * @param endPosition the end position
-   * @param in the in
-   * @param ref the ref
-   * @param objectRefApproxOffset the object ref approx offset
-   * @return the array list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public static ArrayList<MtasTreeHit<?>> searchMtasTree(int startPosition,
       int endPosition, IndexInput in, long ref, long objectRefApproxOffset)
       throws IOException {
@@ -159,21 +111,6 @@ public class CodecSearchTree {
     return list;
   }
 
-  /**
-   * Search mtas tree.
-   *
-   * @param treeItem the tree item
-   * @param startPosition the start position
-   * @param endPosition the end position
-   * @param in the in
-   * @param isSinglePoint the is single point
-   * @param isStoreAdditionalId the is store additional id
-   * @param objectRefApproxOffset the object ref approx offset
-   * @param list the list
-   * @param nodeRefApproxOffset the node ref approx offset
-   * @param checkList the check list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private static void searchMtasTree(MtasTreeItem treeItem, int startPosition,
       int endPosition, IndexInput in, AtomicBoolean isSinglePoint,
       AtomicBoolean isStoreAdditionalId, long objectRefApproxOffset,
@@ -214,18 +151,6 @@ public class CodecSearchTree {
     }
   }
 
-  /**
-   * Gets the mtas tree item.
-   *
-   * @param ref the ref
-   * @param isSinglePoint the is single point
-   * @param isStoreAdditionalIdAndRef the is store additional id and ref
-   * @param nodeRefApproxOffset the node ref approx offset
-   * @param in the in
-   * @param objectRefApproxOffset the object ref approx offset
-   * @return the mtas tree item
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private static MtasTreeItem getMtasTreeItem(Long ref,
       AtomicBoolean isSinglePoint, AtomicBoolean isStoreAdditionalIdAndRef,
       AtomicLong nodeRefApproxOffset, IndexInput in, long objectRefApproxOffset)
@@ -288,39 +213,13 @@ public class CodecSearchTree {
     }
   }
 
-  /**
-   * The Class MtasTreeItem.
-   */
   private static class MtasTreeItem {
-
-    /** The max. */
     public int left, right, max;
-
-    /** The object refs. */
     public long[] objectRefs;
-
-    /** The additional ids. */
     public int[] additionalIds;
-
-    /** The additional refs. */
     public long[] additionalRefs;
-
-    /** The right child. */
     public Long ref, leftChild, rightChild;
 
-    /**
-     * Instantiates a new mtas tree item.
-     *
-     * @param left the left
-     * @param right the right
-     * @param max the max
-     * @param objectRefs the object refs
-     * @param additionalIds the additional ids
-     * @param additionalRefs the additional refs
-     * @param ref the ref
-     * @param leftChild the left child
-     * @param rightChild the right child
-     */
     public MtasTreeItem(int left, int right, int max, long[] objectRefs,
         int[] additionalIds, long[] additionalRefs, Long ref, Long leftChild,
         Long rightChild) {
@@ -336,40 +235,14 @@ public class CodecSearchTree {
     }
   }
 
-  /**
-   * The Class MtasTreeHit.
-   *
-   * @param <T> the generic type
-   */
   public static class MtasTreeHit<T> {
-
-    /** The start position. */
     public int startPosition;
-
-    /** The end position. */
     public int endPosition;
-
-    /** The ref. */
     public long ref;
-
-    /** The additional id. */
     public int additionalId;
-
-    /** The additional ref. */
     public long additionalRef;
-
-    /** The ref data. */
     public T data, idData, refData;
 
-    /**
-     * Instantiates a new mtas tree hit.
-     *
-     * @param startPosition the start position
-     * @param endPosition the end position
-     * @param ref the ref
-     * @param additionalId the additional id
-     * @param additionalRef the additional ref
-     */
     public MtasTreeHit(int startPosition, int endPosition, long ref,
         int additionalId, long additionalRef) {
       this.startPosition = startPosition;
@@ -382,16 +255,6 @@ public class CodecSearchTree {
       refData = null;
     }
 
-    /**
-     * Instantiates a new mtas tree hit.
-     *
-     * @param startPosition the start position
-     * @param endPosition the end position
-     * @param ref the ref
-     * @param additionalId the additional id
-     * @param additionalRef the additional ref
-     * @param data the data
-     */
     public MtasTreeHit(int startPosition, int endPosition, long ref,
         int additionalId, long additionalRef, T data) {
       this(startPosition, endPosition, ref, additionalId, additionalRef);
@@ -400,11 +263,6 @@ public class CodecSearchTree {
       this.refData = null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
       return "hit[" + startPosition + "," + endPosition + "," + ref + ","
@@ -413,18 +271,6 @@ public class CodecSearchTree {
     }
   }
 
-  /**
-   * Search mtas tree with interval tree.
-   *
-   * @param <T> the generic type
-   * @param <N> the number type
-   * @param additionalIds the additional ids
-   * @param intervalTree the interval tree
-   * @param in the in
-   * @param ref the ref
-   * @param objectRefApproxOffset the object ref approx offset
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeWithIntervalTree(
       Collection<Integer> additionalIds, IntervalTree<T, N> intervalTree,
       IndexInput in, long ref, long objectRefApproxOffset) throws IOException {
@@ -444,21 +290,6 @@ public class CodecSearchTree {
     } while (checkList.size() > 0);
   }
 
-  /**
-   * Search mtas tree with interval tree.
-   *
-   * @param <T> the generic type
-   * @param <N> the number type
-   * @param additionalIds the additional ids
-   * @param checkItem the check item
-   * @param in the in
-   * @param isSinglePoint the is single point
-   * @param isStoreAdditionalId the is store additional id
-   * @param objectRefApproxOffset the object ref approx offset
-   * @param nodeRefApproxOffset the node ref approx offset
-   * @param checkList the check list
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeWithIntervalTree(
       Collection<Integer> additionalIds, IntervalItem<T, N> checkItem,
       IndexInput in, AtomicBoolean isSinglePoint,
@@ -506,15 +337,6 @@ public class CodecSearchTree {
     }
   }
 
-  /**
-   * Search mtas tree item with interval tree.
-   *
-   * @param <T> the generic type
-   * @param <N> the number type
-   * @param additionalIds the additional ids
-   * @param treeItem the tree item
-   * @param intervalTreeNode the interval tree node
-   */
   private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeItemWithIntervalTree(
       Collection<Integer> additionalIds, MtasTreeItem treeItem,
       IntervalTreeNode<T, N> intervalTreeNode) {
@@ -528,20 +350,6 @@ public class CodecSearchTree {
     } while (checkList.size() > 0);
   }
 
-  /**
-   * Search mtas tree item with interval tree.
-   *
-   * @param <T> the generic type
-   * @param <N> the number type
-   * @param requiredAdditionalIds the required additional ids
-   * @param intervalTreeItem the interval tree item
-   * @param startPosition the start position
-   * @param endPosition the end position
-   * @param refs the refs
-   * @param additionalIds the additional ids
-   * @param additionalRefs the additional refs
-   * @param checkList the check list
-   */
   private static <T, N extends IntervalTreeNode<T, N>> void searchMtasTreeItemWithIntervalTree(
       Collection<Integer> requiredAdditionalIds,
       IntervalTreeNode<T, N> intervalTreeItem, int startPosition,
@@ -593,31 +401,14 @@ public class CodecSearchTree {
 
   }
 
-  /**
-   * The Class IntervalItem.
-   *
-   * @param <T> the generic type
-   * @param <N> the number type
-   */
   private static class IntervalItem<T, N extends IntervalTreeNode<T, N>> {
-
-    /** The mtas tree item. */
     public MtasTreeItem mtasTreeItem;
-
-    /** The interval tree node. */
     public IntervalTreeNode<T, N> intervalTreeNode;
 
-    /**
-     * Instantiates a new interval item.
-     *
-     * @param mtasTreeItem the mtas tree item
-     * @param intervalTreeNode the interval tree node
-     */
     public IntervalItem(MtasTreeItem mtasTreeItem,
         IntervalTreeNode<T, N> intervalTreeNode) {
       this.mtasTreeItem = mtasTreeItem;
       this.intervalTreeNode = intervalTreeNode;
     }
   }
-
 }

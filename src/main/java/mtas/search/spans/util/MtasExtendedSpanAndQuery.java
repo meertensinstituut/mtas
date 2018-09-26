@@ -10,7 +10,6 @@ import org.apache.lucene.search.spans.SpanQuery;
  */
 public class MtasExtendedSpanAndQuery extends SpanNearQuery {
 
-  /** The local clauses. */
   private HashSet<SpanQuery> localClauses;
 
   /**

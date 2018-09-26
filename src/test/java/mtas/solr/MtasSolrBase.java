@@ -23,22 +23,16 @@ import org.apache.solr.common.util.NamedList;
  */
 public class MtasSolrBase {
 
-  /** The Constant FIELD_ID. */
   public final static String FIELD_ID = "id";
   
-  /** The Constant FIELD_TITLE. */
   public final static String FIELD_TITLE = "title";
   
-  /** The Constant FIELD_TEXT. */
   public final static String FIELD_TEXT = "text";
   
-  /** The Constant FIELD_MTAS. */
   public final static String FIELD_MTAS = "mtas";
   
-  /** The Constant FIELD_MTAS_ADVANCED. */
   public final static String FIELD_MTAS_ADVANCED = "mtasAdvanced";
   
-  /** The Constant FIELD_SOURCE. */
   public final static String FIELD_SOURCE = "source";
 
   /**
@@ -48,7 +42,6 @@ public class MtasSolrBase {
     // do nothing
   }
 
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasSolrBase.class);
   
   /**
@@ -382,7 +375,7 @@ public class MtasSolrBase {
         List<NamedList<Object>> collectionResponseList = (List<NamedList<Object>>) collectionResponseListRaw;
         for (NamedList<Object> item : collectionResponseList) {
           if (item.get("id") != null && item.get("id") instanceof String) {
-            if (id.equals((String) item.get("id"))) {
+            if (id.equals(item.get("id"))) {
               return item;
             }
           }

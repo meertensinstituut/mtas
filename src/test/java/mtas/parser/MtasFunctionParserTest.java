@@ -20,7 +20,6 @@ import mtas.parser.function.util.MtasFunctionParserFunctionResponseLong;
  */
 public class MtasFunctionParserTest {
 
-  /** The generator. */
   Random generator = new Random();
 
   /**
@@ -185,7 +184,7 @@ public class MtasFunctionParserTest {
                     false));
           } else {
             testFunction(pf, args, n,
-                new MtasFunctionParserFunctionResponseDouble((int) 0, false));
+              new MtasFunctionParserFunctionResponseDouble(0, false));
           }
         }
       }
@@ -398,7 +397,7 @@ public class MtasFunctionParserTest {
   private Object compute(int op, long v1, long v2) throws IOException {
     if (op == 0) {
       Long s;
-      s = (long) (v1 + v2);
+      s = v1 + v2;
       if (s > Integer.MAX_VALUE || s < Integer.MIN_VALUE) {
         throw new IOException("too big");
       } else {
@@ -406,7 +405,7 @@ public class MtasFunctionParserTest {
       }
     } else if (op == 1) {
       Long s;
-      s = (long) (v1 - v2);
+      s = v1 - v2;
       if (s > Integer.MAX_VALUE || s < Integer.MIN_VALUE) {
         throw new IOException("too big");
       } else {
@@ -414,7 +413,7 @@ public class MtasFunctionParserTest {
       }
     } else if (op == 2) {
       Long s;
-      s = (long) (v1 * v2);
+      s = v1 * v2;
       if (s > Integer.MAX_VALUE || s < Integer.MIN_VALUE) {
         throw new IOException("too big");
       } else {
@@ -428,7 +427,7 @@ public class MtasFunctionParserTest {
       }
     } else if (op == 4) {
       Long s;
-      s = (long) (v1 ^ v2);
+      s = v1 ^ v2;
       if (s > Integer.MAX_VALUE || s < Integer.MIN_VALUE) {
         throw new IOException("too big");
       } else {

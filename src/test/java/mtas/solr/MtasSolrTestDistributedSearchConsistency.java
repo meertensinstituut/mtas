@@ -36,32 +36,23 @@ import com.google.common.io.Files;
  */
 public class MtasSolrTestDistributedSearchConsistency {
 
-  /** The log. */
   private static Log log = LogFactory
       .getLog(MtasSolrTestDistributedSearchConsistency.class);
 
-  /** The Constant COLLECTION_ALL_OPTIMIZED. */
   private static final String COLLECTION_ALL_OPTIMIZED = "collection1";
 
-  /** The Constant COLLECTION_ALL_MULTIPLE_SEGMENTS. */
   private static final String COLLECTION_ALL_MULTIPLE_SEGMENTS = "collection2";
 
-  /** The Constant COLLECTION_PART1_OPTIMIZED. */
   private static final String COLLECTION_PART1_OPTIMIZED = "collection3";
 
-  /** The Constant COLLECTION_PART2_MULTIPLE_SEGMENTS. */
   private static final String COLLECTION_PART2_MULTIPLE_SEGMENTS = "collection4";
 
-  /** The Constant COLLECTION_DISTRIBUTED. */
   private static final String COLLECTION_DISTRIBUTED = "collection5";
 
-  /** The cloud cluster. */
   private static MiniSolrCloudCluster cloudCluster;
 
-  /** The cloud base dir. */
   private static Path cloudBaseDir;
 
-  /** The solr documents. */
   private static Map<Integer, SolrInputDocument> solrDocuments;
 
   /**
@@ -248,7 +239,7 @@ public class MtasSolrTestDistributedSearchConsistency {
         params.set("mtas.stats.spans.0.type", String.join(",", types));
         params.set("rows", "0");
         Map<String, QueryResponse> itemList = createResults(params,
-            Arrays.asList(new String[] { entry.getKey() }));
+          Arrays.asList(entry.getKey()));
         for (String type : types) {
           Object itemValue = MtasSolrBase.getFromMtasStats(
               itemList.get(entry.getKey()).getResponse(), "spans", "statsKey",
@@ -860,7 +851,7 @@ public class MtasSolrTestDistributedSearchConsistency {
         create.get("id") != null && create.get("id") instanceof String);
     assertTrue(collection + ": create - id incorrect, '" + id
         + "' not equal to '" + create.get("id") + "'",
-        ((String) create.get("id")).equals(id));
+      create.get("id").equals(id));
     assertTrue(collection + ": create - no valid version",
         create.get("version") != null
             && create.get("version") instanceof String);
@@ -868,7 +859,7 @@ public class MtasSolrTestDistributedSearchConsistency {
       assertTrue(
           collection + ": create - version incorrect, '" + version
               + "' not equal to '" + create.get("version") + "'",
-          ((String) create.get("version")).equals(version));
+        create.get("version").equals(version));
     }
     assertTrue(collection + ": create - no valid size",
         create.get("size") != null && create.get("size") instanceof Number);

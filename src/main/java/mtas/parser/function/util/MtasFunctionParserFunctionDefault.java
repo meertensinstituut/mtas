@@ -1,20 +1,10 @@
 package mtas.parser.function.util;
 
-import java.io.IOException;
-
 import mtas.codec.util.CodecUtil;
 
-/**
- * The Class MtasFunctionParserFunctionDefault.
- */
-public class MtasFunctionParserFunctionDefault
-    extends MtasFunctionParserFunction {
+import java.io.IOException;
 
-  /**
-   * Instantiates a new mtas function parser function default.
-   *
-   * @param numberOfArguments the number of arguments
-   */
+public class MtasFunctionParserFunctionDefault extends MtasFunctionParserFunction {
   public MtasFunctionParserFunctionDefault(int numberOfArguments) {
     this.dataType = CodecUtil.DATA_TYPE_LONG;
     this.needPositions = false;
@@ -25,13 +15,6 @@ public class MtasFunctionParserFunctionDefault
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.function.util.MtasFunctionParserFunction#getValueDouble(long[],
-   * long)
-   */
   @Override
   public double getValueDouble(long[] args, long n) throws IOException {
     double value = 0;
@@ -43,13 +26,6 @@ public class MtasFunctionParserFunctionDefault
     return value;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.function.util.MtasFunctionParserFunction#getValueLong(long[],
-   * long)
-   */
   @Override
   public long getValueLong(long[] args, long n) throws IOException {
     long value = 0;
@@ -60,5 +36,4 @@ public class MtasFunctionParserFunctionDefault
     }
     return value;
   }
-
 }

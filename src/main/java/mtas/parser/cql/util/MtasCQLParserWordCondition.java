@@ -1,51 +1,26 @@
 package mtas.parser.cql.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import mtas.search.spans.MtasSpanAndQuery;
 import mtas.search.spans.MtasSpanNotQuery;
 import mtas.search.spans.MtasSpanOrQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
-/**
- * The Class MtasCQLParserWordCondition.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class MtasCQLParserWordCondition {
-
-  /** The Constant TYPE_AND. */
   public static final String TYPE_AND = "and";
-
-  /** The Constant TYPE_OR. */
   public static final String TYPE_OR = "or";
 
-  /** The positive query list. */
   private List<MtasSpanQuery> positiveQueryList;
-
-  /** The negative query list. */
   private List<MtasSpanQuery> negativeQueryList;
-
-  /** The condition list. */
   private List<MtasCQLParserWordCondition> conditionList;
 
-  /** The simplified. */
   private boolean simplified;
-
-  /** The not. */
   private boolean not;
-
-  /** The type. */
   private String type;
-
-  /** The field. */
   private String field;
 
-  /**
-   * Instantiates a new mtas CQL parser word condition.
-   *
-   * @param field the field
-   * @param type the type
-   */
   public MtasCQLParserWordCondition(String field, String type) {
     this.field = field;
     this.type = type;
@@ -56,74 +31,35 @@ public class MtasCQLParserWordCondition {
     conditionList = new ArrayList<MtasCQLParserWordCondition>();
   }
 
-  /**
-   * Type.
-   *
-   * @return the string
-   */
   public String type() {
     return type;
   }
 
-  /**
-   * Field.
-   *
-   * @return the string
-   */
   public String field() {
     return field;
   }
 
-  /**
-   * Swap not.
-   */
   public void swapNot() {
-    not = not ? false : true;
+    not = !not;
     simplified = false;
   }
 
-  /**
-   * Not.
-   *
-   * @return true, if successful
-   */
   public boolean not() {
     return not;
   }
 
-  /**
-   * Adds the positive query.
-   *
-   * @param q the q
-   */
   public void addPositiveQuery(MtasSpanQuery q) {
     positiveQueryList.add(q);
   }
 
-  /**
-   * Adds the negative query.
-   *
-   * @param q the q
-   */
   public void addNegativeQuery(MtasSpanQuery q) {
     negativeQueryList.add(q);
   }
 
-  /**
-   * Gets the positive query.
-   *
-   * @return the positive query
-   */
   public List<MtasSpanQuery> getPositiveQuery() {
     return positiveQueryList;
   }
 
-  /**
-   * Gets the positive query.
-   *
-   * @param index the index
-   * @return the positive query
-   */
   public MtasSpanQuery getPositiveQuery(int index) {
     if ((index >= 0) && (index < positiveQueryList.size())) {
       return positiveQueryList.get(index);
@@ -132,21 +68,10 @@ public class MtasCQLParserWordCondition {
     }
   }
 
-  /**
-   * Gets the negative query.
-   *
-   * @return the negative query
-   */
   public List<MtasSpanQuery> getNegativeQuery() {
     return negativeQueryList;
   }
 
-  /**
-   * Gets the negative query.
-   *
-   * @param index the index
-   * @return the negative query
-   */
   public MtasSpanQuery getNegativeQuery(int index) {
     if ((index >= 0) && (index < negativeQueryList.size())) {
       return negativeQueryList.get(index);
@@ -155,21 +80,11 @@ public class MtasCQLParserWordCondition {
     }
   }
 
-  /**
-   * Adds the condition.
-   *
-   * @param c the c
-   */
   public void addCondition(MtasCQLParserWordCondition c) {
     conditionList.add(c);
     simplified = false;
   }
 
-  /**
-   * Checks if is single.
-   *
-   * @return true, if is single
-   */
   public boolean isSingle() {
     // assume simplified
     if ((positiveQueryList.size() == 1) && (negativeQueryList.size() == 0)) {
@@ -181,48 +96,21 @@ public class MtasCQLParserWordCondition {
     return false;
   }
 
-  /**
-   * Checks if is simple positive.
-   *
-   * @return true, if is simple positive
-   */
   public boolean isSimplePositive() {
     // assume simplified
-    if ((positiveQueryList.size() > 0) && (negativeQueryList.size() == 0)) {
-      return true;
-    }
-    return false;
+    return (positiveQueryList.size() > 0) && (negativeQueryList.size() == 0);
   }
 
-  /**
-   * Checks if is simple negative.
-   *
-   * @return true, if is simple negative
-   */
   public boolean isSimpleNegative() {
     // assume simplified
-    if ((negativeQueryList.size() > 0) && (positiveQueryList.size() == 0)) {
-      return true;
-    }
-    return false;
+    return (negativeQueryList.size() > 0) && (positiveQueryList.size() == 0);
   }
 
-  /**
-   * Checks if is empty.
-   *
-   * @return true, if is empty
-   */
   public boolean isEmpty() {
-    if ((positiveQueryList.size() == 0) && (negativeQueryList.size() == 0)
-        && (conditionList.size() == 0)) {
-      return true;
-    }
-    return false;
+    return (positiveQueryList.size() == 0) && (negativeQueryList.size() == 0)
+      && (conditionList.size() == 0);
   }
 
-  /**
-   * Swap type.
-   */
   public void swapType() {
     if (type.equals(TYPE_AND)) {
       type = TYPE_OR;
@@ -241,18 +129,10 @@ public class MtasCQLParserWordCondition {
     simplified = false;
   }
 
-  /**
-   * Simplified.
-   *
-   * @return the boolean
-   */
   public Boolean simplified() {
     return simplified;
   }
 
-  /**
-   * Simplify.
-   */
   public void simplify() {
     if (!simplified) {
       if (conditionList.size() > 0) {
@@ -363,23 +243,11 @@ public class MtasCQLParserWordCondition {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     return toString("", "");
   }
 
-  /**
-   * To string.
-   *
-   * @param firstIndent the first indent
-   * @param indent the indent
-   * @return the string
-   */
   public String toString(String firstIndent, String indent) {
     StringBuilder text = new StringBuilder();
     if (isEmpty()) {
@@ -410,11 +278,6 @@ public class MtasCQLParserWordCondition {
     return text.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object object) {
     if (object == null) {
@@ -439,8 +302,8 @@ public class MtasCQLParserWordCondition {
               if (!(condition.positiveQueryList
                   .get(i) instanceof MtasCQLParserWordQuery)) {
                 return false;
-              } else if (!((MtasCQLParserWordQuery) positiveQueryList.get(i))
-                  .equals(condition.positiveQueryList.get(i))) {
+              } else if (!positiveQueryList.get(i)
+                                           .equals(condition.positiveQueryList.get(i))) {
                 return false;
               }
             }
@@ -454,8 +317,8 @@ public class MtasCQLParserWordCondition {
               if (!(condition.negativeQueryList
                   .get(i) instanceof MtasCQLParserWordQuery)) {
                 return false;
-              } else if (!((MtasCQLParserWordQuery) negativeQueryList.get(i))
-                  .equals(condition.negativeQueryList.get(i))) {
+              } else if (!negativeQueryList.get(i)
+                                           .equals(condition.negativeQueryList.get(i))) {
                 return false;
               }
             }
@@ -468,11 +331,6 @@ public class MtasCQLParserWordCondition {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -485,5 +343,4 @@ public class MtasCQLParserWordCondition {
     h = (h * 23) ^ negativeQueryList.hashCode();
     return h;
   }
-
 }

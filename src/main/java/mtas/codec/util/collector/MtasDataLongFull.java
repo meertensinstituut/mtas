@@ -1,41 +1,15 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.CodecUtil;
+import org.apache.commons.lang.ArrayUtils;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.SortedSet;
 
-import org.apache.commons.lang.ArrayUtils;
-import mtas.codec.util.CodecUtil;
-
-/**
- * The Class MtasDataLongFull.
- */
 public class MtasDataLongFull extends MtasDataFull<Long, Double> {
-
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Instantiates a new mtas data long full.
-   *
-   * @param collectorType the collector type
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param start the start
-   * @param number the number
-   * @param subCollectorTypes the sub collector types
-   * @param subDataTypes the sub data types
-   * @param subStatsTypes the sub stats types
-   * @param subStatsItems the sub stats items
-   * @param subSortTypes the sub sort types
-   * @param subSortDirections the sub sort directions
-   * @param subStart the sub start
-   * @param subNumber the sub number
-   * @param segmentRegistration the segment registration
-   * @param boundary the boundary
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public MtasDataLongFull(String collectorType, SortedSet<String> statsItems,
       String sortType, String sortDirection, Integer start, Integer number,
       String[] subCollectorTypes, String[] subDataTypes, String[] subStatsTypes,
@@ -48,11 +22,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
         subNumber, new MtasDataLongOperations(), segmentRegistration, boundary);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#getItem(int)
-   */
   @Override
   protected MtasDataItemLongFull getItem(int i) {
     if (i >= 0 && i < size) {
@@ -65,22 +34,12 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long, long)
-   */
   @Override
   public MtasDataCollector<?, ?> add(long valueSum, long valueN)
       throws IOException {
     throw new IOException("not supported");
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#add(long[], int)
-   */
   @Override
   public MtasDataCollector<?, ?> add(long[] values, int number)
       throws IOException {
@@ -90,22 +49,12 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     return dataCollector;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double, long)
-   */
   @Override
   public MtasDataCollector<?, ?> add(double valueSum, long valueN)
       throws IOException {
     throw new IOException("not supported");
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#add(double[], int)
-   */
   @Override
   public MtasDataCollector<?, ?> add(double[] values, int number)
       throws IOException {
@@ -117,26 +66,12 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     return dataCollector;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[],
-   * long, long)
-   */
   @Override
   public MtasDataCollector<?, ?> add(String key, long valueSum, long valueN)
       throws IOException {
     throw new IOException("not supported");
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[],
-   * long[], int)
-   */
   @Override
   public MtasDataCollector<?, ?> add(String key, long[] values, int number)
       throws IOException {
@@ -150,26 +85,12 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[],
-   * double, long)
-   */
   @Override
   public MtasDataCollector<?, ?> add(String key, double valueSum, long valueN)
       throws IOException {
     throw new IOException("not supported");
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#add(java.lang.String[],
-   * double[], int)
-   */
   @Override
   public MtasDataCollector<?, ?> add(String key, double[] values, int number)
       throws IOException {
@@ -185,13 +106,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#compareForComputingSegment(
-   * java.lang.Number, java.lang.Number)
-   */
   @Override
   protected boolean compareWithBoundary(Long value, Long boundary)
       throws IOException {
@@ -207,13 +121,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#minimumForComputingSegment(
-   * java.lang.Number, java.lang.Number)
-   */
   @Override
   protected Long lastForComputingSegment(Long value, Long boundary)
       throws IOException {
@@ -229,13 +136,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#minimumForComputingSegment(
-   * )
-   */
   @Override
   protected Long lastForComputingSegment() throws IOException {
     if (segmentRegistration.equals(SEGMENT_SORT_ASC)
@@ -250,13 +150,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.DataCollector.MtasDataCollector#boundaryForComputingSegment
-   * ()
-   */
   @Override
   protected Long boundaryForSegmentComputing(String segmentName)
       throws IOException {
@@ -287,11 +180,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataCollector#boundaryForSegment()
-   */
   @Override
   protected Long boundaryForSegment(String segmentName) throws IOException {
     if (segmentRegistration.equals(SEGMENT_SORT_ASC)
@@ -310,13 +198,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.collector.MtasDataCollector#stringToBoundary(java.lang.
-   * String, java.lang.Integer)
-   */
   @Override
   protected Long stringToBoundary(String boundary, Integer segmentNumber)
       throws IOException {
@@ -333,13 +214,6 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.collector.MtasDataCollector#validateSegmentBoundary(java.
-   * lang.Object)
-   */
   @Override
   public boolean validateSegmentBoundary(Object o) throws IOException {
     if (o instanceof Long) {
@@ -348,5 +222,4 @@ public class MtasDataLongFull extends MtasDataFull<Long, Double> {
       throw new IOException("incorrect type");
     }
   }
-
 }

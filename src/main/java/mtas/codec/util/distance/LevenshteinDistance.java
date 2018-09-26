@@ -1,55 +1,24 @@
 package mtas.codec.util.distance;
 
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.apache.lucene.util.BytesRef;
 
-/**
- * The Class LevenshteinDistance.
- */
 public class LevenshteinDistance extends Distance {
-
-  /** The initial state. */
   protected final double[] initialState;
-
-  /** The Constant defaultDeletionDistance. */
   protected final static double defaultDeletionDistance = 1.0;
-
-  /** The Constant defaultInsertionDistance. */
   protected final static double defaultInsertionDistance = 1.0;
-
-  /** The Constant defaultReplaceDistance. */
   protected final static double defaultReplaceDistance = 1.0;
-
-  /** The deletion distance. */
   protected double deletionDistance;
-
-  /** The insertion distance. */
   protected double insertionDistance;
-
-  /** The replace distance. */
   protected double replaceDistance;
-
-  /** The Constant PARAMETER_DELETIONDISTANCE. */
   protected final static String PARAMETER_DELETIONDISTANCE = "deletionDistance";
-
-  /** The Constant PARAMETER_INSERTIONDISTANCE. */
   protected final static String PARAMETER_INSERTIONDISTANCE = "insertionDistance";
-
-  /** The Constant PARAMETER_REPLACEDISTANCE. */
   protected final static String PARAMETER_REPLACEDISTANCE = "replaceDistance";
 
-  /**
-   * Instantiates a new levenshtein distance.
-   *
-   * @param prefix the prefix
-   * @param base the base
-   * @param maximum the maximum
-   * @param parameters the parameters
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public LevenshteinDistance(String prefix, String base, Double minimum, Double maximum,
       Map<String, String> parameters) throws IOException {
     super(prefix, base, minimum, maximum, parameters);
@@ -76,12 +45,6 @@ public class LevenshteinDistance extends Distance {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.distance.Distance#validate(org.apache.lucene.util.BytesRef)
-   */
   public boolean validateMaximum(BytesRef term) {
     if (maximum == null) {
       return true;
@@ -127,11 +90,6 @@ public class LevenshteinDistance extends Distance {
     return _distance(state);
   }
   
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.distance.Distance#compute(java.lang.String)
-   */
   @Override
   public double compute(String key) {
     double[][] state = _start();
@@ -144,11 +102,6 @@ public class LevenshteinDistance extends Distance {
     return _distance(state);
   }
 
-  /**
-   * Start.
-   *
-   * @return the double[][]
-   */
   private double[][] _start() {
     double[][] startState = new double[2][];
     startState[0] = new double[initialState.length];
@@ -156,13 +109,6 @@ public class LevenshteinDistance extends Distance {
     return startState;
   }
 
-  /**
-   * Step.
-   *
-   * @param state the state
-   * @param ch1 the ch 1
-   * @return the double[][]
-   */
   private double[][] _step(double[][] state, char ch1) {
     double cost;
     _shift(state);
@@ -177,33 +123,16 @@ public class LevenshteinDistance extends Distance {
     return state;
   }
 
-  /**
-   * Shift.
-   *
-   * @param state the state
-   */
   private void _shift(double[][] state) {
     double[] tmpState = state[0];
     state[0] = state[1];
     state[1] = tmpState;
   }
 
-  /**
-   * Checks if is match.
-   *
-   * @param state the state
-   * @return true, if successful
-   */
   private boolean _is_match(double[][] state) {
     return state[1][state[1].length - 1] < maximum;
   }
 
-  /**
-   * Can match.
-   *
-   * @param state the state
-   * @return true, if successful
-   */
   private boolean _can_match(double[][] state) {
     for (double d : state[1]) {
       if (d < maximum) {
@@ -213,14 +142,7 @@ public class LevenshteinDistance extends Distance {
     return false;
   }
 
-  /**
-   * Distance.
-   *
-   * @param state the state
-   * @return the double
-   */
   private double _distance(double[][] state) {
     return state[1][state[1].length - 1];
   }
-
 }

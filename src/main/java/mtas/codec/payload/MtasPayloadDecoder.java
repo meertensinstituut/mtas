@@ -1,60 +1,26 @@
 package mtas.codec.payload;
 
+import mtas.analysis.token.MtasOffset;
+import mtas.analysis.token.MtasPosition;
+
 import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import mtas.analysis.token.MtasOffset;
-import mtas.analysis.token.MtasPosition;
-
-/**
- * The Class MtasPayloadDecoder.
- */
 public class MtasPayloadDecoder {
-
-  /** The byte stream. */
   private MtasBitInputStream byteStream;
-
-  /** The mtas position. */
   private MtasPosition mtasPosition;
-
-  /** The mtas start position. */
   private int mtasStartPosition;
-
-  /** The mtas positions. */
   private SortedSet<Integer> mtasPositions;
-
-  /** The mtas id. */
   private Integer mtasId = null;
-
-  /** The mtas payload value. */
   private byte[] mtasPayloadValue = null;
-
-  /** The mtas parent id. */
   private Integer mtasParentId = null;
-
-  /** The mtas payload. */
   private Boolean mtasPayload = null;
-
-  /** The mtas parent. */
   private Boolean mtasParent = null;
-
-  /** The mtas position type. */
   private String mtasPositionType = null;
-
-  /** The mtas offset. */
   private MtasOffset mtasOffset;
-
-  /** The mtas real offset. */
   private MtasOffset mtasRealOffset;
 
-  /**
-   * Inits the.
-   *
-   * @param startPosition the start position
-   * @param payload the payload
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public void init(int startPosition, byte[] payload) throws IOException {
     byteStream = new MtasBitInputStream(payload);
     mtasStartPosition = startPosition;
@@ -75,29 +41,13 @@ public class MtasPayloadDecoder {
       }
     }
     // analyze initial bits - offset
-    if (byteStream.readBit() == 1) {
-      getOffset = true;
-    } else {
-      getOffset = false;
-    }
+    getOffset = byteStream.readBit() == 1;
     // analyze initial bits - realOffset
-    if (byteStream.readBit() == 1) {
-      getRealOffset = true;
-    } else {
-      getRealOffset = false;
-    }
+    getRealOffset = byteStream.readBit() == 1;
     // analyze initial bits - parent
-    if (byteStream.readBit() == 1) {
-      mtasParent = true;
-    } else {
-      mtasParent = false;
-    }
+    mtasParent = byteStream.readBit() == 1;
     // analyse initial bits - payload
-    if (byteStream.readBit() == 1) {
-      mtasPayload = true;
-    } else {
-      mtasPayload = false;
-    }
+    mtasPayload = byteStream.readBit() == 1;
     if (byteStream.readBit() == 0) {
       // string
     } else {
@@ -159,58 +109,27 @@ public class MtasPayloadDecoder {
     }
   }
 
-  /**
-   * Gets the mtas id.
-   *
-   * @return the mtas id
-   */
   public Integer getMtasId() {
     return mtasId;
   }
 
-  /**
-   * Gets the mtas parent id.
-   *
-   * @return the mtas parent id
-   */
   public Integer getMtasParentId() {
     return mtasParentId;
   }
 
-  /**
-   * Gets the mtas payload.
-   *
-   * @return the mtas payload
-   */
   public byte[] getMtasPayload() {
     return mtasPayload ? mtasPayloadValue : null;
   }
 
-  /**
-   * Gets the mtas position.
-   *
-   * @return the mtas position
-   */
   public MtasPosition getMtasPosition() {
     return mtasPosition;
   }
 
-  /**
-   * Gets the mtas offset.
-   *
-   * @return the mtas offset
-   */
   public MtasOffset getMtasOffset() {
     return mtasOffset;
   }
 
-  /**
-   * Gets the mtas real offset.
-   *
-   * @return the mtas real offset
-   */
   public MtasOffset getMtasRealOffset() {
     return mtasRealOffset;
   }
-
 }

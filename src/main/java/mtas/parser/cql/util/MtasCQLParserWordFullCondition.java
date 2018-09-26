@@ -7,20 +7,9 @@ import mtas.search.spans.MtasSpanAndQuery;
 import mtas.search.spans.MtasSpanOrQuery;
 import mtas.search.spans.util.MtasSpanQuery;
 
-/**
- * The Class MtasCQLParserWordFullCondition.
- */
-public class MtasCQLParserWordFullCondition
-    extends MtasCQLParserBasicSentencePartCondition {
-
-  /** The word condition. */
+public class MtasCQLParserWordFullCondition extends MtasCQLParserBasicSentencePartCondition {
   private MtasCQLParserWordCondition wordCondition;
 
-  /**
-   * Instantiates a new mtas CQL parser word full condition.
-   *
-   * @param condition the condition
-   */
   public MtasCQLParserWordFullCondition(MtasCQLParserWordCondition condition) {
     minimumOccurence = 1;
     maximumOccurence = 1;
@@ -35,30 +24,14 @@ public class MtasCQLParserWordFullCondition
     wordCondition = condition;
   }
 
-  /**
-   * Gets the condition.
-   *
-   * @return the condition
-   */
   public MtasCQLParserWordCondition getCondition() {
     return wordCondition;
   }
 
-  /**
-   * Checks if is empty.
-   *
-   * @return true, if is empty
-   */
   public boolean isEmpty() {
     return wordCondition.isEmpty();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.cql.util.MtasCQLParserBasicSentencePartCondition#getQuery()
-   */
   @Override
   public MtasSpanQuery getQuery() throws ParseException {
     MtasSpanQuery q = null;
@@ -135,11 +108,6 @@ public class MtasCQLParserWordFullCondition
     return q;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object object) {
     if (object == null)
@@ -148,24 +116,16 @@ public class MtasCQLParserWordFullCondition
       MtasCQLParserWordFullCondition word = (MtasCQLParserWordFullCondition) object;
       if (!wordCondition.equals(word.wordCondition))
         return false;
-      if (not != word.not)
-        return false;
-      return true;
+      return not == word.not;
     } else {
       return false;
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
     h = (h * 7) ^ wordCondition.hashCode();
     return h;
   }
-
 }

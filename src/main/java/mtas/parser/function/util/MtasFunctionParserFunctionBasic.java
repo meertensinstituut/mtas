@@ -1,77 +1,32 @@
 package mtas.parser.function.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import mtas.codec.util.CodecUtil;
 import mtas.parser.function.ParseException;
 
-/**
- * The Class MtasFunctionParserFunctionBasic.
- */
-public class MtasFunctionParserFunctionBasic
-    extends MtasFunctionParserFunction {
+import java.io.IOException;
+import java.util.ArrayList;
 
-  /** The first type. */
+public class MtasFunctionParserFunctionBasic extends MtasFunctionParserFunction {
   private String firstType;
-
-  /** The first id. */
   private int firstId;
-
-  /** The tmp parser longs. */
   private ArrayList<MtasFunctionParserFunction> tmpParserLongs = new ArrayList<>();
-
-  /** The tmp parser doubles. */
   private ArrayList<MtasFunctionParserFunction> tmpParserDoubles = new ArrayList<>();
-
-  /** The tmp constant longs. */
   private ArrayList<Long> tmpConstantLongs = new ArrayList<>();
-
-  /** The tmp constant doubles. */
   private ArrayList<Double> tmpConstantDoubles = new ArrayList<>();
-
-  /** The number. */
   private int number;
-
-  /** The operator list. */
   private String[] operatorList;
-
-  /** The type list. */
   private String[] typeList;
-
-  /** The id list. */
   private int[] idList;
-
-  /** The tmp operator list. */
   private ArrayList<String> tmpOperatorList = new ArrayList<>();
-
-  /** The tmp type list. */
   private ArrayList<String> tmpTypeList = new ArrayList<>();
-
-  /** The tmp id list. */
   private ArrayList<Integer> tmpIdList = new ArrayList<>();
 
-  /** The Constant BASIC_OPERATOR_ADD. */
   public static final String BASIC_OPERATOR_ADD = "add";
-
-  /** The Constant BASIC_OPERATOR_SUBTRACT. */
   public static final String BASIC_OPERATOR_SUBTRACT = "subtract";
-
-  /** The Constant BASIC_OPERATOR_MULTIPLY. */
   public static final String BASIC_OPERATOR_MULTIPLY = "multiply";
-
-  /** The Constant BASIC_OPERATOR_DIVIDE. */
   public static final String BASIC_OPERATOR_DIVIDE = "divide";
-
-  /** The Constant BASIC_OPERATOR_POWER. */
   public static final String BASIC_OPERATOR_POWER = "power";
 
-  /**
-   * Instantiates a new mtas function parser function basic.
-   *
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   public MtasFunctionParserFunctionBasic(MtasFunctionParserItem item)
       throws ParseException {
     sumRule = true;
@@ -134,11 +89,6 @@ public class MtasFunctionParserFunctionBasic
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.parser.function.util.MtasFunctionParserFunction#close()
-   */
   @Override
   public void close() throws ParseException {
     if (!defined()) {
@@ -189,63 +139,26 @@ public class MtasFunctionParserFunctionBasic
     }
   }
 
-  /**
-   * Adds the.
-   *
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   public void add(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_ADD, item);
   }
 
-  /**
-   * Subtract.
-   *
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   public void subtract(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_SUBTRACT, item);
   }
 
-  /**
-   * Multiply.
-   *
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   public void multiply(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_MULTIPLY, item);
   }
 
-  /**
-   * Divide.
-   *
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   public void divide(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_DIVIDE, item);
   }
 
-  /**
-   * Power.
-   *
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   public void power(MtasFunctionParserItem item) throws ParseException {
     basic(BASIC_OPERATOR_POWER, item);
   }
 
-  /**
-   * Basic.
-   *
-   * @param operator the operator
-   * @param item the item
-   * @throws ParseException the parse exception
-   */
   private void basic(String operator, MtasFunctionParserItem item)
       throws ParseException {
     if (!defined()) {
@@ -414,13 +327,6 @@ public class MtasFunctionParserFunctionBasic
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.function.util.MtasFunctionParserFunction#getValueDouble(long[],
-   * long)
-   */
   @Override
   public double getValueDouble(long[] args, long n) throws IOException {
     double sum;
@@ -581,13 +487,6 @@ public class MtasFunctionParserFunctionBasic
     return sum;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.parser.function.util.MtasFunctionParserFunction#getValueLong(long[],
-   * long)
-   */
   @Override
   public long getValueLong(long[] args, long n) throws IOException {
     try {
@@ -752,11 +651,6 @@ public class MtasFunctionParserFunctionBasic
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     if (firstType != null) {
@@ -784,13 +678,6 @@ public class MtasFunctionParserFunctionBasic
     }
   }
 
-  /**
-   * To string.
-   *
-   * @param type the type
-   * @param id the id
-   * @return the string
-   */
   private String toString(String type, int id) {
     if (type.equals(MtasFunctionParserItem.TYPE_CONSTANT_LONG)) {
       return tmpConstantLongs.get(id).toString();
@@ -808,5 +695,4 @@ public class MtasFunctionParserFunctionBasic
       return "..";
     }
   }
-
 }

@@ -29,242 +29,155 @@ import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.payloads.PayloadHelper;
 import org.apache.lucene.util.BytesRef;
 
-/**
- * The Class MtasBasicParser.
- */
 public abstract class MtasBasicParser extends MtasParser {
-
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasBasicParser.class);
 
-  /** The Constant MAPPING_TYPE_REF. */
   protected static final String MAPPING_TYPE_REF = "ref";
 
-  /** The Constant MAPPING_TYPE_RELATION. */
   protected static final String MAPPING_TYPE_RELATION = "relation";
 
-  /** The Constant MAPPING_TYPE_RELATION_ANNOTATION. */
   protected static final String MAPPING_TYPE_RELATION_ANNOTATION = "relationAnnotation";
 
-  /** The Constant MAPPING_TYPE_GROUP. */
   protected static final String MAPPING_TYPE_GROUP = "group";
 
-  /** The Constant MAPPING_TYPE_GROUP_ANNOTATION. */
   protected static final String MAPPING_TYPE_GROUP_ANNOTATION = "groupAnnotation";
 
-  /** The Constant MAPPING_TYPE_WORD. */
   protected static final String MAPPING_TYPE_WORD = "word";
 
-  /** The Constant MAPPING_TYPE_WORD_ANNOTATION. */
   protected static final String MAPPING_TYPE_WORD_ANNOTATION = "wordAnnotation";
 
-  /** The Constant ITEM_TYPE_STRING. */
   protected static final String ITEM_TYPE_STRING = "string";
 
-  /** The Constant ITEM_TYPE_NAME. */
   protected static final String ITEM_TYPE_NAME = "name";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR = "ancestorName";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR_GROUP. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR_GROUP = "ancestorGroupName";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationName";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR_WORD. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR_WORD = "ancestorWordName";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationName";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR_RELATION. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR_RELATION = "ancestorRelationName";
 
-  /** The Constant ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION. */
   protected static final String ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationName";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE. */
   protected static final String ITEM_TYPE_ATTRIBUTE = "attribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR = "ancestorAttribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP = "ancestorGroupAttribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationAttribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD = "ancestorWordAttribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationAttribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION = "ancestorRelationAttribute";
 
-  /** The Constant ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION. */
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationAttribute";
 
-  /** The Constant ITEM_TYPE_TEXT. */
   protected static final String ITEM_TYPE_TEXT = "text";
 
-  /** The Constant ITEM_TYPE_TEXT_SPLIT. */
   protected static final String ITEM_TYPE_TEXT_SPLIT = "textSplit";
 
-  /** The Constant ITEM_TYPE_UNKNOWN_ANCESTOR. */
   protected static final String ITEM_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
 
-  /** The Constant ITEM_TYPE_ANCESTOR. */
   protected static final String ITEM_TYPE_ANCESTOR = "ancestor";
 
-  /** The Constant ITEM_TYPE_ANCESTOR_GROUP. */
   protected static final String ITEM_TYPE_ANCESTOR_GROUP = "ancestorGroup";
 
-  /** The Constant ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION. */
   protected static final String ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
 
-  /** The Constant ITEM_TYPE_ANCESTOR_WORD. */
   protected static final String ITEM_TYPE_ANCESTOR_WORD = "ancestorWord";
 
-  /** The Constant ITEM_TYPE_ANCESTOR_WORD_ANNOTATION. */
   protected static final String ITEM_TYPE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
 
-  /** The Constant ITEM_TYPE_ANCESTOR_RELATION. */
   protected static final String ITEM_TYPE_ANCESTOR_RELATION = "ancestorRelation";
 
-  /** The Constant ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION. */
   protected static final String ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
 
-  /** The Constant ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE. */
   protected static final String ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE = "variableFromAttribute";
 
-  /** The Constant VARIABLE_SUBTYPE_VALUE. */
   protected static final String VARIABLE_SUBTYPE_VALUE = "value";
 
-  /** The Constant VARIABLE_SUBTYPE_VALUE_ITEM. */
   protected static final String VARIABLE_SUBTYPE_VALUE_ITEM = "item";
 
-  /** The Constant MAPPING_SUBTYPE_TOKEN. */
   protected static final String MAPPING_SUBTYPE_TOKEN = "token";
 
-  /** The Constant MAPPING_SUBTYPE_TOKEN_PRE. */
   protected static final String MAPPING_SUBTYPE_TOKEN_PRE = "pre";
 
-  /** The Constant MAPPING_SUBTYPE_TOKEN_POST. */
   protected static final String MAPPING_SUBTYPE_TOKEN_POST = "post";
 
-  /** The Constant MAPPING_SUBTYPE_PAYLOAD. */
   protected static final String MAPPING_SUBTYPE_PAYLOAD = "payload";
 
-  /** The Constant MAPPING_SUBTYPE_CONDITION. */
   protected static final String MAPPING_SUBTYPE_CONDITION = "condition";
 
-  /** The Constant MAPPING_FILTER_UPPERCASE. */
   protected static final String MAPPING_FILTER_UPPERCASE = "uppercase";
 
-  /** The Constant MAPPING_FILTER_LOWERCASE. */
   protected static final String MAPPING_FILTER_LOWERCASE = "lowercase";
 
-  /** The Constant MAPPING_FILTER_ASCII. */
   protected static final String MAPPING_FILTER_ASCII = "ascii";
 
-  /** The Constant MAPPING_FILTER_SPLIT. */
   protected static final String MAPPING_FILTER_SPLIT = "split";
 
-  /** The Constant UPDATE_TYPE_OFFSET. */
   protected static final String UPDATE_TYPE_OFFSET = "offsetUpdate";
 
-  /** The Constant UPDATE_TYPE_POSITION. */
   protected static final String UPDATE_TYPE_POSITION = "positionUpdate";
 
-  /** The Constant UPDATE_TYPE_VARIABLE. */
   protected static final String UPDATE_TYPE_VARIABLE = "variableUpdate";
 
-  /** The Constant UPDATE_TYPE_LOCAL_REF_OFFSET_START. */
   protected static final String UPDATE_TYPE_LOCAL_REF_OFFSET_START = "localRefOffsetStartUpdate";
 
-  /** The Constant UPDATE_TYPE_LOCAL_REF_OFFSET_END. */
   protected static final String UPDATE_TYPE_LOCAL_REF_OFFSET_END = "localRefOffsetEndUpdate";
 
-  /** The Constant UPDATE_TYPE_LOCAL_REF_POSITION_START. */
   protected static final String UPDATE_TYPE_LOCAL_REF_POSITION_START = "localRefPositionStartUpdate";
 
-  /** The Constant UPDATE_TYPE_LOCAL_REF_POSITION_END. */
   protected static final String UPDATE_TYPE_LOCAL_REF_POSITION_END = "localRefPositionEndUpdate";
 
-  /** The Constant MAPPING_VALUE_VALUE. */
   protected static final String MAPPING_VALUE_VALUE = "value";
 
-  /** The Constant MAPPING_VALUE_TYPE. */
   protected static final String MAPPING_VALUE_TYPE = "type";
 
-  /** The Constant MAPPING_VALUE_NAME. */
   protected static final String MAPPING_VALUE_NAME = "name";
 
-  /** The Constant MAPPING_VALUE_NAME. */
   protected static final String MAPPING_VALUE_NAMESPACE = "namespace";
 
-  /** The Constant MAPPING_VALUE_PREFIX. */
   protected static final String MAPPING_VALUE_PREFIX = "prefix";
 
-  /** The Constant MAPPING_VALUE_FILTER. */
   protected static final String MAPPING_VALUE_FILTER = "filter";
 
-  /** The Constant MAPPING_VALUE_DISTANCE. */
   protected static final String MAPPING_VALUE_DISTANCE = "distance";
 
-  /** The Constant MAPPING_VALUE_SOURCE. */
   protected static final String MAPPING_VALUE_SOURCE = "source";
 
-  /** The Constant MAPPING_VALUE_ANCESTOR. */
   protected static final String MAPPING_VALUE_ANCESTOR = "ancestor";
 
-  /** The Constant MAPPING_VALUE_SPLIT. */
   protected static final String MAPPING_VALUE_SPLIT = "split";
 
-  /** The Constant MAPPING_VALUE_NUMBER. */
   protected static final String MAPPING_VALUE_NUMBER = "number";
 
-  /** The Constant MAPPING_VALUE_CONDITION. */
   protected static final String MAPPING_VALUE_CONDITION = "condition";
 
-  /** The Constant MAPPING_VALUE_TEXT. */
   protected static final String MAPPING_VALUE_TEXT = "text";
 
-  /** The Constant MAPPING_VALUE_NOT. */
   protected static final String MAPPING_VALUE_NOT = "not";
 
-  /** The enc. */
   private Base64.Encoder enc = Base64.getEncoder();
 
-  /** The dec. */
   private Base64.Decoder dec = Base64.getDecoder();
 
-  /**
-   * Instantiates a new mtas basic parser.
-   */
   public MtasBasicParser() {
     super();
   }
 
-  /**
-   * Instantiates a new mtas basic parser.
-   *
-   * @param config the config
-   */
   public MtasBasicParser(MtasConfiguration config) {
     super(config);
   }
 
-  /**
-   * Creates the current list.
-   *
-   * @return the map
-   */
   protected Map<String, List<MtasParserObject>> createCurrentList() {
     Map<String, List<MtasParserObject>> currentList = new HashMap<>();
     currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
@@ -280,11 +193,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return currentList;
   }
 
-  /**
-   * Creates the update list.
-   *
-   * @return the map
-   */
   protected Map<String, Map<Integer, Set<String>>> createUpdateList() {
     Map<String, Map<Integer, Set<String>>> updateList = new HashMap<>();
     updateList.put(UPDATE_TYPE_OFFSET, new HashMap<>());
@@ -297,25 +205,10 @@ public abstract class MtasBasicParser extends MtasParser {
     return updateList;
   }
 
-  /**
-   * Creates the variables.
-   *
-   * @return the map
-   */
   protected Map<String, Map<String, String>> createVariables() {
     return new HashMap<>();
   }
 
-  /**
-   * Compute mappings from object.
-   *
-   * @param mtasTokenIdFactory the mtas token id factory
-   * @param object the object
-   * @param currentList the current list
-   * @param updateList the update list
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   protected void computeMappingsFromObject(
       MtasTokenIdFactory mtasTokenIdFactory, MtasParserObject object,
       Map<String, List<MtasParserObject>> currentList,
@@ -615,13 +508,6 @@ public abstract class MtasBasicParser extends MtasParser {
     updateMappingsWithLocalReferences(object, currentList, updateList);
   }
 
-  /**
-   * Compute variables from object.
-   *
-   * @param object the object
-   * @param currentList the current list
-   * @param variables the variables
-   */
   protected void computeVariablesFromObject(MtasParserObject object,
       Map<String, List<MtasParserObject>> currentList,
       Map<String, Map<String, String>> variables) {
@@ -646,12 +532,6 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Check for variables.
-   *
-   * @param values the values
-   * @return true, if successful
-   */
   private boolean checkForVariables(List<Map<String, String>> values) {
     if (values == null || values.isEmpty()) {
       return false;
@@ -666,13 +546,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return false;
   }
 
-  /**
-   * Update mappings with local references.
-   *
-   * @param currentObject the current object
-   * @param currentList the current list
-   * @param updateList the update list
-   */
   private void updateMappingsWithLocalReferences(MtasParserObject currentObject,
       Map<String, List<MtasParserObject>> currentList,
       Map<String, Map<Integer, Set<String>>> updateList) {
@@ -756,13 +629,6 @@ public abstract class MtasBasicParser extends MtasParser {
     currentObject.referredEndOffset.clear();
   }
 
-  /**
-   * Compute type from mapping source.
-   *
-   * @param source the source
-   * @return the string
-   * @throws MtasParserException the mtas parser exception
-   */
   private String computeTypeFromMappingSource(String source)
       throws MtasParserException {
     if (source.equals(MtasParserMapping.SOURCE_OWN)) {
@@ -787,15 +653,6 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Compute object from mapping value.
-   *
-   * @param object the object
-   * @param mappingValue the mapping value
-   * @param currentList the current list
-   * @return the mtas parser object[]
-   * @throws MtasParserException the mtas parser exception
-   */
   private MtasParserObject[] computeObjectFromMappingValue(
       MtasParserObject object, Map<String, String> mappingValue,
       Map<String, List<MtasParserObject>> currentList)
@@ -833,17 +690,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return checkObjects;
   }
 
-  /**
-   * Compute value from mapping values.
-   *
-   * @param object the object
-   * @param mappingValues the mapping values
-   * @param currentList the current list
-   * @param containsVariables the contains variables
-   * @return the string[]
-   * @throws MtasParserException the mtas parser exception
-   * @throws MtasConfigException the mtas config exception
-   */
   private String[] computeValueFromMappingValues(MtasParserObject object,
       List<Map<String, String>> mappingValues,
       Map<String, List<MtasParserObject>> currentList,
@@ -1006,42 +852,16 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Adds the and encode variable.
-   *
-   * @param originalValue the original value
-   * @param newVariable the new variable
-   * @param newVariableName the new variable name
-   * @param encode the encode
-   * @return the string
-   */
   private String addAndEncodeVariable(String originalValue, String newVariable,
       String newVariableName, boolean encode) {
     return addAndEncode(originalValue, newVariable, newVariableName, encode);
   }
 
-  /**
-   * Adds the and encode value.
-   *
-   * @param originalValue the original value
-   * @param newValue the new value
-   * @param encode the encode
-   * @return the string
-   */
   private String addAndEncodeValue(String originalValue, String newValue,
       boolean encode) {
     return addAndEncode(originalValue, null, newValue, encode);
   }
 
-  /**
-   * Adds the and encode.
-   *
-   * @param originalValue the original value
-   * @param newType the new type
-   * @param newValue the new value
-   * @param encode the encode
-   * @return the string
-   */
   private String addAndEncode(String originalValue, String newType,
       String newValue, boolean encode) {
     if (newValue == null) {
@@ -1073,14 +893,6 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Decode and update with variables.
-   *
-   * @param encodedPrefix the encoded prefix
-   * @param encodedPostfix the encoded postfix
-   * @param variables the variables
-   * @return the string
-   */
   protected String decodeAndUpdateWithVariables(String encodedPrefix,
       String encodedPostfix, Map<String, Map<String, String>> variables) {
     String[] prefixSplit;
@@ -1105,14 +917,6 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Decode and update with variables.
-   *
-   * @param splitList the split list
-   * @param variables the variables
-   * @return the string
-   * @throws MtasParserException the mtas parser exception
-   */
   private String decodeAndUpdateWithVariables(String[] splitList,
       Map<String, Map<String, String>> variables) throws MtasParserException {
     StringBuilder builder = new StringBuilder();
@@ -1150,15 +954,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return builder.toString();
   }
 
-  /**
-   * Compute payload from mapping payload.
-   *
-   * @param object the object
-   * @param mappingPayloads the mapping payloads
-   * @param currentList the current list
-   * @return the bytes ref
-   * @throws MtasParserException the mtas parser exception
-   */
   private BytesRef computePayloadFromMappingPayload(MtasParserObject object,
       List<Map<String, String>> mappingPayloads,
       Map<String, List<MtasParserObject>> currentList)
@@ -1201,13 +996,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return payload;
   }
 
-  /**
-   * Prevalidate object.
-   *
-   * @param object the object
-   * @param currentList the current list
-   * @return the boolean
-   */
   Boolean prevalidateObject(MtasParserObject object,
       Map<String, List<MtasParserObject>> currentList) {
     MtasParserType objectType = object.getType();
@@ -1226,14 +1014,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return false;
   }
 
-  /**
-   * Precheck mapping conditions.
-   *
-   * @param object the object
-   * @param mappingConditions the mapping conditions
-   * @param currentList the current list
-   * @throws MtasParserException the mtas parser exception
-   */
   void precheckMappingConditions(MtasParserObject object,
       List<Map<String, String>> mappingConditions,
       Map<String, List<MtasParserObject>> currentList)
@@ -1376,14 +1156,6 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Postcheck mapping conditions.
-   *
-   * @param object the object
-   * @param mappingConditions the mapping conditions
-   * @param currentList the current list
-   * @throws MtasParserException the mtas parser exception
-   */
   private void postcheckMappingConditions(MtasParserObject object,
       List<Map<String, String>> mappingConditions,
       Map<String, List<MtasParserObject>> currentList)
@@ -1426,14 +1198,6 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * Compute filtered split values.
-   *
-   * @param values the values
-   * @param filter the filter
-   * @return the string[]
-   * @throws MtasConfigException the mtas config exception
-   */
   private String[] computeFilteredSplitValues(String[] values, String filter)
       throws MtasConfigException {
     if (filter != null) {
@@ -1490,16 +1254,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return values;
   }
 
-  /**
-   * Compute filtered prefixed value.
-   *
-   * @param type the type
-   * @param value the value
-   * @param filter the filter
-   * @param prefix the prefix
-   * @return the string
-   * @throws MtasConfigException the mtas config exception
-   */
   private String computeFilteredPrefixedValue(String type, String value,
       String filter, String prefix) throws MtasConfigException {
     String localValue = value;
@@ -1537,14 +1291,6 @@ public abstract class MtasBasicParser extends MtasParser {
     return localValue;
   }
 
-  /**
-   * Compute maximum filtered payload.
-   *
-   * @param value the value
-   * @param payload the payload
-   * @param filter the filter
-   * @return the bytes ref
-   */
   private BytesRef computeMaximumFilteredPayload(String value, BytesRef payload,
       String filter) {
     // do magic with filter
@@ -1563,166 +1309,69 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * The Class MtasParserType.
-   *
-   * @param <T> the generic type
-   */
   protected static class MtasParserType<T> {
-
-    /** The type. */
     private String type;
-
-    /** The name. */
     private String name;
-
-    /** The precheck text. */
     protected boolean precheckText;
-
-    /** The ref attribute name. */
     private String refAttributeName;
-
-    /** The items. */
     protected ArrayList<T> items = new ArrayList<>();
 
-    /**
-     * Instantiates a new mtas parser type.
-     *
-     * @param type the type
-     * @param name the name
-     * @param precheckText the precheck text
-     */
     MtasParserType(String type, String name, boolean precheckText) {
       this.type = type;
       this.name = name;
       this.precheckText = precheckText;
     }
 
-    /**
-     * Instantiates a new mtas parser type.
-     *
-     * @param type the type
-     * @param name the name
-     * @param precheckText the precheck text
-     * @param refAttributeName the ref attribute name
-     */
     MtasParserType(String type, String name, boolean precheckText,
         String refAttributeName) {
       this(type, name, precheckText);
       this.refAttributeName = refAttributeName;
     }
 
-    /**
-     * Gets the ref attribute name.
-     *
-     * @return the ref attribute name
-     */
     public String getRefAttributeName() {
       return refAttributeName;
     }
 
-    /**
-     * Gets the name.
-     *
-     * @return the name
-     */
     public String getName() {
       return name;
     }
 
-    /**
-     * Gets the type.
-     *
-     * @return the type
-     */
     public String getType() {
       return type;
     }
 
-    /**
-     * Precheck text.
-     *
-     * @return true, if successful
-     */
     public boolean precheckText() {
       return precheckText;
     }
 
-    /**
-     * Adds the item.
-     *
-     * @param item the item
-     */
     public void addItem(T item) {
       items.add(item);
     }
 
-    /**
-     * Gets the items.
-     *
-     * @return the items
-     */
     public List<T> getItems() {
       return items;
     }
-
   }
 
-  /**
-   * The Class MtasParserVariableValue.
-   */
   protected static class MtasParserVariableValue {
-
-    /** The type. */
     public String type;
-
-    /** The name. */
     public String name;
 
-    /**
-     * Instantiates a new mtas parser variable value.
-     *
-     * @param type the type
-     * @param name the name
-     */
     public MtasParserVariableValue(String type, String name) {
       this.type = type;
       this.name = name;
     }
-
   }
 
-  /**
-   * The Class MtasParserMappingToken.
-   */
   protected static class MtasParserMappingToken {
-
-    /** The type. */
     public String type;
-
-    /** The offset. */
     public Boolean offset;
-
-    /** The realoffset. */
     public Boolean realoffset;
-
-    /** The parent. */
     public Boolean parent;
-
-    /** The pre values. */
     public List<Map<String, String>> preValues;
-
-    /** The post values. */
     public List<Map<String, String>> postValues;
-
-    /** The payload. */
     public List<Map<String, String>> payload;
 
-    /**
-     * Instantiates a new mtas parser mapping token.
-     *
-     * @param tokenType the token type
-     */
     public MtasParserMappingToken(String tokenType) {
       type = tokenType;
       offset = true;
@@ -1733,67 +1382,30 @@ public abstract class MtasBasicParser extends MtasParser {
       payload = new ArrayList<>();
     }
 
-    /**
-     * Sets the offset.
-     *
-     * @param tokenOffset the new offset
-     */
     public void setOffset(Boolean tokenOffset) {
       offset = tokenOffset;
     }
 
-    /**
-     * Sets the real offset.
-     *
-     * @param tokenRealOffset the new real offset
-     */
     public void setRealOffset(Boolean tokenRealOffset) {
       realoffset = tokenRealOffset;
     }
 
-    /**
-     * Sets the parent.
-     *
-     * @param tokenParent the new parent
-     */
     public void setParent(Boolean tokenParent) {
       parent = tokenParent;
     }
-
   }
 
-  /**
-   * The Class MtasParserVariable.
-   */
   protected static class MtasParserVariable {
-
-    /** The name. */
     public String name;
-
-    /** The variable. */
     public String variable;
-
-    /** The values. */
     protected ArrayList<MtasParserVariableValue> values;
 
-    /**
-     * Instantiates a new mtas parser variable.
-     *
-     * @param name the name
-     * @param value the value
-     */
     public MtasParserVariable(String name, String value) {
       this.name = name;
       this.variable = value;
       values = new ArrayList<>();
     }
 
-    /**
-     * Process config.
-     *
-     * @param config the config
-     * @throws MtasConfigException the mtas config exception
-     */
     public void processConfig(MtasConfiguration config)
         throws MtasConfigException {
       for (int k = 0; k < config.children.size(); k++) {
@@ -1822,11 +1434,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();
@@ -1839,98 +1446,34 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  /**
-   * The Class MtasParserMapping.
-   *
-   * @param <T> the generic type
-   */
   protected abstract class MtasParserMapping<T extends MtasParserMapping<T>> {
-
-    /**
-     * Self.
-     *
-     * @return the t
-     */
     protected abstract T self();
-
-    /** The Constant SOURCE_OWN. */
     protected static final String SOURCE_OWN = "own";
-
-    /** The Constant SOURCE_REFS. */
     protected static final String SOURCE_REFS = "refs";
-
-    /** The Constant SOURCE_ANCESTOR_GROUP. */
     protected static final String SOURCE_ANCESTOR_GROUP = "ancestorGroup";
-
-    /** The Constant SOURCE_ANCESTOR_GROUP_ANNOTATION. */
     protected static final String SOURCE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
-
-    /** The Constant SOURCE_ANCESTOR_WORD. */
     protected static final String SOURCE_ANCESTOR_WORD = "ancestorWord";
-
-    /** The Constant SOURCE_ANCESTOR_WORD_ANNOTATION. */
     protected static final String SOURCE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
-
-    /** The Constant SOURCE_ANCESTOR_RELATION. */
     protected static final String SOURCE_ANCESTOR_RELATION = "ancestorRelation";
-
-    /** The Constant SOURCE_ANCESTOR_RELATION_ANNOTATION. */
     protected static final String SOURCE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
-
-    /** The Constant SOURCE_STRING. */
     protected static final String SOURCE_STRING = "string";
-
-    /** The Constant PARSER_TYPE_VARIABLE. */
     protected static final String PARSER_TYPE_VARIABLE = "variable";
-
-    /** The Constant PARSER_TYPE_STRING. */
     protected static final String PARSER_TYPE_STRING = "string";
-
-    /** The Constant PARSER_TYPE_NAME. */
     protected static final String PARSER_TYPE_NAME = "name";
-
-    /** The Constant PARSER_TYPE_ATTRIBUTE. */
     protected static final String PARSER_TYPE_ATTRIBUTE = "attribute";
-
-    /** The Constant PARSER_TYPE_TEXT. */
     protected static final String PARSER_TYPE_TEXT = "text";
-
-    /** The Constant PARSER_TYPE_TEXT_SPLIT. */
     protected static final String PARSER_TYPE_TEXT_SPLIT = "textSplit";
-
-    /** The Constant PARSER_TYPE_EXISTENCE. */
     protected static final String PARSER_TYPE_EXISTENCE = "existence";
-
-    /** The Constant PARSER_TYPE_UNKNOWN_ANCESTOR. */
     protected static final String PARSER_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
-
-    /** The type. */
     protected String type;
-
-    /** The offset. */
     protected String offset;
-
-    /** The real offset. */
     protected String realOffset;
-
-    /** The position. */
     protected String position;
-
-    /** The start. */
     protected String start;
-
-    /** The end. */
     protected String end;
-
-    /** The tokens. */
     protected List<MtasParserMappingToken> tokens;
-
-    /** The conditions. */
     protected List<Map<String, String>> conditions;
 
-    /**
-     * Instantiates a new mtas parser mapping.
-     */
     public MtasParserMapping() {
       type = null;
       offset = null;
@@ -1942,12 +1485,6 @@ public abstract class MtasBasicParser extends MtasParser {
       end = null;
     }
 
-    /**
-     * Process config.
-     *
-     * @param config the config
-     * @throws MtasConfigException the mtas config exception
-     */
     public void processConfig(MtasConfiguration config)
         throws MtasConfigException {
       setStartEnd(config.attributes.get("start"), config.attributes.get("end"));
@@ -2317,12 +1854,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Sets the start end.
-     *
-     * @param start the start
-     * @param end the end
-     */
     protected void setStartEnd(String start, String end) {
       if (start != null && !start.isEmpty() && end != null && !end.isEmpty()) {
         this.start = start;
@@ -2330,11 +1861,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Condition unknown ancestor.
-     *
-     * @param number the number
-     */
     private void conditionUnknownAncestor(String number) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
       mapConstructionItem.put("type", PARSER_TYPE_UNKNOWN_ANCESTOR);
@@ -2342,13 +1868,6 @@ public abstract class MtasBasicParser extends MtasParser {
       conditions.add(mapConstructionItem);
     }
 
-    /**
-     * Adds the string.
-     *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param text the text
-     */
     private void addString(MtasParserMappingToken mappingToken, String type,
         String text) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2362,12 +1881,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Payload string.
-     *
-     * @param mappingToken the mapping token
-     * @param text the text
-     */
     private void payloadString(MtasParserMappingToken mappingToken,
         String text) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2377,14 +1890,6 @@ public abstract class MtasBasicParser extends MtasParser {
       mappingToken.payload.add(mapConstructionItem);
     }
 
-    /**
-     * Adds the name.
-     *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param prefix the prefix
-     * @param filter the filter
-     */
     private void addName(MtasParserMappingToken mappingToken, String type,
         String prefix, String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2399,12 +1904,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Condition name.
-     *
-     * @param condition the condition
-     * @param not the not
-     */
     private void conditionName(String condition, String not) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
       mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
@@ -2414,14 +1913,6 @@ public abstract class MtasBasicParser extends MtasParser {
       conditions.add(mapConstructionItem);
     }
 
-    /**
-     * Adds the text.
-     *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param prefix the prefix
-     * @param filter the filter
-     */
     private void addText(MtasParserMappingToken mappingToken, String type,
         String prefix, String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2436,15 +1927,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Adds the text split.
-     *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param split the split
-     * @param prefix the prefix
-     * @param filter the filter
-     */
     private void addTextSplit(MtasParserMappingToken mappingToken, String type,
         String split, String prefix, String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2460,13 +1942,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Condition text.
-     *
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
-     */
     private void conditionText(String condition, String filter, String not) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
       mapConstructionItem.put(MAPPING_VALUE_SOURCE, SOURCE_OWN);
@@ -2477,12 +1952,6 @@ public abstract class MtasBasicParser extends MtasParser {
       conditions.add(mapConstructionItem);
     }
 
-    /**
-     * Payload text.
-     *
-     * @param mappingToken the mapping token
-     * @param filter the filter
-     */
     private void payloadText(MtasParserMappingToken mappingToken,
         String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2492,15 +1961,6 @@ public abstract class MtasBasicParser extends MtasParser {
       mappingToken.payload.add(mapConstructionItem);
     }
 
-    /**
-     * Adds the attribute.
-     *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param name the name
-     * @param prefix the prefix
-     * @param filter the filter
-     */
     private void addAttribute(MtasParserMappingToken mappingToken, String type,
         String name, String namespace, String prefix, String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2519,15 +1979,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Adds the variable from attribute.
-     *
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param name the name
-     * @param prefix the prefix
-     * @param value the value
-     */
     private void addVariableFromAttribute(MtasParserMappingToken mappingToken,
         String type, String name, String prefix, String value) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2545,14 +1996,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Condition attribute.
-     *
-     * @param name the name
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
-     */
     private void conditionAttribute(String name, String namespace, String condition,
         String filter, String not) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2568,13 +2011,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Payload attribute.
-     *
-     * @param mappingToken the mapping token
-     * @param name the name
-     * @param filter the filter
-     */
     private void payloadAttribute(MtasParserMappingToken mappingToken,
         String name, String filter) {
       HashMap<String, String> mapConstructionItem = new HashMap<>();
@@ -2585,12 +2021,6 @@ public abstract class MtasBasicParser extends MtasParser {
       mappingToken.payload.add(mapConstructionItem);
     }
 
-    /**
-     * Condition ancestor.
-     *
-     * @param ancestorType the ancestor type
-     * @param number the number
-     */
     public void conditionAncestor(String ancestorType, String number) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
           || ancestorType.equals(SOURCE_ANCESTOR_GROUP_ANNOTATION)
@@ -2606,16 +2036,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Adds the ancestor name.
-     *
-     * @param ancestorType the ancestor type
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param distance the distance
-     * @param prefix the prefix
-     * @param filter the filter
-     */
     private void addAncestorName(String ancestorType,
         MtasParserMappingToken mappingToken, String type, String distance,
         String prefix, String filter) {
@@ -2639,15 +2059,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Condition ancestor name.
-     *
-     * @param ancestorType the ancestor type
-     * @param distance the distance
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
-     */
     public void conditionAncestorName(String ancestorType, String distance,
         String condition, String filter, String not) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
@@ -2667,17 +2078,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Adds the ancestor attribute.
-     *
-     * @param ancestorType the ancestor type
-     * @param mappingToken the mapping token
-     * @param type the type
-     * @param distance the distance
-     * @param name the name
-     * @param prefix the prefix
-     * @param filter the filter
-     */
     public void addAncestorAttribute(String ancestorType,
         MtasParserMappingToken mappingToken, String type, String distance,
         String name, String prefix, String filter) {
@@ -2704,16 +2104,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Condition ancestor attribute.
-     *
-     * @param ancestorType the ancestor type
-     * @param distance the distance
-     * @param name the name
-     * @param condition the condition
-     * @param filter the filter
-     * @param not the not
-     */
     public void conditionAncestorAttribute(String ancestorType, String distance,
         String name, String condition, String filter, String not) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
@@ -2736,15 +2126,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Payload ancestor attribute.
-     *
-     * @param mappingToken the mapping token
-     * @param ancestorType the ancestor type
-     * @param distance the distance
-     * @param name the name
-     * @param filter the filter
-     */
     private void payloadAncestorAttribute(MtasParserMappingToken mappingToken,
         String ancestorType, String distance, String name, String filter) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
@@ -2765,13 +2146,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Compute ancestor source type.
-     *
-     * @param type the type
-     * @return the string
-     * @throws MtasConfigException the mtas config exception
-     */
     private String computeAncestorSourceType(String type)
         throws MtasConfigException {
       if (type.equals(MAPPING_TYPE_GROUP)) {
@@ -2791,12 +2165,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Compute distance.
-     *
-     * @param distance the distance
-     * @return the string
-     */
     private String computeDistance(String distance) {
       Integer i = 0;
       if (distance != null) {
@@ -2810,39 +2178,18 @@ public abstract class MtasBasicParser extends MtasParser {
       return null;
     }
 
-    /**
-     * Compute number.
-     *
-     * @param number the number
-     * @return the string
-     */
     private String computeNumber(String number) {
       return computeDistance(number);
     }
 
-    /**
-     * Gets the tokens.
-     *
-     * @return the tokens
-     */
     public List<MtasParserMappingToken> getTokens() {
       return tokens;
     }
 
-    /**
-     * Gets the conditions.
-     *
-     * @return the conditions
-     */
     public List<Map<String, String>> getConditions() {
       return conditions;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();
@@ -2887,152 +2234,63 @@ public abstract class MtasBasicParser extends MtasParser {
 
   }
 
-  /**
-   * The Class MtasParserObject.
-   */
   protected class MtasParserObject {
-
-    /** The object type. */
     MtasParserType objectType;
-
-    /** The object real offset start. */
     private Integer objectRealOffsetStart = null;
-
-    /** The object real offset end. */
     private Integer objectRealOffsetEnd = null;
-
-    /** The object offset start. */
     private Integer objectOffsetStart = null;
-
-    /** The object offset end. */
     private Integer objectOffsetEnd = null;
-
-    /** The object text. */
     private String objectText = null;
-
-    /** The object id. */
     protected String objectId = null;
-
-    /** The object unknown ancestor number. */
     private Integer objectUnknownAncestorNumber = null;
-
-    /** The object attributes. */
     protected HashMap<String, String> objectAttributes = null;
-
-    /** The other object attributes. */
     protected HashMap<String, HashMap<String, String>> objectOtherAttributes = null;
-
-    /** The object positions. */
     private SortedSet<Integer> objectPositions = new TreeSet<>();
-
-    /** The ref ids. */
     private Set<String> refIds = new HashSet<>();
-
-    /** The updateable mappings as parent. */
     private Set<Integer> updateableMappingsAsParent = new HashSet<>();
-
-    /** The updateable ids with position. */
     private Set<String> updateableIdsWithPosition = new HashSet<>();
-
-    /** The updateable mappings with position. */
     protected Set<Integer> updateableMappingsWithPosition = new HashSet<>();
-
-    /** The updateable ids with offset. */
     private Set<String> updateableIdsWithOffset = new HashSet<>();
-
-    /** The updateable mappings with offset. */
     protected Set<Integer> updateableMappingsWithOffset = new HashSet<>();
-
-    /** The referred start position. */
     protected Map<String, Integer> referredStartPosition = new HashMap<>();
-
-    /** The referred end position. */
     protected Map<String, Integer> referredEndPosition = new HashMap<>();
-
-    /** The referred start offset. */
     protected Map<String, Integer> referredStartOffset = new HashMap<>();
-
-    /** The referred end offset. */
     protected Map<String, Integer> referredEndOffset = new HashMap<>();
 
-    /**
-     * Instantiates a new mtas parser object.
-     *
-     * @param type the type
-     */
     MtasParserObject(MtasParserType type) {
       objectType = type;
       objectAttributes = new HashMap<>();
       objectOtherAttributes = new HashMap<>();
     }
 
-    /**
-     * Register updateable mapping at parent.
-     *
-     * @param mappingId the mapping id
-     */
     public void registerUpdateableMappingAtParent(Integer mappingId) {
       updateableMappingsAsParent.add(mappingId);
     }
 
-    /**
-     * Register updateable mappings at parent.
-     *
-     * @param mappingIds the mapping ids
-     */
     public void registerUpdateableMappingsAtParent(Set<Integer> mappingIds) {
       updateableMappingsAsParent.addAll(mappingIds);
     }
 
-    /**
-     * Gets the updateable mappings as parent.
-     *
-     * @return the updateable mappings as parent
-     */
     public Set<Integer> getUpdateableMappingsAsParent() {
       return updateableMappingsAsParent;
     }
 
-    /**
-     * Reset updateable mappings as parent.
-     */
     public void resetUpdateableMappingsAsParent() {
       updateableMappingsAsParent.clear();
     }
 
-    /**
-     * Adds the updateable mapping with position.
-     *
-     * @param mappingId the mapping id
-     */
     public void addUpdateableMappingWithPosition(Integer mappingId) {
       updateableMappingsWithPosition.add(mappingId);
     }
 
-    /**
-     * Adds the updateable id with offset.
-     *
-     * @param id the id
-     */
     public void addUpdateableIdWithOffset(String id) {
       updateableIdsWithOffset.add(id);
     }
 
-    /**
-     * Adds the updateable mapping with offset.
-     *
-     * @param mappingId the mapping id
-     */
     public void addUpdateableMappingWithOffset(Integer mappingId) {
       updateableMappingsWithOffset.add(mappingId);
     }
 
-    /**
-     * Update mappings.
-     *
-     * @param idPositions the id positions
-     * @param idOffsets the id offsets
-     */
     public void updateMappings(Map<String, Set<Integer>> idPositions,
         Map<String, Integer[]> idOffsets) {
       for (Integer mappingId : updateableMappingsWithPosition) {
@@ -3062,12 +2320,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Gets the attribute.
-     *
-     * @param name the name
-     * @return the attribute
-     */
     public String getAttribute(String name) {
       if (name != null) {
         return objectAttributes.get(name);
@@ -3092,38 +2344,18 @@ public abstract class MtasBasicParser extends MtasParser {
       }  
     }
 
-    /**
-     * Gets the id.
-     *
-     * @return the id
-     */
     public String getId() {
       return objectId;
     }
 
-    /**
-     * Gets the type.
-     *
-     * @return the type
-     */
     MtasParserType getType() {
       return objectType;
     }
 
-    /**
-     * Sets the text.
-     *
-     * @param text the new text
-     */
     public void setText(String text) {
       objectText = text;
     }
 
-    /**
-     * Adds the text.
-     *
-     * @param text the text
-     */
     public void addText(String text) {
       if (objectText == null) {
         objectText = text;
@@ -3132,83 +2364,38 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Gets the text.
-     *
-     * @return the text
-     */
     public String getText() {
       return objectText;
     }
 
-    /**
-     * Sets the unknown ancestor number.
-     *
-     * @param i the new unknown ancestor number
-     */
     public void setUnknownAncestorNumber(Integer i) {
       objectUnknownAncestorNumber = i;
     }
 
-    /**
-     * Gets the unknown ancestor number.
-     *
-     * @return the unknown ancestor number
-     */
     public Integer getUnknownAncestorNumber() {
       return objectUnknownAncestorNumber;
     }
 
-    /**
-     * Sets the real offset start.
-     *
-     * @param start the new real offset start
-     */
     public void setRealOffsetStart(Integer start) {
       objectRealOffsetStart = start;
     }
 
-    /**
-     * Gets the real offset start.
-     *
-     * @return the real offset start
-     */
     public Integer getRealOffsetStart() {
       return objectRealOffsetStart;
     }
 
-    /**
-     * Sets the real offset end.
-     *
-     * @param end the new real offset end
-     */
     public void setRealOffsetEnd(Integer end) {
       objectRealOffsetEnd = end;
     }
 
-    /**
-     * Gets the real offset end.
-     *
-     * @return the real offset end
-     */
     public Integer getRealOffsetEnd() {
       return objectRealOffsetEnd;
     }
 
-    /**
-     * Sets the offset start.
-     *
-     * @param start the new offset start
-     */
     public void setOffsetStart(Integer start) {
       objectOffsetStart = start;
     }
 
-    /**
-     * Adds the offset start.
-     *
-     * @param start the start
-     */
     public void addOffsetStart(Integer start) {
       if ((start != null)
           && ((objectOffsetStart == null) || (start < objectOffsetStart))) {
@@ -3216,11 +2403,6 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Adds the offset end.
-     *
-     * @param end the end
-     */
     public void addOffsetEnd(Integer end) {
       if ((end != null)
           && ((objectOffsetEnd == null) || (end > objectOffsetEnd))) {
@@ -3228,38 +2410,18 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Gets the offset start.
-     *
-     * @return the offset start
-     */
     public Integer getOffsetStart() {
       return objectOffsetStart;
     }
 
-    /**
-     * Sets the offset end.
-     *
-     * @param end the new offset end
-     */
     public void setOffsetEnd(Integer end) {
       objectOffsetEnd = end;
     }
 
-    /**
-     * Gets the offset end.
-     *
-     * @return the offset end
-     */
     public Integer getOffsetEnd() {
       return objectOffsetEnd;
     }
 
-    /**
-     * Gets the offset.
-     *
-     * @return the offset
-     */
     public Integer[] getOffset() {
       if (objectOffsetStart != null) {
         return new Integer[] { objectOffsetStart, objectOffsetEnd };
@@ -3268,103 +2430,49 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    /**
-     * Adds the position.
-     *
-     * @param position the position
-     */
     public void addPosition(Integer position) {
       objectPositions.add(position);
     }
 
-    /**
-     * Adds the positions.
-     *
-     * @param positions the positions
-     */
     public void addPositions(Set<Integer> positions) {
       objectPositions.addAll(positions);
     }
 
-    /**
-     * Gets the positions.
-     *
-     * @return the positions
-     */
     public SortedSet<Integer> getPositions() {
       return objectPositions;
     }
 
-    /**
-     * Adds the ref id.
-     *
-     * @param id the id
-     */
     public void addRefId(String id) {
       if (id != null) {
         refIds.add(id);
       }
     }
 
-    /**
-     * Gets the ref ids.
-     *
-     * @return the ref ids
-     */
     public Set<String> getRefIds() {
       return refIds;
     }
 
-    /**
-     * Sets the referred start position.
-     *
-     * @param id the id
-     * @param position the position
-     */
     public void setReferredStartPosition(String id, Integer position) {
       referredStartPosition.put(id, position);
     }
 
-    /**
-     * Sets the referred end position.
-     *
-     * @param id the id
-     * @param position the position
-     */
     public void setReferredEndPosition(String id, Integer position) {
       referredEndPosition.put(id, position);
     }
 
-    /**
-     * Sets the referred start offset.
-     *
-     * @param id the id
-     * @param offset the offset
-     */
     public void setReferredStartOffset(String id, Integer offset) {
       referredStartOffset.put(id, offset);
     }
 
-    /**
-     * Sets the referred end offset.
-     *
-     * @param id the id
-     * @param offset the offset
-     */
     public void setReferredEndOffset(String id, Integer offset) {
       referredEndOffset.put(id, offset);
     }
 
-    /**
-     * Clear referred.
-     */
     public void clearReferred() {
       referredStartPosition.clear();
       referredEndPosition.clear();
       referredStartOffset.clear();
       referredEndOffset.clear();
     }
-
   }
-
 }

@@ -36,65 +36,45 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrComponentList implements MtasSolrComponent<ComponentList> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory.getLog(MtasSolrComponentList.class);
 
-  /** The Constant NAME. */
   public static final String NAME = "list";
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant PARAM_MTAS_LIST. */
   public static final String PARAM_MTAS_LIST = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_LIST_FIELD. */
   public static final String NAME_MTAS_LIST_FIELD = "field";
 
-  /** The Constant NAME_MTAS_LIST_QUERY_TYPE. */
   public static final String NAME_MTAS_LIST_QUERY_TYPE = "query.type";
 
-  /** The Constant NAME_MTAS_LIST_QUERY_VALUE. */
   public static final String NAME_MTAS_LIST_QUERY_VALUE = "query.value";
 
-  /** The Constant NAME_MTAS_LIST_QUERY_PREFIX. */
   public static final String NAME_MTAS_LIST_QUERY_PREFIX = "query.prefix";
 
-  /** The Constant NAME_MTAS_LIST_QUERY_IGNORE. */
   public static final String NAME_MTAS_LIST_QUERY_IGNORE = "query.ignore";
 
-  /** The Constant NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH. */
   public static final String NAME_MTAS_LIST_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumIgnoreLength";
 
-  /** The Constant NAME_MTAS_LIST_QUERY_VARIABLE. */
   public static final String NAME_MTAS_LIST_QUERY_VARIABLE = "query.variable";
 
-  /** The Constant SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_LIST_QUERY_VARIABLE_NAME = "name";
 
-  /** The Constant SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_LIST_QUERY_VARIABLE_VALUE = "value";
 
-  /** The Constant NAME_MTAS_LIST_KEY. */
   public static final String NAME_MTAS_LIST_KEY = "key";
 
-  /** The Constant NAME_MTAS_LIST_PREFIX. */
   public static final String NAME_MTAS_LIST_PREFIX = "prefix";
 
-  /** The Constant NAME_MTAS_LIST_START. */
   public static final String NAME_MTAS_LIST_START = "start";
 
-  /** The Constant NAME_MTAS_LIST_NUMBER. */
   public static final String NAME_MTAS_LIST_NUMBER = "number";
 
-  /** The Constant NAME_MTAS_LIST_LEFT. */
   public static final String NAME_MTAS_LIST_LEFT = "left";
 
-  /** The Constant NAME_MTAS_LIST_RIGHT. */
   public static final String NAME_MTAS_LIST_RIGHT = "right";
 
-  /** The Constant NAME_MTAS_LIST_OUTPUT. */
   public static final String NAME_MTAS_LIST_OUTPUT = "output";
 
   /**

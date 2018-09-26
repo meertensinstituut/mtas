@@ -1,5 +1,7 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.CodecUtil;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -7,43 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import mtas.codec.util.CodecUtil;
-
-/**
- * The Class MtasDataItemBasic.
- *
- * @param <T1> the generic type
- * @param <T2> the generic type
- */
 abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataItem<T1, T2> implements Serializable {
-
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The value sum. */
   protected T1 valueSum;
-
-  /** The value N. */
   protected Long valueN;
-
-  /** The operations. */
   protected MtasDataOperations<T1, T2> operations;
 
-  /**
-   * Instantiates a new mtas data item basic.
-   *
-   * @param valueSum the value sum
-   * @param valueN the value N
-   * @param sub the sub
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param errorNumber the error number
-   * @param errorList the error list
-   * @param operations the operations
-   * @param sourceNumber the source number
-   */
   public MtasDataItemBasic(T1 valueSum, long valueN,
       MtasDataCollector<?, ?> sub, Set<String> statsItems, String sortType,
       String sortDirection, int errorNumber, Map<String, Integer> errorList,
@@ -55,12 +28,6 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
     this.operations = operations;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.
-   * DataCollector.MtasDataItem)
-   */
   @Override
   public void add(MtasDataItem<T1, T2> newItem) throws IOException {
     if (newItem instanceof MtasDataItemBasic) {
@@ -73,11 +40,6 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
-   */
   @Override
   public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     Map<String, Object> response = new HashMap<>();
@@ -107,12 +69,6 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
     return response;
   }
 
-  /**
-   * Gets the value.
-   *
-   * @param statsType the stats type
-   * @return the value
-   */
   protected T2 getValue(String statsType) {
     if (statsType.equals(CodecUtil.STATS_TYPE_MEAN)) {
       return operations.divide1(valueSum, valueN);
@@ -121,11 +77,6 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataItem#getCompareValueType()
-   */
   public final int getCompareValueType() throws IOException {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
@@ -139,11 +90,6 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
-   */
   public final MtasDataItemNumberComparator<Long> getCompareValue0() {
     switch (sortType) {
     case CodecUtil.STATS_TYPE_N:
@@ -152,5 +98,4 @@ abstract class MtasDataItemBasic<T1 extends Number & Comparable<T1>, T2 extends 
       return null;
     }
   }
-
 }

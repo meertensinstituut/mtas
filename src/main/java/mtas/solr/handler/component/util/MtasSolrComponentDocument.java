@@ -27,57 +27,40 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentDocument
     implements MtasSolrComponent<ComponentDocument> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentDocument.class);
 
-  /** The Constant NAME. */
   public static final String NAME = "document";
 
-  /** The Constant PARAM_MTAS_DOCUMENT. */
   public static final String PARAM_MTAS_DOCUMENT = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_DOCUMENT_FIELD. */
   public static final String NAME_MTAS_DOCUMENT_FIELD = "field";
 
-  /** The Constant NAME_MTAS_DOCUMENT_KEY. */
   public static final String NAME_MTAS_DOCUMENT_KEY = "key";
 
-  /** The Constant NAME_MTAS_DOCUMENT_PREFIX. */
   public static final String NAME_MTAS_DOCUMENT_PREFIX = "prefix";
 
-  /** The Constant NAME_MTAS_DOCUMENT_TYPE. */
   public static final String NAME_MTAS_DOCUMENT_TYPE = "type";
 
-  /** The Constant NAME_MTAS_DOCUMENT_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_REGEXP = "regexp";
 
-  /** The Constant NAME_MTAS_DOCUMENT_LIST. */
   public static final String NAME_MTAS_DOCUMENT_LIST = "list";
 
-  /** The Constant NAME_MTAS_DOCUMENT_LIST_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_LIST_REGEXP = "listRegexp";
 
-  /** The Constant NAME_MTAS_DOCUMENT_LIST_EXPAND. */
   public static final String NAME_MTAS_DOCUMENT_LIST_EXPAND = "listExpand";
 
-  /** The Constant NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER. */
   public static final String NAME_MTAS_DOCUMENT_LIST_EXPAND_NUMBER = "listExpandNumber";
 
-  /** The Constant NAME_MTAS_DOCUMENT_IGNORE_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_IGNORE_REGEXP = "ignoreRegexp";
 
-  /** The Constant NAME_MTAS_DOCUMENT_IGNORE_LIST. */
   public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST = "ignoreList";
 
-  /** The Constant NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP. */
   public static final String NAME_MTAS_DOCUMENT_IGNORE_LIST_REGEXP = "ignoreListRegexp";
 
-  /** The Constant NAME_MTAS_DOCUMENT_NUMBER. */
   public static final String NAME_MTAS_DOCUMENT_NUMBER = "number";
 
-  /** The search component. */
   private MtasSolrSearchComponent searchComponent;
 
   /**

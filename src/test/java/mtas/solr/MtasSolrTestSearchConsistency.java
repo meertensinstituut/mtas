@@ -39,14 +39,11 @@ import org.apache.solr.core.CoreContainer;
  */
 public class MtasSolrTestSearchConsistency {
 
-  /** The log. */
   private static Log log = LogFactory
       .getLog(MtasSolrTestSearchConsistency.class);
 
-  /** The server. */
   private static EmbeddedSolrServer server;
 
-  /** The solr path. */
   private static Path solrPath;
 
   /**

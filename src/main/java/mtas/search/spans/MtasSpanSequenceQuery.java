@@ -1,12 +1,10 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import mtas.search.spans.util.MtasExpandSpanQuery;
+import mtas.search.spans.util.MtasIgnoreItem;
+import mtas.search.spans.util.MtasSpanQuery;
+import mtas.search.spans.util.MtasSpanWeight;
+import mtas.search.spans.util.MtasSpans;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
@@ -16,64 +14,28 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 
-import mtas.search.spans.util.MtasExpandSpanQuery;
-import mtas.search.spans.util.MtasIgnoreItem;
-import mtas.search.spans.util.MtasSpanQuery;
-import mtas.search.spans.util.MtasSpanWeight;
-import mtas.search.spans.util.MtasSpans;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * The Class MtasSpanSequenceQuery.
- */
 public class MtasSpanSequenceQuery extends MtasSpanQuery {
-
-  /** The items. */
   private List<MtasSpanSequenceItem> items;
-
-  /** The left minimum. */
   private int leftMinimum;
-
-  /** The left maximum. */
   private int leftMaximum;
-
-  /** The right minimum. */
   private int rightMinimum;
-
-  /** The right maximum. */
   private int rightMaximum;
-
-  /** The ignore query. */
   private MtasSpanQuery ignoreQuery;
-
-  /** The maximum ignore length. */
   private Integer maximumIgnoreLength;
-
-  /** The field. */
   private String field;
 
-  /**
-   * Instantiates a new mtas span sequence query.
-   *
-   * @param items the items
-   * @param ignoreQuery the ignore query
-   * @param maximumIgnoreLength the maximum ignore length
-   */
   public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
       MtasSpanQuery ignoreQuery, Integer maximumIgnoreLength) {
     this(items, 0, 0, 0, 0, ignoreQuery, maximumIgnoreLength);
   }
 
-  /**
-   * Instantiates a new mtas span sequence query.
-   *
-   * @param items the items
-   * @param leftMinimum the left minimum
-   * @param leftMaximum the left maximum
-   * @param rightMinimum the right minimum
-   * @param rightMaximum the right maximum
-   * @param ignoreQuery the ignore query
-   * @param maximumIgnoreLength the maximum ignore length
-   */
   public MtasSpanSequenceQuery(List<MtasSpanSequenceItem> items,
       int leftMinimum, int leftMaximum, int rightMinimum, int rightMaximum,
       MtasSpanQuery ignoreQuery, Integer maximumIgnoreLength) {
@@ -131,49 +93,23 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     setWidth(minimum, maximum);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return field;
   }
 
-  /**
-   * Gets the items.
-   *
-   * @return the items
-   */
   public List<MtasSpanSequenceItem> getItems() {
     return items;
   }
 
-  /**
-   * Gets the ignore query.
-   *
-   * @return the ignore query
-   */
   public MtasSpanQuery getIgnoreQuery() {
     return ignoreQuery;
   }
 
-  /**
-   * Gets the maximum ignore length.
-   *
-   * @return the maximum ignore length
-   */
   public Integer getMaximumIgnoreLength() {
     return maximumIgnoreLength;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     if (items.size() == 1) {
@@ -193,8 +129,7 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       int newRightMaximum = rightMaximum;
       MtasSpanQuery newIgnoreClause = ignoreQuery != null
           ? ignoreQuery.rewrite(reader) : null;
-      boolean actuallyRewritten = ignoreQuery != null
-          ? !newIgnoreClause.equals(ignoreQuery) : false;
+      boolean actuallyRewritten = ignoreQuery != null && !newIgnoreClause.equals(ignoreQuery);
       for (int i = 0; i < items.size(); i++) {
         newItem = items.get(i).rewrite(reader);
         if (newItem.getQuery() instanceof MtasSpanMatchNoneQuery) {
@@ -316,11 +251,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -346,11 +276,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -373,11 +298,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return isEqual;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.Query#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -397,13 +317,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return h;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.lucene.search.spans.SpanQuery#createWeight(org.apache.lucene.
-   * search.IndexSearcher, boolean)
-   */
   @Override
   public MtasSpanWeight createWeight(IndexSearcher searcher,
       boolean needsScores, float boost) throws IOException {
@@ -420,12 +333,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
         searcher, needsScores ? getTermContexts(subWeights) : null, boost);
   }
 
-  /**
-   * Gets the term contexts.
-   *
-   * @param items the items
-   * @return the term contexts
-   */
   protected Map<Term, TermContext> getTermContexts(
       List<MtasSpanSequenceQueryWeight> items) {
     List<SpanWeight> weights = new ArrayList<>();
@@ -435,11 +342,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     return getTermContexts(weights);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
-   */
   @Override
   public void disableTwoPhaseIterator() {
     super.disableTwoPhaseIterator();
@@ -451,30 +353,11 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     }
   }
 
-  /**
-   * The Class SpanSequenceWeight.
-   */
   protected class SpanSequenceWeight extends MtasSpanWeight {
-
-    /** The sub weights. */
     final List<MtasSpanSequenceQueryWeight> subWeights;
-
-    /** The ignore weight. */
     final SpanWeight ignoreWeight;
-
-    /** The maximum ignore length. */
     final Integer maximumIgnoreLength;
 
-    /**
-     * Instantiates a new span sequence weight.
-     *
-     * @param subWeights the sub weights
-     * @param ignoreWeight the ignore weight
-     * @param maximumIgnoreLength the maximum ignore length
-     * @param searcher the searcher
-     * @param terms the terms
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     public SpanSequenceWeight(List<MtasSpanSequenceQueryWeight> subWeights,
         SpanWeight ignoreWeight, Integer maximumIgnoreLength,
         IndexSearcher searcher, Map<Term, TermContext> terms, float boost)
@@ -485,13 +368,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       this.maximumIgnoreLength = maximumIgnoreLength;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.lucene.search.spans.SpanWeight#extractTermContexts(java.util.
-     * Map)
-     */
     @Override
     public void extractTermContexts(Map<Term, TermContext> contexts) {
       for (MtasSpanSequenceQueryWeight w : subWeights) {
@@ -502,14 +378,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.apache.lucene.search.spans.SpanWeight#getSpans(org.apache.lucene.
-     * index.LeafReaderContext,
-     * org.apache.lucene.search.spans.SpanWeight.Postings)
-     */
     @Override
     public MtasSpans getSpans(LeafReaderContext context,
         Postings requiredPostings) throws IOException {
@@ -550,11 +418,6 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
       }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.lucene.search.Weight#extractTerms(java.util.Set)
-     */
     @Override
     public void extractTerms(Set<Term> terms) {
       for (MtasSpanSequenceQueryWeight w : subWeights) {
@@ -580,24 +443,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
 
   }
 
-  /**
-   * The Class MtasSpanSequenceQuerySpans.
-   */
   protected static class MtasSpanSequenceQuerySpans {
-
-    /** The spans. */
     public Spans spans;
-
-    /** The optional. */
     public boolean optional;
 
-    /**
-     * Instantiates a new mtas span sequence query spans.
-     *
-     * @param query the query
-     * @param spans the spans
-     * @param optional the optional
-     */
     public MtasSpanSequenceQuerySpans(MtasSpanSequenceQuery query, Spans spans,
         boolean optional) {
       this.spans = spans != null ? spans : new MtasSpanMatchNoneSpans(query);
@@ -605,23 +454,10 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
     }
   }
 
-  /**
-   * The Class MtasSpanSequenceQueryWeight.
-   */
   private static class MtasSpanSequenceQueryWeight {
-
-    /** The span weight. */
     public SpanWeight spanWeight;
-
-    /** The optional. */
     public boolean optional;
 
-    /**
-     * Instantiates a new mtas span sequence query weight.
-     *
-     * @param spanWeight the span weight
-     * @param optional the optional
-     */
     public MtasSpanSequenceQueryWeight(SpanWeight spanWeight,
         boolean optional) {
       this.spanWeight = spanWeight;
@@ -633,5 +469,4 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

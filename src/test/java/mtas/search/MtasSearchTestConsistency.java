@@ -70,25 +70,18 @@ import mtas.search.spans.util.MtasSpanQuery;
  */
 public class MtasSearchTestConsistency {
 
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasSearchTestConsistency.class);
 
-  /** The Constant FIELD_ID. */
   private static final String FIELD_ID = "id";
 
-  /** The Constant FIELD_TITLE. */
   private static final String FIELD_TITLE = "title";
 
-  /** The Constant FIELD_CONTENT. */
   private static final String FIELD_CONTENT = "content";
 
-  /** The directory. */
   private static Directory directory;
 
-  /** The files. */
   private static HashMap<String, String> files;
 
-  /** The docs. */
   private static ArrayList<Integer> docs;
 
   /**
@@ -1473,13 +1466,10 @@ public class MtasSearchTestConsistency {
    */
   private static class QueryResult {
 
-    /** The docs. */
     public int docs;
 
-    /** The hits. */
     public int hits;
 
-    /** The result list. */
     public List<QueryHit> resultList;
 
     /**

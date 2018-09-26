@@ -1,32 +1,20 @@
 package mtas.search.spans;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
+import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.spans.SpanOrQuery;
 import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanWeight;
 
-import mtas.search.spans.util.MtasSpanQuery;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
 
-/**
- * The Class MtasSpanOrQuery.
- */
 public class MtasSpanOrQuery extends MtasSpanQuery {
-
-  /** The clauses. */
   private HashSet<MtasSpanQuery> clauses;
-
-  /** The base query. */
   private SpanQuery baseQuery;
 
-  /**
-   * Instantiates a new mtas span or query.
-   *
-   * @param initialClauses the initial clauses
-   */
   public MtasSpanOrQuery(MtasSpanQuery... initialClauses) {
     super(null, null);
     Integer minimum = null;
@@ -57,35 +45,17 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
         clauses.toArray(new MtasSpanQuery[clauses.size()]));
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.lucene.search.spans.SpanQuery#getField()
-   */
   @Override
   public String getField() {
     return baseQuery.getField();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.search.spans.util.MtasSpanQuery#createWeight(org.apache.lucene.search.
-   * IndexSearcher, boolean)
-   */
   @Override
   public SpanWeight createWeight(IndexSearcher searcher, boolean needsScores, float boost)
       throws IOException {
     return baseQuery.createWeight(searcher, needsScores, boost);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#rewrite(org.apache.lucene.index.
-   * IndexReader)
-   */
   @Override
   public MtasSpanQuery rewrite(IndexReader reader) throws IOException {
     if (clauses.size() > 1) {
@@ -150,12 +120,6 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.search.spans.MtasSpanUniquePositionQuery#toString(java.lang.String)
-   */
   @Override
   public String toString(String field) {
     StringBuilder buffer = new StringBuilder();
@@ -172,11 +136,6 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     return buffer.toString();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.MtasSpanUniquePositionQuery#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -189,11 +148,6 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     return clauses.equals(that.clauses);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.MtasSpanUniquePositionQuery#hashCode()
-   */
   @Override
   public int hashCode() {
     int h = this.getClass().getSimpleName().hashCode();
@@ -201,11 +155,6 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
     return h;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.search.spans.util.MtasSpanQuery#disableTwoPhaseIterator()
-   */
   @Override
   public void disableTwoPhaseIterator() {
     super.disableTwoPhaseIterator();
@@ -218,5 +167,4 @@ public class MtasSpanOrQuery extends MtasSpanQuery {
   public boolean isMatchAllPositionsQuery() {
     return false;
   }
-
 }

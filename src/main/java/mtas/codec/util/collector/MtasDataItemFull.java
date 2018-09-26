@@ -1,5 +1,8 @@
 package mtas.codec.util.collector;
 
+import mtas.codec.util.CodecUtil;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -8,47 +11,20 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import mtas.codec.util.CodecUtil;
 
-/**
- * The Class MtasDataItemFull.
- *
- * @param <T1> the generic type
- * @param <T2> the generic type
- */
 abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends Number & Comparable<T2>>
     extends MtasDataItem<T1, T2> implements Serializable {
 
-  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The full values. */
   public T1[] fullValues;
 
-  /** The operations. */
   protected MtasDataOperations<T1, T2> operations;
-
-  /** The stats. */
   protected DescriptiveStatistics stats = null;
 
-  /** The fp stats function items. */
   private Pattern fpStatsFunctionItems = Pattern
       .compile("(([^\\(,]+)(\\(([^\\)]*)\\))?)");
 
-  /**
-   * Instantiates a new mtas data item full.
-   *
-   * @param value the value
-   * @param sub the sub
-   * @param statsItems the stats items
-   * @param sortType the sort type
-   * @param sortDirection the sort direction
-   * @param errorNumber the error number
-   * @param errorList the error list
-   * @param operations the operations
-   * @param sourceNumber the source number
-   */
   public MtasDataItemFull(T1[] value, MtasDataCollector<?, ?> sub,
       Set<String> statsItems, String sortType, String sortDirection,
       int errorNumber, Map<String, Integer> errorList,
@@ -59,12 +35,6 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     this.operations = operations;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataItem#add(mtas.codec.util.
-   * DataCollector.MtasDataItem)
-   */
   @Override
   public void add(MtasDataItem<T1, T2> newItem) throws IOException {
     if (newItem instanceof MtasDataItemFull) {
@@ -81,9 +51,6 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     }
   }
 
-  /**
-   * Creates the stats.
-   */
   protected void createStats() {
     if (stats == null) {
       stats = new DescriptiveStatistics();
@@ -93,19 +60,8 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     }
   }
 
-  /**
-   * Gets the distribution.
-   *
-   * @param arguments the arguments
-   * @return the distribution
-   */
   abstract protected HashMap<String, Object> getDistribution(String arguments);
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.DataCollector.MtasDataItem#rewrite()
-   */
   @Override
   public Map<String, Object> rewrite(boolean showDebugInfo) throws IOException {
     createStats();
@@ -167,11 +123,6 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     return response;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataItem#getCompareValueType()
-   */
   @Override
   public final int getCompareValueType() throws IOException {
     switch (sortType) {
@@ -198,11 +149,6 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.collector.MtasDataItem#getCompareValue0()
-   */
   public final MtasDataItemNumberComparator<Long> getCompareValue0() {
     createStats();
     switch (sortType) {
@@ -212,5 +158,4 @@ abstract class MtasDataItemFull<T1 extends Number & Comparable<T1>, T2 extends N
       return null;
     }
   }
-
 }

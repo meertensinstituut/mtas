@@ -1,44 +1,25 @@
 package mtas.solr.update.processor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.util.BytesRef;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.util.BytesRef;
-
-/**
- * The Class MtasUpdateRequestProcessorResultWriter.
- */
 public class MtasUpdateRequestProcessorResultWriter implements Closeable {
-
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorResultWriter.class);
 
-  /** The object output stream. */
   private ObjectOutputStream objectOutputStream;
-
-  /** The file output stream. */
   private FileOutputStream fileOutputStream;
-
-  /** The closed. */
   private boolean closed;
-
-  /** The token number. */
   private int tokenNumber;
-
-  /** The file. */
   private File file;
 
-  /**
-   * Instantiates a new mtas update request processor result writer.
-   *
-   * @param value the value
-   */
   public MtasUpdateRequestProcessorResultWriter(String value) {
     closed = false;
     tokenNumber = 0;
@@ -56,16 +37,6 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
-  /**
-   * Adds the item.
-   *
-   * @param term the term
-   * @param offsetStart the offset start
-   * @param offsetEnd the offset end
-   * @param posIncr the pos incr
-   * @param payload the payload
-   * @param flags the flags
-   */
   public void addItem(String term, Integer offsetStart, Integer offsetEnd,
       Integer posIncr, BytesRef payload, Integer flags) {
     if (!closed) {
@@ -83,21 +54,10 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
-  /**
-   * Gets the token number.
-   *
-   * @return the token number
-   */
   public int getTokenNumber() {
     return tokenNumber;
   }
 
-  /**
-   * Gets the file name.
-   *
-   * @return the file name
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String getFileName() throws IOException {
     if (file != null) {
       return file.getAbsolutePath();
@@ -106,11 +66,6 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Closeable#close()
-   */
   @Override
   public void close() throws IOException {
     if (!closed) {
@@ -120,9 +75,6 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
-  /**
-   * Force close and delete.
-   */
   public void forceCloseAndDelete() {
     try {
       if (objectOutputStream != null) {
@@ -145,5 +97,4 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
       file = null;
     }
   }
-
 }

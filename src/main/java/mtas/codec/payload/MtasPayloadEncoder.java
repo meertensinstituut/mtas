@@ -9,73 +9,31 @@ import mtas.analysis.token.MtasTokenString;
 
 import org.apache.lucene.util.BytesRef;
 
-/**
- * The Class MtasPayloadEncoder.
- */
-
-/**
- * The Class MtasPayloadEncoder.
- */
 public class MtasPayloadEncoder {
-
-  /** The mtas token. */
   private MtasToken mtasToken;
-
-  /** The byte stream. */
   private MtasBitOutputStream byteStream;
-
-  /** The encoding flags. */
   private int encodingFlags;
 
-  /** The Constant ENCODE_PAYLOAD. */
   public static final int ENCODE_PAYLOAD = 1;
-
-  /** The Constant ENCODE_OFFSET. */
   public static final int ENCODE_OFFSET = 2;
-
-  /** The Constant ENCODE_REALOFFSET. */
   public static final int ENCODE_REALOFFSET = 4;
-
-  /** The Constant ENCODE_PARENT. */
   public static final int ENCODE_PARENT = 8;
-
-  /** The Constant ENCODE_DEFAULT. */
   public static final int ENCODE_DEFAULT = ENCODE_PAYLOAD | ENCODE_OFFSET
       | ENCODE_PARENT;
-
-  /** The Constant ENCODE_ALL. */
   public static final int ENCODE_ALL = ENCODE_PAYLOAD | ENCODE_OFFSET
       | ENCODE_REALOFFSET | ENCODE_PARENT;
 
-  /**
-   * Instantiates a new mtas payload encoder.
-   *
-   * @param token the token
-   * @param flags the flags
-   */
   public MtasPayloadEncoder(MtasToken token, int flags) {
     mtasToken = token;
     byteStream = new MtasBitOutputStream();
     encodingFlags = flags;
   }
 
-  /**
-   * Instantiates a new mtas payload encoder.
-   *
-   * @param token the token
-   */
   public MtasPayloadEncoder(MtasToken token) {
     this(token, ENCODE_DEFAULT);
   }
 
-  /**
-   * Gets the payload.
-   *
-   * @return the payload
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public BytesRef getPayload() throws IOException {
-
     // initial bits - position
     if (mtasToken.checkPositionType(MtasPosition.POSITION_SINGLE)) {
       byteStream.writeBit(0);
@@ -143,9 +101,8 @@ public class MtasPayloadEncoder {
             positionList[i] - previousPosition);
         previousPosition = positionList[i];
       }
-    } else {
-      // do nothing
     }
+
     // add offset info (EliasGammaCoding)
     if ((encodingFlags & ENCODE_OFFSET) == ENCODE_OFFSET
         && mtasToken.checkOffset()) {
@@ -188,5 +145,4 @@ public class MtasPayloadEncoder {
     // construct new payload
     return new BytesRef(byteStream.toByteArray());
   }
-
 }

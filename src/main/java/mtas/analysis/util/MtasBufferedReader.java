@@ -10,41 +10,16 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-/**
- * The Class MtasBufferedReader.
- */
 public class MtasBufferedReader extends Reader {
-
-  /** The in. */
   private Reader in;
-
-  /** The cb. */
   private char cb[];
-
-  /** The n chars. */
   private int nChars;
-
-  /** The next char. */
   private int nextChar;
-
-  /** The previous buffer size. */
   private int previousBufferSize;
-
-  /** The skip LF. */
   private boolean skipLF = false;
-
-  /** The default char buffer size. */
   private static int defaultCharBufferSize = 8192;
-
-  /** The default expected line length. */
   private static int defaultExpectedLineLength = 80;
 
-  /**
-   * Instantiates a new mtas buffered reader.
-   *
-   * @param in the in
-   * @param sz the sz
-   */
   public MtasBufferedReader(Reader in, int sz) {
     super(in);
     if (sz <= 0)
@@ -54,30 +29,15 @@ public class MtasBufferedReader extends Reader {
     nextChar = nChars = 0;
   }
 
-  /**
-   * Instantiates a new mtas buffered reader.
-   *
-   * @param in the in
-   */
   public MtasBufferedReader(Reader in) {
     this(in, defaultCharBufferSize);
   }
 
-  /**
-   * Ensure open.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private void ensureOpen() throws IOException {
     if (in == null)
       throw new IOException("Stream closed");
   }
 
-  /**
-   * Fill.
-   *
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private void fill() throws IOException {
     int n;
     previousBufferSize += nChars;
@@ -90,11 +50,6 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Reader#read()
-   */
   @Override
   public int read() throws IOException {
     synchronized (lock) {
@@ -117,15 +72,6 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /**
-   * Read 1.
-   *
-   * @param cbuf the cbuf
-   * @param off the off
-   * @param len the len
-   * @return the int
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private int read1(char[] cbuf, int off, int len) throws IOException {
     if (nextChar >= nChars) {
       /*
@@ -157,11 +103,6 @@ public class MtasBufferedReader extends Reader {
     return n;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Reader#read(char[], int, int)
-   */
   @Override
   public int read(char cbuf[], int off, int len) throws IOException {
     synchronized (lock) {
@@ -186,13 +127,6 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /**
-   * Read line.
-   *
-   * @param ignoreLF the ignore LF
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   String readLine(boolean ignoreLF) throws IOException {
     StringBuffer s = null;
     int startChar;
@@ -254,21 +188,10 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /**
-   * Read line.
-   *
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public String readLine() throws IOException {
     return readLine(false);
   }
 
-  /**
-   * Lines.
-   *
-   * @return the stream
-   */
   public Stream<String> lines() {
     Iterator<String> iter = new Iterator<String>() {
       String nextLine = null;
@@ -302,20 +225,10 @@ public class MtasBufferedReader extends Reader {
         Spliterator.ORDERED | Spliterator.NONNULL), false);
   }
 
-  /**
-   * Gets the position.
-   *
-   * @return the position
-   */
   public int getPosition() {
     return previousBufferSize + nextChar;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Reader#skip(long)
-   */
   @Override
   public long skip(long n) throws IOException {
     if (n < 0L) {
@@ -349,11 +262,6 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Reader#ready()
-   */
   @Override
   public boolean ready() throws IOException {
     synchronized (lock) {
@@ -381,11 +289,6 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Reader#reset()
-   */
   @Override
   public void reset() throws IOException {
     synchronized (lock) {
@@ -395,11 +298,6 @@ public class MtasBufferedReader extends Reader {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.Reader#close()
-   */
   @Override
   public void close() throws IOException {
     synchronized (lock) {

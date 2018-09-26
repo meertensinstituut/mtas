@@ -29,84 +29,58 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
 public class MtasSolrComponentGroup
     implements MtasSolrComponent<ComponentGroup> {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasSolrComponentGroup.class);
 
-  /** The search component. */
   MtasSolrSearchComponent searchComponent;
 
-  /** The Constant NAME. */
   public static final String NAME = "group";
 
-  /** The Constant PARAM_MTAS_GROUP. */
   public static final String PARAM_MTAS_GROUP = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_GROUP_FIELD. */
   public static final String NAME_MTAS_GROUP_FIELD = "field";
 
-  /** The Constant NAME_MTAS_GROUP_QUERY_TYPE. */
   public static final String NAME_MTAS_GROUP_QUERY_TYPE = "query.type";
 
-  /** The Constant NAME_MTAS_GROUP_QUERY_VALUE. */
   public static final String NAME_MTAS_GROUP_QUERY_VALUE = "query.value";
 
-  /** The Constant NAME_MTAS_GROUP_QUERY_PREFIX. */
   public static final String NAME_MTAS_GROUP_QUERY_PREFIX = "query.prefix";
 
-  /** The Constant NAME_MTAS_GROUP_QUERY_IGNORE. */
   public static final String NAME_MTAS_GROUP_QUERY_IGNORE = "query.ignore";
 
-  /** The Constant NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH. */
   public static final String NAME_MTAS_GROUP_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumIgnoreLength";
 
-  /** The Constant NAME_MTAS_GROUP_QUERY_VARIABLE. */
   public static final String NAME_MTAS_GROUP_QUERY_VARIABLE = "query.variable";
 
-  /** The Constant SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_NAME = "name";
 
-  /** The Constant SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_GROUP_QUERY_VARIABLE_VALUE = "value";
 
-  /** The Constant NAME_MTAS_GROUP_KEY. */
   public static final String NAME_MTAS_GROUP_KEY = "key";
 
-  /** The Constant NAME_MTAS_GROUP_NUMBER. */
   public static final String NAME_MTAS_GROUP_NUMBER = "number";
 
-  /** The Constant NAME_MTAS_GROUP_START. */
   public static final String NAME_MTAS_GROUP_START = "start";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_LEFT = "grouping.left";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_RIGHT. */
   public static final String NAME_MTAS_GROUP_GROUPING_RIGHT = "grouping.right";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE = "grouping.hit.inside";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_LEFT = "grouping.hit.left";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_RIGHT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_RIGHT = "grouping.hit.right";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_LEFT = "grouping.hit.insideLeft";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT. */
   public static final String NAME_MTAS_GROUP_GROUPING_HIT_INSIDE_RIGHT = "grouping.hit.insideRight";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_POSITION. */
   public static final String NAME_MTAS_GROUP_GROUPING_POSITION = "position";
 
-  /** The Constant NAME_MTAS_GROUP_GROUPING_PREFIXES. */
   public static final String NAME_MTAS_GROUP_GROUPING_PREFIXES = "prefixes";
 
-  /** The Constant DEFAULT_NUMBER. */
   private static final int DEFAULT_NUMBER = 10;
 
   /**

@@ -1,35 +1,17 @@
 package mtas.codec.util.distance;
 
+import org.apache.lucene.util.BytesRef;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.lucene.util.BytesRef;
-
-/**
- * The Class DamerauLevenshteinDistance.
- */
 public class DamerauLevenshteinDistance extends LevenshteinDistance {
-
-  /** The Constant defaultTranspositionDistance. */
   protected final static double defaultTranspositionDistance = 1.0;
-
-  /** The transposition distance. */
   protected double transpositionDistance;
-
-  /** The Constant PARAMETER_TRANSPOSITIONDISTANCE. */
   protected final static String PARAMETER_TRANSPOSITIONDISTANCE = "transpositionDistance";
 
-  /**
-   * Instantiates a new damerau levenshtein distance.
-   *
-   * @param prefix the prefix
-   * @param base the base
-   * @param maximum the maximum
-   * @param parameters the parameters
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public DamerauLevenshteinDistance(String prefix, String base, Double minimum, Double maximum,
       Map<String, String> parameters) throws IOException {
     super(prefix, base, minimum, maximum, parameters);
@@ -46,13 +28,6 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * mtas.codec.util.distance.LevenshteinDistance#validate(org.apache.lucene.
-   * util.BytesRef)
-   */
   @Override
   public boolean validateMaximum(BytesRef term) {
     if (maximum == null) {
@@ -94,11 +69,6 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     return _distance(state);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see mtas.codec.util.distance.LevenshteinDistance#compute(java.lang.String)
-   */
   @Override
   public double compute(String key) {
     double[][] state = _start();
@@ -113,11 +83,6 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     return _distance(state);
   }
 
-  /**
-   * Start.
-   *
-   * @return the double[][]
-   */
   private double[][] _start() {
     double[][] startState = new double[3][];
     startState[0] = new double[initialState.length];
@@ -126,14 +91,6 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     return startState;
   }
 
-  /**
-   * Step.
-   *
-   * @param state the state
-   * @param ch1 the ch 1
-   * @param ch2 the ch 2
-   * @return the double[][]
-   */
   private double[][] _step(double[][] state, char ch1, char ch2) {
     double cost;
     _shift(state);
@@ -153,11 +110,6 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     return state;
   }
 
-  /**
-   * Shift.
-   *
-   * @param state the state
-   */
   private void _shift(double[][] state) {
     double[] tmpState = state[0];
     state[0] = state[1];
@@ -165,22 +117,10 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     state[2] = tmpState;
   }
 
-  /**
-   * Checks if is match.
-   *
-   * @param state the state
-   * @return true, if successful
-   */
   private boolean _is_match(double[][] state) {
     return state[2][state[2].length - 1] < maximum;
   }
 
-  /**
-   * Can match.
-   *
-   * @param state the state
-   * @return true, if successful
-   */
   private boolean _can_match(double[][] state) {
     for (double d : state[2]) {
       if (d < maximum) {
@@ -190,14 +130,7 @@ public class DamerauLevenshteinDistance extends LevenshteinDistance {
     return false;
   }
 
-  /**
-   * Distance.
-   *
-   * @param state the state
-   * @return the double
-   */
   private double _distance(double[][] state) {
     return state[2][state[2].length - 1];
   }
-
 }

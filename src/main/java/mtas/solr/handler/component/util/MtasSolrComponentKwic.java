@@ -31,59 +31,41 @@ import mtas.solr.handler.component.MtasSolrSearchComponent;
  */
 public class MtasSolrComponentKwic implements MtasSolrComponent<ComponentKwic> {
 
-  /** The Constant NAME. */
   public static final String NAME = "kwic";
 
-  /** The Constant PARAM_MTAS_KWIC. */
   public static final String PARAM_MTAS_KWIC = MtasSolrSearchComponent.PARAM_MTAS
       + "." + NAME;
 
-  /** The Constant NAME_MTAS_KWIC_FIELD. */
   public static final String NAME_MTAS_KWIC_FIELD = "field";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_TYPE. */
   public static final String NAME_MTAS_KWIC_QUERY_TYPE = "query.type";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_VALUE. */
   public static final String NAME_MTAS_KWIC_QUERY_VALUE = "query.value";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_PREFIX. */
   public static final String NAME_MTAS_KWIC_QUERY_PREFIX = "query.prefix";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_IGNORE. */
   public static final String NAME_MTAS_KWIC_QUERY_IGNORE = "query.ignore";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH. */
   public static final String NAME_MTAS_KWIC_QUERY_MAXIMUM_IGNORE_LENGTH = "query.maximumIgnoreLength";
 
-  /** The Constant NAME_MTAS_KWIC_QUERY_VARIABLE. */
   public static final String NAME_MTAS_KWIC_QUERY_VARIABLE = "query.variable";
 
-  /** The Constant SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME. */
   public static final String SUBNAME_MTAS_KWIC_QUERY_VARIABLE_NAME = "name";
 
-  /** The Constant SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE. */
   public static final String SUBNAME_MTAS_KWIC_QUERY_VARIABLE_VALUE = "value";
 
-  /** The Constant NAME_MTAS_KWIC_KEY. */
   public static final String NAME_MTAS_KWIC_KEY = "key";
 
-  /** The Constant NAME_MTAS_KWIC_PREFIX. */
   public static final String NAME_MTAS_KWIC_PREFIX = "prefix";
 
-  /** The Constant NAME_MTAS_KWIC_NUMBER. */
   public static final String NAME_MTAS_KWIC_NUMBER = "number";
 
-  /** The Constant NAME_MTAS_KWIC_START. */
   public static final String NAME_MTAS_KWIC_START = "start";
 
-  /** The Constant NAME_MTAS_KWIC_LEFT. */
   public static final String NAME_MTAS_KWIC_LEFT = "left";
 
-  /** The Constant NAME_MTAS_KWIC_RIGHT. */
   public static final String NAME_MTAS_KWIC_RIGHT = "right";
 
-  /** The Constant NAME_MTAS_KWIC_OUTPUT. */
   public static final String NAME_MTAS_KWIC_OUTPUT = "output";
 
   /**

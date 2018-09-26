@@ -1,61 +1,29 @@
 package mtas.parser.function.util;
 
-import java.io.IOException;
-import java.util.HashSet;
-
+import mtas.codec.util.CodecUtil;
+import mtas.parser.function.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import mtas.codec.util.CodecUtil;
-import mtas.parser.function.ParseException;
+import java.io.IOException;
+import java.util.HashSet;
 
-/**
- * The Class MtasFunctionParserFunction.
- */
 public abstract class MtasFunctionParserFunction {
-
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasFunctionParserFunction.class);
 
-  /** The parser doubles. */
   protected MtasFunctionParserFunction[] parserDoubles;
-
-  /** The parser longs. */
   protected MtasFunctionParserFunction[] parserLongs;
-
-  /** The constant doubles. */
   protected Double[] constantDoubles;
-
-  /** The constant longs. */
   protected long[] constantLongs;
-
-  /** The data type. */
   protected String dataType = null;
-
-  /** The sum rule. */
   protected boolean sumRule = false;
-
-  /** The need positions. */
   protected boolean needPositions = false;
-
-  /** The degree. */
   protected Integer degree = null;
-
-  /** The need argument. */
   protected HashSet<Integer> needArgument = new HashSet<Integer>();
 
-  /** The defined. */
   private boolean defined = false;
 
-  /**
-   * Gets the response.
-   *
-   * @param args the args
-   * @param n the n
-   * @return the response
-   */
-  public final MtasFunctionParserFunctionResponse getResponse(long[] args,
-      long n) {
+  public final MtasFunctionParserFunctionResponse getResponse(long[] args, long n) {
     if (dataType.equals(CodecUtil.DATA_TYPE_LONG)) {
       try {
         long l = getValueLong(args, n);
@@ -77,77 +45,30 @@ public abstract class MtasFunctionParserFunction {
     }
   }
 
-  /**
-   * Gets the value double.
-   *
-   * @param args the args
-   * @param n the n
-   * @return the value double
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract double getValueDouble(long[] args, long n) throws IOException;
 
-  /**
-   * Gets the value long.
-   *
-   * @param args the args
-   * @param n the n
-   * @return the value long
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   public abstract long getValueLong(long[] args, long n) throws IOException;
 
-  /**
-   * Close.
-   *
-   * @throws ParseException the parse exception
-   */
   public void close() throws ParseException {
     defined = true;
   }
 
-  /**
-   * Gets the type.
-   *
-   * @return the type
-   */
   public final String getType() {
     return dataType;
   }
 
-  /**
-   * Sum rule.
-   *
-   * @return the boolean
-   */
   public final Boolean sumRule() {
     return sumRule;
   }
 
-  /**
-   * Need positions.
-   *
-   * @return the boolean
-   */
   public final Boolean needPositions() {
     return needPositions;
   }
 
-  /**
-   * Need argument.
-   *
-   * @param i the i
-   * @return the boolean
-   */
   public final Boolean needArgument(int i) {
     return needArgument.contains(i);
   }
 
-  /**
-   * Need arguments number.
-   *
-   * @return the int
-   */
   public final int needArgumentsNumber() {
     int number = 0;
     for (int i : needArgument) {
@@ -156,22 +77,11 @@ public abstract class MtasFunctionParserFunction {
     return number;
   }
 
-  /**
-   * Need argument.
-   *
-   * @return the hash set
-   */
   public final HashSet<Integer> needArgument() {
     return needArgument;
   }
 
-  /**
-   * Defined.
-   *
-   * @return true, if successful
-   */
   protected final boolean defined() {
     return defined;
   }
-
 }

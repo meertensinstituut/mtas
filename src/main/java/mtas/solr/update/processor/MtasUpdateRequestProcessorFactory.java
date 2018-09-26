@@ -1,15 +1,10 @@
 package mtas.solr.update.processor;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import mtas.analysis.MtasTokenizer;
+import mtas.analysis.util.MtasCharFilterFactory;
+import mtas.analysis.util.MtasTokenizerFactory;
+import mtas.codec.util.CodecUtil;
+import mtas.solr.schema.MtasPreAnalyzedField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -33,44 +28,31 @@ import org.apache.solr.update.AddUpdateCommand;
 import org.apache.solr.update.processor.UpdateRequestProcessor;
 import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 
-import mtas.analysis.MtasTokenizer;
-import mtas.analysis.util.MtasCharFilterFactory;
-import mtas.analysis.util.MtasTokenizerFactory;
-import mtas.codec.util.CodecUtil;
-import mtas.solr.schema.MtasPreAnalyzedField;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
-/**
- * A factory for creating MtasUpdateRequestProcessor objects.
- */
 public class MtasUpdateRequestProcessorFactory
     extends UpdateRequestProcessorFactory {
 
-  /** The Constant log. */
   private static final Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorFactory.class);
 
-  /** The config. */
   private MtasUpdateRequestProcessorConfig config = null;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.solr.update.processor.UpdateRequestProcessorFactory#init(org.
-   * apache.solr.common.util.NamedList)
-   */
   @Override
   @SuppressWarnings("rawtypes")
   public void init(NamedList args) {
     super.init(args);
   }
 
-  /**
-   * Inits the.
-   *
-   * @param req the req
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {
     if (config == null) {
@@ -127,7 +109,6 @@ public class MtasUpdateRequestProcessorFactory
               try {
                 listCharFilters = (ArrayList<SimpleOrderedMap<Object>>) analyzer
                     .findRecursive(FieldType.CHAR_FILTERS);
-                ;
                 configTokenizer = (SimpleOrderedMap<Object>) analyzer
                     .findRecursive(FieldType.TOKENIZER);
               } catch (ClassCastException e) {
@@ -157,7 +138,7 @@ public class MtasUpdateRequestProcessorFactory
                   }
                   if (className != null) {
                     try {
-                      Class<?> cls = Class.forName((String) className);
+                      Class<?> cls = Class.forName(className);
                       if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
                         Class<?>[] types = { Map.class, ResourceLoader.class };
                         Constructor<?> cnstr = cls.getConstructor(types);
@@ -213,7 +194,7 @@ public class MtasUpdateRequestProcessorFactory
                 }
                 if (className != null) {
                   try {
-                    Class<?> cls = Class.forName((String) className);
+                    Class<?> cls = Class.forName(className);
                     Class<?>[] types = { Map.class, ResourceLoader.class };
                     Constructor<?> cnstr = cls.getConstructor(types);
                     Object cff = cnstr.newInstance(args, resourceLoader);
@@ -273,7 +254,6 @@ public class MtasUpdateRequestProcessorFactory
 
 class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
-  /** The log. */
   private static Log log = LogFactory.getLog(MtasUpdateRequestProcessor.class);
 
   private MtasUpdateRequestProcessorConfig config;
@@ -475,7 +455,6 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 }
 
 class MtasUpdateRequestProcessorConfig {
-
   HashMap<String, CharFilterFactory[]> fieldTypeCharFilterFactories;
   HashMap<String, MtasTokenizerFactory> fieldTypeTokenizerFactory;
   HashMap<String, String> fieldMapping;
@@ -527,5 +506,4 @@ class MtasUpdateRequestProcessorSizeReader extends Reader {
   public long getTotalReadSize() {
     return totalReadSize;
   }
-
 }
