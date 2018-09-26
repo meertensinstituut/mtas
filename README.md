@@ -1,6 +1,6 @@
 # Multi Tier Annotation Search
 
-See [textexploration.github.io/mtas/](https://textexploration.github.io/mtas/) for more documentation and instructions.
+See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas/) for more documentation and instructions.
 
 ---
 

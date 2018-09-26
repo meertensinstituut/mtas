@@ -6,14 +6,14 @@ Mtas on a Solr based installation.
 To pull and run the image
 
 ```console
-docker pull textexploration/mtas
-docker run -t -i -p 8080:80 --name mtas textexploration/mtas
+docker pull meertensinstituut/mtas
+docker run -t -i -p 8080:80 --name mtas meertensinstituut/mtas
 ```
 
 Or to build and run
 
 ```console
-docker build -t mtas https://raw.githubusercontent.com/textexploration/mtas/master/docker/Dockerfile
+docker build -t mtas https://raw.githubusercontent.com/meertensinstituut/mtas/master/docker/Dockerfile
 docker run -t -i -p 8080:80 --name mtas mtas
 ```
 

@@ -1,5 +1,5 @@
 #Getting started
-#set($metadata = $xml.read("http://central.maven.org/maven2/org/textexploration/mtas/mtas/maven-metadata.xml"))
+#set($metadata = $xml.read("http://central.maven.org/maven2/nl/knaw/meertens/mtas/mtas/maven-metadata.xml"))
 #set($version = $metadata.versioning.latest)
 #set($fullversion = $version.getText())
 #set($versionnumbers = $StringUtils.split($fullversion,"."))
@@ -16,14 +16,14 @@
 #end
 #end  
 
-Prebuilt jar libraries are available from the [download](download.html) page, current version is [${fullversion}](https://github.com/textexploration/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar) (development)
+Prebuilt jar libraries are available from the [download](download.html) page, current version is [${fullversion}](https://github.com/meertensinstituut/mtas/releases/download/v${fullversion}/mtas-${fullversion}.jar) (development)
 
 **Build from Source with Maven**
 
 Download the source code from GitHub
 
 ``` console 
-git clone git://github.com/textexploration/mtas.git 
+git clone git://github.com/meertensinstituut/mtas.git 
 ```
 
 Build the library from the created project directory `mtas`
