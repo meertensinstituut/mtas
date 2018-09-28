@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class MtasSpanSequenceQuery extends MtasSpanQuery {
@@ -278,43 +279,27 @@ public class MtasSpanSequenceQuery extends MtasSpanQuery {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
-    if (getClass() != obj.getClass())
-      return false;
+    }
     MtasSpanSequenceQuery other = (MtasSpanSequenceQuery) obj;
-    boolean isEqual;
-    isEqual = field.equals(other.field);
-    isEqual &= items.equals(other.items);
-    isEqual &= leftMinimum == other.leftMinimum;
-    isEqual &= leftMaximum == other.leftMaximum;
-    isEqual &= rightMinimum == other.rightMinimum;
-    isEqual &= rightMaximum == other.rightMaximum;
-    isEqual &= ((ignoreQuery == null && other.ignoreQuery == null)
-        || (ignoreQuery != null && other.ignoreQuery != null
-            && ignoreQuery.equals(other.ignoreQuery)));
-    return isEqual;
+    return leftMinimum == other.leftMinimum &&
+      leftMaximum == other.leftMaximum &&
+      rightMinimum == other.rightMinimum &&
+      rightMaximum == other.rightMaximum &&
+      Objects.equals(items, other.items) &&
+      Objects.equals(ignoreQuery, other.ignoreQuery) &&
+      Objects.equals(maximumIgnoreLength, other.maximumIgnoreLength) &&
+      Objects.equals(field, other.field);
   }
 
   @Override
   public int hashCode() {
-    int h = this.getClass().getSimpleName().hashCode();
-    h = (h * 3) ^ field.hashCode();
-    h = (h * 5) ^ items.hashCode();
-    h = Integer.rotateLeft(h, leftMinimum) + leftMinimum;
-    h ^= 11;
-    h = Integer.rotateLeft(h, leftMaximum) + leftMaximum;
-    h ^= 13;
-    h = Integer.rotateLeft(h, rightMinimum) + rightMinimum;
-    h ^= 17;
-    h = Integer.rotateLeft(h, rightMaximum) + rightMaximum;
-    if (ignoreQuery != null) {
-      h = (h * 7) ^ ignoreQuery.hashCode();
-      h = (h * 11) ^ maximumIgnoreLength.hashCode();
-    }
-    return h;
+    return Objects.hash(
+      items, leftMinimum, leftMaximum, rightMinimum, rightMaximum, ignoreQuery, maximumIgnoreLength, field);
   }
 
   @Override
