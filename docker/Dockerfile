@@ -5,7 +5,6 @@
 #
 
 FROM ubuntu:16.04
-MAINTAINER Matthijs Brouwer, Textexploration.org
 
 EXPOSE 8983 80
   
