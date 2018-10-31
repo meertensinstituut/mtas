@@ -115,33 +115,33 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
     return create(input, configuration, null);
   }
 
-  public Reader create(Reader input, String configuration, String defaultConfiguration) throws IOException {
-    if (defaultConfiguration == null) {
-      defaultConfiguration = defaultArgument;
+  public Reader create(Reader input, String configName, String defaultConfigName) throws IOException {
+    if (defaultConfigName == null) {
+      defaultConfigName = defaultArgument;
     }
     if (configs != null && configs.size() > 0) {
-      if (configuration == null && defaultConfiguration == null) {
+      if (configName == null && defaultConfigName == null) {
         throw new IOException("no (default)configuration");
-      } else if (configuration == null) {
-        if (configs.get(defaultConfiguration) != null) {
-          return create(input, configs.get(defaultConfiguration));
+      } else if (configName == null) {
+        if (configs.get(defaultConfigName) != null) {
+          return create(input, configs.get(defaultConfigName));
         } else {
           throw new IOException(
-            "default configuration " + defaultConfiguration + " not available");
+            "default configuration " + defaultConfigName + " not available");
         }
       } else {
-        MtasConfiguration config = configs.get(configuration);
+        MtasConfiguration config = configs.get(configName);
         if (config == null) {
-          if (defaultConfiguration != null) {
-            if (configs.get(defaultConfiguration) != null) {
-              return create(input, configs.get(defaultConfiguration));
+          if (defaultConfigName != null) {
+            if (configs.get(defaultConfigName) != null) {
+              return create(input, configs.get(defaultConfigName));
             } else {
-              throw new IOException("configuration " + configuration
-                + " not found and default configuration " + defaultConfiguration
+              throw new IOException("configuration " + configName
+                + " not found and default configuration " + defaultConfigName
                 + " not available");
             }
           } else {
-            throw new IOException("configuration " + configuration
+            throw new IOException("configuration " + configName
               + " not available and no default configuration");
           }
         } else {
