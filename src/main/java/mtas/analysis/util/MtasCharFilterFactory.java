@@ -17,6 +17,8 @@ import java.util.Map;
  * <p>
  * This could do with a better name, but we're stuck because the current name used in
  * too many configuration files.
+ *
+ * TODO: throw me away.
  */
 public class MtasCharFilterFactory extends CharFilterFactory implements ResourceLoaderAware {
   private static final Log log = LogFactory.getLog(MtasCharFilterFactory.class);

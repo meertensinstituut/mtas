@@ -179,11 +179,8 @@ public class MtasUpdateRequestProcessorFactory
               if (configTokenizer != null) {
                 String className = null;
                 Map<String, String> args = new HashMap<>();
-                Iterator<Map.Entry<String, Object>> it = configTokenizer
-                    .iterator();
                 // get className and args
-                while (it.hasNext()) {
-                  Map.Entry<String, Object> obj = it.next();
+                for (Entry<String, Object> obj : configTokenizer) {
                   if (obj.getValue() instanceof String) {
                     if (obj.getKey().equals(FieldType.CLASS_NAME)) {
                       className = (String) obj.getValue();
@@ -196,8 +193,8 @@ public class MtasUpdateRequestProcessorFactory
                   try {
                     Class<?> cls = Class.forName(className);
                     Class<?>[] types = { Map.class, ResourceLoader.class };
-                    Constructor<?> cnstr = cls.getConstructor(types);
-                    Object cff = cnstr.newInstance(args, resourceLoader);
+                    Constructor<?> constructor = cls.getConstructor(types);
+                    Object cff = constructor.newInstance(args, resourceLoader);
                     if (cff instanceof MtasTokenizerFactory) {
                       config.fieldTypeTokenizerFactory.put(entry.getKey(),
                           (MtasTokenizerFactory) cff);
@@ -296,46 +293,41 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 configuration = obj.toString();
               }
             }
-            // charFilterFactories
+
             if (charFilterFactories != null) {
-              for (CharFilterFactory charFilterFactory : charFilterFactories) {
-                if (charFilterFactory instanceof MtasCharFilterFactory) {
-                  reader = ((MtasCharFilterFactory) charFilterFactory)
-                      .create(reader, configuration, defaultConfiguration);
-                } else {
-                  reader = charFilterFactory.create(reader);
+              for (CharFilterFactory factory : charFilterFactories) {
+                // We don't want the old pseudo-charfilters anymore. Remove this check once
+                // the class MtasCharFilterFactory is dead.
+                if (factory instanceof MtasCharFilterFactory) {
+                  continue;
                 }
-                if (reader == null) {
-                  throw new IOException(
-                      "charFilter " + charFilterFactory.getClass().getName()
-                          + " returns null");
-                }
+                reader = factory.create(reader);
               }
             }
-            
+
             sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
 
             // tokenizerFactory
             result = new MtasUpdateRequestProcessorResultWriter(storedValue);
             int numberOfPositions = 0;
             int numberOfTokens = 0;
-            Map<String,Integer> prefixes = new HashMap<>();
+            Map<String, Integer> prefixes = new HashMap<>();
             String prefix;
             Integer prefixCount;
-            try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {              
+            try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {
               tokenizer.setReader(sizeReader);
               tokenizer.reset();
               // attributes
               CharTermAttribute termAttribute = tokenizer
-                  .getAttribute(CharTermAttribute.class);
+                .getAttribute(CharTermAttribute.class);
               OffsetAttribute offsetAttribute = tokenizer
-                  .getAttribute(OffsetAttribute.class);
+                .getAttribute(OffsetAttribute.class);
               PositionIncrementAttribute positionIncrementAttribute = tokenizer
-                  .getAttribute(PositionIncrementAttribute.class);
+                .getAttribute(PositionIncrementAttribute.class);
               PayloadAttribute payloadAttribute = tokenizer
-                  .getAttribute(PayloadAttribute.class);
+                .getAttribute(PayloadAttribute.class);
               FlagsAttribute flagsAttribute = tokenizer
-                  .getAttribute(FlagsAttribute.class);
+                .getAttribute(FlagsAttribute.class);
 
               while (tokenizer.incrementToken()) {
                 String term = null;
@@ -348,10 +340,10 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                   term = termAttribute.toString();
                   prefix = CodecUtil.termPrefix(term);
                   prefixCount = prefixes.get(prefix);
-                  if(prefixCount!=null) {
-                	  prefixes.put(prefix,  prefixCount+1);
+                  if (prefixCount != null) {
+                    prefixes.put(prefix, prefixCount + 1);
                   } else {
-                	  prefixes.put(prefix,  1);
+                    prefixes.put(prefix, 1);
                   }
                 }
                 if (offsetAttribute != null) {
@@ -372,7 +364,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 numberOfTokens++;
                 numberOfPositions += posIncr;
                 result.addItem(term, offsetStart, offsetEnd, posIncr, payload,
-                    flags);
+                  flags);
                 // System.out.print(term+" ");
               }
 
@@ -386,36 +378,36 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             }
             // update size
             setFields(doc, config.fieldTypeSizeField.get(fieldType),
-                sizeReader.getTotalReadSize());
+              sizeReader.getTotalReadSize());
             // update numberOfPositions
             setFields(doc,
-                config.fieldTypeNumberOfPositionsField.get(fieldType),
-                numberOfPositions);
+              config.fieldTypeNumberOfPositionsField.get(fieldType),
+              numberOfPositions);
             // update numberOfTokens
             setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
-                numberOfTokens);
+              numberOfTokens);
             // update prefixes
             setFields(doc, config.fieldTypePrefixField.get(fieldType),
-                prefixes.keySet());
-            if(config.fieldTypePrefixNumbersFieldPrefix.get(fieldType)!=null) {
-	            for(Entry<String,Integer> prefixesEntry : prefixes.entrySet()) {
-	            	setFields(doc, config.fieldTypePrefixNumbersFieldPrefix.get(fieldType)+prefixesEntry.getKey(),
-	            			prefixesEntry.getValue());
-	            }
-            }    
+              prefixes.keySet());
+            if (config.fieldTypePrefixNumbersFieldPrefix.get(fieldType) != null) {
+              for (Entry<String, Integer> prefixesEntry : prefixes.entrySet()) {
+                setFields(doc, config.fieldTypePrefixNumbersFieldPrefix.get(fieldType) + prefixesEntry.getKey(),
+                  prefixesEntry.getValue());
+              }
+            }
           } catch (IOException e) {
             log.info(e);
             // update error
             doc.addField(config.fieldTypeErrorField.get(fieldType),
-                e.getMessage());
+              e.getMessage());
             // update size
             setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);
             // update numberOfPositions
             setFields(doc,
-                config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
+              config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
             // update numberOfTokens
             setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
-                0);
+              0);
             // update prefixes
             removeFields(doc, config.fieldTypePrefixField.get(fieldType));
             if (result != null) {
@@ -441,7 +433,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
   }
 
   private void setFields(SolrInputDocument doc, String fieldNames,
-      Object value) {
+                         Object value) {
     if (fieldNames != null) {
       String[] tmpFields = fieldNames.split(",");
       for (int i = 0; i < tmpFields.length; i++) {
