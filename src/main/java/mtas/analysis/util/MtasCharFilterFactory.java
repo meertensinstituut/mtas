@@ -23,19 +23,19 @@ import java.util.Map;
 public class MtasCharFilterFactory extends CharFilterFactory implements ResourceLoaderAware {
   private static final Log log = LogFactory.getLog(MtasCharFilterFactory.class);
 
-  public static final String ARGUMENT_TYPE = "type";
-  public static final String ARGUMENT_PREFIX = "prefix";
-  public static final String ARGUMENT_POSTFIX = "postfix";
-  public static final String ARGUMENT_CONFIG = "config";
-  public static final String ARGUMENT_DEFAULT = "default";
-  public static final String VALUE_TYPE_URL = "url";
-  public static final String VALUE_TYPE_FILE = "file";
+  private static final String ARGUMENT_TYPE = "type";
+  private static final String ARGUMENT_PREFIX = "prefix";
+  private static final String ARGUMENT_POSTFIX = "postfix";
+  private static final String ARGUMENT_CONFIG = "config";
+  private static final String ARGUMENT_DEFAULT = "default";
+  private static final String VALUE_TYPE_URL = "url";
+  private static final String VALUE_TYPE_FILE = "file";
 
-  String configArgument;
-  String defaultArgument;
-  String typeArgument;
-  String prefixArgument;
-  String postfixArgument;
+  private String configArgument;
+  private String defaultArgument;
+  private String typeArgument;
+  private String prefixArgument;
+  private String postfixArgument;
 
   private HashMap<String, MtasConfiguration> configs = null;
   private MtasConfiguration config = null;
@@ -104,17 +104,16 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
 
   @Override
   public Reader create(Reader input) {
-    String configuration = null;
     try {
-      return create(input, configuration);
+      return create(input, (String) null);
     } catch (IOException e) {
       log.debug(e);
       return null;
     }
   }
 
-  public Reader create(Reader input, String configuration) throws IOException {
-    return create(input, configuration, null);
+  public Reader create(Reader input, String configName) throws IOException {
+    return create(input, configName, null);
   }
 
   public Reader create(Reader input, String configName, String defaultConfigName) throws IOException {

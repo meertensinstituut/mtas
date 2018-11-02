@@ -31,17 +31,13 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class MtasUpdateRequestProcessorFactory
-    extends UpdateRequestProcessorFactory {
-
+public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFactory {
   private static final Log log = LogFactory
       .getLog(MtasUpdateRequestProcessorFactory.class);
 
@@ -55,187 +51,177 @@ public class MtasUpdateRequestProcessorFactory
 
   @SuppressWarnings("unchecked")
   private void init(SolrQueryRequest req) throws IOException {
-    if (config == null) {
-      // initialise
-      config = new MtasUpdateRequestProcessorConfig();
-      // required info
-      Map<String, FieldType> fieldTypes = req.getSchema().getFieldTypes();
-      Map<String, SchemaField> fields = req.getSchema().getFields();
-      SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()
-          .getResourceLoader();
-      // check fieldTypes
-      // for (String name : fieldTypes.keySet()) {
-      for (Entry<String, FieldType> entry : fieldTypes.entrySet()) {
-        // only for MtasPreAnalyzedField
-        if (entry.getValue() instanceof MtasPreAnalyzedField) {
-          MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) entry.getValue();
-          config.fieldTypeDefaultConfiguration.put(entry.getKey(),
-              mpaf.defaultConfiguration);
-          config.fieldTypeConfigurationFromField.put(entry.getKey(),
-              mpaf.configurationFromField);
-          config.fieldTypeNumberOfTokensField.put(entry.getKey(),
-              mpaf.setNumberOfTokens);
-          config.fieldTypeNumberOfPositionsField.put(entry.getKey(),
-              mpaf.setNumberOfPositions);
-          config.fieldTypeSizeField.put(entry.getKey(), mpaf.setSize);
-          config.fieldTypeErrorField.put(entry.getKey(), mpaf.setError);
-          config.fieldTypePrefixField.put(entry.getKey(), mpaf.setPrefix);
-          config.fieldTypePrefixNumbersFieldPrefix.put(entry.getKey(), mpaf.setPrefixNumbers);
-          if (mpaf.followIndexAnalyzer == null
-              || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {
-            throw new IOException(
-                entry.getKey() + " can't follow " + mpaf.followIndexAnalyzer);
-          } else {
-            FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);
-            SimpleOrderedMap<?> analyzer = null;
-            Object tmpObj1 = fieldType.getNamedPropertyValues(false)
-                .get(FieldType.INDEX_ANALYZER);
-            if (tmpObj1 != null && tmpObj1 instanceof SimpleOrderedMap) {
-              analyzer = (SimpleOrderedMap<?>) tmpObj1;
-            }
-            if (analyzer == null) {
-              Object tmpObj2 = fieldType.getNamedPropertyValues(false)
-                  .get(FieldType.ANALYZER);
-              if (tmpObj2 != null && tmpObj2 instanceof SimpleOrderedMap) {
-                analyzer = (SimpleOrderedMap<?>) tmpObj2;
-              }
-            }
-            if (analyzer == null) {
-              throw new IOException("no analyzer");
-            } else {
-              // charfilters
-              ArrayList<SimpleOrderedMap<Object>> listCharFilters = null;
-              SimpleOrderedMap<Object> configTokenizer = null;
-              try {
-                listCharFilters = (ArrayList<SimpleOrderedMap<Object>>) analyzer
-                    .findRecursive(FieldType.CHAR_FILTERS);
-                configTokenizer = (SimpleOrderedMap<Object>) analyzer
-                    .findRecursive(FieldType.TOKENIZER);
-              } catch (ClassCastException e) {
-                throw new IOException(
-                    "could not cast charFilters and/or tokenizer from analyzer",
-                    e);
-              }
-              if (listCharFilters != null && !listCharFilters.isEmpty()) {
-                CharFilterFactory[] charFilterFactories = new CharFilterFactory[listCharFilters
-                    .size()];
-                int number = 0;
-                for (SimpleOrderedMap<Object> configCharFilter : listCharFilters) {
-                  String className = null;
-                  Map<String, String> args = new HashMap<>();
-                  Iterator<Map.Entry<String, Object>> it = configCharFilter
-                      .iterator();
-                  // get className and args
-                  while (it.hasNext()) {
-                    Map.Entry<String, Object> obj = it.next();
-                    if (obj.getValue() instanceof String) {
-                      if (obj.getKey().equals(FieldType.CLASS_NAME)) {
-                        className = (String) obj.getValue();
-                      } else {
-                        args.put(obj.getKey(), (String) obj.getValue());
-                      }
-                    }
-                  }
-                  if (className != null) {
-                    try {
-                      Class<?> cls = Class.forName(className);
-                      if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
-                        Class<?>[] types = { Map.class, ResourceLoader.class };
-                        Constructor<?> cnstr = cls.getConstructor(types);
-                        Object cff = cnstr.newInstance(args, resourceLoader);
-                        if (cff instanceof MtasCharFilterFactory) {
-                          charFilterFactories[number] = (MtasCharFilterFactory) cff;
-                          number++;
-                        } else {
-                          throw new IOException(
-                              className + " is no MtasCharFilterFactory");
-                        }
-                      } else {
-                        Class<?>[] types = { Map.class };
-                        Constructor<?> cnstr = cls.getConstructor(types);
-                        Object cff = cnstr.newInstance(args);
-                        if (cff instanceof CharFilterFactory) {
-                          charFilterFactories[number] = (CharFilterFactory) cff;
-                          number++;
-                        } else {
-                          throw new IOException(
-                              className + " is no CharFilterFactory");
-                        }
-                      }
-                    } catch (ClassNotFoundException | InstantiationException
-                        | IllegalAccessException | IllegalArgumentException
-                        | InvocationTargetException | NoSuchMethodException e) {
-                      throw new IOException(e);
-                    }
-                  } else {
-                    throw new IOException("no className");
-                  }
-                }
-                config.fieldTypeCharFilterFactories.put(entry.getKey(),
-                    charFilterFactories);
-              } else {
-                config.fieldTypeCharFilterFactories.put(entry.getKey(), null);
-              }
-              if (configTokenizer != null) {
-                String className = null;
-                Map<String, String> args = new HashMap<>();
-                // get className and args
-                for (Entry<String, Object> obj : configTokenizer) {
-                  if (obj.getValue() instanceof String) {
-                    if (obj.getKey().equals(FieldType.CLASS_NAME)) {
-                      className = (String) obj.getValue();
-                    } else {
-                      args.put(obj.getKey(), (String) obj.getValue());
-                    }
-                  }
-                }
-                if (className != null) {
-                  try {
-                    Class<?> cls = Class.forName(className);
-                    Class<?>[] types = { Map.class, ResourceLoader.class };
-                    Constructor<?> constructor = cls.getConstructor(types);
-                    Object cff = constructor.newInstance(args, resourceLoader);
-                    if (cff instanceof MtasTokenizerFactory) {
-                      config.fieldTypeTokenizerFactory.put(entry.getKey(),
-                          (MtasTokenizerFactory) cff);
-                    } else {
-                      throw new IOException(
-                          className + " is no MtasTokenizerFactory");
-                    }
-                  } catch (ClassNotFoundException | InstantiationException
-                      | IllegalAccessException | IllegalArgumentException
-                      | InvocationTargetException | NoSuchMethodException e) {
-                    throw new IOException(e);
-                  }
-                } else {
-                  throw new IOException("no className");
-                }
-              }
+    if (config != null) {
+      return;
+    }
 
+    // initialise
+    config = new MtasUpdateRequestProcessorConfig();
+    // required info
+    Map<String, FieldType> fieldTypes = req.getSchema().getFieldTypes();
+    Map<String, SchemaField> fields = req.getSchema().getFields();
+    SolrResourceLoader resourceLoader = req.getCore().getSolrConfig()
+                                           .getResourceLoader();
+
+    // check fieldTypes
+    for (Entry<String, FieldType> entry : fieldTypes.entrySet()) {
+      String key = entry.getKey();
+      FieldType value = entry.getValue();
+
+      // only for MtasPreAnalyzedField
+      if (value instanceof MtasPreAnalyzedField) {
+        MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) value;
+        config.fieldTypeDefaultConfiguration.put(key, mpaf.defaultConfiguration);
+        config.fieldTypeConfigurationFromField.put(key, mpaf.configurationFromField);
+        config.fieldTypeNumberOfTokensField.put(key, mpaf.setNumberOfTokens);
+        config.fieldTypeNumberOfPositionsField.put(key, mpaf.setNumberOfPositions);
+        config.fieldTypeSizeField.put(key, mpaf.setSize);
+        config.fieldTypeErrorField.put(key, mpaf.setError);
+        config.fieldTypePrefixField.put(key, mpaf.setPrefix);
+        config.fieldTypePrefixNumbersFieldPrefix.put(key, mpaf.setPrefixNumbers);
+        if (mpaf.followIndexAnalyzer == null
+          || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {
+          throw new IOException(
+            key + " can't follow " + mpaf.followIndexAnalyzer);
+        } else {
+          FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);
+          SimpleOrderedMap<?> analyzer = null;
+          Object tmpObj1 = fieldType.getNamedPropertyValues(false)
+                                    .get(FieldType.INDEX_ANALYZER);
+          if (tmpObj1 != null && tmpObj1 instanceof SimpleOrderedMap) {
+            analyzer = (SimpleOrderedMap<?>) tmpObj1;
+          }
+          if (analyzer == null) {
+            Object tmpObj2 = fieldType.getNamedPropertyValues(false)
+                                      .get(FieldType.ANALYZER);
+            if (tmpObj2 != null && tmpObj2 instanceof SimpleOrderedMap) {
+              analyzer = (SimpleOrderedMap<?>) tmpObj2;
+            }
+          }
+          if (analyzer == null) {
+            throw new IOException("no analyzer");
+          }
+
+          // charfilters
+          ArrayList<SimpleOrderedMap<Object>> charFilters;
+          SimpleOrderedMap<Object> configTokenizer;
+          try {
+            charFilters = (ArrayList<SimpleOrderedMap<Object>>) analyzer
+              .findRecursive(FieldType.CHAR_FILTERS);
+            configTokenizer = (SimpleOrderedMap<Object>) analyzer
+              .findRecursive(FieldType.TOKENIZER);
+          } catch (ClassCastException e) {
+            throw new IOException(
+              "could not cast charFilters and/or tokenizer from analyzer", e);
+          }
+
+          if (charFilters == null || charFilters.isEmpty()) {
+            config.fieldTypeCharFilterFactories.put(key, null);
+          } else {
+            CharFilterFactory[] charFilterFactories = new CharFilterFactory[charFilters.size()];
+            int number = 0;
+            for (SimpleOrderedMap<Object> configCharFilter : charFilters) {
+              String className = null;
+              Map<String, String> args = new HashMap<>();
+              // get className and args
+              for (Entry<String, Object> obj : configCharFilter) {
+                if (obj.getValue() instanceof String) {
+                  String name = (String) obj.getValue();
+                  if (obj.getKey().equals(FieldType.CLASS_NAME)) {
+                    className = name;
+                  } else {
+                    args.put(obj.getKey(), name);
+                  }
+                }
+              }
+              if (className == null) {
+                throw new IOException("no className");
+              }
+              Class<?> cls = classForName(className);
+              if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
+                Object obj = construct(cls, args, resourceLoader);
+                if (!(obj instanceof MtasCharFilterFactory)) {
+                  throw new IOException(className + " is no MtasCharFilterFactory");
+                }
+                charFilterFactories[number] = (MtasCharFilterFactory) obj;
+                number++;
+              } else {
+                Object obj = construct(cls, args);
+                if (!(obj instanceof CharFilterFactory)) {
+                  throw new IOException(className + " is no CharFilterFactory");
+                }
+                charFilterFactories[number] = (CharFilterFactory) obj;
+                number++;
+              }
+            }
+            config.fieldTypeCharFilterFactories.put(key, charFilterFactories);
+          }
+
+          if (configTokenizer != null) {
+            String className = null;
+            Map<String, String> args = new HashMap<>();
+            // get className and args
+            for (Entry<String, Object> obj : configTokenizer) {
+              if (obj.getValue() instanceof String) {
+                if (obj.getKey().equals(FieldType.CLASS_NAME)) {
+                  className = (String) obj.getValue();
+                } else {
+                  args.put(obj.getKey(), (String) obj.getValue());
+                }
+              }
+            }
+            if (className == null) {
+              throw new IOException("no className");
+            }
+            Object obj = construct(className, args, resourceLoader);
+            if (obj instanceof MtasTokenizerFactory) {
+              config.fieldTypeTokenizerFactory.put(key, (MtasTokenizerFactory) obj);
+            } else {
+              throw new IOException(className + " is no MtasTokenizerFactory");
             }
           }
         }
       }
-      for (Entry<String, SchemaField> entry : fields.entrySet()) {
-        if (entry.getValue().getType() != null
-            && config.fieldTypeTokenizerFactory
-                .containsKey(entry.getValue().getType().getTypeName())) {
-          config.fieldMapping.put(entry.getKey(),
-              entry.getValue().getType().getTypeName());
-        }
+    }
+
+    for (Entry<String, SchemaField> entry : fields.entrySet()) {
+      FieldType type = entry.getValue().getType();
+      if (type != null && config.fieldTypeTokenizerFactory.containsKey(type.getTypeName())) {
+        config.fieldMapping.put(entry.getKey(), type.getTypeName());
       }
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.apache.solr.update.processor.UpdateRequestProcessorFactory#getInstance(
-   * org.apache.solr.request.SolrQueryRequest,
-   * org.apache.solr.response.SolrQueryResponse,
-   * org.apache.solr.update.processor.UpdateRequestProcessor)
-   */
+  private Class<?> classForName(String name) throws IOException {
+    try {
+      return Class.forName(name);
+    } catch (ClassNotFoundException e) {
+      throw new IOException(e);
+    }
+  }
+
+  private Object construct(String className, Map<String, String> args, SolrResourceLoader loader) throws IOException {
+    return construct(classForName(className), args, loader);
+  }
+
+  private Object construct(Class<?> cls, Map<String, String> args) throws IOException {
+    try {
+      return cls.getConstructor(Map.class).newInstance(args);
+    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException |
+      InvocationTargetException | NoSuchMethodException e) {
+      throw new IOException(e); // XXX should use a different type
+    }
+  }
+
+  private Object construct(Class<?> cls, Map<String, String> args, SolrResourceLoader loader) throws IOException {
+    try {
+      return cls.getConstructor(Map.class, ResourceLoader.class).newInstance(args, loader);
+    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException |
+      InvocationTargetException | NoSuchMethodException e) {
+      throw new IOException(e); // XXX should use a different type
+    }
+  }
+
   @Override
   public UpdateRequestProcessor getInstance(SolrQueryRequest req,
       SolrQueryResponse rsp, UpdateRequestProcessor next) {
@@ -246,11 +232,9 @@ public class MtasUpdateRequestProcessorFactory
     }
     return new MtasUpdateRequestProcessor(next, config);
   }
-
 }
 
 class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
-
   private static Log log = LogFactory.getLog(MtasUpdateRequestProcessor.class);
 
   private MtasUpdateRequestProcessorConfig config;
@@ -406,8 +390,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
             setFields(doc,
               config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
             // update numberOfTokens
-            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
-              0);
+            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType), 0);
             // update prefixes
             removeFields(doc, config.fieldTypePrefixField.get(fieldType));
             if (result != null) {
@@ -425,9 +408,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
   private void removeFields(SolrInputDocument doc, String fieldNames) {
     if (fieldNames != null) {
-      String[] tmpFields = fieldNames.split(",");
-      for (int i = 0; i < tmpFields.length; i++) {
-        doc.removeField(tmpFields[i]);
+      for (String field : fieldNames.split(",")) {
+        doc.removeField(field);
       }
     }
   }
@@ -435,48 +417,34 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
   private void setFields(SolrInputDocument doc, String fieldNames,
                          Object value) {
     if (fieldNames != null) {
-      String[] tmpFields = fieldNames.split(",");
-      for (int i = 0; i < tmpFields.length; i++) {
-        if (!tmpFields[i].trim().isEmpty()) {
-          doc.addField(tmpFields[i].trim(), value);
+      for (String field : fieldNames.split(",")) {
+        field = field.trim();
+        if (!field.isEmpty()) {
+          doc.addField(field, value);
         }
       }
     }
   }
-
 }
 
 class MtasUpdateRequestProcessorConfig {
-  HashMap<String, CharFilterFactory[]> fieldTypeCharFilterFactories;
-  HashMap<String, MtasTokenizerFactory> fieldTypeTokenizerFactory;
-  HashMap<String, String> fieldMapping;
-  HashMap<String, String> fieldTypeDefaultConfiguration;
-  HashMap<String, String> fieldTypeConfigurationFromField;
-  HashMap<String, String> fieldTypeNumberOfTokensField;
-  HashMap<String, String> fieldTypeNumberOfPositionsField;
-  HashMap<String, String> fieldTypeSizeField;
-  HashMap<String, String> fieldTypeErrorField;
-  HashMap<String, String> fieldTypePrefixField;
-  HashMap<String, String> fieldTypePrefixNumbersFieldPrefix;
+  HashMap<String, CharFilterFactory[]> fieldTypeCharFilterFactories = new HashMap<>();
+  HashMap<String, MtasTokenizerFactory> fieldTypeTokenizerFactory = new HashMap<>();
+  HashMap<String, String> fieldMapping = new HashMap<>();
+  HashMap<String, String> fieldTypeDefaultConfiguration = new HashMap<>();
+  HashMap<String, String> fieldTypeConfigurationFromField = new HashMap<>();
+  HashMap<String, String> fieldTypeNumberOfTokensField = new HashMap<>();
+  HashMap<String, String> fieldTypeNumberOfPositionsField = new HashMap<>();
+  HashMap<String, String> fieldTypeSizeField = new HashMap<>();
+  HashMap<String, String> fieldTypeErrorField = new HashMap<>();
+  HashMap<String, String> fieldTypePrefixField = new HashMap<>();
+  HashMap<String, String> fieldTypePrefixNumbersFieldPrefix = new HashMap<>();
 
   MtasUpdateRequestProcessorConfig() {
-    fieldMapping = new HashMap<>();
-    fieldTypeCharFilterFactories = new HashMap<>();
-    fieldTypeTokenizerFactory = new HashMap<>();
-    fieldTypeDefaultConfiguration = new HashMap<>();
-    fieldTypeConfigurationFromField = new HashMap<>();
-    fieldTypeNumberOfTokensField = new HashMap<>();
-    fieldTypeNumberOfPositionsField = new HashMap<>();
-    fieldTypeSizeField = new HashMap<>();
-    fieldTypeErrorField = new HashMap<>();
-    fieldTypePrefixField = new HashMap<>();
-    fieldTypePrefixNumbersFieldPrefix = new HashMap<>();
   }
-
 }
 
 class MtasUpdateRequestProcessorSizeReader extends Reader {
-
   Reader reader;
   long totalReadSize;
 

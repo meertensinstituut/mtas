@@ -1,6 +1,11 @@
 package mtas.parser;
 
-import static org.junit.Assert.*;
+import mtas.parser.function.MtasFunctionParser;
+import mtas.parser.function.ParseException;
+import mtas.parser.function.util.MtasFunctionParserFunction;
+import mtas.parser.function.util.MtasFunctionParserFunctionResponse;
+import mtas.parser.function.util.MtasFunctionParserFunctionResponseDouble;
+import mtas.parser.function.util.MtasFunctionParserFunctionResponseLong;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,12 +13,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Random;
 
-import mtas.parser.function.MtasFunctionParser;
-import mtas.parser.function.ParseException;
-import mtas.parser.function.util.MtasFunctionParserFunction;
-import mtas.parser.function.util.MtasFunctionParserFunctionResponse;
-import mtas.parser.function.util.MtasFunctionParserFunctionResponseDouble;
-import mtas.parser.function.util.MtasFunctionParserFunctionResponseLong;
+import static org.junit.Assert.assertEquals;
 
 /**
  * The Class MtasFunctionParserTest.
