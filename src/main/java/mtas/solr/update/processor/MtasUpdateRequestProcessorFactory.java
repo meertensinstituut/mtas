@@ -31,7 +31,6 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
   }
 
   @SuppressWarnings("unchecked")
-  private void init(SolrQueryRequest req) throws IOException {
+  private void init(SolrQueryRequest req) throws Exception {
     if (config != null) {
       return;
     }
@@ -81,7 +80,7 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
         config.fieldTypePrefixNumbersFieldPrefix.put(key, mpaf.setPrefixNumbers);
         if (mpaf.followIndexAnalyzer == null
           || !fieldTypes.containsKey(mpaf.followIndexAnalyzer)) {
-          throw new IOException(
+          throw new RuntimeException(
             key + " can't follow " + mpaf.followIndexAnalyzer);
         } else {
           FieldType fieldType = fieldTypes.get(mpaf.followIndexAnalyzer);
@@ -99,21 +98,14 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
             }
           }
           if (analyzer == null) {
-            throw new IOException("no analyzer");
+            throw new RuntimeException("no analyzer");
           }
 
           // charfilters
           ArrayList<SimpleOrderedMap<Object>> charFilters;
           SimpleOrderedMap<Object> configTokenizer;
-          try {
-            charFilters = (ArrayList<SimpleOrderedMap<Object>>) analyzer
-              .findRecursive(FieldType.CHAR_FILTERS);
-            configTokenizer = (SimpleOrderedMap<Object>) analyzer
-              .findRecursive(FieldType.TOKENIZER);
-          } catch (ClassCastException e) {
-            throw new IOException(
-              "could not cast charFilters and/or tokenizer from analyzer", e);
-          }
+          charFilters = (ArrayList<SimpleOrderedMap<Object>>) analyzer.findRecursive(FieldType.CHAR_FILTERS);
+          configTokenizer = (SimpleOrderedMap<Object>) analyzer.findRecursive(FieldType.TOKENIZER);
 
           if (charFilters == null || charFilters.isEmpty()) {
             config.fieldTypeCharFilterFactories.put(key, null);
@@ -135,20 +127,21 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
                 }
               }
               if (className == null) {
-                throw new IOException("no className");
+                throw new RuntimeException("no className");
               }
-              Class<?> cls = classForName(className);
+              Class<?> cls = Class.forName(className);
               if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
-                Object obj = construct(cls, args, resourceLoader);
+                Object obj = cls.getConstructor(Map.class, ResourceLoader.class)
+                                .newInstance(args, resourceLoader);
                 if (!(obj instanceof MtasCharFilterFactory)) {
-                  throw new IOException(className + " is no MtasCharFilterFactory");
+                  throw new RuntimeException(className + " is no MtasCharFilterFactory");
                 }
                 charFilterFactories[number] = (MtasCharFilterFactory) obj;
                 number++;
               } else {
-                Object obj = construct(cls, args);
+                Object obj = cls.getConstructor(Map.class).newInstance(args);
                 if (!(obj instanceof CharFilterFactory)) {
-                  throw new IOException(className + " is no CharFilterFactory");
+                  throw new RuntimeException(className + " is no CharFilterFactory");
                 }
                 charFilterFactories[number] = (CharFilterFactory) obj;
                 number++;
@@ -171,13 +164,14 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
               }
             }
             if (className == null) {
-              throw new IOException("no className");
+              throw new RuntimeException("no className");
             }
-            Object obj = construct(className, args, resourceLoader);
+            Object obj = Class.forName(className).getConstructor(Map.class, ResourceLoader.class)
+                              .newInstance(args, resourceLoader);
             if (obj instanceof MtasTokenizerFactory) {
               config.fieldTypeTokenizerFactory.put(key, (MtasTokenizerFactory) obj);
             } else {
-              throw new IOException(className + " is no MtasTokenizerFactory");
+              throw new RuntimeException(className + " is no MtasTokenizerFactory");
             }
           }
         }
@@ -192,42 +186,12 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
     }
   }
 
-  private Class<?> classForName(String name) throws IOException {
-    try {
-      return Class.forName(name);
-    } catch (ClassNotFoundException e) {
-      throw new IOException(e);
-    }
-  }
-
-  private Object construct(String className, Map<String, String> args, SolrResourceLoader loader) throws IOException {
-    return construct(classForName(className), args, loader);
-  }
-
-  private Object construct(Class<?> cls, Map<String, String> args) throws IOException {
-    try {
-      return cls.getConstructor(Map.class).newInstance(args);
-    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException |
-      InvocationTargetException | NoSuchMethodException e) {
-      throw new IOException(e); // XXX should use a different type
-    }
-  }
-
-  private Object construct(Class<?> cls, Map<String, String> args, SolrResourceLoader loader) throws IOException {
-    try {
-      return cls.getConstructor(Map.class, ResourceLoader.class).newInstance(args, loader);
-    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException |
-      InvocationTargetException | NoSuchMethodException e) {
-      throw new IOException(e); // XXX should use a different type
-    }
-  }
-
   @Override
   public UpdateRequestProcessor getInstance(SolrQueryRequest req,
       SolrQueryResponse rsp, UpdateRequestProcessor next) {
     try {
       init(req);
-    } catch (IOException e) {
+    } catch (Exception e) {
       log.error(e);
     }
     return new MtasUpdateRequestProcessor(next, config);
