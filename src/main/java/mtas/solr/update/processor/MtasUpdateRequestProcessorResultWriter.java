@@ -37,8 +37,8 @@ public class MtasUpdateRequestProcessorResultWriter implements Closeable {
     }
   }
 
-  public void addItem(String term, Integer offsetStart, Integer offsetEnd,
-      Integer posIncr, BytesRef payload, Integer flags) {
+  void addItem(String term, Integer offsetStart, Integer offsetEnd,
+               int posIncr, BytesRef payload, Integer flags) {
     if (!closed) {
       tokenNumber++;
       MtasUpdateRequestProcessorResultItem item = new MtasUpdateRequestProcessorResultItem(

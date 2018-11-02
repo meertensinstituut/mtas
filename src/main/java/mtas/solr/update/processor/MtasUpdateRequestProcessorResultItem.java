@@ -14,8 +14,8 @@ public class MtasUpdateRequestProcessorResultItem implements Serializable {
   public byte[] tokenPayload;
   public Integer tokenFlags;
 
-  public MtasUpdateRequestProcessorResultItem(String term, Integer offsetStart,
-      Integer offsetEnd, Integer posIncr, BytesRef payload, Integer flags) {
+  public MtasUpdateRequestProcessorResultItem(String term, Integer offsetStart, Integer offsetEnd,
+                                              int posIncr, BytesRef payload, Integer flags) {
     tokenTerm = term;
     if (offsetStart != null && offsetEnd != null) {
       tokenOffsetStart = offsetStart;
@@ -24,7 +24,7 @@ public class MtasUpdateRequestProcessorResultItem implements Serializable {
       tokenOffsetStart = null;
       tokenOffsetEnd = null;
     }
-    if (posIncr != null && posIncr != 1) {
+    if (posIncr != 1) {
       tokenPosIncr = posIncr;
     } else {
       tokenPosIncr = null;

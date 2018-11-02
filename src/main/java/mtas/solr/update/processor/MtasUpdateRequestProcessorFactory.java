@@ -281,7 +281,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 String term = null;
                 Integer offsetStart = null;
                 Integer offsetEnd = null;
-                Integer posIncr = null;
+                int posIncr = 0;
                 Integer flags = null;
                 BytesRef payload = null;
                 if (termAttribute != null) {
@@ -300,8 +300,6 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 }
                 if (positionIncrementAttribute != null) {
                   posIncr = positionIncrementAttribute.getPositionIncrement();
-                } else {
-                  posIncr = 0;
                 }
                 if (payloadAttribute != null) {
                   payload = payloadAttribute.getPayload();
@@ -311,9 +309,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 }
                 numberOfTokens++;
                 numberOfPositions += posIncr;
-                result.addItem(term, offsetStart, offsetEnd, posIncr, payload,
-                  flags);
-                // System.out.print(term+" ");
+                result.addItem(term, offsetStart, offsetEnd, posIncr, payload, flags);
               }
 
               // Store the temporary filename in the field, so that MtasPreAnalyzedParser
@@ -379,8 +375,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
     }
   }
 
-  private void setFields(SolrInputDocument doc, String fieldNames,
-                         Object value) {
+  private void setFields(SolrInputDocument doc, String fieldNames, Object value) {
     if (fieldNames != null) {
       for (String field : fieldNames.split(",")) {
         field = field.trim();
