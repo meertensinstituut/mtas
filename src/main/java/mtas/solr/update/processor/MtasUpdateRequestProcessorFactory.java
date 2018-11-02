@@ -212,159 +212,134 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
   @Override
   public void processAdd(AddUpdateCommand cmd) throws IOException {
     if (config != null && config.fieldMapping.size() > 0) {
-      // get document
       SolrInputDocument doc = cmd.getSolrInputDocument();
-      // loop over configurations
       for (String field : config.fieldMapping.keySet()) {
-        SolrInputField originalValue = doc.get(field);
-        String fieldType = config.fieldMapping.get(field);
-        CharFilterFactory[] charFilterFactories = config.fieldTypeCharFilterFactories
-            .get(fieldType);
-        MtasTokenizerFactory tokenizerFactory = config.fieldTypeTokenizerFactory
-            .get(config.fieldMapping.get(field));
-        MtasUpdateRequestProcessorSizeReader sizeReader;
-        if (originalValue != null
-            && originalValue.getValue() instanceof String) {
-          MtasUpdateRequestProcessorResultWriter result = null;
-          try {
-            String storedValue = (String) originalValue.getValue();
-            // create reader
-            Reader reader = new StringReader(storedValue);
-            // configuration
-            String configuration = null;
-            String defaultConfiguration = config.fieldTypeDefaultConfiguration
-                .get(fieldType);
-            if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {
-              Object obj = doc.getFieldValue(
-                  config.fieldTypeConfigurationFromField.get(fieldType));
-              if (obj != null) {
-                configuration = obj.toString();
-              }
-            }
+        processAdd(doc, field);
+      }
+    }
+    super.processAdd(cmd);
+  }
 
-            if (charFilterFactories != null) {
-              for (CharFilterFactory factory : charFilterFactories) {
-                // We don't want the old pseudo-charfilters anymore. Remove this check once
-                // the class MtasCharFilterFactory is dead.
-                if (factory instanceof MtasCharFilterFactory) {
-                  continue;
-                }
-                reader = factory.create(reader);
-              }
-            }
+  private void processAdd(SolrInputDocument doc, String field) {
+    SolrInputField originalValue = doc.get(field);
+    String fieldType = config.fieldMapping.get(field);
+    CharFilterFactory[] charFilterFactories = config.fieldTypeCharFilterFactories.get(fieldType);
+    MtasTokenizerFactory tokenizerFactory = config.fieldTypeTokenizerFactory.get(config.fieldMapping.get(field));
+    MtasUpdateRequestProcessorSizeReader sizeReader;
+    if (originalValue != null
+      && originalValue.getValue() instanceof String) {
+      MtasUpdateRequestProcessorResultWriter result = null;
+      try {
+        String storedValue = (String) originalValue.getValue();
+        Reader reader = new StringReader(storedValue);
 
-            sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
-
-            // tokenizerFactory
-            result = new MtasUpdateRequestProcessorResultWriter(storedValue);
-            int numberOfPositions = 0;
-            int numberOfTokens = 0;
-            Map<String, Integer> prefixes = new HashMap<>();
-            String prefix;
-            Integer prefixCount;
-            try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {
-              tokenizer.setReader(sizeReader);
-              tokenizer.reset();
-              // attributes
-              CharTermAttribute termAttribute = tokenizer
-                .getAttribute(CharTermAttribute.class);
-              OffsetAttribute offsetAttribute = tokenizer
-                .getAttribute(OffsetAttribute.class);
-              PositionIncrementAttribute positionIncrementAttribute = tokenizer
-                .getAttribute(PositionIncrementAttribute.class);
-              PayloadAttribute payloadAttribute = tokenizer
-                .getAttribute(PayloadAttribute.class);
-              FlagsAttribute flagsAttribute = tokenizer
-                .getAttribute(FlagsAttribute.class);
-
-              while (tokenizer.incrementToken()) {
-                String term = null;
-                Integer offsetStart = null;
-                Integer offsetEnd = null;
-                int posIncr = 0;
-                Integer flags = null;
-                BytesRef payload = null;
-                if (termAttribute != null) {
-                  term = termAttribute.toString();
-                  prefix = CodecUtil.termPrefix(term);
-                  prefixCount = prefixes.get(prefix);
-                  if (prefixCount != null) {
-                    prefixes.put(prefix, prefixCount + 1);
-                  } else {
-                    prefixes.put(prefix, 1);
-                  }
-                }
-                if (offsetAttribute != null) {
-                  offsetStart = offsetAttribute.startOffset();
-                  offsetEnd = offsetAttribute.endOffset();
-                }
-                if (positionIncrementAttribute != null) {
-                  posIncr = positionIncrementAttribute.getPositionIncrement();
-                }
-                if (payloadAttribute != null) {
-                  payload = payloadAttribute.getPayload();
-                }
-                if (flagsAttribute != null) {
-                  flags = flagsAttribute.getFlags();
-                }
-                numberOfTokens++;
-                numberOfPositions += posIncr;
-                result.addItem(term, offsetStart, offsetEnd, posIncr, payload, flags);
-              }
-
-              // Store the temporary filename in the field, so that MtasPreAnalyzedParser
-              // can pick it up later.
-              doc.remove(field);
-              if (result.getTokenNumber() > 0) {
-                doc.addField(field, result.getFileName());
-              }
-            } finally {
-              result.close();
-            }
-            // update size
-            setFields(doc, config.fieldTypeSizeField.get(fieldType),
-              sizeReader.getTotalReadSize());
-            // update numberOfPositions
-            setFields(doc,
-              config.fieldTypeNumberOfPositionsField.get(fieldType),
-              numberOfPositions);
-            // update numberOfTokens
-            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType),
-              numberOfTokens);
-            // update prefixes
-            setFields(doc, config.fieldTypePrefixField.get(fieldType),
-              prefixes.keySet());
-            if (config.fieldTypePrefixNumbersFieldPrefix.get(fieldType) != null) {
-              for (Entry<String, Integer> prefixesEntry : prefixes.entrySet()) {
-                setFields(doc, config.fieldTypePrefixNumbersFieldPrefix.get(fieldType) + prefixesEntry.getKey(),
-                  prefixesEntry.getValue());
-              }
-            }
-          } catch (IOException e) {
-            log.warn(e);
-            // update error
-            doc.addField(config.fieldTypeErrorField.get(fieldType),
-              e.getMessage());
-            // update size
-            setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);
-            // update numberOfPositions
-            setFields(doc,
-              config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
-            // update numberOfTokens
-            setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType), 0);
-            // update prefixes
-            removeFields(doc, config.fieldTypePrefixField.get(fieldType));
-            if (result != null) {
-              result.forceCloseAndDelete();
-              doc.remove(field);
-            }
+        String configuration = null;
+        String defaultConfiguration = config.fieldTypeDefaultConfiguration.get(fieldType);
+        if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {
+          Object obj = doc.getFieldValue(config.fieldTypeConfigurationFromField.get(fieldType));
+          if (obj != null) {
+            configuration = obj.toString();
           }
         }
-      }
 
+        if (charFilterFactories != null) {
+          for (CharFilterFactory factory : charFilterFactories) {
+            // We don't want the old pseudo-charfilters anymore. Remove this check once
+            // the class MtasCharFilterFactory is dead.
+            if (factory instanceof MtasCharFilterFactory) {
+              continue;
+            }
+            reader = factory.create(reader);
+          }
+        }
+
+        sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
+
+        result = new MtasUpdateRequestProcessorResultWriter(storedValue);
+        int numPositions = 0;
+        Map<String, Integer> prefixes = new HashMap<>();
+        String prefix;
+        Integer prefixCount;
+        try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {
+          tokenizer.setReader(sizeReader);
+          tokenizer.reset();
+
+          CharTermAttribute termAttribute = tokenizer
+            .getAttribute(CharTermAttribute.class);
+          OffsetAttribute offsetAttribute = tokenizer
+            .getAttribute(OffsetAttribute.class);
+          PositionIncrementAttribute positionIncrementAttribute = tokenizer
+            .getAttribute(PositionIncrementAttribute.class);
+          PayloadAttribute payloadAttribute = tokenizer
+            .getAttribute(PayloadAttribute.class);
+          FlagsAttribute flagsAttribute = tokenizer
+            .getAttribute(FlagsAttribute.class);
+
+          while (tokenizer.incrementToken()) {
+            String term = null;
+            Integer offsetStart = null;
+            Integer offsetEnd = null;
+            int posIncr = 0;
+            Integer flags = null;
+            BytesRef payload = null;
+            if (termAttribute != null) {
+              term = termAttribute.toString();
+              prefix = CodecUtil.termPrefix(term);
+              prefixCount = prefixes.get(prefix);
+              if (prefixCount != null) {
+                prefixes.put(prefix, prefixCount + 1);
+              } else {
+                prefixes.put(prefix, 1);
+              }
+            }
+            if (offsetAttribute != null) {
+              offsetStart = offsetAttribute.startOffset();
+              offsetEnd = offsetAttribute.endOffset();
+            }
+            if (positionIncrementAttribute != null) {
+              posIncr = positionIncrementAttribute.getPositionIncrement();
+            }
+            if (payloadAttribute != null) {
+              payload = payloadAttribute.getPayload();
+            }
+            if (flagsAttribute != null) {
+              flags = flagsAttribute.getFlags();
+            }
+            numPositions += posIncr;
+            result.addItem(term, offsetStart, offsetEnd, posIncr, payload, flags);
+          }
+
+          // Store the temporary filename in the field, so that MtasPreAnalyzedParser
+          // can pick it up later.
+          doc.remove(field);
+          if (result.getTokenNumber() > 0) {
+            doc.addField(field, result.getFileName());
+          }
+        } finally {
+          result.close();
+        }
+
+        setFields(doc, config.fieldTypeSizeField.get(fieldType), sizeReader.getTotalReadSize());
+        setFields(doc, config.fieldTypeNumberOfPositionsField.get(fieldType), numPositions);
+        setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType), result.getTokenNumber());
+        setFields(doc, config.fieldTypePrefixField.get(fieldType), prefixes.keySet());
+        if (config.fieldTypePrefixNumbersFieldPrefix.get(fieldType) != null) {
+          for (Entry<String, Integer> prefixesEntry : prefixes.entrySet()) {
+            setFields(doc, config.fieldTypePrefixNumbersFieldPrefix.get(fieldType) + prefixesEntry.getKey(),
+              prefixesEntry.getValue());
+          }
+        }
+      } catch (IOException e) {
+        log.error(e);
+        doc.addField(config.fieldTypeErrorField.get(fieldType), e.getMessage());
+        setFields(doc, config.fieldTypeSizeField.get(fieldType), 0);
+        setFields(doc, config.fieldTypeNumberOfPositionsField.get(fieldType), 0);
+        setFields(doc, config.fieldTypeNumberOfTokensField.get(fieldType), 0);
+        removeFields(doc, config.fieldTypePrefixField.get(fieldType));
+        result.forceCloseAndDelete();
+        doc.remove(field);
+      }
     }
-    // pass it up the chain
-    super.processAdd(cmd);
   }
 
   private void removeFields(SolrInputDocument doc, String fieldNames) {
