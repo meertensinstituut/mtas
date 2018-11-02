@@ -352,7 +352,8 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
                 // System.out.print(term+" ");
               }
 
-              // update field
+              // Store the temporary filename in the field, so that MtasPreAnalyzedParser
+              // can pick it up later.
               doc.remove(field);
               if (result.getTokenNumber() > 0) {
                 doc.addField(field, result.getFileName());

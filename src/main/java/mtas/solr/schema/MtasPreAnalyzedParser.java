@@ -20,6 +20,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 
+/**
+ * Parser that reads a temporary file name from a field and reads that file.
+ * The format is: originally uploaded content, followed by tokens,
+ * encoded as Java-serialized MtasUpdateRequestProcessorResultItems.
+ */
 public class MtasPreAnalyzedParser implements PreAnalyzedParser {
   private static Log log = LogFactory.getLog(MtasPreAnalyzedParser.class);
 
