@@ -107,7 +107,7 @@ public class MtasCharFilterFactory extends CharFilterFactory implements Resource
     try {
       return create(input, (String) null);
     } catch (IOException e) {
-      log.debug(e);
+      log.warn(e);
       return null;
     }
   }

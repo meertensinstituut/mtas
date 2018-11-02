@@ -72,7 +72,7 @@ public class MtasFieldsProducer extends FieldsProducer {
               version, version),
           postingsFormatName);
     } catch (IndexFormatTooOldException e) {
-      log.debug(e);
+      log.warn(e);
       throw new IOException(
           "This MTAS doesn't support your index version, please upgrade");
     }
@@ -98,7 +98,7 @@ public class MtasFieldsProducer extends FieldsProducer {
       indexInputOffsetList.put(name, in.getFilePointer());
       return localPostingsFormatName;
     } else {
-      log.debug("no " + name + " registered");
+      log.warn("no " + name + " registered");
       return null;
     }
   }
@@ -162,7 +162,7 @@ public class MtasFieldsProducer extends FieldsProducer {
     try {
       object = state.directory.openInput(fileName, state.context);
     } catch (FileNotFoundException | NoSuchFileException e) {
-      log.debug(e);
+      log.warn(e);
       // throw new NoSuchFileException(e.getMessage());
       return null;
     }
@@ -175,12 +175,12 @@ public class MtasFieldsProducer extends FieldsProducer {
           state.segmentInfo.getId(), state.segmentSuffix);
     } catch (IndexFormatTooOldException e) {
       object.close();
-      log.debug(e);
+      log.warn(e);
       throw new IndexFormatTooOldException(e.getMessage(), e.getVersion(),
           e.getMinVersion(), e.getMaxVersion());
     } catch (EOFException e) {
       object.close();
-      log.debug(e);
+      log.warn(e);
       // throw new EOFException(e.getMessage());
       return null;
     }

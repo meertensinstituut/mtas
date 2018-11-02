@@ -380,7 +380,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
               }
             }
           } catch (IOException e) {
-            log.info(e);
+            log.warn(e);
             // update error
             doc.addField(config.fieldTypeErrorField.get(fieldType),
               e.getMessage());

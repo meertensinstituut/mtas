@@ -82,7 +82,7 @@ public class MtasPreAnalyzedParser implements PreAnalyzedParser {
       }
     } catch (IOException e) {
       // ignore
-      log.debug(e);
+      log.warn(e);
     }
     return res;
   }
