@@ -1,5 +1,5 @@
-* Script schrijven om hele collectie te indexeren volgens nieuwe upload-API
 * Regressietest op upload van hele collectie (versus oude PHP-uploader);
   uitzoeken wat de huidige tests al dekken
 * Configuratie vereenvoudigen
 * Refactoren van MtasUpdateRequestProcessorFactory en MtasPreAnalyzedParser
+* Uploadscript slimmer: alleen updaten wat er veranderd is

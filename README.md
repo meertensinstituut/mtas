@@ -17,8 +17,8 @@ E.g., if you have a document in `document.json`, you can upload this with cURL a
 Solr should reply with status 0, as usual. The commit can be omitted for extra performance.
 
 If you have JSON files containing only metadata and data in separate files (say `metadata.json` and
-`content.xml`), you need to inject the content into the JSON prior to uploading. The Python script in
-`example/upload.py` shows how to do this.
+`content.xml`), you need to inject the content into the JSON prior to uploading. The Python scripts
+in `example/index_*.py` show how to do this.
 
 ---
 
