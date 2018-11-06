@@ -4,22 +4,21 @@ See [meertensinstituut.github.io/mtas/](https://meertensinstituut.github.io/mtas
 
 ---
 
-A [docker](https://hub.docker.com/r/textexploration/mtas/) image providing a Solr based demonstration scenario with indexing and querying of some sample documents is available. To pull and run
+If you have Solr with Mtas running, you can POST documents to it using your favorite tool/library.
+The documents and their metadata must be JSON-formatted, with fields matching the Solr schema.
+The schema may contain a "magical" field of type `mtas.solr.schema.MtasPreAnalyzedField` that is picked
+up by Mtas for processing.
 
-```console
-docker pull textexploration/mtas
-docker run -t -i -p 8080:80 --name mtas textexploration/mtas
-```
+E.g., if you have a document in `document.json`, you can upload this with cURL as:
 
-Or to build and run
+    curl -H "Content-Type: application/json" -XPOST \
+        "http://localhost:8983/solr/$CORENAME/update?wt=json&commit=true" -d @document.json
 
-```console
-docker build -t mtas https://raw.githubusercontent.com/textexploration/mtas/master/docker/Dockerfile
-docker run -t -i -p 8080:80 --name mtas mtas
-```
+Solr should reply with status 0, as usual. The commit can be omitted for extra performance.
 
-This will provide a website on port 8080 on the ip of your docker host with 
-more information. 
+If you have JSON files containing only metadata and data in separate files (say `metadata.json` and
+`content.xml`), you need to inject the content into the JSON prior to uploading. The Python script in
+`example/upload.py` shows how to do this.
 
 ---
 
