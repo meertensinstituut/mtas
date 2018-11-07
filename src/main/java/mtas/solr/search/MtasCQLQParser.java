@@ -86,9 +86,9 @@ public class MtasCQLQParser extends QParser {
   @Override
   public Query parse() throws SyntaxError {
     if (field == null) {
-      throw new SyntaxError("no " + MTAS_CQL_QPARSER_FIELD);
+      throw new CQLSyntaxError("no " + MTAS_CQL_QPARSER_FIELD);
     } else if (cql == null) {
-      throw new SyntaxError("no " + MTAS_CQL_QPARSER_QUERY);
+      throw new CQLSyntaxError("no " + MTAS_CQL_QPARSER_QUERY);
     } else {
       MtasSpanQuery q = null;
       MtasSpanQuery iq = null;
@@ -99,7 +99,7 @@ public class MtasCQLQParser extends QParser {
           iq = ignoreParser.parse(field, null, null, null, null);
         } catch (mtas.parser.cql.TokenMgrError
             | mtas.parser.cql.ParseException e) {
-          throw new SyntaxError(e);
+          throw new CQLSyntaxError(e);
         }
       }
       Reader queryReader = new BufferedReader(new StringReader(cql));
@@ -107,9 +107,8 @@ public class MtasCQLQParser extends QParser {
       try {
         q = queryParser.parse(field, defaultPrefix, variables, iq,
             maximumIgnoreLength);
-      } catch (mtas.parser.cql.TokenMgrError
-          | mtas.parser.cql.ParseException e) {
-        throw new SyntaxError(e);
+      } catch (mtas.parser.cql.TokenMgrError | mtas.parser.cql.ParseException e) {
+        throw new CQLSyntaxError(e);
       }
       return q;
     }
