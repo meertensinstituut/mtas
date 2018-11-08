@@ -83,25 +83,20 @@ public final class MtasTokenizer extends Tokenizer {
   @Override
   public boolean incrementToken() throws IOException {
     clearAttributes();
-    MtasToken token;
-    Integer positionIncrement;
-    MtasPayloadEncoder payloadEncoder;
-    if (tokenCollectionIterator == null) {
+    if (tokenCollectionIterator == null || !tokenCollectionIterator.hasNext()) {
       return false;
-    } else if (tokenCollectionIterator.hasNext()) {
-      token = tokenCollectionIterator.next();
-      // compute info
-      positionIncrement = token.getPositionStart() - currentPosition;
-      currentPosition = token.getPositionStart();
-      payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);
-      // set info
-      termAtt.append(token.getValue());
-      positionIncrementAtt.setPositionIncrement(positionIncrement);
-      offsetAtt.setOffset(token.getOffsetStart(), token.getOffsetEnd());
-      payloadAtt.setPayload(payloadEncoder.getPayload());
-      return true;
     }
-    return false;
+
+    MtasToken token = tokenCollectionIterator.next();
+    Integer positionIncrement = token.getPositionStart() - currentPosition;
+    currentPosition = token.getPositionStart();
+    MtasPayloadEncoder payloadEncoder = new MtasPayloadEncoder(token, encodingFlags);
+
+    termAtt.append(token.getValue());
+    positionIncrementAtt.setPositionIncrement(positionIncrement);
+    offsetAtt.setOffset(token.getOffsetStart(), token.getOffsetEnd());
+    payloadAtt.setPayload(payloadEncoder.getPayload());
+    return true;
   }
 
   @Override
@@ -153,17 +148,15 @@ public final class MtasTokenizer extends Tokenizer {
       Constructor<?> c = Class.forName(parserName)
           .getDeclaredConstructor(MtasConfiguration.class);      
       Object p = c.newInstance(parserConfiguration);
-      if (p instanceof MtasParser) {
-        MtasParser parser = (MtasParser) p;
-        tokenCollection = parser.createTokenCollection(reader);
-        return;
-      } else {
+      if (!(p instanceof MtasParser)) {
         throw new MtasConfigException("no instance of MtasParser");
       }
+      MtasParser parser = (MtasParser) p;
+      tokenCollection = parser.createTokenCollection(reader);
     } catch (MtasParserException e) {
       log.debug(e);
       tokenCollection = new MtasTokenCollection();
-      throw new MtasParserException(e.getMessage());
+      throw e;
     } catch (NoSuchMethodException | InvocationTargetException
         | IllegalAccessException | ClassNotFoundException
         | InstantiationException e) {
@@ -212,12 +205,11 @@ public final class MtasTokenizer extends Tokenizer {
             }
           }
         } else if (config.children.get(i).name.equals(CONFIGURATION_MTAS_PARSER)) {
-          if (config.children.get(i).attributes.containsKey(CONFIGURATION_MTAS_PARSER_ATTRIBUTE)) {
-            parserName = config.children.get(i).attributes.get(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);
-            parserConfiguration = config.children.get(i);
-          } else {
+          if (!config.children.get(i).attributes.containsKey(CONFIGURATION_MTAS_PARSER_ATTRIBUTE)) {
             throw new IOException("no parser configuration");
           }
+          parserName = config.children.get(i).attributes.get(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);
+          parserConfiguration = config.children.get(i);
         }
       }
     } else {

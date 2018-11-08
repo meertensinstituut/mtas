@@ -1,8 +1,17 @@
 package mtas.solr;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
+import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.util.NamedList;
+import org.apache.solr.core.CoreContainer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,81 +30,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrRequest;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.common.util.NamedList;
-import org.apache.solr.core.CoreContainer;
 
-/**
- * The Class MtasSolrTestSearchConsistency.
- */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MtasSolrTestSearchConsistency {
-
-  private static Log log = LogFactory
-      .getLog(MtasSolrTestSearchConsistency.class);
+  private static Log log = LogFactory.getLog(MtasSolrTestSearchConsistency.class);
 
   private static EmbeddedSolrServer server;
 
   private static Path solrPath;
 
-  /**
-   * Setup.
-   */
   @org.junit.BeforeClass
-  public static void setup() {
-    try {
-      Path dataPath = Paths.get("src" + File.separator + "test"
-          + File.separator + "resources" + File.separator + "data");
-      // data
-      Map<Integer, SolrInputDocument> solrDocuments = MtasSolrBase
-          .createDocuments(true);
+  public static void setup() throws IOException, SolrServerException {
+    Path dataPath = Paths.get("src" + File.separator + "test"
+      + File.separator + "resources" + File.separator + "data");
+    Map<Integer, SolrInputDocument> docs = MtasSolrBase.createDocuments(true);
 
-      // create
-      ArrayList<String> collections = new ArrayList<>(
-          Arrays.asList("collection1", "collection2", "collection3"));
-      initializeDirectory(dataPath, collections);
-      CoreContainer container = new CoreContainer(
-          solrPath.toAbsolutePath().toString());
-      container.load();
-      server = new EmbeddedSolrServer(container, collections.get(0));
+    ArrayList<String> collections = new ArrayList<>(
+      Arrays.asList("collection1", "collection2", "collection3"));
+    initializeDirectory(dataPath, collections);
+    CoreContainer container = new CoreContainer(solrPath.toAbsolutePath().toString());
+    container.load();
+    server = new EmbeddedSolrServer(container, collections.get(0));
 
-      // add
-      server.add("collection1", solrDocuments.get(1));
-      server.commit("collection1");
-      server.add("collection1", solrDocuments.get(2));
-      server.add("collection1", solrDocuments.get(3));
-      server.commit("collection1");
+    server.add("collection1", docs.get(1));
+    server.commit("collection1");
+    server.add("collection1", docs.get(2));
+    server.add("collection1", docs.get(3));
+    server.commit("collection1");
 
-      server.add("collection2", solrDocuments.get(1));
-      server.commit("collection2");
+    server.add("collection2", docs.get(1));
+    server.commit("collection2");
 
-      server.add("collection3", solrDocuments.get(3));
-      server.add("collection3", solrDocuments.get(2));
-      server.commit("collection3");
-
-    } catch (IOException | SolrServerException e) {
-      log.error(e);
-    }
+    server.add("collection3", docs.get(3));
+    server.add("collection3", docs.get(2));
+    server.commit("collection3");
   }
 
-  /**
-   * Initialize directory.
-   *
-   * @param dataPath
-   *          the data path
-   * @param collections
-   *          the collections
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   private static void initializeDirectory(Path dataPath,
       List<String> collections) throws IOException {
     solrPath = Files.createTempDirectory("junitSolr");
@@ -108,16 +82,6 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Creates the collection.
-   *
-   * @param collectionName
-   *          the collection name
-   * @param dataPath
-   *          the data path
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   private static void createCollection(String collectionName, Path dataPath)
       throws IOException {
     File solrFile;
@@ -150,24 +114,12 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Shutdown.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.AfterClass
   public static void shutdown() throws IOException {
     server.close();
     MtasSolrBase.deleteDirectory(solrPath.toFile());
   }
 
-  /**
-   * Cql query parser.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
   public void cqlQueryParser() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -187,12 +139,6 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Cql query parser filter.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
   public void cqlQueryParserFilter() throws IOException {
     ModifiableSolrParams params1 = new ModifiableSolrParams();
@@ -214,12 +160,6 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Mtas request handler stats spans and positions.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
   public void mtasRequestHandlerStatsSpansAndPositions() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -257,12 +197,6 @@ public class MtasSolrTestSearchConsistency {
 
   }
 
-  /**
-   * Mtas request handler stats tokens.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
   public void mtasRequestHandlerStatsTokens() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -291,12 +225,6 @@ public class MtasSolrTestSearchConsistency {
         MtasSolrBase.getFromStats(response, "numberOfTokens", "sum", true));
   }
 
-  /**
-   * Mtas request handler termvector 1.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
   public void mtasRequestHandlerTermvector1() throws IOException {
     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -338,14 +266,8 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Mtas request handler termvector 2.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
-  public void mtasRequestHandlerTermvector2() throws IOException {
+  public void mtasRequestHandlerTermvector2() throws IOException, SolrServerException {
     String[] list = new String[] { "de", "het", "een",
         "not existing word just for testing" };
     String[] types = new String[] { "n", "sum", "sumsq" };
@@ -361,14 +283,8 @@ public class MtasSolrTestSearchConsistency {
     // create full
     params.set("mtas.termvector.0.list", String.join(",", list));
     SolrRequest<?> request = new QueryRequest(params);
-    NamedList<Object> response;
-    try {
-      response = server.request(request, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
-    List<NamedList<Object>> tv = MtasSolrBase.getFromMtasTermvector(response,
-        "tv");
+    NamedList<Object> response = server.request(request, "collection1");
+    List<NamedList<Object>> tv = MtasSolrBase.getFromMtasTermvector(response, "tv");
     for (String key : list) {
       params.clear();
       params.set("q", "*:*");
@@ -390,12 +306,7 @@ public class MtasSolrTestSearchConsistency {
       params.set("mtas.stats.spans.1.type", String.join(",", types));
       params.set("rows", "0");
       SolrRequest<?> requestStats = new QueryRequest(params);
-      NamedList<Object> responseStats;
-      try {
-        responseStats = server.request(requestStats, "collection1");
-      } catch (SolrServerException e) {
-        throw new IOException(e);
-      }
+      NamedList<Object> responseStats = server.request(requestStats, "collection1");
       NamedList<Object> tvItem = null;
       for (NamedList<Object> item : tv) {
         if (item.get("key").equals(key)) {
@@ -420,14 +331,8 @@ public class MtasSolrTestSearchConsistency {
 
   }
 
-  /**
-   * Mtas request handler termvector 3.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
-  public void mtasRequestHandlerTermvector3() throws IOException {
+  public void mtasRequestHandlerTermvector3() throws IOException, SolrServerException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     params.set("q", "*:*");
     params.set("rows", 0);
@@ -443,14 +348,8 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.termvector.0.ignoreList", ".*st.*,.*nm.*");
     params.set("mtas.termvector.0.ignoreListRegexp", true);
     SolrRequest<?> request = new QueryRequest(params);
-    NamedList<Object> response;
-    try {
-      response = server.request(request, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
-    List<NamedList<Object>> tv = MtasSolrBase.getFromMtasTermvector(response,
-        "tv");
+    NamedList<Object> response = server.request(request, "collection1");
+    List<NamedList<Object>> tv = MtasSolrBase.getFromMtasTermvector(response, "tv");
     Set<String> keys = new HashSet<>();
     for (NamedList<Object> item : tv) {
       if (item != null && item.get("key") != null
@@ -469,14 +368,8 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Mtas request handler collection 1.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
-  public void mtasRequestHandlerCollection1() throws IOException {
+  public void mtasRequestHandlerCollection1() throws IOException, SolrServerException {
     // create
     ModifiableSolrParams paramsCreate = new ModifiableSolrParams();
     paramsCreate.set("q", "*:*");
@@ -487,12 +380,7 @@ public class MtasSolrTestSearchConsistency {
     paramsCreate.set("mtas.collection.0.id", "idCreate");
     paramsCreate.set("mtas.collection.0.field", "id");
     SolrRequest<?> requestCreate = new QueryRequest(paramsCreate);
-    NamedList<Object> responseCreate;
-    try {
-      responseCreate = server.request(requestCreate, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responseCreate = server.request(requestCreate, "collection1");
     long n = MtasSolrBase.getNumFound(responseCreate);
     NamedList<Object> create = MtasSolrBase
         .getFromMtasCollection(responseCreate, "create");
@@ -514,14 +402,8 @@ public class MtasSolrTestSearchConsistency {
     paramsPost.set("mtas.collection.0.id", "idPost");
     paramsPost.set("mtas.collection.0.post", "[1,2,3,4]");
     SolrRequest<?> requestPost = new QueryRequest(paramsPost);
-    NamedList<Object> responsePost;
-    try {
-      responsePost = server.request(requestPost, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
-    NamedList<Object> post = MtasSolrBase.getFromMtasCollection(responsePost,
-        "post");
+    NamedList<Object> responsePost = server.request(requestPost, "collection1");
+    NamedList<Object> post = MtasSolrBase.getFromMtasCollection(responsePost, "post");
     assertFalse("post - id not found", post == null);
     assertTrue("post - no valid version",
         post.get("version") != null && post.get("version") instanceof String);
@@ -582,12 +464,7 @@ public class MtasSolrTestSearchConsistency {
     paramsCheck.set("mtas.collection.1.action", "check");
     paramsCheck.set("mtas.collection.1.id", "idPost");
     SolrRequest<?> requestCheck = new QueryRequest(paramsCheck);
-    NamedList<Object> responseCheck;
-    try {
-      responseCheck = server.request(requestCheck, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responseCheck = server.request(requestCheck, "collection1");
     // check create
     NamedList<Object> check1 = MtasSolrBase.getFromMtasCollection(responseCheck,
         "check1");
@@ -626,12 +503,7 @@ public class MtasSolrTestSearchConsistency {
     paramsDelete.set("mtas.collection.1.action", "delete");
     paramsDelete.set("mtas.collection.1.id", "idPost");
     SolrRequest<?> requestDelete = new QueryRequest(paramsDelete);
-    NamedList<Object> responseDelete;
-    try {
-      responseDelete = server.request(requestDelete, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responseDelete = server.request(requestDelete, "collection1");
     // check create
     NamedList<Object> delete1 = MtasSolrBase
         .getFromMtasCollection(responseDelete, "delete1");
@@ -642,12 +514,7 @@ public class MtasSolrTestSearchConsistency {
     assertFalse("delete - post - no response", delete2 == null);
     // list (again)
     SolrRequest<?> requestList2 = new QueryRequest(paramsList);
-    NamedList<Object> responseList2;
-    try {
-      responseList2 = server.request(requestList2, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responseList2 = server.request(requestList2, "collection1");
     // check create
     NamedList<Object> listCreateItem2 = MtasSolrBase
         .getFromMtasCollectionList(responseList2, "list", "idCreate");
@@ -658,14 +525,8 @@ public class MtasSolrTestSearchConsistency {
     assertTrue("list - post - id found", listPostItem2 == null);
   }
 
-  /**
-   * Mtas request handler collection 2.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
-  public void mtasRequestHandlerCollection2() throws IOException {
+  public void mtasRequestHandlerCollection2() throws IOException, SolrServerException {
     // post
     ModifiableSolrParams paramsPost = new ModifiableSolrParams();
     paramsPost.set("q", "*:*");
@@ -684,12 +545,7 @@ public class MtasSolrTestSearchConsistency {
     paramsPost.set("mtas.collection.2.id", "createSet1");
     paramsPost.set("mtas.collection.2.field", MtasSolrBase.FIELD_ID);
     SolrRequest<?> requestPost = new QueryRequest(paramsPost);
-    NamedList<Object> responsePost;
-    try {
-      responsePost = server.request(requestPost, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responsePost = server.request(requestPost, "collection1");
     MtasSolrBase.getFromMtasCollection(responsePost, "post");
     // query set1
     ModifiableSolrParams paramsSelect1 = new ModifiableSolrParams();
@@ -697,12 +553,7 @@ public class MtasSolrTestSearchConsistency {
         + "\" collection=\"postSet1\"}");
     paramsSelect1.set("rows", "0");
     SolrRequest<?> request1 = new QueryRequest(paramsSelect1);
-    NamedList<Object> response1;
-    try {
-      response1 = server.request(request1, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> response1 = server.request(request1, "collection1");
     long n1 = MtasSolrBase.getNumFound(response1);
     assertTrue("incorrect number of matching documents : " + n1, n1 == 2);
     // query set2
@@ -711,12 +562,7 @@ public class MtasSolrTestSearchConsistency {
         + "\" collection=\"postSet2\"}");
     paramsSelect2.set("rows", "0");
     SolrRequest<?> request2 = new QueryRequest(paramsSelect2);
-    NamedList<Object> response2;
-    try {
-      response2 = server.request(request2, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> response2 = server.request(request2, "collection1");
     long n2 = MtasSolrBase.getNumFound(response2);
     assertTrue("incorrect number of matching documents : " + n2, n2 == 1);
     // query set3
@@ -725,12 +571,7 @@ public class MtasSolrTestSearchConsistency {
         + "\" collection=\"createSet1\"}");
     paramsSelect3.set("rows", "0");
     SolrRequest<?> request3 = new QueryRequest(paramsSelect3);
-    NamedList<Object> response3;
-    try {
-      response3 = server.request(request3, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> response3 = server.request(request3, "collection1");
     long n3 = MtasSolrBase.getNumFound(response3);
     assertTrue("incorrect number of matching documents : " + n3, n3 == 3);
     // query set1 or set2
@@ -741,24 +582,13 @@ public class MtasSolrTestSearchConsistency {
             + MtasSolrBase.FIELD_ID + "\" collection=\"postSet2\"})");
     paramsSelect4.set("rows", "0");
     SolrRequest<?> request4 = new QueryRequest(paramsSelect4);
-    NamedList<Object> response4;
-    try {
-      response4 = server.request(request4, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> response4 = server.request(request4, "collection1");
     long n4 = MtasSolrBase.getNumFound(response4);
     assertTrue("incorrect number of matching documents : " + n4, n4 == 3);
   }
 
-  /**
-   * Mtas request handler collection 3.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
-  public void mtasRequestHandlerCollection3() throws IOException {
+  public void mtasRequestHandlerCollection3() throws IOException, SolrServerException {
     // post
     ModifiableSolrParams paramsPost = new ModifiableSolrParams();
     paramsPost.set("q", "*:*");
@@ -769,11 +599,7 @@ public class MtasSolrTestSearchConsistency {
     paramsPost.set("mtas.collection.0.id", "setCreatedByPost");
     paramsPost.set("mtas.collection.0.post", "[1,3,4]");
     SolrRequest<?> requestPost = new QueryRequest(paramsPost);
-    try {
-      server.request(requestPost, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    server.request(requestPost, "collection1");
     // import
     ModifiableSolrParams paramsImport = new ModifiableSolrParams();
     paramsImport.set("q", "*:*");
@@ -784,23 +610,14 @@ public class MtasSolrTestSearchConsistency {
     paramsImport.set("mtas.collection.0.id", "setCreatedByImport");
     paramsImport.set("mtas.collection.0.post", "[1,3,4]");
     SolrRequest<?> requestImport = new QueryRequest(paramsImport);
-    try {
-      server.request(requestImport, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    server.request(requestImport, "collection1");
     // query post
     ModifiableSolrParams paramsSelect1 = new ModifiableSolrParams();
     paramsSelect1.set("q", "{!mtas_join field=\"" + MtasSolrBase.FIELD_ID
         + "\" collection=\"setCreatedByPost\"}");
     paramsSelect1.set("rows", "0");
     SolrRequest<?> request1 = new QueryRequest(paramsSelect1);
-    NamedList<Object> response1;
-    try {
-      response1 = server.request(request1, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> response1 = server.request(request1, "collection1");
     long n1 = MtasSolrBase.getNumFound(response1);
     assertTrue("no matching documents for posted set: " + n1, n1 > 0);
     // query import
@@ -809,12 +626,7 @@ public class MtasSolrTestSearchConsistency {
         + "\" collection=\"setCreatedByImport\"}");
     paramsSelect2.set("rows", "0");
     SolrRequest<?> request2 = new QueryRequest(paramsSelect2);
-    NamedList<Object> response2;
-    try {
-      response2 = server.request(request2, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> response2 = server.request(request2, "collection1");
     long n2 = MtasSolrBase.getNumFound(response2);
     assertTrue("no matching documents for imported set: " + n2, n2 > 0);
     // compare
@@ -823,7 +635,7 @@ public class MtasSolrTestSearchConsistency {
   }
 
   @org.junit.Test
-  public void mtasRequestHandlerGroup1() throws IOException {
+  public void mtasRequestHandlerGroup1() throws IOException, SolrServerException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     final int maxNumber = 1000;
     String cql = "[pos=\"LID\"]";
@@ -840,12 +652,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.group.0.query.value", cql);
     params.set("mtas.group.0.grouping.hit.inside.prefixes", prefix);
     SolrRequest<?> requestGroup = new QueryRequest(params);
-    NamedList<Object> responseGroup = null;
-    try {
-      responseGroup = server.request(requestGroup, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responseGroup = server.request(requestGroup, "collection1");
     // get stats
     params.clear();
     params.set("q", "*:*");
@@ -869,80 +676,53 @@ public class MtasSolrTestSearchConsistency {
     }
     // get group list
     List<NamedList<Object>> groupList = MtasSolrBase
-        .getFromMtasGroup(responseGroup, "groupKey");
+      .getFromMtasGroup(responseGroup, "groupKey");
     long groupSum = 0;
     long statsSum = MtasSolrBase
-        .getFromMtasStats(responseStats, "spans", "statsKey", "sum")
-        .longValue();
+      .getFromMtasStats(responseStats, "spans", "statsKey", "sum")
+      .longValue();
     for (NamedList<Object> groupListItem : groupList) {
-      if (groupListItem.get("sum") instanceof Number) {
-        groupSum += (Long) groupListItem.get("sum");
-      } else {
-        throw new IOException("no sum for item in grouping " + groupListItem);
-      }
+      groupSum += (Long) groupListItem.get("sum");
       Object subListRaw = groupListItem.get("group");
-      if (subListRaw != null && subListRaw instanceof Map) {
-        Object subSubListRaw = ((Map<String, Object>) subListRaw).get("hit");
-        if (subSubListRaw != null && subSubListRaw instanceof Map) {
-          Object subSubSubListRaw = ((Map<String, Object>) subSubListRaw)
-              .get(0);
-          if (subSubSubListRaw != null && subSubSubListRaw instanceof List) {
-            Object subSubSubSubListRaw = ((List<Object>) subSubSubListRaw)
-                .get(0);
-            if (subSubSubSubListRaw != null
-                && subSubSubSubListRaw instanceof Map) {
-              String subKey = (String) ((Map<String, Object>) subSubSubSubListRaw)
-                  .get("value");
-              String subcql = "[" + prefix + "=\"" + subKey + "\"] within "
-                  + cql;
-              // get stats
-              params.clear();
-              params.set("q", "*:*");
-              params.set("rows", 0);
-              params.set("mtas", "true");
-              params.set("mtas.stats", "true");
-              params.set("mtas.stats.spans", "true");
-              params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
-              params.set("mtas.stats.spans.0.key", "statsKey");
-              params.set("mtas.stats.spans.0.minimum", 1);
-              params.set("mtas.stats.spans.0.query.0.type", "cql");
-              params.set("mtas.stats.spans.0.query.0.value", subcql);
-              params.set("mtas.stats.spans.0.type", "n,sum");
-              params.set("rows", "0");
-              SolrRequest<?> requestSubStats = new QueryRequest(params);
-              NamedList<Object> responseSubStats = null;
-              try {
-                responseSubStats = server.request(requestSubStats,
-                    "collection1");
-              } catch (SolrServerException e) {
-                throw new IOException(e);
-              }
-              long subStatsSum = MtasSolrBase.getFromMtasStats(responseSubStats,
-                  "spans", "statsKey", "sum").longValue();
-              long subGroupSum = (Long) groupListItem.get("sum");
-              assertEquals(
-                  "Sum of hit " + subKey
-                      + " not equal to sum for cql expression " + subcql,
-                  subGroupSum, subStatsSum);
-            } else {
-              throw new IOException("problem parsing response (4)");
-            }
-          } else {
-            throw new IOException("problem parsing response (3)");
-          }
-        } else {
-          throw new IOException("problem parsing response (2)");
-        }
-      } else {
-        throw new IOException("problem parsing response (1)");
-      }
+      assertTrue(subListRaw != null && subListRaw instanceof Map);
+      Object subSubListRaw = ((Map<String, Object>) subListRaw).get("hit");
+      assertTrue(subSubListRaw != null && subSubListRaw instanceof Map);
+      Object subSubSubListRaw = ((Map<String, Object>) subSubListRaw).get(0);
+      assertTrue(subSubSubListRaw != null && subSubSubListRaw instanceof List);
+      Object subSubSubSubListRaw = ((List<Object>) subSubSubListRaw).get(0);
+      assertTrue(subSubSubSubListRaw != null && subSubSubSubListRaw instanceof Map);
+      String subKey = (String) ((Map<String, Object>) subSubSubSubListRaw).get("value");
+      String subcql = "[" + prefix + "=\"" + subKey + "\"] within " + cql;
+      // get stats
+      params.clear();
+      params.set("q", "*:*");
+      params.set("rows", 0);
+      params.set("mtas", "true");
+      params.set("mtas.stats", "true");
+      params.set("mtas.stats.spans", "true");
+      params.set("mtas.stats.spans.0.field", MtasSolrBase.FIELD_MTAS);
+      params.set("mtas.stats.spans.0.key", "statsKey");
+      params.set("mtas.stats.spans.0.minimum", 1);
+      params.set("mtas.stats.spans.0.query.0.type", "cql");
+      params.set("mtas.stats.spans.0.query.0.value", subcql);
+      params.set("mtas.stats.spans.0.type", "n,sum");
+      params.set("rows", "0");
+      SolrRequest<?> requestSubStats = new QueryRequest(params);
+      NamedList<Object> responseSubStats = server.request(requestSubStats, "collection1");
+      long subStatsSum = MtasSolrBase.getFromMtasStats(responseSubStats,
+        "spans", "statsKey", "sum").longValue();
+      long subGroupSum = (Long) groupListItem.get("sum");
+      assertEquals(
+        "Sum of hit " + subKey
+          + " not equal to sum for cql expression " + subcql,
+        subGroupSum, subStatsSum);
     }
     assertEquals("Sum of hits grouping not equal to sum for cql expression",
-        groupSum, statsSum);
+      groupSum, statsSum);
   }
 
   @org.junit.Test
-  public void mtasRequestHandlerGroup2() throws IOException {
+  public void mtasRequestHandlerGroup2() throws Exception {
     Map<String, String> params = new HashMap<>();
     String cql;
     // test hit inside
@@ -1029,14 +809,8 @@ public class MtasSolrTestSearchConsistency {
     params.clear();
   }
 
-  /**
-   * Mtas solr schema pre analyzed parser and field.
-   *
-   * @throws IOException
-   *           Signals that an I/O exception has occurred.
-   */
   @org.junit.Test
-  public void mtasSolrSchemaPreAnalyzedParserAndField() throws IOException {
+  public void mtasSolrSchemaPreAnalyzedParserAndField() throws IOException, SolrServerException {
     ModifiableSolrParams params = new ModifiableSolrParams();
     params.set("q", "*:*");
     params.set("stats", "true");
@@ -1061,11 +835,7 @@ public class MtasSolrTestSearchConsistency {
     SolrRequest<?> request = new QueryRequest(params);
     NamedList<Object> response1;
     NamedList<Object> response2;
-    try {
-      response1 = server.request(request, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    response1 = server.request(request, "collection1");
     params.remove("mtas.stats.spans.0.field");
     params.remove("mtas.stats.positions.0.field");
     params.remove("mtas.stats.tokens.0.field");
@@ -1073,11 +843,7 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.positions.0.field",
         MtasSolrBase.FIELD_MTAS_ADVANCED);
     params.set("mtas.stats.tokens.0.field", MtasSolrBase.FIELD_MTAS_ADVANCED);
-    try {
-      response2 = server.request(request, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    response2 = server.request(request, "collection1");
     assertEquals(
         MtasSolrBase.getFromMtasStats(response1, "spans", "statsKey", "sum"),
         MtasSolrBase.getFromStats(response1, "numberOfPositions", "sum", true));
@@ -1090,18 +856,6 @@ public class MtasSolrTestSearchConsistency {
     }
   }
 
-  /**
-   * Creates the termvector assertions.
-   *
-   * @param response1
-   *          the response 1
-   * @param response2
-   *          the response 2
-   * @param key
-   *          the key
-   * @param names
-   *          the names
-   */
   private static void createTermvectorAssertions(NamedList<Object> response1,
       NamedList<Object> response2, String key, String[] names) {
     List<NamedList<Object>> list1 = MtasSolrBase
@@ -1109,34 +863,29 @@ public class MtasSolrTestSearchConsistency {
     List<NamedList<Object>> list2 = MtasSolrBase
         .getFromMtasTermvector(response2, key);
     assertFalse("list should be defined", list1 == null || list2 == null);
-    if (list1 != null && list2 != null) {
-      assertFalse("first list should not be longer",
-          list1.size() > list2.size());
-      assertFalse("list should not be empty", list1.isEmpty());
-      for (int i = 0; i < list1.size(); i++) {
-        Object key1 = list1.get(i).get("key");
-        Object key2 = list2.get(i).get("key");
-        assertFalse("key should be provided", (key1 == null) || (key2 == null));
-        assertTrue("key should be string",
-            (key1 instanceof String) && (key2 instanceof String));
-        assertEquals(
-            "element " + i + " should be equal: " + key1 + " - " + key2, key1,
-            key2);
-        for (int j = 0; j < names.length; j++) {
-          Object value1 = list1.get(i).get(names[j]);
-          Object value2 = list2.get(i).get(names[j]);
-          assertFalse(names[j] + " should be provided",
-              (value1 == null) || (value2 == null));
-          assertEquals(
-              names[j] + " should be equal: " + value1 + " - " + value2, value1,
-              value2);
-        }
+    assertFalse("first list should not be longer",
+      list1.size() > list2.size());
+    assertFalse("list should not be empty", list1.isEmpty());
+
+    for (int i = 0; i < list1.size(); i++) {
+      Object key1 = list1.get(i).get("key");
+      Object key2 = list2.get(i).get("key");
+      assertFalse("key should be provided", key1 == null || key2 == null);
+      assertTrue("key should be string", key1 instanceof String && key2 instanceof String);
+      assertEquals("element " + i + " should be equal: " + key1 + " - " + key2,
+        key1, key2);
+      for (String name : names) {
+        Object value1 = list1.get(i).get(name);
+        Object value2 = list2.get(i).get(name);
+        assertFalse(name + " should be provided", value1 == null || value2 == null);
+        assertEquals(name + " should be equal: " + value1 + " - " + value2,
+          value1, value2);
       }
     }
   }
 
   private static void createGroupTest(String cql, Map<String, String> grouping)
-      throws IOException {
+    throws Exception {
     ModifiableSolrParams params = new ModifiableSolrParams();
     final int maxNumber = Integer.MAX_VALUE;
     String prefix = "t_lc";
@@ -1155,11 +904,7 @@ public class MtasSolrTestSearchConsistency {
     }
     SolrRequest<?> requestGroup = new QueryRequest(params);
     NamedList<Object> responseGroup = null;
-    try {
-      responseGroup = server.request(requestGroup, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    responseGroup = server.request(requestGroup, "collection1");
     // System.out.println(responseGroup);
     // get stats
     params.clear();
@@ -1176,25 +921,14 @@ public class MtasSolrTestSearchConsistency {
     params.set("mtas.stats.spans.0.type", "n,sum");
     params.set("rows", "0");
     SolrRequest<?> requestStats = new QueryRequest(params);
-    NamedList<Object> responseStats = null;
-    try {
-      responseStats = server.request(requestStats, "collection1");
-    } catch (SolrServerException e) {
-      throw new IOException(e);
-    }
+    NamedList<Object> responseStats = server.request(requestStats, "collection1");
     // get group list
-    List<NamedList<Object>> groupList = MtasSolrBase
-        .getFromMtasGroup(responseGroup, "groupKey");
+    List<NamedList<Object>> groupList = MtasSolrBase.getFromMtasGroup(responseGroup, "groupKey");
     long groupSum = 0;
-    long statsSum = MtasSolrBase
-        .getFromMtasStats(responseStats, "spans", "statsKey", "sum")
-        .longValue();
+    long statsSum = MtasSolrBase.getFromMtasStats(responseStats, "spans", "statsKey", "sum").longValue();
     for (NamedList<Object> groupListItem : groupList) {
-      if (groupListItem.get("sum") instanceof Number) {
-        groupSum += (Long) groupListItem.get("sum");
-      } else {
-        throw new IOException("no sum for item in grouping " + groupListItem);
-      }
+      assertNotNull(groupListItem.get("sum"));
+      groupSum += (Long) groupListItem.get("sum");
     }
     assertEquals("Sum of hits grouping not equal to sum for cql expression "
         + cql + " and grouping " + grouping, groupSum, statsSum);

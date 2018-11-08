@@ -1,5 +1,17 @@
 package mtas.analysis.parser;
 
+import mtas.analysis.token.MtasToken;
+import mtas.analysis.token.MtasTokenIdFactory;
+import mtas.analysis.token.MtasTokenString;
+import mtas.analysis.util.MtasConfigException;
+import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.MtasParserException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.payloads.PayloadHelper;
+import org.apache.lucene.util.BytesRef;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,163 +28,79 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mtas.analysis.token.MtasToken;
-import mtas.analysis.token.MtasTokenIdFactory;
-import mtas.analysis.token.MtasTokenString;
-import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
-import mtas.analysis.util.MtasParserException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
-import org.apache.lucene.analysis.payloads.PayloadHelper;
-import org.apache.lucene.util.BytesRef;
-
 public abstract class MtasBasicParser extends MtasParser {
   private static final Log log = LogFactory.getLog(MtasBasicParser.class);
-
   protected static final String MAPPING_TYPE_REF = "ref";
-
   protected static final String MAPPING_TYPE_RELATION = "relation";
-
   protected static final String MAPPING_TYPE_RELATION_ANNOTATION = "relationAnnotation";
-
   protected static final String MAPPING_TYPE_GROUP = "group";
-
   protected static final String MAPPING_TYPE_GROUP_ANNOTATION = "groupAnnotation";
-
   protected static final String MAPPING_TYPE_WORD = "word";
-
   protected static final String MAPPING_TYPE_WORD_ANNOTATION = "wordAnnotation";
-
   protected static final String ITEM_TYPE_STRING = "string";
-
   protected static final String ITEM_TYPE_NAME = "name";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR = "ancestorName";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR_GROUP = "ancestorGroupName";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationName";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR_WORD = "ancestorWordName";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationName";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR_RELATION = "ancestorRelationName";
-
   protected static final String ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationName";
-
   protected static final String ITEM_TYPE_ATTRIBUTE = "attribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR = "ancestorAttribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP = "ancestorGroupAttribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationAttribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD = "ancestorWordAttribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationAttribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION = "ancestorRelationAttribute";
-
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationAttribute";
-
   protected static final String ITEM_TYPE_TEXT = "text";
-
   protected static final String ITEM_TYPE_TEXT_SPLIT = "textSplit";
-
   protected static final String ITEM_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
-
   protected static final String ITEM_TYPE_ANCESTOR = "ancestor";
-
   protected static final String ITEM_TYPE_ANCESTOR_GROUP = "ancestorGroup";
-
   protected static final String ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
-
   protected static final String ITEM_TYPE_ANCESTOR_WORD = "ancestorWord";
-
   protected static final String ITEM_TYPE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
-
   protected static final String ITEM_TYPE_ANCESTOR_RELATION = "ancestorRelation";
-
   protected static final String ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
-
   protected static final String ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE = "variableFromAttribute";
-
   protected static final String VARIABLE_SUBTYPE_VALUE = "value";
-
   protected static final String VARIABLE_SUBTYPE_VALUE_ITEM = "item";
-
   protected static final String MAPPING_SUBTYPE_TOKEN = "token";
-
   protected static final String MAPPING_SUBTYPE_TOKEN_PRE = "pre";
-
   protected static final String MAPPING_SUBTYPE_TOKEN_POST = "post";
-
   protected static final String MAPPING_SUBTYPE_PAYLOAD = "payload";
-
   protected static final String MAPPING_SUBTYPE_CONDITION = "condition";
-
   protected static final String MAPPING_FILTER_UPPERCASE = "uppercase";
-
   protected static final String MAPPING_FILTER_LOWERCASE = "lowercase";
-
   protected static final String MAPPING_FILTER_ASCII = "ascii";
-
   protected static final String MAPPING_FILTER_SPLIT = "split";
-
   protected static final String UPDATE_TYPE_OFFSET = "offsetUpdate";
-
   protected static final String UPDATE_TYPE_POSITION = "positionUpdate";
-
   protected static final String UPDATE_TYPE_VARIABLE = "variableUpdate";
-
   protected static final String UPDATE_TYPE_LOCAL_REF_OFFSET_START = "localRefOffsetStartUpdate";
-
   protected static final String UPDATE_TYPE_LOCAL_REF_OFFSET_END = "localRefOffsetEndUpdate";
-
   protected static final String UPDATE_TYPE_LOCAL_REF_POSITION_START = "localRefPositionStartUpdate";
-
   protected static final String UPDATE_TYPE_LOCAL_REF_POSITION_END = "localRefPositionEndUpdate";
-
   protected static final String MAPPING_VALUE_VALUE = "value";
-
   protected static final String MAPPING_VALUE_TYPE = "type";
-
   protected static final String MAPPING_VALUE_NAME = "name";
-
   protected static final String MAPPING_VALUE_NAMESPACE = "namespace";
-
   protected static final String MAPPING_VALUE_PREFIX = "prefix";
-
   protected static final String MAPPING_VALUE_FILTER = "filter";
-
   protected static final String MAPPING_VALUE_DISTANCE = "distance";
-
   protected static final String MAPPING_VALUE_SOURCE = "source";
-
   protected static final String MAPPING_VALUE_ANCESTOR = "ancestor";
-
   protected static final String MAPPING_VALUE_SPLIT = "split";
-
   protected static final String MAPPING_VALUE_NUMBER = "number";
-
   protected static final String MAPPING_VALUE_CONDITION = "condition";
-
   protected static final String MAPPING_VALUE_TEXT = "text";
-
   protected static final String MAPPING_VALUE_NOT = "not";
 
   private Base64.Encoder enc = Base64.getEncoder();
 
   private Base64.Decoder dec = Base64.getDecoder();
-
-  public MtasBasicParser() {
-    super();
-  }
 
   public MtasBasicParser(MtasConfiguration config) {
     super(config);
@@ -1500,27 +1428,31 @@ public abstract class MtasBasicParser extends MtasParser {
                 .keySet()) {
               String attributeValue = config.children.get(k).attributes
                   .get(tokenAttributeName);
-              if (tokenAttributeName.equals(TOKEN_OFFSET)) {
-                if (!attributeValue.equals("true")
+              switch (tokenAttributeName) {
+                case TOKEN_OFFSET:
+                  if (!attributeValue.equals("true")
                     && !attributeValue.equals("1")) {
-                  mappingToken.setOffset(false);
-                } else {
-                  mappingToken.setOffset(true);
-                }
-              } else if (tokenAttributeName.equals(TOKEN_REALOFFSET)) {
-                if (!attributeValue.equals("true")
+                    mappingToken.setOffset(false);
+                  } else {
+                    mappingToken.setOffset(true);
+                  }
+                  break;
+                case TOKEN_REALOFFSET:
+                  if (!attributeValue.equals("true")
                     && !attributeValue.equals("1")) {
-                  mappingToken.setRealOffset(false);
-                } else {
-                  mappingToken.setRealOffset(true);
-                }
-              } else if (tokenAttributeName.equals(TOKEN_PARENT)) {
-                if (!attributeValue.equals("true")
+                    mappingToken.setRealOffset(false);
+                  } else {
+                    mappingToken.setRealOffset(true);
+                  }
+                  break;
+                case TOKEN_PARENT:
+                  if (!attributeValue.equals("true")
                     && !attributeValue.equals("1")) {
-                  mappingToken.setParent(false);
-                } else {
-                  mappingToken.setParent(true);
-                }
+                    mappingToken.setParent(false);
+                  } else {
+                    mappingToken.setParent(true);
+                  }
+                  break;
               }
             }
             for (int m = 0; m < config.children.get(k).children.size(); m++) {
@@ -1546,101 +1478,111 @@ public abstract class MtasBasicParser extends MtasParser {
                         .get(MAPPING_VALUE_DISTANCE);
                     String valueAttribute = items.children.get(l).attributes
                         .get(MAPPING_VALUE_VALUE);
-                    if (itemType.equals(ITEM_TYPE_STRING)) {
-                      addString(mappingToken, items.name, valueAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_NAME)) {
-                      addName(mappingToken, items.name, prefixAttribute,
+                    switch (itemType) {
+                      case ITEM_TYPE_STRING:
+                        addString(mappingToken, items.name, valueAttribute);
+                        break;
+                      case ITEM_TYPE_NAME:
+                        addName(mappingToken, items.name, prefixAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE)) {
-                      addAttribute(mappingToken, items.name, nameAttribute, namespaceAttribute,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE:
+                        addAttribute(mappingToken, items.name, nameAttribute, namespaceAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_TEXT)) {
-                      addText(mappingToken, items.name, prefixAttribute,
+                        break;
+                      case ITEM_TYPE_TEXT:
+                        addText(mappingToken, items.name, prefixAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_TEXT_SPLIT)) {
-                      addTextSplit(mappingToken, items.name, valueAttribute,
+                        break;
+                      case ITEM_TYPE_TEXT_SPLIT:
+                        addTextSplit(mappingToken, items.name, valueAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR)) {
-                      addAncestorName(computeAncestorSourceType(type),
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR:
+                        addAncestorName(computeAncestorSourceType(type),
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR_GROUP)) {
-                      addAncestorName(SOURCE_ANCESTOR_GROUP, mappingToken,
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR_GROUP:
+                        addAncestorName(SOURCE_ANCESTOR_GROUP, mappingToken,
                           items.name, computeDistance(distanceAttribute),
                           prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION)) {
-                      addAncestorName(SOURCE_ANCESTOR_GROUP_ANNOTATION,
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION:
+                        addAncestorName(SOURCE_ANCESTOR_GROUP_ANNOTATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR_WORD)) {
-                      addAncestorName(SOURCE_ANCESTOR_WORD, mappingToken,
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR_WORD:
+                        addAncestorName(SOURCE_ANCESTOR_WORD, mappingToken,
                           items.name, computeDistance(distanceAttribute),
                           prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION)) {
-                      addAncestorName(SOURCE_ANCESTOR_WORD_ANNOTATION,
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION:
+                        addAncestorName(SOURCE_ANCESTOR_WORD_ANNOTATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_NAME_ANCESTOR_RELATION)) {
-                      addAncestorName(SOURCE_ANCESTOR_RELATION, mappingToken,
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR_RELATION:
+                        addAncestorName(SOURCE_ANCESTOR_RELATION, mappingToken,
                           items.name, computeDistance(distanceAttribute),
                           prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION)) {
-                      addAncestorName(SOURCE_ANCESTOR_RELATION_ANNOTATION,
+                        break;
+                      case ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION:
+                        addAncestorName(SOURCE_ANCESTOR_RELATION_ANNOTATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP)) {
-                      addAncestorAttribute(SOURCE_ANCESTOR_GROUP, mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP:
+                        addAncestorAttribute(SOURCE_ANCESTOR_GROUP, mappingToken,
                           items.name, computeDistance(distanceAttribute),
                           nameAttribute, prefixAttribute, filterAttribute);
-                    } else if (itemType.equals(
-                        ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION)) {
-                      addAncestorAttribute(SOURCE_ANCESTOR_GROUP_ANNOTATION,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION:
+                        addAncestorAttribute(SOURCE_ANCESTOR_GROUP_ANNOTATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD)) {
-                      addAncestorAttribute(SOURCE_ANCESTOR_WORD, mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD:
+                        addAncestorAttribute(SOURCE_ANCESTOR_WORD, mappingToken,
                           items.name, computeDistance(distanceAttribute),
                           nameAttribute, prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION)) {
-                      addAncestorAttribute(SOURCE_ANCESTOR_WORD_ANNOTATION,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION:
+                        addAncestorAttribute(SOURCE_ANCESTOR_WORD_ANNOTATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION)) {
-                      addAncestorAttribute(SOURCE_ANCESTOR_RELATION,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION:
+                        addAncestorAttribute(SOURCE_ANCESTOR_RELATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType.equals(
-                        ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION)) {
-                      addAncestorAttribute(SOURCE_ANCESTOR_RELATION_ANNOTATION,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION:
+                        addAncestorAttribute(SOURCE_ANCESTOR_RELATION_ANNOTATION,
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR)) {
-                      addAncestorAttribute(computeAncestorSourceType(this.type),
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR:
+                        addAncestorAttribute(computeAncestorSourceType(this.type),
                           mappingToken, items.name,
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE)) {
-                      addVariableFromAttribute(mappingToken, items.name,
+                        break;
+                      case ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE:
+                        addVariableFromAttribute(mappingToken, items.name,
                           nameAttribute, prefixAttribute, valueAttribute);
-                    } else {
-                      throw new MtasConfigException(String.format(
+                        break;
+                      default:
+                        throw new MtasConfigException(String.format(
                           "unknown itemType %s for %s in mapping %s", itemType,
                           items.name, config.attributes.get("name")));
                     }
@@ -1662,56 +1604,61 @@ public abstract class MtasBasicParser extends MtasParser {
                         .get(MAPPING_VALUE_FILTER);
                     String distanceAttribute = items.children.get(l).attributes
                         .get(MAPPING_VALUE_DISTANCE);
-                    if (itemType.equals(ITEM_TYPE_STRING)) {
-                      payloadString(mappingToken, valueAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_TEXT)) {
-                      payloadText(mappingToken, filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE)) {
-                      payloadAttribute(mappingToken, nameAttribute,
+                    switch (itemType) {
+                      case ITEM_TYPE_STRING:
+                        payloadString(mappingToken, valueAttribute);
+                        break;
+                      case ITEM_TYPE_TEXT:
+                        payloadText(mappingToken, filterAttribute);
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE:
+                        payloadAttribute(mappingToken, nameAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR:
+                        payloadAncestorAttribute(mappingToken,
                           computeAncestorSourceType(type),
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP:
+                        payloadAncestorAttribute(mappingToken,
                           SOURCE_ANCESTOR_GROUP,
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(
-                        ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION:
+                        payloadAncestorAttribute(mappingToken,
                           SOURCE_ANCESTOR_GROUP_ANNOTATION,
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD:
+                        payloadAncestorAttribute(mappingToken,
                           SOURCE_ANCESTOR_WORD,
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION:
+                        payloadAncestorAttribute(mappingToken,
                           SOURCE_ANCESTOR_WORD_ANNOTATION,
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else if (itemType
-                        .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION:
+                        payloadAncestorAttribute(mappingToken,
                           SOURCE_ANCESTOR_RELATION,
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else if (itemType.equals(
-                        ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION)) {
-                      payloadAncestorAttribute(mappingToken,
+                        break;
+                      case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION:
+                        payloadAncestorAttribute(mappingToken,
                           SOURCE_ANCESTOR_RELATION_ANNOTATION,
                           computeDistance(distanceAttribute), nameAttribute,
                           filterAttribute);
-                    } else {
-                      throw new MtasConfigException(String.format(
+                        break;
+                      default:
+                        throw new MtasConfigException(String.format(
                           "unknown itemType %s for %s in mapping %s", itemType,
                           items.name, config.attributes.get("name")));
                     }
@@ -1743,106 +1690,124 @@ public abstract class MtasBasicParser extends MtasParser {
                   && !notAttribute.equals("1")) {
                 notAttribute = null;
               }
-              if (itemType.equals(ITEM_TYPE_ATTRIBUTE)) {
-                conditionAttribute(nameAttribute, namespaceAttribute, conditionAttribute,
+              switch (itemType) {
+                case ITEM_TYPE_ATTRIBUTE:
+                  conditionAttribute(nameAttribute, namespaceAttribute, conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_NAME)) {
-                conditionName(conditionAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_TEXT)) {
-                conditionText(conditionAttribute, filterAttribute,
+                  break;
+                case ITEM_TYPE_NAME:
+                  conditionName(conditionAttribute, notAttribute);
+                  break;
+                case ITEM_TYPE_TEXT:
+                  conditionText(conditionAttribute, filterAttribute,
                     notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_UNKNOWN_ANCESTOR)) {
-                conditionUnknownAncestor(computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ANCESTOR)) {
-                conditionAncestor(computeAncestorSourceType(type),
+                  break;
+                case ITEM_TYPE_UNKNOWN_ANCESTOR:
+                  conditionUnknownAncestor(computeNumber(numberAttribute));
+                  break;
+                case ITEM_TYPE_ANCESTOR:
+                  conditionAncestor(computeAncestorSourceType(type),
                     computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ANCESTOR_GROUP)) {
-                conditionAncestor(SOURCE_ANCESTOR_GROUP,
+                  break;
+                case ITEM_TYPE_ANCESTOR_GROUP:
+                  conditionAncestor(SOURCE_ANCESTOR_GROUP,
                     computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION)) {
-                conditionAncestor(SOURCE_ANCESTOR_GROUP_ANNOTATION,
+                  break;
+                case ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION:
+                  conditionAncestor(SOURCE_ANCESTOR_GROUP_ANNOTATION,
                     computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ANCESTOR_WORD)) {
-                conditionAncestor(SOURCE_ANCESTOR_WORD,
+                  break;
+                case ITEM_TYPE_ANCESTOR_WORD:
+                  conditionAncestor(SOURCE_ANCESTOR_WORD,
                     computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ANCESTOR_WORD_ANNOTATION)) {
-                conditionAncestor(SOURCE_ANCESTOR_WORD_ANNOTATION,
+                  break;
+                case ITEM_TYPE_ANCESTOR_WORD_ANNOTATION:
+                  conditionAncestor(SOURCE_ANCESTOR_WORD_ANNOTATION,
                     computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ANCESTOR_RELATION)) {
-                conditionAncestor(SOURCE_ANCESTOR_RELATION,
+                  break;
+                case ITEM_TYPE_ANCESTOR_RELATION:
+                  conditionAncestor(SOURCE_ANCESTOR_RELATION,
                     computeNumber(numberAttribute));
-              } else if (itemType
-                  .equals(ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION)) {
-                conditionAncestor(SOURCE_ANCESTOR_RELATION_ANNOTATION,
+                  break;
+                case ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION:
+                  conditionAncestor(SOURCE_ANCESTOR_RELATION_ANNOTATION,
                     computeNumber(numberAttribute));
-              } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR)) {
-                conditionAncestorAttribute(computeAncestorSourceType(type),
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR:
+                  conditionAncestorAttribute(computeAncestorSourceType(type),
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP)) {
-                conditionAncestorAttribute(SOURCE_ANCESTOR_GROUP,
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP:
+                  conditionAncestorAttribute(SOURCE_ANCESTOR_GROUP,
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION)) {
-                conditionAncestorAttribute(SOURCE_ANCESTOR_GROUP_ANNOTATION,
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION:
+                  conditionAncestorAttribute(SOURCE_ANCESTOR_GROUP_ANNOTATION,
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD)) {
-                conditionAncestorAttribute(SOURCE_ANCESTOR_WORD,
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD:
+                  conditionAncestorAttribute(SOURCE_ANCESTOR_WORD,
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION)) {
-                conditionAncestorAttribute(SOURCE_ANCESTOR_WORD_ANNOTATION,
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION:
+                  conditionAncestorAttribute(SOURCE_ANCESTOR_WORD_ANNOTATION,
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION)) {
-                conditionAncestorAttribute(SOURCE_ANCESTOR_RELATION,
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION:
+                  conditionAncestorAttribute(SOURCE_ANCESTOR_RELATION,
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION)) {
-                conditionAncestorAttribute(SOURCE_ANCESTOR_RELATION_ANNOTATION,
+                  break;
+                case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION:
+                  conditionAncestorAttribute(SOURCE_ANCESTOR_RELATION_ANNOTATION,
                     computeDistance(distanceAttribute), nameAttribute,
                     conditionAttribute, filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR)) {
-                conditionAncestorName(computeAncestorSourceType(type),
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR:
+                  conditionAncestorName(computeAncestorSourceType(type),
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR_GROUP)) {
-                conditionAncestorName(SOURCE_ANCESTOR_GROUP,
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR_GROUP:
+                  conditionAncestorName(SOURCE_ANCESTOR_GROUP,
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION)) {
-                conditionAncestorName(SOURCE_ANCESTOR_GROUP_ANNOTATION,
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION:
+                  conditionAncestorName(SOURCE_ANCESTOR_GROUP_ANNOTATION,
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR_WORD)) {
-                conditionAncestorName(SOURCE_ANCESTOR_WORD,
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR_WORD:
+                  conditionAncestorName(SOURCE_ANCESTOR_WORD,
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION)) {
-                conditionAncestorName(SOURCE_ANCESTOR_WORD_ANNOTATION,
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION:
+                  conditionAncestorName(SOURCE_ANCESTOR_WORD_ANNOTATION,
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType.equals(ITEM_TYPE_NAME_ANCESTOR_RELATION)) {
-                conditionAncestorName(SOURCE_ANCESTOR_RELATION,
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR_RELATION:
+                  conditionAncestorName(SOURCE_ANCESTOR_RELATION,
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else if (itemType
-                  .equals(ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION)) {
-                conditionAncestorName(SOURCE_ANCESTOR_RELATION_ANNOTATION,
+                  break;
+                case ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION:
+                  conditionAncestorName(SOURCE_ANCESTOR_RELATION_ANNOTATION,
                     computeDistance(distanceAttribute), conditionAttribute,
                     filterAttribute, notAttribute);
-              } else {
-                throw new MtasConfigException(
+                  break;
+                default:
+                  throw new MtasConfigException(
                     String.format("unknown itemType %s for %s in mapping %s",
-                        itemType, config.children.get(k).name,
-                        config.attributes.get("name")));
+                      itemType, config.children.get(k).name,
+                      config.attributes.get("name")));
               }
             }
           }

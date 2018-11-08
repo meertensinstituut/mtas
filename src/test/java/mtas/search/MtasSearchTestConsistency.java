@@ -1,26 +1,25 @@
 package mtas.search;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-
+import mtas.analysis.token.MtasToken;
+import mtas.codec.util.CodecComponent.ComponentField;
+import mtas.codec.util.CodecComponent.ComponentGroup;
+import mtas.codec.util.CodecComponent.ComponentPosition;
+import mtas.codec.util.CodecComponent.ComponentSpan;
+import mtas.codec.util.CodecComponent.ComponentTermVector;
+import mtas.codec.util.CodecComponent.ComponentToken;
+import mtas.codec.util.CodecComponent.GroupHit;
+import mtas.codec.util.CodecComponent.SubComponentFunction;
+import mtas.codec.util.CodecInfo;
+import mtas.codec.util.CodecSearchTree.MtasTreeHit;
+import mtas.codec.util.CodecUtil;
+import mtas.codec.util.Status;
+import mtas.codec.util.collector.MtasDataItem;
+import mtas.parser.cql.MtasCQLParser;
+import mtas.parser.cql.ParseException;
+import mtas.search.spans.MtasSpanRegexpQuery;
+import mtas.search.spans.util.MtasDisabledTwoPhaseIteratorSpanQuery;
+import mtas.search.spans.util.MtasSpanQuery;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -45,25 +44,30 @@ import org.apache.lucene.search.spans.SpanWeight;
 import org.apache.lucene.search.spans.Spans;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import mtas.analysis.token.MtasToken;
-import mtas.codec.util.CodecInfo;
-import mtas.codec.util.CodecUtil;
-import mtas.codec.util.Status;
-import mtas.codec.util.collector.MtasDataItem;
-import mtas.codec.util.CodecComponent.ComponentField;
-import mtas.codec.util.CodecComponent.ComponentGroup;
-import mtas.codec.util.CodecComponent.ComponentPosition;
-import mtas.codec.util.CodecComponent.ComponentSpan;
-import mtas.codec.util.CodecComponent.ComponentTermVector;
-import mtas.codec.util.CodecComponent.ComponentToken;
-import mtas.codec.util.CodecComponent.GroupHit;
-import mtas.codec.util.CodecComponent.SubComponentFunction;
-import mtas.codec.util.CodecSearchTree.MtasTreeHit;
-import mtas.parser.cql.MtasCQLParser;
-import mtas.parser.cql.ParseException;
-import mtas.search.spans.MtasSpanRegexpQuery;
-import mtas.search.spans.util.MtasDisabledTwoPhaseIteratorSpanQuery;
-import mtas.search.spans.util.MtasSpanQuery;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.zip.GZIPInputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * The Class MtasSearchTestConsistency.
@@ -88,26 +92,20 @@ public class MtasSearchTestConsistency {
    * Initialize.
    */
   @org.junit.BeforeClass
-  public static void initialize() {
-    try {
-      Path dataPath = Paths.get("src" + File.separator + "test" + File.separator
-          + "resources" + File.separator + "data");
-      // directory = FSDirectory.open(Paths.get("testindexMtas"));
-      directory = new RAMDirectory();
-      files = new HashMap<>();
-      files.put("Een onaangenaam mens in de Haarlemmerhout",
-          dataPath.resolve("resources").resolve("beets1.xml.gz")
+  public static void initialize() throws IOException {
+    Path dataPath = Paths.get("src", "test", "resources", "data");
+    // directory = FSDirectory.open(Paths.get("testindexMtas"));
+    directory = new RAMDirectory();
+    files = new HashMap<>();
+    files.put("Een onaangenaam mens in de Haarlemmerhout",
+      dataPath.resolve("resources").resolve("beets1.xml.gz")
               .toAbsolutePath().toString());
-      files.put("Een oude kennis", dataPath.resolve("resources")
-          .resolve("beets2.xml.gz").toAbsolutePath().toString());
-      files.put("Varen en Rijden", dataPath.resolve("resources")
-          .resolve("beets3.xml.gz").toAbsolutePath().toString());
-      createIndex(dataPath.resolve("conf").resolve("folia.xml").toAbsolutePath()
-          .toString(), files);
-      docs = getLiveDocs(DirectoryReader.open(directory));
-    } catch (IOException e) {
-      log.error(e);
-    }
+    files.put("Een oude kennis", dataPath.resolve("resources")
+                                         .resolve("beets2.xml.gz").toAbsolutePath().toString());
+    files.put("Varen en Rijden", dataPath.resolve("resources")
+                                         .resolve("beets3.xml.gz").toAbsolutePath().toString());
+    createIndex(dataPath.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(), files);
+    docs = getLiveDocs(DirectoryReader.open(directory));
   }
 
   /**
@@ -747,7 +745,7 @@ public class MtasSearchTestConsistency {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   @org.junit.Test
-  public void collectStatsPositions1() throws IOException {
+  public void collectStatsPositions1() throws Exception {
     // get total number of words
     IndexReader indexReader = DirectoryReader.open(directory);
     QueryResult queryResult = doQuery(indexReader, FIELD_CONTENT, "[]", null,
@@ -755,35 +753,28 @@ public class MtasSearchTestConsistency {
     indexReader.close();
     int averageNumberOfPositions = queryResult.hits / queryResult.docs;
     // do position query
-    try {
-      ArrayList<Integer> fullDocSet = docs;
-      ComponentField fieldStats = new ComponentField(FIELD_ID);
-      fieldStats.statsPositionList
-          .add(new ComponentPosition("total", null, null, "all"));
-      fieldStats.statsPositionList.add(new ComponentPosition("minimum",
-          (double) (averageNumberOfPositions - 1), null, "n,sum,mean,min,max"));
-      fieldStats.statsPositionList.add(new ComponentPosition("maximum", null,
-          (double) averageNumberOfPositions, "sum"));
-      Map<String, HashMap<String, Object>> response = doAdvancedSearch(
-          fullDocSet, fieldStats);
-      Map<String, Object> responseTotal = (Map<String, Object>) response
-          .get("statsPositions").get("total");
-      Map<String, Object> responseMinimum = (Map<String, Object>) response
-          .get("statsPositions").get("minimum");
-      Map<String, Object> responseMaximum = (Map<String, Object>) response
-          .get("statsPositions").get("maximum");
-      Double total = responseTotal != null ? (Double) responseTotal.get("sum")
-          : 0;
-      Long totalMinimum = responseTotal != null
-          ? (Long) responseMinimum.get("sum") : 0;
-      Long totalMaximum = responseTotal != null
-          ? (Long) responseMaximum.get("sum") : 0;
-      assertEquals("Number of positions", total.longValue(), queryResult.hits);
-      assertEquals("Minimum and maximum on number of positions",
-          total.longValue(), totalMinimum + totalMaximum);
-    } catch (mtas.parser.function.ParseException e) {
-      log.error(e);
-    }
+    ArrayList<Integer> fullDocSet = docs;
+    ComponentField fieldStats = new ComponentField(FIELD_ID);
+    fieldStats.statsPositionList
+      .add(new ComponentPosition("total", null, null, "all"));
+    fieldStats.statsPositionList.add(new ComponentPosition("minimum",
+      (double) (averageNumberOfPositions - 1), null, "n,sum,mean,min,max"));
+    fieldStats.statsPositionList.add(new ComponentPosition("maximum", null,
+      (double) averageNumberOfPositions, "sum"));
+    Map<String, HashMap<String, Object>> response = doAdvancedSearch(
+      fullDocSet, fieldStats);
+    Map<String, Object> responseTotal = (Map<String, Object>) response.get("statsPositions").get("total");
+    Map<String, Object> responseMinimum = (Map<String, Object>) response.get("statsPositions").get("minimum");
+    Map<String, Object> responseMaximum = (Map<String, Object>) response.get("statsPositions").get("maximum");
+    Double total = responseTotal != null ? (Double) responseTotal.get("sum")
+      : 0;
+    Long totalMinimum = responseTotal != null
+      ? (Long) responseMinimum.get("sum") : 0;
+    Long totalMaximum = responseTotal != null
+      ? (Long) responseMaximum.get("sum") : 0;
+    assertEquals("Number of positions", total.longValue(), queryResult.hits);
+    assertEquals("Minimum and maximum on number of positions",
+      total.longValue(), totalMinimum + totalMaximum);
   }
 
   /**
@@ -1291,7 +1282,10 @@ public class MtasSearchTestConsistency {
       Document doc = new Document();
       doc.add(new StringField(FIELD_ID, id.toString(), Field.Store.YES));
       doc.add(new StringField(FIELD_TITLE, title, Field.Store.YES));
-      doc.add(new TextField(FIELD_CONTENT, file, Field.Store.YES));
+      try (InputStream in = new FileInputStream(file)) {
+        String content = IOUtils.toString(new GZIPInputStream(in), Charset.forName("UTF-8"));
+        doc.add(new TextField(FIELD_CONTENT, content, Field.Store.YES));
+      }
       w.addDocument(doc);
     } catch (Exception e) {
       log.error("Couldn't add " + title + " (" + file + ")", e);

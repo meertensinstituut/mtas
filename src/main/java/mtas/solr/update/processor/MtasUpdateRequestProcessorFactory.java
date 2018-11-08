@@ -220,12 +220,11 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
     super.processAdd(cmd);
   }
 
-  private void processAdd(SolrInputDocument doc, String field) {
+  private void processAdd(SolrInputDocument doc, String field) throws IOException {
     SolrInputField originalValue = doc.get(field);
     String fieldType = config.fieldMapping.get(field);
     CharFilterFactory[] charFilterFactories = config.fieldTypeCharFilterFactories.get(fieldType);
     MtasTokenizerFactory tokenizerFactory = config.fieldTypeTokenizerFactory.get(config.fieldMapping.get(field));
-    MtasUpdateRequestProcessorSizeReader sizeReader;
     if (originalValue != null
       && originalValue.getValue() instanceof String) {
       MtasUpdateRequestProcessorResultWriter result = null;
@@ -244,16 +243,11 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
 
         if (charFilterFactories != null) {
           for (CharFilterFactory factory : charFilterFactories) {
-            // We don't want the old pseudo-charfilters anymore. Remove this check once
-            // the class MtasCharFilterFactory is dead.
-            if (factory instanceof MtasCharFilterFactory) {
-              continue;
-            }
             reader = factory.create(reader);
           }
         }
 
-        sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
+        MtasUpdateRequestProcessorSizeReader sizeReader = new MtasUpdateRequestProcessorSizeReader(reader);
 
         result = new MtasUpdateRequestProcessorResultWriter(storedValue);
         int numPositions = 0;
