@@ -4,7 +4,6 @@ import mtas.analysis.token.MtasToken;
 import mtas.codec.MtasCodecPostingsFormat;
 import mtas.codec.util.CodecComponent.ComponentCollection;
 import mtas.codec.util.CodecComponent.ComponentField;
-import mtas.parser.function.util.MtasFunctionParserFunction;
 import mtas.search.spans.util.MtasSpanQuery;
 import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexReader;
@@ -194,8 +193,7 @@ public class CodecUtil {
     return statsItems;
   }
 
-  static String createStatsType(Set<String> statsItems, String sortType,
-      MtasFunctionParserFunction functionParser) {
+  static String createStatsType(Set<String> statsItems, String sortType) {
     String statsType = STATS_BASIC;
     for (String statsItem : statsItems) {
       if (STATS_FULL_TYPES.contains(statsItem)) {
@@ -220,8 +218,7 @@ public class CodecUtil {
       if (STATS_FULL_TYPES.contains(sortType)) {
         statsType = STATS_FULL;
       } else if (STATS_ADVANCED_TYPES.contains(sortType)) {
-        statsType = (statsType == null || !Objects.equals(statsType, STATS_FULL))
-            ? STATS_ADVANCED : statsType;
+        statsType = !Objects.equals(statsType, STATS_FULL) ? STATS_ADVANCED : statsType;
       }
     }
     return statsType;

@@ -236,7 +236,7 @@ public class CodecComponent {
       uniqueKey = new HashMap<>();
       dataType = CodecUtil.DATA_TYPE_LONG;
       statsItems = CodecUtil.createStatsItems(statsType);
-      this.statsType = CodecUtil.createStatsType(statsItems, null, null);
+      this.statsType = CodecUtil.createStatsType(statsItems, null);
       this.statsData = new HashMap<>();
       if (this.listNumber > 0) {
         this.statsList = new HashMap<>();
@@ -420,8 +420,8 @@ public class CodecComponent {
       this.sortType = CodecUtil.STATS_TYPE_SUM;
       this.sortDirection = CodecUtil.SORT_DESC;
       this.statsItems = CodecUtil.createStatsItems("n,sum,mean");
-      this.statsType = CodecUtil.createStatsType(this.statsItems, this.sortType,
-          null);
+      this.statsType = CodecUtil.createStatsType(this.statsItems, this.sortType
+      );
       this.start = start;
       this.number = number;
       HashSet<String> tmpPrefixes = new HashSet<>();
@@ -616,7 +616,7 @@ public class CodecComponent {
         this.baseCollectorTypes[i] = DataCollector.COLLECTOR_TYPE_LIST;
         this.baseStatsItems[i] = CodecUtil.createStatsItems(this.baseTypes[i]);
         this.baseStatsTypes[i] = CodecUtil.createStatsType(baseStatsItems[i],
-            this.baseSortTypes[i], new MtasFunctionParserFunctionDefault(1));
+          this.baseSortTypes[i]);
       }
       boolean doFunctions;
       doFunctions = baseFunctionKeys != null && baseFunctionExpressions != null
@@ -984,7 +984,7 @@ public class CodecComponent {
       parser = new MtasFunctionParserFunctionDefault(queries.length);
       dataType = parser.getType();
       statsItems = CodecUtil.createStatsItems(type);
-      statsType = CodecUtil.createStatsType(this.statsItems, null, parser);
+      statsType = CodecUtil.createStatsType(this.statsItems, null);
       if (minimumDouble != null) {
         this.minimumLong = minimumDouble.longValue();
       } else {
@@ -1060,7 +1060,7 @@ public class CodecComponent {
       this.key = key;
       dataType = CodecUtil.DATA_TYPE_LONG;
       this.statsItems = CodecUtil.createStatsItems(statsType);
-      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);
+      this.statsType = CodecUtil.createStatsType(this.statsItems, null);
       if (minimumDouble != null) {
         this.minimumLong = minimumDouble.longValue();
       } else {
@@ -1092,7 +1092,7 @@ public class CodecComponent {
       this.key = key;
       dataType = CodecUtil.DATA_TYPE_LONG;
       this.statsItems = CodecUtil.createStatsItems(statsType);
-      this.statsType = CodecUtil.createStatsType(this.statsItems, null, null);
+      this.statsType = CodecUtil.createStatsType(this.statsItems, null);
       if (minimumDouble != null) {
         this.minimumLong = minimumDouble.longValue();
       } else {
@@ -1438,8 +1438,8 @@ public class CodecComponent {
       this.sortDirection = sortDirection;
       this.dataType = parserFunction.getType();
       this.statsItems = CodecUtil.createStatsItems(this.type);
-      this.statsType = CodecUtil.createStatsType(statsItems, sortType,
-          parserFunction);
+      this.statsType = CodecUtil.createStatsType(statsItems, sortType
+      );
       if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
         dataCollector = DataCollector.getCollector(
             DataCollector.COLLECTOR_TYPE_LIST, dataType, statsType, statsItems,
@@ -1464,7 +1464,7 @@ public class CodecComponent {
           new BufferedReader(new StringReader(this.expression))).parse();
       dataType = parserFunction.getType();
       statsItems = CodecUtil.createStatsItems(this.type);
-      statsType = CodecUtil.createStatsType(statsItems, null, parserFunction);
+      statsType = CodecUtil.createStatsType(statsItems, null);
       if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
         dataCollector = DataCollector.getCollector(
             DataCollector.COLLECTOR_TYPE_LIST, dataType, statsType, statsItems,

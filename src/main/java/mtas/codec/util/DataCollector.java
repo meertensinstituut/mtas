@@ -34,7 +34,7 @@ public class DataCollector {
       SortedSet<String>[] subStatsItems, String[] subSortTypes,
       String[] subSortDirections, Integer[] subStart, Integer[] subNumber,
       String segmentRegistration, String boundary) throws IOException {
-    if (dataType != null && dataType.equals(CodecUtil.DATA_TYPE_LONG)) {
+    if (CodecUtil.DATA_TYPE_LONG.equals(dataType)) {
       switch (statsType) {
         case CodecUtil.STATS_BASIC:
           return new MtasDataLongBasic(collectorType, statsItems, sortType,
@@ -54,7 +54,7 @@ public class DataCollector {
         default:
           throw new IOException("unknown statsType " + statsType);
       }
-    } else if (dataType != null && dataType.equals(CodecUtil.DATA_TYPE_DOUBLE)) {
+    } else if (CodecUtil.DATA_TYPE_DOUBLE.equals(dataType)) {
       switch (statsType) {
         case CodecUtil.STATS_BASIC:
           return new MtasDataDoubleBasic(collectorType, statsItems, sortType,

@@ -114,14 +114,6 @@ public class CodecCollector {
     }
 
     while (iterator.hasNext()) {
-      // try
-      // {
-      // Thread.sleep(10000);
-      // }
-      // catch(InterruptedException ex)
-      // {
-      // Thread.currentThread().interrupt();
-      // }
       LeafReaderContext lrc = iterator.next();
       LeafReader r = lrc.reader();
       // compute relevant docSet/docList
@@ -197,12 +189,10 @@ public class CodecCollector {
         && needSecondRoundTermvector(fieldInfo.termVectorList)) {
       // check positions
       boolean needPositions = false;
-      if (!fieldInfo.termVectorList.isEmpty()) {
-        for (ComponentTermVector ctv : fieldInfo.termVectorList) {
-          if (!needPositions) {
-            needPositions = ctv.functions != null ? ctv.functionNeedPositions()
-                : needPositions;
-          }
+      for (ComponentTermVector ctv : fieldInfo.termVectorList) {
+        needPositions = ctv.functions != null && ctv.functionNeedPositions();
+        if (needPositions) {
+          break;
         }
       }
       Map<Integer, Integer> positionsData = null;
@@ -227,45 +217,34 @@ public class CodecCollector {
   }
 
   public static void collectCollection(IndexReader reader, List<Integer> docSet,
-      ComponentCollection collectionInfo) throws IOException {
-    if (collectionInfo.action().equals(ComponentCollection.ACTION_CHECK)) {
-      // can't do anything in lucene for check
-    } else if (collectionInfo.action()
-        .equals(ComponentCollection.ACTION_LIST)) {
-      // can't do anything in lucene for list
-    } else if (collectionInfo.action()
-        .equals(ComponentCollection.ACTION_CREATE)) {
-      BytesRef term = null;
-      PostingsEnum postingsEnum = null;
-      Integer docId;
-      Integer termDocId = -1;
-      Terms terms;
-      LeafReaderContext lrc;
-      LeafReader r;
-      ListIterator<LeafReaderContext> iterator = reader.leaves().listIterator();
-      while (iterator.hasNext()) {
-        lrc = iterator.next();
-        r = lrc.reader();
-        for (String field : collectionInfo.fields()) {
-          if ((terms = r.terms(field)) != null) {
-            TermsEnum termsEnum = terms.iterator();
-            while ((term = termsEnum.next()) != null) {
-              Iterator<Integer> docIterator = docSet.iterator();
-              postingsEnum = termsEnum.postings(postingsEnum,
-                  PostingsEnum.NONE);
-              termDocId = -1;
-              while (docIterator.hasNext()) {
-                docId = docIterator.next() - lrc.docBase;
-                if ((docId >= termDocId) && ((docId.equals(termDocId))
-                    || ((termDocId = postingsEnum.advance(docId))
-                        .equals(docId)))) {
-                  collectionInfo.addValue(term.utf8ToString());
-                  break;
-                }
-                if (termDocId.equals(PostingsEnum.NO_MORE_DOCS)) {
-                  break;
-                }
-              }
+                                       ComponentCollection collectionInfo) throws IOException {
+    if (!ComponentCollection.ACTION_CREATE.equals(collectionInfo.action())) {
+      return;
+    }
+
+    PostingsEnum postingsEnum = null;
+    for (LeafReaderContext lrc : reader.leaves()) {
+      LeafReader r = lrc.reader();
+      for (String field : collectionInfo.fields()) {
+        Terms terms = r.terms(field);
+        if (terms == null) {
+          continue;
+        }
+
+        TermsEnum termsEnum = terms.iterator();
+        BytesRef term;
+        while ((term = termsEnum.next()) != null) {
+          postingsEnum = termsEnum.postings(postingsEnum, PostingsEnum.NONE);
+          int termDocId = -1;
+          for (int inDocSet : docSet) {
+            int docId = inDocSet - lrc.docBase;
+            if ((docId >= termDocId) &&
+              ((docId == termDocId) || ((termDocId = postingsEnum.advance(docId)) == docId))) {
+              collectionInfo.addValue(term.utf8ToString());
+              break;
+            }
+            if (termDocId == PostingsEnum.NO_MORE_DOCS) {
+              break;
             }
           }
         }
@@ -1950,7 +1929,7 @@ public class CodecCollector {
     if (documentList != null) {
       SortedSet<String> listStatsItems = CodecUtil.createStatsItems("sum");
       String listStatsType = CodecUtil.createStatsType(listStatsItems,
-          CodecUtil.STATS_TYPE_SUM, null);
+        CodecUtil.STATS_TYPE_SUM);
       for (ComponentDocument document : documentList) {
         // initialize
         for (int docId : docList) {
@@ -2964,7 +2943,7 @@ public class CodecCollector {
                         if (preliminaryNumberBasic.docNumber > 0) {
                           continueAfterPreliminaryCheck = preliminaryRegisterValue(
                               term, termVector, preliminaryNumberBasic,
-                              termNumberMaximum, segmentNumber, mutableKey);
+                            termNumberMaximum, mutableKey);
                         } else {
                           continueAfterPreliminaryCheck = false;
                         }
@@ -2981,8 +2960,8 @@ public class CodecCollector {
                       if (numberBasic.docNumber > 0) {
                         termCounter++;
                         registerStatus = registerValue(term, termVector,
-                            numberBasic, termNumberMaximum, segmentNumber,
-                            false, mutableKey);
+                          numberBasic, termNumberMaximum,
+                          false, mutableKey);
                         if (registerStatus != null) {
                           computeFullList.put(BytesRef.deepCopyOf(term),
                               registerStatus);
@@ -3113,7 +3092,7 @@ public class CodecCollector {
                           docSet, termDocId, termsEnum, r, lrc, postingsEnum);
                       if (numberBasic.docNumber > 0) {
                         registerStatus = registerValue(term, termVector,
-                            numberBasic, 0, segmentNumber, true, mutableKey);
+                          numberBasic, 0, true, mutableKey);
                         if (registerStatus != null) {
                           TermvectorNumberFull numberFull = computeTermvectorNumberFull(
                               docSet, termDocId, termsEnum, lrc, postingsEnum,
@@ -3281,9 +3260,9 @@ public class CodecCollector {
 
   @SuppressWarnings("unchecked")
   private static RegisterStatus registerValue(BytesRef term,
-      ComponentTermVector termVector, TermvectorNumberBasic number,
-      Integer termNumberMaximum, Integer segmentNumber, boolean forceAccept,
-      String[] mutableKey) throws IOException {
+                                              ComponentTermVector termVector, TermvectorNumberBasic number,
+                                              Integer termNumberMaximum, boolean forceAccept,
+                                              String[] mutableKey) throws IOException {
     long value = termVector.subComponentFunction.parserFunction
         .getValueLong(number.valueSum, 0);
     long sortValue = 0;
@@ -3318,8 +3297,8 @@ public class CodecCollector {
             mutableKey[0] = MtasToken.getPostfixFromValue(term);
           }
           String segmentStatus = dataCollector.validateSegmentValue(
-              mutableKey[0], sortValue, termNumberMaximum, segmentNumber,
-              false);
+            mutableKey[0], sortValue, termNumberMaximum,
+            false);
           if (segmentStatus != null) {
             if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {
               addItemForced = true;
@@ -3331,7 +3310,7 @@ public class CodecCollector {
         // no boundary
       } else {
         String segmentStatus = dataCollector.validateSegmentValue(sortValue,
-            termNumberMaximum, segmentNumber);
+          termNumberMaximum);
         if (segmentStatus != null) {
           boolean possibleAddItem;
           if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY_OR_NEW)) {
@@ -3340,7 +3319,7 @@ public class CodecCollector {
               .equals(MtasDataCollector.SEGMENT_POSSIBLE_KEY)) {
             mutableKey[0] = MtasToken.getPostfixFromValue(term);
             segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],
-                sortValue, termNumberMaximum, segmentNumber, true);
+              sortValue, termNumberMaximum, true);
             possibleAddItem = segmentStatus != null;
           } else {
             // should never happen?
@@ -3352,7 +3331,7 @@ public class CodecCollector {
               mutableKey[0] = MtasToken.getPostfixFromValue(term);
             }
             segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],
-                sortValue, termNumberMaximum, segmentNumber, false);
+              sortValue, termNumberMaximum, false);
             if (segmentStatus != null) {
               addItem = true;
               if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY)) {
@@ -3410,8 +3389,8 @@ public class CodecCollector {
   }
 
   private static boolean preliminaryRegisterValue(BytesRef term,
-      ComponentTermVector termVector, TermvectorNumberBasic number,
-      Integer termNumberMaximum, Integer segmentNumber, String[] mutableKey)
+                                                  ComponentTermVector termVector, TermvectorNumberBasic number,
+                                                  Integer termNumberMaximum, String[] mutableKey)
       throws IOException {
     long sortValue = 0;
     if (termVector.subComponentFunction.sortDirection
@@ -3433,7 +3412,7 @@ public class CodecCollector {
       return dataCollector.validateSegmentBoundary(sortValue);
     } else {
       String segmentStatus = dataCollector.validateSegmentValue(sortValue,
-          termNumberMaximum, segmentNumber);
+        termNumberMaximum);
       if (segmentStatus != null) {
         if (segmentStatus.equals(MtasDataCollector.SEGMENT_KEY_OR_NEW)) {
           return true;
@@ -3441,7 +3420,7 @@ public class CodecCollector {
             .equals(MtasDataCollector.SEGMENT_POSSIBLE_KEY)) {
           mutableKey[0] = MtasToken.getPostfixFromValue(term);
           segmentStatus = dataCollector.validateSegmentValue(mutableKey[0],
-              sortValue, termNumberMaximum, segmentNumber, true);
+            sortValue, termNumberMaximum, true);
           return segmentStatus != null;
         } else {
           // should never happen?

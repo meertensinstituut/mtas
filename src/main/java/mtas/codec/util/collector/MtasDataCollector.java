@@ -78,7 +78,7 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   protected transient int[] newErrorNumber;
   protected transient HashMap<String, Integer>[] newErrorList;
 
-  public transient Set<String> newKnownKeyFoundInSegment;
+  private transient Set<String> newKnownKeyFoundInSegment;
 
   private transient String[] newSubCollectorTypes;
   private transient String[] newSubDataTypes;
@@ -118,12 +118,11 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
       segmentValueTopListLast = new LinkedHashMap<>();
       if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)
           || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
-        if (boundary != null) {
-          segmentValueBoundary = stringToBoundary(boundary);
-        } else {
-          throw new IOException("did expect boundary with segmentRegistration "
+        if (boundary == null) {
+          throw new IOException("expected boundary with segmentRegistration "
               + segmentRegistration);
         }
+        segmentValueBoundary = stringToBoundary(boundary);
       } else if (boundary != null) {
         throw new IOException("didn't expect boundary with segmentRegistration "
             + segmentRegistration);
@@ -209,12 +208,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
         segmentKeyValueList.put(segmentName, new HashMap<String, T1>());
         if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)
             || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
-          if (boundary != null) {
-            segmentValuesBoundary.put(segmentName,
-                stringToBoundary(boundary, segmentNumber));
-          } else {
+          if (boundary == null) {
             throw new IOException("expected boundary");
           }
+          segmentValuesBoundary.put(segmentName, stringToBoundary(boundary, segmentNumber));
         } else {
           segmentValuesBoundary.put(segmentName, null);
         }
@@ -238,200 +235,197 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   @SuppressWarnings("unchecked")
   private void initNewListBasic(int maxNumberOfTerms) throws IOException {
-    if (!closed) {
-      position = 0;
-      newPosition = 0;
-      newCurrentPosition = 0;
-      newSize = maxNumberOfTerms + size;
-      newKeyList = new String[newSize];
-      newSourceNumberList = new int[newSize];
-      newErrorNumber = new int[newSize];
-      newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
-      newKnownKeyFoundInSegment = new HashSet<>();
-      if (hasSub) {
-        newSubCollectorListNextLevel = new MtasDataCollector[newSize];
-      }
-    } else {
+    if (closed) {
       throw new IOException("already closed");
+    }
+
+    position = 0;
+    newPosition = 0;
+    newCurrentPosition = 0;
+    newSize = maxNumberOfTerms + size;
+    newKeyList = new String[newSize];
+    newSourceNumberList = new int[newSize];
+    newErrorNumber = new int[newSize];
+    newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
+    newKnownKeyFoundInSegment = new HashSet<>();
+    if (hasSub) {
+      newSubCollectorListNextLevel = new MtasDataCollector[newSize];
     }
   }
 
   @SuppressWarnings("unchecked")
   protected void increaseNewListSize() throws IOException {
-    if (!closed) {
-      String[] tmpNewKeyList = newKeyList;
-      int[] tmpNewSourceNumberList = newSourceNumberList;
-      int[] tmpNewErrorNumber = newErrorNumber;
-      HashMap<String, Integer>[] tmpNewErrorList = newErrorList;
-      int tmpNewSize = newSize;
-      newSize = 2 * newSize;
-      newKeyList = new String[newSize];
-      newSourceNumberList = new int[newSize];
-      newErrorNumber = new int[newSize];
-      newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
-      System.arraycopy(tmpNewKeyList, 0, newKeyList, 0, tmpNewSize);
-      System.arraycopy(tmpNewSourceNumberList, 0, newSourceNumberList, 0,
-          tmpNewSize);
-      System.arraycopy(tmpNewErrorNumber, 0, newErrorNumber, 0, tmpNewSize);
-      System.arraycopy(tmpNewErrorList, 0, newErrorList, 0, tmpNewSize);
-      if (hasSub) {
-        MtasDataCollector<?, ?>[] tmpNewSubCollectorListNextLevel = newSubCollectorListNextLevel;
-        newSubCollectorListNextLevel = new MtasDataCollector[newSize];
-        System.arraycopy(tmpNewSubCollectorListNextLevel, 0,
-            newSubCollectorListNextLevel, 0, tmpNewSize);
-      }
-    } else {
+    if (closed) {
       throw new IOException("already closed");
+    }
+    String[] tmpNewKeyList = newKeyList;
+    int[] tmpNewSourceNumberList = newSourceNumberList;
+    int[] tmpNewErrorNumber = newErrorNumber;
+    HashMap<String, Integer>[] tmpNewErrorList = newErrorList;
+    int tmpNewSize = newSize;
+    newSize = 2 * newSize;
+    newKeyList = new String[newSize];
+    newSourceNumberList = new int[newSize];
+    newErrorNumber = new int[newSize];
+    newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[newSize];
+    System.arraycopy(tmpNewKeyList, 0, newKeyList, 0, tmpNewSize);
+    System.arraycopy(tmpNewSourceNumberList, 0, newSourceNumberList, 0,
+      tmpNewSize);
+    System.arraycopy(tmpNewErrorNumber, 0, newErrorNumber, 0, tmpNewSize);
+    System.arraycopy(tmpNewErrorList, 0, newErrorList, 0, tmpNewSize);
+    if (hasSub) {
+      MtasDataCollector<?, ?>[] tmpNewSubCollectorListNextLevel = newSubCollectorListNextLevel;
+      newSubCollectorListNextLevel = new MtasDataCollector[newSize];
+      System.arraycopy(tmpNewSubCollectorListNextLevel, 0,
+        newSubCollectorListNextLevel, 0, tmpNewSize);
     }
   }
 
-  protected final MtasDataCollector add(boolean increaseSourceNumber)
-      throws IOException {
-    if (!closed) {
-      if (!collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
-        throw new IOException(
-            "collector should be " + DataCollector.COLLECTOR_TYPE_DATA);
-      } else {
-        if (newPosition > 0) {
-          newCurrentExisting = true;
-        } else if (position < getSize()) {
-          // copy
-          newKeyList[0] = keyList[0];
-          newSourceNumberList[0] = sourceNumberList[0];
-          if (increaseSourceNumber) {
-            newSourceNumberList[0]++;
-          }
-          newErrorNumber[0] = errorNumber[0];
-          newErrorList[0] = errorList[0];
-          if (hasSub) {
-            newSubCollectorNextLevel = subCollectorNextLevel;
-          }
-          copyToNew(0, 0);
-          newPosition = 1;
-          position = 1;
-          newCurrentExisting = true;
-        } else {
-          // add key
-          newKeyList[0] = DataCollector.COLLECTOR_TYPE_DATA;
-          newSourceNumberList[0] = 1;
-          newErrorNumber[0] = 0;
-          newErrorList[0] = new HashMap<>();
-          newPosition = 1;
-          newCurrentPosition = newPosition - 1;
-          newCurrentExisting = false;
-          // ready, only handle sub
-          if (hasSub) {
-            newSubCollectorNextLevel = DataCollector.getCollector(
-                subCollectorTypes[0], subDataTypes[0], subStatsTypes[0],
-                subStatsItems[0], subSortTypes[0], subSortDirections[0],
-                subStart[0], subNumber[0], newSubCollectorTypes,
-                newSubDataTypes, newSubStatsTypes, newSubStatsItems,
-                newSubSortTypes, newSubSortDirections, newSubStart,
-                newSubNumber, segmentRegistration, null);
-          } else {
-            newSubCollectorNextLevel = null;
-          }
-        }
-        return newSubCollectorNextLevel;
-      }
-    } else {
+  protected final MtasDataCollector add(boolean increaseSourceNumber) throws IOException {
+    if (closed) {
       throw new IOException("already closed");
     }
+    if (!collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
+      throw new IOException(
+        "collector should be " + DataCollector.COLLECTOR_TYPE_DATA);
+    }
+    if (newPosition > 0) {
+      newCurrentExisting = true;
+    } else if (position < getSize()) {
+      // copy
+      newKeyList[0] = keyList[0];
+      newSourceNumberList[0] = sourceNumberList[0];
+      if (increaseSourceNumber) {
+        newSourceNumberList[0]++;
+      }
+      newErrorNumber[0] = errorNumber[0];
+      newErrorList[0] = errorList[0];
+      if (hasSub) {
+        newSubCollectorNextLevel = subCollectorNextLevel;
+      }
+      copyToNew(0, 0);
+      newPosition = 1;
+      position = 1;
+      newCurrentExisting = true;
+    } else {
+      // add key
+      newKeyList[0] = DataCollector.COLLECTOR_TYPE_DATA;
+      newSourceNumberList[0] = 1;
+      newErrorNumber[0] = 0;
+      newErrorList[0] = new HashMap<>();
+      newPosition = 1;
+      newCurrentPosition = newPosition - 1;
+      newCurrentExisting = false;
+      // ready, only handle sub
+      if (hasSub) {
+        newSubCollectorNextLevel = DataCollector.getCollector(
+          subCollectorTypes[0], subDataTypes[0], subStatsTypes[0],
+          subStatsItems[0], subSortTypes[0], subSortDirections[0],
+          subStart[0], subNumber[0], newSubCollectorTypes,
+          newSubDataTypes, newSubStatsTypes, newSubStatsItems,
+          newSubSortTypes, newSubSortDirections, newSubStart,
+          newSubNumber, segmentRegistration, null);
+      } else {
+        newSubCollectorNextLevel = null;
+      }
+    }
+    return newSubCollectorNextLevel;
   }
 
   protected final MtasDataCollector add(String key,
-      boolean increaseSourceNumber) throws IOException {
-    if (!closed) {
-      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
-        throw new IOException(
-            "collector should be " + DataCollector.COLLECTOR_TYPE_LIST);
-      } else if (key == null) {
-        throw new IOException("key shouldn't be null");
-      } else {
-        // check previous added
-        if ((newPosition > 0)
-            && newKeyList[(newPosition - 1)].compareTo(key) >= 0) {
-          int i = newPosition;
-          do {
-            i--;
-            if (newKeyList[i].equals(key)) {
-              newCurrentPosition = i;
-              newCurrentExisting = true;
-              if (subDataTypes != null) {
-                return newSubCollectorListNextLevel[newCurrentPosition];
-              } else {
-                return null;
-              }
-            }
-          } while ((i > 0) && (newKeyList[i].compareTo(key) > 0));
-        }
-        // move position in old list
-        if (position < getSize()) {
-          // just add smaller or equal items
-          while (keyList[position].compareTo(key) <= 0) {
-            if (newPosition == newSize) {
-              increaseNewListSize();
-            }
-            // copy
-            newKeyList[newPosition] = keyList[position];
-            newSourceNumberList[newPosition] = sourceNumberList[position];
-            newErrorNumber[newPosition] = errorNumber[position];
-            newErrorList[newPosition] = errorList[position];
-            if (hasSub) {
-              newSubCollectorListNextLevel[newPosition] = subCollectorListNextLevel[position];
-            }
-            copyToNew(position, newPosition);
-            newPosition++;
-            position++;
-            // check if added key from list is right key
-            if (newKeyList[(newPosition - 1)].equals(key)) {
-              if (increaseSourceNumber) {
-                newSourceNumberList[(newPosition - 1)]++;
-              }
-              newCurrentPosition = newPosition - 1;
-              newCurrentExisting = true;
-              // register known key found again in segment
-              newKnownKeyFoundInSegment.add(key);
-              // ready
-              if (hasSub) {
-                return newSubCollectorListNextLevel[newCurrentPosition];
-              } else {
-                return null;
-              }
-              // stop if position exceeds size
-            } else if (position == getSize()) {
-              break;
-            }
+                                        boolean increaseSourceNumber) throws IOException {
+    if (closed) {
+      throw new IOException("already closed");
+    }
+    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
+      throw new IOException(
+        "collector should be " + DataCollector.COLLECTOR_TYPE_LIST);
+    }
+    if (key == null) {
+      throw new IOException("key shouldn't be null");
+    }
+
+    // check previous added
+    if ((newPosition > 0)
+      && newKeyList[(newPosition - 1)].compareTo(key) >= 0) {
+      int i = newPosition;
+      do {
+        i--;
+        if (newKeyList[i].equals(key)) {
+          newCurrentPosition = i;
+          newCurrentExisting = true;
+          if (subDataTypes != null) {
+            return newSubCollectorListNextLevel[newCurrentPosition];
+          } else {
+            return null;
           }
         }
-        // check size
+      } while ((i > 0) && (newKeyList[i].compareTo(key) > 0));
+    }
+
+    // move position in old list
+    if (position < getSize()) {
+      // just add smaller or equal items
+      while (keyList[position].compareTo(key) <= 0) {
         if (newPosition == newSize) {
           increaseNewListSize();
         }
-        // add key
-        newKeyList[newPosition] = key;
-        newSourceNumberList[newPosition] = 1;
-        newErrorNumber[newPosition] = 0;
-        newErrorList[newPosition] = new HashMap<>();
-        newPosition++;
-        newCurrentPosition = newPosition - 1;
-        newCurrentExisting = false;
-        // ready, only handle sub
+        // copy
+        newKeyList[newPosition] = keyList[position];
+        newSourceNumberList[newPosition] = sourceNumberList[position];
+        newErrorNumber[newPosition] = errorNumber[position];
+        newErrorList[newPosition] = errorList[position];
         if (hasSub) {
-          newSubCollectorListNextLevel[newCurrentPosition] = DataCollector
-              .getCollector(subCollectorTypes[0], subDataTypes[0],
-                  subStatsTypes[0], subStatsItems[0], subSortTypes[0],
-                  subSortDirections[0], subStart[0], subNumber[0],
-                  newSubCollectorTypes, newSubDataTypes, newSubStatsTypes,
-                  newSubStatsItems, newSubSortTypes, newSubSortDirections,
-                  newSubStart, newSubNumber, segmentRegistration, null);
-          return newSubCollectorListNextLevel[newCurrentPosition];
-        } else {
-          return null;
+          newSubCollectorListNextLevel[newPosition] = subCollectorListNextLevel[position];
+        }
+        copyToNew(position, newPosition);
+        newPosition++;
+        position++;
+        // check if added key from list is right key
+        if (newKeyList[(newPosition - 1)].equals(key)) {
+          if (increaseSourceNumber) {
+            newSourceNumberList[(newPosition - 1)]++;
+          }
+          newCurrentPosition = newPosition - 1;
+          newCurrentExisting = true;
+          // register known key found again in segment
+          newKnownKeyFoundInSegment.add(key);
+          // ready
+          if (hasSub) {
+            return newSubCollectorListNextLevel[newCurrentPosition];
+          } else {
+            return null;
+          }
+          // stop if position exceeds size
+        } else if (position == getSize()) {
+          break;
         }
       }
+    }
+    // check size
+    if (newPosition == newSize) {
+      increaseNewListSize();
+    }
+    // add key
+    newKeyList[newPosition] = key;
+    newSourceNumberList[newPosition] = 1;
+    newErrorNumber[newPosition] = 0;
+    newErrorList[newPosition] = new HashMap<>();
+    newPosition++;
+    newCurrentPosition = newPosition - 1;
+    newCurrentExisting = false;
+    // ready, only handle sub
+    if (hasSub) {
+      newSubCollectorListNextLevel[newCurrentPosition] = DataCollector
+        .getCollector(subCollectorTypes[0], subDataTypes[0],
+          subStatsTypes[0], subStatsItems[0], subSortTypes[0],
+          subSortDirections[0], subStart[0], subNumber[0],
+          newSubCollectorTypes, newSubDataTypes, newSubStatsTypes,
+          newSubStatsItems, newSubSortTypes, newSubSortDirections,
+          newSubStart, newSubNumber, segmentRegistration, null);
+      return newSubCollectorListNextLevel[newCurrentPosition];
     } else {
-      throw new IOException("already closed");
+      return null;
     }
   }
 
@@ -550,15 +544,10 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   }
 
   public boolean checkExistenceNecessaryKeys() throws IOException {
-    if (!closed) {
-      if (segmentRegistration != null) {
-        return segmentRecomputeKeyList.size() == 0;
-      } else {
-        return true;
-      }
-    } else {
+    if (closed) {
       throw new IOException("already closed");
     }
+    return segmentRegistration == null || segmentRecomputeKeyList.size() == 0;
   }
 
   abstract public boolean validateSegmentBoundary(Object o) throws IOException;
@@ -574,20 +563,18 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
     return false;
   }
 
-  public String validateSegmentValue(T1 value, int maximumNumber,
-      int segmentNumber) throws IOException {
-    if (!closed) {
-      if (segmentRegistration != null) {
-        if (maximumNumber > 0) {
-          T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
-          if (segmentValueTopList.size() < maximumNumber
-              || compareWithBoundary(value, tmpSegmentValueBoundary)) {
-            return SEGMENT_KEY_OR_NEW;
-          } else if (segmentKeys.size() > newKnownKeyFoundInSegment.size()) {
-            return SEGMENT_POSSIBLE_KEY;
-          } else {
-            return null;
-          }
+  public String validateSegmentValue(T1 value, int maximumNumber) throws IOException {
+    if (closed) {
+      throw new IOException("already closed");
+    }
+    if (segmentRegistration != null) {
+      if (maximumNumber > 0) {
+        T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
+        if (segmentValueTopList.size() < maximumNumber
+          || compareWithBoundary(value, tmpSegmentValueBoundary)) {
+          return SEGMENT_KEY_OR_NEW;
+        } else if (segmentKeys.size() > newKnownKeyFoundInSegment.size()) {
+          return SEGMENT_POSSIBLE_KEY;
         } else {
           return null;
         }
@@ -595,231 +582,226 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
         return null;
       }
     } else {
-      throw new IOException("already closed");
+      return null;
     }
   }
 
   public String validateSegmentValue(String key, T1 value, int maximumNumber,
-      int segmentNumber, boolean test) throws IOException {
-    if (!closed) {
-      if (segmentRegistration != null) {
-        if (maximumNumber > 0) {
-          T1 tmpSegmentValueMaxListMin = segmentValueTopListLast
-              .get(segmentName);
-          T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
-          if (segmentValueTopList.size() < maximumNumber) {
-            if (!test) {
-              segmentKeyValueList.get(segmentName).put(key, value);
-              segmentValueTopList.add(value);
-              segmentValueTopListLast.put(segmentName,
-                  (tmpSegmentValueMaxListMin == null) ? value
-                      : lastForComputingSegment(tmpSegmentValueMaxListMin,
-                          value));
-              if (segmentValueTopList.size() == maximumNumber) {
-                tmpSegmentValueMaxListMin = segmentValueTopListLast
-                    .get(segmentName);
-                segmentValueTopListLast.put(segmentName,
-                    tmpSegmentValueMaxListMin);
-                segmentValuesBoundary.put(segmentName,
-                    boundaryForSegmentComputing(segmentName));
-              }
-            }
-            return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
-          } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {
-            // System.out.println(key+" "+value+" "+tmpSegmentValueBoundary);
-            if (!test) {
-              segmentKeyValueList.get(segmentName).put(key, value);
-              if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {
-                segmentValueTopList.add(value);
-                segmentValueTopList.remove(tmpSegmentValueMaxListMin);
-                tmpSegmentValueMaxListMin = lastForComputingSegment();
-                segmentValueTopListLast.put(segmentName,
-                    tmpSegmentValueMaxListMin);
-                segmentValuesBoundary.put(segmentName,
-                    boundaryForSegmentComputing(segmentName));
-              }
-            }
-            return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
-          } else if (segmentKeys.contains(key)) {
-            if (!test) {
-              segmentKeyValueList.get(segmentName).put(key, value);
-            }
-            return SEGMENT_KEY;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    } else {
+                                     boolean test) throws IOException {
+    if (closed) {
       throw new IOException("already closed");
+    }
+    if (segmentRegistration == null || maximumNumber <= 0) {
+      return null;
+    }
+
+    T1 tmpSegmentValueMaxListMin = segmentValueTopListLast
+      .get(segmentName);
+    T1 tmpSegmentValueBoundary = segmentValuesBoundary.get(segmentName);
+    if (segmentValueTopList.size() < maximumNumber) {
+      if (!test) {
+        segmentKeyValueList.get(segmentName).put(key, value);
+        segmentValueTopList.add(value);
+        segmentValueTopListLast.put(segmentName,
+          (tmpSegmentValueMaxListMin == null) ? value
+            : lastForComputingSegment(tmpSegmentValueMaxListMin,
+            value));
+        if (segmentValueTopList.size() == maximumNumber) {
+          tmpSegmentValueMaxListMin = segmentValueTopListLast
+              .get(segmentName);
+          segmentValueTopListLast.put(segmentName,
+            tmpSegmentValueMaxListMin);
+          segmentValuesBoundary.put(segmentName,
+            boundaryForSegmentComputing(segmentName));
+          }
+        }
+      return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
+    } else if (compareWithBoundary(value, tmpSegmentValueBoundary)) {
+      if (!test) {
+        segmentKeyValueList.get(segmentName).put(key, value);
+        if (compareWithBoundary(value, tmpSegmentValueMaxListMin)) {
+          segmentValueTopList.add(value);
+          segmentValueTopList.remove(tmpSegmentValueMaxListMin);
+          tmpSegmentValueMaxListMin = lastForComputingSegment();
+          segmentValueTopListLast.put(segmentName,
+            tmpSegmentValueMaxListMin);
+          segmentValuesBoundary.put(segmentName,
+            boundaryForSegmentComputing(segmentName));
+        }
+      }
+      return segmentKeys.contains(key) ? SEGMENT_KEY : SEGMENT_NEW;
+    } else if (segmentKeys.contains(key)) {
+      if (!test) {
+        segmentKeyValueList.get(segmentName).put(key, value);
+      }
+      return SEGMENT_KEY;
+    } else {
+      return null;
     }
   }
 
   protected final void setError(int newPosition, int errorNumberItem,
       HashMap<String, Integer> errorListItem, boolean currentExisting)
       throws IOException {
-    if (!closed) {
-      if (currentExisting) {
-        newErrorNumber[newPosition] += errorNumberItem;
-        HashMap<String, Integer> item = newErrorList[newPosition];
-        for (Entry<String, Integer> entry : errorListItem.entrySet()) {
-          if (item.containsKey(entry.getKey())) {
-            item.put(entry.getKey(),
-                item.get(entry.getKey()) + entry.getValue());
-          } else {
-            item.put(entry.getKey(), entry.getValue());
-          }
+    if (closed) {
+      throw new IOException("already closed");
+    }
+    if (currentExisting) {
+      newErrorNumber[newPosition] += errorNumberItem;
+      HashMap<String, Integer> item = newErrorList[newPosition];
+      for (Entry<String, Integer> entry : errorListItem.entrySet()) {
+        if (item.containsKey(entry.getKey())) {
+          item.put(entry.getKey(),
+            item.get(entry.getKey()) + entry.getValue());
+        } else {
+          item.put(entry.getKey(), entry.getValue());
         }
-      } else {
-        newErrorNumber[newPosition] = errorNumberItem;
-        newErrorList[newPosition] = errorListItem;
       }
     } else {
-      throw new IOException("already closed");
+      newErrorNumber[newPosition] = errorNumberItem;
+      newErrorList[newPosition] = errorListItem;
     }
   }
 
   private boolean sortedAndUnique(String[] keyList, int size)
       throws IOException {
-    if (!closed) {
-      for (int i = 1; i < size; i++) {
-        if (keyList[(i - 1)].compareTo(keyList[i]) >= 0) {
-          return false;
-        }
-      }
-      return true;
-    } else {
+    if (closed) {
       throw new IOException("already closed");
     }
+    for (int i = 1; i < size; i++) {
+      if (keyList[(i - 1)].compareTo(keyList[i]) >= 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private int[][] computeSortAndUniqueMapping(String[] keyList, int size)
       throws IOException {
-    if (!closed) {
-      if (size > 0) {
-        SortedMap<String, int[]> sortedMap = new TreeMap<>();
-        for (int i = 0; i < size; i++) {
-          if (sortedMap.containsKey(keyList[i])) {
-            int[] previousList = sortedMap.get(keyList[i]);
-            int[] newList = new int[previousList.length + 1];
-            System.arraycopy(previousList, 0, newList, 0, previousList.length);
-            newList[previousList.length] = i;
-            sortedMap.put(keyList[i], newList);
-          } else {
-            sortedMap.put(keyList[i], new int[] { i });
-          }
-        }
-        Collection<int[]> values = sortedMap.values();
-        int[][] result = new int[sortedMap.size()][];
-        return values.toArray(result);
-      } else {
-        return null;
-      }
-    } else {
+    if (closed) {
       throw new IOException("already closed");
     }
+    if (size <= 0) {
+      return null;
+    }
+    SortedMap<String, int[]> sortedMap = new TreeMap<>();
+    for (int i = 0; i < size; i++) {
+      if (sortedMap.containsKey(keyList[i])) {
+        int[] previousList = sortedMap.get(keyList[i]);
+        int[] newList = new int[previousList.length + 1];
+        System.arraycopy(previousList, 0, newList, 0, previousList.length);
+        newList[previousList.length] = i;
+        sortedMap.put(keyList[i], newList);
+      } else {
+        sortedMap.put(keyList[i], new int[]{i});
+      }
+    }
+    Collection<int[]> values = sortedMap.values();
+    int[][] result = new int[sortedMap.size()][];
+    return values.toArray(result);
   }
 
   protected void remapData(int[][] mapping) throws IOException {
-    if (!closed) {
-      // remap and merge keys
-      String[] newKeyList = new String[mapping.length];
-      // process mapping for functions?
-      HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<>();
-      int[] newSourceNumberList = new int[mapping.length];
-      int[] newErrorNumber = new int[mapping.length];
-      @SuppressWarnings("unchecked")
-      HashMap<String, Integer>[] newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[mapping.length];
-      for (int i = 0; i < mapping.length; i++) {
-        newKeyList[i] = keyList[mapping[i][0]];
-        newSourceNumberList[i] = sourceNumberList[mapping[i][0]];
-        for (int j = 0; j < mapping[i].length; j++) {
-          if (j == 0) {
-            newErrorNumber[i] = errorNumber[mapping[i][j]];
-            newErrorList[i] = errorList[mapping[i][j]];
-          } else {
-            newErrorNumber[i] += errorNumber[mapping[i][j]];
-            for (Entry<String, Integer> entry : errorList[mapping[i][j]]
-                .entrySet()) {
-              if (newErrorList[i].containsKey(entry.getKey())) {
-                newErrorList[i].put(entry.getKey(),
-                    newErrorList[i].get(entry.getKey()) + entry.getValue());
-              } else {
-                newErrorList[i].put(entry.getKey(), entry.getValue());
-              }
-            }
-          }
-        }
-      }
-      if (hasSub) {
-        newSubCollectorListNextLevel = new MtasDataCollector<?, ?>[mapping.length];
-        for (int i = 0; i < mapping.length; i++) {
-          for (int j = 0; j < mapping[i].length; j++) {
-            if (j == 0 || newSubCollectorListNextLevel[i] == null) {
-              newSubCollectorListNextLevel[i] = subCollectorListNextLevel[mapping[i][j]];
+    if (closed) {
+      throw new IOException("already closed");
+    }
+
+    // remap and merge keys
+    String[] newKeyList = new String[mapping.length];
+    // process mapping for functions?
+    HashMap<MtasDataCollector<?, ?>, MtasDataCollector<?, ?>> map = new HashMap<>();
+    int[] newSourceNumberList = new int[mapping.length];
+    int[] newErrorNumber = new int[mapping.length];
+    @SuppressWarnings("unchecked")
+    HashMap<String, Integer>[] newErrorList = (HashMap<String, Integer>[]) new HashMap<?, ?>[mapping.length];
+
+    for (int i = 0; i < mapping.length; i++) {
+      newKeyList[i] = keyList[mapping[i][0]];
+      newSourceNumberList[i] = sourceNumberList[mapping[i][0]];
+      for (int j = 0; j < mapping[i].length; j++) {
+        if (j == 0) {
+          newErrorNumber[i] = errorNumber[mapping[i][j]];
+          newErrorList[i] = errorList[mapping[i][j]];
+        } else {
+          newErrorNumber[i] += errorNumber[mapping[i][j]];
+          for (Entry<String, Integer> entry : errorList[mapping[i][j]]
+            .entrySet()) {
+            if (newErrorList[i].containsKey(entry.getKey())) {
+              newErrorList[i].put(entry.getKey(),
+                newErrorList[i].get(entry.getKey()) + entry.getValue());
             } else {
-              newSubCollectorListNextLevel[i]
-                  .merge(subCollectorListNextLevel[mapping[i][j]], map, false);
+              newErrorList[i].put(entry.getKey(), entry.getValue());
             }
           }
         }
-        subCollectorListNextLevel = newSubCollectorListNextLevel;
       }
+    }
+
+    if (hasSub) {
+      newSubCollectorListNextLevel = new MtasDataCollector<?, ?>[mapping.length];
+      for (int i = 0; i < mapping.length; i++) {
+        for (int j = 0; j < mapping[i].length; j++) {
+          if (j == 0 || newSubCollectorListNextLevel[i] == null) {
+            newSubCollectorListNextLevel[i] = subCollectorListNextLevel[mapping[i][j]];
+          } else {
+            newSubCollectorListNextLevel[i]
+              .merge(subCollectorListNextLevel[mapping[i][j]], map, false);
+          }
+        }
+      }
+      subCollectorListNextLevel = newSubCollectorListNextLevel;
+    }
+
+    keyList = newKeyList;
+    sourceNumberList = newSourceNumberList;
+    errorNumber = newErrorNumber;
+    errorList = newErrorList;
+    size = keyList.length;
+    position = 0;
+  }
+
+  public void closeNewList() throws IOException {
+    if (closed) {
+      return;
+    }
+
+    if (segmentRegistration != null) {
+      this.segmentName = null;
+    }
+    if (newSize > 0) {
+      // add remaining old
+      while (position < getSize()) {
+        if (newPosition == newSize) {
+          increaseNewListSize();
+        }
+        newKeyList[newPosition] = keyList[position];
+        newSourceNumberList[newPosition] = sourceNumberList[position];
+        newErrorNumber[newPosition] = errorNumber[position];
+        newErrorList[newPosition] = errorList[position];
+        if (hasSub) {
+          newSubCollectorListNextLevel[newPosition] = subCollectorListNextLevel[position];
+        }
+        copyToNew(position, newPosition);
+        position++;
+        newPosition++;
+      }
+      // copy
       keyList = newKeyList;
       sourceNumberList = newSourceNumberList;
       errorNumber = newErrorNumber;
       errorList = newErrorList;
-      size = keyList.length;
-      position = 0;
-    } else {
-      throw new IOException("already closed");
-    }
-  }
-
-  public void closeNewList() throws IOException {
-    if (!closed) {
-      if (segmentRegistration != null) {
-        this.segmentName = null;
+      subCollectorListNextLevel = newSubCollectorListNextLevel;
+      copyFromNew();
+      size = newPosition;
+      // sort and merge
+      if (!sortedAndUnique(keyList, getSize())) {
+        remapData(computeSortAndUniqueMapping(keyList, getSize()));
       }
-      if (newSize > 0) {
-        // add remaining old
-        while (position < getSize()) {
-          if (newPosition == newSize) {
-            increaseNewListSize();
-          }
-          newKeyList[newPosition] = keyList[position];
-          newSourceNumberList[newPosition] = sourceNumberList[position];
-          newErrorNumber[newPosition] = errorNumber[position];
-          newErrorList[newPosition] = errorList[position];
-          if (hasSub) {
-            newSubCollectorListNextLevel[newPosition] = subCollectorListNextLevel[position];
-          }
-          copyToNew(position, newPosition);
-          position++;
-          newPosition++;
-        }
-        // copy
-        keyList = newKeyList;
-        sourceNumberList = newSourceNumberList;
-        errorNumber = newErrorNumber;
-        errorList = newErrorList;
-        subCollectorListNextLevel = newSubCollectorListNextLevel;
-        copyFromNew();
-        size = newPosition;
-        // sort and merge
-        if (!sortedAndUnique(keyList, getSize())) {
-          remapData(computeSortAndUniqueMapping(keyList, getSize()));
-        }
-      }
-      position = 0;
-      newSize = 0;
-      newPosition = 0;
-      newCurrentPosition = 0;
     }
+    position = 0;
+    newSize = 0;
+    newPosition = 0;
+    newCurrentPosition = 0;
   }
 
   abstract protected MtasDataItem<T1, T2> getItem(int i);
@@ -889,9 +871,13 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public void close() throws IOException {
-    if (!closed) {
-      closeNewList();
-      if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
+    if (closed) {
+      return;
+    }
+
+    closeNewList();
+    switch (collectorType) {
+      case DataCollector.COLLECTOR_TYPE_LIST:
         // compute initial basic list
         TreeMap<String, MtasDataItem<T1, T2>> basicList = new TreeMap<>();
         for (int i = 0; i < getSize(); i++) {
@@ -903,27 +889,27 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
         }
         // create result based on basic list
         result = new MtasDataCollectorResult<>(collectorType, sortType,
-            sortDirection, basicList, start, number);
+          sortDirection, basicList, start, number);
         // reduce
         if (segmentRegistration != null) {
           if (segmentRegistration.equals(SEGMENT_SORT_ASC)
-              || segmentRegistration.equals(SEGMENT_SORT_DESC)) {
+            || segmentRegistration.equals(SEGMENT_SORT_DESC)) {
             reduceToKeys(result.getComparatorList().keySet());
           } else if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)
-              || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
+            || segmentRegistration.equals(SEGMENT_BOUNDARY_DESC)) {
             Map<String, MtasDataItemNumberComparator> comparatorList = result
-                .getComparatorList();
+              .getComparatorList();
             HashSet<String> filteredKeySet = new HashSet<>();
             if (segmentRegistration.equals(SEGMENT_BOUNDARY_ASC)) {
               for (Entry<String, MtasDataItemNumberComparator> entry : comparatorList
-                  .entrySet()) {
+                .entrySet()) {
                 if (entry.getValue().compareTo(segmentValueBoundary) < 0) {
                   filteredKeySet.add(entry.getKey());
                 }
               }
             } else {
               for (Entry<String, MtasDataItemNumberComparator> entry : comparatorList
-                  .entrySet()) {
+                .entrySet()) {
                 if (entry.getValue().compareTo(segmentValueBoundary) > 0) {
                   filteredKeySet.add(entry.getKey());
                 }
@@ -932,21 +918,24 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
             reduceToKeys(filteredKeySet);
             basicList.keySet().retainAll(filteredKeySet);
             result = new MtasDataCollectorResult<>(collectorType, sortType,
-                sortDirection, basicList, start, number);
+              sortDirection, basicList, start, number);
           }
         }
-      } else if (collectorType.equals(DataCollector.COLLECTOR_TYPE_DATA)) {
+        break;
+
+      case DataCollector.COLLECTOR_TYPE_DATA:
         if (getSize() > 0) {
           result = new MtasDataCollectorResult<>(collectorType, getItem(0));
         } else {
           result = new MtasDataCollectorResult<>(collectorType, sortType,
-              sortDirection);
+            sortDirection);
         }
-      } else {
+        break;
+
+      default:
         throw new IOException("type " + collectorType + " not supported");
-      }
-      closed = true;
     }
+    closed = true;
   }
 
   public String getCollectorType() {
@@ -970,15 +959,13 @@ public abstract class MtasDataCollector<T1 extends Number & Comparable<T1>, T2 e
   }
 
   public void setWithTotal() throws IOException {
-    if (collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
-      if (segmentName != null) {
-        throw new IOException("can't get total with segmentRegistration");
-      } else {
-        withTotal = true;
-      }
-    } else {
+    if (!collectorType.equals(DataCollector.COLLECTOR_TYPE_LIST)) {
       throw new IOException(
-          "can't get total for dataCollector of type " + collectorType);
+        "can't get total for dataCollector of type " + collectorType);
     }
+    if (segmentName != null) {
+      throw new IOException("can't get total with segmentRegistration");
+    }
+    withTotal = true;
   }
 }
