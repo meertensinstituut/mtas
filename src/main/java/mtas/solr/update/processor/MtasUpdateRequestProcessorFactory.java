@@ -12,7 +12,6 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.util.CharFilterFactory;
-import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
@@ -154,13 +153,12 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
             if (className == null) {
               throw new RuntimeException("no className");
             }
-            Object obj = Class.forName(className).getConstructor(Map.class, ResourceLoader.class)
-                              .newInstance(args, resourceLoader);
-            if (obj instanceof MtasTokenizerFactory) {
-              config.fieldTypeTokenizerFactory.put(key, (MtasTokenizerFactory) obj);
-            } else {
+            if (!className.equals("mtas.analysis.util.MtasTokenizerFactory")) {
               throw new RuntimeException(className + " is no MtasTokenizerFactory");
             }
+            MtasTokenizerFactory tokFactory = new MtasTokenizerFactory(args);
+            tokFactory.inform(resourceLoader);
+            config.fieldTypeTokenizerFactory.put(key, tokFactory);
           }
         }
       }
