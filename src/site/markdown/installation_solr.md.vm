@@ -110,7 +110,6 @@ We define the referred Mtas fieldType by
 ```console
 <fieldType name="mtas" class="solr.TextField" postingsFormat="MtasCodec">
   <analyzer type="index">
-    <charFilter class="mtas.analysis.util.MtasCharFilterFactory" type="url" prefix="http://localhost/demo/" postfix="" />
     <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" configFile="folia.xml" />
   </analyzer>
   <analyzer type="query">
@@ -119,12 +118,6 @@ We define the referred Mtas fieldType by
   </analyzer>
 </fieldType>
 ```
-
-The charFilter with class *mtas.analysis.util.MtasCharFilterFactory* in the 
-index analyzer contains an obligatory attribute `type` and two optional attributes 
-`prefix` and `postfix`. The *type* can be *url* or *file*, referring to either an external
-url or a file on the filesystem. On indexing, the optional *prefix* and *postfix* attributes 
-will be added to the provided value, resulting in a full url or location of a file. 
 
 The tokenizer with class *mtas.analysis.util.MtasTokenizerFactory* in the index analyzer
 has an attribute `configFile` containing the name of the required tokenizer configuration.
@@ -143,7 +136,6 @@ defined slightly different:
 ```console
 <fieldType name="mtas_config" class="solr.TextField" postingsFormat="MtasCodec">
   <analyzer type="index">
-    <charFilter class="mtas.analysis.util.MtasCharFilterFactory" config="mtas.xml" />
     <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml" />
   </analyzer>
 </fieldType>
@@ -186,10 +178,6 @@ followed by the prefix, and containing the number of occurrences of this prefix.
   <configurations type="mtas.analysis.util.MtasTokenizerFactory">
     <configuration name="folia" file="folia.xml" />
     <configuration name="tei" file="tei.xml" />
-  </configurations>
-  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
-    <configuration name="folia" type="url" prefix="http://www.mycompany.com/archive/" postfix=".xml" />
-    <configuration name="tei" type="file" prefix="/storage/tei/" postfix="" />
   </configurations>
 </mtas>
 ``` 

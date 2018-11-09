@@ -486,8 +486,6 @@
 	<fieldType name="mtas_text_example_test" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
 				configFile="mtas/folia_test.xml" />
 		</analyzer>
@@ -496,8 +494,6 @@
 	<fieldType name="mtas_text_example_local" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				type="file" prefix="/local/data/" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
 				configFile="mtas/folia_test.xml" />
 		</analyzer>
@@ -506,8 +502,6 @@
 	<fieldType name="mtas_text_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				config="mtas.xml" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
 				config="mtas.xml" />
 		</analyzer>
@@ -529,8 +523,6 @@
 	<fieldType name="mtasSource_text_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				config="mtasSource.xml" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
 				config="mtasSource.xml" />
 		</analyzer>

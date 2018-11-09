@@ -382,8 +382,6 @@
 	<fieldType name="mtas_text" class="solr.TextField"
     postingsFormat="MtasCodec">
     <analyzer type="index">
-      <charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-        type="file" prefix="/local/data/" />
       <tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
         configFile="mtas/folia_oeaw.xml" />
     </analyzer>

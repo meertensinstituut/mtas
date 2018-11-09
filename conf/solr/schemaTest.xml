@@ -119,7 +119,6 @@
     
     <fieldType name="mtas_text" class="solr.TextField" postingsFormat="MtasCodec">
       <analyzer type="index">
-        <charFilter class="mtas.analysis.util.MtasCharFilterFactory" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/"/>
         <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml"/>
       </analyzer>
       <analyzer type="query">

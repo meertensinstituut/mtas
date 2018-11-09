@@ -1232,9 +1232,8 @@ public class MtasSearchTestConsistency {
     Map<String, String> paramsTokenizer = new HashMap<>();
     paramsTokenizer.put("configFile", configFile);
     Analyzer mtasAnalyzer = CustomAnalyzer
-        .builder(Paths.get("docker").toAbsolutePath())
-        .addCharFilter("mtas", paramsCharFilterMtas)
-        .withTokenizer("mtas", paramsTokenizer).build();
+      .builder(Paths.get("docker").toAbsolutePath())
+      .withTokenizer("mtas", paramsTokenizer).build();
     Map<String, Analyzer> analyzerPerField = new HashMap<>();
     analyzerPerField.put(FIELD_CONTENT, mtasAnalyzer);
     PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(

@@ -151,34 +151,6 @@ public class MtasConfiguration {
     return configs;
   }
 
-  public static HashMap<String, MtasConfiguration> readMtasCharFilterConfigurations(
-    ResourceLoader resourceLoader, String configFile) throws IOException {
-    HashMap<String, HashMap<String, String>> configs = readConfigurations(
-      resourceLoader, configFile, MtasCharFilterFactory.class.getName());
-    if (configs == null) {
-      throw new IOException("no configurations");
-    } else {
-      HashMap<String, MtasConfiguration> result = new HashMap<>();
-      for (Entry<String, HashMap<String, String>> entry : configs.entrySet()) {
-        HashMap<String, String> config = entry.getValue();
-        if (config.containsKey(CHARFILTER_CONFIGURATION_TYPE)) {
-          MtasConfiguration item = new MtasConfiguration();
-          item.attributes.put(CHARFILTER_CONFIGURATION_TYPE,
-            config.get(CHARFILTER_CONFIGURATION_TYPE));
-          item.attributes.put(CHARFILTER_CONFIGURATION_PREFIX,
-            config.get(CHARFILTER_CONFIGURATION_PREFIX));
-          item.attributes.put(CHARFILTER_CONFIGURATION_POSTFIX,
-            config.get(CHARFILTER_CONFIGURATION_POSTFIX));
-          result.put(entry.getKey(), item);
-        } else {
-          throw new IOException("configuration " + entry.getKey() + " has no "
-            + CHARFILTER_CONFIGURATION_TYPE);
-        }
-      }
-      return result;
-    }
-  }
-
   public static HashMap<String, MtasConfiguration> readMtasTokenizerConfigurations(
     ResourceLoader resourceLoader, String configFile) throws IOException {
     HashMap<String, HashMap<String, String>> configs = readConfigurations(

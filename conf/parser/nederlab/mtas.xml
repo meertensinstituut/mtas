@@ -24,28 +24,4 @@
     <configuration name="HuygensING-vangoghbrieven" file="mtas/folia_huygensing_vangogh.xml" />
     <configuration name="isotei" file="mtas/iso_tei.xml" />    
   </configurations>
-  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
-    <configuration name="test" type="file" />
-    <configuration name="TEST" type="file" prefix="/Users/matthijs/Software/Mtas/demo/data/" />
-    <configuration name="CRM" type="file" prefix="/Users/matthijs/Software/Mtas/data/CRM/data/files/" postfix=".txt" />
-    <configuration name="CGR" type="file" prefix="/Users/matthijs/Software/Mtas/data/CGR/data/files/" postfix=".txt" />
-    <configuration name="DBNL" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="DDD" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="EDBO" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="SoNaR" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="PM" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-declercq" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-actazh" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-beaufort" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-stellingwerff" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-heinsius" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-clusius" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-vandam" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-varia" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-epistolarium" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-aalberse" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="Meertens-gekaaptebrieven" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="HuygensING-vangoghbrieven" type="url" prefix="https://openskos.meertens.knaw.nl/nederlab/archief/get/" />
-    <configuration name="isotei" type="file" prefix="/Users/matthijs/Software/Mtas/data/ISO_TEI/" postfix="" />    
-  </configurations>
 </mtas>

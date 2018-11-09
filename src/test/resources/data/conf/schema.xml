@@ -34,8 +34,6 @@
 
 	<fieldType name="mtas" class="solr.TextField" postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				type="file" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
 				configFile="folia.xml" />
 		</analyzer>
@@ -44,8 +42,6 @@
 	<fieldType name="mtas_example" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<charFilter class="mtas.analysis.util.MtasCharFilterFactory"
-				config="mtas.xml" />
 			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
 				config="mtas.xml" />
 		</analyzer>

@@ -73,10 +73,6 @@ Within one index, multiple configurations can be used to map resources to the Mt
     <configuration name="folia" file="folia.xml" />
     <configuration name="tei" file="tei.xml" />
   </configurations>
-  <configurations type="mtas.analysis.util.MtasCharFilterFactory">
-    <configuration name="folia" type="url" prefix="http://archive.yourorganization.com/" postfix=".xml" />
-    <configuration name="tei" type="file" prefix="/data/resources/" postfix=".xml.gz" />
-  </configurations>
 </mtas>
 ```
 

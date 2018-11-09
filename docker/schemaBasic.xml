@@ -27,7 +27,6 @@
   </fieldType>
   <fieldType name="mtas" class="solr.TextField" postingsFormat="MtasCodec">
     <analyzer type="index">
-      <charFilter class="mtas.analysis.util.MtasCharFilterFactory" type="url" prefix="http://localhost/demo/" postfix="" />
       <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" configFile="mtas/demo_folia.xml" />
     </analyzer>
     <analyzer type="query">

@@ -1,7 +1,6 @@
 package mtas.solr.update.processor;
 
 import mtas.analysis.MtasTokenizer;
-import mtas.analysis.util.MtasCharFilterFactory;
 import mtas.analysis.util.MtasTokenizerFactory;
 import mtas.codec.util.CodecUtil;
 import mtas.solr.schema.MtasPreAnalyzedField;
@@ -129,23 +128,12 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
               if (className == null) {
                 throw new RuntimeException("no className");
               }
-              Class<?> cls = Class.forName(className);
-              if (cls.isAssignableFrom(MtasCharFilterFactory.class)) {
-                Object obj = cls.getConstructor(Map.class, ResourceLoader.class)
-                                .newInstance(args, resourceLoader);
-                if (!(obj instanceof MtasCharFilterFactory)) {
-                  throw new RuntimeException(className + " is no MtasCharFilterFactory");
-                }
-                charFilterFactories[number] = (MtasCharFilterFactory) obj;
-                number++;
-              } else {
-                Object obj = cls.getConstructor(Map.class).newInstance(args);
-                if (!(obj instanceof CharFilterFactory)) {
-                  throw new RuntimeException(className + " is no CharFilterFactory");
-                }
-                charFilterFactories[number] = (CharFilterFactory) obj;
-                number++;
+              Object obj = Class.forName(className).getConstructor(Map.class).newInstance(args);
+              if (!(obj instanceof CharFilterFactory)) {
+                throw new RuntimeException(className + " is no CharFilterFactory");
               }
+              charFilterFactories[number] = (CharFilterFactory) obj;
+              number++;
             }
             config.fieldTypeCharFilterFactories.put(key, charFilterFactories);
           }
