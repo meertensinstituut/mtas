@@ -47,9 +47,9 @@ public class MtasTokenizerFactory extends TokenizerFactory
     analyzerArgumentParserArgs = get(args, ARGUMENT_PARSER_ARGS);
     defaultArgument = get(args, ARGUMENT_DEFAULT);
     int numberOfArgs = 0;
-    numberOfArgs = (configFileArgument==null)?numberOfArgs:numberOfArgs+1;
-    numberOfArgs = (configArgument==null)?numberOfArgs:numberOfArgs+1;
-    numberOfArgs = (analyzerArgument==null)?numberOfArgs:numberOfArgs+1;
+    numberOfArgs += (configFileArgument == null) ? 0 : 1;
+    numberOfArgs += (configArgument == null) ? 0 : 1;
+    numberOfArgs += (analyzerArgument == null) ? 0 : 1;
     
     if (numberOfArgs>1) {
       throw new IOException(this.getClass().getName() + " can't have multiple of "

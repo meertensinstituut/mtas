@@ -25,9 +25,6 @@ public class MtasConfiguration {
   private static final String CONFIGURATIONS_CONFIGURATION = "configuration";
   private static final String CONFIGURATIONS_CONFIGURATION_NAME = "name";
   private static final String TOKENIZER_CONFIGURATION_FILE = "file";
-  static final String CHARFILTER_CONFIGURATION_TYPE = "type";
-  static final String CHARFILTER_CONFIGURATION_PREFIX = "prefix";
-  static final String CHARFILTER_CONFIGURATION_POSTFIX = "postfix";
 
   public String name = null;
   public HashMap<String, String> attributes = new HashMap<>();
