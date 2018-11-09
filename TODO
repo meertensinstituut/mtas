@@ -1,5 +1,6 @@
-* Regressietest op upload van hele collectie (versus oude PHP-uploader);
-  uitzoeken wat de huidige tests al dekken
 * Configuratie vereenvoudigen
 * Refactoren van MtasUpdateRequestProcessorFactory en MtasPreAnalyzedParser
 * Uploadscript slimmer: alleen updaten wat er veranderd is
+* In documentatie het concept collectie uitleggen en consequent gebruiken
+  (zijn de collecties in search_component_collection.md de collecties in
+  mtas.xml?)
