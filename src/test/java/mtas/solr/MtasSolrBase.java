@@ -333,7 +333,6 @@ public class MtasSolrBase {
     if (includeAdvanced) {
       doc.addField(FIELD_SOURCE, "source" + id);
       doc.addField(FIELD_MTAS_ADVANCED, content);
-      // doc.addField(FIELD_MTAS_ADVANCED, path); // XXX content?
     }
     return doc;
   }
