@@ -323,7 +323,7 @@ public class MtasSolrBase {
     doc.addField(FIELD_TITLE, title);
     doc.addField(FIELD_TEXT, title);
 
-    String path = dataPath.resolve("resources").resolve(basename).toAbsolutePath().toString();
+    String path = dataPath.resolve(basename).toAbsolutePath().toString();
     String content;
     try (InputStream in = new FileInputStream(path)) {
       content = IOUtils.toString(new GZIPInputStream(in), Charset.forName("UTF-8"));

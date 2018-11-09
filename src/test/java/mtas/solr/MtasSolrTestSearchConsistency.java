@@ -1,7 +1,5 @@
 package mtas.solr;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -13,12 +11,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.core.CoreContainer;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,21 +30,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MtasSolrTestSearchConsistency {
-  private static Log log = LogFactory.getLog(MtasSolrTestSearchConsistency.class);
-
   private static EmbeddedSolrServer server;
 
   private static Path solrPath;
 
   @org.junit.BeforeClass
   public static void setup() throws IOException, SolrServerException {
-    Path dataPath = Paths.get("src" + File.separator + "test"
-      + File.separator + "resources" + File.separator + "data");
+    Path resources = Paths.get("src", "test", "resources");
     Map<Integer, SolrInputDocument> docs = MtasSolrBase.createDocuments(true);
 
     ArrayList<String> collections = new ArrayList<>(
       Arrays.asList("collection1", "collection2", "collection3"));
-    initializeDirectory(dataPath, collections);
+    initializeDirectory(resources, collections);
     CoreContainer container = new CoreContainer(solrPath.toAbsolutePath().toString());
     container.load();
     server = new EmbeddedSolrServer(container, collections.get(0));
@@ -70,48 +60,35 @@ public class MtasSolrTestSearchConsistency {
     server.commit("collection3");
   }
 
-  private static void initializeDirectory(Path dataPath,
-      List<String> collections) throws IOException {
+  private static void initializeDirectory(Path resources, List<String> collections) throws IOException {
     solrPath = Files.createTempDirectory("junitSolr");
     // create and fill
-    Files.copy(dataPath.resolve("conf").resolve("solr.xml"),
+    Files.copy(resources.resolve("conf").resolve("solr.xml"),
         solrPath.resolve("solr.xml"));
     // create collection(s)
     for (String collectionName : collections) {
-      createCollection(collectionName, dataPath);
+      createCollection(collectionName, resources);
     }
   }
 
-  private static void createCollection(String collectionName, Path dataPath)
-      throws IOException {
-    File solrFile;
-    BufferedWriter writer;
-    // create directories
-    if (solrPath.resolve(collectionName).toFile().mkdir()
-        && solrPath.resolve(collectionName).resolve("conf").toFile().mkdir()
-        && solrPath.resolve(collectionName).resolve("data").toFile().mkdir()) {
-      // copy files
-      Files.copy(dataPath.resolve("conf").resolve("solrconfig.xml"), solrPath
-          .resolve(collectionName).resolve("conf").resolve("solrconfig.xml"));
-      Files.copy(dataPath.resolve("conf").resolve("schema.xml"), solrPath
-          .resolve(collectionName).resolve("conf").resolve("schema.xml"));
-      Files.copy(dataPath.resolve("conf").resolve("folia.xml"), solrPath
-          .resolve(collectionName).resolve("conf").resolve("folia.xml"));
-      Files.copy(dataPath.resolve("conf").resolve("mtas.xml"),
-          solrPath.resolve(collectionName).resolve("conf").resolve("mtas.xml"));
-      // create core.properties
-      solrFile = solrPath.resolve(collectionName).resolve("core.properties")
-          .toFile();
-      writer = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(solrFile), StandardCharsets.UTF_8));
-      try {
-        writer.write("name=" + collectionName + "\n");
-      } finally {
-        writer.close();
-      }
-    } else {
+  private static void createCollection(String collectionName, Path resources) throws IOException {
+    final Path collTemp = solrPath.resolve(collectionName);
+    final Path confDst = collTemp.resolve("conf");
+
+    if (!collTemp.toFile().mkdir()
+      || !confDst.toFile().mkdir()
+      || !collTemp.resolve("data").toFile().mkdir()) {
       throw new IOException("couldn't make directories");
     }
+
+    final Path confSrc = resources.resolve("conf");
+    Files.copy(confSrc.resolve("solrconfig.xml"), confDst.resolve("solrconfig.xml"));
+    Files.copy(confSrc.resolve("schema.xml"), confDst.resolve("schema.xml"));
+    Files.copy(confSrc.resolve("folia.xml"), confDst.resolve("folia.xml"));
+    Files.copy(confSrc.resolve("mtas.xml"), confDst.resolve("mtas.xml"));
+
+    Path coreProps = collTemp.resolve("core.properties");
+    Files.write(coreProps, ("name=" + collectionName + "\n").getBytes());
   }
 
   @org.junit.AfterClass

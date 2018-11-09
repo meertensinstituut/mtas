@@ -93,18 +93,16 @@ public class MtasSearchTestConsistency {
    */
   @org.junit.BeforeClass
   public static void initialize() throws IOException {
-    Path dataPath = Paths.get("src", "test", "resources", "data");
+    Path resources = Paths.get("src", "test", "resources");
+    Path dataPath = resources.resolve("data");
     // directory = FSDirectory.open(Paths.get("testindexMtas"));
     directory = new RAMDirectory();
     files = new HashMap<>();
     files.put("Een onaangenaam mens in de Haarlemmerhout",
-      dataPath.resolve("resources").resolve("beets1.xml.gz")
-              .toAbsolutePath().toString());
-    files.put("Een oude kennis", dataPath.resolve("resources")
-                                         .resolve("beets2.xml.gz").toAbsolutePath().toString());
-    files.put("Varen en Rijden", dataPath.resolve("resources")
-                                         .resolve("beets3.xml.gz").toAbsolutePath().toString());
-    createIndex(dataPath.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(), files);
+      dataPath.resolve("beets1.xml.gz").toAbsolutePath().toString());
+    files.put("Een oude kennis", dataPath.resolve("beets2.xml.gz").toAbsolutePath().toString());
+    files.put("Varen en Rijden", dataPath.resolve("beets3.xml.gz").toAbsolutePath().toString());
+    createIndex(resources.resolve("conf").resolve("folia.xml").toAbsolutePath().toString(), files);
     docs = getLiveDocs(DirectoryReader.open(directory));
   }
 

@@ -47,8 +47,8 @@ public class MtasSolrTestDistributedSearchConsistency {
   public static void setup() throws Exception {
     solrDocuments = MtasSolrBase.createDocuments(false);
 
-    Path dataPath = Paths.get("src" + File.separator + "test" + File.separator
-      + "resources" + File.separator + "data");
+    Path resources = Paths.get("src", "test", "resources");
+    Path confDir = resources.resolve("conf");
     String solrxml = MiniSolrCloudCluster.DEFAULT_CLOUD_SOLR_XML;
     JettyConfig jettyConfig = JettyConfig.builder().setContext("/solr").build();
     File cloudBase = Files.createTempDir();
@@ -65,11 +65,11 @@ public class MtasSolrTestDistributedSearchConsistency {
     cloudCluster = new MiniSolrCloudCluster(1, clusterDir, solrxml, jettyConfig);
     CloudSolrClient client = cloudCluster.getSolrClient();
     client.connect();
-    createCloudCollection(COLLECTION_ALL_OPTIMIZED, 1, 1, dataPath.resolve("conf"));
-    createCloudCollection(COLLECTION_ALL_MULTIPLE_SEGMENTS, 1, 1, dataPath.resolve("conf"));
-    createCloudCollection(COLLECTION_PART1_OPTIMIZED, 1, 1, dataPath.resolve("conf"));
-    createCloudCollection(COLLECTION_PART2_MULTIPLE_SEGMENTS, 1, 1, dataPath.resolve("conf"));
-    createCloudCollection(COLLECTION_DISTRIBUTED, 1, 1, dataPath.resolve("conf"));
+    createCloudCollection(COLLECTION_ALL_OPTIMIZED, 1, 1, confDir);
+    createCloudCollection(COLLECTION_ALL_MULTIPLE_SEGMENTS, 1, 1, confDir);
+    createCloudCollection(COLLECTION_PART1_OPTIMIZED, 1, 1, confDir);
+    createCloudCollection(COLLECTION_PART2_MULTIPLE_SEGMENTS, 1, 1, confDir);
+    createCloudCollection(COLLECTION_DISTRIBUTED, 1, 1, confDir);
 
     // collection1
     client.add(COLLECTION_ALL_OPTIMIZED, solrDocuments.get(1));
