@@ -84,8 +84,16 @@ public class MtasSolrTestSearchConsistency {
     final Path confSrc = resources.resolve("conf");
     Files.copy(confSrc.resolve("solrconfig.xml"), confDst.resolve("solrconfig.xml"));
     Files.copy(confSrc.resolve("schema.xml"), confDst.resolve("schema.xml"));
+
+    // For the case configFile="folia.xml"
     Files.copy(confSrc.resolve("folia.xml"), confDst.resolve("folia.xml"));
-    Files.copy(confSrc.resolve("mtas.xml"), confDst.resolve("mtas.xml"));
+
+    // For case without configFile: mtasconf directory
+    Path mtasconf = Files.createDirectory(confDst.resolve("mtasconf"));
+    Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source1.xml"));
+    Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source2.xml"));
+    Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source3.xml"));
+    // Files.copy(confSrc.resolve("mtas.xml"), confDst.resolve("mtas.xml"));
 
     Path coreProps = collTemp.resolve("core.properties");
     Files.write(coreProps, ("name=" + collectionName + "\n").getBytes());

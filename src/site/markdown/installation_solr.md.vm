@@ -128,15 +128,15 @@ assumed prefix when this field will be queried directly within Solr.
 See [configuration](indexing_configuration.html) for more information about
 the definition of a tokenizer configuration.
 
-**Multiple tokenize configurations**
+**Multiple tokenizer configurations**
 
 If multiple tokenizer configurations are required, the Mtas fieldType has to be 
-defined slightly different: 
+defined slightly differently:
 
 ```console
 <fieldType name="mtas_config" class="solr.TextField" postingsFormat="MtasCodec">
   <analyzer type="index">
-    <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml" />
+    <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" />
   </analyzer>
 </fieldType>
 <fieldType name="mtas" class="mtas.solr.schema.MtasPreAnalyzedField"
@@ -152,10 +152,9 @@ defined slightly different:
 ```
 
 An additional fieldType (here named mtas_config) is defined, containing 
-only an index analyzer. Both the charFilter and tokenizer within this analyzer have
-an attribute `config` referring to a Mtas configuration file. Depending on the required 
-tokenizer configuration, for the charFilter this file will define *type*, *prefix* and *postfix* and for the tokenizer this file 
-will define the *configFile*. An example of a Mtas configuration file is added below.
+only an index analyzer. The tokenizer within this analyzer has no attributes.
+The configuration file for the tokenizer is the file mtasconf/<collection_name>.xml
+in the Solr core directory, e.g., `mtasconf/HuygensING-heinsius.xml`.
 
 The Mtas fieldType is defined with class *mtas.solr.schema.MtasPreAnalyzedField*, 
 an obligatory attribute `followIndexAnalyzer` referring to the additional fieldType
@@ -169,16 +168,3 @@ The optional attributes `setNumberOfTokens`, `setNumberOfPositions`, `setSize`, 
 filesize, prefixes and possible errors. The optional attribute `setPrefixNumbers` defines a prefix to be used
 for adding for each occurring prefix a field with a name constructed from this `setPrefixNumbers` value 
 followed by the prefix, and containing the number of occurrences of this prefix.
-
-**Example of a Mtas configuration file**
-
-```console
-<?xml version="1.0" encoding="UTF-8" ?>
-<mtas>
-  <configurations type="mtas.analysis.util.MtasTokenizerFactory">
-    <configuration name="folia" file="folia.xml" />
-    <configuration name="tei" file="tei.xml" />
-  </configurations>
-</mtas>
-``` 
-

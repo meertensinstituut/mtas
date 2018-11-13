@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<mtas>
-  <configurations type="mtas.analysis.util.MtasTokenizerFactory">
-    <configuration name="CRM" file="mtas/crm.xml" />
-    <configuration name="CGR" file="mtas/cgr.xml" />
-  </configurations>
-</mtas>

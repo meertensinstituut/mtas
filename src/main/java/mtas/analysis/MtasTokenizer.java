@@ -16,8 +16,8 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -59,18 +59,7 @@ public final class MtasTokenizer extends Tokenizer {
       PositionIncrementAttribute.class);
   private Iterator<MtasToken> tokenCollectionIterator;
 
-  public MtasTokenizer() {
-  }
-
-  public MtasTokenizer(final String configFileName) {
-    readConfigurationFile(configFileName);
-  }
-
-  public MtasTokenizer(final MtasConfiguration config) throws IOException {
-    processConfiguration(config);
-  }
-
-  public MtasTokenizer(final InputStream reader) throws IOException {
+  public MtasTokenizer(final InputStream reader) throws IOException, XMLStreamException {
     processConfiguration(MtasConfiguration.readConfiguration(reader));
   }
 
@@ -167,21 +156,7 @@ public final class MtasTokenizer extends Tokenizer {
 
   }
 
-  private void readConfigurationFile(final String configFile) {
-    InputStream is;
-    try {
-      is = new FileInputStream(configFile);
-      processConfiguration(MtasConfiguration.readConfiguration(is));
-      is.close();
-    } catch (FileNotFoundException e) {
-      log.error("Couldn't find " + configFile, e);
-    } catch (IOException e) {
-      log.error("Couldn't read " + configFile, e);
-    }
-  }
-
-  private void processConfiguration(final MtasConfiguration config)
-      throws IOException {
+  private void processConfiguration(final MtasConfiguration config) throws IOException {
     HashMap<String, Integer> indexEncodingMapper = new HashMap<>();
     indexEncodingMapper.put("payload", MtasPayloadEncoder.ENCODE_PAYLOAD);
     indexEncodingMapper.put("offset", MtasPayloadEncoder.ENCODE_OFFSET);

@@ -1,25 +1,24 @@
 package mtas.analysis.util;
 
 import mtas.analysis.MtasTokenizer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeFactory;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A factory for creating MtasTokenizer objects.
  */
 public class MtasTokenizerFactory extends TokenizerFactory
     implements ResourceLoaderAware {
-  private static final Log log = LogFactory.getLog(MtasTokenizerFactory.class);
-
   public static final String ARGUMENT_CONFIGFILE = "configFile";
   public static final String ARGUMENT_CONFIG = "config";
   public static final String ARGUMENT_PARSER = "parser";
@@ -31,8 +30,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
   private String configFileArgument;
   private String analyzerArgument;
   private String analyzerArgumentParserArgs;
-  private HashMap<String, MtasConfiguration> configs = null;
-  private MtasConfiguration config = null;
+  private ResourceLoader loader;
 
   public MtasTokenizerFactory(Map<String, String> args) throws IOException {
     super(args);
@@ -56,17 +54,19 @@ public class MtasTokenizerFactory extends TokenizerFactory
       throw new IOException(this.getClass().getName() + " should have "
           + ARGUMENT_CONFIGFILE + " or " + ARGUMENT_CONFIG+" or "+ARGUMENT_PARSER);
     }
+
+    if (configFileArgument == null && configArgument == null && analyzerArgument == null) {
+      throw new IOException("no configuration");
+    }
   }
 
   @Override
   public MtasTokenizer create(AttributeFactory factory) {
-    MtasTokenizer tokenizer = null;
     try {
-      tokenizer = create(factory, null);
+      return create(factory, null);
     } catch (IOException e) {
-      log.error(e);
+      throw new UncheckedIOException(e);
     }
-    return tokenizer;
   }
 
   public MtasTokenizer create(String configuration) throws IOException {
@@ -81,76 +81,61 @@ public class MtasTokenizerFactory extends TokenizerFactory
     return create(factory, configuration, null);
   }
 
-  public MtasTokenizer create(AttributeFactory factory, String configuration, String defaultConfiguration)
+  public MtasTokenizer create(AttributeFactory factory, String collection, String defaultCollection)
     throws IOException {
-    if (defaultConfiguration == null) {
-      defaultConfiguration = defaultArgument;
+    if (loader == null) {
+      throw new IllegalStateException("loader == null, inform not called?");
     }
-    if (configs != null && configs.size() > 0) {
-      if (configuration == null && defaultConfiguration == null) {
-        throw new IOException("no (default)configuration");
-      } else if (configuration == null) {
-        if (configs.get(defaultConfiguration) == null) {
-          throw new IOException("default configuration " + defaultConfiguration + " not available");
-        }
-        return new MtasTokenizer(factory, configs.get(defaultConfiguration));
-      } else {
-        MtasConfiguration config = configs.get(configuration);
-        if (config != null) {
-          return new MtasTokenizer(factory, config);
-        }
-        if (defaultConfiguration == null) {
-          throw new IOException("configuration " + configuration
-            + " not available and no default configuration");
-        }
-        if (configs.get(defaultConfiguration) == null) {
-          throw new IOException("configuration " + configuration
-            + " not found and default configuration " + defaultConfiguration
-            + " not available");
-        }
-        return new MtasTokenizer(factory, configs.get(defaultConfiguration));
+    if (configFileArgument != null) {
+      return new MtasTokenizer(factory, loadCollectionConfig(null));
+    }
+    if (defaultCollection == null) {
+      defaultCollection = defaultArgument;
+    }
+    if (collection == null) {
+      if (defaultCollection == null) {
+        throw new IOException("no collection or default collection specified");
       }
-    } else if (config != null) {
-      return new MtasTokenizer(factory, config);
-    } else {
-      throw new IOException("no configuration");
+      collection = defaultCollection;
     }
+
+    return new MtasTokenizer(factory, Objects.requireNonNull(loadCollectionConfig(collection)));
   }
 
   @Override
   public void inform(ResourceLoader loader) throws IOException {
-    if (config != null || configs != null || loader == null) {
-      return;
-    }
-    if (configFileArgument == null && configArgument == null && analyzerArgument == null) {
-      throw new IOException("no configuration");
-    }
+    this.loader = Objects.requireNonNull(loader);
+  }
+
+  // Configurations are loaded on demand by create, since inform doesn't know the
+  // collection name. It's impossible to load all configurations without knowing their
+  // names, since ZooKeeper ResourceLoaders don't give access to directories.
+  // TODO: cache the results of this method.
+  private MtasConfiguration loadCollectionConfig(String collection) throws IOException {
     if (configFileArgument != null) {
       try {
-        config = MtasConfiguration.readConfiguration(
-          loader.openResource(configFileArgument));
-      } catch (IOException e) {
-        throw new IOException(
-          "Problem loading configuration from " + configFileArgument, e);
+        return MtasConfiguration.readConfiguration(loader.openResource(configFileArgument));
+      } catch (IOException | XMLStreamException e) {
+        throw new IOException("Problem loading configuration from " + configFileArgument, e);
       }
     }
     if (configArgument != null) {
+      String path = "mtasconf/" + collection + ".xml";
       try {
-        configs = MtasConfiguration.readMtasTokenizerConfigurations(
-          loader, configArgument);
-      } catch (IOException e) {
-        throw new IOException(
-          "Problem loading configurations from " + configArgument, e);
+        return MtasConfiguration.readConfiguration(loader.openResource(path));
+      } catch (IOException | XMLStreamException e) {
+        throw new IOException("Problem loading configuration from resource " + path, e);
       }
     }
     if (analyzerArgument != null) {
-      configs = null;
-      config = new MtasConfiguration();
+      MtasConfiguration config = new MtasConfiguration();
       MtasConfiguration subConfig = new MtasConfiguration();
       subConfig.name = "parser";
       subConfig.attributes.put("name", analyzerArgument);
       subConfig.attributes.put(ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
       config.children.add(subConfig);
+      return config;
     }
+    throw new IllegalStateException("can't happen");
   }
 }

@@ -1215,13 +1215,6 @@ public class MtasSearchTestConsistency {
     return response;
   }
 
-  /**
-   * Creates the index.
-   *
-   * @param configFile the config file
-   * @param files the files
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
   private static void createIndex(String configFile,
       HashMap<String, String> files) throws IOException {
     // analyzer
@@ -1274,19 +1267,15 @@ public class MtasSearchTestConsistency {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private static void addDoc(IndexWriter w, Integer id, String title,
-      String file) throws IOException {
-    try {
-      Document doc = new Document();
-      doc.add(new StringField(FIELD_ID, id.toString(), Field.Store.YES));
-      doc.add(new StringField(FIELD_TITLE, title, Field.Store.YES));
-      try (InputStream in = new FileInputStream(file)) {
-        String content = IOUtils.toString(new GZIPInputStream(in), Charset.forName("UTF-8"));
-        doc.add(new TextField(FIELD_CONTENT, content, Field.Store.YES));
-      }
-      w.addDocument(doc);
-    } catch (Exception e) {
-      log.error("Couldn't add " + title + " (" + file + ")", e);
+                             String file) throws IOException {
+    Document doc = new Document();
+    doc.add(new StringField(FIELD_ID, id.toString(), Field.Store.YES));
+    doc.add(new StringField(FIELD_TITLE, title, Field.Store.YES));
+    try (InputStream in = new FileInputStream(file)) {
+      String content = IOUtils.toString(new GZIPInputStream(in), Charset.forName("UTF-8"));
+      doc.add(new TextField(FIELD_CONTENT, content, Field.Store.YES));
     }
+    w.addDocument(doc);
   }
 
   /**

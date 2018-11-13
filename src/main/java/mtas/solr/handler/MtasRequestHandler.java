@@ -84,7 +84,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
   }
 
   @Override
-  public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws IOException {
+  public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws Exception {
     String action;
     if ((action = req.getParams().get(PARAM_ACTION)) != null) {
       // generate list of files
