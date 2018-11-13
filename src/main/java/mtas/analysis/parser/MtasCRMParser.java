@@ -1,5 +1,14 @@
 package mtas.analysis.parser;
 
+import mtas.analysis.token.MtasTokenCollection;
+import mtas.analysis.token.MtasTokenIdFactory;
+import mtas.analysis.util.LineReader;
+import mtas.analysis.util.MtasConfigException;
+import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.MtasParserException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -14,16 +23,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import mtas.analysis.token.MtasTokenCollection;
-import mtas.analysis.token.MtasTokenIdFactory;
-import mtas.analysis.util.MtasBufferedReader;
-import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
-import mtas.analysis.util.MtasParserException;
 
 public class MtasCRMParser extends MtasBasicParser {
   private static final Log log = LogFactory.getLog(MtasCRMParser.class);
@@ -246,7 +245,7 @@ public class MtasCRMParser extends MtasBasicParser {
 
     tokenCollection = new MtasTokenCollection();
     MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
-    try (MtasBufferedReader br = new MtasBufferedReader(reader)) {
+    try (LineReader br = new LineReader(reader)) {
       String line;
       int currentOffset;
       int previousOffset = br.getPosition();
