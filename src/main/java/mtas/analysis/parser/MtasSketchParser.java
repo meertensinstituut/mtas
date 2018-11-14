@@ -33,7 +33,6 @@ final public class MtasSketchParser extends MtasBasicParser {
     autorepair = true;
     try {
       initParser();
-      // System.out.print(printConfig());
     } catch (MtasConfigException e) {
       log.error(e);
     }
@@ -54,42 +53,44 @@ final public class MtasSketchParser extends MtasBasicParser {
             if (current.child(j).getName().equals("mapping")) {
               Configuration mapping = current.child(j);
               String typeMapping = mapping.getAttr("type");
+              if (typeMapping == null) {
+                continue;
+              }
+
               String nameMapping = mapping.getAttr("name");
-              if ((typeMapping != null)) {
-                if (typeMapping.equals(MAPPING_TYPE_WORD)) {
-                  MtasSketchParserMappingWord m = new MtasSketchParserMappingWord();
-                  m.processConfig(mapping);
-                  wordType.addItem(m);
-                } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)
-                  && (nameMapping != null)) {
-                  MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
-                  m.processConfig(mapping);
-                  if (wordAnnotationTypes
-                    .containsKey(Integer.parseInt(nameMapping))) {
-                    wordAnnotationTypes.get(Integer.parseInt(nameMapping))
-                                       .addItem(m);
-                  } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
-                      typeMapping, nameMapping, false);
-                    t.addItem(m);
-                    wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
-                  }
-                } else if (typeMapping.equals(MAPPING_TYPE_GROUP)
-                  && (nameMapping != null)) {
-                  MtasSketchParserMappingGroup m = new MtasSketchParserMappingGroup();
-                  m.processConfig(mapping);
-                  if (groupTypes.containsKey(nameMapping)) {
-                    groupTypes.get(nameMapping).addItem(m);
-                  } else {
-                    MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
-                      typeMapping, nameMapping, false);
-                    t.addItem(m);
-                    groupTypes.put(nameMapping, t);
-                  }
+              if (typeMapping.equals(MAPPING_TYPE_WORD)) {
+                MtasSketchParserMappingWord m = new MtasSketchParserMappingWord();
+                m.processConfig(mapping);
+                wordType.addItem(m);
+              } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)
+                && (nameMapping != null)) {
+                MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
+                m.processConfig(mapping);
+                if (wordAnnotationTypes
+                  .containsKey(Integer.parseInt(nameMapping))) {
+                  wordAnnotationTypes.get(Integer.parseInt(nameMapping))
+                                     .addItem(m);
                 } else {
-                  throw new MtasConfigException("unknown mapping type "
-                    + typeMapping + " or missing name");
+                  MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
+                    typeMapping, nameMapping, false);
+                  t.addItem(m);
+                  wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
                 }
+              } else if (typeMapping.equals(MAPPING_TYPE_GROUP)
+                && (nameMapping != null)) {
+                MtasSketchParserMappingGroup m = new MtasSketchParserMappingGroup();
+                m.processConfig(mapping);
+                if (groupTypes.containsKey(nameMapping)) {
+                  groupTypes.get(nameMapping).addItem(m);
+                } else {
+                  MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
+                    typeMapping, nameMapping, false);
+                  t.addItem(m);
+                  groupTypes.put(nameMapping, t);
+                }
+              } else {
+                throw new MtasConfigException("unknown mapping type "
+                  + typeMapping + " or missing name");
               }
             }
           }
@@ -119,8 +120,7 @@ final public class MtasSketchParser extends MtasBasicParser {
       MtasParserType tmpCurrentType;
       MtasParserObject currentObject;
       Pattern groupPattern = Pattern.compile("^<([^\\/>]+)\\/>$");
-      Pattern groupStartPattern = Pattern
-        .compile("^<([^>\\/\\s][^>\\s]*)(|\\s[^>]+)>$");
+      Pattern groupStartPattern = Pattern.compile("^<([^>\\/\\s][^>\\s]*)(|\\s[^>]+)>$");
       Pattern groupEndPattern = Pattern.compile("^<\\/([^>\\s]+)>$");
       Pattern attributePattern = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
       while ((line = br.readLine()) != null) {

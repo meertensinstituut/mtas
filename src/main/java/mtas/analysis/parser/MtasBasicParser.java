@@ -3,8 +3,8 @@ package mtas.analysis.parser;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.token.MtasTokenString;
-import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.Configuration;
+import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasParserException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,7 +14,6 @@ import org.apache.lucene.util.BytesRef;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,101 +27,100 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Collections.singletonList;
+
 public abstract class MtasBasicParser extends MtasParser {
   private static final Log log = LogFactory.getLog(MtasBasicParser.class);
-  protected static final String MAPPING_TYPE_REF = "ref";
-  protected static final String MAPPING_TYPE_RELATION = "relation";
-  protected static final String MAPPING_TYPE_RELATION_ANNOTATION = "relationAnnotation";
-  protected static final String MAPPING_TYPE_GROUP = "group";
-  protected static final String MAPPING_TYPE_GROUP_ANNOTATION = "groupAnnotation";
-  protected static final String MAPPING_TYPE_WORD = "word";
-  protected static final String MAPPING_TYPE_WORD_ANNOTATION = "wordAnnotation";
-  protected static final String ITEM_TYPE_STRING = "string";
-  protected static final String ITEM_TYPE_NAME = "name";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR = "ancestorName";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR_GROUP = "ancestorGroupName";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationName";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR_WORD = "ancestorWordName";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationName";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR_RELATION = "ancestorRelationName";
-  protected static final String ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationName";
-  protected static final String ITEM_TYPE_ATTRIBUTE = "attribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR = "ancestorAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP = "ancestorGroupAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD = "ancestorWordAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION = "ancestorRelationAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION =
+  static final String MAPPING_TYPE_REF = "ref";
+  static final String MAPPING_TYPE_RELATION = "relation";
+  static final String MAPPING_TYPE_RELATION_ANNOTATION = "relationAnnotation";
+  static final String MAPPING_TYPE_GROUP = "group";
+  static final String MAPPING_TYPE_GROUP_ANNOTATION = "groupAnnotation";
+  static final String MAPPING_TYPE_WORD = "word";
+  static final String MAPPING_TYPE_WORD_ANNOTATION = "wordAnnotation";
+  static final String ITEM_TYPE_STRING = "string";
+  static final String ITEM_TYPE_NAME = "name";
+  static final String ITEM_TYPE_NAME_ANCESTOR = "ancestorName";
+  static final String ITEM_TYPE_NAME_ANCESTOR_GROUP = "ancestorGroupName";
+  static final String ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationName";
+  static final String ITEM_TYPE_NAME_ANCESTOR_WORD = "ancestorWordName";
+  static final String ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationName";
+  static final String ITEM_TYPE_NAME_ANCESTOR_RELATION = "ancestorRelationName";
+  static final String ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationName";
+  static final String ITEM_TYPE_ATTRIBUTE = "attribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR = "ancestorAttribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP = "ancestorGroupAttribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotationAttribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD = "ancestorWordAttribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationAttribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION = "ancestorRelationAttribute";
+  static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION =
     "ancestorRelationAnnotationAttribute";
-  protected static final String ITEM_TYPE_TEXT = "text";
-  protected static final String ITEM_TYPE_TEXT_SPLIT = "textSplit";
-  protected static final String ITEM_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
-  protected static final String ITEM_TYPE_ANCESTOR = "ancestor";
-  protected static final String ITEM_TYPE_ANCESTOR_GROUP = "ancestorGroup";
-  protected static final String ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
-  protected static final String ITEM_TYPE_ANCESTOR_WORD = "ancestorWord";
-  protected static final String ITEM_TYPE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
-  protected static final String ITEM_TYPE_ANCESTOR_RELATION = "ancestorRelation";
-  protected static final String ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
-  protected static final String ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE = "variableFromAttribute";
-  protected static final String VARIABLE_SUBTYPE_VALUE = "value";
-  protected static final String VARIABLE_SUBTYPE_VALUE_ITEM = "item";
-  protected static final String MAPPING_SUBTYPE_TOKEN = "token";
-  protected static final String MAPPING_SUBTYPE_TOKEN_PRE = "pre";
-  protected static final String MAPPING_SUBTYPE_TOKEN_POST = "post";
-  protected static final String MAPPING_SUBTYPE_PAYLOAD = "payload";
-  protected static final String MAPPING_SUBTYPE_CONDITION = "condition";
-  protected static final String MAPPING_FILTER_UPPERCASE = "uppercase";
-  protected static final String MAPPING_FILTER_LOWERCASE = "lowercase";
-  protected static final String MAPPING_FILTER_ASCII = "ascii";
-  protected static final String MAPPING_FILTER_SPLIT = "split";
-  protected static final String UPDATE_TYPE_OFFSET = "offsetUpdate";
-  protected static final String UPDATE_TYPE_POSITION = "positionUpdate";
-  protected static final String UPDATE_TYPE_VARIABLE = "variableUpdate";
-  protected static final String UPDATE_TYPE_LOCAL_REF_OFFSET_START = "localRefOffsetStartUpdate";
-  protected static final String UPDATE_TYPE_LOCAL_REF_OFFSET_END = "localRefOffsetEndUpdate";
-  protected static final String UPDATE_TYPE_LOCAL_REF_POSITION_START = "localRefPositionStartUpdate";
-  protected static final String UPDATE_TYPE_LOCAL_REF_POSITION_END = "localRefPositionEndUpdate";
-  protected static final String MAPPING_VALUE_VALUE = "value";
-  protected static final String MAPPING_VALUE_TYPE = "type";
-  protected static final String MAPPING_VALUE_NAME = "name";
-  protected static final String MAPPING_VALUE_NAMESPACE = "namespace";
-  protected static final String MAPPING_VALUE_PREFIX = "prefix";
-  protected static final String MAPPING_VALUE_FILTER = "filter";
-  protected static final String MAPPING_VALUE_DISTANCE = "distance";
-  protected static final String MAPPING_VALUE_SOURCE = "source";
-  protected static final String MAPPING_VALUE_ANCESTOR = "ancestor";
-  protected static final String MAPPING_VALUE_SPLIT = "split";
-  protected static final String MAPPING_VALUE_NUMBER = "number";
-  protected static final String MAPPING_VALUE_CONDITION = "condition";
-  protected static final String MAPPING_VALUE_TEXT = "text";
-  protected static final String MAPPING_VALUE_NOT = "not";
+  static final String ITEM_TYPE_TEXT = "text";
+  static final String ITEM_TYPE_TEXT_SPLIT = "textSplit";
+  static final String ITEM_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
+  static final String ITEM_TYPE_ANCESTOR = "ancestor";
+  static final String ITEM_TYPE_ANCESTOR_GROUP = "ancestorGroup";
+  static final String ITEM_TYPE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
+  static final String ITEM_TYPE_ANCESTOR_WORD = "ancestorWord";
+  static final String ITEM_TYPE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
+  static final String ITEM_TYPE_ANCESTOR_RELATION = "ancestorRelation";
+  static final String ITEM_TYPE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
+  static final String ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE = "variableFromAttribute";
+  static final String VARIABLE_SUBTYPE_VALUE = "value";
+  static final String VARIABLE_SUBTYPE_VALUE_ITEM = "item";
+  static final String MAPPING_SUBTYPE_TOKEN = "token";
+  static final String MAPPING_SUBTYPE_TOKEN_PRE = "pre";
+  static final String MAPPING_SUBTYPE_TOKEN_POST = "post";
+  static final String MAPPING_SUBTYPE_PAYLOAD = "payload";
+  static final String MAPPING_SUBTYPE_CONDITION = "condition";
+  static final String MAPPING_FILTER_UPPERCASE = "uppercase";
+  static final String MAPPING_FILTER_LOWERCASE = "lowercase";
+  static final String MAPPING_FILTER_ASCII = "ascii";
+  static final String MAPPING_FILTER_SPLIT = "split";
+  static final String UPDATE_TYPE_OFFSET = "offsetUpdate";
+  static final String UPDATE_TYPE_POSITION = "positionUpdate";
+  static final String UPDATE_TYPE_VARIABLE = "variableUpdate";
+  static final String UPDATE_TYPE_LOCAL_REF_OFFSET_START = "localRefOffsetStartUpdate";
+  static final String UPDATE_TYPE_LOCAL_REF_OFFSET_END = "localRefOffsetEndUpdate";
+  static final String UPDATE_TYPE_LOCAL_REF_POSITION_START = "localRefPositionStartUpdate";
+  static final String UPDATE_TYPE_LOCAL_REF_POSITION_END = "localRefPositionEndUpdate";
+  static final String MAPPING_VALUE_VALUE = "value";
+  static final String MAPPING_VALUE_TYPE = "type";
+  static final String MAPPING_VALUE_NAME = "name";
+  static final String MAPPING_VALUE_NAMESPACE = "namespace";
+  static final String MAPPING_VALUE_PREFIX = "prefix";
+  static final String MAPPING_VALUE_FILTER = "filter";
+  static final String MAPPING_VALUE_DISTANCE = "distance";
+  static final String MAPPING_VALUE_SOURCE = "source";
+  static final String MAPPING_VALUE_ANCESTOR = "ancestor";
+  static final String MAPPING_VALUE_SPLIT = "split";
+  static final String MAPPING_VALUE_NUMBER = "number";
+  static final String MAPPING_VALUE_CONDITION = "condition";
+  static final String MAPPING_VALUE_TEXT = "text";
+  static final String MAPPING_VALUE_NOT = "not";
 
   private Base64.Encoder enc = Base64.getEncoder();
 
   private Base64.Decoder dec = Base64.getDecoder();
 
-  public MtasBasicParser(Configuration config) {
+  MtasBasicParser(Configuration config) {
     super(config);
   }
 
-  protected Map<String, List<MtasParserObject>> createCurrentList() {
+  Map<String, List<MtasParserObject>> createCurrentList() {
     Map<String, List<MtasParserObject>> currentList = new HashMap<>();
-    currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_RELATION_ANNOTATION,
-      new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_REF, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_GROUP_ANNOTATION,
-      new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD, new ArrayList<MtasParserObject>());
-    currentList.put(MAPPING_TYPE_WORD_ANNOTATION,
-      new ArrayList<MtasParserObject>());
+    currentList.put(MAPPING_TYPE_RELATION, new ArrayList<>());
+    currentList.put(MAPPING_TYPE_RELATION_ANNOTATION, new ArrayList<>());
+    currentList.put(MAPPING_TYPE_REF, new ArrayList<>());
+    currentList.put(MAPPING_TYPE_GROUP, new ArrayList<>());
+    currentList.put(MAPPING_TYPE_GROUP_ANNOTATION, new ArrayList<>());
+    currentList.put(MAPPING_TYPE_WORD, new ArrayList<>());
+    currentList.put(MAPPING_TYPE_WORD_ANNOTATION, new ArrayList<>());
     return currentList;
   }
 
-  protected Map<String, Map<Integer, Set<String>>> createUpdateList() {
+  Map<String, Map<Integer, Set<String>>> createUpdateList() {
     Map<String, Map<Integer, Set<String>>> updateList = new HashMap<>();
     updateList.put(UPDATE_TYPE_OFFSET, new HashMap<>());
     updateList.put(UPDATE_TYPE_POSITION, new HashMap<>());
@@ -134,14 +132,14 @@ public abstract class MtasBasicParser extends MtasParser {
     return updateList;
   }
 
-  protected Map<String, Map<String, String>> createVariables() {
+  Map<String, Map<String, String>> createVariables() {
     return new HashMap<>();
   }
 
-  protected void computeMappingsFromObject(
-      MtasTokenIdFactory mtasTokenIdFactory, MtasParserObject object,
-      Map<String, List<MtasParserObject>> currentList,
-      Map<String, Map<Integer, Set<String>>> updateList)
+  void computeMappingsFromObject(
+    MtasTokenIdFactory mtasTokenIdFactory, MtasParserObject object,
+    Map<String, List<MtasParserObject>> currentList,
+    Map<String, Map<Integer, Set<String>>> updateList)
       throws MtasParserException, MtasConfigException {
     MtasParserType<MtasParserMapping<?>> objectType = object.getType();
     List<MtasParserMapping<?>> mappings = objectType.getItems();
@@ -167,16 +165,14 @@ public abstract class MtasBasicParser extends MtasParser {
               // continue, but no token
             } else {
               // check conditions
-              postcheckMappingConditions(object, mapping.getConditions(),
-                  currentList);
-              boolean containsVariables = checkForVariables(
-                  mappingToken.preValues);
-              containsVariables = !containsVariables
-                  ? checkForVariables(mappingToken.postValues)
-                  : containsVariables;
+              postcheckMappingConditions(object, mapping.getConditions(), currentList);
+              boolean containsVariables = checkForVariables(mappingToken.preValues);
+              if (!containsVariables) {
+                containsVariables = checkForVariables(mappingToken.postValues);
+              }
               // construct preValue
               String[] preValue = computeValueFromMappingValues(object,
-                  mappingToken.preValues, currentList, containsVariables);
+                mappingToken.preValues, currentList, containsVariables);
               // at least preValue
               if (preValue == null || preValue.length == 0) {
                 throw new MtasParserException("no preValues");
@@ -184,15 +180,15 @@ public abstract class MtasBasicParser extends MtasParser {
                 // no delimiter in preValue
                 for (int k = 0; k < preValue.length; k++) {
                   if ((preValue[k] = preValue[k].replace(MtasToken.DELIMITER,
-                      "")).isEmpty()) {
+                    "")).isEmpty()) {
                     throw new MtasParserException("empty preValue");
-                  }
                 }
               }
-              // construct postValue
+              }
+
               String[] postValue = computeValueFromMappingValues(object,
-                  mappingToken.postValues, currentList, containsVariables);
-              // construct value
+                mappingToken.postValues, currentList, containsVariables);
+
               String[] value;
               if (postValue == null || postValue.length == 0) {
                 value = preValue.clone();
@@ -212,22 +208,22 @@ public abstract class MtasBasicParser extends MtasParser {
               } else {
                 value = new String[preValue.length * postValue.length];
                 int number = 0;
-                for (int k1 = 0; k1 < preValue.length; k1++) {
-                  for (int k2 = 0; k2 < postValue.length; k2++) {
-                    value[number] = preValue[k1] + MtasToken.DELIMITER
-                        + postValue[k2];
+                for (String pre : preValue) {
+                  for (String post : postValue) {
+                    value[number] = pre + MtasToken.DELIMITER + post;
                     number++;
-                  }
+                }
                 }
               }
+
               // construct payload
               BytesRef payload = computePayloadFromMappingPayload(object,
-                  mappingToken.payload, currentList);
+                mappingToken.payload, currentList);
               // create token and get id: from now on, we must continue, no
               // exceptions allowed...
-              for (int k = 0; k < value.length; k++) {
+              for (String v : value) {
                 MtasTokenString token = new MtasTokenString(
-                    mtasTokenIdFactory.createTokenId(), value[k]);
+                  mtasTokenIdFactory.createTokenId(), v);
                 // store settings offset, realoffset and parent
                 token.setProvideOffset(mappingToken.offset);
                 token.setProvideRealOffset(mappingToken.realoffset);
@@ -241,67 +237,64 @@ public abstract class MtasBasicParser extends MtasParser {
                 if (!currentList.get(checkType).isEmpty()) {
                   if (currentList.get(checkType).contains(object)) {
                     int listPosition = currentList.get(checkType)
-                        .indexOf(object);
+                                                  .indexOf(object);
                     if (listPosition > 0) {
                       currentList.get(checkType).get(listPosition - 1)
-                          .registerUpdateableMappingAtParent(token.getId());
+                                 .registerUpdateableMappingAtParent(token.getId());
                     }
                   } else {
                     currentList.get(checkType)
-                        .get(currentList.get(checkType).size() - 1)
-                        .registerUpdateableMappingAtParent(token.getId());
+                               .get(currentList.get(checkType).size() - 1)
+                               .registerUpdateableMappingAtParent(token.getId());
                   }
                   // if no real ancestor, register id update when group
                   // ancestor is created
                 } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
                   currentList.get(MAPPING_TYPE_GROUP)
-                      .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
-                      .registerUpdateableMappingAtParent(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
+                             .registerUpdateableMappingAtParent(token.getId());
                 } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
                   currentList.get(MAPPING_TYPE_RELATION)
-                      .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
-                      .registerUpdateableMappingAtParent(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
+                             .registerUpdateableMappingAtParent(token.getId());
                 }
                 // update children
                 for (Integer tmpId : object.getUpdateableMappingsAsParent()) {
                   if (tokenCollection.get(tmpId) != null) {
                     tokenCollection.get(tmpId).setParentId(token.getId());
-                  }
+                }
                 }
                 object.resetUpdateableMappingsAsParent();
                 // use own position
                 if (mapping.position.equals(MtasParserMapping.SOURCE_OWN)) {
                   token.addPositions(object.getPositions());
                   // use position from ancestorGroup
-                } else if (mapping.position
-                    .equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)
-                    && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())) {
+                } else if (mapping.position.equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)
+                  && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())) {
                   currentList.get(MAPPING_TYPE_GROUP)
-                      .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
-                      .addUpdateableMappingWithPosition(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
+                             .addUpdateableMappingWithPosition(token.getId());
                   // use position from ancestorWord
-                } else if (mapping.position
-                    .equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)
-                    && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
+                } else if (mapping.position.equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)
+                  && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
                   currentList.get(MAPPING_TYPE_WORD)
-                      .get(currentList.get(MAPPING_TYPE_WORD).size() - 1)
-                      .addUpdateableMappingWithPosition(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_WORD).size() - 1)
+                             .addUpdateableMappingWithPosition(token.getId());
                   // use position from ancestorRelation
-                } else if (mapping.position
-                    .equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)
-                    && (!currentList.get(MAPPING_TYPE_RELATION).isEmpty())) {
+                } else if (mapping.position.equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)
+                  && (!currentList.get(MAPPING_TYPE_RELATION).isEmpty())) {
                   currentList.get(MAPPING_TYPE_RELATION)
-                      .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
-                      .addUpdateableMappingWithPosition(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
+                             .addUpdateableMappingWithPosition(token.getId());
                   // register id to get positions later from references
-                } else if (mapping.position
-                    .equals(MtasParserMapping.SOURCE_REFS)) {
+                } else if (!mapping.position.equals(MtasParserMapping.SOURCE_REFS)) {
+                  throw new IllegalStateException("should not happen");
+                } else {
                   if (mapping.type.equals(MAPPING_TYPE_GROUP_ANNOTATION)) {
                     if (mapping.start != null && mapping.end != null) {
                       String start = object.getAttribute(mapping.start);
                       String end = object.getAttribute(mapping.end);
-                      if (start != null && !start.isEmpty() && end != null
-                          && !end.isEmpty()) {
+                      if (start != null && !start.isEmpty() && end != null && !end.isEmpty()) {
                         if (start.startsWith("#")) {
                           start = start.substring(1);
                         }
@@ -309,63 +302,49 @@ public abstract class MtasBasicParser extends MtasParser {
                           end = end.substring(1);
                         }
                         updateList.get(UPDATE_TYPE_LOCAL_REF_POSITION_START)
-                            .put(token.getId(),
-                                new HashSet<String>(Arrays.asList(start)));
-                        updateList.get(UPDATE_TYPE_LOCAL_REF_POSITION_END).put(
-                            token.getId(),
-                            new HashSet<String>(Arrays.asList(end)));
-                        updateList.get(UPDATE_TYPE_LOCAL_REF_OFFSET_START).put(
-                            token.getId(),
-                            new HashSet<String>(Arrays.asList(start)));
-                        updateList.get(UPDATE_TYPE_LOCAL_REF_OFFSET_END).put(
-                            token.getId(),
-                            new HashSet<String>(Arrays.asList(end)));
-                      }
+                                  .put(token.getId(), new HashSet<>(singletonList(start)));
+                        updateList.get(UPDATE_TYPE_LOCAL_REF_POSITION_END)
+                                  .put(token.getId(), new HashSet<>(singletonList(end)));
+                        updateList.get(UPDATE_TYPE_LOCAL_REF_OFFSET_START)
+                                  .put(token.getId(), new HashSet<>(singletonList(start)));
+                        updateList.get(UPDATE_TYPE_LOCAL_REF_OFFSET_END)
+                                  .put(token.getId(), new HashSet<>(singletonList(end)));
                     }
-                  } else {
-                    updateList.get(UPDATE_TYPE_POSITION).put(token.getId(),
-                        object.getRefIds());
                   }
                 } else {
-                  // should not happen
+                    updateList.get(UPDATE_TYPE_POSITION)
+                              .put(token.getId(), object.getRefIds());
+                }
                 }
                 // use own offset
                 if (mapping.offset.equals(MtasParserMapping.SOURCE_OWN)) {
-                  token.setOffset(object.getOffsetStart(),
-                      object.getOffsetEnd());
+                  token.setOffset(object.getOffsetStart(), object.getOffsetEnd());
                   // use offset from ancestorGroup
-                } else if (mapping.offset
-                    .equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)
-                    && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())) {
+                } else if (mapping.offset.equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)
+                  && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())) {
                   currentList.get(MAPPING_TYPE_GROUP)
-                      .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
-                      .addUpdateableMappingWithOffset(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
+                             .addUpdateableMappingWithOffset(token.getId());
                   // use offset from ancestorWord
-                } else if (mapping.offset
-                    .equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)
-                    && !currentList.get(MAPPING_TYPE_WORD).isEmpty()) {
+                } else if (mapping.offset.equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)
+                  && !currentList.get(MAPPING_TYPE_WORD).isEmpty()) {
                   currentList.get(MAPPING_TYPE_WORD)
-                      .get(currentList.get(MAPPING_TYPE_WORD).size() - 1)
-                      .addUpdateableMappingWithOffset(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_WORD).size() - 1)
+                             .addUpdateableMappingWithOffset(token.getId());
                   // use offset from ancestorRelation
-                } else if (mapping.offset
-                    .equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)
-                    && !currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
+                } else if (mapping.offset.equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)
+                  && !currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
                   currentList.get(MAPPING_TYPE_RELATION)
-                      .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
-                      .addUpdateableMappingWithOffset(token.getId());
+                             .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
+                             .addUpdateableMappingWithOffset(token.getId());
                   // register id to get offset later from refs
-                } else if (mapping.offset
-                    .equals(MtasParserMapping.SOURCE_REFS)) {
+                } else if (mapping.offset.equals(MtasParserMapping.SOURCE_REFS)) {
                   updateList.get(UPDATE_TYPE_OFFSET).put(token.getId(),
-                      object.getRefIds());
+                    object.getRefIds());
                 }
                 // always use own realOffset
-                token.setRealOffset(object.getRealOffsetStart(),
-                    object.getRealOffsetEnd());
-                // set payload
+                token.setRealOffset(object.getRealOffsetStart(), object.getRealOffsetEnd());
                 token.setPayload(payload);
-                // add token to collection
                 tokenCollection.add(token);
               }
             }
@@ -392,13 +371,13 @@ public abstract class MtasBasicParser extends MtasParser {
             }
           }
           if (startAttribute != null && endAttribute != null
-              && !object.getPositions().isEmpty()) {
+            && !object.getPositions().isEmpty()) {
             object.setReferredStartPosition(startAttribute,
-                object.getPositions().first());
+              object.getPositions().first());
             object.setReferredEndPosition(endAttribute,
-                object.getPositions().last());
+              object.getPositions().last());
             object.setReferredStartOffset(startAttribute,
-                object.getOffsetStart());
+              object.getOffsetStart());
             object.setReferredEndOffset(endAttribute, object.getOffsetEnd());
           }
         }
@@ -411,35 +390,34 @@ public abstract class MtasBasicParser extends MtasParser {
     if (!currentList.get(objectType.getType()).isEmpty()) {
       if (currentList.get(objectType.getType()).contains(object)) {
         int listPosition = currentList.get(objectType.getType())
-            .indexOf(object);
+                                      .indexOf(object);
         if (listPosition > 0) {
           currentList.get(objectType.getType()).get(listPosition - 1)
-              .registerUpdateableMappingsAtParent(
-                  object.getUpdateableMappingsAsParent());
+                     .registerUpdateableMappingsAtParent(
+                       object.getUpdateableMappingsAsParent());
         }
       } else {
         currentList.get(objectType.getType())
-            .get(currentList.get(objectType.getType()).size() - 1)
-            .registerUpdateableMappingsAtParent(
-                object.getUpdateableMappingsAsParent());
+                   .get(currentList.get(objectType.getType()).size() - 1)
+                   .registerUpdateableMappingsAtParent(
+                     object.getUpdateableMappingsAsParent());
       }
     } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
       currentList.get(MAPPING_TYPE_GROUP)
-          .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
-          .registerUpdateableMappingsAtParent(
-              object.getUpdateableMappingsAsParent());
+                 .get(currentList.get(MAPPING_TYPE_GROUP).size() - 1)
+                 .registerUpdateableMappingsAtParent(
+                   object.getUpdateableMappingsAsParent());
     } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
       currentList.get(MAPPING_TYPE_RELATION)
-          .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
-          .registerUpdateableMappingsAtParent(
-              object.getUpdateableMappingsAsParent());
+                 .get(currentList.get(MAPPING_TYPE_RELATION).size() - 1)
+                 .registerUpdateableMappingsAtParent(
+                   object.getUpdateableMappingsAsParent());
     }
     updateMappingsWithLocalReferences(object, currentList, updateList);
   }
 
-  protected void computeVariablesFromObject(MtasParserObject object,
-      Map<String, List<MtasParserObject>> currentList,
-      Map<String, Map<String, String>> variables) {
+  void computeVariablesFromObject(MtasParserObject object,
+                                  Map<String, Map<String, String>> variables) {
     MtasParserType<MtasParserVariable> parserType = object.getType();
     String id = object.getId();
     if (id != null) {
@@ -464,12 +442,10 @@ public abstract class MtasBasicParser extends MtasParser {
   private boolean checkForVariables(List<Map<String, String>> values) {
     if (values == null || values.isEmpty()) {
       return false;
-    } else {
-      for (Map<String, String> list : values) {
-        if (list.containsKey("type") && list.get("type")
-            .equals(MtasParserMapping.PARSER_TYPE_VARIABLE)) {
-          return true;
-        }
+    }
+    for (Map<String, String> list : values) {
+      if (MtasParserMapping.PARSER_TYPE_VARIABLE.equals(list.get("type"))) {
+        return true;
       }
     }
     return false;
@@ -560,59 +536,53 @@ public abstract class MtasBasicParser extends MtasParser {
 
   private String computeTypeFromMappingSource(String source)
       throws MtasParserException {
-    if (source.equals(MtasParserMapping.SOURCE_OWN)) {
-      return null;
-    } else if (source.equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP)) {
-      return MAPPING_TYPE_GROUP;
-    } else if (source
-        .equals(MtasParserMapping.SOURCE_ANCESTOR_GROUP_ANNOTATION)) {
-      return MAPPING_TYPE_GROUP_ANNOTATION;
-    } else if (source.equals(MtasParserMapping.SOURCE_ANCESTOR_WORD)) {
-      return MAPPING_TYPE_WORD;
-    } else if (source
-        .equals(MtasParserMapping.SOURCE_ANCESTOR_WORD_ANNOTATION)) {
-      return MAPPING_TYPE_WORD_ANNOTATION;
-    } else if (source.equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION)) {
-      return MAPPING_TYPE_RELATION;
-    } else if (source
-        .equals(MtasParserMapping.SOURCE_ANCESTOR_RELATION_ANNOTATION)) {
-      return MAPPING_TYPE_RELATION_ANNOTATION;
-    } else {
-      throw new MtasParserException("unknown source " + source);
+    switch (source) {
+      case MtasParserMapping.SOURCE_OWN:
+        return null;
+      case MtasParserMapping.SOURCE_ANCESTOR_GROUP:
+        return MAPPING_TYPE_GROUP;
+      case MtasParserMapping.SOURCE_ANCESTOR_GROUP_ANNOTATION:
+        return MAPPING_TYPE_GROUP_ANNOTATION;
+      case MtasParserMapping.SOURCE_ANCESTOR_WORD:
+        return MAPPING_TYPE_WORD;
+      case MtasParserMapping.SOURCE_ANCESTOR_WORD_ANNOTATION:
+        return MAPPING_TYPE_WORD_ANNOTATION;
+      case MtasParserMapping.SOURCE_ANCESTOR_RELATION:
+        return MAPPING_TYPE_RELATION;
+      case MtasParserMapping.SOURCE_ANCESTOR_RELATION_ANNOTATION:
+        return MAPPING_TYPE_RELATION_ANNOTATION;
+      default:
+        throw new MtasParserException("unknown source " + source);
     }
   }
 
-  private MtasParserObject[] computeObjectFromMappingValue(
-      MtasParserObject object, Map<String, String> mappingValue,
-      Map<String, List<MtasParserObject>> currentList)
-      throws MtasParserException {
+  private MtasParserObject[] computeObjectFromMappingValue(MtasParserObject object, Map<String, String> mappingValue,
+                                                           Map<String, List<MtasParserObject>> currentList)
+    throws MtasParserException {
+    // try to get relevant object
+    if (mappingValue.get(MAPPING_VALUE_SOURCE).equals(MtasParserMapping.SOURCE_OWN)) {
+      return new MtasParserObject[]{object};
+    }
+
+    Integer ancestorNumber = mappingValue.get(MAPPING_VALUE_ANCESTOR) != null
+      ? Integer.parseInt(mappingValue.get(MAPPING_VALUE_ANCESTOR)) : null;
+    String ancestorType = computeTypeFromMappingSource(mappingValue.get(MAPPING_VALUE_SOURCE));
+
+    // get ancestor object
     MtasParserObject[] checkObjects = null;
     MtasParserObject checkObject;
-    Integer ancestorNumber = null;
-    String ancestorType = null;
-    // try to get relevant object
-    if (mappingValue.get(MAPPING_VALUE_SOURCE)
-        .equals(MtasParserMapping.SOURCE_OWN)) {
-      checkObjects = new MtasParserObject[] { object };
-    } else {
-      ancestorNumber = mappingValue.get(MAPPING_VALUE_ANCESTOR) != null
-          ? Integer.parseInt(mappingValue.get(MAPPING_VALUE_ANCESTOR)) : null;
-      ancestorType = computeTypeFromMappingSource(
-          mappingValue.get(MAPPING_VALUE_SOURCE));
-      // get ancestor object
-      if (ancestorType != null) {
-        int s = currentList.get(ancestorType).size();
-        // check existence ancestor for conditions
-        if (ancestorNumber != null) {
-          if ((s > 0) && (ancestorNumber < s) && (checkObject = currentList
-              .get(ancestorType).get((s - ancestorNumber - 1))) != null) {
-            checkObjects = new MtasParserObject[] { checkObject };
-          }
-        } else {
-          checkObjects = new MtasParserObject[s];
-          for (int i = s - 1; i >= 0; i--) {
-            checkObjects[s - i - 1] = currentList.get(ancestorType).get(i);
-          }
+    if (ancestorType != null) {
+      int s = currentList.get(ancestorType).size();
+      // check existence ancestor for conditions
+      if (ancestorNumber != null) {
+        if (s > 0 && ancestorNumber < s
+          && (checkObject = currentList.get(ancestorType).get((s - ancestorNumber - 1))) != null) {
+          checkObjects = new MtasParserObject[]{checkObject};
+        }
+      } else {
+        checkObjects = new MtasParserObject[s];
+        for (int i = s - 1; i >= 0; i--) {
+          checkObjects[s - i - 1] = currentList.get(ancestorType).get(i);
         }
       }
     }
@@ -716,22 +686,21 @@ public abstract class MtasBasicParser extends MtasParser {
               String[] nextValue = new String[value.length * textValues.length];
               boolean nullValue = false;
               int number = 0;
-              for (int k = 0; k < textValues.length; k++) {
+              for (String textValue : textValues) {
                 String subvalue = computeFilteredPrefixedValue(
-                    mappingValue.get(MAPPING_VALUE_TYPE), textValues[k],
-                    mappingValue.get(MAPPING_VALUE_FILTER),
-                    mappingValue.get(MAPPING_VALUE_PREFIX) == null
-                        || mappingValue.get(MAPPING_VALUE_PREFIX).isEmpty()
-                            ? null : mappingValue.get(MAPPING_VALUE_PREFIX));
+                  mappingValue.get(MAPPING_VALUE_TYPE), textValue,
+                  mappingValue.get(MAPPING_VALUE_FILTER),
+                  mappingValue.get(MAPPING_VALUE_PREFIX) == null
+                    || mappingValue.get(MAPPING_VALUE_PREFIX).isEmpty()
+                    ? null : mappingValue.get(MAPPING_VALUE_PREFIX));
                 if (subvalue != null) {
-                  for (int i = 0; i < value.length; i++) {
-                    nextValue[number] = addAndEncodeValue(value[i], subvalue,
-                        containsVariables);
+                  for (String v : value) {
+                    nextValue[number] = addAndEncodeValue(v, subvalue, containsVariables);
                     number++;
                   }
                 } else if (!nullValue) {
-                  for (int i = 0; i < value.length; i++) {
-                    nextValue[number] = value[i];
+                  for (String v : value) {
+                    nextValue[number] = v;
                     number++;
                   }
                   nullValue = true;
@@ -740,32 +709,28 @@ public abstract class MtasBasicParser extends MtasParser {
               value = new String[number];
               System.arraycopy(nextValue, 0, value, 0, number);
             }
-          } else if (mappingValue.get("type")
-              .equals(MtasParserMapping.PARSER_TYPE_VARIABLE)) {
-            if (containsVariables) {
-              String variableName = mappingValue.get(MAPPING_VALUE_NAME);
-              String variableValue = mappingValue.get(MAPPING_VALUE_VALUE);
-              String prefix = mappingValue.get(MAPPING_VALUE_PREFIX);
-              if (variableName != null && variableValue != null
-                  && mappingValue.get(MAPPING_VALUE_SOURCE)
-                      .equals(MtasParserMapping.SOURCE_OWN)) {
-                String subvalue = object.getAttribute(variableValue);
-                if (subvalue != null && subvalue.startsWith("#")) {
-                  subvalue = subvalue.substring(1);
-                }
-                if (subvalue != null) {
-                  for (int i = 0; i < value.length; i++) {
-                    if (prefix != null && !prefix.isEmpty()) {
-                      value[i] = addAndEncodeValue(value[i], prefix,
-                          containsVariables);
-                    }
-                    value[i] = addAndEncodeVariable(value[i], variableName,
-                        subvalue, containsVariables);
+          } else if (mappingValue.get("type").equals(MtasParserMapping.PARSER_TYPE_VARIABLE)) {
+            if (!containsVariables) {
+              throw new MtasParserException("unexpected variable");
+            }
+            String variableName = mappingValue.get(MAPPING_VALUE_NAME);
+            String variableValue = mappingValue.get(MAPPING_VALUE_VALUE);
+            String prefix = mappingValue.get(MAPPING_VALUE_PREFIX);
+            if (variableName != null && variableValue != null
+              && mappingValue.get(MAPPING_VALUE_SOURCE)
+                             .equals(MtasParserMapping.SOURCE_OWN)) {
+              String subvalue = object.getAttribute(variableValue);
+              if (subvalue != null && subvalue.startsWith("#")) {
+                subvalue = subvalue.substring(1);
+              }
+              if (subvalue != null) {
+                for (int i = 0; i < value.length; i++) {
+                  if (prefix != null && !prefix.isEmpty()) {
+                    value[i] = addAndEncodeValue(value[i], prefix, true);
                   }
+                  value[i] = addAndEncodeVariable(value[i], variableName, subvalue, true);
                 }
               }
-            } else {
-              throw new MtasParserException("unexpected variable");
             }
           } else {
             throw new MtasParserException(
@@ -792,38 +757,37 @@ public abstract class MtasBasicParser extends MtasParser {
   }
 
   private String addAndEncode(String originalValue, String newType,
-      String newValue, boolean encode) {
+                              String newValue, boolean encode) {
     if (newValue == null) {
       return originalValue;
+    }
+    String finalNewValue;
+    if (encode) {
+      if (newType == null) {
+        finalNewValue = new String(
+          enc.encode(newValue.getBytes(StandardCharsets.UTF_8)),
+          StandardCharsets.UTF_8);
+      } else {
+        finalNewValue = new String(
+          enc.encode(newType.getBytes(StandardCharsets.UTF_8)),
+          StandardCharsets.UTF_8)
+          + ":"
+          + new String(
+          enc.encode(newValue.getBytes(StandardCharsets.UTF_8)),
+          StandardCharsets.UTF_8);
+      }
     } else {
-      String finalNewValue;
-      if (encode) {
-        if (newType == null) {
-          finalNewValue = new String(
-              enc.encode(newValue.getBytes(StandardCharsets.UTF_8)),
-              StandardCharsets.UTF_8);
-        } else {
-          finalNewValue = new String(
-              enc.encode(newType.getBytes(StandardCharsets.UTF_8)),
-              StandardCharsets.UTF_8)
-              + ":"
-              + new String(
-                  enc.encode(newValue.getBytes(StandardCharsets.UTF_8)),
-                  StandardCharsets.UTF_8);
-        }
-      } else {
-        finalNewValue = newValue;
-      }
-      if (originalValue == null || originalValue.isEmpty()) {
-        return finalNewValue;
-      } else {
-        return originalValue + (encode ? " " : "") + finalNewValue;
-      }
+      finalNewValue = newValue;
+    }
+    if (originalValue == null || originalValue.isEmpty()) {
+      return finalNewValue;
+    } else {
+      return originalValue + (encode ? " " : "") + finalNewValue;
     }
   }
 
-  protected String decodeAndUpdateWithVariables(String encodedPrefix,
-      String encodedPostfix, Map<String, Map<String, String>> variables) {
+  String decodeAndUpdateWithVariables(String encodedPrefix, String encodedPostfix,
+                                      Map<String, Map<String, String>> variables) {
     String[] prefixSplit;
     String[] postfixSplit;
     if (encodedPrefix != null && !encodedPrefix.isEmpty()) {
@@ -943,9 +907,9 @@ public abstract class MtasBasicParser extends MtasParser {
     return false;
   }
 
-  void precheckMappingConditions(MtasParserObject object,
-      List<Map<String, String>> mappingConditions,
-      Map<String, List<MtasParserObject>> currentList)
+  private void precheckMappingConditions(MtasParserObject object,
+                                         List<Map<String, String>> mappingConditions,
+                                         Map<String, List<MtasParserObject>> currentList)
       throws MtasParserException {
     for (Map<String, String> mappingCondition : mappingConditions) {
       // condition existence ancestor
@@ -981,39 +945,37 @@ public abstract class MtasBasicParser extends MtasParser {
       } else {
         MtasParserObject[] checkObjects = computeObjectFromMappingValue(object,
             mappingCondition, currentList);
-        Boolean notCondition = false;
-        if (mappingCondition.get("not") != null) {
-          notCondition = true;
-        }
+        Boolean notCondition = (mappingCondition.get("not") != null);
+
         // do checks
         if (checkObjects != null) {
-          checkObjectLoop: for (MtasParserObject checkObject : checkObjects) {
+          for (MtasParserObject checkObject : checkObjects) {
             MtasParserType checkType = checkObject.getType();
             // condition on name
             if (mappingCondition.get("type")
-                .equals(MtasParserMapping.PARSER_TYPE_NAME)) {
+                                .equals(MtasParserMapping.PARSER_TYPE_NAME)) {
               if (notCondition && mappingCondition.get(MAPPING_VALUE_CONDITION)
-                  .equals(checkType.getName())) {
+                                                  .equals(checkType.getName())) {
                 throw new MtasParserException("condition NOT "
-                    + mappingCondition.get(MAPPING_VALUE_CONDITION)
-                    + " on name not matched (is " + checkType.getName() + ")");
+                  + mappingCondition.get(MAPPING_VALUE_CONDITION)
+                  + " on name not matched (is " + checkType.getName() + ")");
               } else if (!notCondition && mappingCondition
-                  .get(MAPPING_VALUE_CONDITION).equals(checkType.getName())) {
-                break checkObjectLoop;
+                .get(MAPPING_VALUE_CONDITION).equals(checkType.getName())) {
+                break;
               } else if (!notCondition && !mappingCondition
-                  .get(MAPPING_VALUE_CONDITION).equals(checkType.getName())) {
+                .get(MAPPING_VALUE_CONDITION).equals(checkType.getName())) {
                 throw new MtasParserException("condition "
-                    + mappingCondition.get(MAPPING_VALUE_CONDITION)
-                    + " on name not matched (is " + checkType.getName() + ")");
+                  + mappingCondition.get(MAPPING_VALUE_CONDITION)
+                  + " on name not matched (is " + checkType.getName() + ")");
               }
               // condition on attribute
             } else if (mappingCondition.get("type")
-                .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
+                                       .equals(MtasParserMapping.PARSER_TYPE_ATTRIBUTE)) {
               String attributeCondition = mappingCondition
-                  .get(MAPPING_VALUE_CONDITION);
+                .get(MAPPING_VALUE_CONDITION);
               String namespace = mappingCondition.get(MAPPING_VALUE_NAMESPACE);
               String attributeValue;
-              if(namespace==null) {
+              if (namespace == null) {
                 attributeValue = checkObject.getAttribute(mappingCondition.get(MAPPING_VALUE_NAME));
               } else {
                 attributeValue = checkObject.getOtherAttribute(namespace, mappingCondition.get(MAPPING_VALUE_NAME));
@@ -1021,58 +983,58 @@ public abstract class MtasBasicParser extends MtasParser {
               if ((attributeCondition == null) && (attributeValue == null)) {
                 if (!notCondition) {
                   throw new MtasParserException("attribute "
-                      + mappingCondition.get("name") + " not available");
+                    + mappingCondition.get("name") + " not available");
                 }
               } else if ((attributeCondition != null)
-                  && (attributeValue == null)) {
+                && (attributeValue == null)) {
                 if (!notCondition) {
                   throw new MtasParserException(
-                      "condition " + attributeCondition + " on attribute "
-                          + mappingCondition.get("name")
-                          + " not matched (is null)");
+                    "condition " + attributeCondition + " on attribute "
+                      + mappingCondition.get("name")
+                      + " not matched (is null)");
                 }
               } else if (attributeCondition != null) {
                 if (!notCondition
-                    && !attributeCondition.equals(attributeValue)) {
+                  && !attributeCondition.equals(attributeValue)) {
                   throw new MtasParserException(
-                      "condition " + attributeCondition + " on attribute "
-                          + mappingCondition.get("name") + " not matched (is "
-                          + attributeValue + ")");
+                    "condition " + attributeCondition + " on attribute "
+                      + mappingCondition.get("name") + " not matched (is "
+                      + attributeValue + ")");
                 } else if (!notCondition
-                    && attributeCondition.equals(attributeValue)) {
-                  break checkObjectLoop;
+                  && attributeCondition.equals(attributeValue)) {
+                  break;
                 } else if (notCondition
-                    && attributeCondition.equals(attributeValue)) {
+                  && attributeCondition.equals(attributeValue)) {
                   throw new MtasParserException(
-                      "condition NOT " + attributeCondition + " on attribute "
-                          + mappingCondition.get("name") + " not matched (is "
-                          + attributeValue + ")");
+                    "condition NOT " + attributeCondition + " on attribute "
+                      + mappingCondition.get("name") + " not matched (is "
+                      + attributeValue + ")");
                 }
               }
               // condition on text
             } else if (mappingCondition.get("type")
-                .equals(MtasParserMapping.PARSER_TYPE_TEXT)
-                && object.getType().precheckText()) {
+                                       .equals(MtasParserMapping.PARSER_TYPE_TEXT)
+              && object.getType().precheckText()) {
               String textCondition = mappingCondition
-                  .get(MAPPING_VALUE_CONDITION);
+                .get(MAPPING_VALUE_CONDITION);
               String textValue = object.getText();
               if ((textCondition == null)
-                  && ((textValue == null) || textValue.equals(""))) {
+                && ((textValue == null) || textValue.equals(""))) {
                 if (!notCondition) {
                   throw new MtasParserException("no text available");
                 }
               } else if ((textCondition != null) && (textValue == null)) {
                 if (!notCondition) {
                   throw new MtasParserException("condition " + textCondition
-                      + " on text not matched (is null)");
+                    + " on text not matched (is null)");
                 }
               } else if (textCondition != null) {
                 if (!notCondition && !textCondition.equals(textValue)) {
                   throw new MtasParserException("condition " + textCondition
-                      + " on text not matched (is " + textValue + ")");
+                    + " on text not matched (is " + textValue + ")");
                 } else if (notCondition && textCondition.equals(textValue)) {
                   throw new MtasParserException("condition NOT " + textCondition
-                      + " on text not matched (is " + textValue + ")");
+                    + " on text not matched (is " + textValue + ")");
                 }
               }
             }
@@ -1150,8 +1112,7 @@ public abstract class MtasBasicParser extends MtasParser {
             } else {
               int i1 = Integer.parseInt(splitContentMatcher.group(1));
               int i2 = Integer.parseInt(splitContentMatcher.group(3));
-              for (int i = Math.max(0, i1); i < Math.min(values.length,
-                  i2); i++) {
+              for (int i = Math.max(0, i1); i < Math.min(values.length, i2); i++) {
                 valuesFilter[i] = true;
               }
             }
@@ -1160,8 +1121,8 @@ public abstract class MtasBasicParser extends MtasParser {
       }
       if (doSplitFilter) {
         int number = 0;
-        for (int i = 0; i < valuesFilter.length; i++) {
-          if (valuesFilter[i]) {
+        for (boolean b : valuesFilter) {
+          if (b) {
             number++;
           }
         }
@@ -1238,10 +1199,10 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  protected static class MtasParserType<T> {
+  static class MtasParserType<T> {
     private String type;
     private String name;
-    protected boolean precheckText;
+    boolean precheckText;
     private String refAttributeName;
     protected ArrayList<T> items = new ArrayList<>();
 
@@ -1257,7 +1218,7 @@ public abstract class MtasBasicParser extends MtasParser {
       this.refAttributeName = refAttributeName;
     }
 
-    public String getRefAttributeName() {
+    String getRefAttributeName() {
       return refAttributeName;
     }
 
@@ -1269,11 +1230,11 @@ public abstract class MtasBasicParser extends MtasParser {
       return type;
     }
 
-    public boolean precheckText() {
+    boolean precheckText() {
       return precheckText;
     }
 
-    public void addItem(T item) {
+    void addItem(T item) {
       items.add(item);
     }
 
@@ -1282,23 +1243,23 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  protected static class MtasParserVariableValue {
+  private static class MtasParserVariableValue {
     public String type;
     public String name;
 
-    public MtasParserVariableValue(String type, String name) {
+    MtasParserVariableValue(String type, String name) {
       this.type = type;
       this.name = name;
     }
   }
 
-  protected static class MtasParserMappingToken {
+  private static class MtasParserMappingToken {
     public String type;
     public Boolean offset;
     public Boolean realoffset;
     public Boolean parent;
-    public List<Map<String, String>> preValues;
-    public List<Map<String, String>> postValues;
+    List<Map<String, String>> preValues;
+    List<Map<String, String>> postValues;
     public List<Map<String, String>> payload;
 
     public MtasParserMappingToken(String tokenType) {
@@ -1315,7 +1276,7 @@ public abstract class MtasBasicParser extends MtasParser {
       offset = tokenOffset;
     }
 
-    public void setRealOffset(Boolean tokenRealOffset) {
+    void setRealOffset(Boolean tokenRealOffset) {
       realoffset = tokenRealOffset;
     }
 
@@ -1324,18 +1285,18 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  protected static class MtasParserVariable {
+  static class MtasParserVariable {
     public String name;
     public String variable;
     protected ArrayList<MtasParserVariableValue> values;
 
-    public MtasParserVariable(String name, String value) {
+    MtasParserVariable(String name, String value) {
       this.name = name;
       this.variable = value;
       values = new ArrayList<>();
     }
 
-    public void processConfig(Configuration config)
+    void processConfig(Configuration config)
         throws MtasConfigException {
       for (int k = 0; k < config.numChildren(); k++) {
         if (config.child(k).getName().equals(VARIABLE_SUBTYPE_VALUE)) {
@@ -1373,33 +1334,34 @@ public abstract class MtasBasicParser extends MtasParser {
     }
   }
 
-  protected abstract class MtasParserMapping<T extends MtasParserMapping<T>> {
+  abstract class MtasParserMapping<T extends MtasParserMapping<T>> {
     protected abstract T self();
-    protected static final String SOURCE_OWN = "own";
-    protected static final String SOURCE_REFS = "refs";
-    protected static final String SOURCE_ANCESTOR_GROUP = "ancestorGroup";
-    protected static final String SOURCE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
-    protected static final String SOURCE_ANCESTOR_WORD = "ancestorWord";
-    protected static final String SOURCE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
-    protected static final String SOURCE_ANCESTOR_RELATION = "ancestorRelation";
-    protected static final String SOURCE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
-    protected static final String SOURCE_STRING = "string";
-    protected static final String PARSER_TYPE_VARIABLE = "variable";
-    protected static final String PARSER_TYPE_STRING = "string";
-    protected static final String PARSER_TYPE_NAME = "name";
-    protected static final String PARSER_TYPE_ATTRIBUTE = "attribute";
-    protected static final String PARSER_TYPE_TEXT = "text";
-    protected static final String PARSER_TYPE_TEXT_SPLIT = "textSplit";
-    protected static final String PARSER_TYPE_EXISTENCE = "existence";
-    protected static final String PARSER_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
-    protected String type;
-    protected String offset;
-    protected String realOffset;
-    protected String position;
-    protected String start;
-    protected String end;
-    protected List<MtasParserMappingToken> tokens;
-    protected List<Map<String, String>> conditions;
+
+    static final String SOURCE_OWN = "own";
+    static final String SOURCE_REFS = "refs";
+    static final String SOURCE_ANCESTOR_GROUP = "ancestorGroup";
+    static final String SOURCE_ANCESTOR_GROUP_ANNOTATION = "ancestorGroupAnnotation";
+    static final String SOURCE_ANCESTOR_WORD = "ancestorWord";
+    static final String SOURCE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotation";
+    static final String SOURCE_ANCESTOR_RELATION = "ancestorRelation";
+    static final String SOURCE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotation";
+    static final String SOURCE_STRING = "string";
+    static final String PARSER_TYPE_VARIABLE = "variable";
+    static final String PARSER_TYPE_STRING = "string";
+    static final String PARSER_TYPE_NAME = "name";
+    static final String PARSER_TYPE_ATTRIBUTE = "attribute";
+    static final String PARSER_TYPE_TEXT = "text";
+    static final String PARSER_TYPE_TEXT_SPLIT = "textSplit";
+    static final String PARSER_TYPE_EXISTENCE = "existence";
+    static final String PARSER_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
+    String type;
+    String offset;
+    String realOffset;
+    String position;
+    String start;
+    String end;
+    List<MtasParserMappingToken> tokens;
+    List<Map<String, String>> conditions;
 
     public MtasParserMapping() {
       type = null;
@@ -1963,7 +1925,7 @@ public abstract class MtasBasicParser extends MtasParser {
       mappingToken.payload.add(mapConstructionItem);
     }
 
-    public void conditionAncestor(String ancestorType, String number) {
+    void conditionAncestor(String ancestorType, String number) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
           || ancestorType.equals(SOURCE_ANCESTOR_GROUP_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_WORD)
@@ -2001,8 +1963,8 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    public void conditionAncestorName(String ancestorType, String distance,
-        String condition, String filter, String not) {
+    void conditionAncestorName(String ancestorType, String distance,
+                               String condition, String filter, String not) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
           || ancestorType.equals(SOURCE_ANCESTOR_GROUP_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_WORD)
@@ -2020,9 +1982,9 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    public void addAncestorAttribute(String ancestorType,
-        MtasParserMappingToken mappingToken, String type, String distance,
-        String name, String prefix, String filter) {
+    void addAncestorAttribute(String ancestorType,
+                              MtasParserMappingToken mappingToken, String type, String distance,
+                              String name, String prefix, String filter) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
           || ancestorType.equals(SOURCE_ANCESTOR_GROUP_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_WORD)
@@ -2046,8 +2008,8 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    public void conditionAncestorAttribute(String ancestorType, String distance,
-        String name, String condition, String filter, String not) {
+    void conditionAncestorAttribute(String ancestorType, String distance,
+                                    String name, String condition, String filter, String not) {
       if (ancestorType.equals(SOURCE_ANCESTOR_GROUP)
           || ancestorType.equals(SOURCE_ANCESTOR_GROUP_ANNOTATION)
           || ancestorType.equals(SOURCE_ANCESTOR_WORD)
@@ -2090,20 +2052,21 @@ public abstract class MtasBasicParser extends MtasParser {
 
     private String computeAncestorSourceType(String type)
         throws MtasConfigException {
-      if (type.equals(MAPPING_TYPE_GROUP)) {
-        return SOURCE_ANCESTOR_GROUP;
-      } else if (type.equals(MAPPING_TYPE_GROUP_ANNOTATION)) {
-        return SOURCE_ANCESTOR_GROUP_ANNOTATION;
-      } else if (type.equals(MAPPING_TYPE_WORD)) {
-        return SOURCE_ANCESTOR_WORD;
-      } else if (type.equals(MAPPING_TYPE_WORD_ANNOTATION)) {
-        return SOURCE_ANCESTOR_WORD_ANNOTATION;
-      } else if (type.equals(MAPPING_TYPE_RELATION)) {
-        return SOURCE_ANCESTOR_RELATION;
-      } else if (type.equals(MAPPING_TYPE_RELATION_ANNOTATION)) {
-        return SOURCE_ANCESTOR_RELATION_ANNOTATION;
-      } else {
-        throw new MtasConfigException("unknown type " + type);
+      switch (type) {
+        case MAPPING_TYPE_GROUP:
+          return SOURCE_ANCESTOR_GROUP;
+        case MAPPING_TYPE_GROUP_ANNOTATION:
+          return SOURCE_ANCESTOR_GROUP_ANNOTATION;
+        case MAPPING_TYPE_WORD:
+          return SOURCE_ANCESTOR_WORD;
+        case MAPPING_TYPE_WORD_ANNOTATION:
+          return SOURCE_ANCESTOR_WORD_ANNOTATION;
+        case MAPPING_TYPE_RELATION:
+          return SOURCE_ANCESTOR_RELATION;
+        case MAPPING_TYPE_RELATION_ANNOTATION:
+          return SOURCE_ANCESTOR_RELATION_ANNOTATION;
+        default:
+          throw new MtasConfigException("unknown type " + type);
       }
     }
 
@@ -2111,7 +2074,7 @@ public abstract class MtasBasicParser extends MtasParser {
       Integer i = 0;
       if (distance != null) {
         Integer d = Integer.parseInt(distance);
-        if ((d != null) && (d >= i)) {
+        if (d >= i) {
           return distance;
         } else {
           return i.toString();
@@ -2176,28 +2139,27 @@ public abstract class MtasBasicParser extends MtasParser {
 
   }
 
-  protected class MtasParserObject {
+  final class MtasParserObject {
     MtasParserType objectType;
     private Integer objectRealOffsetStart = null;
     private Integer objectRealOffsetEnd = null;
     private Integer objectOffsetStart = null;
     private Integer objectOffsetEnd = null;
     private String objectText = null;
-    protected String objectId = null;
+    String objectId = null;
     private Integer objectUnknownAncestorNumber = null;
-    protected HashMap<String, String> objectAttributes = null;
-    protected HashMap<String, HashMap<String, String>> objectOtherAttributes = null;
+    HashMap<String, String> objectAttributes = null;
+    HashMap<String, HashMap<String, String>> objectOtherAttributes = null;
     private SortedSet<Integer> objectPositions = new TreeSet<>();
     private Set<String> refIds = new HashSet<>();
     private Set<Integer> updateableMappingsAsParent = new HashSet<>();
-    private Set<String> updateableIdsWithPosition = new HashSet<>();
-    protected Set<Integer> updateableMappingsWithPosition = new HashSet<>();
+    Set<Integer> updateableMappingsWithPosition = new HashSet<>();
     private Set<String> updateableIdsWithOffset = new HashSet<>();
-    protected Set<Integer> updateableMappingsWithOffset = new HashSet<>();
-    protected Map<String, Integer> referredStartPosition = new HashMap<>();
-    protected Map<String, Integer> referredEndPosition = new HashMap<>();
-    protected Map<String, Integer> referredStartOffset = new HashMap<>();
-    protected Map<String, Integer> referredEndOffset = new HashMap<>();
+    Set<Integer> updateableMappingsWithOffset = new HashSet<>();
+    Map<String, Integer> referredStartPosition = new HashMap<>();
+    Map<String, Integer> referredEndPosition = new HashMap<>();
+    Map<String, Integer> referredStartOffset = new HashMap<>();
+    Map<String, Integer> referredEndOffset = new HashMap<>();
 
     MtasParserObject(MtasParserType type) {
       objectType = type;
@@ -2205,51 +2167,42 @@ public abstract class MtasBasicParser extends MtasParser {
       objectOtherAttributes = new HashMap<>();
     }
 
-    public void registerUpdateableMappingAtParent(Integer mappingId) {
+    void registerUpdateableMappingAtParent(Integer mappingId) {
       updateableMappingsAsParent.add(mappingId);
     }
 
-    public void registerUpdateableMappingsAtParent(Set<Integer> mappingIds) {
+    void registerUpdateableMappingsAtParent(Set<Integer> mappingIds) {
       updateableMappingsAsParent.addAll(mappingIds);
     }
 
-    public Set<Integer> getUpdateableMappingsAsParent() {
+    Set<Integer> getUpdateableMappingsAsParent() {
       return updateableMappingsAsParent;
     }
 
-    public void resetUpdateableMappingsAsParent() {
+    void resetUpdateableMappingsAsParent() {
       updateableMappingsAsParent.clear();
     }
 
-    public void addUpdateableMappingWithPosition(Integer mappingId) {
+    void addUpdateableMappingWithPosition(Integer mappingId) {
       updateableMappingsWithPosition.add(mappingId);
     }
 
-    public void addUpdateableIdWithOffset(String id) {
+    void addUpdateableIdWithOffset(String id) {
       updateableIdsWithOffset.add(id);
     }
 
-    public void addUpdateableMappingWithOffset(Integer mappingId) {
+    void addUpdateableMappingWithOffset(Integer mappingId) {
       updateableMappingsWithOffset.add(mappingId);
     }
 
-    public void updateMappings(Map<String, Set<Integer>> idPositions,
-        Map<String, Integer[]> idOffsets) {
+    void updateMappings(Map<String, Set<Integer>> idPositions,
+                        Map<String, Integer[]> idOffsets) {
       for (Integer mappingId : updateableMappingsWithPosition) {
         tokenCollection.get(mappingId).addPositions(objectPositions);
       }
       for (Integer mappingId : updateableMappingsWithOffset) {
         tokenCollection.get(mappingId).addOffset(objectOffsetStart,
             objectOffsetEnd);
-      }
-      for (String id : updateableIdsWithPosition) {
-        if (idPositions.containsKey(id)) {
-          if (idPositions.get(id) == null) {
-            idPositions.put(id, objectPositions);
-          } else {
-            idPositions.get(id).addAll(objectPositions);
-          }
-        }
       }
       for (String id : updateableIdsWithOffset) {
         if (idOffsets.containsKey(id)) {
@@ -2262,15 +2215,15 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    public String getAttribute(String name) {
+    String getAttribute(String name) {
       if (name != null) {
         return objectAttributes.get(name);
       } else {
         return null;
       }
     }
-    
-    public String getOtherAttribute(String other, String name) {
+
+    String getOtherAttribute(String other, String name) {
       if(other==null) {
         return getAttribute(name);
       } else {
@@ -2298,7 +2251,7 @@ public abstract class MtasBasicParser extends MtasParser {
       objectText = text;
     }
 
-    public void addText(String text) {
+    void addText(String text) {
       if (objectText == null) {
         objectText = text;
       } else {
@@ -2310,42 +2263,42 @@ public abstract class MtasBasicParser extends MtasParser {
       return objectText;
     }
 
-    public void setUnknownAncestorNumber(Integer i) {
+    void setUnknownAncestorNumber(Integer i) {
       objectUnknownAncestorNumber = i;
     }
 
-    public Integer getUnknownAncestorNumber() {
+    Integer getUnknownAncestorNumber() {
       return objectUnknownAncestorNumber;
     }
 
-    public void setRealOffsetStart(Integer start) {
+    void setRealOffsetStart(Integer start) {
       objectRealOffsetStart = start;
     }
 
-    public Integer getRealOffsetStart() {
+    Integer getRealOffsetStart() {
       return objectRealOffsetStart;
     }
 
-    public void setRealOffsetEnd(Integer end) {
+    void setRealOffsetEnd(Integer end) {
       objectRealOffsetEnd = end;
     }
 
-    public Integer getRealOffsetEnd() {
+    Integer getRealOffsetEnd() {
       return objectRealOffsetEnd;
     }
 
-    public void setOffsetStart(Integer start) {
+    void setOffsetStart(Integer start) {
       objectOffsetStart = start;
     }
 
-    public void addOffsetStart(Integer start) {
+    void addOffsetStart(Integer start) {
       if ((start != null)
           && ((objectOffsetStart == null) || (start < objectOffsetStart))) {
         objectOffsetStart = start;
       }
     }
 
-    public void addOffsetEnd(Integer end) {
+    void addOffsetEnd(Integer end) {
       if ((end != null)
           && ((objectOffsetEnd == null) || (end > objectOffsetEnd))) {
         objectOffsetEnd = end;
@@ -2356,7 +2309,7 @@ public abstract class MtasBasicParser extends MtasParser {
       return objectOffsetStart;
     }
 
-    public void setOffsetEnd(Integer end) {
+    void setOffsetEnd(Integer end) {
       objectOffsetEnd = end;
     }
 
@@ -2372,11 +2325,11 @@ public abstract class MtasBasicParser extends MtasParser {
       }
     }
 
-    public void addPosition(Integer position) {
+    void addPosition(Integer position) {
       objectPositions.add(position);
     }
 
-    public void addPositions(Set<Integer> positions) {
+    void addPositions(Set<Integer> positions) {
       objectPositions.addAll(positions);
     }
 
@@ -2384,37 +2337,30 @@ public abstract class MtasBasicParser extends MtasParser {
       return objectPositions;
     }
 
-    public void addRefId(String id) {
+    void addRefId(String id) {
       if (id != null) {
         refIds.add(id);
       }
     }
 
-    public Set<String> getRefIds() {
+    Set<String> getRefIds() {
       return refIds;
     }
 
-    public void setReferredStartPosition(String id, Integer position) {
+    void setReferredStartPosition(String id, Integer position) {
       referredStartPosition.put(id, position);
     }
 
-    public void setReferredEndPosition(String id, Integer position) {
+    void setReferredEndPosition(String id, Integer position) {
       referredEndPosition.put(id, position);
     }
 
-    public void setReferredStartOffset(String id, Integer offset) {
+    void setReferredStartOffset(String id, Integer offset) {
       referredStartOffset.put(id, offset);
     }
 
-    public void setReferredEndOffset(String id, Integer offset) {
+    void setReferredEndOffset(String id, Integer offset) {
       referredEndOffset.put(id, offset);
-    }
-
-    public void clearReferred() {
-      referredStartPosition.clear();
-      referredEndPosition.clear();
-      referredStartOffset.clear();
-      referredEndOffset.clear();
     }
   }
 }

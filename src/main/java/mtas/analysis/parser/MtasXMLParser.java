@@ -344,7 +344,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
                 if ((tmpVariableType = variableTypes.get(qname)) != null) {
                   variableObject = new MtasParserObject(tmpVariableType);
                   collectAttributes(variableObject, streamReader);
-                  computeVariablesFromObject(variableObject, currentList,
+                  computeVariablesFromObject(variableObject,
                     variables);
                 }
                 if (parsingContent) {

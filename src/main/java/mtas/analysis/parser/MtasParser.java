@@ -8,18 +8,15 @@ import mtas.analysis.util.MtasParserException;
 import java.io.Reader;
 
 abstract public class MtasParser {
-  protected MtasTokenCollection tokenCollection;
+  MtasTokenCollection tokenCollection;
   protected Configuration config;
   protected Boolean autorepair = false;
   protected Boolean makeunique = false;
-  protected static final String TOKEN_OFFSET = "offset";
-  protected static final String TOKEN_REALOFFSET = "realoffset";
-  protected static final String TOKEN_PARENT = "parent";
+  static final String TOKEN_OFFSET = "offset";
+  static final String TOKEN_REALOFFSET = "realoffset";
+  static final String TOKEN_PARENT = "parent";
 
-  public MtasParser() {
-  }
-
-  public MtasParser(Configuration config) {
+  MtasParser(Configuration config) {
     this.config = config;
   }
 
