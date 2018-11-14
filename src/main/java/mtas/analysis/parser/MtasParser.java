@@ -1,14 +1,15 @@
 package mtas.analysis.parser;
 
-import java.io.Reader;
 import mtas.analysis.token.MtasTokenCollection;
+import mtas.analysis.util.Configuration;
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
 import mtas.analysis.util.MtasParserException;
+
+import java.io.Reader;
 
 abstract public class MtasParser {
   protected MtasTokenCollection tokenCollection;
-  protected MtasConfiguration config;
+  protected Configuration config;
   protected Boolean autorepair = false;
   protected Boolean makeunique = false;
   protected static final String TOKEN_OFFSET = "offset";
@@ -18,20 +19,20 @@ abstract public class MtasParser {
   public MtasParser() {
   }
 
-  public MtasParser(MtasConfiguration config) {
+  public MtasParser(Configuration config) {
     this.config = config;
   }
 
   protected void initParser() throws MtasConfigException {
     if (config != null) {
       // find namespaceURI
-      for (int i = 0; i < config.children.size(); i++) {
-        MtasConfiguration current = config.children.get(i);
-        if (current.name.equals("autorepair")) {
-          autorepair = current.attributes.get("value").equals("true");
+      for (int i = 0; i < config.numChildren(); i++) {
+        Configuration current = config.child(i);
+        if (current.getName().equals("autorepair")) {
+          autorepair = current.getAttr("value").equals("true");
         }
-        if (current.name.equals("makeunique")) {
-          makeunique = current.attributes.get("value").equals("true");
+        if (current.getName().equals("makeunique")) {
+          makeunique = current.getAttr("value").equals("true");
         }
       }
     }

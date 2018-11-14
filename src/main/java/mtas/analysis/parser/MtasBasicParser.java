@@ -4,7 +4,7 @@ import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.token.MtasTokenString;
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.Configuration;
 import mtas.analysis.util.MtasParserException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +53,8 @@ public abstract class MtasBasicParser extends MtasParser {
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD = "ancestorWordAttribute";
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION = "ancestorWordAnnotationAttribute";
   protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION = "ancestorRelationAttribute";
-  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION = "ancestorRelationAnnotationAttribute";
+  protected static final String ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION =
+    "ancestorRelationAnnotationAttribute";
   protected static final String ITEM_TYPE_TEXT = "text";
   protected static final String ITEM_TYPE_TEXT_SPLIT = "textSplit";
   protected static final String ITEM_TYPE_UNKNOWN_ANCESTOR = "unknownAncestor";
@@ -102,7 +103,7 @@ public abstract class MtasBasicParser extends MtasParser {
 
   private Base64.Decoder dec = Base64.getDecoder();
 
-  public MtasBasicParser(MtasConfiguration config) {
+  public MtasBasicParser(Configuration config) {
     super(config);
   }
 
@@ -110,14 +111,14 @@ public abstract class MtasBasicParser extends MtasParser {
     Map<String, List<MtasParserObject>> currentList = new HashMap<>();
     currentList.put(MAPPING_TYPE_RELATION, new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_RELATION_ANNOTATION,
-        new ArrayList<MtasParserObject>());
+      new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_REF, new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_GROUP, new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_GROUP_ANNOTATION,
-        new ArrayList<MtasParserObject>());
+      new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_WORD, new ArrayList<MtasParserObject>());
     currentList.put(MAPPING_TYPE_WORD_ANNOTATION,
-        new ArrayList<MtasParserObject>());
+      new ArrayList<MtasParserObject>());
     return currentList;
   }
 
@@ -1334,18 +1335,16 @@ public abstract class MtasBasicParser extends MtasParser {
       values = new ArrayList<>();
     }
 
-    public void processConfig(MtasConfiguration config)
+    public void processConfig(Configuration config)
         throws MtasConfigException {
-      for (int k = 0; k < config.children.size(); k++) {
-        if (config.children.get(k).name.equals(VARIABLE_SUBTYPE_VALUE)) {
+      for (int k = 0; k < config.numChildren(); k++) {
+        if (config.child(k).getName().equals(VARIABLE_SUBTYPE_VALUE)) {
 
-          for (int m = 0; m < config.children.get(k).children.size(); m++) {
-            if (config.children.get(k).children.get(m).name
-                .equals(VARIABLE_SUBTYPE_VALUE_ITEM)) {
-              String valueType = config.children.get(k).children
-                  .get(m).attributes.get("type");
-              String nameType = config.children.get(k).children
-                  .get(m).attributes.get("name");
+          for (int m = 0; m < config.child(k).numChildren(); m++) {
+            if (config.child(k).child(m).getName()
+                      .equals(VARIABLE_SUBTYPE_VALUE_ITEM)) {
+              String valueType = config.child(k).child(m).getAttr("type");
+              String nameType = config.child(k).child(m).getAttr("name");
               if ((valueType != null) && valueType.equals("attribute")
                   && nameType != null) {
                 MtasParserVariableValue variableValue = new MtasParserVariableValue(
@@ -1356,8 +1355,8 @@ public abstract class MtasBasicParser extends MtasParser {
           }
         } else {
           throw new MtasConfigException(
-              "unknown variable subtype " + config.children.get(k).name
-                  + " in variable " + config.attributes.get("name"));
+            "unknown variable subtype " + config.child(k).getName()
+              + " in variable " + config.getAttr("name"));
         }
       }
     }
@@ -1413,21 +1412,19 @@ public abstract class MtasBasicParser extends MtasParser {
       end = null;
     }
 
-    public void processConfig(MtasConfiguration config)
+    public void processConfig(Configuration config)
         throws MtasConfigException {
-      setStartEnd(config.attributes.get("start"), config.attributes.get("end"));
-      for (int k = 0; k < config.children.size(); k++) {
-        if (config.children.get(k).name.equals(MAPPING_SUBTYPE_TOKEN)) {
-          String tokenType = config.children.get(k).attributes.get("type");
+      setStartEnd(config.getAttr("start"), config.getAttr("end"));
+      for (int k = 0; k < config.numChildren(); k++) {
+        if (config.child(k).getName().equals(MAPPING_SUBTYPE_TOKEN)) {
+          String tokenType = config.child(k).getAttr("type");
           if ((tokenType != null) && tokenType.equals("string")) {
             MtasParserMappingToken mappingToken = new MtasParserMappingToken(
                 tokenType);
             tokens.add(mappingToken);
             // check attributes
-            for (String tokenAttributeName : config.children.get(k).attributes
-                .keySet()) {
-              String attributeValue = config.children.get(k).attributes
-                  .get(tokenAttributeName);
+            for (String tokenAttributeName : config.child(k).attrNames()) {
+              String attributeValue = config.child(k).getAttr(tokenAttributeName);
               switch (tokenAttributeName) {
                 case TOKEN_OFFSET:
                   if (!attributeValue.equals("true")
@@ -1455,155 +1452,141 @@ public abstract class MtasBasicParser extends MtasParser {
                   break;
               }
             }
-            for (int m = 0; m < config.children.get(k).children.size(); m++) {
-              if (config.children.get(k).children.get(m).name
-                  .equals(MAPPING_SUBTYPE_TOKEN_PRE)
-                  || config.children.get(k).children.get(m).name
-                      .equals(MAPPING_SUBTYPE_TOKEN_POST)) {
-                MtasConfiguration items = config.children.get(k).children
-                    .get(m);
-                for (int l = 0; l < items.children.size(); l++) {
-                  if (items.children.get(l).name.equals("item")) {
-                    String itemType = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_TYPE);
-                    String nameAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_NAME);
-                    String namespaceAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_NAMESPACE);
-                    String prefixAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_PREFIX);
-                    String filterAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_FILTER);
-                    String distanceAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_DISTANCE);
-                    String valueAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_VALUE);
+            for (int m = 0; m < config.child(k).numChildren(); m++) {
+              if (config.child(k).child(m).getName()
+                        .equals(MAPPING_SUBTYPE_TOKEN_PRE)
+                || config.child(k).child(m).getName()
+                         .equals(MAPPING_SUBTYPE_TOKEN_POST)) {
+                Configuration items = config.child(k).child(m);
+                for (int l = 0; l < items.numChildren(); l++) {
+                  if (items.child(l).getName().equals("item")) {
+                    String itemType = items.child(l).getAttr(MAPPING_VALUE_TYPE);
+                    String nameAttribute = items.child(l).getAttr(MAPPING_VALUE_NAME);
+                    String namespaceAttribute = items.child(l).getAttr(MAPPING_VALUE_NAMESPACE);
+                    String prefixAttribute = items.child(l).getAttr(MAPPING_VALUE_PREFIX);
+                    String filterAttribute = items.child(l).getAttr(MAPPING_VALUE_FILTER);
+                    String distanceAttribute = items.child(l).getAttr(MAPPING_VALUE_DISTANCE);
+                    String valueAttribute = items.child(l).getAttr(MAPPING_VALUE_VALUE);
                     switch (itemType) {
                       case ITEM_TYPE_STRING:
-                        addString(mappingToken, items.name, valueAttribute);
+                        addString(mappingToken, items.getName(), valueAttribute);
                         break;
                       case ITEM_TYPE_NAME:
-                        addName(mappingToken, items.name, prefixAttribute,
+                        addName(mappingToken, items.getName(), prefixAttribute,
                           filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE:
-                        addAttribute(mappingToken, items.name, nameAttribute, namespaceAttribute,
+                        addAttribute(mappingToken, items.getName(), nameAttribute, namespaceAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_TEXT:
-                        addText(mappingToken, items.name, prefixAttribute,
+                        addText(mappingToken, items.getName(), prefixAttribute,
                           filterAttribute);
                         break;
                       case ITEM_TYPE_TEXT_SPLIT:
-                        addTextSplit(mappingToken, items.name, valueAttribute,
+                        addTextSplit(mappingToken, items.getName(), valueAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR:
                         addAncestorName(computeAncestorSourceType(type),
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR_GROUP:
                         addAncestorName(SOURCE_ANCESTOR_GROUP, mappingToken,
-                          items.name, computeDistance(distanceAttribute),
+                          items.getName(), computeDistance(distanceAttribute),
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR_GROUP_ANNOTATION:
                         addAncestorName(SOURCE_ANCESTOR_GROUP_ANNOTATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR_WORD:
                         addAncestorName(SOURCE_ANCESTOR_WORD, mappingToken,
-                          items.name, computeDistance(distanceAttribute),
+                          items.getName(), computeDistance(distanceAttribute),
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR_WORD_ANNOTATION:
                         addAncestorName(SOURCE_ANCESTOR_WORD_ANNOTATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR_RELATION:
                         addAncestorName(SOURCE_ANCESTOR_RELATION, mappingToken,
-                          items.name, computeDistance(distanceAttribute),
+                          items.getName(), computeDistance(distanceAttribute),
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_NAME_ANCESTOR_RELATION_ANNOTATION:
                         addAncestorName(SOURCE_ANCESTOR_RELATION_ANNOTATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), prefixAttribute,
                           filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP:
                         addAncestorAttribute(SOURCE_ANCESTOR_GROUP, mappingToken,
-                          items.name, computeDistance(distanceAttribute),
+                          items.getName(), computeDistance(distanceAttribute),
                           nameAttribute, prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR_GROUP_ANNOTATION:
                         addAncestorAttribute(SOURCE_ANCESTOR_GROUP_ANNOTATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD:
                         addAncestorAttribute(SOURCE_ANCESTOR_WORD, mappingToken,
-                          items.name, computeDistance(distanceAttribute),
+                          items.getName(), computeDistance(distanceAttribute),
                           nameAttribute, prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR_WORD_ANNOTATION:
                         addAncestorAttribute(SOURCE_ANCESTOR_WORD_ANNOTATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION:
                         addAncestorAttribute(SOURCE_ANCESTOR_RELATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR_RELATION_ANNOTATION:
                         addAncestorAttribute(SOURCE_ANCESTOR_RELATION_ANNOTATION,
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_ATTRIBUTE_ANCESTOR:
                         addAncestorAttribute(computeAncestorSourceType(this.type),
-                          mappingToken, items.name,
+                          mappingToken, items.getName(),
                           computeDistance(distanceAttribute), nameAttribute,
                           prefixAttribute, filterAttribute);
                         break;
                       case ITEM_TYPE_VARIABLE_FROM_ATTRIBUTE:
-                        addVariableFromAttribute(mappingToken, items.name,
+                        addVariableFromAttribute(mappingToken, items.getName(),
                           nameAttribute, prefixAttribute, valueAttribute);
                         break;
                       default:
                         throw new MtasConfigException(String.format(
                           "unknown itemType %s for %s in mapping %s", itemType,
-                          items.name, config.attributes.get("name")));
+                          items.getName(), config.getAttr("name")));
                     }
                   }
                 }
-              } else if (config.children.get(k).children.get(m).name
-                  .equals(MAPPING_SUBTYPE_PAYLOAD)) {
-                MtasConfiguration items = config.children.get(k).children
-                    .get(m);
-                for (int l = 0; l < items.children.size(); l++) {
-                  if (items.children.get(l).name.equals("item")) {
-                    String itemType = items.children.get(l).attributes
-                        .get("type");
-                    String valueAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_VALUE);
-                    String nameAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_NAME);
-                    String filterAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_FILTER);
-                    String distanceAttribute = items.children.get(l).attributes
-                        .get(MAPPING_VALUE_DISTANCE);
+              } else if (config.child(k).child(m).getName()
+                               .equals(MAPPING_SUBTYPE_PAYLOAD)) {
+                Configuration items = config.child(k).child(m);
+                for (int l = 0; l < items.numChildren(); l++) {
+                  if (items.child(l).getName().equals("item")) {
+                    String itemType = items.child(l).getAttr("type");
+                    String valueAttribute = items.child(l).getAttr(MAPPING_VALUE_VALUE);
+                    String nameAttribute = items.child(l).getAttr(MAPPING_VALUE_NAME);
+                    String filterAttribute = items.child(l).getAttr(MAPPING_VALUE_FILTER);
+                    String distanceAttribute = items.child(l).getAttr(MAPPING_VALUE_DISTANCE);
                     switch (itemType) {
                       case ITEM_TYPE_STRING:
                         payloadString(mappingToken, valueAttribute);
@@ -1660,32 +1643,26 @@ public abstract class MtasBasicParser extends MtasParser {
                       default:
                         throw new MtasConfigException(String.format(
                           "unknown itemType %s for %s in mapping %s", itemType,
-                          items.name, config.attributes.get("name")));
+                          items.getName(), config.getAttr("name")));
                     }
                   }
                 }
               }
             }
           }
-        } else if (config.children.get(k).name
-            .equals(MAPPING_SUBTYPE_CONDITION)) {
-          MtasConfiguration items = config.children.get(k);
-          for (int l = 0; l < items.children.size(); l++) {
-            if (items.children.get(l).name.equals("item")) {
-              String itemType = items.children.get(l).attributes.get("type");
-              String nameAttribute = items.children.get(l).attributes
-                  .get(MAPPING_VALUE_NAME);
-              String namespaceAttribute = items.children.get(l).attributes
-                  .get(MAPPING_VALUE_NAMESPACE);
-              String conditionAttribute = items.children.get(l).attributes
-                  .get(MAPPING_VALUE_CONDITION);
-              String filterAttribute = items.children.get(l).attributes
-                  .get(MAPPING_VALUE_FILTER);
-              String numberAttribute = items.children.get(l).attributes
-                  .get(MAPPING_VALUE_NUMBER);
-              String distanceAttribute = items.children.get(l).attributes
-                  .get(MAPPING_VALUE_DISTANCE);
-              String notAttribute = items.children.get(l).attributes.get("not");
+        } else if (config.child(k).getName()
+                         .equals(MAPPING_SUBTYPE_CONDITION)) {
+          Configuration items = config.child(k);
+          for (int l = 0; l < items.numChildren(); l++) {
+            if (items.child(l).getName().equals("item")) {
+              String itemType = items.child(l).getAttr("type");
+              String nameAttribute = items.child(l).getAttr(MAPPING_VALUE_NAME);
+              String namespaceAttribute = items.child(l).getAttr(MAPPING_VALUE_NAMESPACE);
+              String conditionAttribute = items.child(l).getAttr(MAPPING_VALUE_CONDITION);
+              String filterAttribute = items.child(l).getAttr(MAPPING_VALUE_FILTER);
+              String numberAttribute = items.child(l).getAttr(MAPPING_VALUE_NUMBER);
+              String distanceAttribute = items.child(l).getAttr(MAPPING_VALUE_DISTANCE);
+              String notAttribute = items.child(l).getAttr("not");
               if ((notAttribute != null) && !notAttribute.equals("true")
                   && !notAttribute.equals("1")) {
                 notAttribute = null;
@@ -1806,15 +1783,15 @@ public abstract class MtasBasicParser extends MtasParser {
                 default:
                   throw new MtasConfigException(
                     String.format("unknown itemType %s for %s in mapping %s",
-                      itemType, config.children.get(k).name,
-                      config.attributes.get("name")));
+                      itemType, config.child(k).getName(),
+                      config.getAttr("name")));
               }
             }
           }
         } else {
           throw new MtasConfigException(
               String.format("unknown mapping subType %s in mapping %s",
-                  config.children.get(k).name, config.attributes.get("name")));
+                config.child(k).getName(), config.getAttr("name")));
         }
       }
     }

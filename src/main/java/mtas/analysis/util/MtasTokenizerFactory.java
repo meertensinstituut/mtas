@@ -111,10 +111,10 @@ public class MtasTokenizerFactory extends TokenizerFactory
   // collection name. It's impossible to load all configurations without knowing their
   // names, since ZooKeeper ResourceLoaders don't give access to directories.
   // TODO: cache the results of this method.
-  private MtasConfiguration loadCollectionConfig(String collection) throws IOException {
+  private Configuration loadCollectionConfig(String collection) throws IOException {
     if (configFileArgument != null) {
       try {
-        return MtasConfiguration.readConfiguration(loader.openResource(configFileArgument));
+        return Configuration.read(loader.openResource(configFileArgument));
       } catch (IOException | XMLStreamException e) {
         throw new IOException("Problem loading configuration from " + configFileArgument, e);
       }
@@ -122,18 +122,17 @@ public class MtasTokenizerFactory extends TokenizerFactory
     if (configArgument != null) {
       String path = "mtasconf/" + collection + ".xml";
       try {
-        return MtasConfiguration.readConfiguration(loader.openResource(path));
+        return Configuration.read(loader.openResource(path));
       } catch (IOException | XMLStreamException e) {
         throw new IOException("Problem loading configuration from resource " + path, e);
       }
     }
     if (analyzerArgument != null) {
-      MtasConfiguration config = new MtasConfiguration();
-      MtasConfiguration subConfig = new MtasConfiguration();
-      subConfig.name = "parser";
-      subConfig.attributes.put("name", analyzerArgument);
-      subConfig.attributes.put(ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
-      config.children.add(subConfig);
+      Configuration config = new Configuration();
+      Configuration subConfig = new Configuration("parser", null,
+        "name", analyzerArgument,
+        ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
+      config.addChild(subConfig);
       return config;
     }
     throw new IllegalStateException("can't happen");

@@ -1,10 +1,10 @@
 package mtas.analysis.parser;
 
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.Configuration;
 
 final public class MtasFoliaParser extends MtasXMLParser {
-  public MtasFoliaParser(MtasConfiguration config) {
+  public MtasFoliaParser(Configuration config) {
     super(config);
   }
 

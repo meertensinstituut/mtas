@@ -5,7 +5,7 @@ import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.util.LineReader;
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.Configuration;
 import mtas.analysis.util.MtasParserException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +28,7 @@ final public class MtasSketchParser extends MtasBasicParser {
   private HashMap<Integer, MtasParserType<MtasParserMapping<?>>> wordAnnotationTypes = new HashMap<>();
   private HashMap<String, MtasParserType<MtasParserMapping<?>>> groupTypes = new HashMap<>();
 
-  public MtasSketchParser(MtasConfiguration config) {
+  public MtasSketchParser(Configuration config) {
     super(config);
     autorepair = true;
     try {
@@ -47,48 +47,48 @@ final public class MtasSketchParser extends MtasBasicParser {
       // always word, no mappings
       wordType = new MtasParserType<>(MAPPING_TYPE_WORD, null, false);
 
-      for (int i = 0; i < config.children.size(); i++) {
-        MtasConfiguration current = config.children.get(i);
-        if (current.name.equals("mappings")) {
-          for (int j = 0; j < current.children.size(); j++) {
-            if (current.children.get(j).name.equals("mapping")) {
-              MtasConfiguration mapping = current.children.get(j);
-              String typeMapping = mapping.attributes.get("type");
-              String nameMapping = mapping.attributes.get("name");
+      for (int i = 0; i < config.numChildren(); i++) {
+        Configuration current = config.child(i);
+        if (current.getName().equals("mappings")) {
+          for (int j = 0; j < current.numChildren(); j++) {
+            if (current.child(j).getName().equals("mapping")) {
+              Configuration mapping = current.child(j);
+              String typeMapping = mapping.getAttr("type");
+              String nameMapping = mapping.getAttr("name");
               if ((typeMapping != null)) {
                 if (typeMapping.equals(MAPPING_TYPE_WORD)) {
                   MtasSketchParserMappingWord m = new MtasSketchParserMappingWord();
                   m.processConfig(mapping);
                   wordType.addItem(m);
                 } else if (typeMapping.equals(MAPPING_TYPE_WORD_ANNOTATION)
-                    && (nameMapping != null)) {
+                  && (nameMapping != null)) {
                   MtasSketchParserMappingWordAnnotation m = new MtasSketchParserMappingWordAnnotation();
                   m.processConfig(mapping);
                   if (wordAnnotationTypes
-                      .containsKey(Integer.parseInt(nameMapping))) {
+                    .containsKey(Integer.parseInt(nameMapping))) {
                     wordAnnotationTypes.get(Integer.parseInt(nameMapping))
-                        .addItem(m);
+                                       .addItem(m);
                   } else {
                     MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
-                        typeMapping, nameMapping, false);
+                      typeMapping, nameMapping, false);
                     t.addItem(m);
                     wordAnnotationTypes.put(Integer.parseInt(nameMapping), t);
                   }
                 } else if (typeMapping.equals(MAPPING_TYPE_GROUP)
-                    && (nameMapping != null)) {
+                  && (nameMapping != null)) {
                   MtasSketchParserMappingGroup m = new MtasSketchParserMappingGroup();
                   m.processConfig(mapping);
                   if (groupTypes.containsKey(nameMapping)) {
                     groupTypes.get(nameMapping).addItem(m);
                   } else {
                     MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
-                        typeMapping, nameMapping, false);
+                      typeMapping, nameMapping, false);
                     t.addItem(m);
                     groupTypes.put(nameMapping, t);
                   }
                 } else {
                   throw new MtasConfigException("unknown mapping type "
-                      + typeMapping + " or missing name");
+                    + typeMapping + " or missing name");
                 }
               }
             }
@@ -100,7 +100,7 @@ final public class MtasSketchParser extends MtasBasicParser {
 
   @Override
   public MtasTokenCollection createTokenCollection(Reader reader)
-      throws MtasParserException, MtasConfigException {
+    throws MtasParserException, MtasConfigException {
     AtomicInteger position = new AtomicInteger(0);
     Integer unknownAncestors = 0;
 
@@ -120,7 +120,7 @@ final public class MtasSketchParser extends MtasBasicParser {
       MtasParserObject currentObject;
       Pattern groupPattern = Pattern.compile("^<([^\\/>]+)\\/>$");
       Pattern groupStartPattern = Pattern
-          .compile("^<([^>\\/\\s][^>\\s]*)(|\\s[^>]+)>$");
+        .compile("^<([^>\\/\\s][^>\\s]*)(|\\s[^>]+)>$");
       Pattern groupEndPattern = Pattern.compile("^<\\/([^>\\s]+)>$");
       Pattern attributePattern = Pattern.compile("([^\\s]+)=\"([^\"]*)\"");
       while ((line = br.readLine()) != null) {
@@ -137,21 +137,21 @@ final public class MtasSketchParser extends MtasBasicParser {
             // System.out.println("Start "+matcherGroupStart.group(1)+" -
             // "+matcherGroupStart.group(2));
             if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
-                && (currentList.get(MAPPING_TYPE_RELATION).isEmpty())
-                && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
-                && (tmpCurrentType = groupTypes
-                    .get(matcherGroupStart.group(1))) != null) {
+              && (currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+              && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+              && (tmpCurrentType = groupTypes
+              .get(matcherGroupStart.group(1))) != null) {
               currentObject = new MtasParserObject(tmpCurrentType);
               currentObject.setUnknownAncestorNumber(unknownAncestors);
               currentObject.setRealOffsetStart(previousOffset);
               String attributeText = matcherGroupStart.group(2).trim();
               if (!attributeText.equals("")) {
                 Matcher matcherAttribute = attributePattern
-                    .matcher(attributeText);
+                  .matcher(attributeText);
                 currentObject.objectAttributes = new HashMap<String, String>();
                 while (matcherAttribute.find()) {
                   currentObject.objectAttributes.put(matcherAttribute.group(1),
-                      matcherAttribute.group(2));
+                    matcherAttribute.group(2));
                 }
               }
               if (!prevalidateObject(currentObject, currentList)) {
@@ -165,29 +165,29 @@ final public class MtasSketchParser extends MtasBasicParser {
             // end group
             if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
               if ((tmpCurrentType = groupTypes
-                  .get(matcherGroupEnd.group(1))) != null) {
+                .get(matcherGroupEnd.group(1))) != null) {
                 currentObject = currentList.get(MAPPING_TYPE_GROUP)
-                    .remove(currentList.get(MAPPING_TYPE_GROUP).size() - 1);
+                                           .remove(currentList.get(MAPPING_TYPE_GROUP).size() - 1);
                 assert unknownAncestors == 0 : "error in administration "
-                    + currentObject.getType().getName();
+                  + currentObject.getType().getName();
                 // ignore text: should not occur
                 currentObject.setRealOffsetEnd(currentOffset - 1);
                 idPositions.put(currentObject.getId(),
-                    currentObject.getPositions());
+                  currentObject.getPositions());
                 idOffsets.put(currentObject.getId(), currentObject.getOffset());
                 currentObject.updateMappings(idPositions, idOffsets);
                 unknownAncestors = currentObject.getUnknownAncestorNumber();
                 computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                    currentList, updateList);
+                  currentList, updateList);
               }
             }
           }
         } else {
           if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
-              && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
-              && (currentList.get(MAPPING_TYPE_WORD).isEmpty())
-              && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).isEmpty())
-              && (wordType != null)) {
+            && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+            && (currentList.get(MAPPING_TYPE_WORD).isEmpty())
+            && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).isEmpty())
+            && (wordType != null)) {
             // start word
             currentObject = new MtasParserObject(wordType);
             currentObject.setOffsetStart(previousOffset);
@@ -202,8 +202,8 @@ final public class MtasSketchParser extends MtasBasicParser {
               unknownAncestors = 0;
             }
             if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
-                && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
-                && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
+              && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).isEmpty())
+              && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
               // start and finish word annotations
               String[] items = line.split("\t");
               for (int i = 0; i < items.length; i++) {
@@ -212,14 +212,14 @@ final public class MtasSketchParser extends MtasBasicParser {
                   currentObject = new MtasParserObject(tmpCurrentType);
                   currentObject.setRealOffsetStart(previousOffset);
                   currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)
-                      .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
-                      .getPositions());
+                                                        .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
+                                                        .getPositions());
                   currentObject.setUnknownAncestorNumber(unknownAncestors);
                   if (!prevalidateObject(currentObject, currentList)) {
                     unknownAncestors++;
                   } else {
                     currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
-                        .add(currentObject);
+                               .add(currentObject);
                     unknownAncestors = 0;
                   }
                   // finish word annotation
@@ -227,29 +227,29 @@ final public class MtasSketchParser extends MtasBasicParser {
                     unknownAncestors--;
                   } else {
                     currentObject = currentList
-                        .get(MAPPING_TYPE_WORD_ANNOTATION).remove(
-                            currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size()
-                                - 1);
+                      .get(MAPPING_TYPE_WORD_ANNOTATION).remove(
+                        currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size()
+                          - 1);
                     assert unknownAncestors == 0 : "error in administration "
-                        + currentObject.getType().getName();
+                      + currentObject.getType().getName();
                     currentObject.setText(items[i]);
                     currentObject.setRealOffsetEnd(currentOffset - 1);
                     idPositions.put(currentObject.getId(),
-                        currentObject.getPositions());
+                      currentObject.getPositions());
                     idOffsets.put(currentObject.getId(),
-                        currentObject.getOffset());
+                      currentObject.getOffset());
                     // offset always null, so update later with word (should be
                     // possible)
                     if ((currentObject.getId() != null)
-                        && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
+                      && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
                       currentList.get(MAPPING_TYPE_WORD)
-                          .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
-                          .addUpdateableIdWithOffset(currentObject.getId());
+                                 .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
+                                 .addUpdateableIdWithOffset(currentObject.getId());
                     }
                     currentObject.updateMappings(idPositions, idOffsets);
                     unknownAncestors = currentObject.getUnknownAncestorNumber();
                     computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                        currentList, updateList);
+                      currentList, updateList);
                   }
                 }
               }
@@ -259,26 +259,26 @@ final public class MtasSketchParser extends MtasBasicParser {
               unknownAncestors--;
             } else {
               currentObject = currentList.get(MAPPING_TYPE_WORD)
-                  .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);
+                                         .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);
               assert unknownAncestors == 0 : "error in administration "
-                  + currentObject.getType().getName();
+                + currentObject.getType().getName();
               currentObject.setText(null);
               currentObject.setOffsetEnd(currentOffset - 1);
               currentObject.setRealOffsetEnd(currentOffset - 1);
               // update ancestor groups with position and offset
               for (MtasParserObject currentGroup : currentList
-                  .get(MAPPING_TYPE_GROUP)) {
+                .get(MAPPING_TYPE_GROUP)) {
                 currentGroup.addPositions(currentObject.getPositions());
                 currentGroup.addOffsetStart(currentObject.getOffsetStart());
                 currentGroup.addOffsetEnd(currentObject.getOffsetEnd());
               }
               idPositions.put(currentObject.getId(),
-                  currentObject.getPositions());
+                currentObject.getPositions());
               idOffsets.put(currentObject.getId(), currentObject.getOffset());
               currentObject.updateMappings(idPositions, idOffsets);
               unknownAncestors = currentObject.getUnknownAncestorNumber();
               computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                  currentList, updateList);
+                currentList, updateList);
             }
           }
         }
@@ -290,18 +290,18 @@ final public class MtasSketchParser extends MtasBasicParser {
     }
     // update tokens with offset
     for (Entry<Integer, Set<String>> updateItem : updateList
-        .get(UPDATE_TYPE_OFFSET).entrySet()) {
+      .get(UPDATE_TYPE_OFFSET).entrySet()) {
       for (String refId : updateItem.getValue()) {
         Integer[] refOffset = idOffsets.get(refId);
         if (refOffset != null) {
           tokenCollection.get(updateItem.getKey()).addOffset(refOffset[0],
-              refOffset[1]);
+            refOffset[1]);
         }
       }
     }
     // update tokens with position
     for (Entry<Integer, Set<String>> updateItem : updateList
-        .get(UPDATE_TYPE_POSITION).entrySet()) {
+      .get(UPDATE_TYPE_POSITION).entrySet()) {
       for (String refId : updateItem.getValue()) {
         MtasToken token = tokenCollection.get(updateItem.getKey());
         token.addPositions(idPositions.get(refId));
@@ -323,12 +323,12 @@ final public class MtasSketchParser extends MtasBasicParser {
   }
 
   private String printConfigTypes(
-      HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
+    HashMap<?, MtasParserType<MtasParserMapping<?>>> types) {
     StringBuilder text = new StringBuilder();
     for (Entry<?, MtasParserType<MtasParserMapping<?>>> entry : types
-        .entrySet()) {
+      .entrySet()) {
       text.append("- " + entry.getKey() + ": " + entry.getValue().items.size()
-          + " mapping(s)\n");
+        + " mapping(s)\n");
       for (int i = 0; i < entry.getValue().items.size(); i++) {
         text.append("\t" + entry.getValue().items.get(i) + "\n");
       }
@@ -337,7 +337,7 @@ final public class MtasSketchParser extends MtasBasicParser {
   }
 
   private class MtasSketchParserMappingWord
-      extends MtasParserMapping<MtasSketchParserMappingWord> {
+    extends MtasParserMapping<MtasSketchParserMappingWord> {
     public MtasSketchParserMappingWord() {
       super();
       this.position = SOURCE_OWN;
@@ -353,7 +353,7 @@ final public class MtasSketchParser extends MtasBasicParser {
   }
 
   private class MtasSketchParserMappingWordAnnotation
-      extends MtasParserMapping<MtasSketchParserMappingWordAnnotation> {
+    extends MtasParserMapping<MtasSketchParserMappingWordAnnotation> {
     public MtasSketchParserMappingWordAnnotation() {
       super();
       this.position = SOURCE_OWN;
@@ -369,7 +369,7 @@ final public class MtasSketchParser extends MtasBasicParser {
   }
 
   private class MtasSketchParserMappingGroup
-      extends MtasParserMapping<MtasSketchParserMappingGroup> {
+    extends MtasParserMapping<MtasSketchParserMappingGroup> {
     public MtasSketchParserMappingGroup() {
       super();
       this.position = SOURCE_OWN;

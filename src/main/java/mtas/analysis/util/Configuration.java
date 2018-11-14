@@ -13,18 +13,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class MtasConfiguration {
-  public String name = null;
-  public HashMap<String, String> attributes = new HashMap<>();
-  public List<MtasConfiguration> children = new ArrayList<>();
-  public MtasConfiguration parent = null;
+public class Configuration {
+  private final String name;
+  private final HashMap<String, String> attributes = new HashMap<>();
+  private final List<Configuration> children = new ArrayList<>();
+  private final Configuration parent;
 
-  public MtasConfiguration() {
+  Configuration() {
+    this(null, null);
   }
 
-  public static MtasConfiguration readConfiguration(InputStream reader)
-    throws IOException, XMLStreamException {
-    MtasConfiguration currentConfig = null;
+  Configuration(String name, Configuration parent, String... attr) {
+    if (attr.length % 2 != 0) {
+      throw new IllegalArgumentException("attr must be a list of key-value pairs");
+    }
+    for (int i = 0; i < attr.length; i += 2) {
+      attributes.put(attr[i], attr[i + 1]);
+    }
+
+    this.name = name;
+    this.parent = parent;
+  }
+
+  public static Configuration read(InputStream reader) throws IOException, XMLStreamException {
+    Configuration currentConfig = null;
     // parse xml
     XMLInputFactory factory = XMLInputFactory.newInstance();
     XMLStreamReader streamReader = factory.createXMLStreamReader(reader);
@@ -46,16 +58,14 @@ public class MtasConfiguration {
             qname = streamReader.getName();
             if (currentConfig == null) {
               if (qname.getLocalPart().equals("mtas")) {
-                currentConfig = new MtasConfiguration();
+                currentConfig = new Configuration();
               } else {
                 throw new IOException("no Mtas Configuration");
               }
             } else {
-              MtasConfiguration parentConfig = currentConfig;
-              currentConfig = new MtasConfiguration();
+              Configuration parentConfig = currentConfig;
+              currentConfig = new Configuration(qname.getLocalPart(), parentConfig);
               parentConfig.children.add(currentConfig);
-              currentConfig.parent = parentConfig;
-              currentConfig.name = qname.getLocalPart();
               for (int i = 0; i < streamReader.getAttributeCount(); i++) {
                 currentConfig.attributes.put(
                   streamReader.getAttributeLocalName(i),
@@ -86,6 +96,33 @@ public class MtasConfiguration {
     throw new IllegalStateException("not reached");
   }
 
+  public Iterable<String> attrNames() {
+    return attributes.keySet();
+  }
+
+  /**
+   * Returns the value of an attribute or null if not set.
+   */
+  public String getAttr(String name) {
+    return attributes.get(name);
+  }
+
+  public void addChild(Configuration child) {
+    children.add(child);
+  }
+
+  public Configuration child(int i) {
+    return children.get(i);
+  }
+
+  public int numChildren() {
+    return children.size();
+  }
+
+  public String getName() {
+    return name;
+  }
+
   public String toString() {
     return toString(0);
   }
@@ -103,7 +140,7 @@ public class MtasConfiguration {
       }
     }
     if (children != null) {
-      for (MtasConfiguration child : children) {
+      for (Configuration child : children) {
         text += (indent > 0 ? String.format("%" + indent + "s", "") : "")
           + child.toString(indent + 2);
       }

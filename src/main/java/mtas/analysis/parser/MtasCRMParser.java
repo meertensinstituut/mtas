@@ -4,7 +4,7 @@ import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.util.LineReader;
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.Configuration;
 import mtas.analysis.util.MtasParserException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +44,7 @@ public class MtasCRMParser extends MtasBasicParser {
 
   Pattern pairPattern = Pattern.compile("^([b|e])([a-z])([0-9]+)$");
 
-  public MtasCRMParser(MtasConfiguration config) {
+  public MtasCRMParser(Configuration config) {
     super(config);
     try {
       initParser();
@@ -61,18 +61,18 @@ public class MtasCRMParser extends MtasBasicParser {
     if (config != null) {
       // always word, no mappings
       wordType = new MtasParserType<>(MAPPING_TYPE_WORD, null, false);
-      for (int i = 0; i < config.children.size(); i++) {
-        MtasConfiguration current = config.children.get(i);
-        if (current.name.equals("filters")) {
-          for (int j = 0; j < current.children.size(); j++) {
-            if (current.children.get(j).name.equals("filter")) {
-              MtasConfiguration filter = current.children.get(j);
-              String typeFilter = filter.attributes.get("type");
-              String nameFilter = filter.attributes.get("name");
+      for (int i = 0; i < config.numChildren(); i++) {
+        Configuration current = config.child(i);
+        if (current.getName().equals("filters")) {
+          for (int j = 0; j < current.numChildren(); j++) {
+            if (current.child(j).getName().equals("filter")) {
+              Configuration filter = current.child(j);
+              String typeFilter = filter.getAttr("type");
+              String nameFilter = filter.getAttr("name");
               if(typeFilter!=null) {
                 if(typeFilter.equals(FILTER_TYPE_REPLACE)) {
-                  String value = filter.attributes.get("value");
-                  String replace = filter.attributes.get("replace");
+                  String value = filter.getAttr("value");
+                  String replace = filter.getAttr("replace");
                   if(nameFilter!=null && value!=null && replace!=null) {
                     String[] names = nameFilter.split(Pattern.quote(","));
                     for(String name : names) {
@@ -102,13 +102,13 @@ public class MtasCRMParser extends MtasBasicParser {
                 throw new MtasConfigException("no type provided for filter" );
               }
             }
-          }  
-        } else if (current.name.equals("mappings")) {
-          for (int j = 0; j < current.children.size(); j++) {
-            if (current.children.get(j).name.equals("mapping")) {
-              MtasConfiguration mapping = current.children.get(j);
-              String typeMapping = mapping.attributes.get("type");
-              String nameMapping = mapping.attributes.get("name");
+          }
+        } else if (current.getName().equals("mappings")) {
+          for (int j = 0; j < current.numChildren(); j++) {
+            if (current.child(j).getName().equals("mapping")) {
+              Configuration mapping = current.child(j);
+              String typeMapping = mapping.getAttr("type");
+              String nameMapping = mapping.getAttr("name");
               if ((typeMapping != null)) {
                 if (typeMapping.equals(MAPPING_TYPE_WORD)) {
                   MtasCRMParserMappingWordAnnotation m = new MtasCRMParserMappingWordAnnotation();
@@ -166,13 +166,13 @@ public class MtasCRMParser extends MtasBasicParser {
               }
             }
           }
-        } else if (current.name.equals("functions")) {
-          for (int j = 0; j < current.children.size(); j++) {
-            if (current.children.get(j).name.equals("function")) {
-              MtasConfiguration function = current.children.get(j);
-              String nameFunction = function.attributes.get("name");
-              String typeFunction = function.attributes.get("type");
-              String splitFunction = function.attributes.get("split");
+        } else if (current.getName().equals("functions")) {
+          for (int j = 0; j < current.numChildren(); j++) {
+            if (current.child(j).getName().equals("function")) {
+              Configuration function = current.child(j);
+              String nameFunction = function.getAttr("name");
+              String typeFunction = function.getAttr("type");
+              String splitFunction = function.getAttr("split");
               if (nameFunction != null && typeFunction != null) {
                 MtasCRMParserFunction mtasCRMParserFunction = new MtasCRMParserFunction(
                     typeFunction, splitFunction);
@@ -182,22 +182,18 @@ public class MtasCRMParser extends MtasBasicParser {
                 }
                 functions.get(typeFunction).put(nameFunction,
                     mtasCRMParserFunction);
-                MtasConfiguration subCurrent = current.children.get(j);
-                for (int k = 0; k < subCurrent.children.size(); k++) {
-                  if (subCurrent.children.get(k).name.equals("condition")) {
-                    MtasConfiguration subSubCurrent = subCurrent.children
-                        .get(k);
-                    if (subSubCurrent.attributes.containsKey("value")) {
-                      String[] valuesCondition = subSubCurrent.attributes
-                          .get("value").split(Pattern.quote(","));
+                Configuration subCurrent = current.child(j);
+                for (int k = 0; k < subCurrent.numChildren(); k++) {
+                  if (subCurrent.child(k).getName().equals("condition")) {
+                    Configuration subSubCurrent = subCurrent.child(k);
+                    if (subSubCurrent.getAttr("value") != null) {
+                      String[] valuesCondition = subSubCurrent.getAttr("value").split(Pattern.quote(","));
                       ArrayList<MtasCRMParserFunctionOutput> valueOutputList = new ArrayList<>();
-                      for (int l = 0; l < subSubCurrent.children.size(); l++) {
-                        if (subSubCurrent.children.get(l).name
-                            .equals("output")) {
-                          String valueOutput = subSubCurrent.children
-                              .get(l).attributes.get("value");
-                          String nameOutput = subSubCurrent.children
-                              .get(l).attributes.get("name");
+                      for (int l = 0; l < subSubCurrent.numChildren(); l++) {
+                        if (subSubCurrent.child(l).getName()
+                                         .equals("output")) {
+                          String valueOutput = subSubCurrent.child(l).getAttr("value");
+                          String nameOutput = subSubCurrent.child(l).getAttr("name");
                           if (nameOutput != null) {
                             MtasCRMParserFunctionOutput o = new MtasCRMParserFunctionOutput(
                                 nameOutput, valueOutput);

@@ -4,7 +4,7 @@ import mtas.analysis.parser.MtasParser;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.Configuration;
 import mtas.analysis.util.MtasParserException;
 import mtas.codec.payload.MtasPayloadEncoder;
 import org.apache.commons.logging.Log;
@@ -48,7 +48,7 @@ public final class MtasTokenizer extends Tokenizer {
   private int currentPosition = 0;
   private int encodingFlags = MtasPayloadEncoder.ENCODE_DEFAULT;
   private String parserName = null;
-  private MtasConfiguration parserConfiguration = null;
+  private Configuration parserConfiguration = null;
   private MtasTokenCollection tokenCollection;
   private final CharTermAttribute termAtt = addAttribute(
       CharTermAttribute.class);
@@ -60,11 +60,11 @@ public final class MtasTokenizer extends Tokenizer {
   private Iterator<MtasToken> tokenCollectionIterator;
 
   public MtasTokenizer(final InputStream reader) throws IOException, XMLStreamException {
-    processConfiguration(MtasConfiguration.readConfiguration(reader));
+    processConfiguration(Configuration.read(reader));
   }
 
   public MtasTokenizer(final AttributeFactory factory,
-      final MtasConfiguration config) throws IOException {
+                       final Configuration config) throws IOException {
     super(factory);
     processConfiguration(config);
   }
@@ -135,7 +135,7 @@ public final class MtasTokenizer extends Tokenizer {
     tokenCollection = null;
     try {
       Constructor<?> c = Class.forName(parserName)
-          .getDeclaredConstructor(MtasConfiguration.class);      
+                              .getDeclaredConstructor(Configuration.class);
       Object p = c.newInstance(parserConfiguration);
       if (!(p instanceof MtasParser)) {
         throw new MtasConfigException("no instance of MtasParser");
@@ -156,7 +156,7 @@ public final class MtasTokenizer extends Tokenizer {
 
   }
 
-  private void processConfiguration(final MtasConfiguration config) throws IOException {
+  private void processConfiguration(final Configuration config) throws IOException {
     HashMap<String, Integer> indexEncodingMapper = new HashMap<>();
     indexEncodingMapper.put("payload", MtasPayloadEncoder.ENCODE_PAYLOAD);
     indexEncodingMapper.put("offset", MtasPayloadEncoder.ENCODE_OFFSET);
@@ -164,27 +164,25 @@ public final class MtasTokenizer extends Tokenizer {
     indexEncodingMapper.put("parent", MtasPayloadEncoder.ENCODE_PARENT);
     // process
     if (config != null) {
-      for (int i = 0; i < config.children.size(); i++) {
-        if (config.children.get(i).name.equals(CONFIGURATION_MTAS_INDEX)) {
-          MtasConfiguration index = config.children.get(i);
-          for (int j = 0; j < index.children.size(); j++) {
-            if (indexEncodingMapper.containsKey(index.children.get(j).name)) {
-              String value = index.children.get(j).attributes.get(CONFIGURATION_MTAS_INDEX_ATTRIBUTE);
+      for (int i = 0; i < config.numChildren(); i++) {
+        if (config.child(i).getName().equals(CONFIGURATION_MTAS_INDEX)) {
+          Configuration index = config.child(i);
+          for (int j = 0; j < index.numChildren(); j++) {
+            if (indexEncodingMapper.containsKey(index.child(j).getName())) {
+              String value = index.child(j).getAttr(CONFIGURATION_MTAS_INDEX_ATTRIBUTE);
               if ((value.equals(VALUE_TRUE)) || (value.equals(VALUE_1))) {
-                encodingFlags |= indexEncodingMapper
-                    .get(index.children.get(j).name);
+                encodingFlags |= indexEncodingMapper.get(index.child(j).getName());
               } else if ((value.equals(VALUE_FALSE)) || (value.equals(VALUE_0))) {
-                encodingFlags &= ~indexEncodingMapper
-                    .get(index.children.get(j).name);
+                encodingFlags &= ~indexEncodingMapper.get(index.child(j).getName());
               }
             }
           }
-        } else if (config.children.get(i).name.equals(CONFIGURATION_MTAS_PARSER)) {
-          if (!config.children.get(i).attributes.containsKey(CONFIGURATION_MTAS_PARSER_ATTRIBUTE)) {
+        } else if (config.child(i).getName().equals(CONFIGURATION_MTAS_PARSER)) {
+          if (config.child(i).getAttr(CONFIGURATION_MTAS_PARSER_ATTRIBUTE) == null) {
             throw new IOException("no parser configuration");
           }
-          parserName = config.children.get(i).attributes.get(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);
-          parserConfiguration = config.children.get(i);
+          parserName = config.child(i).getAttr(CONFIGURATION_MTAS_PARSER_ATTRIBUTE);
+          parserConfiguration = config.child(i);
         }
       }
     } else {

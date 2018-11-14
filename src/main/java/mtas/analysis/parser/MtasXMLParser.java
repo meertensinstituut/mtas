@@ -4,7 +4,7 @@ import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
 import mtas.analysis.token.MtasTokenIdFactory;
 import mtas.analysis.util.MtasConfigException;
-import mtas.analysis.util.MtasConfiguration;
+import mtas.analysis.util.Configuration;
 import mtas.analysis.util.MtasParserException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +60,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   private static final String XML_MAPPING_TYPE = "type";
   private static final String XML_MAPPING_NAME = "name";
 
-  public MtasXMLParser(MtasConfiguration config) {
+  public MtasXMLParser(Configuration config) {
     super(config);
     try {
       initParser();
@@ -87,7 +87,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     text.append("type: " + relationTypes.size() + " x relation\n");
     text.append(printConfigMappingTypes(relationTypes));
     text.append(
-        "type: " + relationAnnotationTypes.size() + " x relationAnnotation\n");
+      "type: " + relationAnnotationTypes.size() + " x relationAnnotation\n");
     text.append(printConfigMappingTypes(relationAnnotationTypes));
     text.append("type: " + refTypes.size() + " x references\n");
     text.append(printConfigMappingTypes(refTypes));
@@ -96,12 +96,12 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private String printConfigMappingTypes(
-      Map<QName, MtasParserType<MtasParserMapping<?>>> types) {
+    Map<QName, MtasParserType<MtasParserMapping<?>>> types) {
     StringBuilder text = new StringBuilder();
     for (Entry<QName, MtasParserType<MtasParserMapping<?>>> entry : types
-        .entrySet()) {
+      .entrySet()) {
       text.append("- " + entry.getKey().getLocalPart() + ": "
-          + entry.getValue().items.size() + " mapping(s)\n");
+        + entry.getValue().items.size() + " mapping(s)\n");
       for (int i = 0; i < entry.getValue().items.size(); i++) {
         text.append("\t" + entry.getValue().items.get(i) + "\n");
       }
@@ -110,12 +110,12 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private String printConfigVariableTypes(
-      Map<QName, MtasParserType<MtasParserVariable>> types) {
+    Map<QName, MtasParserType<MtasParserVariable>> types) {
     StringBuilder text = new StringBuilder();
     for (Entry<QName, MtasParserType<MtasParserVariable>> entry : types
-        .entrySet()) {
+      .entrySet()) {
       text.append("- " + entry.getKey().getLocalPart() + ": "
-          + entry.getValue().items.size() + " variables(s)\n");
+        + entry.getValue().items.size() + " variables(s)\n");
       for (int i = 0; i < entry.getValue().items.size(); i++) {
         text.append("\t" + entry.getValue().items.get(i) + "\n");
       }
@@ -128,22 +128,21 @@ abstract class MtasXMLParser extends MtasBasicParser {
     super.initParser();
     if (config != null) {
       // find namespaceURI
-      for (int i = 0; i < config.children.size(); i++) {
-        MtasConfiguration current = config.children.get(i);
-        if (current.name.equals("namespaceURI")) {
-          namespaceURI = current.attributes.get("value");
+      for (int i = 0; i < config.numChildren(); i++) {
+        Configuration current = config.child(i);
+        if (current.getName().equals("namespaceURI")) {
+          namespaceURI = current.getAttr("value");
         }
       }
-      for (int i = 0; i < config.children.size(); i++) {
-        MtasConfiguration current = config.children.get(i);
-        switch (current.name) {
+      for (int i = 0; i < config.numChildren(); i++) {
+        Configuration current = config.child(i);
+        switch (current.getName()) {
           case XML_VARIABLES:
-            for (int j = 0; j < current.children.size(); j++) {
-              if (current.children.get(j).name.equals(XML_VARIABLE)) {
-                MtasConfiguration variable = current.children.get(j);
-                String nameVariable = variable.attributes.get(XML_VARIABLE_NAME);
-                String valueVariable = variable.attributes
-                  .get(XML_VARIABLE_VALUE);
+            for (int j = 0; j < current.numChildren(); j++) {
+              if (current.child(j).getName().equals(XML_VARIABLE)) {
+                Configuration variable = current.child(j);
+                String nameVariable = variable.getAttr(XML_VARIABLE_NAME);
+                String valueVariable = variable.getAttr(XML_VARIABLE_VALUE);
                 if ((nameVariable != null) && (valueVariable != null)) {
                   MtasParserVariable v = new MtasParserVariable(nameVariable,
                     valueVariable);
@@ -162,11 +161,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
             }
             break;
           case XML_REFERENCES:
-            for (int j = 0; j < current.children.size(); j++) {
-              if (current.children.get(j).name.equals(XML_REFERENCE)) {
-                MtasConfiguration reference = current.children.get(j);
-                String name = reference.attributes.get(XML_REFERENCE_NAME);
-                String ref = reference.attributes.get(XML_REFERENCE_REF);
+            for (int j = 0; j < current.numChildren(); j++) {
+              if (current.child(j).getName().equals(XML_REFERENCE)) {
+                Configuration reference = current.child(j);
+                String name = reference.getAttr(XML_REFERENCE_NAME);
+                String ref = reference.getAttr(XML_REFERENCE_REF);
                 if ((name != null) && (ref != null)) {
                   MtasParserType<MtasParserMapping<?>> t = new MtasParserType<>(
                     MAPPING_TYPE_REF, name, false, ref);
@@ -176,11 +175,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
             }
             break;
           case XML_MAPPINGS:
-            for (int j = 0; j < current.children.size(); j++) {
-              if (current.children.get(j).name.equals(XML_MAPPING)) {
-                MtasConfiguration mapping = current.children.get(j);
-                String typeMapping = mapping.attributes.get(XML_MAPPING_TYPE);
-                String nameMapping = mapping.attributes.get(XML_MAPPING_NAME);
+            for (int j = 0; j < current.numChildren(); j++) {
+              if (current.child(j).getName().equals(XML_MAPPING)) {
+                Configuration mapping = current.child(j);
+                String typeMapping = mapping.getAttr(XML_MAPPING_TYPE);
+                String nameMapping = mapping.getAttr(XML_MAPPING_NAME);
                 if ((typeMapping != null) && (nameMapping != null)) {
                   switch (typeMapping) {
                     case MAPPING_TYPE_RELATION: {
@@ -299,7 +298,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     tokenCollection = new MtasTokenCollection();
     MtasTokenIdFactory mtasTokenIdFactory = new MtasTokenIdFactory();
     XMLInputFactory factory = XMLInputFactory.newInstance();
-    try {      
+    try {
       XMLStreamReader streamReader = factory.createXMLStreamReader(reader);
       QName qname;
       try {
@@ -311,446 +310,446 @@ abstract class MtasXMLParser extends MtasBasicParser {
         MtasParserObject variableObject = null;
         while (true) {
           switch (event) {
-          case XMLStreamConstants.START_DOCUMENT:
-            log.debug("start of document");
-            String encodingScheme = streamReader.getCharacterEncodingScheme();
-            if (encodingScheme == null) {
-              //ignore for now
-              log.info("No encodingScheme found, assume utf-8");
-              //throw new MtasParserException("No encodingScheme found");              
-            } else if (!encodingScheme.equalsIgnoreCase("utf-8")) {
-              throw new MtasParserException(
+            case XMLStreamConstants.START_DOCUMENT:
+              log.debug("start of document");
+              String encodingScheme = streamReader.getCharacterEncodingScheme();
+              if (encodingScheme == null) {
+                //ignore for now
+                log.info("No encodingScheme found, assume utf-8");
+                //throw new MtasParserException("No encodingScheme found");
+              } else if (!encodingScheme.equalsIgnoreCase("utf-8")) {
+                throw new MtasParserException(
                   "XML not UTF-8 encoded but '" + encodingScheme + "'");
-            }
-            break;
-          case XMLStreamConstants.END_DOCUMENT:
-            log.debug("end of document");
-            break;
-          case XMLStreamConstants.SPACE:
-            // set offset (end of start-element)
-            lastOffset = streamReader.getLocation().getCharacterOffset();
-            break;
-          case XMLStreamConstants.START_ELEMENT:
-            // get data
-            qname = streamReader.getName();
-            // check for rootTag
-            if (!hasRoot) {
-              if (qname.equals(getQName(rootTag))) {
-                hasRoot = true;
+              }
+              break;
+            case XMLStreamConstants.END_DOCUMENT:
+              log.debug("end of document");
+              break;
+            case XMLStreamConstants.SPACE:
+              // set offset (end of start-element)
+              lastOffset = streamReader.getLocation().getCharacterOffset();
+              break;
+            case XMLStreamConstants.START_ELEMENT:
+              // get data
+              qname = streamReader.getName();
+              // check for rootTag
+              if (!hasRoot) {
+                if (qname.equals(getQName(rootTag))) {
+                  hasRoot = true;
+                } else {
+                  throw new MtasParserException("No " + rootTag);
+                }
+                // parse content
               } else {
-                throw new MtasParserException("No " + rootTag);
-              }
-              // parse content
-            } else {
-              if ((tmpVariableType = variableTypes.get(qname)) != null) {
-                variableObject = new MtasParserObject(tmpVariableType);
-                collectAttributes(variableObject, streamReader);
-                computeVariablesFromObject(variableObject, currentList,
+                if ((tmpVariableType = variableTypes.get(qname)) != null) {
+                  variableObject = new MtasParserObject(tmpVariableType);
+                  collectAttributes(variableObject, streamReader);
+                  computeVariablesFromObject(variableObject, currentList,
                     variables);
-              }
-              if (parsingContent) {
-                // check for relation : not within word, not within
-                // groupAnnotation
-                if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
+                }
+                if (parsingContent) {
+                  // check for relation : not within word, not within
+                  // groupAnnotation
+                  if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                        .isEmpty())
+                                   .isEmpty())
                     && (tmpCurrentType = relationTypes.get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentList.get(MAPPING_TYPE_RELATION).add(currentObject);
-                    unknownAncestors = 0;
-                  }
-                  // check for relation annotation: not within word, but within
-                  // relation
-                } else if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentList.get(MAPPING_TYPE_RELATION).add(currentObject);
+                      unknownAncestors = 0;
+                    }
+                    // check for relation annotation: not within word, but within
+                    // relation
+                  } else if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (!currentList.get(MAPPING_TYPE_RELATION).isEmpty())
                     && (tmpCurrentType = relationAnnotationTypes
-                        .get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
-                        .add(currentObject);
-                    unknownAncestors = 0;
-                  }
-                  // check for group: not within word, not within relation, not
-                  // within groupAnnotation
-                } else if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
+                    .get(qname)) != null) {
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
+                                 .add(currentObject);
+                      unknownAncestors = 0;
+                    }
+                    // check for group: not within word, not within relation, not
+                    // within groupAnnotation
+                  } else if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (currentList.get(MAPPING_TYPE_RELATION).isEmpty())
                     && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                        .isEmpty())
+                                   .isEmpty())
                     && (tmpCurrentType = groupTypes.get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentList.get(MAPPING_TYPE_GROUP).add(currentObject);
-                    unknownAncestors = 0;
-                  }
-                  // check for group annotation: not within word, not within
-                  // relation, but within group
-                } else if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentList.get(MAPPING_TYPE_GROUP).add(currentObject);
+                      unknownAncestors = 0;
+                    }
+                    // check for group annotation: not within word, not within
+                    // relation, but within group
+                  } else if ((currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (currentList.get(MAPPING_TYPE_RELATION).isEmpty())
                     && (!currentList.get(MAPPING_TYPE_GROUP).isEmpty())
                     && (tmpCurrentType = groupAnnotationTypes
-                        .get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                        .add(currentObject);
-                    unknownAncestors = 0;
-                  }
-                  // check for word: not within relation, not within
-                  // groupAnnotation, not within word, not within wordAnnotation
-                } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+                    .get(qname)) != null) {
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                                 .add(currentObject);
+                      unknownAncestors = 0;
+                    }
+                    // check for word: not within relation, not within
+                    // groupAnnotation, not within word, not within wordAnnotation
+                  } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
                     && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                        .isEmpty())
+                                   .isEmpty())
                     && (currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (currentList.get(MAPPING_TYPE_WORD_ANNOTATION).isEmpty())
                     && (tmpCurrentType = wordTypes.get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setOffsetStart(lastOffset);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentObject.addPosition(position.getAndIncrement());
-                    currentList.get(MAPPING_TYPE_WORD).add(currentObject);
-                    unknownAncestors = 0;
-                  }
-                  // check for word annotation: not within relation, not within
-                  // groupAnnotation, but within word
-                } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setOffsetStart(lastOffset);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentObject.addPosition(position.getAndIncrement());
+                      currentList.get(MAPPING_TYPE_WORD).add(currentObject);
+                      unknownAncestors = 0;
+                    }
+                    // check for word annotation: not within relation, not within
+                    // groupAnnotation, but within word
+                  } else if ((currentList.get(MAPPING_TYPE_RELATION).isEmpty())
                     && (currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                        .isEmpty())
+                                   .isEmpty())
                     && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())
                     && (tmpCurrentType = wordAnnotationTypes
-                        .get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)
-                      .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
-                      .getPositions());
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
-                        .add(currentObject);
-                    unknownAncestors = 0;
-                  }
-                  // check for references: within relation
-                } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()
+                    .get(qname)) != null) {
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.addPositions(currentList.get(MAPPING_TYPE_WORD)
+                                                          .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
+                                                          .getPositions());
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
+                                 .add(currentObject);
+                      unknownAncestors = 0;
+                    }
+                    // check for references: within relation
+                  } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()
                     && (tmpCurrentType = refTypes.get(qname)) != null) {
-                  currentObject = new MtasParserObject(tmpCurrentType);
-                  collectAttributes(currentObject, streamReader);
-                  currentObject.setUnknownAncestorNumber(unknownAncestors);
-                  currentObject.setRealOffsetStart(lastOffset);
-                  if (!prevalidateObject(currentObject, currentList)) {
-                    unknownAncestors++;
-                  } else {
-                    currentType = tmpCurrentType;
-                    currentList.get(MAPPING_TYPE_REF).add(currentObject);
-                    unknownAncestors = 0;
-                    // add reference to ancestor relations
-                    for (MtasParserObject currentRelation : currentList
+                    currentObject = new MtasParserObject(tmpCurrentType);
+                    collectAttributes(currentObject, streamReader);
+                    currentObject.setUnknownAncestorNumber(unknownAncestors);
+                    currentObject.setRealOffsetStart(lastOffset);
+                    if (!prevalidateObject(currentObject, currentList)) {
+                      unknownAncestors++;
+                    } else {
+                      currentType = tmpCurrentType;
+                      currentList.get(MAPPING_TYPE_REF).add(currentObject);
+                      unknownAncestors = 0;
+                      // add reference to ancestor relations
+                      for (MtasParserObject currentRelation : currentList
                         .get(MAPPING_TYPE_RELATION)) {
-                      currentRelation.addRefId(currentObject
+                        currentRelation.addRefId(currentObject
                           .getAttribute(currentType.getRefAttributeName()));
-                      // register mapping for relation (for recursive relations)
-                      SortedSet<String> keyMapList;
-                      if (currentRelation.getId() != null) {
-                        if (relationKeyMap
+                        // register mapping for relation (for recursive relations)
+                        SortedSet<String> keyMapList;
+                        if (currentRelation.getId() != null) {
+                          if (relationKeyMap
                             .containsKey(currentRelation.getId())) {
-                          keyMapList = relationKeyMap
+                            keyMapList = relationKeyMap
                               .get(currentRelation.getId());
-                        } else {
-                          keyMapList = new TreeSet<>();
-                          relationKeyMap.put(currentRelation.getId(),
+                          } else {
+                            keyMapList = new TreeSet<>();
+                            relationKeyMap.put(currentRelation.getId(),
                               keyMapList);
-                        }
-                        keyMapList.add(currentObject
+                          }
+                          keyMapList.add(currentObject
                             .getAttribute(currentType.getRefAttributeName()));
+                        }
                       }
                     }
+                  } else {
+                    unknownAncestors++;
                   }
-                } else {
-                  unknownAncestors++;
-                }
-                // check for start content
-              } else if (qname.equals(getQName(contentTag))) {
-                parsingContent = true;
-                // unexpected
-              } else if (!allowNonContent) {
-                throw new MtasParserException(
+                  // check for start content
+                } else if (qname.equals(getQName(contentTag))) {
+                  parsingContent = true;
+                  // unexpected
+                } else if (!allowNonContent) {
+                  throw new MtasParserException(
                     "Unexpected " + qname.getLocalPart() + " in document");
+                }
               }
-            }
-            // set offset (end of start-element)
-            lastOffset = streamReader.getLocation().getCharacterOffset();
-            break;
-          case XMLStreamConstants.END_ELEMENT:
-            // set offset (end of end-element)
-            lastOffset = streamReader.getLocation().getCharacterOffset();
-            // get data
-            qname = streamReader.getName();
-            // parse content
-            if (parsingContent) {
-              if (unknownAncestors > 0) {
-                unknownAncestors--;
-                // check for reference: because otherwise currentList should
-                // contain no references
-              } else if (!currentList.get(MAPPING_TYPE_REF).isEmpty()) {
-                if ((currentType = refTypes.get(qname)) != null) {
-                  currentObject = currentList.get(MAPPING_TYPE_REF)
-                      .remove(currentList.get(MAPPING_TYPE_REF).size() - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  // ignore text and realOffset: not relevant
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
-                  // this shouldn't happen
-                }
-                // check for wordAnnotation: because otherwise currentList
-                // should contain no wordAnnotations
-              } else if (!currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
-                  .isEmpty()) {
-                if ((currentType = wordAnnotationTypes.get(qname)) != null) {
-                  currentObject = currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
-                      .remove(
-                          currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size()
-                              - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  // offset always null, so update later with word (should be
-                  // possible)
-                  if ((currentObject.getId() != null)
-                      && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
-                    currentList.get(MAPPING_TYPE_WORD)
-                        .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
-                        .addUpdateableIdWithOffset(currentObject.getId());
-                  }
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
-                  // this shouldn't happen
-                }
-                // check for word: because otherwise currentList should contain
-                // no words
-              } else if (!currentList.get(MAPPING_TYPE_WORD).isEmpty()) {
-                if ((currentType = wordTypes.get(qname)) != null) {
-                  currentObject = currentList.get(MAPPING_TYPE_WORD)
-                      .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  currentObject.setOffsetEnd(lastOffset);
-                  currentObject.setRealOffsetEnd(lastOffset);
-                  // update ancestor groups with position and offset
-                  for (MtasParserObject currentGroup : currentList
-                      .get(MAPPING_TYPE_GROUP)) {
-                    currentGroup.addPositions(currentObject.getPositions());
-                    currentGroup.addOffsetStart(currentObject.getOffsetStart());
-                    currentGroup.addOffsetEnd(currentObject.getOffsetEnd());
-                  }
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
-                  // this shouldn't happen
-                }
-                // check for group annotation: because otherwise currentList
-                // should contain no groupAnnotations
-              } else if (!currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                  .isEmpty()) {
-                if ((currentType = groupAnnotationTypes.get(qname)) != null) {
-                  currentObject = currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                      .remove(
-                          currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size()
-                              - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
-                  // this shouldn't happen
-                }
-                // check for relation annotation
-              } else if (!currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
-                  .isEmpty()) {
-                if ((currentType = relationAnnotationTypes
-                    .get(qname)) != null) {
-                  currentObject = currentList
-                      .get(MAPPING_TYPE_RELATION_ANNOTATION).remove(currentList
-                          .get(MAPPING_TYPE_RELATION_ANNOTATION).size() - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
-                  // this shouldn't happen
-                }
-                // check for relation
-              } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
-                if ((currentType = relationTypes.get(qname)) != null) {
-                  currentObject = currentList.get(MAPPING_TYPE_RELATION).remove(
-                      currentList.get(MAPPING_TYPE_RELATION).size() - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  // ignore text: should not occur
-                  currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
-                  // this shouldn't happen
-                }
-                // check for group
-              } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
-                if ((currentType = groupTypes.get(qname)) != null) {
-                  currentObject = currentList.get(MAPPING_TYPE_GROUP)
-                      .remove(currentList.get(MAPPING_TYPE_GROUP).size() - 1);
-                  assert currentObject.getType()
-                      .equals(currentType) : "object expected to be "
-                          + currentObject.getType().getName() + ", not "
-                          + currentType.getName();
-                  assert unknownAncestors == 0 : "error in administration "
-                      + currentObject.getType().getName();
-                  // ignore text: should not occur
-                  currentObject.setRealOffsetEnd(lastOffset);
-                  idPositions.put(currentObject.getId(),
-                      currentObject.getPositions());
-                  idOffsets.put(currentObject.getId(),
-                      currentObject.getOffset());
-                  currentObject.updateMappings(idPositions, idOffsets);
-                  unknownAncestors = currentObject.getUnknownAncestorNumber();
-                  computeMappingsFromObject(mtasTokenIdFactory, currentObject,
-                      currentList, updateList);
-                } else {
+              // set offset (end of start-element)
+              lastOffset = streamReader.getLocation().getCharacterOffset();
+              break;
+            case XMLStreamConstants.END_ELEMENT:
+              // set offset (end of end-element)
+              lastOffset = streamReader.getLocation().getCharacterOffset();
+              // get data
+              qname = streamReader.getName();
+              // parse content
+              if (parsingContent) {
+                if (unknownAncestors > 0) {
                   unknownAncestors--;
+                  // check for reference: because otherwise currentList should
+                  // contain no references
+                } else if (!currentList.get(MAPPING_TYPE_REF).isEmpty()) {
+                  if ((currentType = refTypes.get(qname)) != null) {
+                    currentObject = currentList.get(MAPPING_TYPE_REF)
+                                               .remove(currentList.get(MAPPING_TYPE_REF).size() - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    // ignore text and realOffset: not relevant
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    // this shouldn't happen
+                  }
+                  // check for wordAnnotation: because otherwise currentList
+                  // should contain no wordAnnotations
+                } else if (!currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
+                                       .isEmpty()) {
+                  if ((currentType = wordAnnotationTypes.get(qname)) != null) {
+                    currentObject = currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
+                                               .remove(
+                                                 currentList.get(MAPPING_TYPE_WORD_ANNOTATION).size()
+                                                   - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    currentObject.setRealOffsetEnd(lastOffset);
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    // offset always null, so update later with word (should be
+                    // possible)
+                    if ((currentObject.getId() != null)
+                      && (!currentList.get(MAPPING_TYPE_WORD).isEmpty())) {
+                      currentList.get(MAPPING_TYPE_WORD)
+                                 .get((currentList.get(MAPPING_TYPE_WORD).size() - 1))
+                                 .addUpdateableIdWithOffset(currentObject.getId());
+                    }
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    // this shouldn't happen
+                  }
+                  // check for word: because otherwise currentList should contain
+                  // no words
+                } else if (!currentList.get(MAPPING_TYPE_WORD).isEmpty()) {
+                  if ((currentType = wordTypes.get(qname)) != null) {
+                    currentObject = currentList.get(MAPPING_TYPE_WORD)
+                                               .remove(currentList.get(MAPPING_TYPE_WORD).size() - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    currentObject.setOffsetEnd(lastOffset);
+                    currentObject.setRealOffsetEnd(lastOffset);
+                    // update ancestor groups with position and offset
+                    for (MtasParserObject currentGroup : currentList
+                      .get(MAPPING_TYPE_GROUP)) {
+                      currentGroup.addPositions(currentObject.getPositions());
+                      currentGroup.addOffsetStart(currentObject.getOffsetStart());
+                      currentGroup.addOffsetEnd(currentObject.getOffsetEnd());
+                    }
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    // this shouldn't happen
+                  }
+                  // check for group annotation: because otherwise currentList
+                  // should contain no groupAnnotations
+                } else if (!currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                                       .isEmpty()) {
+                  if ((currentType = groupAnnotationTypes.get(qname)) != null) {
+                    currentObject = currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                                               .remove(
+                                                 currentList.get(MAPPING_TYPE_GROUP_ANNOTATION).size()
+                                                   - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    currentObject.setRealOffsetEnd(lastOffset);
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    // this shouldn't happen
+                  }
+                  // check for relation annotation
+                } else if (!currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
+                                       .isEmpty()) {
+                  if ((currentType = relationAnnotationTypes
+                    .get(qname)) != null) {
+                    currentObject = currentList
+                      .get(MAPPING_TYPE_RELATION_ANNOTATION).remove(currentList
+                        .get(MAPPING_TYPE_RELATION_ANNOTATION).size() - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    currentObject.setRealOffsetEnd(lastOffset);
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    // this shouldn't happen
+                  }
+                  // check for relation
+                } else if (!currentList.get(MAPPING_TYPE_RELATION).isEmpty()) {
+                  if ((currentType = relationTypes.get(qname)) != null) {
+                    currentObject = currentList.get(MAPPING_TYPE_RELATION).remove(
+                      currentList.get(MAPPING_TYPE_RELATION).size() - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    // ignore text: should not occur
+                    currentObject.setRealOffsetEnd(lastOffset);
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    // this shouldn't happen
+                  }
+                  // check for group
+                } else if (!currentList.get(MAPPING_TYPE_GROUP).isEmpty()) {
+                  if ((currentType = groupTypes.get(qname)) != null) {
+                    currentObject = currentList.get(MAPPING_TYPE_GROUP)
+                                               .remove(currentList.get(MAPPING_TYPE_GROUP).size() - 1);
+                    assert currentObject.getType()
+                                        .equals(currentType) : "object expected to be "
+                      + currentObject.getType().getName() + ", not "
+                      + currentType.getName();
+                    assert unknownAncestors == 0 : "error in administration "
+                      + currentObject.getType().getName();
+                    // ignore text: should not occur
+                    currentObject.setRealOffsetEnd(lastOffset);
+                    idPositions.put(currentObject.getId(),
+                      currentObject.getPositions());
+                    idOffsets.put(currentObject.getId(),
+                      currentObject.getOffset());
+                    currentObject.updateMappings(idPositions, idOffsets);
+                    unknownAncestors = currentObject.getUnknownAncestorNumber();
+                    computeMappingsFromObject(mtasTokenIdFactory, currentObject,
+                      currentList, updateList);
+                  } else {
+                    unknownAncestors--;
+                  }
+                } else if (qname.equals(getQName("text"))) {
+                  parsingContent = false;
+                  assert unknownAncestors == 0 : "error in administration unknownAncestors";
+                  assert currentList.get(MAPPING_TYPE_REF)
+                                    .isEmpty() : "error in administration references";
+                  assert currentList.get(MAPPING_TYPE_GROUP)
+                                    .isEmpty() : "error in administration groups";
+                  assert currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
+                                    .isEmpty() : "error in administration groupAnnotations";
+                  assert currentList.get(MAPPING_TYPE_WORD)
+                                    .isEmpty() : "error in administration words";
+                  assert currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
+                                    .isEmpty() : "error in administration wordAnnotations";
+                  assert currentList.get(MAPPING_TYPE_RELATION)
+                                    .isEmpty() : "error in administration relations";
+                  assert currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
+                                    .isEmpty() : "error in administration relationAnnotations";
                 }
-              } else if (qname.equals(getQName("text"))) {
-                parsingContent = false;
-                assert unknownAncestors == 0 : "error in administration unknownAncestors";
-                assert currentList.get(MAPPING_TYPE_REF)
-                    .isEmpty() : "error in administration references";
-                assert currentList.get(MAPPING_TYPE_GROUP)
-                    .isEmpty() : "error in administration groups";
-                assert currentList.get(MAPPING_TYPE_GROUP_ANNOTATION)
-                    .isEmpty() : "error in administration groupAnnotations";
-                assert currentList.get(MAPPING_TYPE_WORD)
-                    .isEmpty() : "error in administration words";
-                assert currentList.get(MAPPING_TYPE_WORD_ANNOTATION)
-                    .isEmpty() : "error in administration wordAnnotations";
-                assert currentList.get(MAPPING_TYPE_RELATION)
-                    .isEmpty() : "error in administration relations";
-                assert currentList.get(MAPPING_TYPE_RELATION_ANNOTATION)
-                    .isEmpty() : "error in administration relationAnnotations";
               }
-            }
-            // forget text
-            textContent = null;
-            break;
-          case XMLStreamConstants.CHARACTERS:
-            // set offset (end of start-element)
-            lastOffset = streamReader.getLocation().getCharacterOffset();
-            // check for text
-            if (streamReader.hasText()) {
-              textContent = streamReader.getText();
-            }
-            if (currentObject != null && unknownAncestors.equals(0)) {
-              currentObject.addText(textContent);
-            }
-            break;
-          default:
-            break;
+              // forget text
+              textContent = null;
+              break;
+            case XMLStreamConstants.CHARACTERS:
+              // set offset (end of start-element)
+              lastOffset = streamReader.getLocation().getCharacterOffset();
+              // check for text
+              if (streamReader.hasText()) {
+                textContent = streamReader.getText();
+              }
+              if (currentObject != null && unknownAncestors.equals(0)) {
+                currentObject.addText(textContent);
+              }
+              break;
+            default:
+              break;
           }
           if (!streamReader.hasNext()) {
             break;
@@ -764,22 +763,22 @@ abstract class MtasXMLParser extends MtasBasicParser {
       assert unknownAncestors == 0 : "error in administration unknownAncestors";
       assert hasRoot : "no " + rootTag;
     } catch (XMLStreamException e) {
-      log.debug(e);      
+      log.debug(e);
       throw new MtasParserException("No valid XML: " + e.getMessage());
     }
 
     // update tokens with variable
     for (Entry<Integer, Set<String>> updateItem : updateList
-        .get(UPDATE_TYPE_VARIABLE).entrySet()) {
+      .get(UPDATE_TYPE_VARIABLE).entrySet()) {
       MtasToken token = tokenCollection.get(updateItem.getKey());
       String encodedPrefix = token.getPrefix();
       String encodedPostfix = token.getPostfix();
       token.setValue(decodeAndUpdateWithVariables(encodedPrefix, encodedPostfix,
-          variables));
+        variables));
     }
     // update tokens with offset
     for (Entry<Integer, Set<String>> updateItem : updateList
-        .get(UPDATE_TYPE_OFFSET).entrySet()) {
+      .get(UPDATE_TYPE_OFFSET).entrySet()) {
       Set<String> refIdList = new HashSet<>();
       for (String refId : updateItem.getValue()) {
         if (idPositions.containsKey(refId)) {
@@ -800,7 +799,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
     }
     // update tokens with position
     for (Entry<Integer, Set<String>> updateItem : updateList
-        .get(UPDATE_TYPE_POSITION).entrySet()) {
+      .get(UPDATE_TYPE_POSITION).entrySet()) {
       HashSet<String> refIdList = new HashSet<>();
       for (String refId : updateItem.getValue()) {
         if (idPositions.containsKey(refId)) {
@@ -825,14 +824,15 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private Collection<? extends String> recursiveCollect(String refId,
-      Map<String, SortedSet<String>> relationKeyMap, int maxRecursion) {
+                                                        Map<String, SortedSet<String>> relationKeyMap,
+                                                        int maxRecursion) {
     Set<String> list = new HashSet<>();
     if (maxRecursion > 0 && relationKeyMap.containsKey(refId)) {
       SortedSet<String> subList = relationKeyMap.get(refId);
       for (String subRefId : subList) {
         list.add(subRefId);
         list.addAll(
-            recursiveCollect(subRefId, relationKeyMap, maxRecursion - 1));
+          recursiveCollect(subRefId, relationKeyMap, maxRecursion - 1));
       }
     }
     return list;
@@ -848,11 +848,11 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   public void collectAttributes(MtasParserObject currentObject,
-      XMLStreamReader streamReader) {
+                                XMLStreamReader streamReader) {
     String attributeNamespaceURI;
     currentObject.objectAttributes.clear();
     currentObject.objectId = streamReader.getAttributeValue(namespaceURI_id,
-        "id");
+      "id");
     for (int i = 0; i < streamReader.getAttributeCount(); i++) {
       attributeNamespaceURI = streamReader.getAttributeNamespace(i);
       if (attributeNamespaceURI == null || attributeNamespaceURI.equals("")) {
@@ -860,25 +860,25 @@ abstract class MtasXMLParser extends MtasBasicParser {
       }
       if (namespaceURI == null || attributeNamespaceURI.equals(namespaceURI)) {
         currentObject.objectAttributes.put(
-            streamReader.getAttributeLocalName(i),
-            streamReader.getAttributeValue(i));
+          streamReader.getAttributeLocalName(i),
+          streamReader.getAttributeValue(i));
       } else {
         HashMap<String, String> otherMap;
-        if(!currentObject.objectOtherAttributes.containsKey(attributeNamespaceURI)) {
-           otherMap = new HashMap<>();          
+        if (!currentObject.objectOtherAttributes.containsKey(attributeNamespaceURI)) {
+          otherMap = new HashMap<>();
           currentObject.objectOtherAttributes.put(attributeNamespaceURI, otherMap);
         } else {
           otherMap = currentObject.objectOtherAttributes.get(attributeNamespaceURI);
         }
         otherMap.put(
-            streamReader.getAttributeLocalName(i),
-            streamReader.getAttributeValue(i));
+          streamReader.getAttributeLocalName(i),
+          streamReader.getAttributeValue(i));
       }
     }
   }
 
   private class MtasXMLParserMappingRelation
-      extends MtasParserMapping<MtasXMLParserMappingRelation> {
+    extends MtasParserMapping<MtasXMLParserMappingRelation> {
     public MtasXMLParserMappingRelation() {
       super();
       this.position = SOURCE_REFS;
@@ -894,7 +894,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private class MtasXMLParserMappingRelationAnnotation
-      extends MtasParserMapping<MtasXMLParserMappingRelationAnnotation> {
+    extends MtasParserMapping<MtasXMLParserMappingRelationAnnotation> {
     public MtasXMLParserMappingRelationAnnotation() {
       super();
       this.position = SOURCE_ANCESTOR_RELATION;
@@ -910,7 +910,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private class MtasXMLParserMappingGroup
-      extends MtasParserMapping<MtasXMLParserMappingGroup> {
+    extends MtasParserMapping<MtasXMLParserMappingGroup> {
     public MtasXMLParserMappingGroup() {
       super();
       this.position = SOURCE_OWN;
@@ -926,7 +926,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private class MtasXMLParserMappingGroupAnnotation
-      extends MtasParserMapping<MtasXMLParserMappingGroupAnnotation> {
+    extends MtasParserMapping<MtasXMLParserMappingGroupAnnotation> {
     public MtasXMLParserMappingGroupAnnotation() {
       super();
       this.position = SOURCE_ANCESTOR_GROUP;
@@ -951,7 +951,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private class MtasXMLParserMappingWord
-      extends MtasParserMapping<MtasXMLParserMappingWord> {
+    extends MtasParserMapping<MtasXMLParserMappingWord> {
 
     public MtasXMLParserMappingWord() {
       super();
@@ -968,7 +968,7 @@ abstract class MtasXMLParser extends MtasBasicParser {
   }
 
   private class MtasXMLParserMappingWordAnnotation
-      extends MtasParserMapping<MtasXMLParserMappingWordAnnotation> {
+    extends MtasParserMapping<MtasXMLParserMappingWordAnnotation> {
 
     public MtasXMLParserMappingWordAnnotation() {
       super();
