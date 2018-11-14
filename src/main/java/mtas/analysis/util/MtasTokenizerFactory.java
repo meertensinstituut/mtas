@@ -86,9 +86,11 @@ public class MtasTokenizerFactory extends TokenizerFactory
     if (loader == null) {
       throw new IllegalStateException("loader == null, inform not called?");
     }
+
     if (configFileArgument != null) {
-      return new MtasTokenizer(factory, loadCollectionConfig(null));
+      return new MtasTokenizer(factory, loadConfig(configFileArgument));
     }
+
     if (defaultCollection == null) {
       defaultCollection = defaultArgument;
     }
@@ -99,7 +101,18 @@ public class MtasTokenizerFactory extends TokenizerFactory
       collection = defaultCollection;
     }
 
-    return new MtasTokenizer(factory, Objects.requireNonNull(loadCollectionConfig(collection)));
+    Configuration config = null;
+    if (configArgument != null) {
+      String path = "mtasconf/" + collection + ".xml";
+      config = loadConfig(path);
+    }
+    if (analyzerArgument != null) {
+      Configuration subConfig = new Configuration("parser", null,
+        "name", analyzerArgument,
+        ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
+      config = new Configuration(subConfig);
+    }
+    return new MtasTokenizer(factory, Objects.requireNonNull(config));
   }
 
   @Override
@@ -110,31 +123,15 @@ public class MtasTokenizerFactory extends TokenizerFactory
   // Configurations are loaded on demand by create, since inform doesn't know the
   // collection name. It's impossible to load all configurations without knowing their
   // names, since ZooKeeper ResourceLoaders don't give access to directories.
-  // TODO: cache the results of this method.
-  private Configuration loadCollectionConfig(String collection) throws IOException {
-    if (configFileArgument != null) {
-      try {
-        return Configuration.read(loader.openResource(configFileArgument));
-      } catch (IOException | XMLStreamException e) {
-        throw new IOException("Problem loading configuration from " + configFileArgument, e);
-      }
+  // This doesn't matter for performance, since tokenizers are long-lived; looks like
+  // Solr/Lucene caches them.
+  private Configuration loadConfig(String path) {
+    try {
+      return Configuration.read(loader.openResource(path));
+    } catch (IOException e) {
+      throw new UncheckedIOException("Problem loading configuration from resource " + path, e);
+    } catch (XMLStreamException e) {
+      throw new RuntimeException("Problem loading configuration from resource " + path, e);
     }
-    if (configArgument != null) {
-      String path = "mtasconf/" + collection + ".xml";
-      try {
-        return Configuration.read(loader.openResource(path));
-      } catch (IOException | XMLStreamException e) {
-        throw new IOException("Problem loading configuration from resource " + path, e);
-      }
-    }
-    if (analyzerArgument != null) {
-      Configuration config = new Configuration();
-      Configuration subConfig = new Configuration("parser", null,
-        "name", analyzerArgument,
-        ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
-      config.addChild(subConfig);
-      return config;
-    }
-    throw new IllegalStateException("can't happen");
   }
 }

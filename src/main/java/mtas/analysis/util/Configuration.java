@@ -19,10 +19,22 @@ public class Configuration {
   private final List<Configuration> children = new ArrayList<>();
   private final Configuration parent;
 
-  Configuration() {
+  private Configuration() {
     this(null, null);
   }
 
+  /**
+   * Makes a Configuration with one child, sub.
+   */
+  Configuration(Configuration sub) {
+    this();
+    children.add(sub);
+  }
+
+  /**
+   * Makes a configuration with the given parent and attributes.
+   * attr must be a list of attribute names (even indices) and values (odd indices).
+   */
   Configuration(String name, Configuration parent, String... attr) {
     if (attr.length % 2 != 0) {
       throw new IllegalArgumentException("attr must be a list of key-value pairs");
@@ -105,10 +117,6 @@ public class Configuration {
    */
   public String getAttr(String name) {
     return attributes.get(name);
-  }
-
-  public void addChild(Configuration child) {
-    children.add(child);
   }
 
   public Configuration child(int i) {
