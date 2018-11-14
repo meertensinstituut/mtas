@@ -95,9 +95,7 @@ public class MtasSpanMatchNoneQuery extends MtasSpanQuery {
 
   @Override
   public String toString(String field) {
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(this.getClass().getSimpleName() + "([])");
-    return buffer.toString();
+    return this.getClass().getSimpleName() + "([])";
   }
 
   @Override
