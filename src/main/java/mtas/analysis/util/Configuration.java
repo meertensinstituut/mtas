@@ -19,37 +19,13 @@ public class Configuration {
   private final List<Configuration> children = new ArrayList<>();
   private final Configuration parent;
 
-  private Configuration() {
-    this(null, null);
-  }
-
-  /**
-   * Makes a Configuration with one child, sub.
-   */
-  Configuration(Configuration sub) {
-    this();
-    children.add(sub);
-  }
-
-  /**
-   * Makes a configuration with the given parent and attributes.
-   * attr must be a list of attribute names (even indices) and values (odd indices).
-   */
-  Configuration(String name, Configuration parent, String... attr) {
-    if (attr.length % 2 != 0) {
-      throw new IllegalArgumentException("attr must be a list of key-value pairs");
-    }
-    for (int i = 0; i < attr.length; i += 2) {
-      attributes.put(attr[i], attr[i + 1]);
-    }
-
+  private Configuration(String name, Configuration parent) {
     this.name = name;
     this.parent = parent;
   }
 
   public static Configuration read(InputStream reader) throws IOException, XMLStreamException {
     Configuration currentConfig = null;
-    // parse xml
     XMLInputFactory factory = XMLInputFactory.newInstance();
     XMLStreamReader streamReader = factory.createXMLStreamReader(reader);
     QName qname;
@@ -59,18 +35,17 @@ public class Configuration {
         switch (event) {
           case XMLStreamConstants.START_DOCUMENT:
             if (!streamReader.getCharacterEncodingScheme().equals("UTF-8")) {
-              throw new IOException("XML not UTF-8 encoded");
+              throw new IOException("XML not UTF-8 encoded"); // XXX why is this?
             }
             break;
           case XMLStreamConstants.END_DOCUMENT:
           case XMLStreamConstants.SPACE:
             break;
           case XMLStreamConstants.START_ELEMENT:
-            // get data
             qname = streamReader.getName();
             if (currentConfig == null) {
               if (qname.getLocalPart().equals("mtas")) {
-                currentConfig = new Configuration();
+                currentConfig = new Configuration(null, null);
               } else {
                 throw new IOException("no Mtas Configuration");
               }
@@ -137,22 +112,22 @@ public class Configuration {
 
   private String toString(int indent) {
     String text = "";
+
     if (name != null) {
       text += (indent > 0 ? String.format("%" + indent + "s", "") : "")
         + "name: " + name + "\n";
     }
-    if (attributes != null) {
-      for (Entry<String, String> entry : attributes.entrySet()) {
-        text += (indent > 0 ? String.format("%" + indent + "s", "") : "") + entry.getKey()
-          + ":" + entry.getValue() + "\n";
-      }
+
+    for (Entry<String, String> entry : attributes.entrySet()) {
+      text += (indent > 0 ? String.format("%" + indent + "s", "") : "") + entry.getKey()
+        + ":" + entry.getValue() + "\n";
     }
-    if (children != null) {
-      for (Configuration child : children) {
-        text += (indent > 0 ? String.format("%" + indent + "s", "") : "")
-          + child.toString(indent + 2);
-      }
+
+    for (Configuration child : children) {
+      text += (indent > 0 ? String.format("%" + indent + "s", "") : "")
+        + child.toString(indent + 2);
     }
+
     return text;
   }
 }

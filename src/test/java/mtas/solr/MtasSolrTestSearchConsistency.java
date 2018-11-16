@@ -93,7 +93,6 @@ public class MtasSolrTestSearchConsistency {
     Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source1.xml"));
     Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source2.xml"));
     Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source3.xml"));
-    // Files.copy(confSrc.resolve("mtas.xml"), confDst.resolve("mtas.xml"));
 
     Path coreProps = collTemp.resolve("core.properties");
     Files.write(coreProps, ("name=" + collectionName + "\n").getBytes());

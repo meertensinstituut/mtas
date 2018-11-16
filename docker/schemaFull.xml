@@ -31,7 +31,7 @@
   </fieldType>
   <fieldType name="mtas_config" class="solr.TextField" postingsFormat="MtasCodec">
     <analyzer type="index">
-      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml" />
+      <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" />
     </analyzer>
   </fieldType>
   <fieldType name="mtas" class="mtas.solr.schema.MtasPreAnalyzedField"

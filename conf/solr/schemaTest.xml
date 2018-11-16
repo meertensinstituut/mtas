@@ -119,7 +119,7 @@
     
     <fieldType name="mtas_text" class="solr.TextField" postingsFormat="MtasCodec">
       <analyzer type="index">
-        <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" config="mtas.xml"/>
+        <tokenizer class="mtas.analysis.util.MtasTokenizerFactory" />
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>

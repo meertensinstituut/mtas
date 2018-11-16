@@ -16,10 +16,7 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
 
-import javax.xml.stream.XMLStreamException;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,8 +28,6 @@ import java.util.Iterator;
  */
 public final class MtasTokenizer extends Tokenizer {
   private static final Log log = LogFactory.getLog(MtasTokenizer.class);
-
-  public static final String CONFIGURATION_MTAS = "mtas";
 
   public static final String CONFIGURATION_MTAS_INDEX = "index";
   public static final String CONFIGURATION_MTAS_INDEX_ATTRIBUTE = "index";
@@ -50,21 +45,13 @@ public final class MtasTokenizer extends Tokenizer {
   private String parserName = null;
   private Configuration parserConfiguration = null;
   private MtasTokenCollection tokenCollection;
-  private final CharTermAttribute termAtt = addAttribute(
-      CharTermAttribute.class);
+  private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
   private final OffsetAttribute offsetAtt = addAttribute(OffsetAttribute.class);
-  private final PayloadAttribute payloadAtt = addAttribute(
-      PayloadAttribute.class);
-  private final PositionIncrementAttribute positionIncrementAtt = addAttribute(
-      PositionIncrementAttribute.class);
+  private final PayloadAttribute payloadAtt = addAttribute(PayloadAttribute.class);
+  private final PositionIncrementAttribute positionIncrementAtt = addAttribute(PositionIncrementAttribute.class);
   private Iterator<MtasToken> tokenCollectionIterator;
 
-  public MtasTokenizer(final InputStream reader) throws IOException, XMLStreamException {
-    processConfiguration(Configuration.read(reader));
-  }
-
-  public MtasTokenizer(final AttributeFactory factory,
-                       final Configuration config) throws IOException {
+  public MtasTokenizer(final AttributeFactory factory, final Configuration config) throws IOException {
     super(factory);
     processConfiguration(config);
   }

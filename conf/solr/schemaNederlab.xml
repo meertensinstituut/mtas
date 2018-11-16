@@ -579,8 +579,7 @@
 	<fieldType name="mtas_text_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				config="mtas.xml" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory" />
 		</analyzer>
 	</fieldType>
 
@@ -600,8 +599,7 @@
 	<fieldType name="mtasSource_text_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				config="mtasSource.xml" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory" />
 		</analyzer>
 	</fieldType>
 

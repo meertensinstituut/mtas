@@ -99,8 +99,7 @@
 	<fieldType name="middelnederlands_mtas_example_config" class="solr.TextField"
 		postingsFormat="MtasCodec">
 		<analyzer type="index">
-			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory"
-				config="mtas.xml" />
+			<tokenizer class="mtas.analysis.util.MtasTokenizerFactory" />
 		</analyzer>
 	</fieldType>
 

@@ -20,38 +20,13 @@ import java.util.Objects;
 public class MtasTokenizerFactory extends TokenizerFactory
     implements ResourceLoaderAware {
   public static final String ARGUMENT_CONFIGFILE = "configFile";
-  public static final String ARGUMENT_CONFIG = "config";
-  public static final String ARGUMENT_PARSER = "parser";
-  public static final String ARGUMENT_PARSER_ARGS = "parserArgs";
 
-  private String configArgument;
   private String configFileArgument;
-  private String analyzerArgument;
-  private String analyzerArgumentParserArgs;
   private ResourceLoader loader;
 
   public MtasTokenizerFactory(Map<String, String> args) throws IOException {
     super(args);
     configFileArgument = get(args, ARGUMENT_CONFIGFILE);
-    configArgument = get(args, ARGUMENT_CONFIG);
-    analyzerArgument = get(args, ARGUMENT_PARSER);
-    analyzerArgumentParserArgs = get(args, ARGUMENT_PARSER_ARGS);
-    int numberOfArgs = 0;
-    numberOfArgs += (configFileArgument == null) ? 0 : 1;
-    numberOfArgs += (configArgument == null) ? 0 : 1;
-    numberOfArgs += (analyzerArgument == null) ? 0 : 1;
-    
-    if (numberOfArgs>1) {
-      throw new IOException(this.getClass().getName() + " can't have multiple of "
-          + ARGUMENT_CONFIGFILE + ", " + ARGUMENT_CONFIG+" AND "+ARGUMENT_PARSER);
-    } else if (numberOfArgs==0) {
-      throw new IOException(this.getClass().getName() + " should have "
-          + ARGUMENT_CONFIGFILE + " or " + ARGUMENT_CONFIG+" or "+ARGUMENT_PARSER);
-    }
-
-    if (configFileArgument == null && configArgument == null && analyzerArgument == null) {
-      throw new IOException("no configuration");
-    }
   }
 
   @Override
@@ -76,17 +51,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
       return new MtasTokenizer(factory, loadConfig(configFileArgument));
     }
 
-    Configuration config = null;
-    if (configArgument != null) {
-      String path = "mtasconf/" + collection + ".xml";
-      config = loadConfig(path);
-    }
-    if (analyzerArgument != null) {
-      Configuration subConfig = new Configuration("parser", null,
-        "name", analyzerArgument,
-        ARGUMENT_PARSER_ARGS, analyzerArgumentParserArgs);
-      config = new Configuration(subConfig);
-    }
+    Configuration config = loadConfig("mtasconf/" + collection + ".xml");
     return new MtasTokenizer(factory, Objects.requireNonNull(config));
   }
 
