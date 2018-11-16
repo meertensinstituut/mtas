@@ -68,7 +68,6 @@ public class MtasUpdateRequestProcessorFactory extends UpdateRequestProcessorFac
       // only for MtasPreAnalyzedField
       if (value instanceof MtasPreAnalyzedField) {
         MtasPreAnalyzedField mpaf = (MtasPreAnalyzedField) value;
-        config.fieldTypeDefaultConfiguration.put(key, mpaf.defaultConfiguration);
         config.fieldTypeConfigurationFromField.put(key, mpaf.configurationFromField);
         config.fieldTypeNumberOfTokensField.put(key, mpaf.setNumberOfTokens);
         config.fieldTypeNumberOfPositionsField.put(key, mpaf.setNumberOfPositions);
@@ -219,7 +218,6 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
         Reader reader = new StringReader(storedValue);
 
         String configuration = null;
-        String defaultConfiguration = config.fieldTypeDefaultConfiguration.get(fieldType);
         if (config.fieldTypeConfigurationFromField.get(fieldType) != null) {
           Object obj = doc.getFieldValue(config.fieldTypeConfigurationFromField.get(fieldType));
           if (obj != null) {
@@ -240,7 +238,7 @@ class MtasUpdateRequestProcessor extends UpdateRequestProcessor {
         Map<String, Integer> prefixes = new HashMap<>();
         String prefix;
         Integer prefixCount;
-        try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration, defaultConfiguration)) {
+        try (MtasTokenizer tokenizer = tokenizerFactory.create(configuration)) {
           tokenizer.setReader(sizeReader);
           tokenizer.reset();
 
@@ -346,7 +344,6 @@ class MtasUpdateRequestProcessorConfig {
   HashMap<String, CharFilterFactory[]> fieldTypeCharFilterFactories = new HashMap<>();
   HashMap<String, MtasTokenizerFactory> fieldTypeTokenizerFactory = new HashMap<>();
   HashMap<String, String> fieldMapping = new HashMap<>();
-  HashMap<String, String> fieldTypeDefaultConfiguration = new HashMap<>();
   HashMap<String, String> fieldTypeConfigurationFromField = new HashMap<>();
   HashMap<String, String> fieldTypeNumberOfTokensField = new HashMap<>();
   HashMap<String, String> fieldTypeNumberOfPositionsField = new HashMap<>();

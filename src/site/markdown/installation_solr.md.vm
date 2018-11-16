@@ -140,7 +140,7 @@ defined slightly differently:
   </analyzer>
 </fieldType>
 <fieldType name="mtas" class="mtas.solr.schema.MtasPreAnalyzedField"
-  followIndexAnalyzer="mtas_config" defaultConfiguration="default"
+  followIndexAnalyzer="mtas_config"
   configurationFromField="type" setNumberOfTokens="numberOfTokens"
   setNumberOfPositions="numberOfPositions" setSize="size"
   setError="error" setPrefix="prefixes" setPrefixNumbers="prefix_" postingsFormat="MtasCodec">
@@ -158,10 +158,8 @@ in the Solr core directory, e.g., `mtasconf/HuygensING-heinsius.xml`.
 
 The Mtas fieldType is defined with class *mtas.solr.schema.MtasPreAnalyzedField*, 
 an obligatory attribute `followIndexAnalyzer` referring to the additional fieldType
-we defined before. The optional attribute `defaultConfiguration` contains the name 
-of the default configuration to be used, and the obligatory attribute 
-`configurationFromField` contains the name of the field defining the required 
-configuration. 
+we defined before.  The obligatory attribute `configurationFromField` contains the name
+of the field defining the required configuration.
 
 The optional attributes `setNumberOfTokens`, `setNumberOfPositions`, `setSize`, `setPrefix` and 
 `setError` define fields that may be filled with respectively number of tokens, number of positions, 

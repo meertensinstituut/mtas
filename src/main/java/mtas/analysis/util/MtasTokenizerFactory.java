@@ -23,10 +23,8 @@ public class MtasTokenizerFactory extends TokenizerFactory
   public static final String ARGUMENT_CONFIG = "config";
   public static final String ARGUMENT_PARSER = "parser";
   public static final String ARGUMENT_PARSER_ARGS = "parserArgs";
-  public static final String ARGUMENT_DEFAULT = "default";
 
   private String configArgument;
-  private String defaultArgument;
   private String configFileArgument;
   private String analyzerArgument;
   private String analyzerArgumentParserArgs;
@@ -38,7 +36,6 @@ public class MtasTokenizerFactory extends TokenizerFactory
     configArgument = get(args, ARGUMENT_CONFIG);
     analyzerArgument = get(args, ARGUMENT_PARSER);
     analyzerArgumentParserArgs = get(args, ARGUMENT_PARSER_ARGS);
-    defaultArgument = get(args, ARGUMENT_DEFAULT);
     int numberOfArgs = 0;
     numberOfArgs += (configFileArgument == null) ? 0 : 1;
     numberOfArgs += (configArgument == null) ? 0 : 1;
@@ -47,9 +44,6 @@ public class MtasTokenizerFactory extends TokenizerFactory
     if (numberOfArgs>1) {
       throw new IOException(this.getClass().getName() + " can't have multiple of "
           + ARGUMENT_CONFIGFILE + ", " + ARGUMENT_CONFIG+" AND "+ARGUMENT_PARSER);
-    } else if (configArgument == null && defaultArgument != null) {
-      throw new IOException(this.getClass().getName() + " can't have "
-          + ARGUMENT_DEFAULT + " without " + ARGUMENT_CONFIG);
     } else if (numberOfArgs==0) {
       throw new IOException(this.getClass().getName() + " should have "
           + ARGUMENT_CONFIGFILE + " or " + ARGUMENT_CONFIG+" or "+ARGUMENT_PARSER);
@@ -72,33 +66,14 @@ public class MtasTokenizerFactory extends TokenizerFactory
   public MtasTokenizer create(String configuration) throws IOException {
     return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration);
   }
-  
-  public MtasTokenizer create(String configuration, String defaultConfiguration) throws IOException {
-    return create(TokenStream.DEFAULT_TOKEN_ATTRIBUTE_FACTORY, configuration, defaultConfiguration);
-  }
-  
-  public MtasTokenizer create(AttributeFactory factory, String configuration) throws IOException {
-    return create(factory, configuration, null);
-  }
 
-  public MtasTokenizer create(AttributeFactory factory, String collection, String defaultCollection)
-    throws IOException {
+  public MtasTokenizer create(AttributeFactory factory, String collection) throws IOException {
     if (loader == null) {
       throw new IllegalStateException("loader == null, inform not called?");
     }
 
     if (configFileArgument != null) {
       return new MtasTokenizer(factory, loadConfig(configFileArgument));
-    }
-
-    if (defaultCollection == null) {
-      defaultCollection = defaultArgument;
-    }
-    if (collection == null) {
-      if (defaultCollection == null) {
-        throw new IOException("no collection or default collection specified");
-      }
-      collection = defaultCollection;
     }
 
     Configuration config = null;

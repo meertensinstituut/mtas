@@ -105,7 +105,7 @@
 	</fieldType>
 
 	<fieldType name="middelnederlands_mtas" class="mtas.solr.schema.MtasPreAnalyzedField"
-		followIndexAnalyzer="middelnederlands_mtas_example_config" defaultConfiguration="default"
+		followIndexAnalyzer="middelnederlands_mtas_example_config"
 		configurationFromField="sourceCollection"
 		setNumberOfTokens="textNumberOfTokens"
 		setNumberOfPositions="textNumberOfPositions" setSize="textSize"

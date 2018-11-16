@@ -585,7 +585,7 @@
 	</fieldType>
 
 	<fieldType name="mtas_text" class="mtas.solr.schema.MtasPreAnalyzedField"
-		followIndexAnalyzer="mtas_text_example_config" defaultConfiguration="default"
+		followIndexAnalyzer="mtas_text_example_config"
 		configurationFromField="NLCore_NLAdministrative_sourceCollection"
 		setNumberOfTokens="NLContent_mtas_numberOfTokens"
 		setNumberOfPositions="NLContent_mtas_numberOfPositions" setSize="NLContent_mtas_size"

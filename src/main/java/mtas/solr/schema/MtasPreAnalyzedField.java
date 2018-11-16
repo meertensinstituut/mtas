@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class MtasPreAnalyzedField extends PreAnalyzedField {
   private final static String FOLLOW_INDEX_ANALYZER = "followIndexAnalyzer";
-  private final static String DEFAULT_CONFIGURATION = "defaultConfiguration";
   private final static String CONFIGURATION_FROM_FIELD = "configurationFromField";
   private final static String SET_NUMBER_OF_TOKENS = "setNumberOfTokens";
   private final static String SET_NUMBER_OF_POSITIONS = "setNumberOfPositions";
@@ -17,7 +16,6 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
   private final static String SET_PREFIX_NUMBERS = "setPrefixNumbers";
 
   public String followIndexAnalyzer = null;
-  public String defaultConfiguration = null;
   public String configurationFromField = null;
   public String setNumberOfTokens = null;
   public String setNumberOfPositions = null;
@@ -35,7 +33,6 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
   @Override
   protected void setArgs(IndexSchema schema, Map<String, String> args) {
     followIndexAnalyzer = args.get(FOLLOW_INDEX_ANALYZER);
-    defaultConfiguration = args.get(DEFAULT_CONFIGURATION);
     configurationFromField = args.get(CONFIGURATION_FROM_FIELD);
     setNumberOfTokens = args.get(SET_NUMBER_OF_TOKENS);
     setNumberOfPositions = args.get(SET_NUMBER_OF_POSITIONS);
@@ -48,7 +45,6 @@ public class MtasPreAnalyzedField extends PreAnalyzedField {
           + " for fieldType " + this.getTypeName());
     }
     args.remove(FOLLOW_INDEX_ANALYZER);
-    args.remove(DEFAULT_CONFIGURATION);
     args.remove(CONFIGURATION_FROM_FIELD);
     args.remove(SET_NUMBER_OF_TOKENS);
     args.remove(SET_NUMBER_OF_POSITIONS);

@@ -3,6 +3,5 @@
 * In documentatie het concept collectie uitleggen en consequent gebruiken
   (zijn de collecties in search_component_collection.md de collecties in
   mtas.xml?)
-* Kan defaultConfiguration weg?
 * Upload versnellen: metadata (JSON) en content (XML) als twee onderdelen
   van een request opsturen (als form?)

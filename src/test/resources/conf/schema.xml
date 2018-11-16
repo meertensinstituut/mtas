@@ -48,7 +48,7 @@
 	</fieldType>
 
 	<fieldType name="mtas_preAnalyzed" class="mtas.solr.schema.MtasPreAnalyzedField"
-		followIndexAnalyzer="mtas_example" defaultConfiguration="default"
+		followIndexAnalyzer="mtas_example"
 		configurationFromField="source" setNumberOfTokens="numberOfTokens"
 		setNumberOfPositions="numberOfPositions" setSize="size" setError="error"
 		setPrefix="prefix" postingsFormat="MtasCodec">
