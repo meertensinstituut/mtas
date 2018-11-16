@@ -88,8 +88,8 @@ public class MtasSolrTestSearchConsistency {
     // For the case configFile="folia.xml"
     Files.copy(confSrc.resolve("folia.xml"), confDst.resolve("folia.xml"));
 
-    // For case without configFile: mtasconf directory
-    Path mtasconf = Files.createDirectory(confDst.resolve("mtasconf"));
+    // For case without configFile: mtas directory
+    Path mtasconf = Files.createDirectory(confDst.resolve("mtas"));
     Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source1.xml"));
     Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source2.xml"));
     Files.copy(confSrc.resolve("folia.xml"), mtasconf.resolve("source3.xml"));

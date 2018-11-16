@@ -51,7 +51,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
       return new MtasTokenizer(factory, loadConfig(configFileArgument));
     }
 
-    Configuration config = loadConfig("mtasconf/" + collection + ".xml");
+    Configuration config = loadConfig("mtas/" + collection + ".xml");
     return new MtasTokenizer(factory, Objects.requireNonNull(config));
   }
 

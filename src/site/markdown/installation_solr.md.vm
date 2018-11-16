@@ -153,8 +153,8 @@ defined slightly differently:
 
 An additional fieldType (here named mtas_config) is defined, containing 
 only an index analyzer. The tokenizer within this analyzer has no attributes.
-The configuration file for the tokenizer is the file mtasconf/<collection_name>.xml
-in the Solr core directory, e.g., `mtasconf/HuygensING-heinsius.xml`.
+The configuration file for the tokenizer is the file conf/mtas/<collection_name>.xml
+in the Solr core directory, e.g., `conf/mtas/HuygensING-heinsius.xml`.
 
 The Mtas fieldType is defined with class *mtas.solr.schema.MtasPreAnalyzedField*, 
 an obligatory attribute `followIndexAnalyzer` referring to the additional fieldType
