@@ -23,7 +23,9 @@ Mtas can be used as plugin for Apache Solr
 - Installed [Apache Solr](https://lucene.apache.org/solr/)
 - Currently supported and advised version is ${majorversion}.${minorversion}.${incrementalversion}
 
-Start with a new Solr core.
+Start with a new Solr core. **Make sure** the `solrconfig.xml` and `schema.xml` files
+live in a `conf/` subdirectory of the core's directory; at least Solr 7.3.0 will report
+the wrong path if they live elsewhere, and the broker will be broken.
 
 **Libraries**
 
@@ -32,7 +34,7 @@ A prebuilt `mtas-${fullversion}.jar` is available from the [download](download.h
 
 Furthermore, add the [Apache Commons Mathematics Library](http://commons.apache.org/proper/commons-math/) to the `lib` directory of the new Solr core.
 
-**Solrconfig.xml**
+**conf/solrconfig.xml**
 
 Some changes have to be made within the `solrconfig.xml` file, elements have to be added to the `<config/>` or existing elements have te be adjusted:
 
@@ -96,7 +98,7 @@ managed-schema. So the configuration must contain:
 <schemaFactory class="ClassicIndexSchemaFactory"/>
 ```    
   
-**Schema.xml**
+**conf/schema.xml**
 
 We extend a (classic) schema with one (or multiple) fields that may contain 
 annotated text, e.g.
