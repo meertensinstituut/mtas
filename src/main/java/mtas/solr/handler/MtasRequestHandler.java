@@ -1,5 +1,8 @@
 package mtas.solr.handler;
 
+import mtas.analysis.MtasTokenizer;
+import mtas.analysis.util.MtasFetchData;
+import mtas.analysis.util.MtasParserException;
 import mtas.solr.handler.component.MtasSolrSearchComponent;
 import mtas.solr.handler.component.util.MtasSolrComponentStatus;
 import mtas.solr.handler.util.MtasSolrHistoryList;
@@ -15,22 +18,28 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
+import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.handler.RequestHandlerBase;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
+import org.noggit.JSONParser;
+import org.noggit.ObjectBuilder;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
  * Request handler that serves various bits of information about the mtas configuration.
+ * This is used by the broker.
  */
 public class MtasRequestHandler extends RequestHandlerBase {
   private static Log log = LogFactory.getLog(MtasRequestHandler.class);
@@ -38,6 +47,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
   public static final String MESSAGE_ERROR = "error";
   public static final String ACTION_CONFIG_FILES = "files";
   public static final String ACTION_CONFIG_FILE = "file";
+  public static final String ACTION_MAPPING = "mapping";
   public static final String ACTION_RUNNING = "running";
   public static final String ACTION_HISTORY = "history";
   public static final String ACTION_ERROR = "error";
@@ -48,6 +58,9 @@ public class MtasRequestHandler extends RequestHandlerBase {
   public static final String PARAM_ABORT = "abort";
   public static final String PARAM_SHARDREQUESTS = "shardRequests";
   public static final String PARAM_CONFIG_FILE = "file";
+  public static final String PARAM_MAPPING_CONFIGURATION = "configuration";
+  public static final String PARAM_MAPPING_DOCUMENT = "document";
+  public static final String PARAM_MAPPING_DOCUMENT_URL = "url";
 
   private MtasSolrRunningList running;
   private MtasSolrHistoryList history;
@@ -77,6 +90,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     if (action == null) {
       return;
     }
+
     // generate list of files
     switch (action) {
       case ACTION_CONFIG_FILES:
@@ -97,6 +111,50 @@ public class MtasRequestHandler extends RequestHandlerBase {
           }
         }
         // test mapping
+        break;
+      case ACTION_MAPPING: // dry run
+        String configuration = null;
+        String document = null;
+        String documentUrl = null;
+        if (req.getContentStreams() != null) {
+          Iterator<ContentStream> it = req.getContentStreams().iterator();
+          if (it.hasNext()) {
+            ContentStream cs = it.next();
+            Map<String, String> params = new HashMap<>();
+            getParamsFromJSON(params, IOUtils.toString(cs.getReader()));
+            configuration = params.get(PARAM_MAPPING_CONFIGURATION);
+            document = params.get(PARAM_MAPPING_DOCUMENT);
+            documentUrl = params.get(PARAM_MAPPING_DOCUMENT_URL);
+          }
+        } else {
+          configuration = req.getParams().get(PARAM_MAPPING_CONFIGURATION);
+          document = req.getParams().get(PARAM_MAPPING_DOCUMENT);
+          documentUrl = req.getParams().get(PARAM_MAPPING_DOCUMENT_URL);
+        }
+        if (configuration != null && documentUrl != null) {
+          InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
+          try (MtasTokenizer tokenizer = new MtasTokenizer(stream)) {
+            MtasFetchData fetchData = new MtasFetchData(new StringReader(documentUrl));
+            rsp.add(ACTION_MAPPING, tokenizer.getList(fetchData.getUrl(null, null)));
+            tokenizer.close();
+          } catch (IOException | MtasParserException e) {
+            log.info(e);
+            rsp.add(MESSAGE_ERROR, e.getMessage());
+          } finally {
+            stream.close();
+          }
+        } else if (configuration != null && document != null) {
+          InputStream stream = IOUtils.toInputStream(configuration, StandardCharsets.UTF_8);
+          try (MtasTokenizer tokenizer = new MtasTokenizer(stream)) {
+            rsp.add(ACTION_MAPPING, tokenizer.getList(new StringReader(document)));
+            tokenizer.close();
+          } catch (IOException e) {
+            log.info(e);
+            rsp.add(MESSAGE_ERROR, e.getMessage());
+          } finally {
+            stream.close();
+          }
+        }
         break;
       case ACTION_RUNNING:
       case ACTION_HISTORY:
@@ -123,9 +181,8 @@ public class MtasRequestHandler extends RequestHandlerBase {
       case ACTION_STATUS:
         String key = req.getParams().get(PARAM_KEY, null);
         String abort = req.getParams().get(PARAM_ABORT, null);
-        MtasSolrStatus solrStatus;
-        if ((solrStatus = history.get(key)) != null
-          || (solrStatus = running.get(key)) != null
+        MtasSolrStatus solrStatus = null;
+        if ((solrStatus = history.get(key)) != null || (solrStatus = running.get(key)) != null
           || (solrStatus = error.get(key)) != null) {
           if (abort != null && !solrStatus.finished()) {
             solrStatus.setError(abort);
@@ -160,6 +217,37 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return "Mtas Request Handler";
   }
 
+  @SuppressWarnings("unchecked")
+  private static void getParamsFromJSON(Map<String, String> params, String json) {
+    JSONParser parser = new JSONParser(json);
+    try {
+      Object o = ObjectBuilder.getVal(parser);
+      if (!(o instanceof Map)) {
+        return;
+      }
+      Map<String, Object> map = (Map<String, Object>) o;
+      // To make consistent with json.param handling, we should make query
+      // params come after json params (i.e. query params should
+      // appear to overwrite json params.
+
+      // Solr params are based on String though, so we need to convert
+      for (Map.Entry<String, Object> entry : map.entrySet()) {
+        String key = entry.getKey();
+        Object val = entry.getValue();
+        if (params.get(key) != null) {
+          continue;
+        }
+        if (val == null) {
+          params.remove(key);
+        } else if (val instanceof String) {
+          params.put(key, (String) val);
+        }
+      }
+    } catch (Exception e) {
+      log.debug("ignore parse exceptions at this stage, they may be caused by incomplete macro expansions", e);
+    }
+  }
+
   public void registerStatus(MtasSolrStatus item) throws IOException {
     history.add(item);
     running.add(item);
@@ -170,6 +258,10 @@ public class MtasRequestHandler extends RequestHandlerBase {
     if (item.error()) {
       error.add(item);
     }
+  }
+
+  public void checkKey(String key) throws IOException {
+    history.updateKey(key);
   }
 
   public ShardInformation getShardInformation(String shard) {
@@ -190,31 +282,31 @@ public class MtasRequestHandler extends RequestHandlerBase {
     solrParams.add(MtasSolrSearchComponent.PARAM_MTAS, CommonParams.TRUE);
     solrParams.add(MtasSolrComponentStatus.PARAM_MTAS_STATUS, CommonParams.TRUE);
     solrParams.add(
-        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER,
-        CommonParams.TRUE);
+      MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER,
+      CommonParams.TRUE);
     solrParams.add(
-        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS,
-        CommonParams.TRUE);
+      MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS,
+      CommonParams.TRUE);
     solrParams.add(
-        MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS,
-        CommonParams.TRUE);
+      MtasSolrComponentStatus.PARAM_MTAS_STATUS + "." + MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS,
+      CommonParams.TRUE);
     SolrClient solrClient = new HttpSolrClient.Builder(shard).build();
-    try {  
+    try {
       QueryResponse response = solrClient.query(solrParams);
       Object mtasHandlerObject = Objects.requireNonNull(
-          response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-              MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER),
-          "no number of segments for " + shard);
+        response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          MtasSolrComponentStatus.NAME_MTAS_STATUS_MTASHANDLER),
+        "no number of segments for " + shard);
       Object numberOfSegmentsObject = Objects.requireNonNull(
-          response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-              MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS),
-          "no number of documents for " + shard);
+        response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFSEGMENTS),
+        "no number of documents for " + shard);
       Object numberOfDocumentsObject = Objects.requireNonNull(
-          response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
-              MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS),
-          "no name for " + shard);
+        response.getResponse().findRecursive(MtasSolrSearchComponent.NAME, MtasSolrComponentStatus.NAME,
+          MtasSolrComponentStatus.NAME_MTAS_STATUS_NUMBEROFDOCUMENTS),
+        "no name for " + shard);
       Object nameObject = Objects.requireNonNull(response.getResponse().findRecursive(MtasSolrSearchComponent.NAME,
-          MtasSolrComponentStatus.NAME, ShardInformation.NAME_NAME), "no handler for " + shard);
+        MtasSolrComponentStatus.NAME, ShardInformation.NAME_NAME), "no handler for " + shard);
       if (mtasHandlerObject instanceof String) {
         shardInformation.mtasHandler = (String) mtasHandlerObject;
       }
@@ -243,7 +335,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
     return shardInformation;
   }
 
-  private class StatusController extends Thread {
+  public class StatusController extends Thread {
     @Override
     public void run() {
       List<MtasSolrStatus> statusWithException;
@@ -272,7 +364,7 @@ public class MtasRequestHandler extends RequestHandlerBase {
 
     private String location;
 
-    ShardInformation(String location) {
+    public ShardInformation(String location) {
       this.location = location;
     }
 

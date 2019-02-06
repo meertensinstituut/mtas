@@ -3,8 +3,8 @@ package mtas.analysis;
 import mtas.analysis.parser.MtasParser;
 import mtas.analysis.token.MtasToken;
 import mtas.analysis.token.MtasTokenCollection;
-import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.Configuration;
+import mtas.analysis.util.MtasConfigException;
 import mtas.analysis.util.MtasParserException;
 import mtas.codec.payload.MtasPayloadEncoder;
 import org.apache.commons.logging.Log;
@@ -16,7 +16,10 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.util.AttributeFactory;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -50,6 +53,10 @@ public final class MtasTokenizer extends Tokenizer {
   private final PayloadAttribute payloadAtt = addAttribute(PayloadAttribute.class);
   private final PositionIncrementAttribute positionIncrementAtt = addAttribute(PositionIncrementAttribute.class);
   private Iterator<MtasToken> tokenCollectionIterator;
+
+  public MtasTokenizer(final InputStream reader) throws IOException, XMLStreamException {
+    processConfiguration(Configuration.read(reader));
+  }
 
   public MtasTokenizer(final AttributeFactory factory, final Configuration config) throws IOException {
     super(factory);
