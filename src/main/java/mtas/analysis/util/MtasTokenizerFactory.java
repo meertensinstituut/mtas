@@ -1,6 +1,8 @@
 package mtas.analysis.util;
 
 import mtas.analysis.MtasTokenizer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
@@ -19,6 +21,8 @@ import java.util.Objects;
  */
 public class MtasTokenizerFactory extends TokenizerFactory
     implements ResourceLoaderAware {
+  private static final Log log = LogFactory.getLog(MtasTokenizerFactory.class);
+
   public static final String ARGUMENT_CONFIGFILE = "configFile";
 
   private String configFileArgument;
@@ -66,6 +70,7 @@ public class MtasTokenizerFactory extends TokenizerFactory
   // This doesn't matter for performance, since tokenizers are long-lived; looks like
   // Solr/Lucene caches them.
   private Configuration loadConfig(String path) {
+    log.info(String.format("loading config file %s", path));
     try {
       return Configuration.read(loader.openResource(path));
     } catch (IOException e) {

@@ -34,8 +34,8 @@ public class Configuration {
       while (true) {
         switch (event) {
           case XMLStreamConstants.START_DOCUMENT:
-            if (!streamReader.getCharacterEncodingScheme().equals("UTF-8")) {
-              throw new IOException("XML not UTF-8 encoded"); // XXX why is this?
+            if (!"UTF-8".equals(streamReader.getCharacterEncodingScheme())) {
+              throw new IOException("configuration file must declare UTF-8 encoding"); // XXX why is this?
             }
             break;
           case XMLStreamConstants.END_DOCUMENT:
