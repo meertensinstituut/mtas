@@ -3,7 +3,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<currentLuceneVersion>7.4.0</currentLuceneVersion>
+		<currentLuceneVersion>8.4.1</currentLuceneVersion>
 	</properties>
 	<scm>
 		<connection>scm:git:https://github.com/textexploration/mtas.git</connection>
